@@ -20,13 +20,16 @@
 #include "cave.h"
 #include "caveobject.h"
 #include "caveengine.h"
+#include "cavesound.h"
+#include "cavedb.h"
 #include "caveset.h"
+#include "c64import.h"
 #include "settings.h"
 #include "util.h"
-#include "game.h"
-#include "sdl_gfx.h"
+#include "gameplay.h"
+#include "sdlgfx.h"
+#include "sdlui.h"
 #include "sound.h"
-#include "sdl_ui.h"
 #include "about.h"
 
 /* for main menu */
@@ -73,12 +76,12 @@ showheader_uncover()
 	showheader_new();
 	if (gd_show_name_of_game) {
 		/* if showing the name of the cave... */
-		gd_blittext_n(gd_screen, -1, statusbar_y1, GD_C64_WHITE, gd_default_cave->name);
+		gd_blittext_n(gd_screen, -1, statusbar_y1, GD_C64_WHITE, gd_caveset_data->name);
 		cavename_y=statusbar_y2;	/* show cave name in the second line */
 	} else
 		/* otherwise, cave name in the middle. */
 		cavename_y=statusbar_mid;
-	gd_blittext_printf_n(gd_screen, -1, cavename_y, GD_C64_WHITE, "%d%c, %s/%d", game.player_lives, GD_PLAYER_CHAR, game.cave->name, game.cave->rendered);
+	gd_blittext_printf_n(gd_screen, -1, cavename_y, GD_C64_WHITE, "%d%c, %s/%d", gd_gameplay.player_lives, GD_PLAYER_CHAR, gd_gameplay.cave->name, gd_gameplay.cave->rendered);
 }
 
 static void
@@ -119,43 +122,49 @@ showheader_game()
 		/* ALTERNATIVE STATUS BAR BY PRESSING SHIFT */
 		x=14*gd_scale;
 		
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%c%02d", GD_PLAYER_CHAR, game.player_lives);
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%c%02d", GD_PLAYER_CHAR, gd_gameplay.player_lives);
 		x+=24*gd_scale;
 		/* color numbers are not the same as key numbers! c3->k1, c2->k2, c1->k3 */
 		/* this is how it was implemented in crdr7. */
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, game.cave->color3, "%c%02d", GD_KEY_CHAR, game.cave->key1);
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, gd_gameplay.cave->color3, "%c%02d", GD_KEY_CHAR, gd_gameplay.cave->key1);
 		x+=10*gd_scale;
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, game.cave->color2, "%c%02d", GD_KEY_CHAR, game.cave->key2);
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, gd_gameplay.cave->color2, "%c%02d", GD_KEY_CHAR, gd_gameplay.cave->key2);
 		x+=10*gd_scale;
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, game.cave->color1, "%c%02d", GD_KEY_CHAR, game.cave->key3);
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, gd_gameplay.cave->color1, "%c%02d", GD_KEY_CHAR, gd_gameplay.cave->key3);
 		x+=24*gd_scale;
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%02d", game.cave->gravity_will_change/game.cave->timing_factor);
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%02d", gd_cave_time_show(gd_gameplay.cave, gd_gameplay.cave->gravity_will_change));
 	} else {
 		/* NORMAL STATUS BAR */
 		x=0;
+		int time_secs;
+
+		/* cave time is rounded _UP_ to seconds. so at the exact moment when it changes from
+		   2sec remaining to 1sec remaining, the player has exactly one second. when it changes
+		   to zero, it is the exact moment of timeout. */
+		time_secs=gd_cave_time_show(gd_gameplay.cave, gd_gameplay.cave->time);
 
 		if (gd_keystate[SDLK_f]) {
 			/* fast forward mode - show "FAST" */
 			x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_YELLOW, "%cFAST%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
 		} else {
 			/* normal speed mode - show diamonds needed and value */
-			if (game.cave->diamonds_needed>game.cave->diamonds_collected) {
-				if (game.cave->diamonds_needed>0)
-					x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_RED, "%03d", game.cave->diamonds_needed);
+			if (gd_gameplay.cave->diamonds_needed>gd_gameplay.cave->diamonds_collected) {
+				if (gd_gameplay.cave->diamonds_needed>0)
+					x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_RED, "%03d", gd_gameplay.cave->diamonds_needed);
 				else
 					/* did not already count diamonds needed */
 					x=gd_blittext(gd_screen, x, statusbar_mid, GD_C64_RED, "???");
 			}
 			else
 				x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, " %c%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
-			x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%c%02d", GD_DIAMOND_CHAR, game.cave->diamond_value);
+			x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%c%02d", GD_DIAMOND_CHAR, gd_gameplay.cave->diamond_value);
 		}
 		x+=10*gd_scale;
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_GREEN, "%03d", game.cave->diamonds_collected);
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_GREEN, "%03d", gd_gameplay.cave->diamonds_collected);
 		x+=10*gd_scale;
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%03d", game.cave->time/game.cave->timing_factor);
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%03d", time_secs);
 		x+=10*gd_scale;
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%06d", game.player_score);
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%06d", gd_gameplay.player_score);
 	}
 }
 
@@ -213,7 +222,7 @@ play_game(int start_cave, int start_level)
 		if (!success)
 			break;
 
-		gd_select_pixbuf_colors(game.cave->color0, game.cave->color1, game.cave->color2, game.cave->color3, game.cave->color4, game.cave->color5);
+		gd_select_pixbuf_colors(gd_gameplay.cave->color0, gd_gameplay.cave->color1, gd_gameplay.cave->color2, gd_gameplay.cave->color3, gd_gameplay.cave->color4, gd_gameplay.cave->color5);
 		gd_scroll_to_origin();
 		SDL_FillRect(gd_screen, NULL, SDL_MapRGB(gd_screen->format, 0, 0, 0));	/* fill whole gd_screen with black */
 
@@ -278,18 +287,18 @@ play_game(int start_cave, int start_level)
 			}
 			
 			/* CAVE ITERATE ********************************************************************* */
-			while (iterate && SDL_GetTicks()>=last_iterate+game.cave->speed/speed_div) {
-				if (!paused && !game.out_of_window) {
-					PLAYER_STATE pl;
+			while (iterate && SDL_GetTicks()>=last_iterate+gd_gameplay.cave->speed/speed_div) {
+				if (!paused && !gd_gameplay.out_of_window) {
+					GdPlayerState pl;
 					GdDirection player_move;
 					
 					/* returns true if cave is finished. if false, we will continue */
 					player_move=gd_direction_from_keypress(gd_up(), gd_down(), gd_left(), gd_right());
-					pl=game.cave->player_state;
+					pl=gd_gameplay.cave->player_state;
 
 					iterate=!gd_game_iterate_cave(player_move, gd_fire(), suicide, gd_keystate[SDLK_ESCAPE]);
 
-					if (pl!=PL_TIMEOUT && game.cave->player_state==PL_TIMEOUT)
+					if (pl!=GD_PL_TIMEOUT && gd_gameplay.cave->player_state==GD_PL_TIMEOUT)
 						/* cave did timeout at this moment */
 						outoftime_since=SDL_GetTicks();
 				}
@@ -302,7 +311,7 @@ play_game(int start_cave, int start_level)
 				suicide=FALSE;
 				
 				/* we do not do last_iterate=getticks, as do not want to miss iterate cycles */
-				last_iterate+=game.cave->speed/speed_div;
+				last_iterate+=gd_gameplay.cave->speed/speed_div;
 			}
 			
 			/* CAVE DRAWING, BONUS POINTS, ... ********************************************************************* */
@@ -337,35 +346,35 @@ play_game(int start_cave, int start_level)
 				}
 
 				/* draw cave to gd_screen */
-				gd_drawcave(gd_screen, game.cave, game.gfx_buffer);
+				gd_drawcave(gd_screen, gd_gameplay.cave, gd_gameplay.gfx_buffer);
 
 				/* draw status bar */
-				if (game.player_lives==0)
+				if (gd_gameplay.player_lives==0)
 					showheader_gameover();
 				else
-				switch(game.cave->player_state) {
-					case PL_TIMEOUT:
+				switch(gd_gameplay.cave->player_state) {
+					case GD_PL_TIMEOUT:
 						if ((SDL_GetTicks()-outoftime_since)/1000%4==0)
 							showheader_timeout();
 						else
 							showheader_game();
 						break;
-					case PL_LIVING:
-					case PL_DIED:
+					case GD_PL_LIVING:
+					case GD_PL_DIED:
 						if (paused && (SDL_GetTicks()-paused_since)/1000%4==0)
 							showheader_pause();
 						else
 							showheader_game();
 						break;
 						
-					case PL_NOT_YET:
+					case GD_PL_NOT_YET:
 						if (paused && (SDL_GetTicks()-paused_since)/1000%4==0)
 							showheader_pause();
 						else
 							showheader_uncover();
 						break;
 						
-					case PL_EXITED:
+					case GD_PL_EXITED:
 						showheader_game();
 						break;
 				}
@@ -381,16 +390,16 @@ play_game(int start_cave, int start_level)
 	gd_stop_game();
 
 	/* (if stopped because of a quit event, do not bother highscore at all) */
-	if (!gd_quit && show_highscore && gd_cave_is_highscore(gd_default_cave, game.player_score)) {
+	if (!gd_quit && show_highscore && gd_is_highscore(gd_caveset_data->highscore, gd_gameplay.player_score)) {
 		GdHighScore hs;
 		int rank;
 
 		/* enter to highscore table */
-		g_strlcpy(hs.name, game.player_name, sizeof(hs.name));
-		hs.score=game.player_score;
+		gd_strcpy(hs.name, gd_gameplay.player_name);
+		hs.score=gd_gameplay.player_score;
 		
-		rank=gd_cave_add_highscore(gd_default_cave, hs);
-		gd_show_highscore(gd_default_cave, rank);
+		rank=gd_add_highscore(gd_caveset_data->highscore, hs);
+		gd_show_highscore(NULL, rank);
 	}
 	else {
 		/* no high score */
@@ -453,7 +462,7 @@ main_menu()
 
 	y=gd_screen->h-3*gd_line_height();
 	x=gd_blittext_n(gd_screen, 0, y, GD_C64_WHITE, "GAME: ");
-	x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, gd_default_cave->name);
+	x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, gd_caveset_data->name);
 
 	gd_status_line("CRSR: SELECT   RETURN: PLAY   H: HELP");
 	
@@ -662,6 +671,7 @@ int main(int argc, char *argv[])
 	if (gd_param_license) {
 		char *wrapped=gd_wrap_text(gd_about_license, 72);
 		
+		/* print license and quit. */
 		g_print("%s", wrapped);
 		g_free(wrapped);
 		return 0;
@@ -672,6 +682,9 @@ int main(int argc, char *argv[])
 	gd_install_log_handler();
 
 	gd_cave_init();
+	gd_cave_db_init();
+	gd_cave_sound_db_init();
+	gd_c64_import_init_tables();
 	
 	gd_load_settings();
 
@@ -679,7 +692,7 @@ int main(int argc, char *argv[])
 
 	gd_clear_error_flag();
 
-	game.wait_before_game_over=TRUE;
+	gd_gameplay.wait_before_game_over=TRUE;
 	
 	/* LOAD A CAVESET FROM A FILE, OR AN INTERNAL ONE */
 	/* if remaining arguments, they are filenames */

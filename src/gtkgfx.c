@@ -17,10 +17,12 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
+#include "gfxutil.h"
 #include "cave.h"
+#include "cavedb.h"
 #include "caveset.h"
 #include "caveobject.h"
-#include "gtk_gfx.h"
+#include "gtkgfx.h"
 #include "c64_gfx.h"	/* char c64_gfx[] with (almost) original graphics */
 #include "settings.h"
 #include "util.h"
@@ -53,55 +55,16 @@ void gd_create_pixbuf_for_builtin_gfx()
 static GdkPixbuf *
 scale2x(GdkPixbuf *src)
 {
-	const int width = gdk_pixbuf_get_width(src);
-	const int height = gdk_pixbuf_get_height(src);
-	int y, x;
-	int srcpitch;
-	int dstpitch;
-
-	guint8* srcpix;
-	guint8* dstpix;
-   	guint32 E0, E1, E2, E3, B, D, E, F, H;
-
    	GdkPixbuf *dst;
    	
    	g_assert(gdk_pixbuf_get_colorspace(src)==GDK_COLORSPACE_RGB);
    	g_assert(gdk_pixbuf_get_has_alpha(src));
    	g_assert(gdk_pixbuf_get_n_channels(src)==4);
+   	g_assert(gdk_pixbuf_get_bits_per_sample(src)==8);
 
 	dst=gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 2*gdk_pixbuf_get_width(src), 2*gdk_pixbuf_get_height(src));
-	
-	srcpitch=gdk_pixbuf_get_rowstride(src);
-	dstpitch=gdk_pixbuf_get_rowstride(dst);
-	srcpix=gdk_pixbuf_get_pixels(src);
-	dstpix=gdk_pixbuf_get_pixels(dst);
-   	
-	for (y=0; y<height; ++y) {
-		for (x=0; x<width; ++ x) {
-			B = *(guint32*)(srcpix + (MAX(0,y-1)*srcpitch) + (4*x));
-			D = *(guint32*)(srcpix + (y*srcpitch) + (4*MAX(0,x-1)));
-			E = *(guint32*)(srcpix + (y*srcpitch) + (4*x));
-			F = *(guint32*)(srcpix + (y*srcpitch) + (4*MIN(width-1,x+1)));
-			H = *(guint32*)(srcpix + (MIN(height-1,y+1)*srcpitch) + (4*x));
 
-			if (B != H && D != F) {
-				E0 = D == B ? D : E;
-				E1 = B == F ? F : E;
-				E2 = D == H ? D : E;
-				E3 = H == F ? F : E;
-			} else {
-				E0 = E;
-				E1 = E;
-				E2 = E;
-				E3 = E;
-			}
-
-			*(guint32*)(dstpix + y*2*dstpitch + x*2*4) = E0;
-			*(guint32*)(dstpix + y*2*dstpitch + (x*2+1)*4) = E1;
-			*(guint32*)(dstpix + (y*2+1)*dstpitch + x*2*4) = E2;
-			*(guint32*)(dstpix + (y*2+1)*dstpitch + (x*2+1)*4) = E3;
-		}
-	}
+	gd_scale2x(gdk_pixbuf_get_pixels(src), gdk_pixbuf_get_width(src), gdk_pixbuf_get_height(src), gdk_pixbuf_get_rowstride(src), gdk_pixbuf_get_pixels(dst), gdk_pixbuf_get_rowstride(dst));
 	
 	return dst;
 }
@@ -109,74 +72,16 @@ scale2x(GdkPixbuf *src)
 static GdkPixbuf *
 scale3x(GdkPixbuf *src)
 {
-	const int width = gdk_pixbuf_get_width(src);
-	const int height = gdk_pixbuf_get_height(src);
-	int y, x;
-	int srcpitch;
-	int dstpitch;
-
-	guint8* srcpix;
-	guint8* dstpix;
-   	guint32 E0, E1, E2, E3, E4, E5, E6, E7, E8, A, B, C, D, E, F, G, H, I;
-
    	GdkPixbuf *dst;
    	
    	g_assert(gdk_pixbuf_get_colorspace(src)==GDK_COLORSPACE_RGB);
    	g_assert(gdk_pixbuf_get_has_alpha(src));
    	g_assert(gdk_pixbuf_get_n_channels(src)==4);
+   	g_assert(gdk_pixbuf_get_bits_per_sample(src)==8);
 
 	dst=gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 3*gdk_pixbuf_get_width(src), 3*gdk_pixbuf_get_height(src));
-	
-	srcpitch=gdk_pixbuf_get_rowstride(src);
-	dstpitch=gdk_pixbuf_get_rowstride(dst);
-	srcpix=gdk_pixbuf_get_pixels(src);
-	dstpix=gdk_pixbuf_get_pixels(dst);
-   	
-	for (y=0; y<height; ++y) {
-		for (x=0; x<width; ++ x) {
-			A = *(guint32*)(srcpix + (MAX(0,y-1)*srcpitch) + (4*MAX(0,x-1)));
-			B = *(guint32*)(srcpix + (MAX(0,y-1)*srcpitch) + (4*x));
-			C = *(guint32*)(srcpix + (MAX(0,y-1)*srcpitch) + (4*MIN(width-1,x+1)));
-			D = *(guint32*)(srcpix + (y*srcpitch) + (4*MAX(0,x-1)));
-			E = *(guint32*)(srcpix + (y*srcpitch) + (4*x));
-			F = *(guint32*)(srcpix + (y*srcpitch) + (4*MIN(width-1,x+1)));
-			G = *(guint32*)(srcpix + (MIN(height-1,y+1)*srcpitch) + (4*MAX(0,x-1)));
-			H = *(guint32*)(srcpix + (MIN(height-1,y+1)*srcpitch) + (4*x));
-			I = *(guint32*)(srcpix + (MIN(height-1,y+1)*srcpitch) + (4*MIN(width-1,x+1)));
-			
-			if (B != H && D != F) {
-				E0 = D == B ? D : E;
-				E1 = (D == B && E != C) || (B == F && E != A) ? B : E;
-				E2 = B == F ? F : E;
-				E3 = (D == B && E != G) || (D == H && E != A) ? D : E;
-				E4 = E;
-				E5 = (B == F && E != I) || (H == F && E != C) ? F : E;
-				E6 = D == H ? D : E;
-				E7 = (D == H && E != I) || (H == F && E != G) ? H : E;
-				E8 = H == F ? F : E;
-			} else {
-				E0 = E;
-				E1 = E;
-				E2 = E;
-				E3 = E;
-				E4 = E;
-				E5 = E;
-				E6 = E;
-				E7 = E;
-				E8 = E;
-			}
 
-			*(guint32*)(dstpix + y*3*dstpitch + x*3*4) = E0;
-			*(guint32*)(dstpix + y*3*dstpitch + (x*3+1)*4) = E1;
-			*(guint32*)(dstpix + y*3*dstpitch + (x*3+2)*4) = E2;
-			*(guint32*)(dstpix + (y*3+1)*dstpitch + x*3*4) = E3;
-			*(guint32*)(dstpix + (y*3+1)*dstpitch + (x*3+1)*4) = E4;
-			*(guint32*)(dstpix + (y*3+1)*dstpitch + (x*3+2)*4) = E5;
-			*(guint32*)(dstpix + (y*3+2)*dstpitch + x*3*4) = E6;
-			*(guint32*)(dstpix + (y*3+2)*dstpitch + (x*3+1)*4) = E7;
-			*(guint32*)(dstpix + (y*3+2)*dstpitch + (x*3+2)*4) = E8;
-		}
-	}
+	gd_scale3x(gdk_pixbuf_get_pixels(src), gdk_pixbuf_get_width(src), gdk_pixbuf_get_height(src), gdk_pixbuf_get_rowstride(src), gdk_pixbuf_get_pixels(dst), gdk_pixbuf_get_rowstride(dst));
 	
 	return dst;
 }
@@ -284,41 +189,72 @@ create_composite_cell_pixbuf(GdElement dest, GdElement src1, GdElement src2)
 	/* destination image=source1 */
 	cells_pb[gd_elements[dest].image]=gdk_pixbuf_copy(cells_pb[gd_elements[src1].image]);
 	/* composite source2 to destination */
-	gdk_pixbuf_composite(cells_pb[gd_elements[src2].image], cells_pb[gd_elements[dest].image], 0, 0, pixbuf_cell_size, pixbuf_cell_size, 0, 0, 1, 1, GDK_INTERP_NEAREST, 75);
+	gdk_pixbuf_composite(cells_pb[gd_elements[src2].image], cells_pb[gd_elements[dest].image], 0, 0, pixbuf_cell_size, pixbuf_cell_size, 0, 0, 1, 1, GDK_INTERP_NEAREST, 85);
 }
 
-gboolean
-gd_is_image_ok_for_theme (const char *filename)
+/* check if pixbuf is suitable for a theme.
+   report_error=TRUE, then it will send warning messages if it isn't.
+ */
+const char *
+gd_is_pixbuf_ok_for_theme(GdkPixbuf *pixbuf)
 {
-	/* load from file */
+	static char *error=NULL;
 	int width, height;
-	GdkPixbuf *pixbuf;
-	GError *error=NULL;
-
-	g_assert(filename!=NULL);
-
-	if (!gdk_pixbuf_get_file_info (filename, &width, &height)) {
-//		g_warning("%s: cannot determine file format!", filename);
-		return FALSE;
-	}
+	
+	g_assert(pixbuf!=NULL);
+	
+	g_free(error);
+	error=NULL;
+	
+	width=gdk_pixbuf_get_width(pixbuf);
+	height=gdk_pixbuf_get_height(pixbuf);
+	
 	if ((width % NUM_OF_CELLS_X != 0) || (height % NUM_OF_CELLS_Y != 0) || (width / NUM_OF_CELLS_X != height / NUM_OF_CELLS_Y)) {
-//		g_warning("%s: image should contain %d cells in a row and %d in a column!", filename, NUM_OF_CELLS_X, NUM_OF_CELLS_Y);
-		return FALSE;
-	}
-	pixbuf=gdk_pixbuf_new_from_file (filename, &error);
-	if (error) {
-//		g_warning("%s", error->message);
-		g_error_free(error);
-		return FALSE;
+		error=g_strdup_printf("Image should contain %d cells in a row and %d in a column!", NUM_OF_CELLS_X, NUM_OF_CELLS_Y);
+		return error;
 	}
 	if (!gdk_pixbuf_get_has_alpha(pixbuf)) {
-//		g_warning("%s: image should have an alpha channel!", filename);
-		g_object_unref(pixbuf);
-		return FALSE;
+		error=g_strdup_printf("Image should have an alpha channel!");
+		return error;
 	}
-	g_object_unref(pixbuf);
+	
+	/* passes tests */
+	return NULL;
+}
 
-	return TRUE;	/* passed checks */
+/* check if file is suitable for a theme.
+   report_error=TRUE, then it will send warning messages if it isn't.
+ */
+const char *
+gd_is_image_ok_for_theme(const char *filename)
+{
+	/* load from file */
+	GdkPixbuf *pixbuf;
+	GError *error=NULL;
+	static char *error_msg=NULL;
+	const char *error_from_pixbuf;
+
+	g_assert(filename!=NULL);
+	
+	g_free(error_msg);
+	error_msg=NULL;
+
+	/* open file */
+	pixbuf=gdk_pixbuf_new_from_file (filename, &error);
+	if (error) {
+		error_msg=g_strdup(error->message);
+		g_error_free(error);
+		return error_msg;
+	}
+	error_from_pixbuf=gd_is_pixbuf_ok_for_theme(pixbuf);
+	g_object_unref(pixbuf);
+	
+	if (error_from_pixbuf) {
+		error_msg=g_strdup(error_from_pixbuf);
+		return error_msg;
+	}
+
+	return NULL;	/* passed tests */
 }
 
 /* remove pixmaps from x server */
@@ -338,36 +274,6 @@ free_pixmaps()
 		if (cells_editor[i])
 			g_object_unref (cells_editor[i]);
 		cells_editor[i]=NULL;
-	}
-}
-
-void
-gd_tv_pixbuf(GdkPixbuf *pixbuf)
-{
-	int width, height, rowstride, n_channels;
-	guchar *pixels, *p;
-	int x, y;
-
-	n_channels=gdk_pixbuf_get_n_channels (pixbuf);
-
-	g_assert (gdk_pixbuf_get_colorspace(pixbuf)==GDK_COLORSPACE_RGB);
-	g_assert (gdk_pixbuf_get_bits_per_sample(pixbuf)==8);
-	g_assert (gdk_pixbuf_get_has_alpha(pixbuf));
-	g_assert (n_channels==4);
-
-	width=gdk_pixbuf_get_width (pixbuf);
-	height=gdk_pixbuf_get_height (pixbuf);
-
-	rowstride=gdk_pixbuf_get_rowstride (pixbuf);
-	pixels=gdk_pixbuf_get_pixels (pixbuf);
-
-	for (y=0; y<height; y+=2) {
-		p=pixels + y * rowstride;
-		for (x=0; x<width*n_channels; x+=n_channels) {
-			p[x+0]=p[x+0]/5*4;
-			p[x+1]=p[x+1]/5*4;
-			p[x+2]=p[x+2]/5*4;
-		}
 	}
 }
 
@@ -438,9 +344,9 @@ loadcells(GdkPixbuf *cells_pixbuf)
 	gd_cell_size_editor=pixbuf_cell_size*gd_scaling_scale[gd_cell_scale_editor];
 
 	/* draw some elements, combining them with arrows and the like */
-	create_composite_cell_pixbuf(O_STEEL_EXPLODABLE, O_STEEL, O_EXPLODE_1);
-	create_composite_cell_pixbuf(O_STEEL_EATABLE, O_STEEL, O_DIRT);
-	create_composite_cell_pixbuf(O_BRICK_EATABLE, O_BRICK, O_DIRT);
+	add_arrow_to_cell(O_STEEL_EATABLE, O_STEEL, O_EATABLE, GDK_PIXBUF_ROTATE_NONE);
+	add_arrow_to_cell(O_BRICK_EATABLE, O_BRICK, O_EATABLE, GDK_PIXBUF_ROTATE_NONE);
+	create_composite_cell_pixbuf(O_BRICK_NON_SLOPED, O_STEEL, O_BRICK);
 
 	create_composite_cell_pixbuf(O_WALLED_KEY_1, O_KEY_1, O_BRICK);
 	create_composite_cell_pixbuf(O_WALLED_KEY_2, O_KEY_2, O_BRICK);
@@ -504,7 +410,7 @@ loadcells(GdkPixbuf *cells_pixbuf)
 	add_arrow_to_cell(O_INVIS_OUTBOX, O_OUTBOX_CLOSED, O_OUT, GDK_PIXBUF_ROTATE_NONE);
 	add_arrow_to_cell(O_OUTBOX, O_OUTBOX_OPEN, O_OUT, GDK_PIXBUF_ROTATE_NONE);
 
-	add_arrow_to_cell(O_UNKNOWN, O_STEEL, O_EXCLAMATION_MARK, GDK_PIXBUF_ROTATE_NONE);
+	add_arrow_to_cell(O_UNKNOWN, O_STEEL, O_QUESTION_MARK, GDK_PIXBUF_ROTATE_NONE);
 	add_arrow_to_cell(O_WAITING_STONE, O_STONE, O_EXCLAMATION_MARK, GDK_PIXBUF_ROTATE_NONE);
 	
 	/* blinking outbox: helps editor, drawing the cave is more simple */
@@ -639,29 +545,23 @@ c64_gfx_data_from_pixbuf(GdkPixbuf *pixbuf)
 gboolean
 gd_loadcells_file (const char *filename)
 {
-	int width, height;
 	GdkPixbuf *cells_pixbuf;
 	GError *error=NULL;
+	const char *error_msg;
 
 	/* load cell graphics */
 	/* load from file */
-	if (!gdk_pixbuf_get_file_info (filename, &width, &height)) {
-		g_warning("%s: cannot determine file format", gd_filename_to_utf8(filename));
-		return FALSE;
-	}
-	if ((width % NUM_OF_CELLS_X != 0) || (height % NUM_OF_CELLS_Y != 0) || (width / NUM_OF_CELLS_X != height / NUM_OF_CELLS_Y)) {
-		g_warning("%s: image should contain %d cells in a row and %d in a column!", gd_filename_to_utf8(filename), NUM_OF_CELLS_X, NUM_OF_CELLS_Y);
-		return FALSE;
-	}
 	cells_pixbuf=gdk_pixbuf_new_from_file (filename, &error);
 	if (error) {
 		g_warning("%s", error->message);
 		g_error_free(error);
 		return FALSE;
 	}
-	if (!gdk_pixbuf_get_has_alpha(cells_pixbuf)) {
-		g_warning("%s: the image should have an alpha channel!", filename);
+	/* check if file has the properties which we need for a theme */	
+	error_msg=gd_is_pixbuf_ok_for_theme(cells_pixbuf);
+	if (error_msg) {
 		g_object_unref(cells_pixbuf);
+		g_warning("%s", error_msg);
 		return FALSE;
 	}
 
@@ -691,11 +591,32 @@ gd_loadcells_default()
 	gd_select_pixbuf_colors(gd_c64_colors[0].rgb, gd_c64_colors[8].rgb, gd_c64_colors[12].rgb, gd_c64_colors[1].rgb, gd_c64_colors[1].rgb, gd_c64_colors[1].rgb);	/* just to set some default */
 }
 
+/* wrapper */
+void
+gd_pal_pixbuf(GdkPixbuf *pixbuf)
+{
+#if G_BYTE_ORDER == G_BIG_ENDIAN
+    guint32 rshift = 24;
+    guint32 gshift = 16;
+    guint32 bshift = 8;
+    guint32 ashift = 0;
+#else
+    guint32 rshift = 0;
+    guint32 gshift = 8;
+    guint32 bshift = 16;
+    guint32 ashift = 24;
+#endif
+	g_assert(gdk_pixbuf_get_has_alpha(pixbuf));
+	
+	gd_pal_emu(gdk_pixbuf_get_pixels(pixbuf), gdk_pixbuf_get_width(pixbuf), gdk_pixbuf_get_height(pixbuf), gdk_pixbuf_get_rowstride(pixbuf), rshift, gshift, bshift, ashift);
+}
 
 /* create pixmap for image number 'index', using cell size. */
 /* a pixmap * array is to be given; that may be cells_game or cells_editor */
+/* pal emulation does just that. */
+/* if render_selected is true, it will render the blue cell, too - that is used only in the editor. */
 static void
-create_pixmap(GdkPixmap **cells, int index, int cell_size, GdScalingType type, gboolean tv_emul)
+create_pixmap(GdkPixmap **cells, int index, int cell_size, GdScalingType type, gboolean render_selected, gboolean pal_emul)
 {
 	GdkPixbuf *selected, *normal, *element;
 	GdkWindow *window;
@@ -708,28 +629,30 @@ create_pixmap(GdkPixmap **cells, int index, int cell_size, GdScalingType type, g
 	/* scale the cell.
 	 * scale every cell on its own, or else some pixels might be merged on borders */
 	normal=gd_pixbuf_scale(cells_pb[index], type);
-	if (tv_emul)
-		gd_tv_pixbuf(normal);
+	if (pal_emul)
+		gd_pal_pixbuf(normal);
 	/* create colored cells. */
 	/* here no scaling is done, so interp_nearest is ok. */
-	selected=gdk_pixbuf_composite_color_simple (normal, cell_size, cell_size, GDK_INTERP_NEAREST, 128, 1, gd_select_color, gd_select_color);
-	element=gdk_pixbuf_composite_color_simple (normal, cell_size, cell_size, GDK_INTERP_NEAREST, 128, 1, gd_flash_color, gd_flash_color);
 
 	/* create pixmap containing pixbuf */
 	/* draw the pixbufs to the new pixmaps */
 	cells[index]=gdk_pixmap_new (window, cell_size, cell_size, -1);
 	gdk_draw_pixbuf(cells[index], NULL, normal, 0, 0, 0, 0, cell_size, cell_size, GDK_RGB_DITHER_MAX, 0, 0);
 
+	element=gdk_pixbuf_composite_color_simple (normal, cell_size, cell_size, GDK_INTERP_NEAREST, 128, 1, gd_flash_color, gd_flash_color);
 	cells[NUM_OF_CELLS + index]=gdk_pixmap_new (window, cell_size, cell_size, -1);
 	gdk_draw_pixbuf(cells[NUM_OF_CELLS + index], NULL, element, 0, 0, 0, 0, cell_size, cell_size, GDK_RGB_DITHER_MAX, 0, 0);
+	g_object_unref(element);
 
-	cells[2 * NUM_OF_CELLS + index]=gdk_pixmap_new (window, cell_size, cell_size, -1);
-	gdk_draw_pixbuf(cells[2 * NUM_OF_CELLS + index], NULL, selected, 0, 0, 0, 0, cell_size, cell_size, GDK_RGB_DITHER_MAX, 0, 0);
-
+	if (render_selected) {
+		selected=gdk_pixbuf_composite_color_simple (normal, cell_size, cell_size, GDK_INTERP_NEAREST, 128, 1, gd_select_color, gd_select_color);
+		cells[2 * NUM_OF_CELLS + index]=gdk_pixmap_new (window, cell_size, cell_size, -1);
+		gdk_draw_pixbuf(cells[2 * NUM_OF_CELLS + index], NULL, selected, 0, 0, 0, 0, cell_size, cell_size, GDK_RGB_DITHER_MAX, 0, 0);
+		g_object_unref(selected);
+	}
+	
 	/* forget scaled pixbufs, as only the pixmaps are needed */
 	g_object_unref(normal);
-	g_object_unref(selected);
-	g_object_unref(element);
 }
 
 /* return a pixmap scaled for the game */
@@ -738,9 +661,10 @@ gd_game_pixmap(int index)
 {
 	int i;
 	
+	g_assert(index<2*NUM_OF_CELLS);	/* make sure that no blue/"selected" pixbuf is requested for a game */
 	i=index%NUM_OF_CELLS;	/* might request a colored, so we do a % NUM_OF_CELLS */
 	if (cells_game[i]==NULL)	/* check if pixmap already exists */
-		create_pixmap(cells_game, i, gd_cell_size_game, gd_cell_scale_game, gd_tv_emulation_game);
+		create_pixmap(cells_game, i, gd_cell_size_game, gd_cell_scale_game, FALSE, gd_pal_emulation_game);
 	return cells_game[index];
 }
 
@@ -752,7 +676,7 @@ gd_editor_pixmap(int index)
 	
 	i=index%NUM_OF_CELLS;	/* might request a colored, so we do a % NUM_OF_CELLS */
 	if (cells_editor[i]==NULL)	/* check if pixmap already exists */
-		create_pixmap(cells_editor, i, gd_cell_size_editor, gd_cell_scale_editor, gd_tv_emulation_editor);
+		create_pixmap(cells_editor, i, gd_cell_size_editor, gd_cell_scale_editor, TRUE, gd_pal_emulation_editor);
 	return cells_editor[index];
 }
 
@@ -863,7 +787,7 @@ gd_drawcave_to_pixbuf(const Cave * cave, const int width, const int height, cons
 	/* get size of one cell in the original pixbuf */
 	cell_size=gdk_pixbuf_get_width (cells_pb[0]);
 
-	/* add four pixels black border */
+	/* add two pixels black border: +4 +4 for width and height */
 	pixbuf=gdk_pixbuf_new (GDK_COLORSPACE_RGB, gdk_pixbuf_get_has_alpha (cells_pb[0]), 8, (x2-x1+1)*cell_size+4, (y2-y1+1)*cell_size+4);
 	gdk_pixbuf_fill (pixbuf, 0x000000ff);	/* fill with opaque black */
 	
@@ -914,6 +838,4 @@ gd_drawcave_to_pixbuf(const Cave * cave, const int width, const int height, cons
 	
 	return scaled;
 }
-
-
 

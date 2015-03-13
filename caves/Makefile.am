@@ -1,16 +1,12 @@
 # Automatically generated Makefile.am! Check ./create_makefile.sh
 
 Arno_Weberdir = $(pkgdatadir)/Arno_Weber
-Arno_Weber_CAVES = Arno_Weber/arno_01.gds Arno_Weber/arno_02.gds Arno_Weber/arno_03.gds Arno_Weber/arno_04.gds Arno_Weber/arno_05.gds Arno_Weber/arno_06.gds Arno_Weber/arno_07.gds Arno_Weber/arno_08.gds Arno_Weber/arno_09.gds Arno_Weber/arno_10.gds Arno_Weber/arno_11.gds Arno_Weber/arno_12.gds Arno_Weber/arno_13.gds Arno_Weber/arno_14.gds Arno_Weber/arno_15.gds Arno_Weber/arno_16.gds Arno_Weber/arno_17.gds Arno_Weber/arno_exploding.gds Arno_Weber/arno_santa.gds Arno_Weber/future_dash.gds
+Arno_Weber_CAVES = Arno_Weber/arno_01.gds Arno_Weber/arno_02.gds Arno_Weber/arno_03.gds Arno_Weber/arno_04.gds Arno_Weber/arno_05.gds Arno_Weber/arno_06.gds Arno_Weber/arno_07.gds Arno_Weber/arno_08.gds Arno_Weber/arno_09.gds Arno_Weber/arno_10.gds Arno_Weber/arno_11.gds Arno_Weber/arno_12.gds Arno_Weber/arno_13.gds Arno_Weber/arno_14.gds Arno_Weber/arno_15.gds Arno_Weber/arno_16.gds Arno_Weber/arno_17.gds Arno_Weber/future_dash.gds Arno_Weber/exploding_dash.gds Arno_Weber/santas_bd_party.gds Arno_Weber/exploding_dash_ii.gds
 Arno_Weber_DATA = $(Arno_Weber_CAVES)
 
 Boulderwillidir = $(pkgdatadir)/Boulderwilli
 Boulderwilli_CAVES = Boulderwilli/babydash.gds Boulderwilli/children_1.gds Boulderwilli/midnight_dash.gds Boulderwilli/moonlight_2.gds Boulderwilli/moonlight_3.gds
 Boulderwilli_DATA = $(Boulderwilli_CAVES)
-
-Bouldi_Dashdir = $(pkgdatadir)/Bouldi_Dash
-Bouldi_Dash_CAVES = Bouldi_Dash/bouldi_dash_1.gds Bouldi_Dash/bouldi_dash_10.gds Bouldi_Dash/bouldi_dash_2.gds Bouldi_Dash/bouldi_dash_3.gds Bouldi_Dash/bouldi_dash_4.gds Bouldi_Dash/bouldi_dash_5.gds Bouldi_Dash/bouldi_dash_6.gds Bouldi_Dash/bouldi_dash_7.gds Bouldi_Dash/bouldi_dash_8.gds Bouldi_Dash/bouldi_dash_9.gds
-Bouldi_Dash_DATA = $(Bouldi_Dash_CAVES)
 
 Coolshakerdir = $(pkgdatadir)/Coolshaker
 Coolshaker_CAVES = Coolshaker/quolder_dash_1.gds Coolshaker/quolder_dash_15.gds Coolshaker/quolder_dash_16.gds Coolshaker/quolder_dash_25.gds Coolshaker/quolder_dash_5.gds Coolshaker/quolder_dash_6.gds Coolshaker/quolder_dash_7.gds Coolshaker/quolder_dash_8.gds
@@ -29,7 +25,7 @@ Firefox_CAVES = Firefox/bl-firefox25.gds Firefox/bl-firefox01.gds Firefox/bl-fir
 Firefox_DATA = $(Firefox_CAVES)
 
 Gertruddir = $(pkgdatadir)/Gertrud
-Gertrud_CAVES = Gertrud/gertrud_s_game_a.gds Gertrud/gertrud_s_game_b.gds Gertrud/gertrud_s_game_c.gds Gertrud/gertrud_s_game_d.gds Gertrud/gertrud_s_game_e.gds Gertrud/gertrud_s_game_f.gds Gertrud/gertrud_s_game_g.gds Gertrud/gertrud_s_game_h.gds
+Gertrud_CAVES = Gertrud/gertrud_s_game_a.gds Gertrud/gertrud_s_game_b.gds Gertrud/gertrud_s_game_c.gds Gertrud/gertrud_s_game_d.gds Gertrud/gertrud_s_game_e.gds Gertrud/gertrud_s_game_f.gds Gertrud/gertrud_s_game_g.gds Gertrud/gertrud_s_game_h.gds Gertrud/Rodex_I.gds Gertrud/Rodex_II.gds Gertrud/Rodex_III.gds Gertrud/Rodex_IV.gds Gertrud/Rodex_V.gds
 Gertrud_DATA = $(Gertrud_CAVES)
 
 Karlchen_Opossumdir = $(pkgdatadir)/Karlchen_Opossum
@@ -73,7 +69,7 @@ Phoenix_CAVES = Phoenix/fun_dash_02.gds Phoenix/fun_dash_04.gds Phoenix/fun_dash
 Phoenix_DATA = $(Phoenix_CAVES)
 
 Posocopi_Waldkirchdir = $(pkgdatadir)/Posocopi_Waldkirch
-Posocopi_Waldkirch_CAVES = Posocopi_Waldkirch/best_of_powerdash.gds Posocopi_Waldkirch/boulder_dash_47.gds Posocopi_Waldkirch/legend_of_powerdash.gds Posocopi_Waldkirch/legend_of_powerdash_no_one.gds Posocopi_Waldkirch/powereat_1.gds Posocopi_Waldkirch/professional_powerdash_1.gds Posocopi_Waldkirch/professional_powerdash_2.gds Posocopi_Waldkirch/professional_powerdash_3.gds Posocopi_Waldkirch/profpackdash_part_a.gds Posocopi_Waldkirch/profpackdash_part_b.gds Posocopi_Waldkirch/profpackdash_part_c.gds Posocopi_Waldkirch/profpackdash_part_d.gds Posocopi_Waldkirch/profpackdash_part_e.gds Posocopi_Waldkirch/return_of_powerdash.gds
+Posocopi_Waldkirch_CAVES = Posocopi_Waldkirch/best_of_powerdash.gds Posocopi_Waldkirch/boulder_dash_47.gds Posocopi_Waldkirch/legend_of_powerdash.gds Posocopi_Waldkirch/legend_of_powerdash_no_one.gds Posocopi_Waldkirch/powereat_1.gds Posocopi_Waldkirch/professional_powerdash_1.gds Posocopi_Waldkirch/professional_powerdash_2.gds Posocopi_Waldkirch/professional_powerdash_3.gds Posocopi_Waldkirch/profpackdash_part_a.gds Posocopi_Waldkirch/profpackdash_part_b.gds Posocopi_Waldkirch/profpackdash_part_c.gds Posocopi_Waldkirch/profpackdash_part_d.gds Posocopi_Waldkirch/profpackdash_part_e.gds Posocopi_Waldkirch/return_of_powerdash.gds Posocopi_Waldkirch/first_boulder_1.gds Posocopi_Waldkirch/first_boulder_2.gds Posocopi_Waldkirch/first_boulder_3.gds
 Posocopi_Waldkirch_DATA = $(Posocopi_Waldkirch_CAVES)
 
 Prof_Knibbledir = $(pkgdatadir)/Prof_Knibble
@@ -105,7 +101,7 @@ Sendy_CAVES = Sendy/sendydash_1.gds Sendy/sendydash_2.gds Sendy/sendydash_3.gds 
 Sendy_DATA = $(Sendy_CAVES)
 
 Skeletordir = $(pkgdatadir)/Skeletor
-Skeletor_CAVES = Skeletor/mega_boulderdash_1.gds Skeletor/mega_boulderdash_2.gds Skeletor/mega_boulderdash_3.gds Skeletor/mega_boulderdash_4.gds Skeletor/mega_boulderdash_6.gds
+Skeletor_CAVES = Skeletor/mega_boulderdash_1.gds Skeletor/mega_boulderdash_2.gds Skeletor/mega_boulderdash_3.gds Skeletor/mega_boulderdash_4.gds Skeletor/mega_boulderdash_6.gds Skeletor/mega_boulderdash_5.gds
 Skeletor_DATA = $(Skeletor_CAVES)
 
 Stormbringerdir = $(pkgdatadir)/Stormbringer
@@ -129,7 +125,19 @@ boulder_rush_cave_pack_CAVES = boulder_rush_cave_pack/Achim_Haertel.gds boulder_
 boulder_rush_cave_pack_DATA = $(boulder_rush_cave_pack_CAVES)
 
 variousdir = $(pkgdatadir)/various
-various_CAVES = various/angels_boulder_1.gds various/cws_boulder_2.gds various/blunder_bash.gds various/boulder_dash_1.gds various/angels_boulder_2.gds various/3_boulderdash_games_a.gds various/arkanoid.gds various/nahost_91.gds various/3_boulderdash_games_b.gds various/blue_wonder.gds various/3_boulderdash_games_c.gds various/dididash_1.gds various/afl.gds various/boulder_dash_9_8.gds various/afl_posocopi.gds various/bouder_dash_geil.gds various/boulder_dash_2.gds various/boulder_dash_9_9.gds various/boulder_dash_2000.gds various/boulder_dash_beginner.gds various/boulder_dash_3.gds various/boulder_dash_iv.gds various/boulder_dash_9_1.gds various/boulder_dash_pro.gds various/boulder_dash_9_2.gds various/boulder_dash_super_prof.gds various/boulder_dash_9_3.gds various/cup_dash_4.gds various/boulder_dash_9_4.gds various/construction_kit.gds various/boulder_dash_9_5.gds various/falcon_dash-the_dark_cave.gds various/boulder_dash_9_6.gds various/cws_boulder.gds various/boulder_dash_9_7.gds various/dididash_2.gds various/cash_dash.gds various/boulder_dash_the_lost_levels.gds various/cheech_und_chongs_boulder_1.gds various/cheech_und_chongs_boulder_2.gds various/dr_watson_4.gds various/dr_watson_4_no_one_version.gds various/eclips_dash_part_b.gds various/falcon_dash-the_big_diamond.gds various/falcon_dash-the_legend_continues.gds various/fraggle_dash_one.gds various/frusti_dash.gds various/giga_boulder_1.gds various/gods_boulder.gds various/gods_boulder_ii.gds various/hooligan_dash_01.gds various/hooligan_dash_03.gds various/joker_dash_1.gds various/joker_dash_4.gds various/labyrinth_dash.gds various/lucky_dash.gds various/masters_boulder_dash.gds various/mb_games_0.gds various/mb_games_1.gds various/mb_games_2.gds various/mb_games_3.gds various/mb_games_4.gds various/mb_games_5.gds various/mb_games_6.gds various/mb_games_7.gds various/mb_games_8.gds various/mb_games_9.gds various/mjman_s_boulder_dash.gds various/mjr_boulder_dash.gds various/mr_rockford_boulder_dash_12.gds various/mr_rockford_boulder_dash_13.gds various/new_boulder_dash_01.gds various/orion_dash_1.gds various/polish_boulderdash.gds various/rockford_im_nimmerland_2.gds various/steel_dash_1.gds various/steel_dash_2.gds various/thomas_boulder.gds various/unknown_boulderdash_12.gds various/BoulderDash-UX.gds
+various_CAVES = various/angels_boulder_1.gds various/cws_boulder_2.gds various/blunder_bash.gds various/boulder_dash_1.gds various/angels_boulder_2.gds various/3_boulderdash_games_a.gds various/arkanoid.gds various/nahost_91.gds various/3_boulderdash_games_b.gds various/blue_wonder.gds various/3_boulderdash_games_c.gds various/dididash_1.gds various/afl.gds various/boulder_dash_9_8.gds various/afl_posocopi.gds various/bouder_dash_geil.gds various/boulder_dash_2.gds various/boulder_dash_9_9.gds various/boulder_dash_2000.gds various/boulder_dash_beginner.gds various/boulder_dash_3.gds various/boulder_dash_iv.gds various/boulder_dash_9_1.gds various/boulder_dash_pro.gds various/boulder_dash_9_2.gds various/boulder_dash_super_prof.gds various/boulder_dash_9_3.gds various/cup_dash_4.gds various/boulder_dash_9_4.gds various/construction_kit.gds various/boulder_dash_9_5.gds various/falcon_dash-the_dark_cave.gds various/boulder_dash_9_6.gds various/cws_boulder.gds various/boulder_dash_9_7.gds various/dididash_2.gds various/cash_dash.gds various/boulder_dash_the_lost_levels.gds various/cheech_und_chongs_boulder_1.gds various/cheech_und_chongs_boulder_2.gds various/dr_watson_4.gds various/dr_watson_4_no_one_version.gds various/eclips_dash_part_b.gds various/falcon_dash-the_big_diamond.gds various/falcon_dash-the_legend_continues.gds various/fraggle_dash_one.gds various/frusti_dash.gds various/giga_boulder_1.gds various/gods_boulder.gds various/gods_boulder_ii.gds various/hooligan_dash_01.gds various/hooligan_dash_03.gds various/joker_dash_1.gds various/joker_dash_4.gds various/labyrinth_dash.gds various/lucky_dash.gds various/masters_boulder_dash.gds various/mb_games_0.gds various/mb_games_1.gds various/mb_games_2.gds various/mb_games_3.gds various/mb_games_4.gds various/mb_games_5.gds various/mb_games_6.gds various/mb_games_7.gds various/mb_games_8.gds various/mb_games_9.gds various/mjman_s_boulder_dash.gds various/mjr_boulder_dash.gds various/mr_rockford_boulder_dash_12.gds various/mr_rockford_boulder_dash_13.gds various/new_boulder_dash_01.gds various/orion_dash_1.gds various/polish_boulderdash.gds various/rockford_im_nimmerland_2.gds various/thomas_boulder.gds various/unknown_boulderdash_12.gds various/BoulderDash-UX.gds
 various_DATA = $(various_CAVES)
 
-EXTRA_DIST = ./create_makefile.sh $(Arno_Weber_CAVES) $(Boulderwilli_CAVES) $(Bouldi_Dash_CAVES) $(Coolshaker_CAVES) $(Daniel_CAVES) $(Don_Pedro_CAVES) $(Firefox_CAVES) $(Gertrud_CAVES) $(Karlchen_Opossum_CAVES) $(Lord_Diego_CAVES) $(Marek_Roth_CAVES) $(Michael_and_Ingo_CAVES) $(NO1_CAVES) $(NO1_delight_CAVES) $(NO1_prima_CAVES) $(Olaf_Roth_CAVES) $(Pete_CAVES) $(Phoenix_CAVES) $(Posocopi_Waldkirch_CAVES) $(Prof_Knibble_CAVES) $(Profi_Boulder_disks_CAVES) $(Rolf_Roth_CAVES) $(Ron_van_Schaik_CAVES) $(Rory_Agsten_CAVES) $(Scserbin_Zoltan_CAVES) $(Sendy_CAVES) $(Skeletor_CAVES) $(Stormbringer_CAVES) $(Super_boulder_CAVES) $(The_Blockheads_CAVES) $(boulder_rush_atari_pack_CAVES) $(boulder_rush_cave_pack_CAVES) $(various_CAVES)
+Mario_Albrechtdir = $(pkgdatadir)/Mario_Albrecht
+Mario_Albrecht_CAVES = Mario_Albrecht/Mario_Dash_1.gds Mario_Albrecht/Mario_Dash_2.gds Mario_Albrecht/Mario_Dash_3.gds
+Mario_Albrecht_DATA = $(Mario_Albrecht_CAVES)
+
+Rolf_Langedir = $(pkgdatadir)/Rolf_Lange
+Rolf_Lange_CAVES = Rolf_Lange/Rolo_Dash_II.gds Rolf_Lange/Rolo_Dash_I.gds
+Rolf_Lange_DATA = $(Rolf_Lange_CAVES)
+
+Spiderdir = $(pkgdatadir)/Spider
+Spider_CAVES = Spider/bouldi_dash_1.gds Spider/bouldi_dash_10.gds Spider/bouldi_dash_2.gds Spider/bouldi_dash_3.gds Spider/bouldi_dash_4.gds Spider/bouldi_dash_5.gds Spider/bouldi_dash_6.gds Spider/bouldi_dash_7.gds Spider/bouldi_dash_8.gds Spider/bouldi_dash_9.gds Spider/steel_dash_1.gds Spider/steel_dash_2.gds
+Spider_DATA = $(Spider_CAVES)
+
+EXTRA_DIST = ./create_makefile.sh $(Arno_Weber_CAVES) $(Boulderwilli_CAVES) $(Coolshaker_CAVES) $(Daniel_CAVES) $(Don_Pedro_CAVES) $(Firefox_CAVES) $(Gertrud_CAVES) $(Karlchen_Opossum_CAVES) $(Lord_Diego_CAVES) $(Marek_Roth_CAVES) $(Michael_and_Ingo_CAVES) $(NO1_CAVES) $(NO1_delight_CAVES) $(NO1_prima_CAVES) $(Olaf_Roth_CAVES) $(Pete_CAVES) $(Phoenix_CAVES) $(Posocopi_Waldkirch_CAVES) $(Prof_Knibble_CAVES) $(Profi_Boulder_disks_CAVES) $(Rolf_Roth_CAVES) $(Ron_van_Schaik_CAVES) $(Rory_Agsten_CAVES) $(Scserbin_Zoltan_CAVES) $(Sendy_CAVES) $(Skeletor_CAVES) $(Stormbringer_CAVES) $(Super_boulder_CAVES) $(The_Blockheads_CAVES) $(boulder_rush_atari_pack_CAVES) $(boulder_rush_cave_pack_CAVES) $(various_CAVES) $(Mario_Albrecht_CAVES) $(Rolf_Lange_CAVES) $(Spider_CAVES)

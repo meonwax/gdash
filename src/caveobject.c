@@ -18,6 +18,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "cave.h"
+#include "cavedb.h"
 #include "caveobject.h"
 
 
@@ -128,7 +129,7 @@ gd_object_new_from_string(char *str)
 	if (!equalsign)
 		return NULL;
 
-	/* split string */
+	/* split string by replacing the equal sign with zero */
 	*equalsign='\0';
 	name=str;
 	param=equalsign+1;
@@ -299,40 +300,40 @@ gd_get_object_description_markup (GdObject *selected)
 
 	switch (selected->type) {
 	case POINT:
-		return g_markup_printf_escaped (_("Point of <b>%s</b> at %d,%d"), gd_elements[selected->element].lowercase_name, selected->x1, selected->y1);
+		return g_markup_printf_escaped(_("Point of <b>%s</b> at %d,%d"), gd_elements[selected->element].lowercase_name, selected->x1, selected->y1);
 
 	case LINE:
-		return g_markup_printf_escaped (_("Line from %d,%d to %d,%d of <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
+		return g_markup_printf_escaped(_("Line from %d,%d to %d,%d of <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
 
 	case RECTANGLE:
-		return g_markup_printf_escaped (_("Rectangle from %d,%d to %d,%d of <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
+		return g_markup_printf_escaped(_("Rectangle from %d,%d to %d,%d of <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
 
 	case FILLED_RECTANGLE:
-		return g_markup_printf_escaped (_("Rectangle from %d,%d to %d,%d of <b>%s</b>, filled with <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
+		return g_markup_printf_escaped(_("Rectangle from %d,%d to %d,%d of <b>%s</b>, filled with <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
 
 	case RASTER:
-		return g_markup_printf_escaped (_("Raster from %d,%d to %d,%d of <b>%s</b>, distance %+d,%+d"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, selected->dx, selected->dy);
+		return g_markup_printf_escaped(_("Raster from %d,%d to %d,%d of <b>%s</b>, distance %+d,%+d"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, selected->dx, selected->dy);
 
 	case JOIN:
-		return g_markup_printf_escaped (_("Join <b>%s</b> to every <b>%s</b>, distance %+d,%+d"), gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name, selected->dx, selected->dy);
+		return g_markup_printf_escaped(_("Join <b>%s</b> to every <b>%s</b>, distance %+d,%+d"), gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name, selected->dx, selected->dy);
 
 	case FLOODFILL_BORDER:
-		return g_markup_printf_escaped (_("Floodfill from %d,%d of <b>%s</b>, border <b>%s</b>"), selected->x1, selected->y1, gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name);
+		return g_markup_printf_escaped(_("Floodfill from %d,%d of <b>%s</b>, border <b>%s</b>"), selected->x1, selected->y1, gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name);
 
 	case FLOODFILL_REPLACE:
-		return g_markup_printf_escaped (_("Floodfill from %d,%d of <b>%s</b>, replacing <b>%s</b>"), selected->x1, selected->y1, gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name);
+		return g_markup_printf_escaped(_("Floodfill from %d,%d of <b>%s</b>, replacing <b>%s</b>"), selected->x1, selected->y1, gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name);
 
 	case MAZE:
-		return g_markup_printf_escaped (_("Maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
+		return g_markup_printf_escaped(_("Maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
 
 	case MAZE_UNICURSAL:
-		return g_markup_printf_escaped (_("Unicursal maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
+		return g_markup_printf_escaped(_("Unicursal maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
 
 	case MAZE_BRAID:
-		return g_markup_printf_escaped (_("Braid maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
+		return g_markup_printf_escaped(_("Braid maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
 
 	case RANDOM_FILL:
-		return g_markup_printf_escaped (_("Random fill from %d,%d to %d,%d, replacing %s"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
+		return g_markup_printf_escaped(_("Random fill from %d,%d to %d,%d, replacing %s"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
 		
 	case NONE:
 		g_assert_not_reached();
@@ -587,14 +588,14 @@ draw_join(Cave *cave, const GdObject *object)
 {
 	int x, y;
 
-	for (y=0; y < cave->h; y++)
-		for (x=0; x < cave->w; x++)
+	for (y=0; y<cave->h; y++)
+		for (x=0; x<cave->w; x++)
 			if (cave->map[y][x]==object->element) {
 				int nx=x + object->dx;
 				int ny=y + object->dy;
 				/* this one implements wraparound for joins. it is needed by many caves in profi boulder series */
-				while (nx > cave->w)
-					nx -= cave->w, ny++;
+				while (nx>=cave->w)
+					nx-=cave->w, ny++;
 				gd_cave_store_rc (cave, nx, ny, object->fill_element, object);
 			}
 }
@@ -1087,6 +1088,7 @@ gd_cave_draw_object (Cave * cave, const GdObject *object, int level)
 	g_assert (cave!=NULL);
 	g_assert (cave->map!=NULL);
 	g_assert (cave->objects_order!=NULL);
+	g_assert (object!=NULL);
 
 	switch (object->type) {
 		case POINT:
@@ -1195,7 +1197,7 @@ gd_cave_new_rendered (const Cave *data, const int level, const guint32 seed)
 				if (data->level_rand[level]<0)
 					randm=g_rand_int_range(cave->random, 0, 256);	/* use the much better glib random generator */
 				else
-					randm=gd_c64_predictable_random(cave);	/* use c64 */
+					randm=gd_cave_c64_random(cave);	/* use c64 */
 
 				element=data->initial_fill;
 				if (randm<data->random_fill_probability[0])
@@ -1224,7 +1226,7 @@ gd_cave_new_rendered (const Cave *data, const int level, const guint32 seed)
 	else {
 		/* IF CAVE HAS A MAP, SIMPLY USE IT... no need to fill with random elements */
 		
-		/* initialize c64 predictable random for slime. the values were taken from afl bd, see internals.txt */
+		/* initialize c64 predictable random for slime. the values were taken from afl bd, see docs/internals.txt */
 		cave->rand_seed_1=0;
 		cave->rand_seed_2=0x1e;
 	}
@@ -1241,7 +1243,7 @@ gd_cave_new_rendered (const Cave *data, const int level, const guint32 seed)
 	if (cave->scheduling==GD_SCHEDULING_MILLISECONDS)
 		cave->speed=data->level_speed[level];		/* exact timing */
 	else {
-		cave->speed=120;	/* delay loop based timing... set something for first iteration, the later it will be calculated */
+		cave->speed=120;	/* delay loop based timing... set something for first iteration, then later it will be calculated */
 		cave->c64_timing=data->level_ckdelay[level];	/* this one may be used by iterate routine to calculate actual delay if c64scheduling is selected */
 	}
 
@@ -1249,18 +1251,24 @@ gd_cave_new_rendered (const Cave *data, const int level, const guint32 seed)
 }
 
 
+
+/*
+   render cave at specified level.
+   copy result to the map; remove objects.
+   the cave will be map-based.
+ */
 void
-gd_flatten_cave (Cave *cave, const int level)
+gd_flatten_cave(Cave *cave, const int level)
 {
 	Cave *rendered;
 
-	g_return_if_fail (cave != NULL);
+	g_return_if_fail(cave != NULL);
 
 	/* render cave at specified level to obtain map. seed=0 */
-	rendered=gd_cave_new_rendered (cave, level, 0);
+	rendered=gd_cave_new_rendered(cave, level, 0);
 	/* forget old map without objects */
-	gd_cave_map_free (cave->map);
-	/* copy new map */
+	gd_cave_map_free(cave->map);
+	/* copy new map to cave */
 	cave->map=gd_cave_map_dup(rendered, map);
 	gd_cave_free(rendered);
 

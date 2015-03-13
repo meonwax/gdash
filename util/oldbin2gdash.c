@@ -22,7 +22,7 @@ const char *s_plc="GDashPLC";
 const char *s_dlb="GDashDLB";
 const char *s_atg="GDashATG";
 const char *s_crl="GDashCRL";
-const char *s_crd="GDashCRD";
+const char *s_cd7="GDashCD7";
 const char *s_1st="GDash1ST";
 
 typedef enum _format {
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 		case F_DLB: strcpy(out, s_dlb); break;
 		case F_ATG: strcpy(out, s_atg); break;
 		case F_CRL: strcpy(out, s_crl); break;
-		case F_CRD: strcpy(out, s_crd); break;
+		case F_CRD: strcpy(out, s_cd7); break;
 		case F_1ST: strcpy(out, s_1st); break;
 	}
 	outlength=(guint32 *)(out+8);

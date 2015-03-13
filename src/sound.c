@@ -21,32 +21,36 @@
 #include <glib.h>
 #include "settings.h"
 #include "cave.h"
+#include "cavesound.h"
 #include "util.h"
 
 /*
 	The C64 sound chip (the SID) had 3 channels. Boulder Dash used all 3 of them.
 	
 	Different channels were used for different sounds.
+	Channel 1: other small sounds, ie. diamonds falling, boulders rolling.
+
+	Channel 2: Walking, diamond collecting and explosion; also time running out sound.
+
 	Channel 3: amoeba sound, magic wall sound,
 		cave cover & uncover sound, and the crack sound (gate open)
-	
-	Channel 2: Walking, diamond collecting and explosion; also time running out sound.
-	
-	Channel 1: other small sounds, ie. diamonds falling, boulders rolling.
 	
 	Sounds have precedence over each other. Ie. the crack sound is given precedence
 	over other sounds (amoeba, for example.)
 	Different channels also behave differently. Channel 2 sounds are not stopped, ie.
 	walking can not be heard, until the explosion sound is finished playing completely.
+	Explosions are always restarted, though. This is controlled by the array defined
+	in cave.c.
 	Channel 1 sounds are always stopped, if a new sound is requested.
 	
 	Here we implement this a bit differently. We use samples, instead of synthesizing
 	the sounds. By stopping samples, sometimes small clicks generate. Therefore we do
 	not stop them, rather fade them out quickly. (The SID had filters, which stopped
 	these small clicks.)
-	Also, channel 1 should be stopped very often. So I decided to use two SDL_Mixer
-	channels to emulate one C64 channel; and they are used alternating. SDL channel 4
-	is the "backup" channel 1. Other channels have the same indexes.
+	Also, channel 1 and 2 should be stopped very often. So I decided to use two
+	SDL_Mixer channels to emulate one C64 channel; and they are used alternating.
+	SDL channel 4 is the "backup" channel 1, channel 5 is the backup channel 2.
+	Other channels have the same indexes.
 
  */
 
@@ -55,7 +59,15 @@
 #ifdef GD_SOUND
 static Mix_Chunk *sounds[GD_S_MAX];
 static gboolean mixer_started=FALSE;
-static GdSound sound_playing[4];
+static GdSound snd_playing[5];
+#endif
+
+#ifdef GD_SOUND
+static GdSound
+sound_playing(int channel)
+{
+	return snd_playing[channel];
+}
 #endif
 
 #ifdef GD_SOUND
@@ -63,8 +75,8 @@ static void
 loadsound(GdSound which, const char *filename)
 {
 	const char *full_filename;
-	
-	g_assert(which!=GD_S_DIAMOND_RANDOM);	/* this should not be loaded, rather it will be selected randomly */
+
+	g_assert(!gd_sound_is_fake(which));	
 	g_assert(mixer_started);
 	
 	if (sounds[which]!=NULL) {
@@ -86,21 +98,11 @@ loadsound(GdSound which, const char *filename)
 
 
 #ifdef GD_SOUND
-static gboolean
-is_sound_looped(GdSound sound)
-{
-	if (sound==GD_S_COVER || sound==GD_S_AMOEBA || sound==GD_S_MAGIC_WALL || sound==GD_S_COVER || sound==GD_S_PNEUMATIC_HAMMER || sound==GD_S_WATER)
-		return TRUE;
-	else
-		return FALSE;
-}
-#endif
-
-#ifdef GD_SOUND
+/* this is called by sdl for an sdl channel. so no magic with channel_x_alter. */
 static void
 channel_done(int channel)
 {
-	sound_playing[channel]=GD_S_NONE;
+	snd_playing[channel]=GD_S_NONE;
 }
 #endif
 
@@ -108,7 +110,7 @@ channel_done(int channel)
 static void
 halt_channel(int channel)
 {
-	Mix_FadeOutChannel(channel, 80);
+	Mix_FadeOutChannel(channel, 40);
 }
 #endif
 
@@ -117,7 +119,7 @@ static void
 play_sound(int channel, GdSound sound)
 {
 	/* channel 1 and channel 4 are used alternating */
-	static gboolean channel1_alter=FALSE;
+	/* channel 2 and channel 5 are used alternating */
 	static const GdSound diamond_sounds[]={
 		GD_S_DIAMOND_1,
 		GD_S_DIAMOND_2,
@@ -129,34 +131,25 @@ play_sound(int channel, GdSound sound)
 		GD_S_DIAMOND_8,
 	};
 
+	/* if the user likes classic sounds */
+	if (gd_classic_sound)
+		if (!gd_sound_is_classic(sound))
+			sound=gd_sound_classic_equivalent(sound);
+	/* no sound is possible, as not all sounds have classic equivalent */	
+	if (sound==GD_S_NONE)
+		return;
+
 	/* change diamond falling random to a selected diamond falling sound. */
-	/* others are hack! */
-	switch (sound) {
-		case GD_S_DIAMOND_RANDOM:
-			sound=diamond_sounds[g_random_int_range(0, G_N_ELEMENTS(diamond_sounds))];
-			break;
-
-		default:
-			break;
-	}
-
-	if (channel==1) {
-		int other_channel;
-		/* channel 1 and channel 4 emulate the sid channel 1 */
-		channel1_alter=!channel1_alter;
-		if (channel1_alter)
-			channel=4, other_channel=1;
-		else
-			channel=1, other_channel=4;
-			
-		if (sound_playing[other_channel]!=GD_S_NONE)
-			halt_channel(other_channel);
-	}
-
-	/* channel 2 and 3 sounds are started immediately; channel 1 may have been changed to channel 4 above. */
-	Mix_PlayChannel(channel, sounds[sound], is_sound_looped(sound)?-1:0);
+	if (sound==GD_S_DIAMOND_RANDOM)
+		sound=diamond_sounds[g_random_int_range(0, G_N_ELEMENTS(diamond_sounds))];
+	
+	/* at this point, fake sounds should have been changed to normal sounds */
+	g_assert(!gd_sound_is_fake(sound));
+	
+	/* channel 1 may have been changed to channel 4 above. */
+	Mix_PlayChannel(channel, sounds[sound], gd_sound_is_looped(sound)?-1:0);
 	Mix_Volume(channel, MIX_MAX_VOLUME);
-	sound_playing[channel]=sound;
+	snd_playing[channel]=sound;
 }
 #endif
 
@@ -170,8 +163,8 @@ gd_sound_init()
 #ifdef GD_SOUND
 	int i;
 	
-	for (i=0; i<G_N_ELEMENTS(sound_playing); i++)
-		sound_playing[i]=GD_S_NONE;
+	for (i=0; i<G_N_ELEMENTS(snd_playing); i++)
+		snd_playing[i]=GD_S_NONE;
 	
 	if(Mix_OpenAudio(gd_sdl_44khz_mixing?44100:22050, gd_sdl_16bit_mixing?AUDIO_S16:AUDIO_U8, 1, 1024)==-1) {
 		g_warning("%s", Mix_GetError());
@@ -195,6 +188,7 @@ gd_sound_init()
 	loadsound(GD_S_TIMEOUT_7, "timeout_7.ogg");
 	loadsound(GD_S_TIMEOUT_8, "timeout_8.ogg");
 	loadsound(GD_S_TIMEOUT_9, "timeout_9.ogg");
+	loadsound(GD_S_TIMEOUT, "timeout.ogg");
 	loadsound(GD_S_FINISHED, "finished.ogg");
 
 	loadsound(GD_S_EXPLOSION, "explosion.ogg");
@@ -222,6 +216,8 @@ gd_sound_init()
 	loadsound(GD_S_KEY_COLLECT, "key_collect.ogg");
 	loadsound(GD_S_BLADDER_SPENDER, "bladder_spender.ogg");
 	loadsound(GD_S_BLADDER_CONVERT, "bladder_convert.ogg");
+	loadsound(GD_S_BLADDER_MOVE, "bladder_move.ogg");
+	loadsound(GD_S_BITER_EAT, "biter_eat.ogg");
 	loadsound(GD_S_BOMB_EXPLOSION, "bomb_explosion.ogg");
 	loadsound(GD_S_GHOST_EXPLOSION, "ghost_explosion.ogg");
 	loadsound(GD_S_VOODOO_EXPLOSION, "voodoo_explosion.ogg");
@@ -257,56 +253,83 @@ gd_no_sound()
 	if (!mixer_started)
 		return;
 
-	/* if any of the channels are playing looped sounds, that should be stopped. */
-	/* non-looping sounds are not stopped; they will go away automatically with time. */
-	for (i=0; i<G_N_ELEMENTS(sound_playing); i++) {
-		if (is_sound_looped(sound_playing[i]))
-			halt_channel(i);
-	}
+	/* stop all sounds. */
+	for (i=0; i<G_N_ELEMENTS(snd_playing); i++)
+		halt_channel(i);
 #endif
 }
 
 void
-gd_play_sounds(GdSound sound1, GdSound sound2, GdSound sound3)
+gd_play_bonus_life_sound()
+{
+#ifdef GD_SOUND
+	play_sound(gd_sound_get_channel(GD_S_BONUS_LIFE), GD_S_BONUS_LIFE);
+#endif
+}
+
+static void
+play_sounds(GdSound sound1, GdSound sound2, GdSound sound3)
 {
 #ifdef GD_SOUND
 	if (!mixer_started || !gd_sdl_sound)
 		return;
-	
-	/* CHANNEL 3 is for crack sound, amoeba and magic wall. */
-	if (sound3!=GD_S_NONE) {
-		/* if requests a non-looped sound, play that immediately. that can be a crack sound, gravity change, new life, ... */
-		if (!is_sound_looped(sound3))
-			play_sound(3, sound3);
-		else {
-			/* if the sound is looped, play it, but only if != previous one. if they are equal, the sound is looped, and already playing. */
-			/* also, do not interrupt the previous sound, if it is non-looped. */
-			if (sound_playing[3]==GD_S_NONE || (sound3!=sound_playing[3] && is_sound_looped(sound_playing[3])))
-				play_sound(3, sound3);
-		}
-	} else {
-		/* sound3=none, so interrupt sound requested. */
-		/* only interrupt looped sounds. non-looped sounds will fade out automatically. */
-		if (is_sound_looped(sound_playing[3]))
-			halt_channel(3);
-	}
 
+	/* CHANNEL 1 is for small sounds */
+	if (sound1!=GD_S_NONE) {
+		play_sound(1, sound1);
+	} else {
+		/* only interrupt looped sounds. non-looped sounds will go away automatically. */
+		if (gd_sound_is_looped(sound_playing(1)))
+			halt_channel(1);
+	}
 	
 	/* CHANNEL 2 is for walking, explosions */
 	/* if no sound requested, do nothing. */
 	if (sound2!=GD_S_NONE) {
-		/* 1) always restart explosion sound. */
-		/* 2) play other sound only if not currently playing an explosion */
-		if (sound2==GD_S_EXPLOSION || sound_playing[2]!=GD_S_EXPLOSION)
+		gboolean play=FALSE;
+		
+		/* always start if not currently playing a sound. */
+		if (sound_playing(2)==GD_S_NONE
+			|| gd_sound_force_start(sound2)
+			|| gd_sound_get_precedence(sound2)>gd_sound_get_precedence(sound_playing(2)))
+			play=TRUE;
+
+		/* if figured out to play: do it. */
+		/* if the requested sound is looped, and already playing, forget the request. */
+		if (play && !(gd_sound_is_looped(sound2) && sound2==sound_playing(2)))
 			play_sound(2, sound2);
 	} else {
-		/* let sounds fade out. */
+		/* only interrupt looped sounds. non-looped sounds will go away automatically. */
+		if (gd_sound_is_looped(sound_playing(2)))
+			halt_channel(2);
+	}
+	
+	/* CHANNEL 3 is for crack sound, amoeba and magic wall. */
+	if (sound3!=GD_S_NONE) {
+		/* if requests a non-looped sound, play that immediately. that can be a crack sound, gravity change, new life, ... */
+		if (!gd_sound_is_looped(sound3))
+			play_sound(3, sound3);
+		else {
+			/* if the sound is looped, play it, but only if != previous one. if they are equal,
+			   the sound is looped, and already playing, no need to touch it. */
+			/* also, do not interrupt the previous sound, if it is non-looped. later calls of this function will probably
+			   contain the same sound3, and then it will be set. */
+			if (sound_playing(3)==GD_S_NONE || (sound3!=sound_playing(3) && gd_sound_is_looped(sound_playing(3))))
+				play_sound(3, sound3);
+		}
+	} else {
+		/* sound3=none, so interrupt sound requested. */
+		/* only interrupt looped sounds. non-looped sounds will go away automatically. */
+		if (gd_sound_is_looped(sound_playing(3)))
+			halt_channel(3);
 	}
 
-	
-	/* CHANNEL 1 is for small sounds */
-	if (sound1!=GD_S_NONE)
-		play_sound(1, sound1);
 #endif
 }
 
+
+void
+gd_cave_play_sounds(Cave *cave)
+{
+	play_sounds(cave->sound1, cave->sound2, cave->sound3);
+}

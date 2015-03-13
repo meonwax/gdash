@@ -50,11 +50,14 @@ GdkPixmap **gd_create_title_animation (void);
 void gd_preferences (GtkWidget *parent);
 
 void gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, Cave *highlight_cave, int highlight_rank);
-void gd_save_caveset_as_cb (GtkWidget *widget, gpointer data);
-void gd_save_caveset_cb (GtkWidget *widget, gpointer data);
-void gd_open_caveset (GtkWidget *window, const char *directory);
 
-gboolean gd_ask_overwrite(GtkWidget *parent, const char *filename);
+gboolean gd_open_caveset_in_ui(const char *filename, gboolean highscore_load_from_bdcff);
+
+void gd_save_caveset_as (GtkWidget *parent);
+void gd_save_caveset (GtkWidget *parent);
+void gd_open_caveset (GtkWidget *parent, const char *directory);
+
+gboolean gd_ask_overwrite(const char *filename);
 
 gboolean gd_discard_changes (GtkWidget *parent);
 
@@ -62,13 +65,15 @@ void gd_warningmessage (const char *primary, const char *secondary);
 void gd_errormessage (const char *primary, const char *secondary);
 void gd_infomessage (const char *primary, const char *secondary);
 
+gboolean gd_question_yesno(const char *primary, const char *secondary);
+
 void gd_load_internal(GtkWidget *parent, int i);
 
 GtkWidget *gd_label_new_printf(const char *format, ...);
 GtkWidget *gd_label_new_printf_centered(const char *format, ...);
 void gd_label_set_markup_printf(GtkLabel *label, const char *format, ...);
 
-void gd_show_errors();
-void gd_show_last_error();
+void gd_show_errors(GtkWidget *parent);
+void gd_show_last_error(GtkWidget *parent);
 
 #endif

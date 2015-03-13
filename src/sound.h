@@ -19,7 +19,8 @@
 
 void gd_sound_init();
 void gd_no_sound();
-void gd_play_sounds(GdSound sound1, GdSound sound2, GdSound sound3);
+void gd_cave_play_sounds(Cave *cave);
+void gd_play_bonus_life_sound();
 
 #endif
 

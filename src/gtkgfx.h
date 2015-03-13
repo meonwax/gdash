@@ -25,11 +25,12 @@ extern int gd_cell_size_game, gd_cell_size_editor;
 extern GdkPixbuf *gd_pixbuf_for_builtin;
 
 /* tv stripes for a pixbuf. exported for the settings window */
-void gd_tv_pixbuf(GdkPixbuf *pixbuf);
+void gd_pal_pixbuf(GdkPixbuf *pixbuf);
 GdkPixbuf *gd_pixbuf_scale(GdkPixbuf *orig, GdScalingType type);
 
 /* png graphics loading */
-gboolean gd_is_image_ok_for_theme(const char *filename);
+const char* gd_is_pixbuf_ok_for_theme(GdkPixbuf *pixbuf);
+const char* gd_is_image_ok_for_theme(const char *filename);
 void gd_loadcells_default();
 gboolean gd_loadcells_file(const char *filename);
 

@@ -18,38 +18,89 @@
 
 #include <glib.h>
 
+#include "config.h"
+
+
+
+/*******************************************
+ *
+ * BIG STRUCT HANDLING
+ *
+ */
+/* possible types handled */
+typedef enum _gd_type {
+	/* not real types, only used by editor to build ui */
+	GD_TAB,
+	GD_LABEL,
+	GD_LEVEL_LABEL,
+	
+	/* gd types */
+	GD_TYPE_STRING,
+	GD_TYPE_INT,
+	GD_TYPE_RATIO,
+	GD_TYPE_ELEMENT,
+	GD_TYPE_BOOLEAN,
+	GD_TYPE_PROBABILITY,
+	GD_TYPE_COLOR,
+	GD_TYPE_EFFECT,
+	GD_TYPE_DIRECTION,
+	GD_TYPE_SCHEDULING,
+} GdType;
+
+enum _gd_property_flags {
+	GD_ALWAYS_SAVE=1<<0,
+	GD_DONT_SAVE=1<<1,
+	GD_DONT_SHOW_IN_EDITOR=1<<2,
+};
+
+typedef struct {
+	char *identifier;	/* bdcff identifier */
+	GdType type;	/* data type */
+	int flags;		/* flags for bdcff saving/loading */
+	char *name;		/* name in editor */
+	int offset;		/* byte offset in a Cave structure. use the CAVE_OFFSET macro */
+	int count;		/* size of array; usually 1, for non-arrays. */
+	char *tooltip;	/* tooltip text in editor */
+	int min, max;	/* integers have minimum and maximum */
+} GdStructDescriptor;
+
+typedef struct _gd_property_default {
+	int offset;	/* data offset (bytes) in a cave structure */
+	int defval;	/* default value, converted to int. if type is a float, *1000000 */
+	
+	int property_index;	/* index in gd_cave_properties; created at runtime */
+} GdPropertyDefault;
+
+
+
 /* these define the number of the cells in the png file */
 #define NUM_OF_CELLS_X 8
 #define NUM_OF_CELLS_Y 36
+
 /* +64: placeholder for cells which are rendered by the game; for example diamond+arrow = falling diamond */
-#define NUM_OF_CELLS (NUM_OF_CELLS_X*NUM_OF_CELLS_Y+64)
+#define NUM_OF_CELLS (NUM_OF_CELLS_X*NUM_OF_CELLS_Y+72)
+
+
+
+
 
 
 typedef guint32 GdColor;
+extern const GdColor gd_flash_color;
 
 typedef struct _c64_colors {
 	const char *name;
 	const GdColor rgb;
 	guint32 p;
-} GDC64Color;
-extern GDC64Color gd_c64_colors[16];
+} GdC64Color;
+extern const GdColor gd_select_color;
 
-#define GD_C64_BLACK (gd_c64_colors[0].rgb)
-#define GD_C64_WHITE (gd_c64_colors[1].rgb)
-#define GD_C64_RED (gd_c64_colors[2].rgb)
-#define GD_C64_PURPLE (gd_c64_colors[4].rgb)
-#define GD_C64_CYAN (gd_c64_colors[3].rgb)
-#define GD_C64_GREEN (gd_c64_colors[5].rgb)
-#define GD_C64_BLUE (gd_c64_colors[6].rgb)
-#define GD_C64_YELLOW (gd_c64_colors[7].rgb)
-#define GD_C64_ORANGE (gd_c64_colors[8].rgb)
-#define GD_C64_BROWN (gd_c64_colors[9].rgb)
-#define GD_C64_LIGHTRED (gd_c64_colors[10].rgb)
-#define GD_C64_GRAY1 (gd_c64_colors[11].rgb)
-#define GD_C64_GRAY2 (gd_c64_colors[12].rgb)
-#define GD_C64_LIGHTGREEN (gd_c64_colors[13].rgb)
-#define GD_C64_LIGHTBLUE (gd_c64_colors[14].rgb)
-#define GD_C64_GRAY3 (gd_c64_colors[15].rgb)
+
+
+
+
+
+
 
 
 
@@ -67,6 +118,7 @@ typedef enum _element {
 	O_BRICK_SLOPED_UP_LEFT,
 	O_BRICK_SLOPED_DOWN_LEFT,
 	O_BRICK_SLOPED_DOWN_RIGHT,
+	O_BRICK_NON_SLOPED,
 	O_MAGIC_WALL,
 	O_PRE_OUTBOX,
 	O_OUTBOX,
@@ -252,9 +304,7 @@ typedef enum _element {
 	O_UNKNOWN,	/* unknown element imported or read from bdcff */
 	O_NONE,		/* do not draw this element when creating cave; can be used, for example, to skip drawing a maze's path */
 
-	/* remembering last index */
-	/* this should get an integer value which is 1 more than the one above. */
-	O_MAX,
+	O_MAX,	/* remembering last index: this should get an integer value which is 1 more than the one above. */
 
 	/* fake elements to help drawing */
 	O_FAKE_BONUS,
@@ -271,6 +321,8 @@ typedef enum _element {
 	O_GROWING_WALL_SWITCH_VERT,
 	O_GRAVITY_SWITCH_ACTIVE,
 
+	O_QUESTION_MARK,
+	O_EATABLE,
 	O_DOWN_ARROW,
 	O_LEFTRIGHT_ARROW,
 	O_EVERYDIR_ARROW,
@@ -285,46 +337,54 @@ typedef enum _element {
 	O_MASK = ~(SCANNED | COVERED)
 } GdElement;
 
-extern GdElement gd_char_to_element[];
+
+
+
 
 typedef enum _element_property {
 	/* properties */
-	P_SLOPED_LEFT = 1 << 0,	/**< stones and diamonds roll down to left on this */
-	P_SLOPED_RIGHT = 1 << 1,	/**< stones and diamonds roll down to right on this */
+	P_SLOPED_LEFT = 1 << 0,	/* stones and diamonds roll down to left on this */
+	P_SLOPED_RIGHT = 1 << 1,	/* stones and diamonds roll down to right on this */
 	P_SLOPED_UP = 1 << 2,
 	P_SLOPED_DOWN = 1 << 3,
-	P_SLOPED = P_SLOPED_LEFT|P_SLOPED_RIGHT|P_SLOPED_UP|P_SLOPED_DOWN,			/**< stones and diamonds roll down on this in any direction */
+	P_SLOPED = P_SLOPED_LEFT|P_SLOPED_RIGHT|P_SLOPED_UP|P_SLOPED_DOWN,			/* stones and diamonds roll down on this in any direction */
 	
-	P_AMOEBA_CONSUMES = 1 << 4,		/**< amoeba can eat this */
+	P_AMOEBA_CONSUMES = 1 << 4,		/* amoeba can eat this */
 	P_DIRT = 1 << 5,				/* it is dirt, or something similar (dirt2 or sloped dirt) */
-	P_BLOWS_UP_FLIES = 1 << 6,			/**< flies blow up, if they touch this */
+	P_BLOWS_UP_FLIES = 1 << 6,			/* flies blow up, if they touch this */
 
-	P_EXPLODES_TO_SPACE = 1 << 7,			/**< explodes if hit by a rock */
-	P_EXPLODES_TO_DIAMONDS = 1 << 8,/**< explodes to diamonds if hit by a rock */
-	P_EXPLODES_TO_STONES = 1 << 9,		/**< explodes to rocks if hit by a rock */
+	P_EXPLODES_TO_SPACE = 1 << 7,			/* explodes if hit by a rock */
+	P_EXPLODES_TO_DIAMONDS = 1 << 8,/* explodes to diamonds if hit by a rock */
+	P_EXPLODES_TO_STONES = 1 << 9,		/* explodes to rocks if hit by a rock */
 	P_EXPLODES=P_EXPLODES_TO_SPACE|P_EXPLODES_TO_DIAMONDS|P_EXPLODES_TO_STONES,	/* explodes to something if hit */
 
-	P_NON_EXPLODABLE = 1 << 10,		/**< selfexplaining */
-	P_CCW = 1 << 11,			/**< this creature has a default counterclockwise rotation (for example, o_fire_1) */
-	P_CAN_BE_HAMMERED = 1 << 12,	/**< can be broken by pneumatic hammer */
+	P_NON_EXPLODABLE = 1 << 10,		/* selfexplaining */
+	P_CCW = 1 << 11,			/* this creature has a default counterclockwise rotation (for example, o_fire_1) */
+	P_CAN_BE_HAMMERED = 1 << 12,	/* can be broken by pneumatic hammer */
 	P_VISUAL_EFFECT = 1 << 13,
 } GdElementProperties;
 
+
+
+
+
+
+
 /** These are states of the magic wall. */
-typedef enum magic_wall_state {
-	MW_DORMANT,					/* Starting with this. */
-	MW_ACTIVE,					/* Boulder or diamond dropped into. */
-	MW_EXPIRED					/* Turned off after magic_wall_milling_time. */
-} MAGIC_WALL_STATE;
+typedef enum _magic_wall_state {
+	GD_MW_DORMANT,					/* Starting with this. */
+	GD_MW_ACTIVE,					/* Boulder or diamond dropped into. */
+	GD_MW_EXPIRED					/* Turned off after magic_wall_milling_time. */
+} GdMagicWallState;
 
 /** These are states of Player. */
-typedef enum player_state {
-	PL_NOT_YET,				/* Not yet living. Beginning of cave time. */
-	PL_LIVING,				/* Ok. */
-	PL_TIMEOUT,				/* Time is up */
-	PL_DIED,				/* Died. */
-	PL_EXITED				/* Exited the cave, proceed to next one */
-} PLAYER_STATE;
+typedef enum _player_state {
+	GD_PL_NOT_YET,				/* Not yet living. Beginning of cave time. */
+	GD_PL_LIVING,				/* Ok. */
+	GD_PL_TIMEOUT,				/* Time is up */
+	GD_PL_DIED,				/* Died. */
+	GD_PL_EXITED				/* Exited the cave, proceed to next one */
+} GdPlayerState;
 
 typedef enum _direction {
 	/* not moving */
@@ -353,25 +413,17 @@ typedef enum _direction {
 	MV_DOWN_LEFT_2=14,
 	MV_LEFT_2=15,
 	MV_UP_LEFT_2=16,
+	
+	MV_MAX,
 } GdDirection;
 
 typedef enum _sound {
 	GD_S_NONE,
-	GD_S_DIAMOND_RANDOM,	/* randomly select a diamond sound */
-	GD_S_AMOEBA,			/* loop */
-	GD_S_MAGIC_WALL,		/* loop */
-	GD_S_COVER,				/* loop */
-	GD_S_PNEUMATIC_HAMMER,	/* loop */
-	GD_S_WATER,				/* loop */
-	GD_S_CRACK,
-	GD_S_GRAVITY_CHANGE,
+
 	GD_S_STONE,
 	GD_S_FALLING_WALL,
 	GD_S_GROWING_WALL,
-	GD_S_DOOR_OPEN,
-	GD_S_WALK_EARTH,
-	GD_S_WALK_EMPTY,
-	GD_S_STIRRING,
+	GD_S_DIAMOND_RANDOM,	/* randomly select a diamond sound */
 	GD_S_DIAMOND_1,
 	GD_S_DIAMOND_2,
 	GD_S_DIAMOND_3,
@@ -381,17 +433,23 @@ typedef enum _sound {
 	GD_S_DIAMOND_7,
 	GD_S_DIAMOND_8,
 	GD_S_DIAMOND_COLLECT,
+	GD_S_SKELETON_COLLECT,
 	GD_S_PNEUMATIC_COLLECT,
 	GD_S_BOMB_COLLECT,
 	GD_S_CLOCK_COLLECT,
 	GD_S_SWEET_COLLECT,
 	GD_S_KEY_COLLECT,
-	GD_S_SKELETON_COLLECT,
 	GD_S_SLIME,
 	GD_S_ACID_SPREAD,
-	GD_S_WATER_SPREAD,
+	GD_S_BLADDER_MOVE,
 	GD_S_BLADDER_CONVERT,
 	GD_S_BLADDER_SPENDER,
+	GD_S_BITER_EAT,
+
+	GD_S_DOOR_OPEN,
+	GD_S_WALK_EARTH,
+	GD_S_WALK_EMPTY,
+	GD_S_STIRRING,
 	GD_S_BOX_PUSH,
 	GD_S_TELEPORTER,
 	GD_S_TIMEOUT_1,
@@ -403,6 +461,7 @@ typedef enum _sound {
 	GD_S_TIMEOUT_7,
 	GD_S_TIMEOUT_8,
 	GD_S_TIMEOUT_9,
+	GD_S_TIMEOUT,
 	GD_S_EXPLOSION,
 	GD_S_BOMB_EXPLOSION,
 	GD_S_GHOST_EXPLOSION,
@@ -413,10 +472,18 @@ typedef enum _sound {
 	GD_S_SWITCH_CREATURES,
 	GD_S_SWITCH_GRAVITY,
 	GD_S_SWITCH_GROWING,
+
+	GD_S_AMOEBA,			/* loop */
+	GD_S_MAGIC_WALL,		/* loop */
+	GD_S_COVER,				/* loop */
+	GD_S_PNEUMATIC_HAMMER,	/* loop */
+	GD_S_WATER,				/* loop */
+	GD_S_CRACK,
+	GD_S_GRAVITY_CHANGE,
 	GD_S_BONUS_LIFE,
+
 	GD_S_MAX,
 } GdSound;
-
 
 
 /* ELEMENTS DESCRIPTION */
@@ -434,7 +501,6 @@ typedef struct _elements {
 	char *lowercase_name;	/* lowercase of translated name. for editor; generated inside the game. */
 	char character_new;		/* character given automatically for elements which don't have one defined in original bdcff description */
 } GdElements;
-extern GdElements gd_elements[];
 
 typedef char GdString[128];
 
@@ -462,6 +528,7 @@ typedef struct _gd_cave_demo {
 typedef enum _gd_scheduling {
 	GD_SCHEDULING_MILLISECONDS,
 	GD_SCHEDULING_BD1,
+	GD_SCHEDULING_BD2,
 	GD_SCHEDULING_PLCK,
 	GD_SCHEDULING_CRDR,
 	GD_SCHEDULING_MAX
@@ -483,7 +550,7 @@ typedef struct _cave {
 
 	GdString charset;			/* these are not used by gdash */
 	GdString fontset;
-
+	
 	/* and this one the highscores */
 	GdHighScore highscore[GD_HIGHSCORE_NUM];
 
@@ -497,7 +564,7 @@ typedef struct _cave {
 	gboolean intermission_rewardlife;	/* one life extra, if the intermission is successfully finished */
 	gboolean selectable;			/* is this selectable as an initial cave for a game? */
 	gboolean diagonal_movements;	/* are diagonal movements allowed? */
-	gboolean snap_explosions;		/* if true, snapping will create explosions */
+	GdElement snap_element;		/* snapping (press fire+move) usually leaves space behind, but can be other */
 	gboolean short_explosions;		/* in >=1stb, diamond and creature explosions were of 5 stages */
 
 	GdScheduling scheduling;	/* scheduling type; see above */
@@ -517,6 +584,8 @@ typedef struct _cave {
 	int level_ckdelay[5];		/* Timing in original game units */
 	int level_time[5];			/* Available time, per level */
 	int level_timevalue[5];		/* points for each second remaining, when exiting level */
+	
+	int max_time;			/* the maximum time in seconds. if above, it overflows */
 
 	int w, h;				/* Sizes of cave, width and height. */
 	int x1,y1,x2,y2;		/* Visible part of the cave */
@@ -537,6 +606,7 @@ typedef struct _cave {
 	int amoeba_threshold;			/* amoeba to stones ratio */
 	gboolean amoeba_timer_started_immediately;	/* FALSE: amoeba will start life at the first possibility of growing. */
 	gboolean amoeba_timer_wait_for_hatching;	/* amoeba timer does not start before player's birth */
+	gboolean amoeba_sound;			/* if the living amoeba has sound. */
 
 	GdElement acid_eats_this;		/* acid eats this element */
 	double acid_spread_ratio;		/* Probability of acid blowing up, each frame */
@@ -561,6 +631,13 @@ typedef struct _cave {
 	
 	gboolean water_does_not_flow_down;	/* if true, water will not grow downwards, only in other directions. */
 	gboolean water_sound;			/* water has sound */
+	
+	gboolean bladder_sound;		/* bladder moving and pushing has sound */
+	GdElement bladder_converts_by;	/* bladder converts to clock by touching this element */
+
+	int biter_delay_frame;		/* frame count biters do move */
+	GdElement biter_eat;		/* biters eat this */
+	gboolean biter_sound;		/* biters have sound */	
 
 	/* effects */
 	GdElement explosion_to;			/* explosion converts to this element */
@@ -578,11 +655,10 @@ typedef struct _cave {
 	GdElement magic_stone_to;		/* magic wall converts falling stone to */
 	GdElement magic_diamond_to;		/* magic wall converts falling diamond to */
 
-	GdElement bladder_converts_by;	/* bladder converts to clock by touching this element */
 	GdElement bomb_explode_to;		/* bombs explode to this element */
 
-	double pushing_stone_prob;		/* probability of pushing boulder, normally 0.25 */
-	double pushing_stone_prob_sweet;	/* probability of pushing, after eating sweet, normally 1.0 */
+	double pushing_stone_prob;		/* probability of pushing stone */
+	double pushing_stone_prob_sweet;	/* probability of pushing, after eating sweet */
 
 	gboolean creatures_backwards;	/* creatures changed direction */
 	gboolean creatures_direction_auto_change_on_start;	/* the change occurs also at the start signal */
@@ -595,14 +671,13 @@ typedef struct _cave {
 	int gravity_change_time;
 	gboolean gravity_affects_all;	/* if true, gravity also affects falling wall, bladder and waiting stones */
 
-	int biter_delay_frame;		/* frame count biters do move */
-	GdElement biter_eat;	/* biters eat this */
-
 	gboolean hammered_walls_reappear;
 	int pneumatic_hammer_frame;
 	int hammered_wall_reappear_frame;
 	
 	/* internal variables, used during the game. private data :) */
+	GdElement* (*getp) (const struct _cave*, int x, int y);	/* returns a pointer to the element at x, y. this points to a perfect border or a line shifting get function. */
+
 	gboolean hatched;			/* hatching has happened. (timers may run, ...) */
 	gboolean gate_open;			/* self-explaining */
 	guint32 render_seed;		/* the seed value, which was used to render the cave, is saved here. will be used by record&playback */
@@ -611,32 +686,34 @@ typedef struct _cave {
 	int timing_factor;			/* number of "milliseconds" in each second :) 1000 for ntsc, 1200 for pal. */
 	gpointer **objects_order;	/* two-dimensional map of cave; each cell is a pointer to the drawing object, which created this element. NULL if map or random. */
 	int **hammered_reappear;	/* integer map of cave; if non-zero, a brick wall will appear there */
+
 	int speed;					/* Time between game cycles in ms */
 	int c64_timing;				/* a ckdelay value for the level this cave is rendered for */
 	int ckdelay;				/* ckdelay value for the current iteration */
 	int ckdelay_extra_for_animation;	/* bd1 and similar engines had animation bits in cave data, to set which elements to animate (firefly, butterfly, amoeba).
 											animating an element also caused some delay each frame; according to my measurements, around 2.6 ms/element. */
+
 	int time;					/* seconds remaining to finish cave */
-	int timevalue;				/* points for remaining seconds */
+	int timevalue;				/* points for remaining seconds - for current level */
 	int diamonds_needed;		/* diamonds needed to open outbox */
 	int diamonds_collected;		/* diamonds collected */
+	int skeletons_collected;	/* number of skeletons collected */
 	int gate_open_flash;		/* flashing of screen when gate opens */
-	int score;						/* Score got this frame. */
+	int score;					/* Score got this frame. */
 	gboolean amoeba_too_big;	/* Too much amoeba found, and amoeba will convert into stones next frame. */
 	gboolean amoeba_enclosed;		/* Amoeba closed, so will convert into diamonds next frame */
-	MAGIC_WALL_STATE magic_wall_state;		/* State of magic wall */
-	PLAYER_STATE player_state;		/* Player state. not yet living, living, exited... */
+	GdMagicWallState magic_wall_state;		/* State of magic wall */
+	GdPlayerState player_state;		/* Player state. not yet living, living, exited... */
 	int player_seen_ago;			/* player was seen this number of scans ago */
 	gboolean kill_player;			/* Voodoo died, or used pressed escape to restart level. */
 	gboolean amoeba_started;		/* amoeba started. */
 	gboolean sweet_eaten;			/* player ate sweet, he's strong. prob_sweet applies, and also able to push chasing stones */
 	int player_x, player_y;			/* Coordinates of player (for scrolling) */
 	int px[16], py[16];				/* coordinates of player, for chasing stone */
-	gboolean diamond_key_collected;	/* Key collected, so trapped diamonds convert to diamonds */
 	int key1, key2, key3;			/* The player is holding this number of keys of each color */
+	gboolean diamond_key_collected;	/* Key collected, so trapped diamonds convert to diamonds */
 	gboolean expanding_wall_changed;	/* growing wall direction is changed */
 	int time_decrement;				/* time to subtract after destroying voodoo (time penalties converting to gravestones) */
-	int skeletons_collected;			/* number of skeletons collected */
 
 	gboolean inbox_flash_toggle;	/* negated every scan. helps drawing inboxes, and making players be born at different times. */
 	GdDirection last_direction;		/* last direction player moved. used by draw routines */
@@ -644,7 +721,7 @@ typedef struct _cave {
 	int biters_wait_frame;				/* number of frames to wait until biteres will move again */
 	int creatures_direction_will_change;	/* creatures automatically change direction every x seconds */
 	unsigned int rand_seed_1, rand_seed_2;	/* used for predictable random generator during the game. */
-	GdElement* (*getp) (const struct _cave*, int x, int y);	/* returns a pointer to the element at x, y. this points to a perfect border or a line shifting get function. */
+
 	gboolean gravity_switch_active;	/* true if gravity switch is activated, and can be used. */
 	int gravity_will_change;	/* gravity will change in this number of seconds */
 	gboolean gravity_disabled;	/* when the player is stirring the pot, there is no gravity. */
@@ -655,51 +732,15 @@ typedef struct _cave {
 } Cave;
 
 
+#define CAVE_OFFSET(property) (G_STRUCT_OFFSET(Cave, property))
 
 
-/* CAVE DESCRIPTION */
-typedef enum _gd_type {
-	/* not real types, only used by editor to build ui */
-	GD_TAB,
-	GD_LABEL,
-	GD_LEVEL_LABEL,
-	
-	/* gd types */
-	GD_TYPE_STRING,
-	GD_TYPE_INT,
-	GD_TYPE_RATIO,
-	GD_TYPE_ELEMENT,
-	GD_TYPE_BOOLEAN,
-	GD_TYPE_PROBABILITY,
-	GD_TYPE_COLOR,
-	GD_TYPE_EFFECT,
-	GD_TYPE_DIRECTION,
-	GD_TYPE_SCHEDULING,
-} GdType;
 
-enum _gd_property_flags {
-	GD_FOR_CAVESET=1<<0,
-	GD_ALWAYS_SAVE=1<<1,
-	GD_DONT_SAVE=1<<2,
-	GD_DONT_SHOW_IN_EDITOR=1<<3,
-};
 
-typedef struct {
-	char *identifier;
-	GdType type;
-	int flags;
-	char *name;
-	int offset;
-	int count;
-	char *tooltip;
-	int defval;
-	int min, max;
-} GdCaveProperties;
 
-extern const GdCaveProperties gd_cave_properties[];
 
-extern const GdColor gd_flash_color;
-extern const GdColor gd_select_color;
+
+
 
 
 /* arrays for movements */
@@ -708,9 +749,23 @@ extern const int gd_dx[], gd_dy[];
 
 /* names of directions */
 extern const char* gd_direction_name[];
+extern const char* gd_direction_filename[];
 /* names of schedulings */
 extern const char* gd_scheduling_name[];
 extern const char* gd_scheduling_filename[];	/* identifiers in bdcff */
+
+extern GdElement gd_char_to_element[];
+
+void gd_create_char_to_element_table();
+GdElement gd_get_element_from_character (guint8 character);
+GdElement gd_get_element_from_string (const char *string);
+
+
+
+void gd_struct_set_defaults_from_array(gpointer str, const GdStructDescriptor *properties, GdPropertyDefault *defaults);
+char *gd_struct_explain_defaults_in_string(const GdStructDescriptor *properties, GdPropertyDefault *defaults);
+
+
 
 /* init cave engine */
 void gd_cave_init();
@@ -721,25 +776,27 @@ guint gd_str_case_hash(gconstpointer v);
 
 /* cave highscore functions */
 int gd_highscore_compare(gconstpointer a, gconstpointer b);
-gboolean gd_cave_is_highscore(Cave *cave, int score);
-int gd_cave_add_highscore(Cave *cave, GdHighScore hs);
-void gd_cave_clear_highscore(Cave *cave);
+gboolean gd_is_highscore(GdHighScore *scores, int score);
+int gd_add_highscore(GdHighScore *scores, GdHighScore hs);
+void gd_clear_highscore(GdHighScore *hs);
+gboolean gd_has_highscore(GdHighScore *hs);
 
 /* cave creator and destructor functions */
-Cave *gd_cave_new(void);
+Cave *gd_cave_new();
 Cave *gd_cave_new_from_cave(const Cave *orig);
 void gd_cave_copy(Cave *dest, const Cave *src);
 void gd_cave_free(Cave *cave);
 
 /* cave manipulation */
-void gd_cave_set_defaults(Cave *cave);
+void gd_cave_set_gdash_defaults(Cave *cave);
+void gd_cave_set_defaults_from_array(Cave* cave, GdPropertyDefault *defaults);
 void gd_cave_correct_visible_size(Cave *cave);
-void gd_cave_shrink(Cave *cave);
+void gd_cave_auto_shrink(Cave *cave);
 void gd_cave_easy(Cave *cave);
 void gd_cave_set_random_colors(Cave *cave);
-void gd_cave_set_ckdelay_extra_for_animation(Cave *cave);
 void gd_cave_setup_for_game(Cave *cave);
 void gd_cave_count_diamonds(Cave *cave);
+unsigned int gd_cave_c64_random(Cave *);
 
 /* support */
 gpointer gd_cave_map_new_for_cave(const Cave *cave, const int cell_size);
@@ -747,6 +804,7 @@ gpointer gd_cave_map_dup_size(const Cave * cave, const gpointer map, const int c
 #define gd_cave_map_new(CAVE, TYPE) ((TYPE **)gd_cave_map_new_for_cave((CAVE), sizeof(TYPE)))
 #define gd_cave_map_dup(CAVE, MAP) ((gpointer)gd_cave_map_dup_size((CAVE), (gpointer *)(CAVE)->MAP, sizeof((CAVE)->MAP[0][0])))
 void gd_cave_map_free(gpointer map);
+
 void gd_cave_store_rc (Cave * cave, const int x, const int y, const GdElement element, const void* order);
 static inline GdElement
 gd_cave_get_rc (const Cave *cave, const int x, const int y)
@@ -755,22 +813,29 @@ gd_cave_get_rc (const Cave *cave, const int x, const int y)
 
 	return cave->map[y][x];
 }
-unsigned int gd_c64_predictable_random(Cave *);
-void gd_cave_clear_strings(Cave *cave);
 
 /* i/o */
 const char* gd_get_color_name(GdColor color);
 int gd_get_c64_color_index(GdColor color);
 GdColor gd_get_color_from_string(const char *color);
 
-void gd_create_char_to_element_table();
-GdElement gd_get_element_from_character (guint8 character);
-GdElement gd_get_element_from_string (const char *string);
+const char *gd_direction_get_visible_name(GdDirection dir);
+const char *gd_direction_get_filename(GdDirection dir);
+GdDirection gd_direction_from_string(const char *str);
 
+/* game playing helpers */
 #define GD_REDRAW (1<<10)
 void gd_drawcave_game (const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, gboolean paused);
-
 gboolean gd_cave_scroll(int width, int visible, int center, gboolean exact, int start, int to, int *current, int *desired, int *speed);
+
+/* function to copy a GdString */
+static inline int
+gd_strcpy(GdString dest, const GdString src)
+{
+	return g_strlcpy(dest, src, sizeof(GdString));
+}
+
+int gd_cave_time_show(Cave *cave, int internal_time);
 
 
 #endif							/* _CAVE_H */

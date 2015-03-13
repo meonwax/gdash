@@ -20,10 +20,11 @@
 #include <glib/gi18n.h>
 #include "util.h"
 #include "cave.h"
+#include "cavedb.h"
 #include "caveobject.h"
 #include "caveset.h"
 #include "c64import.h"
-#include "gtk_gfx.h"
+#include "gtkgfx.h"
 
 static int steel=0x38;	/* magic value: the code of steel wall */
 
@@ -467,17 +468,17 @@ gd_save_html (char *htmlname, GtkWidget *window)
 	pngbasename=g_path_get_basename(pngoutbasename);
 
 	g_string_append_printf (contents, "<HTML>\n");
-	g_string_append_printf (contents, "<TITLE>%s</TITLE>", gd_default_cave->name);
+	g_string_append_printf (contents, "<TITLE>%s</TITLE>", gd_caveset_data->name);
 	g_string_append_printf (contents, "<BODY>\n");
 
-	g_string_append_printf (contents, "<H1>%s</H1>", gd_default_cave->name);
+	g_string_append_printf (contents, "<H1>%s</H1>", gd_caveset_data->name);
 	g_string_append_printf (contents, _("Caves: %d<BR>\n"), gd_caveset_count ());
-	if (!g_str_equal(gd_default_cave->author, ""))
-		g_string_append_printf (contents, _("Author: %s<BR>\n"), gd_default_cave->author);
-	if (!g_str_equal(gd_default_cave->description, ""))
-		g_string_append_printf (contents, _("Description: %s<BR>\n"), gd_default_cave->description);
-	if (!g_str_equal(gd_default_cave->www, ""))
-		g_string_append_printf (contents, _("WWW: %s<BR>\n"), gd_default_cave->www);
+	if (!g_str_equal(gd_caveset_data->author, ""))
+		g_string_append_printf (contents, _("Author: %s<BR>\n"), gd_caveset_data->author);
+	if (!g_str_equal(gd_caveset_data->description, ""))
+		g_string_append_printf (contents, _("Description: %s<BR>\n"), gd_caveset_data->description);
+	if (!g_str_equal(gd_caveset_data->www, ""))
+		g_string_append_printf (contents, _("WWW: %s<BR>\n"), gd_caveset_data->www);
 
 	g_string_append_printf (contents, "<HR>\n");
 

@@ -22,7 +22,7 @@ static const char *s_bd1="GDashBD1";
 static const char *s_bd2="GDashBD2";
 static const char *s_plc="GDashPLC";
 static const char *s_crl="GDashCRL";
-static const char *s_crd="GDashCRD";
+static const char *s_cd7="GDashCD7";
 static const char *s_1st="GDash1ST";
 
 /* loaded memory map */
@@ -207,30 +207,49 @@ static int try_plck()
 	int x, i;
 	int has_names;
 	int has_diego=0;
-
+	int valid;
+	int ok;
+	
 	strcpy((char *)out, s_plc);
 	outpos=12;
 	printf("\n*** Trying to interpret PLCK caves...\n");
 	/* try plck */
-	/* plck caves begin with steel walls, coded 0x44. */
-	/* we assume that there are at least 4 caves. */
-	for (x=0; x<3; x++)
-		if (memory[0x5e8b+x]!=0x0e && memory[0x5e8b+x]!=0x19) {
-			printf("Assumptions failed for PLCK.\n");
-			return 0;
-		}
-	/* check selection table. 0x19=selectable; 0x0e=nonselect, 0x00=nonpresent. */
-	if ((memory[0x5e8b]==0x19 || memory[0x5e8b]==0x0e) && (memory[0x5e8c]==0x19 || memory[0x5e8c]==0x0e))
+	valid=0;
+	ok=0;
+
+	/* try to detect plck cave selection table. assume there are at least 5 caves. */
+	/* selection table without names. */
+	for (x=0; x<5; x++)
+		if (memory[0x5e8b+x]==0x0e || memory[0x5e8b+x]==0x19)
+			ok++;
+	if (ok==5) {
+		valid=1;
 		has_names=0;
-	else
+	}
+	
+	/* selection table with names. */
+	ok=0;
+	for (x=0; x<5; x++)
+		if (memory[0x5e8b+13*x+12]==0x0e || memory[0x5e8b+13*x+12]==0x19)
+			ok++;
+	if (ok==5) {
+		valid=1;
 		has_names=1;
+	}
+	if (!valid) {
+		printf("Assumptions failed for PLCK - could not find cave selection table.\n");
+		return 0;
+	}
+
+	/* check selection table. 0x19=selectable; 0x0e=nonselect, 0x00=nonpresent. */
 	printf(has_names?"PLCK caves have names.\n":"PLCK caves have no names.\n");
 	
 	i=0;
 	/* while present and (selectable or nonselectable)   <- find any valid byte in cave selection table. */
-	while (memory[0x5e8b+i]!=0 && (memory[0x5e8b+i]==0x0e || memory[0x5e8b+i]==0x19)) {
+	while ((!has_names && (memory[0x5e8b+i]!=0 && (memory[0x5e8b+i]==0x0e || memory[0x5e8b+i]==0x19)))
+			|| (has_names && (memory[0x5e8b+i*13+12]!=0 && (memory[0x5e8b+i*13+12]==0x0e || memory[0x5e8b+i*13+12]==0x19)))) {
 		int j, pos;
-
+		
 		pos=0x7000+0x200*i;
 
 		/* check for error */
@@ -412,7 +431,7 @@ try_crdr()
 {
 	int i, b, caves;
 
-	strcpy((char *)out, s_crd);
+	strcpy((char *)out, s_cd7);
 	outpos=12;
 
 	/* try autodetect */

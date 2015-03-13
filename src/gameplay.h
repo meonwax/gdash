@@ -13,12 +13,13 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef _GD_GAME_H
-#define _GD_GAME_H
+#ifndef _GD_GAMEPLAY_H
+#define _GD_GAMEPLAY_H
 #include <glib.h>
+#include "gameplay.h"
 #include "cave.h"
 
-typedef struct _gd_game {
+typedef struct _gd_gameplay {
 	GdString player_name;	/* Name of player */
 	int player_score;		/* Score of player */
 	int player_lives;		/* Remaining lives of player */
@@ -37,7 +38,7 @@ typedef struct _gd_game {
 	gboolean wait_before_game_over;		/* wait some time before covering the cave, if there is a game over. main() should set it true for sdl, false for gtk+ */
 	
 	int **gfx_buffer;		/* contains the indexes to the cells; created by *start_level, deleted by *stop_game */
-} GdGame;
+} GdGameplay;
 
 typedef enum _gd_game_state {
 	GD_GAME_NOTHING,
@@ -49,7 +50,7 @@ typedef enum _gd_game_state {
 	GD_GAME_GAME_OVER,
 } GdGameState;
 
-extern GdGame game;
+extern GdGameplay gd_gameplay;
 
 void gd_stop_game();
 void gd_create_snapshot();

@@ -13,8 +13,8 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef _GD_CAVE_ENGINE_H
-#define _GD_CAVE_ENGINE_H
+#ifndef _GD_CAVEENGINE_H
+#define _GD_CAVEENGINE_H
 
 #include <glib.h>
 #include "cave.h"
@@ -22,7 +22,8 @@
 /* the game itself */
 GdDirection gd_direction_from_keypress(gboolean up, gboolean down, gboolean left, gboolean right);
 void gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gboolean suicide);
-gboolean gd_cave_set_seconds_sound(Cave *cave);
+void gd_cave_set_seconds_sound(Cave *cave);
+void gd_cave_clear_sounds(Cave *cave);
 
 #endif
 

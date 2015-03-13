@@ -16,15 +16,16 @@
 #include <SDL.h>
 #include <glib.h>
 #include <glib/gstdio.h>
+#include "cavedb.h"
 #include "config.h"
 #include "cave.h"
 #include "caveset.h"
-#include "sdl_gfx.h"
+#include "sdlgfx.h"
 #include "settings.h"
 #include "util.h"
 #include "about.h"
 
-#include "sdl_ui.h"
+#include "sdlui.h"
 
 int filenamesort(gconstpointer a, gconstpointer b)
 {
@@ -427,8 +428,9 @@ gd_settings_menu()
 		{ TypeBoolean, "Fullscreen", &gd_sdl_fullscreen },
 		{ TypeTheme,   "Theme", NULL },
 		{ TypeScale,   "Scale", &gd_sdl_scale },
-		{ TypeBoolean, "TV emulation", &gd_sdl_tv_emulation },
+		{ TypeBoolean, "PAL emulation", &gd_sdl_pal_emulation },
 		{ TypeBoolean, "Sound", &gd_sdl_sound },
+		{ TypeBoolean, "Classic sounds only", &gd_classic_sound },
 		{ TypeBoolean, "16-bit mixing", &gd_sdl_16bit_mixing },
 		{ TypeBoolean, "44kHz mixing", &gd_sdl_44khz_mixing },
 		{ TypeBoolean, "Easy play", &gd_easy_play },
@@ -609,15 +611,20 @@ gd_show_highscore(Cave *highlight_cave, int highlight_line)
 	finished=FALSE;
 	while (!finished && !gd_quit) {
 		int i;
+		GdHighScore *scores;
 		
 		/* current cave or game */
 		if (current)
 			cave=current->data;
 		else
-			cave=gd_default_cave;
+			cave=NULL;
+		if (!cave)
+			scores=gd_caveset_data->highscore;
+		else
+			scores=cave->highscore;
 
 		gd_clear_line(gd_screen, gd_font_height());
-		gd_blittext_n(gd_screen, -1, gd_font_height(), GD_C64_YELLOW, cave->name);
+		gd_blittext_n(gd_screen, -1, gd_font_height(), GD_C64_YELLOW, cave?cave->name:gd_caveset_data->name);
 
 		/* show scores */		
 		for (i=0; i<max; i++) {
@@ -627,8 +634,8 @@ gd_show_highscore(Cave *highlight_cave, int highlight_line)
 			c=i/5%2?GD_C64_PURPLE:GD_C64_GREEN;
 			if (cave==highlight_cave && i==highlight_line)
 				c=GD_C64_WHITE;
-			if (cave->highscore[i].score!=0)
-				gd_blittext_printf_n(gd_screen, 0, (i+2)*gd_line_height(), c, "%2d %6d %s", i+1, cave->highscore[i].score, cave->highscore[i].name);
+			if (scores[i].score!=0)
+				gd_blittext_printf_n(gd_screen, 0, (i+2)*gd_line_height(), c, "%2d %6d %s", i+1, scores[i].score, scores[i].name);
 		}
 		SDL_Flip(gd_screen);
 

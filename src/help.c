@@ -16,9 +16,10 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include "cave.h"
+#include "cavedb.h"
 #include "config.h"
-#include "gtk_ui.h"
-#include "gtk_gfx.h"
+#include "gtkui.h"
+#include "gtkgfx.h"
 #include "caveobject.h"
 
 struct helpdata {

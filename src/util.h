@@ -13,11 +13,16 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef _GD_ERRORS_H
-#define _GD_ERRORS_H
+#ifndef _GD_UTIL_H
+#define _GD_UTIL_H
 
 #include <glib.h>
 
+/*******************************************
+ *
+ * ERROR HANDLING
+ *
+ */
 typedef struct _error {
 	GLogLevelFlags flags;
 	char *message;
@@ -32,12 +37,21 @@ void gd_install_log_handler();
 gboolean gd_has_new_error();
 void gd_clear_errors();
 
+
+
+
+
+
+
+
+
 /* returns a static string which contains the utf8 representation of the filename in system encoding*/
 const char *gd_filename_to_utf8(const char *filename);
 
 /* tries to find a file in the gdash installation and returns a path (owned by this function, not to be g_free()d) */
 const char *gd_find_file(const char *filename);
 
+/* wrap a text to specified width */
 char *gd_wrap_text(const char *orig, int width);
 
 #endif

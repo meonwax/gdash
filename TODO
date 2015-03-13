@@ -1,35 +1,20 @@
-DONE
-----
-
-
-WILLNOT
--------
-When opening the "cave settings" dialog while the editor window is rather small, it opens higher than the editor window, which can be off screen.
-	the problem is in gtk+; bug reported. http://bugzilla.gnome.org/show_bug.cgi?id=314084
-
-
 TO DO
 -----
-Scheduling:
-	*) I checked BD1 intermission timing. As said, it reduces the vertical size. To be exact, you can freely walk in lines 2 to 14. Walking to line 15 results in a permanent delay state, as you would get in line 22 on a normal cave. Same delays, but faster, since less lines are processed.
-	*) different settings for clck, 1stb, bd2?
+language button
 
-editor nyitva - le kene tiltani a preferences menupontot
+All drawing objects should wraparound, at least when lineshifted borders are activated.
 
-Also some ideas for sdash: What about the music theme at the title picture?
+As the name of the game can be hidden in sdash, maybe you can also use the real Boulder Dash font for the status line before hatching? 
 
-sounds:
-	*) water sound, slime sound, ... defaultok
-		lehet hogy magától meghatározza a ráta alapján?
-	*) EZEKET MIND A MAKEFILEBA!
+Scheduling:	different settings for clck, 1stb?
+
+music theme at the title picture?
 	
 sdash bd1 intermissions scroll. maybe screen should be larger? or disable scrolling for these somehow?
 
 extensive commenting
 
 cow not perfect
-
-window parents
 
 record and playback of games
 
@@ -39,5 +24,7 @@ I think the way you implemented the Maze and RandomFill is okay. I assume the en
 
 copy&paste objects?
 
-magicwall breakscan; De Luxe Caves 1 Cave L, De Luxe Caves 2 Cave A, Deluxe Caves 3 Cave A 
+compat:
+	*) magicwall breakscan; De Luxe Caves 1 Cave L, De Luxe Caves 2 Cave A, Deluxe Caves 3 Cave A 
+	*) frustidash
 

@@ -42,6 +42,9 @@ extern gboolean gd_colored_objects;	/* show objects with different color */
 extern gboolean gd_show_object_list;	/* show object list in editor */
 extern gboolean gd_show_test_label;	/* label with cave variables in tests */
 
+extern int gd_editor_window_width;	/* window size */
+extern int gd_editor_window_height;	/* window size */
+
 /* settings */
 extern gboolean gd_easy_play;
 extern gboolean gd_time_min_sec;
@@ -54,19 +57,20 @@ extern gboolean gd_allow_dirt_mod;
 extern gboolean gd_use_bdcff_highscore;
 extern gboolean gd_show_name_of_game;
 extern GdScalingType gd_cell_scale_game;
-extern gboolean gd_tv_emulation_game;
+extern gboolean gd_pal_emulation_game;
 extern GdScalingType gd_cell_scale_editor;
-extern gboolean gd_tv_emulation_editor;
+extern gboolean gd_pal_emulation_editor;
 extern char *gd_theme;
 
 extern gboolean gd_sdl_fullscreen;
 extern GdScalingType gd_sdl_scale;
 extern char *gd_sdl_theme;
-extern gboolean gd_sdl_tv_emulation;
+extern gboolean gd_sdl_pal_emulation;
 
 extern gboolean gd_sdl_sound;
 extern gboolean gd_sdl_16bit_mixing;
 extern gboolean gd_sdl_44khz_mixing;
+extern gboolean gd_classic_sound;
 
 
 /* gdash directories */

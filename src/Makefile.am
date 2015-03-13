@@ -25,31 +25,40 @@ endif
 bin_PROGRAMS = $(GDASH) $(SDASH)
 
 
-
+strip: $(bin_PROGRAMS)
+	strip $(bin_PROGRAMS)
 
 # base sources and headers:
 #   the gdash engine.
 base_headers = \
 	cave.h \
+	cavedb.h \
 	caveengine.h \
 	caveobject.h \
+	cavesound.h \
+	bdcff.h \
 	caveset.h \
 	c64import.h \
-	game.h \
+	gameplay.h \
 	settings.h \
 	util.h \
-	about.h
+	about.h \
+	gfxutil.h
 
 base_sources = \
 	cave.c \
+	cavedb.c \
 	caveengine.c \
 	caveobject.c \
+	cavesound.c \
+	bdcff.c \
 	caveset.c \
 	c64import.c \
-	game.c \
+	gameplay.c \
 	settings.c \
 	util.c \
-	about.c
+	about.c \
+	gfxutil.c
 
 # sdl-mixer generated sounds.
 #   may be linked to the game or not.
@@ -61,41 +70,41 @@ sound_sources = \
 
 # gtk sources and headers:
 #   the gdash gtk ui, with editor.
-gtk_sources = \
-	gtk_gfx.c \
-	gtk_ui.c \
-	gtk_main.c \
-	editor-widgets.c \
-	editor-export.c \
+gtksources = \
+	gtkgfx.c \
+	gtkui.c \
+	gtkmain.c \
+	editorwidgets.c \
+	editorexport.c \
 	editor.c \
 	help.c
 
-gtk_headers = \
-	gtk_gfx.h\
-	gtk_ui.h\
-	gtk_main.h \
+gtkheaders = \
+	gtkgfx.h\
+	gtkui.h\
+	gtkmain.h \
 	editor.h \
-	editor-widgets.h\
-	editor-export.h\
+	editorwidgets.h\
+	editorexport.h\
 	help.h
 
 # sdl sources and headers:
 #   the gdash sdl ui with sounds.
-sdl_sources = \
-	sdl_gfx.c \
-	sdl_main.c \
-	sdl_ui.c
+sdlsources = \
+	sdlgfx.c \
+	sdlmain.c \
+	sdlui.c
 
-sdl_headers = \
-	sdl_gfx.h \
-	sdl_ui.h
+sdlheaders = \
+	sdlgfx.h \
+	sdlui.h
 
 
 
 noinst_HEADERS = \
 	$(base_headers) \
-	$(gtk_headers) \
-	$(sdl_headers) \
+	$(gtkheaders) \
+	$(sdlheaders) \
 	$(sound_headers)
 
 
@@ -107,7 +116,7 @@ gdash_LDFLAGS = -g -Wall -lSDL_mixer
 gdash_LDADD = @GTK_LIBS@ @LIBINTL@ @SDL_LIBS@
 gdash_SOURCES = \
 	$(base_sources) \
-	$(gtk_sources) \
+	$(gtksources) \
 	$(sound_sources)
 
 
@@ -120,5 +129,5 @@ sdash_LDFLAGS = -g -Wall -lSDL_mixer
 sdash_LDADD = @GLIB_LIBS@ @SDL_LIBS@
 sdash_SOURCES = \
 	$(base_sources) \
-	$(sdl_sources) \
+	$(sdlsources) \
 	$(sound_sources)

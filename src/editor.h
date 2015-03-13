@@ -18,6 +18,6 @@
 
 extern GtkWidget *editor_window;
 
-extern void cave_editor_cb (GtkWidget * widget, gpointer data);
+extern void gd_open_cave_editor();
 
 #endif							/* _CAVE_EDITOR_H */

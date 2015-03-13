@@ -19,30 +19,56 @@
 #include <glib.h>
 #include "cave.h"
 
-extern Cave *gd_default_cave;
+typedef struct _gd_caveset_data {
+	GdString name;				/* Name of caveset */
+	GdString description;		/* Some words about the caveset */
+	GdString author;			/* Author */
+	GdString difficulty;		/* difficulty of the caveset, for info purposes */
+	GdString www;				/* link to author's webpage */
+	GdString date;				/* date of creation */
+	GdString remark;			/* some note */
+
+	GdString charset;			/* these are not used by gdash */
+	GdString fontset;
+
+	/* these are only for a game. */
+	int initial_lives;			/* initial lives at game start */
+	int maximum_lives;			/* maximum lives */
+	int bonus_life_score;		/* bonus life / number of points */
+
+	/* and this one the highscores */
+	GdHighScore highscore[GD_HIGHSCORE_NUM];
+} GdCavesetData;
+
+extern const GdStructDescriptor gd_caveset_properties[];
+
+extern GdCavesetData *gd_caveset_data;
 extern GList *gd_caveset;
 extern gboolean gd_caveset_edited;
 
-
+/* #included cavesets; configdir passed to look for .hsc file */
 gboolean gd_caveset_load_from_internal(int caveset, const char *configdir);
-gboolean gd_caveset_load_from_file(const char *filename, const char *configdir);
+const gchar **gd_caveset_get_internal_game_names();
 
+/* caveset load from file; configdir passed to look for .hsc file */
+gboolean gd_caveset_load_from_file(const char *filename, const char *configdir);
+/* caveset save to bdcff file */
 gboolean gd_caveset_save(const char *filename);
 
-
-const gchar **gd_caveset_get_internal_game_names();
+/* misc caveset functions */
 int gd_caveset_count(void);
 void gd_caveset_clear(void);
 Cave *gd_return_nth_cave(const int cave);
-
-int gd_caveset_first_selectable ();
-
-
+int gd_caveset_first_selectable();
 Cave *gd_cave_new_from_caveset(const int cave, const int level, guint32 seed);
 
-
+/* highscore in config directory */
 void gd_save_highscore(const char* directory);
 gboolean gd_load_highscore(const char *directory);
+
+GdCavesetData *gd_caveset_data_new();
+void gd_caveset_data_free(GdCavesetData *data);
+
 
 #endif							/* _CAVESET_H */
 

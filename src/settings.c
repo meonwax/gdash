@@ -36,6 +36,10 @@ gboolean gd_colored_objects=TRUE;	/* show objects with different color */
 gboolean gd_show_object_list=TRUE;	/* show object list */
 #define SETTING_SHOW_TEST_LABEL "show_test_label"
 gboolean gd_show_test_label=TRUE;	/* show a label with some variables, for testing */
+#define SETTING_EDITOR_WINDOW_WIDTH "editor_window_width"
+int gd_editor_window_width=800;	/* window size */
+#define SETTING_EDITOR_WINDOW_HEIGHT "editor_window_height"
+int gd_editor_window_height=520;	/* window size */
 
 /* settings */
 #define SETTING_EASY_PLAY "easy_play"
@@ -56,12 +60,12 @@ gboolean gd_allow_dirt_mod=TRUE;
 gboolean gd_show_preview=TRUE;
 #define SETTING_CELL_SCALE_GAME "cell_scale_game"
 GdScalingType gd_cell_scale_game=GD_SCALING_ORIGINAL;
-#define SETTING_TV_EMULATION_GAME "tv_emulation_game"
-gboolean gd_tv_emulation_game=FALSE;
+#define SETTING_PAL_EMULATION_GAME "pal_emulation_game"
+gboolean gd_pal_emulation_game=FALSE;
 #define SETTING_CELL_SCALE_EDITOR "cell_scale_editor"
 GdScalingType gd_cell_scale_editor=GD_SCALING_ORIGINAL;
-#define SETTING_TV_EMULATION_EDITOR "tv_emulation_editor"
-gboolean gd_tv_emulation_editor=FALSE;
+#define SETTING_PAL_EMULATION_EDITOR "pal_emulation_editor"
+gboolean gd_pal_emulation_editor=FALSE;
 #define SETTING_THEME "theme"
 char *gd_theme;
 #define SETTING_USE_BDCFF_HIGHSCORE "use_bdcff_highscore"
@@ -76,6 +80,8 @@ gboolean gd_sdl_sound=TRUE;
 gboolean gd_sdl_16bit_mixing=FALSE;
 #define SETTING_SDL_44KHZ_MIXING "sdl_44khz_mixing"
 gboolean gd_sdl_44khz_mixing=TRUE;
+#define SETTING_CLASSIC_SOUND "classic_sound"
+gboolean gd_classic_sound=FALSE;
 
 /* sdl game settings */
 #define SETTING_SDL_FULLSCREEN "sdl_fullscreen"
@@ -84,8 +90,8 @@ gboolean gd_sdl_fullscreen=FALSE;
 GdScalingType gd_sdl_scale=GD_SCALING_ORIGINAL;
 #define SETTING_SDL_THEME "sdl_theme"
 char *gd_sdl_theme;
-#define SETTING_SDL_TV_EMULATION "sdl_tv_emulation"
-gboolean gd_sdl_tv_emulation=FALSE;
+#define SETTING_SDL_PAL_EMULATION "sdl_pal_emulation"
+gboolean gd_sdl_pal_emulation=FALSE;
 
 char *gd_user_config_dir;
 char *gd_system_data_dir;
@@ -201,6 +207,8 @@ gd_load_settings()
     gd_colored_objects=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_COLORED_OBJECTS, gd_colored_objects);
     gd_show_object_list=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_OBJECT_LIST, gd_show_object_list);
     gd_show_test_label=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_TEST_LABEL, gd_show_test_label);
+    gd_editor_window_width=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_WIDTH, gd_editor_window_width);
+    gd_editor_window_height=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_HEIGHT, gd_editor_window_height);
     gd_easy_play=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_EASY_PLAY, gd_easy_play);
     gd_time_min_sec=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_TIME_MIN_SEC, gd_time_min_sec);
     gd_all_caves_selectable=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_ALL_CAVES_SELECTABLE, gd_all_caves_selectable);
@@ -215,20 +223,21 @@ gd_load_settings()
     gd_sdl_sound=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_SOUND, gd_sdl_sound);
     gd_sdl_16bit_mixing=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_16BIT_MIXING, gd_sdl_16bit_mixing);
     gd_sdl_44khz_mixing=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_44KHZ_MIXING, gd_sdl_44khz_mixing);
+    gd_classic_sound=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_CLASSIC_SOUND, gd_classic_sound);
     gd_cell_scale_game=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_CELL_SCALE_GAME, gd_cell_scale_game);
     if (gd_cell_scale_game<0 || gd_cell_scale_game>=GD_SCALING_MAX)
     	gd_cell_scale_game=0;
-    gd_tv_emulation_game=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_TV_EMULATION_GAME, gd_tv_emulation_game);
+    gd_pal_emulation_game=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_GAME, gd_pal_emulation_game);
     gd_cell_scale_editor=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_CELL_SCALE_EDITOR, gd_cell_scale_editor);
     if (gd_cell_scale_editor<0 || gd_cell_scale_editor>=GD_SCALING_MAX)
     	gd_cell_scale_editor=0;
-    gd_tv_emulation_editor=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_TV_EMULATION_EDITOR, gd_tv_emulation_editor);
+    gd_pal_emulation_editor=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_EDITOR, gd_pal_emulation_editor);
 	gd_theme=g_key_file_get_string(ini, SETTINGS_GDASH_GROUP, SETTING_THEME, NULL);
 	gd_sdl_theme=g_key_file_get_string(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_THEME, NULL);
     gd_sdl_scale=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_SCALE, gd_sdl_scale);
     if (gd_sdl_scale<0 || gd_sdl_scale>=GD_SCALING_MAX)
     	gd_sdl_scale=0;
-    gd_sdl_tv_emulation=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_TV_EMULATION, gd_sdl_tv_emulation);
+    gd_sdl_pal_emulation=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_PAL_EMULATION, gd_sdl_pal_emulation);
 
     g_key_file_free(ini);
 }
@@ -248,6 +257,8 @@ gd_save_settings()
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_COLORED_OBJECTS, gd_colored_objects);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_OBJECT_LIST, gd_show_object_list);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_TEST_LABEL, gd_show_test_label);
+    g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_WIDTH, gd_editor_window_width);
+    g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_HEIGHT, gd_editor_window_height);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_EASY_PLAY, gd_easy_play);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_TIME_MIN_SEC, gd_time_min_sec);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_ALL_CAVES_SELECTABLE, gd_all_caves_selectable);
@@ -255,8 +266,8 @@ gd_save_settings()
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_MOUSE_PLAY, gd_mouse_play);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_ALLOW_DIRT_MOD, gd_allow_dirt_mod);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_RANDOM_COLORS, gd_random_colors);
-    g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_TV_EMULATION_GAME, gd_tv_emulation_game);
-    g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_TV_EMULATION_EDITOR, gd_tv_emulation_editor);
+    g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_GAME, gd_pal_emulation_game);
+    g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_EDITOR, gd_pal_emulation_editor);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_PREVIEW, gd_show_preview);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_NAME_OF_GAME, gd_show_name_of_game);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_CELL_SCALE_GAME, gd_cell_scale_game);
@@ -266,8 +277,9 @@ gd_save_settings()
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_SOUND, gd_sdl_sound);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_16BIT_MIXING, gd_sdl_16bit_mixing);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_44KHZ_MIXING, gd_sdl_44khz_mixing);
+    g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_CLASSIC_SOUND, gd_classic_sound);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_SCALE, gd_sdl_scale);
-    g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_TV_EMULATION, gd_sdl_tv_emulation);
+    g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_PAL_EMULATION, gd_sdl_pal_emulation);
 
     if (gd_theme)
 	    g_key_file_set_string(ini, SETTINGS_GDASH_GROUP, SETTING_THEME, gd_theme);

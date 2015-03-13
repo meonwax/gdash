@@ -15,14 +15,15 @@
  */
 #include <SDL.h>
 #include <glib.h>
-#include "game.h"
+#include "gameplay.h"
 #include "cave.h"
 #include "settings.h"
-#include "sdl_gfx.h"
+#include "sdlgfx.h"
 #include "util.h"
 #include "c64_gfx.h"	/* char c64_gfx[] with (almost) original graphics */
 #include "title.h"
 #include "c64_font.h"
+#include "gfxutil.h"
 
 #define GD_NUM_OF_CHARS 128
 
@@ -54,6 +55,7 @@ static gboolean using_png_gfx;
     static guint32 bmask = 0x0000ff00;
     static guint32 amask = 0x000000ff;
 
+	/* for non-alpha channel gdk pixbuf includes */
     static guint32 rmask_24 = 0xff0000;
     static guint32 gmask_24 = 0x00ff00;
     static guint32 bmask_24 = 0x0000ff;
@@ -63,6 +65,7 @@ static gboolean using_png_gfx;
     static guint32 bmask = 0x00ff0000;
     static guint32 amask = 0xff000000;
 
+	/* for non-alpha channel gdk pixbuf includes */
     static guint32 rmask_24 = 0x0000ff;
     static guint32 gmask_24 = 0x00ff00;
     static guint32 bmask_24 = 0xff0000;
@@ -272,158 +275,38 @@ static void zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst, gboolean smooth)
 }
 
 
-/*
-  this requires a destination surface already setup to be twice as
-  large as the source. oh, and formats must match too. this will just
-  blindly assume you didn't flounder.
-*/
-
-/* somewhat optimized implementation of the Scale2x algorithm. */
-/* http://scale2x.sourceforge.net */
+/* wrapper */
 static void
 scale2x(SDL_Surface *src, SDL_Surface *dst)
 {
-	int y, x;
-	const int srcpitch = src->pitch;
-	const int dstpitch = dst->pitch;
-	const int width = src->w;
-	const int height = src->h;
-
-	guint8* srcpix = (guint8*)src->pixels;
-	guint8* dstpix = (guint8*)dst->pixels;
-   	guint32 E0, E1, E2, E3, B, D, E, F, H;
-
 	g_assert(dst->w == src->w*2);
 	g_assert(dst->h == src->h*2);
 	g_assert(src->format->BytesPerPixel==4);
 	g_assert(dst->format->BytesPerPixel==4);
-
+	
 	SDL_LockSurface(src);
 	SDL_LockSurface(dst);
-	for (y=0; y<height; ++y) {
-		for (x=0; x<width; ++x) {
-			B = *(guint32*)(srcpix + (MAX(0,y-1)*srcpitch) + (4*x));
-			D = *(guint32*)(srcpix + (y*srcpitch) + (4*MAX(0,x-1)));
-			E = *(guint32*)(srcpix + (y*srcpitch) + (4*x));
-			F = *(guint32*)(srcpix + (y*srcpitch) + (4*MIN(width-1,x+1)));
-			H = *(guint32*)(srcpix + (MIN(height-1,y+1)*srcpitch) + (4*x));
-			
-			if (B != H && D != F) {
-				E0 = D == B ? D : E;
-				E1 = B == F ? F : E;
-				E2 = D == H ? D : E;
-				E3 = H == F ? F : E;
-			} else {
-				E0 = E;
-				E1 = E;
-				E2 = E;
-				E3 = E;
-			}
-
-			*(guint32*)(dstpix + y*2*dstpitch + x*2*4) = E0;
-			*(guint32*)(dstpix + y*2*dstpitch + (x*2+1)*4) = E1;
-			*(guint32*)(dstpix + (y*2+1)*dstpitch + x*2*4) = E2;
-			*(guint32*)(dstpix + (y*2+1)*dstpitch + (x*2+1)*4) = E3;
-		}
-	}
+	gd_scale2x(src->pixels, src->w, src->h, src->pitch, dst->pixels, dst->pitch);
 	SDL_UnlockSurface(src);
 	SDL_UnlockSurface(dst);
 }
 
-/* the same but 3x */
 static void
 scale3x(SDL_Surface *src, SDL_Surface *dst)
 {
-	int y, x;
-	const int srcpitch = src->pitch;
-	const int dstpitch = dst->pitch;
-	const int width = src->w;
-	const int height = src->h;
-
-	guint8* srcpix = (guint8*)src->pixels;
-	guint8* dstpix = (guint8*)dst->pixels;
-   	guint32 E0, E1, E2, E3, E4, E5, E6, E7, E8, A, B, C, D, E, F, G, H, I;
-
 	g_assert(dst->w == src->w*3);
 	g_assert(dst->h == src->h*3);
 	g_assert(src->format->BytesPerPixel==4);
 	g_assert(dst->format->BytesPerPixel==4);
-
+	
 	SDL_LockSurface(src);
 	SDL_LockSurface(dst);
-	for (y=0; y<height; ++y) {
-		for (x=0; x<width; ++ x) {
-			A = *(guint32*)(srcpix + (MAX(0,y-1)*srcpitch) + (4*MAX(0,x-1)));
-			B = *(guint32*)(srcpix + (MAX(0,y-1)*srcpitch) + (4*x));
-			C = *(guint32*)(srcpix + (MAX(0,y-1)*srcpitch) + (4*MIN(width-1,x+1)));
-			D = *(guint32*)(srcpix + (y*srcpitch) + (4*MAX(0,x-1)));
-			E = *(guint32*)(srcpix + (y*srcpitch) + (4*x));
-			F = *(guint32*)(srcpix + (y*srcpitch) + (4*MIN(width-1,x+1)));
-			G = *(guint32*)(srcpix + (MIN(height-1,y+1)*srcpitch) + (4*MAX(0,x-1)));
-			H = *(guint32*)(srcpix + (MIN(height-1,y+1)*srcpitch) + (4*x));
-			I = *(guint32*)(srcpix + (MIN(height-1,y+1)*srcpitch) + (4*MIN(width-1,x+1)));
-			
-			if (B != H && D != F) {
-				E0 = D == B ? D : E;
-				E1 = (D == B && E != C) || (B == F && E != A) ? B : E;
-				E2 = B == F ? F : E;
-				E3 = (D == B && E != G) || (D == H && E != A) ? D : E;
-				E4 = E;
-				E5 = (B == F && E != I) || (H == F && E != C) ? F : E;
-				E6 = D == H ? D : E;
-				E7 = (D == H && E != I) || (H == F && E != G) ? H : E;
-				E8 = H == F ? F : E;
-			} else {
-				E0 = E;
-				E1 = E;
-				E2 = E;
-				E3 = E;
-				E4 = E;
-				E5 = E;
-				E6 = E;
-				E7 = E;
-				E8 = E;
-			}
-
-			*(guint32*)(dstpix + y*3*dstpitch + x*3*4) = E0;
-			*(guint32*)(dstpix + y*3*dstpitch + (x*3+1)*4) = E1;
-			*(guint32*)(dstpix + y*3*dstpitch + (x*3+2)*4) = E2;
-			*(guint32*)(dstpix + (y*3+1)*dstpitch + x*3*4) = E3;
-			*(guint32*)(dstpix + (y*3+1)*dstpitch + (x*3+1)*4) = E4;
-			*(guint32*)(dstpix + (y*3+1)*dstpitch + (x*3+2)*4) = E5;
-			*(guint32*)(dstpix + (y*3+2)*dstpitch + x*3*4) = E6;
-			*(guint32*)(dstpix + (y*3+2)*dstpitch + (x*3+1)*4) = E7;
-			*(guint32*)(dstpix + (y*3+2)*dstpitch + (x*3+2)*4) = E8;
-		}
-	}
+	gd_scale3x(src->pixels, src->w, src->h, src->pitch, dst->pixels, dst->pitch);
 	SDL_UnlockSurface(src);
 	SDL_UnlockSurface(dst);
 }
 
-/* create tv-striped surface. */
-static void
-tv_surface(SDL_Surface *surface)
-{
-	SDL_Surface *black;
-	int y;
-	
-	/* the width is the same, the height is 1 pixel. */
-	black=SDL_CreateRGBSurface(0, surface->w, 1, 32, 0, 0, 0, 0);	/* no amask here, as we set overall alpha! */
-	SDL_FillRect(black, NULL, SDL_MapRGB(black->format, 0, 0, 0));
-	SDL_SetAlpha(black, SDL_SRCALPHA, 51);	/* 20x opacity (256/5) */
-	
-	/* blit the black stripe to every second row. */
-	for (y=0; y<surface->h; y+=2) {
-		SDL_Rect r;
-		
-		r.x=0;
-		r.y=y;
-		
-		SDL_BlitSurface(black, NULL, surface, &r);
-	}
-	
-	SDL_FreeSurface(black);
-}
+
 
 
 /* scales a pixbuf with the appropriate scaling type. */
@@ -463,8 +346,8 @@ surface_scale(SDL_Surface *orig)
 			scale3x(orig, dest);
 			break;
 			
+		/* not a valid case, but to avoid compiler warning */
 		case GD_SCALING_MAX:
-			/* to avoid compiler warning */
 			g_assert_not_reached();
 			break;
 	}
@@ -473,21 +356,30 @@ surface_scale(SDL_Surface *orig)
 }
 
 
+/* wrapper */
+static void
+pal_emu_surface(SDL_Surface *image)
+{
+	SDL_LockSurface(image);
+	gd_pal_emu(image->pixels, image->w, image->h, image->pitch, image->format->Rshift, image->format->Gshift, image->format->Bshift, image->format->Ashift);
+	SDL_UnlockSurface(image);
+}
 
 
 /* create new surface, which is SDL_DisplayFormatted. */
 /* it is also scaled by gd_scale. */
-/* somewhat "optimized" */
 static SDL_Surface *
 displayformat(SDL_Surface *orig)
 {
 	SDL_Surface *scaled, *displayformat;
-	
+
+	/* at this point we must already be working with 32bit surfaces */	
 	g_assert(orig->format->BytesPerPixel==4);
 	
+//	pal_emu(orig);
 	scaled=surface_scale(orig);
-	if (gd_sdl_tv_emulation)
-		tv_surface(scaled);
+	if (gd_sdl_pal_emulation)
+		pal_emu_surface(scaled);
 	displayformat=SDL_DisplayFormat(scaled);
 	SDL_FreeSurface(scaled);
 
@@ -735,9 +627,9 @@ gd_scroll(const Cave *cave, gboolean exact_scroll)
 	if (changed) {
 		int x, y;
 		
-		for (y=0; y<game.cave->h; y++)
-			for (x=0; x<game.cave->w; x++)
-				game.gfx_buffer[y][x]=-1;
+		for (y=0; y<gd_gameplay.cave->h; y++)
+			for (x=0; x<gd_gameplay.cave->w; x++)
+				gd_gameplay.gfx_buffer[y][x]=-1;
 	}
 
 	/* check if active player is visible at the moment. */
@@ -773,7 +665,7 @@ gd_drawcave(SDL_Surface *dest, const Cave *cave, int **gfx_buffer)
 	SDL_Rect cliprect;
 
 	/* do the scrolling. scroll exactly, if player is not yet alive */
-	game.out_of_window=gd_scroll(cave, cave->player_state==PL_NOT_YET);
+	gd_gameplay.out_of_window=gd_scroll(cave, cave->player_state==GD_PL_NOT_YET);
 
 	/* on-screen clipping rectangle */
 	cliprect.x=0;
@@ -782,18 +674,18 @@ gd_drawcave(SDL_Surface *dest, const Cave *cave, int **gfx_buffer)
 	cliprect.h=play_area_h;
 	SDL_SetClipRect(dest, &cliprect);
 
-	gd_drawcave_game(cave, gfx_buffer, game.bonus_life_flash!=0, FALSE);
+	gd_drawcave_game(cave, gfx_buffer, gd_gameplay.bonus_life_flash!=0, FALSE);
 
 	/* here we draw all cells to be redrawn. we do not take scrolling area into consideration - sdl will do the clipping. */
 	for (y=cave->y1, yd=0; y<=cave->y2; y++, yd++) {
 		for (x=cave->x1, xd=0; x<=cave->x2; x++, xd++) {
-			if (game.gfx_buffer[y][x] & GD_REDRAW) {	/* if it needs to be redrawn */
+			if (gd_gameplay.gfx_buffer[y][x] & GD_REDRAW) {	/* if it needs to be redrawn */
 				SDL_Rect offset;
 
 				offset.y=y*cell_size+statusbar_height-scroll_y;	/* sdl_blitsurface changes offset, so we have to set y here, too. */
 				offset.x=x*cell_size-scroll_x;
 
-				game.gfx_buffer[y][x]=game.gfx_buffer[y][x] & ~GD_REDRAW;	/* now we have drawn it */
+				gd_gameplay.gfx_buffer[y][x]=gd_gameplay.gfx_buffer[y][x] & ~GD_REDRAW;	/* now we have drawn it */
 
 				SDL_BlitSurface(cells[gfx_buffer[y][x]], NULL, dest, &offset);
 			}
@@ -1375,7 +1267,7 @@ gd_create_dark_background()
 	dark_tile=SDL_CreateRGBSurface(0, tile->w, tile->h, 24, 0, 0, 0, 0);
 	SDL_BlitSurface(tile, NULL, dark_tile, NULL);
 	SDL_FreeSurface(tile);
-	SDL_SetAlpha(dark_tile, SDL_SRCALPHA, 64);	/* 1/4 opacity */
+	SDL_SetAlpha(dark_tile, SDL_SRCALPHA, 256/6);	/* 1/6 opacity */
 	
 	/* create the image, and fill it with the tile. */
 	/* the image is screen size / gd_scale, so we prefer the original screen size here */

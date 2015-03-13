@@ -60,29 +60,29 @@ am__vpath_adj = case $$p in \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(Arno_Weberdir)" \
-	"$(DESTDIR)$(Boulderwillidir)" "$(DESTDIR)$(Bouldi_Dashdir)" \
-	"$(DESTDIR)$(Coolshakerdir)" "$(DESTDIR)$(Danieldir)" \
-	"$(DESTDIR)$(Don_Pedrodir)" "$(DESTDIR)$(Firefoxdir)" \
-	"$(DESTDIR)$(Gertruddir)" "$(DESTDIR)$(Karlchen_Opossumdir)" \
+	"$(DESTDIR)$(Boulderwillidir)" "$(DESTDIR)$(Coolshakerdir)" \
+	"$(DESTDIR)$(Danieldir)" "$(DESTDIR)$(Don_Pedrodir)" \
+	"$(DESTDIR)$(Firefoxdir)" "$(DESTDIR)$(Gertruddir)" \
+	"$(DESTDIR)$(Karlchen_Opossumdir)" \
 	"$(DESTDIR)$(Lord_Diegodir)" "$(DESTDIR)$(Marek_Rothdir)" \
+	"$(DESTDIR)$(Mario_Albrechtdir)" \
 	"$(DESTDIR)$(Michael_and_Ingodir)" "$(DESTDIR)$(NO1dir)" \
 	"$(DESTDIR)$(NO1_delightdir)" "$(DESTDIR)$(NO1_primadir)" \
 	"$(DESTDIR)$(Olaf_Rothdir)" "$(DESTDIR)$(Petedir)" \
 	"$(DESTDIR)$(Phoenixdir)" "$(DESTDIR)$(Posocopi_Waldkirchdir)" \
 	"$(DESTDIR)$(Prof_Knibbledir)" \
 	"$(DESTDIR)$(Profi_Boulder_disksdir)" \
-	"$(DESTDIR)$(Rolf_Rothdir)" "$(DESTDIR)$(Ron_van_Schaikdir)" \
-	"$(DESTDIR)$(Rory_Agstendir)" \
+	"$(DESTDIR)$(Rolf_Langedir)" "$(DESTDIR)$(Rolf_Rothdir)" \
+	"$(DESTDIR)$(Ron_van_Schaikdir)" "$(DESTDIR)$(Rory_Agstendir)" \
 	"$(DESTDIR)$(Scserbin_Zoltandir)" "$(DESTDIR)$(Sendydir)" \
-	"$(DESTDIR)$(Skeletordir)" "$(DESTDIR)$(Stormbringerdir)" \
-	"$(DESTDIR)$(Super_boulderdir)" \
+	"$(DESTDIR)$(Skeletordir)" "$(DESTDIR)$(Spiderdir)" \
+	"$(DESTDIR)$(Stormbringerdir)" "$(DESTDIR)$(Super_boulderdir)" \
 	"$(DESTDIR)$(The_Blockheadsdir)" \
 	"$(DESTDIR)$(boulder_rush_atari_packdir)" \
 	"$(DESTDIR)$(boulder_rush_cave_packdir)" \
 	"$(DESTDIR)$(variousdir)"
 Arno_WeberDATA_INSTALL = $(INSTALL_DATA)
 BoulderwilliDATA_INSTALL = $(INSTALL_DATA)
-Bouldi_DashDATA_INSTALL = $(INSTALL_DATA)
 CoolshakerDATA_INSTALL = $(INSTALL_DATA)
 DanielDATA_INSTALL = $(INSTALL_DATA)
 Don_PedroDATA_INSTALL = $(INSTALL_DATA)
@@ -91,6 +91,7 @@ GertrudDATA_INSTALL = $(INSTALL_DATA)
 Karlchen_OpossumDATA_INSTALL = $(INSTALL_DATA)
 Lord_DiegoDATA_INSTALL = $(INSTALL_DATA)
 Marek_RothDATA_INSTALL = $(INSTALL_DATA)
+Mario_AlbrechtDATA_INSTALL = $(INSTALL_DATA)
 Michael_and_IngoDATA_INSTALL = $(INSTALL_DATA)
 NO1DATA_INSTALL = $(INSTALL_DATA)
 NO1_delightDATA_INSTALL = $(INSTALL_DATA)
@@ -101,31 +102,34 @@ PhoenixDATA_INSTALL = $(INSTALL_DATA)
 Posocopi_WaldkirchDATA_INSTALL = $(INSTALL_DATA)
 Prof_KnibbleDATA_INSTALL = $(INSTALL_DATA)
 Profi_Boulder_disksDATA_INSTALL = $(INSTALL_DATA)
+Rolf_LangeDATA_INSTALL = $(INSTALL_DATA)
 Rolf_RothDATA_INSTALL = $(INSTALL_DATA)
 Ron_van_SchaikDATA_INSTALL = $(INSTALL_DATA)
 Rory_AgstenDATA_INSTALL = $(INSTALL_DATA)
 Scserbin_ZoltanDATA_INSTALL = $(INSTALL_DATA)
 SendyDATA_INSTALL = $(INSTALL_DATA)
 SkeletorDATA_INSTALL = $(INSTALL_DATA)
+SpiderDATA_INSTALL = $(INSTALL_DATA)
 StormbringerDATA_INSTALL = $(INSTALL_DATA)
 Super_boulderDATA_INSTALL = $(INSTALL_DATA)
 The_BlockheadsDATA_INSTALL = $(INSTALL_DATA)
 boulder_rush_atari_packDATA_INSTALL = $(INSTALL_DATA)
 boulder_rush_cave_packDATA_INSTALL = $(INSTALL_DATA)
 variousDATA_INSTALL = $(INSTALL_DATA)
-DATA = $(Arno_Weber_DATA) $(Boulderwilli_DATA) $(Bouldi_Dash_DATA) \
-	$(Coolshaker_DATA) $(Daniel_DATA) $(Don_Pedro_DATA) \
-	$(Firefox_DATA) $(Gertrud_DATA) $(Karlchen_Opossum_DATA) \
-	$(Lord_Diego_DATA) $(Marek_Roth_DATA) $(Michael_and_Ingo_DATA) \
-	$(NO1_DATA) $(NO1_delight_DATA) $(NO1_prima_DATA) \
-	$(Olaf_Roth_DATA) $(Pete_DATA) $(Phoenix_DATA) \
-	$(Posocopi_Waldkirch_DATA) $(Prof_Knibble_DATA) \
-	$(Profi_Boulder_disks_DATA) $(Rolf_Roth_DATA) \
-	$(Ron_van_Schaik_DATA) $(Rory_Agsten_DATA) \
-	$(Scserbin_Zoltan_DATA) $(Sendy_DATA) $(Skeletor_DATA) \
-	$(Stormbringer_DATA) $(Super_boulder_DATA) \
-	$(The_Blockheads_DATA) $(boulder_rush_atari_pack_DATA) \
-	$(boulder_rush_cave_pack_DATA) $(various_DATA)
+DATA = $(Arno_Weber_DATA) $(Boulderwilli_DATA) $(Coolshaker_DATA) \
+	$(Daniel_DATA) $(Don_Pedro_DATA) $(Firefox_DATA) \
+	$(Gertrud_DATA) $(Karlchen_Opossum_DATA) $(Lord_Diego_DATA) \
+	$(Marek_Roth_DATA) $(Mario_Albrecht_DATA) \
+	$(Michael_and_Ingo_DATA) $(NO1_DATA) $(NO1_delight_DATA) \
+	$(NO1_prima_DATA) $(Olaf_Roth_DATA) $(Pete_DATA) \
+	$(Phoenix_DATA) $(Posocopi_Waldkirch_DATA) \
+	$(Prof_Knibble_DATA) $(Profi_Boulder_disks_DATA) \
+	$(Rolf_Lange_DATA) $(Rolf_Roth_DATA) $(Ron_van_Schaik_DATA) \
+	$(Rory_Agsten_DATA) $(Scserbin_Zoltan_DATA) $(Sendy_DATA) \
+	$(Skeletor_DATA) $(Spider_DATA) $(Stormbringer_DATA) \
+	$(Super_boulder_DATA) $(The_Blockheads_DATA) \
+	$(boulder_rush_atari_pack_DATA) $(boulder_rush_cave_pack_DATA) \
+	$(various_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
@@ -246,14 +250,11 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 Arno_Weberdir = $(pkgdatadir)/Arno_Weber
-Arno_Weber_CAVES = Arno_Weber/arno_01.gds Arno_Weber/arno_02.gds Arno_Weber/arno_03.gds Arno_Weber/arno_04.gds Arno_Weber/arno_05.gds Arno_Weber/arno_06.gds Arno_Weber/arno_07.gds Arno_Weber/arno_08.gds Arno_Weber/arno_09.gds Arno_Weber/arno_10.gds Arno_Weber/arno_11.gds Arno_Weber/arno_12.gds Arno_Weber/arno_13.gds Arno_Weber/arno_14.gds Arno_Weber/arno_15.gds Arno_Weber/arno_16.gds Arno_Weber/arno_17.gds Arno_Weber/arno_exploding.gds Arno_Weber/arno_santa.gds Arno_Weber/future_dash.gds
+Arno_Weber_CAVES = Arno_Weber/arno_01.gds Arno_Weber/arno_02.gds Arno_Weber/arno_03.gds Arno_Weber/arno_04.gds Arno_Weber/arno_05.gds Arno_Weber/arno_06.gds Arno_Weber/arno_07.gds Arno_Weber/arno_08.gds Arno_Weber/arno_09.gds Arno_Weber/arno_10.gds Arno_Weber/arno_11.gds Arno_Weber/arno_12.gds Arno_Weber/arno_13.gds Arno_Weber/arno_14.gds Arno_Weber/arno_15.gds Arno_Weber/arno_16.gds Arno_Weber/arno_17.gds Arno_Weber/future_dash.gds Arno_Weber/exploding_dash.gds Arno_Weber/santas_bd_party.gds Arno_Weber/exploding_dash_ii.gds
 Arno_Weber_DATA = $(Arno_Weber_CAVES)
 Boulderwillidir = $(pkgdatadir)/Boulderwilli
 Boulderwilli_CAVES = Boulderwilli/babydash.gds Boulderwilli/children_1.gds Boulderwilli/midnight_dash.gds Boulderwilli/moonlight_2.gds Boulderwilli/moonlight_3.gds
 Boulderwilli_DATA = $(Boulderwilli_CAVES)
-Bouldi_Dashdir = $(pkgdatadir)/Bouldi_Dash
-Bouldi_Dash_CAVES = Bouldi_Dash/bouldi_dash_1.gds Bouldi_Dash/bouldi_dash_10.gds Bouldi_Dash/bouldi_dash_2.gds Bouldi_Dash/bouldi_dash_3.gds Bouldi_Dash/bouldi_dash_4.gds Bouldi_Dash/bouldi_dash_5.gds Bouldi_Dash/bouldi_dash_6.gds Bouldi_Dash/bouldi_dash_7.gds Bouldi_Dash/bouldi_dash_8.gds Bouldi_Dash/bouldi_dash_9.gds
-Bouldi_Dash_DATA = $(Bouldi_Dash_CAVES)
 Coolshakerdir = $(pkgdatadir)/Coolshaker
 Coolshaker_CAVES = Coolshaker/quolder_dash_1.gds Coolshaker/quolder_dash_15.gds Coolshaker/quolder_dash_16.gds Coolshaker/quolder_dash_25.gds Coolshaker/quolder_dash_5.gds Coolshaker/quolder_dash_6.gds Coolshaker/quolder_dash_7.gds Coolshaker/quolder_dash_8.gds
 Coolshaker_DATA = $(Coolshaker_CAVES)
@@ -293,7 +294,7 @@ Firefox_CAVES = Firefox/bl-firefox25.gds Firefox/bl-firefox01.gds \
 	Firefox/bl-firefox33.gds Firefox/bl-firefox34.gds
 Firefox_DATA = $(Firefox_CAVES)
 Gertruddir = $(pkgdatadir)/Gertrud
-Gertrud_CAVES = Gertrud/gertrud_s_game_a.gds Gertrud/gertrud_s_game_b.gds Gertrud/gertrud_s_game_c.gds Gertrud/gertrud_s_game_d.gds Gertrud/gertrud_s_game_e.gds Gertrud/gertrud_s_game_f.gds Gertrud/gertrud_s_game_g.gds Gertrud/gertrud_s_game_h.gds
+Gertrud_CAVES = Gertrud/gertrud_s_game_a.gds Gertrud/gertrud_s_game_b.gds Gertrud/gertrud_s_game_c.gds Gertrud/gertrud_s_game_d.gds Gertrud/gertrud_s_game_e.gds Gertrud/gertrud_s_game_f.gds Gertrud/gertrud_s_game_g.gds Gertrud/gertrud_s_game_h.gds Gertrud/Rodex_I.gds Gertrud/Rodex_II.gds Gertrud/Rodex_III.gds Gertrud/Rodex_IV.gds Gertrud/Rodex_V.gds
 Gertrud_DATA = $(Gertrud_CAVES)
 Karlchen_Opossumdir = $(pkgdatadir)/Karlchen_Opossum
 Karlchen_Opossum_CAVES = Karlchen_Opossum/frettchen_dash_01.gds Karlchen_Opossum/frettchen_dash_02.gds Karlchen_Opossum/frettchen_dash_03.gds Karlchen_Opossum/frettchen_dash_04.gds Karlchen_Opossum/frettchen_dash_05.gds Karlchen_Opossum/frettchen_dash_06.gds Karlchen_Opossum/frettchen_dash_07.gds Karlchen_Opossum/frettchen_dash_08.gds Karlchen_Opossum/frettchen_dash_16.gds Karlchen_Opossum/frettchen_dash_17.gds Karlchen_Opossum/frettchen_dash_18.gds Karlchen_Opossum/frettchen_dash_19.gds Karlchen_Opossum/frettchen_dash_21.gds Karlchen_Opossum/frettchen_dash_22.gds Karlchen_Opossum/melmac_dash_1.gds Karlchen_Opossum/melmac_dash_2.gds Karlchen_Opossum/melmac_dash_3.gds Karlchen_Opossum/ossi_dash_1.gds Karlchen_Opossum/ossi_dash_2.gds
@@ -390,7 +391,7 @@ Phoenixdir = $(pkgdatadir)/Phoenix
 Phoenix_CAVES = Phoenix/fun_dash_02.gds Phoenix/fun_dash_04.gds Phoenix/fun_dash_05.gds Phoenix/fun_dash_08.gds Phoenix/fun_dash_09.gds Phoenix/fun_dash_11.gds Phoenix/fun_dash_12.gds Phoenix/fun_dash_13.gds Phoenix/fun_dash_14.gds Phoenix/fun_dash_16.gds Phoenix/fun_dash_18.gds Phoenix/fun_dash_19.gds Phoenix/fun_dash_20.gds Phoenix/hawk_dash_01.gds Phoenix/hawk_dash_03.gds
 Phoenix_DATA = $(Phoenix_CAVES)
 Posocopi_Waldkirchdir = $(pkgdatadir)/Posocopi_Waldkirch
-Posocopi_Waldkirch_CAVES = Posocopi_Waldkirch/best_of_powerdash.gds Posocopi_Waldkirch/boulder_dash_47.gds Posocopi_Waldkirch/legend_of_powerdash.gds Posocopi_Waldkirch/legend_of_powerdash_no_one.gds Posocopi_Waldkirch/powereat_1.gds Posocopi_Waldkirch/professional_powerdash_1.gds Posocopi_Waldkirch/professional_powerdash_2.gds Posocopi_Waldkirch/professional_powerdash_3.gds Posocopi_Waldkirch/profpackdash_part_a.gds Posocopi_Waldkirch/profpackdash_part_b.gds Posocopi_Waldkirch/profpackdash_part_c.gds Posocopi_Waldkirch/profpackdash_part_d.gds Posocopi_Waldkirch/profpackdash_part_e.gds Posocopi_Waldkirch/return_of_powerdash.gds
+Posocopi_Waldkirch_CAVES = Posocopi_Waldkirch/best_of_powerdash.gds Posocopi_Waldkirch/boulder_dash_47.gds Posocopi_Waldkirch/legend_of_powerdash.gds Posocopi_Waldkirch/legend_of_powerdash_no_one.gds Posocopi_Waldkirch/powereat_1.gds Posocopi_Waldkirch/professional_powerdash_1.gds Posocopi_Waldkirch/professional_powerdash_2.gds Posocopi_Waldkirch/professional_powerdash_3.gds Posocopi_Waldkirch/profpackdash_part_a.gds Posocopi_Waldkirch/profpackdash_part_b.gds Posocopi_Waldkirch/profpackdash_part_c.gds Posocopi_Waldkirch/profpackdash_part_d.gds Posocopi_Waldkirch/profpackdash_part_e.gds Posocopi_Waldkirch/return_of_powerdash.gds Posocopi_Waldkirch/first_boulder_1.gds Posocopi_Waldkirch/first_boulder_2.gds Posocopi_Waldkirch/first_boulder_3.gds
 Posocopi_Waldkirch_DATA = $(Posocopi_Waldkirch_CAVES)
 Prof_Knibbledir = $(pkgdatadir)/Prof_Knibble
 Prof_Knibble_CAVES = Prof_Knibble/best_of_knibble.gds Prof_Knibble/boulder_dash_friday.gds Prof_Knibble/boulder_dash_monday.gds Prof_Knibble/boulder_dash_saturday.gds Prof_Knibble/boulder_dash_sunday.gds Prof_Knibble/boulder_dash_thursday.gds Prof_Knibble/boulder_dash_tuesday.gds Prof_Knibble/boulder_dash_wednesday.gds Prof_Knibble/knibble_dash_1.gds Prof_Knibble/knibble_dash_2.gds Prof_Knibble/knibble_dash_3.gds Prof_Knibble/knibble_dash_4.gds Prof_Knibble/knibble_dash_5.gds Prof_Knibble/knibble_dash_7.gds Prof_Knibble/knibble_dash_8.gds Prof_Knibble/knibble_dash_9.gds Prof_Knibble/knibble_eat_1.gds Prof_Knibble/knibble_eat_2.gds Prof_Knibble/knibble_eat_3.gds Prof_Knibble/knibble_eat_effect_1.gds Prof_Knibble/knibble_power_1.gds Prof_Knibble/knibble_revival.gds Prof_Knibble/mrs_rockford.gds
@@ -755,7 +756,7 @@ Sendydir = $(pkgdatadir)/Sendy
 Sendy_CAVES = Sendy/sendydash_1.gds Sendy/sendydash_2.gds Sendy/sendydash_3.gds Sendy/crli_caves.gds
 Sendy_DATA = $(Sendy_CAVES)
 Skeletordir = $(pkgdatadir)/Skeletor
-Skeletor_CAVES = Skeletor/mega_boulderdash_1.gds Skeletor/mega_boulderdash_2.gds Skeletor/mega_boulderdash_3.gds Skeletor/mega_boulderdash_4.gds Skeletor/mega_boulderdash_6.gds
+Skeletor_CAVES = Skeletor/mega_boulderdash_1.gds Skeletor/mega_boulderdash_2.gds Skeletor/mega_boulderdash_3.gds Skeletor/mega_boulderdash_4.gds Skeletor/mega_boulderdash_6.gds Skeletor/mega_boulderdash_5.gds
 Skeletor_DATA = $(Skeletor_CAVES)
 Stormbringerdir = $(pkgdatadir)/Stormbringer
 Stormbringer_CAVES = Stormbringer/best_of_stormdash.gds Stormbringer/crazy_dash_1.gds Stormbringer/crazy_dash_2.gds Stormbringer/crazy_dash_3.gds Stormbringer/crazy_dash_4.gds Stormbringer/crazy_dash_5.gds Stormbringer/crazy_dash_6.gds Stormbringer/crazy_dash_7.gds
@@ -816,11 +817,20 @@ various_CAVES = various/angels_boulder_1.gds various/cws_boulder_2.gds \
 	various/mr_rockford_boulder_dash_13.gds \
 	various/new_boulder_dash_01.gds various/orion_dash_1.gds \
 	various/polish_boulderdash.gds \
-	various/rockford_im_nimmerland_2.gds various/steel_dash_1.gds \
-	various/steel_dash_2.gds various/thomas_boulder.gds \
-	various/unknown_boulderdash_12.gds various/BoulderDash-UX.gds
+	various/rockford_im_nimmerland_2.gds \
+	various/thomas_boulder.gds various/unknown_boulderdash_12.gds \
+	various/BoulderDash-UX.gds
 various_DATA = $(various_CAVES)
-EXTRA_DIST = ./create_makefile.sh $(Arno_Weber_CAVES) $(Boulderwilli_CAVES) $(Bouldi_Dash_CAVES) $(Coolshaker_CAVES) $(Daniel_CAVES) $(Don_Pedro_CAVES) $(Firefox_CAVES) $(Gertrud_CAVES) $(Karlchen_Opossum_CAVES) $(Lord_Diego_CAVES) $(Marek_Roth_CAVES) $(Michael_and_Ingo_CAVES) $(NO1_CAVES) $(NO1_delight_CAVES) $(NO1_prima_CAVES) $(Olaf_Roth_CAVES) $(Pete_CAVES) $(Phoenix_CAVES) $(Posocopi_Waldkirch_CAVES) $(Prof_Knibble_CAVES) $(Profi_Boulder_disks_CAVES) $(Rolf_Roth_CAVES) $(Ron_van_Schaik_CAVES) $(Rory_Agsten_CAVES) $(Scserbin_Zoltan_CAVES) $(Sendy_CAVES) $(Skeletor_CAVES) $(Stormbringer_CAVES) $(Super_boulder_CAVES) $(The_Blockheads_CAVES) $(boulder_rush_atari_pack_CAVES) $(boulder_rush_cave_pack_CAVES) $(various_CAVES)
+Mario_Albrechtdir = $(pkgdatadir)/Mario_Albrecht
+Mario_Albrecht_CAVES = Mario_Albrecht/Mario_Dash_1.gds Mario_Albrecht/Mario_Dash_2.gds Mario_Albrecht/Mario_Dash_3.gds
+Mario_Albrecht_DATA = $(Mario_Albrecht_CAVES)
+Rolf_Langedir = $(pkgdatadir)/Rolf_Lange
+Rolf_Lange_CAVES = Rolf_Lange/Rolo_Dash_II.gds Rolf_Lange/Rolo_Dash_I.gds
+Rolf_Lange_DATA = $(Rolf_Lange_CAVES)
+Spiderdir = $(pkgdatadir)/Spider
+Spider_CAVES = Spider/bouldi_dash_1.gds Spider/bouldi_dash_10.gds Spider/bouldi_dash_2.gds Spider/bouldi_dash_3.gds Spider/bouldi_dash_4.gds Spider/bouldi_dash_5.gds Spider/bouldi_dash_6.gds Spider/bouldi_dash_7.gds Spider/bouldi_dash_8.gds Spider/bouldi_dash_9.gds Spider/steel_dash_1.gds Spider/steel_dash_2.gds
+Spider_DATA = $(Spider_CAVES)
+EXTRA_DIST = ./create_makefile.sh $(Arno_Weber_CAVES) $(Boulderwilli_CAVES) $(Coolshaker_CAVES) $(Daniel_CAVES) $(Don_Pedro_CAVES) $(Firefox_CAVES) $(Gertrud_CAVES) $(Karlchen_Opossum_CAVES) $(Lord_Diego_CAVES) $(Marek_Roth_CAVES) $(Michael_and_Ingo_CAVES) $(NO1_CAVES) $(NO1_delight_CAVES) $(NO1_prima_CAVES) $(Olaf_Roth_CAVES) $(Pete_CAVES) $(Phoenix_CAVES) $(Posocopi_Waldkirch_CAVES) $(Prof_Knibble_CAVES) $(Profi_Boulder_disks_CAVES) $(Rolf_Roth_CAVES) $(Ron_van_Schaik_CAVES) $(Rory_Agsten_CAVES) $(Scserbin_Zoltan_CAVES) $(Sendy_CAVES) $(Skeletor_CAVES) $(Stormbringer_CAVES) $(Super_boulder_CAVES) $(The_Blockheads_CAVES) $(boulder_rush_atari_pack_CAVES) $(boulder_rush_cave_pack_CAVES) $(various_CAVES) $(Mario_Albrecht_CAVES) $(Rolf_Lange_CAVES) $(Spider_CAVES)
 all: all-am
 
 .SUFFIXES:
@@ -887,23 +897,6 @@ uninstall-BoulderwilliDATA:
 	  f=$(am__strip_dir) \
 	  echo " rm -f '$(DESTDIR)$(Boulderwillidir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(Boulderwillidir)/$$f"; \
-	done
-install-Bouldi_DashDATA: $(Bouldi_Dash_DATA)
-	@$(NORMAL_INSTALL)
-	test -z "$(Bouldi_Dashdir)" || $(mkdir_p) "$(DESTDIR)$(Bouldi_Dashdir)"
-	@list='$(Bouldi_Dash_DATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  echo " $(Bouldi_DashDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(Bouldi_Dashdir)/$$f'"; \
-	  $(Bouldi_DashDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(Bouldi_Dashdir)/$$f"; \
-	done
-
-uninstall-Bouldi_DashDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(Bouldi_Dash_DATA)'; for p in $$list; do \
-	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(Bouldi_Dashdir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(Bouldi_Dashdir)/$$f"; \
 	done
 install-CoolshakerDATA: $(Coolshaker_DATA)
 	@$(NORMAL_INSTALL)
@@ -1040,6 +1033,23 @@ uninstall-Marek_RothDATA:
 	  f=$(am__strip_dir) \
 	  echo " rm -f '$(DESTDIR)$(Marek_Rothdir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(Marek_Rothdir)/$$f"; \
+	done
+install-Mario_AlbrechtDATA: $(Mario_Albrecht_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(Mario_Albrechtdir)" || $(mkdir_p) "$(DESTDIR)$(Mario_Albrechtdir)"
+	@list='$(Mario_Albrecht_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(Mario_AlbrechtDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(Mario_Albrechtdir)/$$f'"; \
+	  $(Mario_AlbrechtDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(Mario_Albrechtdir)/$$f"; \
+	done
+
+uninstall-Mario_AlbrechtDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(Mario_Albrecht_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(Mario_Albrechtdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(Mario_Albrechtdir)/$$f"; \
 	done
 install-Michael_and_IngoDATA: $(Michael_and_Ingo_DATA)
 	@$(NORMAL_INSTALL)
@@ -1211,6 +1221,23 @@ uninstall-Profi_Boulder_disksDATA:
 	  echo " rm -f '$(DESTDIR)$(Profi_Boulder_disksdir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(Profi_Boulder_disksdir)/$$f"; \
 	done
+install-Rolf_LangeDATA: $(Rolf_Lange_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(Rolf_Langedir)" || $(mkdir_p) "$(DESTDIR)$(Rolf_Langedir)"
+	@list='$(Rolf_Lange_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(Rolf_LangeDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(Rolf_Langedir)/$$f'"; \
+	  $(Rolf_LangeDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(Rolf_Langedir)/$$f"; \
+	done
+
+uninstall-Rolf_LangeDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(Rolf_Lange_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(Rolf_Langedir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(Rolf_Langedir)/$$f"; \
+	done
 install-Rolf_RothDATA: $(Rolf_Roth_DATA)
 	@$(NORMAL_INSTALL)
 	test -z "$(Rolf_Rothdir)" || $(mkdir_p) "$(DESTDIR)$(Rolf_Rothdir)"
@@ -1312,6 +1339,23 @@ uninstall-SkeletorDATA:
 	  f=$(am__strip_dir) \
 	  echo " rm -f '$(DESTDIR)$(Skeletordir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(Skeletordir)/$$f"; \
+	done
+install-SpiderDATA: $(Spider_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(Spiderdir)" || $(mkdir_p) "$(DESTDIR)$(Spiderdir)"
+	@list='$(Spider_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(SpiderDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(Spiderdir)/$$f'"; \
+	  $(SpiderDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(Spiderdir)/$$f"; \
+	done
+
+uninstall-SpiderDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(Spider_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(Spiderdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(Spiderdir)/$$f"; \
 	done
 install-StormbringerDATA: $(Stormbringer_DATA)
 	@$(NORMAL_INSTALL)
@@ -1423,7 +1467,7 @@ CTAGS:
 
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/Arno_Weber $(distdir)/Boulderwilli $(distdir)/Bouldi_Dash $(distdir)/Coolshaker $(distdir)/Daniel $(distdir)/Don_Pedro $(distdir)/Firefox $(distdir)/Gertrud $(distdir)/Karlchen_Opossum $(distdir)/Lord_Diego $(distdir)/Marek_Roth $(distdir)/Michael_and_Ingo $(distdir)/NO1 $(distdir)/NO1_delight $(distdir)/NO1_prima $(distdir)/Olaf_Roth $(distdir)/Pete $(distdir)/Phoenix $(distdir)/Posocopi_Waldkirch $(distdir)/Prof_Knibble $(distdir)/Profi_Boulder_disks $(distdir)/Rolf_Roth $(distdir)/Ron_van_Schaik $(distdir)/Rory_Agsten $(distdir)/Scserbin_Zoltan $(distdir)/Sendy $(distdir)/Skeletor $(distdir)/Stormbringer $(distdir)/Super_boulder $(distdir)/The_Blockheads $(distdir)/boulder_rush_atari_pack $(distdir)/boulder_rush_cave_pack $(distdir)/various
+	$(mkdir_p) $(distdir)/Arno_Weber $(distdir)/Boulderwilli $(distdir)/Coolshaker $(distdir)/Daniel $(distdir)/Don_Pedro $(distdir)/Firefox $(distdir)/Gertrud $(distdir)/Karlchen_Opossum $(distdir)/Lord_Diego $(distdir)/Marek_Roth $(distdir)/Mario_Albrecht $(distdir)/Michael_and_Ingo $(distdir)/NO1 $(distdir)/NO1_delight $(distdir)/NO1_prima $(distdir)/Olaf_Roth $(distdir)/Pete $(distdir)/Phoenix $(distdir)/Posocopi_Waldkirch $(distdir)/Prof_Knibble $(distdir)/Profi_Boulder_disks $(distdir)/Rolf_Lange $(distdir)/Rolf_Roth $(distdir)/Ron_van_Schaik $(distdir)/Rory_Agsten $(distdir)/Scserbin_Zoltan $(distdir)/Sendy $(distdir)/Skeletor $(distdir)/Spider $(distdir)/Stormbringer $(distdir)/Super_boulder $(distdir)/The_Blockheads $(distdir)/boulder_rush_atari_pack $(distdir)/boulder_rush_cave_pack $(distdir)/various
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -1454,7 +1498,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(DATA)
 installdirs:
-	for dir in "$(DESTDIR)$(Arno_Weberdir)" "$(DESTDIR)$(Boulderwillidir)" "$(DESTDIR)$(Bouldi_Dashdir)" "$(DESTDIR)$(Coolshakerdir)" "$(DESTDIR)$(Danieldir)" "$(DESTDIR)$(Don_Pedrodir)" "$(DESTDIR)$(Firefoxdir)" "$(DESTDIR)$(Gertruddir)" "$(DESTDIR)$(Karlchen_Opossumdir)" "$(DESTDIR)$(Lord_Diegodir)" "$(DESTDIR)$(Marek_Rothdir)" "$(DESTDIR)$(Michael_and_Ingodir)" "$(DESTDIR)$(NO1dir)" "$(DESTDIR)$(NO1_delightdir)" "$(DESTDIR)$(NO1_primadir)" "$(DESTDIR)$(Olaf_Rothdir)" "$(DESTDIR)$(Petedir)" "$(DESTDIR)$(Phoenixdir)" "$(DESTDIR)$(Posocopi_Waldkirchdir)" "$(DESTDIR)$(Prof_Knibbledir)" "$(DESTDIR)$(Profi_Boulder_disksdir)" "$(DESTDIR)$(Rolf_Rothdir)" "$(DESTDIR)$(Ron_van_Schaikdir)" "$(DESTDIR)$(Rory_Agstendir)" "$(DESTDIR)$(Scserbin_Zoltandir)" "$(DESTDIR)$(Sendydir)" "$(DESTDIR)$(Skeletordir)" "$(DESTDIR)$(Stormbringerdir)" "$(DESTDIR)$(Super_boulderdir)" "$(DESTDIR)$(The_Blockheadsdir)" "$(DESTDIR)$(boulder_rush_atari_packdir)" "$(DESTDIR)$(boulder_rush_cave_packdir)" "$(DESTDIR)$(variousdir)"; do \
+	for dir in "$(DESTDIR)$(Arno_Weberdir)" "$(DESTDIR)$(Boulderwillidir)" "$(DESTDIR)$(Coolshakerdir)" "$(DESTDIR)$(Danieldir)" "$(DESTDIR)$(Don_Pedrodir)" "$(DESTDIR)$(Firefoxdir)" "$(DESTDIR)$(Gertruddir)" "$(DESTDIR)$(Karlchen_Opossumdir)" "$(DESTDIR)$(Lord_Diegodir)" "$(DESTDIR)$(Marek_Rothdir)" "$(DESTDIR)$(Mario_Albrechtdir)" "$(DESTDIR)$(Michael_and_Ingodir)" "$(DESTDIR)$(NO1dir)" "$(DESTDIR)$(NO1_delightdir)" "$(DESTDIR)$(NO1_primadir)" "$(DESTDIR)$(Olaf_Rothdir)" "$(DESTDIR)$(Petedir)" "$(DESTDIR)$(Phoenixdir)" "$(DESTDIR)$(Posocopi_Waldkirchdir)" "$(DESTDIR)$(Prof_Knibbledir)" "$(DESTDIR)$(Profi_Boulder_disksdir)" "$(DESTDIR)$(Rolf_Langedir)" "$(DESTDIR)$(Rolf_Rothdir)" "$(DESTDIR)$(Ron_van_Schaikdir)" "$(DESTDIR)$(Rory_Agstendir)" "$(DESTDIR)$(Scserbin_Zoltandir)" "$(DESTDIR)$(Sendydir)" "$(DESTDIR)$(Skeletordir)" "$(DESTDIR)$(Spiderdir)" "$(DESTDIR)$(Stormbringerdir)" "$(DESTDIR)$(Super_boulderdir)" "$(DESTDIR)$(The_Blockheadsdir)" "$(DESTDIR)$(boulder_rush_atari_packdir)" "$(DESTDIR)$(boulder_rush_cave_packdir)" "$(DESTDIR)$(variousdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -1500,20 +1544,20 @@ info: info-am
 info-am:
 
 install-data-am: install-Arno_WeberDATA install-BoulderwilliDATA \
-	install-Bouldi_DashDATA install-CoolshakerDATA \
-	install-DanielDATA install-Don_PedroDATA install-FirefoxDATA \
-	install-GertrudDATA install-Karlchen_OpossumDATA \
-	install-Lord_DiegoDATA install-Marek_RothDATA \
+	install-CoolshakerDATA install-DanielDATA \
+	install-Don_PedroDATA install-FirefoxDATA install-GertrudDATA \
+	install-Karlchen_OpossumDATA install-Lord_DiegoDATA \
+	install-Marek_RothDATA install-Mario_AlbrechtDATA \
 	install-Michael_and_IngoDATA install-NO1DATA \
 	install-NO1_delightDATA install-NO1_primaDATA \
 	install-Olaf_RothDATA install-PeteDATA install-PhoenixDATA \
 	install-Posocopi_WaldkirchDATA install-Prof_KnibbleDATA \
-	install-Profi_Boulder_disksDATA install-Rolf_RothDATA \
-	install-Ron_van_SchaikDATA install-Rory_AgstenDATA \
-	install-Scserbin_ZoltanDATA install-SendyDATA \
-	install-SkeletorDATA install-StormbringerDATA \
-	install-Super_boulderDATA install-The_BlockheadsDATA \
-	install-boulder_rush_atari_packDATA \
+	install-Profi_Boulder_disksDATA install-Rolf_LangeDATA \
+	install-Rolf_RothDATA install-Ron_van_SchaikDATA \
+	install-Rory_AgstenDATA install-Scserbin_ZoltanDATA \
+	install-SendyDATA install-SkeletorDATA install-SpiderDATA \
+	install-StormbringerDATA install-Super_boulderDATA \
+	install-The_BlockheadsDATA install-boulder_rush_atari_packDATA \
 	install-boulder_rush_cave_packDATA install-variousDATA
 
 install-exec-am:
@@ -1541,19 +1585,20 @@ ps: ps-am
 ps-am:
 
 uninstall-am: uninstall-Arno_WeberDATA uninstall-BoulderwilliDATA \
-	uninstall-Bouldi_DashDATA uninstall-CoolshakerDATA \
-	uninstall-DanielDATA uninstall-Don_PedroDATA \
-	uninstall-FirefoxDATA uninstall-GertrudDATA \
-	uninstall-Karlchen_OpossumDATA uninstall-Lord_DiegoDATA \
-	uninstall-Marek_RothDATA uninstall-Michael_and_IngoDATA \
+	uninstall-CoolshakerDATA uninstall-DanielDATA \
+	uninstall-Don_PedroDATA uninstall-FirefoxDATA \
+	uninstall-GertrudDATA uninstall-Karlchen_OpossumDATA \
+	uninstall-Lord_DiegoDATA uninstall-Marek_RothDATA \
+	uninstall-Mario_AlbrechtDATA uninstall-Michael_and_IngoDATA \
 	uninstall-NO1DATA uninstall-NO1_delightDATA \
 	uninstall-NO1_primaDATA uninstall-Olaf_RothDATA \
 	uninstall-PeteDATA uninstall-PhoenixDATA \
 	uninstall-Posocopi_WaldkirchDATA uninstall-Prof_KnibbleDATA \
-	uninstall-Profi_Boulder_disksDATA uninstall-Rolf_RothDATA \
-	uninstall-Ron_van_SchaikDATA uninstall-Rory_AgstenDATA \
-	uninstall-Scserbin_ZoltanDATA uninstall-SendyDATA \
-	uninstall-SkeletorDATA uninstall-StormbringerDATA \
+	uninstall-Profi_Boulder_disksDATA uninstall-Rolf_LangeDATA \
+	uninstall-Rolf_RothDATA uninstall-Ron_van_SchaikDATA \
+	uninstall-Rory_AgstenDATA uninstall-Scserbin_ZoltanDATA \
+	uninstall-SendyDATA uninstall-SkeletorDATA \
+	uninstall-SpiderDATA uninstall-StormbringerDATA \
 	uninstall-Super_boulderDATA uninstall-The_BlockheadsDATA \
 	uninstall-boulder_rush_atari_packDATA \
 	uninstall-boulder_rush_cave_packDATA uninstall-info-am \
@@ -1562,39 +1607,41 @@ uninstall-am: uninstall-Arno_WeberDATA uninstall-BoulderwilliDATA \
 .PHONY: all all-am check check-am clean clean-generic distclean \
 	distclean-generic distdir dvi dvi-am html html-am info info-am \
 	install install-Arno_WeberDATA install-BoulderwilliDATA \
-	install-Bouldi_DashDATA install-CoolshakerDATA \
-	install-DanielDATA install-Don_PedroDATA install-FirefoxDATA \
-	install-GertrudDATA install-Karlchen_OpossumDATA \
-	install-Lord_DiegoDATA install-Marek_RothDATA \
+	install-CoolshakerDATA install-DanielDATA \
+	install-Don_PedroDATA install-FirefoxDATA install-GertrudDATA \
+	install-Karlchen_OpossumDATA install-Lord_DiegoDATA \
+	install-Marek_RothDATA install-Mario_AlbrechtDATA \
 	install-Michael_and_IngoDATA install-NO1DATA \
 	install-NO1_delightDATA install-NO1_primaDATA \
 	install-Olaf_RothDATA install-PeteDATA install-PhoenixDATA \
 	install-Posocopi_WaldkirchDATA install-Prof_KnibbleDATA \
-	install-Profi_Boulder_disksDATA install-Rolf_RothDATA \
-	install-Ron_van_SchaikDATA install-Rory_AgstenDATA \
-	install-Scserbin_ZoltanDATA install-SendyDATA \
-	install-SkeletorDATA install-StormbringerDATA \
-	install-Super_boulderDATA install-The_BlockheadsDATA \
-	install-am install-boulder_rush_atari_packDATA \
+	install-Profi_Boulder_disksDATA install-Rolf_LangeDATA \
+	install-Rolf_RothDATA install-Ron_van_SchaikDATA \
+	install-Rory_AgstenDATA install-Scserbin_ZoltanDATA \
+	install-SendyDATA install-SkeletorDATA install-SpiderDATA \
+	install-StormbringerDATA install-Super_boulderDATA \
+	install-The_BlockheadsDATA install-am \
+	install-boulder_rush_atari_packDATA \
 	install-boulder_rush_cave_packDATA install-data \
 	install-data-am install-exec install-exec-am install-info \
 	install-info-am install-man install-strip install-variousDATA \
 	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
 	pdf-am ps ps-am uninstall uninstall-Arno_WeberDATA \
-	uninstall-BoulderwilliDATA uninstall-Bouldi_DashDATA \
-	uninstall-CoolshakerDATA uninstall-DanielDATA \
-	uninstall-Don_PedroDATA uninstall-FirefoxDATA \
-	uninstall-GertrudDATA uninstall-Karlchen_OpossumDATA \
-	uninstall-Lord_DiegoDATA uninstall-Marek_RothDATA \
+	uninstall-BoulderwilliDATA uninstall-CoolshakerDATA \
+	uninstall-DanielDATA uninstall-Don_PedroDATA \
+	uninstall-FirefoxDATA uninstall-GertrudDATA \
+	uninstall-Karlchen_OpossumDATA uninstall-Lord_DiegoDATA \
+	uninstall-Marek_RothDATA uninstall-Mario_AlbrechtDATA \
 	uninstall-Michael_and_IngoDATA uninstall-NO1DATA \
 	uninstall-NO1_delightDATA uninstall-NO1_primaDATA \
 	uninstall-Olaf_RothDATA uninstall-PeteDATA \
 	uninstall-PhoenixDATA uninstall-Posocopi_WaldkirchDATA \
 	uninstall-Prof_KnibbleDATA uninstall-Profi_Boulder_disksDATA \
-	uninstall-Rolf_RothDATA uninstall-Ron_van_SchaikDATA \
-	uninstall-Rory_AgstenDATA uninstall-Scserbin_ZoltanDATA \
-	uninstall-SendyDATA uninstall-SkeletorDATA \
+	uninstall-Rolf_LangeDATA uninstall-Rolf_RothDATA \
+	uninstall-Ron_van_SchaikDATA uninstall-Rory_AgstenDATA \
+	uninstall-Scserbin_ZoltanDATA uninstall-SendyDATA \
+	uninstall-SkeletorDATA uninstall-SpiderDATA \
 	uninstall-StormbringerDATA uninstall-Super_boulderDATA \
 	uninstall-The_BlockheadsDATA uninstall-am \
 	uninstall-boulder_rush_atari_packDATA \

@@ -19,15 +19,73 @@
 #include "settings.h"
 #include "cave.h"
 #include "caveobject.h"
-#include "c64import.h"
+#include "cavedb.h"
 #include "util.h"
 
+#include "c64import.h"
+
+/* conversion table for imported bd1 caves. */
+static const GdElement bd1_import_table[]={
+	/*  0 */ O_SPACE, O_DIRT, O_BRICK, O_MAGIC_WALL,
+	/*  4 */ O_PRE_OUTBOX, O_OUTBOX, O_STEEL_EXPLODABLE, O_STEEL,
+	/*  8 */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
+	/*  c */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
+	/* 10 */ O_STONE, O_STONE, O_STONE_F, O_STONE_F,
+	/* 14 */ O_DIAMOND, O_DIAMOND, O_DIAMOND_F, O_DIAMOND_F,
+	/* 18 */ O_ACID, O_ACID, O_EXPLODE_1, O_EXPLODE_2,	/* ACID: marek roth extension in crazy dream 3 */
+	/* 1c */ O_EXPLODE_3, O_EXPLODE_4, O_EXPLODE_5, O_PRE_DIA_1,
+	/* 20 */ O_PRE_DIA_2, O_PRE_DIA_3, O_PRE_DIA_4, O_PRE_DIA_5,
+	/* 24 */ O_PRE_DIA_5, O_INBOX, O_PRE_PL_1, O_PRE_PL_2,
+	/* 28 */ O_PRE_PL_3, O_PRE_PL_3, O_H_GROWING_WALL, O_H_GROWING_WALL,
+	/* 2c */ O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN,
+	/* 30 */ O_BUTTER_4, O_BUTTER_1, O_BUTTER_2, O_BUTTER_3,
+	/* 34 */ O_BUTTER_4, O_BUTTER_1, O_BUTTER_2, O_BUTTER_3,
+	/* 38 */ O_PLAYER, O_PLAYER, O_AMOEBA, O_AMOEBA,
+	/* 3c */ O_VOODOO, O_INVIS_OUTBOX, O_SLIME, O_UNKNOWN
+};
+
 /* conversion table for imported plck caves. */
-static const GdElement plck_nybble[]={
+static const GdElement plck_import_nybble[]={
 	/*  0 */ O_STONE, O_DIAMOND, O_MAGIC_WALL, O_BRICK,
 	/*  4 */ O_STEEL, O_H_GROWING_WALL, O_VOODOO, O_DIRT,
 	/*  8 */ O_GUARD_1, O_BUTTER_4, O_AMOEBA, O_SLIME,
 	/* 12 */ O_PRE_INVIS_OUTBOX, O_PRE_OUTBOX, O_INBOX, O_SPACE
+};
+
+/* conversion table for imported 1stb caves. */
+static const GdElement firstboulder_import_table[]={
+	/*  0 */ O_SPACE, O_DIRT, O_BRICK, O_MAGIC_WALL,
+	/*  4 */ O_PRE_OUTBOX, O_OUTBOX, O_PRE_INVIS_OUTBOX, O_INVIS_OUTBOX,
+	/*  8 */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
+	/*  c */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
+	/* 10 */ O_STONE, O_STONE, O_STONE_F, O_STONE_F,
+	/* 14 */ O_DIAMOND, O_DIAMOND, O_DIAMOND_F, O_DIAMOND_F,
+	/* 18 */ O_PRE_CLOCK_1, O_PRE_CLOCK_2, O_PRE_CLOCK_3, O_PRE_CLOCK_4,
+	/* 1c */ O_BITER_SWITCH, O_BITER_SWITCH, O_BLADDER_SPENDER, O_PRE_DIA_1,
+	/* 20 */ O_PRE_DIA_1, O_PRE_DIA_2, O_PRE_DIA_3, O_PRE_DIA_4,
+	/* 24 */ O_PRE_DIA_5, O_INBOX, O_PRE_PL_1, O_PRE_PL_2,
+	/* 28 */ O_PRE_PL_3, O_CLOCK, O_H_GROWING_WALL, O_H_GROWING_WALL,	/* CLOCK: not mentioned in marek's bd inside faq */
+	/* 2c */ O_CREATURE_SWITCH, O_CREATURE_SWITCH, O_GROWING_WALL_SWITCH, O_GROWING_WALL_SWITCH,
+	/* 30 */ O_BUTTER_3, O_BUTTER_4, O_BUTTER_1, O_BUTTER_2,
+	/* 34 */ O_BUTTER_3, O_BUTTER_4, O_BUTTER_1, O_BUTTER_2,
+	/* 38 */ O_STEEL, O_SLIME, O_BOMB, O_SWEET,
+	/* 3c */ O_PRE_STONE_1, O_PRE_STONE_2, O_PRE_STONE_3, O_PRE_STONE_4,
+	/* 40 */ O_BLADDER, O_BLADDER_1, O_BLADDER_2, O_BLADDER_3,
+	/* 44 */ O_BLADDER_4, O_BLADDER_5, O_BLADDER_6, O_BLADDER_7,
+	/* 48 */ O_BLADDER_8, O_BLADDER_9, O_EXPLODE_1, O_EXPLODE_1,
+	/* 4c */ O_EXPLODE_2, O_EXPLODE_3, O_EXPLODE_4, O_EXPLODE_5,
+	/* 50 */ O_PLAYER, O_PLAYER, O_PLAYER_BOMB, O_PLAYER_BOMB,
+	/* 54 */ O_PLAYER_GLUED, O_PLAYER_GLUED, O_VOODOO, O_AMOEBA,
+	/* 58 */ O_AMOEBA, O_BOMB_TICK_1, O_BOMB_TICK_2, O_BOMB_TICK_3,
+	/* 5c */ O_BOMB_TICK_4, O_BOMB_TICK_5, O_BOMB_TICK_6, O_BOMB_TICK_7,
+	/* 60 */ O_BOMB_EXPL_1, O_BOMB_EXPL_2, O_BOMB_EXPL_3, O_BOMB_EXPL_4,
+	/* 64 */ O_GHOST, O_GHOST, O_GHOST_EXPL_1, O_GHOST_EXPL_2,
+	/* 68 */ O_GHOST_EXPL_3, O_GHOST_EXPL_4, O_GRAVESTONE, O_STONE_GLUED,
+	/* 6c */ O_DIAMOND_GLUED, O_DIAMOND_KEY, O_TRAPPED_DIAMOND, O_GRAVESTONE,
+	/* 70 */ O_WAITING_STONE, O_WAITING_STONE, O_CHASING_STONE, O_CHASING_STONE,
+	/* 74 */ O_PRE_STEEL_1, O_PRE_STEEL_2, O_PRE_STEEL_3, O_PRE_STEEL_4,
+	/* 78 */ O_BITER_1, O_BITER_2, O_BITER_3, O_BITER_4,
+	/* 7c */ O_BITER_1, O_BITER_2, O_BITER_3, O_BITER_4,
 };
 
 /* conversion table for imported crazy dream caves. */
@@ -137,7 +195,6 @@ const GdElement gd_crazylight_import_table[]={
 	/* 7c */ O_BITER_1|SCANNED, O_BITER_2|SCANNED, O_BITER_3|SCANNED, O_BITER_4|SCANNED,
 };
 
-
 static guint8 no1_default_colors[]={
 	4, 10, 1, 8, 9, 3, 12, 11, 1, 6, 14, 7,	14, 3, 7,
 	5, 8, 7, 4, 9, 3, 10, 5, 1, 5, 4, 1, 9, 6, 1,
@@ -145,86 +202,225 @@ static guint8 no1_default_colors[]={
 	14, 2, 3, 3, 11, 1, 7, 5, 1, 11, 10, 7, 9, 8, 1
 };
 
+GdPropertyDefault gd_defaults_bd1[] = {
+	{CAVE_OFFSET(amoeba_threshold), 200},
+	{CAVE_OFFSET(amoeba_growth_prob), 31250},
+	{CAVE_OFFSET(amoeba_fast_growth_prob), 250000},
+	{CAVE_OFFSET(amoeba_timer_started_immediately), TRUE}, 
+	{CAVE_OFFSET(amoeba_timer_wait_for_hatching), FALSE}, 
+	{CAVE_OFFSET(lineshift), TRUE}, 
+	{CAVE_OFFSET(diagonal_movements), FALSE}, 
+	{CAVE_OFFSET(voodoo_collects_diamonds), FALSE}, 
+	{CAVE_OFFSET(voodoo_dies_by_stone), FALSE}, 
+	{CAVE_OFFSET(voodoo_can_be_destroyed), TRUE}, 
+	{CAVE_OFFSET(creatures_backwards), FALSE}, 
+	{CAVE_OFFSET(creatures_direction_auto_change_on_start), FALSE}, 
+	{CAVE_OFFSET(creatures_direction_auto_change_time), 0}, 
+	{CAVE_OFFSET(hatching_delay_time), 2}, 
+	{CAVE_OFFSET(intermission_instantlife), TRUE}, 
+	{CAVE_OFFSET(intermission_rewardlife), FALSE}, 
+	{CAVE_OFFSET(magic_wall_stops_amoeba), TRUE}, 
+	{CAVE_OFFSET(magic_timer_wait_for_hatching), FALSE}, 
+	{CAVE_OFFSET(pushing_stone_prob), 125000},
+	{CAVE_OFFSET(pushing_stone_prob_sweet), 1000000},
+	{CAVE_OFFSET(active_is_first_found), FALSE}, 
+	{CAVE_OFFSET(short_explosions), TRUE}, 
+	{CAVE_OFFSET(slime_predictable), TRUE}, 
+	{CAVE_OFFSET(snap_element), O_SPACE},
+	{CAVE_OFFSET(max_time), 999},
+
+	{CAVE_OFFSET(scheduling), GD_SCHEDULING_BD1}, 
+	{CAVE_OFFSET(pal_timing), TRUE}, 
+	{-1},
+};
+
+GdPropertyDefault gd_defaults_bd2[] = {
+	{CAVE_OFFSET(amoeba_threshold), 200},
+	{CAVE_OFFSET(amoeba_growth_prob), 31250},
+	{CAVE_OFFSET(amoeba_fast_growth_prob), 250000},
+	{CAVE_OFFSET(amoeba_timer_started_immediately), FALSE},
+	{CAVE_OFFSET(amoeba_timer_wait_for_hatching), FALSE},
+	{CAVE_OFFSET(lineshift), TRUE},
+	{CAVE_OFFSET(diagonal_movements), FALSE},
+	{CAVE_OFFSET(voodoo_collects_diamonds), FALSE},
+	{CAVE_OFFSET(voodoo_dies_by_stone), FALSE},
+	{CAVE_OFFSET(voodoo_can_be_destroyed), TRUE},
+	{CAVE_OFFSET(creatures_backwards), FALSE},
+	{CAVE_OFFSET(creatures_direction_auto_change_on_start), FALSE},
+	{CAVE_OFFSET(creatures_direction_auto_change_time), 0},
+	{CAVE_OFFSET(hatching_delay_time), 2},
+	{CAVE_OFFSET(intermission_instantlife), TRUE},
+	{CAVE_OFFSET(intermission_rewardlife), FALSE},
+	{CAVE_OFFSET(magic_wall_stops_amoeba), FALSE},	/* marek roth bd inside faq 3.0 */
+	{CAVE_OFFSET(magic_timer_wait_for_hatching), FALSE},
+	{CAVE_OFFSET(pushing_stone_prob), 125000},
+	{CAVE_OFFSET(pushing_stone_prob_sweet), 1000000},
+	{CAVE_OFFSET(active_is_first_found), FALSE},
+	{CAVE_OFFSET(short_explosions), TRUE},
+	{CAVE_OFFSET(slime_predictable), TRUE},
+	{CAVE_OFFSET(snap_element), O_SPACE},
+	{CAVE_OFFSET(max_time), 999},
+
+	{CAVE_OFFSET(pal_timing), TRUE},
+	{CAVE_OFFSET(scheduling), GD_SCHEDULING_BD2},
+	{-1},
+};
+
+GdPropertyDefault gd_defaults_plck[] = {
+	{CAVE_OFFSET(amoeba_growth_prob), 31250},
+	{CAVE_OFFSET(amoeba_fast_growth_prob), 250000},
+	{CAVE_OFFSET(amoeba_timer_started_immediately), FALSE},
+	{CAVE_OFFSET(amoeba_timer_wait_for_hatching), FALSE},
+	{CAVE_OFFSET(lineshift), TRUE},
+	{CAVE_OFFSET(diagonal_movements), FALSE},
+	{CAVE_OFFSET(voodoo_collects_diamonds), FALSE},
+	{CAVE_OFFSET(voodoo_dies_by_stone), FALSE},
+	{CAVE_OFFSET(voodoo_can_be_destroyed), TRUE},
+	{CAVE_OFFSET(creatures_backwards), FALSE},
+	{CAVE_OFFSET(creatures_direction_auto_change_on_start), FALSE},
+	{CAVE_OFFSET(creatures_direction_auto_change_time), 0},
+	{CAVE_OFFSET(hatching_delay_time), 2},
+	{CAVE_OFFSET(intermission_instantlife), TRUE},
+	{CAVE_OFFSET(intermission_rewardlife), FALSE},
+	{CAVE_OFFSET(magic_wall_stops_amoeba), FALSE},
+	{CAVE_OFFSET(magic_timer_wait_for_hatching), FALSE},
+	{CAVE_OFFSET(pushing_stone_prob), 125000},
+	{CAVE_OFFSET(pushing_stone_prob_sweet), 1000000},
+	{CAVE_OFFSET(active_is_first_found), FALSE},
+	{CAVE_OFFSET(short_explosions), TRUE},
+	{CAVE_OFFSET(snap_element), O_SPACE},
+	{CAVE_OFFSET(max_time), 999},
+
+	{CAVE_OFFSET(pal_timing), TRUE},
+	{CAVE_OFFSET(scheduling), GD_SCHEDULING_PLCK},
+	{-1},
+};
+
+GdPropertyDefault gd_defaults_1stb[] = {
+	{CAVE_OFFSET(amoeba_growth_prob), 31250},
+	{CAVE_OFFSET(amoeba_fast_growth_prob), 250000},
+	{CAVE_OFFSET(amoeba_timer_started_immediately), FALSE},
+	{CAVE_OFFSET(amoeba_timer_wait_for_hatching), TRUE},
+	{CAVE_OFFSET(lineshift), TRUE},
+	{CAVE_OFFSET(voodoo_collects_diamonds), TRUE},
+	{CAVE_OFFSET(voodoo_dies_by_stone), TRUE},
+	{CAVE_OFFSET(voodoo_can_be_destroyed), FALSE},
+	{CAVE_OFFSET(creatures_direction_auto_change_on_start), TRUE},
+	{CAVE_OFFSET(hatching_delay_time), 2},
+	{CAVE_OFFSET(intermission_instantlife), FALSE},
+	{CAVE_OFFSET(intermission_rewardlife), TRUE},
+	{CAVE_OFFSET(magic_timer_wait_for_hatching), TRUE},
+	{CAVE_OFFSET(pushing_stone_prob), 125000},
+	{CAVE_OFFSET(pushing_stone_prob_sweet), 1000000},
+	{CAVE_OFFSET(active_is_first_found), TRUE},
+	{CAVE_OFFSET(short_explosions), FALSE},
+	{CAVE_OFFSET(slime_predictable), TRUE},
+	{CAVE_OFFSET(snap_element), O_SPACE},
+	{CAVE_OFFSET(max_time), 999},
+
+	{CAVE_OFFSET(pal_timing), TRUE},
+	{CAVE_OFFSET(scheduling), GD_SCHEDULING_PLCK},
+	{CAVE_OFFSET(enclosed_amoeba_to), O_PRE_DIA_1},	/* not immediately to diamond, but with animation */
+	{CAVE_OFFSET(dirt_looks_like), O_DIRT2},
+	{-1},
+};
+
+GdPropertyDefault gd_defaults_crdr_7[] = {
+	{CAVE_OFFSET(amoeba_growth_prob), 31250},
+	{CAVE_OFFSET(amoeba_fast_growth_prob), 250000},
+	{CAVE_OFFSET(amoeba_timer_started_immediately), FALSE},
+	{CAVE_OFFSET(amoeba_timer_wait_for_hatching), TRUE},
+	{CAVE_OFFSET(lineshift), TRUE},
+	{CAVE_OFFSET(voodoo_collects_diamonds), TRUE},
+	{CAVE_OFFSET(voodoo_dies_by_stone), TRUE},
+	{CAVE_OFFSET(voodoo_can_be_destroyed), FALSE},
+	{CAVE_OFFSET(creatures_direction_auto_change_on_start), FALSE},
+	{CAVE_OFFSET(intermission_instantlife), FALSE},
+	{CAVE_OFFSET(intermission_rewardlife), TRUE},
+	{CAVE_OFFSET(magic_timer_wait_for_hatching), TRUE},
+	{CAVE_OFFSET(pushing_stone_prob), 125000},
+	{CAVE_OFFSET(pushing_stone_prob_sweet), 1000000},
+	{CAVE_OFFSET(active_is_first_found), TRUE},
+	{CAVE_OFFSET(short_explosions), FALSE},
+	{CAVE_OFFSET(slime_predictable), TRUE},
+	{CAVE_OFFSET(snap_element), O_SPACE},
+	{CAVE_OFFSET(max_time), 999},
+
+	{CAVE_OFFSET(pal_timing), TRUE},
+	{CAVE_OFFSET(scheduling), GD_SCHEDULING_CRDR},
+	{CAVE_OFFSET(enclosed_amoeba_to), O_PRE_DIA_1},	/* not immediately to diamond, but with animation */
+	{CAVE_OFFSET(water_does_not_flow_down), TRUE},
+	{CAVE_OFFSET(skeletons_worth_diamonds), 1},	/* in crdr, skeletons can also be used to open the gate */
+	{CAVE_OFFSET(gravity_affects_all), FALSE},	/* the intermission "survive" needs this flag */
+	{-1},
+};
+
+GdPropertyDefault gd_defaults_crli[] = {
+	{CAVE_OFFSET(amoeba_growth_prob), 31250},
+	{CAVE_OFFSET(amoeba_fast_growth_prob), 250000},
+	{CAVE_OFFSET(amoeba_timer_started_immediately), FALSE},
+	{CAVE_OFFSET(amoeba_timer_wait_for_hatching), TRUE},
+	{CAVE_OFFSET(lineshift), TRUE},
+	{CAVE_OFFSET(voodoo_collects_diamonds), TRUE},
+	{CAVE_OFFSET(voodoo_dies_by_stone), TRUE},
+	{CAVE_OFFSET(voodoo_can_be_destroyed), FALSE},
+	{CAVE_OFFSET(creatures_direction_auto_change_on_start), FALSE},
+	{CAVE_OFFSET(hatching_delay_time), 2},
+	{CAVE_OFFSET(intermission_instantlife), FALSE},
+	{CAVE_OFFSET(intermission_rewardlife), TRUE},
+	{CAVE_OFFSET(magic_timer_wait_for_hatching), TRUE},
+	{CAVE_OFFSET(pushing_stone_prob), 125000},
+	{CAVE_OFFSET(pushing_stone_prob_sweet), 1000000},
+	{CAVE_OFFSET(active_is_first_found), TRUE},
+	{CAVE_OFFSET(short_explosions), FALSE},
+	{CAVE_OFFSET(slime_predictable), TRUE},
+	{CAVE_OFFSET(max_time), 999},
+
+	{CAVE_OFFSET(pal_timing), TRUE},
+	{CAVE_OFFSET(scheduling), GD_SCHEDULING_PLCK},
+	{CAVE_OFFSET(enclosed_amoeba_to), O_PRE_DIA_1},	/* not immediately to diamond, but with animation */
+	{-1},
+};
+
 /* internal character (letter) codes in c64 games.
    missing: "triple line" after >, diamond between ()s, player's head after )
    used for converting names of caves imported from crli and other types of binary data */
-const char *gd_bd_internal_chars="            ,!./0123456789:*<=>  ABCDEFGHIJKLMNOPQRSTUVWXYZ( ) _";
+const char gd_bd_internal_chars[]="            ,!./0123456789:*<=>  ABCDEFGHIJKLMNOPQRSTUVWXYZ( ) _";
 
-typedef enum _dirt_mod {
-	DIRT_MOD_NEVER,
-	DIRT_MOD_SLIME,
-	DIRT_MOD_AMOEBA,
-	DIRT_MOD_BOTH,
-} DirtModType;
+/* used for bdcff engine flag. */
+const char *gd_engines[]={"BD1", "BD2", "PLCK", "1stB", "CrDr", "CrLi"};
+
+
+
+
+
+
+
 
 static GdElement
 bd1_import(guint8 c, int i)
 {
-	/* conversion table for imported bd1 caves. */
-	static const GdElement bd1_import_table[]={
-		/*  0 */ O_SPACE, O_DIRT, O_BRICK, O_MAGIC_WALL,
-		/*  4 */ O_PRE_OUTBOX, O_OUTBOX, O_STEEL_EXPLODABLE, O_STEEL,
-		/*  8 */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
-		/*  c */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
-		/* 10 */ O_STONE, O_STONE, O_STONE_F, O_STONE_F,
-		/* 14 */ O_DIAMOND, O_DIAMOND, O_DIAMOND_F, O_DIAMOND_F,
-		/* 18 */ O_ACID, O_ACID, O_EXPLODE_1, O_EXPLODE_2,	/* ACID: marek roth extension in crazy dream 3 */
-		/* 1c */ O_EXPLODE_3, O_EXPLODE_4, O_EXPLODE_5, O_PRE_DIA_1,
-		/* 20 */ O_PRE_DIA_2, O_PRE_DIA_3, O_PRE_DIA_4, O_PRE_DIA_5,
-		/* 24 */ O_PRE_DIA_5, O_INBOX, O_PRE_PL_1, O_PRE_PL_2,
-		/* 28 */ O_PRE_PL_3, O_PRE_PL_3, O_H_GROWING_WALL, O_H_GROWING_WALL,
-		/* 2c */ O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN,
-		/* 30 */ O_BUTTER_4, O_BUTTER_1, O_BUTTER_2, O_BUTTER_3,
-		/* 34 */ O_BUTTER_4, O_BUTTER_1, O_BUTTER_2, O_BUTTER_3,
-		/* 38 */ O_PLAYER, O_PLAYER, O_AMOEBA, O_AMOEBA,
-		/* 3c */ O_VOODOO, O_INVIS_OUTBOX, O_SLIME, O_UNKNOWN
-	};
-
 	if (c<G_N_ELEMENTS(bd1_import_table))
 		return bd1_import_table[c];
 	g_warning("Invalid BD1 element in imported file at cave data %d: %d", i, c);
 	return O_UNKNOWN;
 }
 
+/* deluxe caves 1 contained a special element, non-sloped brick. */
+static GdElement
+deluxecaves_1_import(guint8 c, int i)
+{
+	GdElement e=bd1_import(c, i);
+	
+	if (e==O_H_GROWING_WALL)
+		e=O_BRICK_NON_SLOPED;
+	
+	return e;
+}
+
 static GdElement
 firstboulder_import(guint8 c, int i)
 {
-	/* conversion table for imported 1stb caves. */
-	static const GdElement firstboulder_import_table[]={
-		/*  0 */ O_SPACE, O_DIRT, O_BRICK, O_MAGIC_WALL,
-		/*  4 */ O_PRE_OUTBOX, O_OUTBOX, O_PRE_INVIS_OUTBOX, O_INVIS_OUTBOX,
-		/*  8 */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
-		/*  c */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
-		/* 10 */ O_STONE, O_STONE, O_STONE_F, O_STONE_F,
-		/* 14 */ O_DIAMOND, O_DIAMOND, O_DIAMOND_F, O_DIAMOND_F,
-		/* 18 */ O_PRE_CLOCK_1, O_PRE_CLOCK_2, O_PRE_CLOCK_3, O_PRE_CLOCK_4,
-		/* 1c */ O_BITER_SWITCH, O_BITER_SWITCH, O_BLADDER_SPENDER, O_PRE_DIA_1,
-		/* 20 */ O_PRE_DIA_1, O_PRE_DIA_2, O_PRE_DIA_3, O_PRE_DIA_4,
-		/* 24 */ O_PRE_DIA_5, O_INBOX, O_PRE_PL_1, O_PRE_PL_2,
-		/* 28 */ O_PRE_PL_3, O_CLOCK, O_H_GROWING_WALL, O_H_GROWING_WALL,	/* CLOCK: not mentioned in marek's bd inside faq */
-		/* 2c */ O_CREATURE_SWITCH, O_CREATURE_SWITCH, O_GROWING_WALL_SWITCH, O_GROWING_WALL_SWITCH,
-		/* 30 */ O_BUTTER_3, O_BUTTER_4, O_BUTTER_1, O_BUTTER_2,
-		/* 34 */ O_BUTTER_3, O_BUTTER_4, O_BUTTER_1, O_BUTTER_2,
-		/* 38 */ O_STEEL, O_SLIME, O_BOMB, O_SWEET,
-		/* 3c */ O_PRE_STONE_1, O_PRE_STONE_2, O_PRE_STONE_3, O_PRE_STONE_4,
-		/* 40 */ O_BLADDER, O_BLADDER_1, O_BLADDER_2, O_BLADDER_3,
-		/* 44 */ O_BLADDER_4, O_BLADDER_5, O_BLADDER_6, O_BLADDER_7,
-		/* 48 */ O_BLADDER_8, O_BLADDER_9, O_EXPLODE_1, O_EXPLODE_1,
-		/* 4c */ O_EXPLODE_2, O_EXPLODE_3, O_EXPLODE_4, O_EXPLODE_5,
-		/* 50 */ O_PLAYER, O_PLAYER, O_PLAYER_BOMB, O_PLAYER_BOMB,
-		/* 54 */ O_PLAYER_GLUED, O_PLAYER_GLUED, O_VOODOO, O_AMOEBA,
-		/* 58 */ O_AMOEBA, O_BOMB_TICK_1, O_BOMB_TICK_2, O_BOMB_TICK_3,
-		/* 5c */ O_BOMB_TICK_4, O_BOMB_TICK_5, O_BOMB_TICK_6, O_BOMB_TICK_7,
-		/* 60 */ O_BOMB_EXPL_1, O_BOMB_EXPL_2, O_BOMB_EXPL_3, O_BOMB_EXPL_4,
-		/* 64 */ O_GHOST, O_GHOST, O_GHOST_EXPL_1, O_GHOST_EXPL_2,
-		/* 68 */ O_GHOST_EXPL_3, O_GHOST_EXPL_4, O_GRAVESTONE, O_STONE_GLUED,
-		/* 6c */ O_DIAMOND_GLUED, O_DIAMOND_KEY, O_TRAPPED_DIAMOND, O_GRAVESTONE,
-		/* 70 */ O_WAITING_STONE, O_WAITING_STONE, O_CHASING_STONE, O_CHASING_STONE,
-		/* 74 */ O_PRE_STEEL_1, O_PRE_STEEL_2, O_PRE_STEEL_3, O_PRE_STEEL_4,
-		/* 78 */ O_BITER_1, O_BITER_2, O_BITER_3, O_BITER_4,
-		/* 7c */ O_BITER_1, O_BITER_2, O_BITER_3, O_BITER_4,
-	};
-
 	if (c<G_N_ELEMENTS(firstboulder_import_table))
 		return firstboulder_import_table[c];
 	g_warning("Invalid 1stB element in imported file at cave data %d: %d", i, c);
@@ -239,6 +435,17 @@ crazylight_import(guint8 c, int i)
 	g_warning("Invalid CrLi element in imported file at cave data %d: %d", i, c);
 	return O_UNKNOWN;
 }
+
+
+
+
+#if 0
+typedef enum _dirt_mod {
+	DIRT_MOD_NEVER,
+	DIRT_MOD_SLIME,
+	DIRT_MOD_AMOEBA,
+	DIRT_MOD_BOTH,
+} DirtModType;
 
 static void
 set_dirt_mod (Cave *cave, DirtModType mod_type)
@@ -287,136 +494,73 @@ set_dirt_mod (Cave *cave, DirtModType mod_type)
 		cave->dirt_looks_like=O_DIRT2;
 	return;
 }
+#endif
 
 
 
 
-void
-gd_cave_set_bd1_defaults(Cave *cave)
+
+GdPropertyDefault *
+gd_get_engine_default_array(GdEngine engine)
 {
-	cave->scheduling=GD_SCHEDULING_BD1;
-	cave->lineshift=TRUE;
-	cave->pal_timing=TRUE;
-	cave->level_ckdelay[0]=12;	/* original ckdelay values as documented by peter broadribb. */
-	cave->level_ckdelay[1]=6;
-	cave->level_ckdelay[2]=3;
-	cave->level_ckdelay[3]=1;
-	cave->level_ckdelay[4]=0;
-
-	/* set visible size for intermission */
-	if (cave->intermission) {
-		int i;
-		
-		for(i=0; i<5; i++)	/* intermissions are FAST */
-			cave->level_ckdelay[i]=0;
-		cave->x2=19;
-		cave->y2=11;
+	switch(engine) {
+		case GD_ENGINE_BD1:
+			return gd_defaults_bd1;
+			break;
+		case GD_ENGINE_BD2:
+			return gd_defaults_bd2;
+			break;
+		case GD_ENGINE_PLCK:
+			return gd_defaults_plck;
+			break;
+		case GD_ENGINE_1STB:
+			return gd_defaults_1stb;
+			break;
+		case GD_ENGINE_CRDR7:
+			return gd_defaults_crdr_7;
+			break;
+		case GD_ENGINE_CRLI:
+			return gd_defaults_crli;
+			break;
+			
+		/* to avoid compiler warning */
+		case GD_ENGINE_INVALID:
+			g_assert_not_reached();
+			break;
 	}
-	cave->active_is_first_found=FALSE;
-	cave->intermission_instantlife=TRUE;
-	cave->intermission_rewardlife=FALSE;
+	
+	return gd_defaults_bd1;
 }
 
-void
-gd_cave_set_bd2_defaults(Cave *cave)
-{
-	cave->lineshift=TRUE;
-	cave->pal_timing=TRUE;
-	cave->scheduling=GD_SCHEDULING_BD1;
-	cave->magic_wall_stops_amoeba=FALSE;	/* marek roth bd inside faq 3.0 */
-	cave->amoeba_timer_started_immediately=FALSE;
-	cave->level_ckdelay[0]=12;	/* original ckdelay values as documented by peter broadribb. */
-	cave->level_ckdelay[1]=6;
-	cave->level_ckdelay[2]=3;
-	cave->level_ckdelay[3]=1;
-	cave->level_ckdelay[4]=0;
 
-	/* set visible size for intermission */
-	/* unlike bd1, intermissions are same speed as normal caves */
-	if (cave->intermission) {
-		cave->x2=19;
-		cave->y2=11;
+void
+gd_cave_set_engine_defaults(Cave *cave, GdEngine engine)
+{
+	gd_cave_set_defaults_from_array(cave, gd_get_engine_default_array(engine));
+
+	/* these have hardcoded ckdelay. */	
+	/* setting this ckdelay array does not fit into the gd_struct_default scheme. */
+	if (engine==GD_ENGINE_BD1 || engine==GD_ENGINE_BD2) {
+		cave->level_ckdelay[0]=12;
+		cave->level_ckdelay[1]=6;
+		cave->level_ckdelay[2]=3;
+		cave->level_ckdelay[3]=1;
+		cave->level_ckdelay[4]=0;
 	}
-	cave->active_is_first_found=FALSE;
-	cave->intermission_instantlife=TRUE;
-	cave->intermission_rewardlife=FALSE;
 }
 
-void
-gd_cave_set_plck_defaults(Cave *cave)
+
+GdEngine
+gd_cave_get_engine_from_string(const char *param)
 {
-	cave->lineshift=TRUE;
-	cave->pal_timing=TRUE;
-	cave->scheduling=GD_SCHEDULING_PLCK;
-	cave->magic_wall_stops_amoeba=FALSE;	/* different from bd1 */
-	cave->active_is_first_found=FALSE;
-	cave->intermission_instantlife=TRUE;
-	cave->intermission_rewardlife=FALSE;
+	int i;
+	
+	for (i=0; i<GD_ENGINE_INVALID; i++)
+		if (g_ascii_strcasecmp(param, gd_engines[i])==0)
+			return (GdEngine) i;
+
+	return GD_ENGINE_INVALID;
 }
-
-void
-gd_cave_set_1stb_defaults(Cave *cave)
-{
-	cave->lineshift=TRUE;
-	cave->pal_timing=TRUE;
-	cave->scheduling=GD_SCHEDULING_PLCK;
-	cave->amoeba_timer_started_immediately=FALSE;
-	cave->amoeba_timer_wait_for_hatching=TRUE;
-	cave->voodoo_dies_by_stone=TRUE;
-	cave->voodoo_collects_diamonds=TRUE;
-	cave->voodoo_can_be_destroyed=FALSE;
-	cave->short_explosions=FALSE;
-	cave->creatures_direction_auto_change_on_start=TRUE;
-	cave->magic_wall_stops_amoeba=FALSE;
-	cave->magic_timer_wait_for_hatching=TRUE;
-	cave->enclosed_amoeba_to=O_PRE_DIA_1;	/* not immediately to diamond, but with animation */
-	cave->dirt_looks_like=O_DIRT2;
-	cave->intermission_instantlife=FALSE;
-	cave->intermission_rewardlife=TRUE;
-}
-
-void
-gd_cave_set_crdr_defaults(Cave *cave)
-{
-	cave->lineshift=TRUE;
-	cave->pal_timing=TRUE;
-	cave->scheduling=GD_SCHEDULING_CRDR;
-	cave->amoeba_timer_started_immediately=FALSE;
-	cave->amoeba_timer_wait_for_hatching=TRUE;
-	cave->voodoo_dies_by_stone=TRUE;
-	cave->voodoo_collects_diamonds=TRUE;
-	cave->voodoo_can_be_destroyed=FALSE;
-	cave->short_explosions=FALSE;
-	cave->magic_wall_stops_amoeba=FALSE;
-	cave->magic_timer_wait_for_hatching=TRUE;
-	cave->enclosed_amoeba_to=O_PRE_DIA_1;	/* not immediately to diamond, but with animation */
-	cave->water_does_not_flow_down=TRUE;
-	cave->intermission_instantlife=FALSE;
-	cave->intermission_rewardlife=TRUE;
-	cave->skeletons_worth_diamonds=1;	/* in crdr, skeletons can also be used to open the gate */
-	cave->gravity_affects_all=FALSE;	/* the intermission "survive" needs this flag */
-}
-
-void
-gd_cave_set_crli_defaults(Cave *cave)
-{
-	cave->lineshift=TRUE;
-	cave->pal_timing=TRUE;
-	cave->scheduling=GD_SCHEDULING_PLCK;
-	cave->amoeba_timer_started_immediately=FALSE;
-	cave->amoeba_timer_wait_for_hatching=TRUE;
-	cave->voodoo_dies_by_stone=TRUE;
-	cave->voodoo_collects_diamonds=TRUE;
-	cave->voodoo_can_be_destroyed=FALSE;
-	cave->short_explosions=FALSE;
-	cave->magic_wall_stops_amoeba=FALSE;
-	cave->magic_timer_wait_for_hatching=TRUE;
-	cave->enclosed_amoeba_to=O_PRE_DIA_1;	/* not immediately to diamond, but with animation */
-	cave->intermission_instantlife=FALSE;
-	cave->intermission_rewardlife=TRUE;
-}
-
-
 
 
 
@@ -443,7 +587,7 @@ gd_cave_set_crli_defaults(Cave *cave)
 
 /* import bd1 cave data into our format. */
 static int
-cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes)
+cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, gboolean is_deluxe_caves_1)
 {
 	int length, direction;
 	int index;
@@ -451,6 +595,12 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes)
 	guint8 code;
 	GdObject object;
 	int i;
+	GdElement (* import_func) (guint8 c, int i);
+	
+	if (is_deluxe_caves_1)
+		import_func=deluxecaves_1_import;
+	else
+		import_func=bd1_import;
 	
 	gd_error_set_context(cave->name);
 
@@ -458,7 +608,16 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes)
 		g_critical("truncated BD1 cave data, %d bytes", remaining_bytes);
 		return -1;
 	}
-	gd_cave_set_bd1_defaults(cave);
+	gd_cave_set_engine_defaults(cave, GD_ENGINE_BD1);
+	/* set visible size for intermission */
+	if (cave->intermission) {
+		int i;
+		
+		for(i=0; i<5; i++)	/* intermissions are FAST */
+			cave->level_ckdelay[i]=0;
+		cave->x2=19;
+		cave->y2=11;
+	}
 
 	/* cave number data[0] */
 	cave->amoeba_slow_growth_time=data[1];
@@ -482,7 +641,7 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes)
 		there is no problem importing these; as other bd1 caves did not contain acid at all, so it does not matter
 		how we set the values.
 	*/
-	cave->acid_eats_this=bd1_import(data[0x1c]&0x3F, 0x1c);	/* 0x1c index: same as probability1 !!!!! don't be surprised. we do a &0x3f because of this */
+	cave->acid_eats_this=import_func(data[0x1c]&0x3F, 0x1c);	/* 0x1c index: same as probability1 !!!!! don't be surprised. we do a &0x3f because of this */
 	cave->acid_spread_ratio=data[0x16]/255.0;	/* acid speed */
 	cave->acid_turns_to=(data[0x17]&(1<<2))?O_EXPLODE_3:O_ACID;
 	
@@ -495,7 +654,7 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes)
 
 	/* random fill */
 	for (i=0; i < 4; i++) {
-		cave->random_fill[i]=bd1_import(data[24+i], 24+i);
+		cave->random_fill[i]=import_func(data[24+i], 24+i);
 		cave->random_fill_probability[i]=data[28+i];
 	}
 
@@ -513,7 +672,7 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes)
 			
 			/* as this one uses nonstandard dx dy values, create points instead */
 			object.type=POINT;
-			object.element=bd1_import(data[index+1], index+1);
+			object.element=import_func(data[index+1], index+1);
 			x1=data[index+2];
 			y1=data[index+3]-2;
 			nx=data[index+4];
@@ -533,7 +692,7 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes)
 			index+=8;
 		} else {
 			/* object is code&3f, object type is upper 2 bits */
-			object.element=bd1_import(code & 0x3F, index);
+			object.element=import_func(code & 0x3F, index);
 			switch ((code >> 6) & 3) {
 			case 0:				/* 00: POINT */
 				object.type=POINT;
@@ -566,7 +725,7 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes)
 				object.y1=data[index+2] - 2;
 				object.x2=object.x1+data[index+3]-1;	/* width */
 				object.y2=object.y1+data[index+4]-1;	/* height */
-				object.fill_element=bd1_import(data[index+5], index+5);
+				object.fill_element=import_func(data[index+5], index+5);
 				if (object.x1>=cave->w || object.y1>=cave->h || object.x2>=cave->w || object.y2>=cave->h)
 					g_warning("invalid filled rectangle coordinates %d,%d %d,%d at byte %d", object.x1, object.y1, object.x2, object.y2, index);
 				
@@ -610,7 +769,12 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes)
 		g_critical("truncated BD2 cave data, %d bytes", remaining_bytes);
 		return -1;
 	}
-	gd_cave_set_bd2_defaults(cave);
+	gd_cave_set_engine_defaults(cave, GD_ENGINE_BD2);
+	/* set visible size for intermission */
+	if (cave->intermission) {
+		cave->x2=19;
+		cave->y2=11;
+	}
 
 	cave->amoeba_slow_growth_time=data[0];
 	cave->magic_wall_milling_time=data[0];
@@ -770,8 +934,8 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes)
 			n=0;	/* number of bytes read from map */
 			for (y=1; y<cave->h-1; y++)	/* the first and the last rows are not stored. */
 				for (x=0; x<cave->w; x+=2) {
-					cave->map[y][x]=plck_nybble[data[index+3+n] >> 4];	/* msb 4 bits */
-					cave->map[y][x+1]=plck_nybble[data[index+3+n] % 16];	/* lsb 4 bits */
+					cave->map[y][x]=plck_import_nybble[data[index+3+n] >> 4];	/* msb 4 bits */
+					cave->map[y][x+1]=plck_import_nybble[data[index+3+n] % 16];	/* lsb 4 bits */
 					n++;
 				}
 			/* the position of inbox is stored. this is to check the cave */
@@ -839,8 +1003,7 @@ cave_copy_from_plck (Cave *cave, const guint8 *data, int remaining_bytes)
 		return -1;
 	}
 
-	gd_cave_set_plck_defaults(cave);
-
+	gd_cave_set_engine_defaults(cave, GD_ENGINE_PLCK);
 	cave->intermission=data[0x1da]!=0;
 	if (cave->intermission) {	/* set visible size for intermission */
 		cave->x2=19;
@@ -855,7 +1018,7 @@ cave_copy_from_plck (Cave *cave, const guint8 *data, int remaining_bytes)
 		
 		/* found selection table */
 		cave->selectable=data[0x1f0]==0x19;
-		g_strlcpy(cave->name, "              ", sizeof(cave->name));
+		gd_strcpy(cave->name, "              ");
 		for (j=0; j<12; j++)
 			cave->name[j]=data[0x1f2+j];
 		g_strchomp(cave->name);	/* remove spaces */
@@ -898,8 +1061,8 @@ cave_copy_from_plck (Cave *cave, const guint8 *data, int remaining_bytes)
 	}
 	for (y=1; y < cave->h-1; y++)	/* two rows of steel wall. the second one is stored */
 		for (x=0; x < cave->w; x += 2) {
-			cave->map[y][x]=plck_nybble[data[(y+1)*20 + x/2] >> 4];	/* msb 4 bits: we do not check index ranges, as >>4 and %16 will result in 0..15 */
-			cave->map[y][x+1]=plck_nybble[data[(y+1)*20 + x/2] % 16];	/* lsb 4 bits */
+			cave->map[y][x]=plck_import_nybble[data[(y+1)*20 + x/2] >> 4];	/* msb 4 bits: we do not check index ranges, as >>4 and %16 will result in 0..15 */
+			cave->map[y][x+1]=plck_import_nybble[data[(y+1)*20 + x/2] % 16];	/* lsb 4 bits */
 		}
 
 	/* check for diego-effects */
@@ -933,13 +1096,13 @@ cave_copy_from_atg (Cave *cave, const guint8 *data, int remaining_bytes)
 
 
 	/* cave name at start */
-	g_strlcpy(cave->name, (char *)data, sizeof(cave->name));
+	gd_strcpy(cave->name, (char *)data);
 	/* delete trailing spaces */
 	g_strchomp (cave->name);
 	gd_error_set_context(cave->name);
 
 	cave->intermission=data[0x10];
-	gd_cave_set_bd1_defaults(cave);
+	gd_cave_set_engine_defaults(cave, GD_ENGINE_BD1);
 	cave->magic_wall_stops_amoeba=FALSE;	/* as in plc - i guess the game did not have the same bug as c64 bd1 */
 	/* some cave data is stored after the cave map. and the map can have different sizes (but the size is fixed) */
 	datapos=cave->intermission?0x7f:0x1b5;
@@ -979,8 +1142,8 @@ cave_copy_from_atg (Cave *cave, const guint8 *data, int remaining_bytes)
 	}
 	for (y=1; y<cave->h-1; y++)
 		for (x=0; x<cave->w; x+=2) {
-			cave->map[y][x]=plck_nybble[data[17+(y*cave->w+x)/2] >> 4];	/* msb 4 bits */
-			cave->map[y][x+1]=plck_nybble[data[17+(y*cave->w+x)/2] % 16];	/* lsb 4 bits */
+			cave->map[y][x]=plck_import_nybble[data[17+(y*cave->w+x)/2] >> 4];	/* msb 4 bits */
+			cave->map[y][x+1]=plck_import_nybble[data[17+(y*cave->w+x)/2] % 16];	/* lsb 4 bits */
 		}
 
 	return datapos+8;
@@ -1002,7 +1165,7 @@ cave_copy_from_dlb (Cave *cave, const guint8 *data, int remaining_bytes)
 	guint8 byte, separator;
 
 	gd_error_set_context(cave->name);
-	gd_cave_set_plck_defaults(cave);	/* essentially the plck engine */
+	gd_cave_set_engine_defaults(cave, GD_ENGINE_PLCK); /* essentially the plck engine */
 
 	for (i=0; i<5; i++) {
 		/* does not really have levels, so just duplicate data five times */
@@ -1094,8 +1257,8 @@ cave_copy_from_dlb (Cave *cave, const guint8 *data, int remaining_bytes)
 	}
 	for (y=1; y<cave->h-1; y++)
 		for (x=0; x<cave->w; x+=2) {
-			cave->map[y][x]=plck_nybble[decomp[((y-1)*cave->w+x)/2] >> 4];	/* msb 4 bits */
-			cave->map[y][x+1]=plck_nybble[decomp[((y-1)*cave->w+x)/2] % 16];	/* lsb 4 bits */
+			cave->map[y][x]=plck_import_nybble[decomp[((y-1)*cave->w+x)/2] >> 4];	/* msb 4 bits */
+			cave->map[y][x+1]=plck_import_nybble[decomp[((y-1)*cave->w+x)/2] % 16];	/* lsb 4 bits */
 		}
 
 	/* return number of bytes read from buffer */
@@ -1117,10 +1280,10 @@ cave_copy_from_1stb (Cave *cave, const guint8 *data, int remaining_bytes)
 		return -1;
 	}
 
-	gd_cave_set_1stb_defaults(cave);
+	gd_cave_set_engine_defaults(cave, GD_ENGINE_1STB);
 
 	/* copy name */
-	g_strlcpy(cave->name, "              ", sizeof(cave->name));
+	gd_strcpy(cave->name, "              ");
 	for (i=0; i<14; i++) {
 		int c=data[0x3a0+i];
 		
@@ -1226,9 +1389,9 @@ cave_copy_from_1stb (Cave *cave, const guint8 *data, int remaining_bytes)
 }
 
 
-/* crazy dream */
+/* crazy dream 7 */
 static int
-cave_copy_from_crdr (Cave *cave, const guint8 *data, int remaining_bytes)
+cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 {
 	int i, index;
 	guint8 checksum;
@@ -1236,7 +1399,7 @@ cave_copy_from_crdr (Cave *cave, const guint8 *data, int remaining_bytes)
 	gboolean growing_wall_dir_change;
 	
 	/* if we have name, convert */
-	g_strlcpy(cave->name, "              ", sizeof(cave->name));
+	gd_strcpy(cave->name, "              ");
 	for (i=0; i<14; i++) {
 		int c=data[i];
 		
@@ -1259,11 +1422,11 @@ cave_copy_from_crdr (Cave *cave, const guint8 *data, int remaining_bytes)
 	
 	/* jump 15 bytes, 14 was the name and 15 selectability */
 	data+=15;
-	if (strncmp((char *)data+0x30, "V4\0020", 4)!=0)
+	if (memcmp((char *)data+0x30, "V4\0020", 4)!=0)
 		g_warning("unknown crdr version %c%c%c%c", data[0x30], data[0x31], data[0x32], data[0x33]);
 
 	gd_error_set_context(cave->name);
-	gd_cave_set_crdr_defaults(cave);
+	gd_cave_set_engine_defaults(cave, GD_ENGINE_CRDR7);
 	
 	for (i=0; i<5; i++) {
 		cave->level_time[i]=(int)data[0x0]*100 + data[0x1]*10 + data[0x2];
@@ -1361,7 +1524,7 @@ cave_copy_from_crdr (Cave *cave, const guint8 *data, int remaining_bytes)
 		case 3:
 			cave->gravity=MV_RIGHT; break;
 	}
-	cave->snap_explosions=(data[0x3a]&4)!=0;
+	cave->snap_element=((data[0x3a]&4)!=0)?O_EXPLODE_1:O_SPACE;
 	/* we do not know the values for these, so do not import */
 	//	cave->dirt_looks_like... data[0x3c]
 	//	cave->expanding_wall_looks_like... data[0x3b]
@@ -1522,6 +1685,161 @@ cave_copy_from_crdr (Cave *cave, const guint8 *data, int remaining_bytes)
 	return 15+0x49+index;
 }
 
+static void
+addition_crazy_dream_9(Cave *cave, const guint8 *buf, const int length)
+{
+	guint8 checksum;
+	int i;
+	
+	/* crazy dream 9 hack */	
+	checksum=0;
+	for (i=0; i<length; i++)
+		checksum=checksum ^ buf[i];
+
+	/* check cave name and the checksum. both are hardcoded here */	
+	if (g_str_equal(cave->name, "Rockfall") && checksum==134) {
+		int i;
+		
+		GdObject object;
+
+		object.type=RANDOM_FILL;
+		object.levels=GD_OBJECT_LEVEL_ALL;
+		for (i=0; i<5; i++)
+			object.seed[i]=-1;
+
+		object.x1=0;
+		object.y1=0;
+		object.x2=39;
+		object.y2=21;
+		
+		object.element=O_BLADDER_SPENDER;	/* element to replace */
+		
+		object.fill_element=O_DIRT;	/* initial fill */
+		object.random_fill_probability[0]=37;
+		object.random_fill[0]=O_DIAMOND;
+		object.random_fill_probability[1]=32;
+		object.random_fill[1]=O_STONE;
+		object.random_fill_probability[2]=2;
+		object.random_fill[2]=O_ACID;
+		object.random_fill_probability[3]=0;
+		object.random_fill[3]=O_DIRT;
+		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
+	}
+	
+	if (g_str_equal(cave->name, "Roll dice now!") && checksum==235) {
+		GdObject object;
+		int i;
+
+		object.type=RANDOM_FILL;
+		object.levels=GD_OBJECT_LEVEL_ALL;
+		for (i=0; i<5; i++)
+			object.seed[i]=-1;
+
+		object.x1=0;
+		object.y1=0;
+		object.x2=39;
+		object.y2=21;
+		
+		object.element=O_BLADDER_SPENDER;	/* element to replace */
+		
+		object.fill_element=O_DIRT;	/* initial fill */
+		object.random_fill_probability[0]=0x18;
+		object.random_fill[0]=O_STONE;
+		object.random_fill_probability[1]=0x08;
+		object.random_fill[1]=O_BUTTER_3;
+		object.random_fill_probability[2]=0;
+		object.random_fill[2]=O_DIRT;
+		object.random_fill_probability[3]=0;
+		object.random_fill[3]=O_DIRT;
+		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
+	}
+	
+	if (g_str_equal(cave->name, "Random maze") && checksum==24) {
+		GdObject object;
+		int i;
+		
+		object.type=MAZE;
+		object.levels=GD_OBJECT_LEVEL_ALL;
+		for (i=0; i<5; i++)
+			object.seed[i]=-1;
+		object.horiz=50;
+		object.x1=1;
+		object.y1=4;
+		object.x2=35;
+		object.y2=20;
+		object.element=O_NONE;
+		object.fill_element=O_DIRT;
+		object.dx=1;
+		object.dy=1;
+
+		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
+	}
+
+	if (g_str_equal(cave->name, "Metamorphosis") && checksum==53) {
+		GdObject object;
+		int i;
+		
+		object.type=MAZE;
+		object.levels=GD_OBJECT_LEVEL_ALL;
+		for (i=0; i<5; i++)
+			object.seed[i]=-1;
+		object.horiz=50;
+		object.x1=4;
+		object.y1=1;
+		object.x2=38;
+		object.y2=19;
+		object.element=O_NONE;
+		object.fill_element=O_BLADDER_SPENDER;
+		object.dx=1;
+		object.dy=3;
+
+		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
+
+		/* replace object - x1,y1,x2,y2 stay :) */
+		object.type=RANDOM_FILL;
+		object.element=O_BLADDER_SPENDER;	/* element to replace */
+		object.fill_element=O_DIRT;	/* initial fill */
+		object.random_fill_probability[0]=0x18;
+		object.random_fill[0]=O_STONE;
+		object.random_fill_probability[1]=0;
+		object.random_fill[1]=O_DIRT;
+		object.random_fill_probability[2]=0;
+		object.random_fill[2]=O_DIRT;
+		object.random_fill_probability[3]=0;
+		object.random_fill[3]=O_DIRT;
+		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
+
+		cave->creatures_backwards=TRUE;	/* XXX why? */
+	}
+	
+	if (g_str_equal(cave->name, "All the way") && checksum==33) {
+		GdObject object;
+		int i;
+		
+		object.type=MAZE_UNICURSAL;
+		object.levels=GD_OBJECT_LEVEL_ALL;
+		for (i=0; i<5; i++)
+			object.seed[i]=-1;
+		object.horiz=50;
+		object.x1=1;
+		object.y1=1;
+		object.x2=35;
+		object.y2=19;
+		object.element=O_BRICK;
+		object.fill_element=O_PRE_DIA_1;
+		object.dx=1;
+		object.dy=1;
+		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
+
+		/* a point which "breaks" the unicursal maze */		
+		object.type=POINT;
+		object.element=O_BRICK;
+		object.x1=35;
+		object.y1=18;
+		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
+	}
+}
+
 
 
 /* crazy light contruction kit */
@@ -1530,7 +1848,6 @@ cave_copy_from_crli (Cave *cave, const guint8 *data, int remaining_bytes)
 {
 	guint8 uncompressed[1024];
 	int datapos, cavepos, i, x, y;
-	guint8 checksum;
 	gboolean cavefile;
 	const char *versions[]={"V2.2", "V2.6", "V3.0"};
 	enum {
@@ -1541,7 +1858,7 @@ cave_copy_from_crli (Cave *cave, const guint8 *data, int remaining_bytes)
 	} version=none;
 	GdElement (*import) (guint8 c, int i)=NULL;	/* import function */
 
-	gd_cave_set_crli_defaults(cave);
+	gd_cave_set_engine_defaults(cave, GD_ENGINE_CRLI);
 	
 	/* detect if this is a cavefile */
 	if (data[0]==0 && data[1]==0xc4 && data[2] == 'D' && data[3] == 'L' && data[4] == 'P') {
@@ -1555,7 +1872,7 @@ cave_copy_from_crli (Cave *cave, const guint8 *data, int remaining_bytes)
 
 	/* if we have name, convert */
 	if (!cavefile) {
-		g_strlcpy(cave->name, "              ", sizeof(cave->name));
+		gd_strcpy(cave->name, "              ");
 		for (i=0; i<14; i++) {
 			int c=data[i+1];
 			
@@ -1606,7 +1923,7 @@ cave_copy_from_crli (Cave *cave, const guint8 *data, int remaining_bytes)
 
 	/* check crli version */	
 	for (i=0; i<G_N_ELEMENTS(versions); i++)
-		if (strncmp((char *)uncompressed+0x3a0, versions[i], 4)==0)
+		if (memcmp((char *)uncompressed+0x3a0, versions[i], 4)==0)
 			version=i+1;
 
 	/* v3.0 has falling wall and box, and no ghost. */
@@ -1733,155 +2050,6 @@ cave_copy_from_crli (Cave *cave, const guint8 *data, int remaining_bytes)
 	else
 		cave->selectable=!data[0];	/* given by converter */
 
-
-	/* crazy dream 9 hack */	
-	checksum=0;
-	for (i=0; i<0x3b0; i++)
-		checksum=checksum ^ uncompressed[i];
-
-	/* check cave name and the checksum. both are hardcoded here */	
-	if (g_str_equal(cave->name, "Rockfall") && checksum==216) {
-		int i;
-		
-		GdObject object;
-
-		object.type=RANDOM_FILL;
-		object.levels=GD_OBJECT_LEVEL_ALL;
-		for (i=0; i<5; i++)
-			object.seed[i]=-1;
-
-		object.x1=0;
-		object.y1=0;
-		object.x2=39;
-		object.y2=21;
-		
-		object.element=O_BLADDER_SPENDER;	/* element to replace */
-		
-		object.fill_element=O_DIRT;	/* initial fill */
-		object.random_fill_probability[0]=37;
-		object.random_fill[0]=O_DIAMOND;
-		object.random_fill_probability[1]=32;
-		object.random_fill[1]=O_STONE;
-		object.random_fill_probability[2]=2;
-		object.random_fill[2]=O_ACID;
-		object.random_fill_probability[3]=0;
-		object.random_fill[3]=O_DIRT;
-		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
-	}
-	
-	if (g_str_equal(cave->name, "Roll dice now!") && checksum==21) {
-		GdObject object;
-		int i;
-
-		object.type=RANDOM_FILL;
-		object.levels=GD_OBJECT_LEVEL_ALL;
-		for (i=0; i<5; i++)
-			object.seed[i]=-1;
-
-		object.x1=0;
-		object.y1=0;
-		object.x2=39;
-		object.y2=21;
-		
-		object.element=O_BLADDER_SPENDER;	/* element to replace */
-		
-		object.fill_element=O_DIRT;	/* initial fill */
-		object.random_fill_probability[0]=0x18;
-		object.random_fill[0]=O_STONE;
-		object.random_fill_probability[1]=0x08;
-		object.random_fill[1]=O_BUTTER_3;
-		object.random_fill_probability[2]=0;
-		object.random_fill[2]=O_DIRT;
-		object.random_fill_probability[3]=0;
-		object.random_fill[3]=O_DIRT;
-		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
-	}
-	
-	if (g_str_equal(cave->name, "Random maze") && checksum==226) {
-		GdObject object;
-		int i;
-		
-		object.type=MAZE;
-		object.levels=GD_OBJECT_LEVEL_ALL;
-		for (i=0; i<5; i++)
-			object.seed[i]=-1;
-		object.horiz=50;
-		object.x1=1;
-		object.y1=4;
-		object.x2=35;
-		object.y2=20;
-		object.element=O_NONE;
-		object.fill_element=O_DIRT;
-		object.dx=1;
-		object.dy=1;
-
-		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
-	}
-
-	if (g_str_equal(cave->name, "Metamorphosis") && checksum==229) {
-		GdObject object;
-		int i;
-		
-		object.type=MAZE;
-		object.levels=GD_OBJECT_LEVEL_ALL;
-		for (i=0; i<5; i++)
-			object.seed[i]=-1;
-		object.horiz=50;
-		object.x1=4;
-		object.y1=1;
-		object.x2=38;
-		object.y2=19;
-		object.element=O_NONE;
-		object.fill_element=O_BLADDER_SPENDER;
-		object.dx=1;
-		object.dy=3;
-
-		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
-
-		/* replace object - x1,y1,x2,y2 stay :) */
-		object.type=RANDOM_FILL;
-		object.element=O_BLADDER_SPENDER;	/* element to replace */
-		object.fill_element=O_DIRT;	/* initial fill */
-		object.random_fill_probability[0]=0x18;
-		object.random_fill[0]=O_STONE;
-		object.random_fill_probability[1]=0;
-		object.random_fill[1]=O_DIRT;
-		object.random_fill_probability[2]=0;
-		object.random_fill[2]=O_DIRT;
-		object.random_fill_probability[3]=0;
-		object.random_fill[3]=O_DIRT;
-		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
-
-		cave->creatures_backwards=TRUE;	/* XXX why? */
-	}
-	
-	if (g_str_equal(cave->name, "All the way") && checksum==212) {
-		GdObject object;
-		int i;
-		
-		object.type=MAZE_UNICURSAL;
-		object.levels=GD_OBJECT_LEVEL_ALL;
-		for (i=0; i<5; i++)
-			object.seed[i]=-1;
-		object.horiz=50;
-		object.x1=1;
-		object.y1=1;
-		object.x2=35;
-		object.y2=19;
-		object.element=O_BRICK;
-		object.fill_element=O_PRE_DIA_1;
-		object.dx=1;
-		object.dy=1;
-		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
-
-		/* a point which "breaks" the unicursal maze */		
-		object.type=POINT;
-		object.element=O_BRICK;
-		object.x1=35;
-		object.y1=18;
-		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
-	}
-	
 	return datapos;
 }
 
@@ -1890,39 +2058,45 @@ GdCavefileFormat
 gd_caveset_imported_format(const guint8 *buf)
 {
 	const char *s_bd1="GDashBD1";
+	const char *s_dc1="GDashDC1";
 	const char *s_bd2="GDashBD2";
 	const char *s_plc="GDashPLC";
 	const char *s_dlb="GDashDLB";
 	const char *s_atg="GDashATG";
 	const char *s_crl="GDashCRL";
-	const char *s_crd="GDashCRD";
+	const char *s_cd7="GDashCD7";
+	const char *s_cd9="GDashCD9";
 	const char *s_1st="GDash1ST";
 
-	if (strncmp((char *)buf, s_bd1, 8)==0)	/* 8 bytes in s_... */
-		return BD1;
-	if (strncmp((char *)buf, s_bd2, 8)==0)	/* 8 bytes in s_... */
-		return BD2;
-	if (strncmp((char *)buf, s_plc, 8)==0)	/* 8 bytes in s_... */
-		return PLC;
-	if (strncmp((char *)buf, s_dlb, 8)==0)	/* 8 bytes in s_... */
-		return DLB;
-	if (strncmp((char *)buf, s_crl, 8)==0)	/* 8 bytes in s_... */
-		return CRLI;
-	if (strncmp((char *)buf, s_crd, 8)==0)	/* 8 bytes in s_... */
-		return CRDR;
-	if (strncmp((char *)buf, s_atg, 8)==0)	/* 8 bytes in s_... */
-		return ATG;
-	if (strncmp((char *)buf, s_1st, 8)==0)	/* 8 bytes in s_... */
-		return FIRSTB;
+	if (memcmp((char *)buf, s_bd1, strlen(s_bd1))==0)
+		return GD_FORMAT_BD1;
+	if (memcmp((char *)buf, s_dc1, strlen(s_dc1))==0)
+		return GD_FORMAT_DC1;
+	if (memcmp((char *)buf, s_bd2, strlen(s_bd2))==0)
+		return GD_FORMAT_BD2;
+	if (memcmp((char *)buf, s_plc, strlen(s_plc))==0)
+		return GD_FORMAT_PLC;
+	if (memcmp((char *)buf, s_dlb, strlen(s_dlb))==0)
+		return GD_FORMAT_DLB;
+	if (memcmp((char *)buf, s_crl, strlen(s_crl))==0)
+		return GD_FORMAT_CRLI;
+	if (memcmp((char *)buf, s_cd7, strlen(s_cd7))==0)
+		return GD_FORMAT_CRDR_7;
+	if (memcmp((char *)buf, s_cd9, strlen(s_cd9))==0)
+		return GD_FORMAT_CRDR_9;
+	if (memcmp((char *)buf, s_atg, strlen(s_atg))==0)
+		return GD_FORMAT_ATG;
+	if (memcmp((char *)buf, s_1st, strlen(s_1st))==0)
+		return GD_FORMAT_FIRSTB;
 
-	return UNKNOWN;
+	return GD_FORMAT_UNKNOWN;
 }
 
 
-/** Load caveset from memory buffer.
+/*
+	Load caveset from memory buffer.
 	Loads the caveset from a memory buffer.
-	File type is given in arg2.
-	@result GList *caves.
+	returns: GList * of caves.
 */
 GList *
 gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
@@ -1944,7 +2118,7 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 		return NULL;
 	}
 	format=gd_caveset_imported_format(buf);
-	if (format==UNKNOWN) {
+	if (format==GD_FORMAT_UNKNOWN) {
 		g_warning("buffer does not contain a GDash datafile");
 		return NULL;
 	}
@@ -1960,20 +2134,26 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 		int insertpos=-1;	/* default is to append cave to caveset; g_list_insert appends when pos=-1 */
 		
 		newcave=gd_cave_new();
+		
+		cavelength=0;	/* to avoid compiler warning */
 
 		switch (format) {
-		case BD1:				/* boulder dash 1 */
-		case BD2:				/* boulder dash 2 */
+		case GD_FORMAT_BD1:				/* boulder dash 1 */
+		case GD_FORMAT_DC1:				/* deluxe caves 1 */
+		case GD_FORMAT_BD2:				/* boulder dash 2 */
+			/* these are not in the data so we guess */
 			newcave->selectable=(cavenum<16) && (cavenum%4 == 0);
 			newcave->intermission=cavenum>15;
+			/* no name, so we make up one */
 			if (newcave->intermission)
 				g_snprintf(newcave->name, sizeof(newcave->name), _("Intermission %d"), cavenum-15);
 			else
 				g_snprintf(newcave->name, sizeof(newcave->name), _("Cave %c"), 'A'+cavenum);
 
 			switch(format) {
-				case BD1: cavelength=cave_copy_from_bd1 (newcave, buf+bufp, length-bufp); break;
-				case BD2: cavelength=cave_copy_from_bd2 (newcave, buf+bufp, length-bufp); break;
+				case GD_FORMAT_BD1: cavelength=cave_copy_from_bd1 (newcave, buf+bufp, length-bufp, FALSE); break;
+				case GD_FORMAT_DC1: cavelength=cave_copy_from_bd1 (newcave, buf+bufp, length-bufp, TRUE); break;
+				case GD_FORMAT_BD2: cavelength=cave_copy_from_bd2 (newcave, buf+bufp, length-bufp); break;
 				default:
 					g_assert_not_reached();
 			};
@@ -1984,17 +2164,17 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 				insertpos=(cavenum-15)*5-1;
 			break;
 
-		case FIRSTB:
+		case GD_FORMAT_FIRSTB:
 			cavelength=cave_copy_from_1stb(newcave, buf+bufp, length-bufp);
 			/* every fifth cave (4+1 intermission) is selectable. */
 			newcave->selectable=cavenum%5==0;
 			break;
 
-		case PLC:				/* peter liepa construction kit */
+		case GD_FORMAT_PLC:				/* peter liepa construction kit */
 			cavelength=cave_copy_from_plck (newcave, buf+bufp, length-bufp);
 			break;
 
-		case DLB:	/* no one's delight boulder dash, something like rle compressed plck caves */
+		case GD_FORMAT_DLB:	/* no one's delight boulder dash, something like rle compressed plck caves */
 			/* but there are 20 of them, as if it was a bd1 or bd2 game. also num%5=4 is intermission. */
 			/* we have to set intermission flag on our own, as the file did not contain the info explicitly */
 			newcave->intermission=(cavenum%5)==4;
@@ -2011,7 +2191,7 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 			cavelength=cave_copy_from_dlb (newcave, buf+bufp, length-bufp);
 			break;
 
-		case ATG:				/* atari games, imported from boulder rush */
+		case GD_FORMAT_ATG:				/* atari games, imported from boulder rush */
 			cavelength=cave_copy_from_atg(newcave, buf+bufp, length-bufp);	/* this also sets name */
 			newcave->selectable=cavenum%5 == 0;
 			/* atg games have no color info - use the no1 color table so they are different */
@@ -2023,19 +2203,25 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 			newcave->color5=newcave->color3;
 			break;
 
-		case CRLI:
+		case GD_FORMAT_CRLI:
 			cavelength=cave_copy_from_crli (newcave, buf+bufp, length-bufp);
 			break;
 
-		case CRDR:
-			cavelength=cave_copy_from_crdr (newcave, buf+bufp, length-bufp);
+		case GD_FORMAT_CRDR_7:
+			cavelength=cave_copy_from_crdr_7 (newcave, buf+bufp, length-bufp);
 			break;
 
-		default:
+		case GD_FORMAT_CRDR_9:
+			cavelength=cave_copy_from_crli (newcave, buf+bufp, length-bufp);
+			if (cavelength!=-1)
+				addition_crazy_dream_9(newcave, buf, cavelength);
+			break;
+		
+		case GD_FORMAT_UNKNOWN:
 			g_assert_not_reached();
 			break;
 		}
-
+		
 		gd_error_set_context(NULL);
 		if (cavelength==-1) {
 			gd_cave_free(newcave);
@@ -2047,7 +2233,7 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 		bufp+=cavelength;
 		
 		/* hack: some dlb files contain junk data after 20 caves. */
-		if (format==DLB && cavenum==20) {
+		if (format==GD_FORMAT_DLB && cavenum==20) {
 			if (bufp<length)
 				g_warning("excess data in dlb file, %d bytes", (int)(length-bufp));
 			break;
@@ -2056,7 +2242,7 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 
 	/* try to detect if plc caves are in standard layout. */
 	/* that is, caveset looks like an original, (4 cave,1 intermission)+ */
-	if (format==PLC)
+	if (format==GD_FORMAT_PLC)
 		/* if no selection table stored by any2gdash */
 		if ((buf[2+0x1f0]!=buf[2+0x1f1]-1) || (buf[2+0x1f0]!=0x19 && buf[2+0x1f0]!=0x0e)) {
 			GList *iter;
@@ -2086,7 +2272,7 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 	cavenum=1; intermissionnum=1;
 	num=1;
 	/* use numbering instead of letters, if following formats or too many caves (as we would run out of letters) */
-	numbering=format==PLC || format==CRLI || g_list_length(caveset)>26;
+	numbering=format==GD_FORMAT_PLC || format==GD_FORMAT_CRLI || g_list_length(caveset)>26;
 	for (iter=caveset; iter!=NULL; iter=iter->next) {
 		Cave *cave=(Cave *)iter->data;
 		
@@ -2114,7 +2300,8 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 	}	
 	
 	gd_error_set_context(NULL);
-	
+
+	/* if the uses requests, we make all caves selectable. intermissions not. */	
 	if (gd_import_as_all_caves_selectable)
 		for (iter=caveset; iter!=NULL; iter=iter->next) {
 			Cave *cave=(Cave *)iter->data;
@@ -2126,6 +2313,23 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 	
 	return caveset;
 }
+
+
+
+
+
+/* to be called at program start. */
+void
+gd_c64_import_init_tables()
+{
+	g_assert(gd_defaults_bd1[G_N_ELEMENTS(gd_defaults_bd1)-1].offset==-1);
+	g_assert(gd_defaults_bd2[G_N_ELEMENTS(gd_defaults_bd2)-1].offset==-1);
+	g_assert(gd_defaults_plck[G_N_ELEMENTS(gd_defaults_plck)-1].offset==-1);
+	g_assert(gd_defaults_1stb[G_N_ELEMENTS(gd_defaults_1stb)-1].offset==-1);
+	g_assert(gd_defaults_crdr_7[G_N_ELEMENTS(gd_defaults_crdr_7)-1].offset==-1);
+	g_assert(gd_defaults_crli[G_N_ELEMENTS(gd_defaults_crli)-1].offset==-1);
+}
+
 
 
 

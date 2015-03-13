@@ -16,7 +16,9 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include "cave.h"
-#include "gtk_gfx.h"
+#include "cavedb.h"
+#include "gtkgfx.h"
+#include "editorwidgets.h"
 
 /*
  * A COMBO BOX with c64 colors.
@@ -318,7 +320,7 @@ element_button_clicked(GtkWidget *button, gpointer data)
 	static const GdElement elements[]= {
 		/* normal */
 		O_SPACE, O_DIRT, O_DIAMOND, O_STONE, O_MEGA_STONE, O_DIRT_GLUED, O_DIAMOND_GLUED, O_STONE_GLUED,
-		O_BRICK, O_BRICK_EATABLE, O_H_GROWING_WALL, O_V_GROWING_WALL, O_GROWING_WALL, O_STEEL, O_STEEL_EATABLE, O_STEEL_EXPLODABLE,
+		O_BRICK, O_BRICK_EATABLE, O_BRICK_NON_SLOPED, O_SPACE, O_SPACE, O_STEEL, O_STEEL_EATABLE, O_STEEL_EXPLODABLE,
 		
 		O_INBOX, O_PRE_OUTBOX, O_PRE_INVIS_OUTBOX, O_PLAYER_GLUED, O_VOODOO, O_SPACE, O_SPACE, O_SPACE,
 		O_WALLED_KEY_1, O_WALLED_KEY_2, O_WALLED_KEY_3, O_WALLED_DIAMOND, O_STEEL_SLOPED_UP_RIGHT, O_STEEL_SLOPED_UP_LEFT, O_STEEL_SLOPED_DOWN_LEFT, O_STEEL_SLOPED_DOWN_RIGHT,
@@ -330,14 +332,14 @@ element_button_clicked(GtkWidget *button, gpointer data)
 		O_DOOR_1, O_DOOR_2, O_DOOR_3, O_TRAPPED_DIAMOND, O_DIRT_SLOPED_UP_RIGHT, O_DIRT_SLOPED_UP_LEFT, O_DIRT_SLOPED_DOWN_LEFT, O_DIRT_SLOPED_DOWN_RIGHT, 
 
 		O_GRAVITY_SWITCH, O_CREATURE_SWITCH, O_BITER_SWITCH, O_GROWING_WALL_SWITCH, O_SPACE, O_SPACE, O_SPACE, O_SPACE,
-		O_SPACE, O_SPACE, O_SPACE, O_SPACE, O_SPACE, O_SPACE, O_SPACE, O_NONE,
+		O_H_GROWING_WALL, O_V_GROWING_WALL, O_GROWING_WALL, O_SPACE, O_SPACE, O_SPACE, O_SPACE, O_NONE,
 
 		O_SPACE, O_GUARD_2, O_ALT_GUARD_2, O_SPACE, O_SPACE, O_BUTTER_2, O_ALT_BUTTER_2, O_SPACE, O_SPACE, O_STONEFLY_2, O_COW_2, O_SPACE, O_SPACE, O_SPACE, O_SPACE, O_SPACE,
 		O_GUARD_1, O_GUARD_3, O_ALT_GUARD_1, O_ALT_GUARD_3, O_BUTTER_1, O_BUTTER_3, O_ALT_BUTTER_1, O_ALT_BUTTER_3, O_STONEFLY_1, O_STONEFLY_3, O_COW_1, O_COW_3, O_BITER_1, O_BITER_2, O_BITER_3, O_BITER_4,
 		O_SPACE, O_GUARD_4, O_ALT_GUARD_4, O_SPACE, O_SPACE, O_BUTTER_4, O_ALT_BUTTER_4, O_SPACE, O_SPACE, O_STONEFLY_4, O_COW_4, O_SPACE, O_BLADDER, O_GHOST, O_WAITING_STONE, O_CHASING_STONE,
 
 		/* for effects */		
-		O_DIRT2, O_DIAMOND_F, O_STONE_F, O_FALLING_WALL_F, O_UNKNOWN, O_PRE_PL_1, O_PRE_PL_2, O_PRE_PL_3, O_PLAYER, O_PLAYER_BOMB, O_PLAYER_STIRRING, O_OUTBOX, O_INVIS_OUTBOX, O_TIME_PENALTY, O_GRAVESTONE, O_SPACE,
+		O_DIRT2, O_DIAMOND_F, O_STONE_F, O_MEGA_STONE_F, O_FALLING_WALL_F, O_UNKNOWN, O_PRE_PL_1, O_PRE_PL_2, O_PRE_PL_3, O_PLAYER, O_PLAYER_BOMB, O_PLAYER_STIRRING, O_OUTBOX, O_INVIS_OUTBOX, O_TIME_PENALTY, O_GRAVESTONE,
 
 		O_BLADDER_1, O_BLADDER_2, O_BLADDER_3, O_BLADDER_4, O_BLADDER_5, O_BLADDER_6, O_BLADDER_7, O_BLADDER_8, O_BLADDER_9,
 		O_COW_ENCLOSED_1, O_COW_ENCLOSED_2, O_COW_ENCLOSED_3, O_COW_ENCLOSED_4, O_COW_ENCLOSED_5, O_COW_ENCLOSED_6, O_COW_ENCLOSED_7,
@@ -463,6 +465,9 @@ enum
   NUM_DIR_COLS
 };
 
+/* directions to be shown, and corresponding icons. */
+static GdDirection shown_dirs[]= { MV_UP, MV_RIGHT, MV_DOWN, MV_LEFT };
+static const char *dir_icons[]= { GTK_STOCK_GO_UP, GTK_STOCK_GO_FORWARD, GTK_STOCK_GO_DOWN, GTK_STOCK_GO_BACK };
 
 GtkWidget *
 gd_direction_combo_new(const GdDirection initial)
@@ -470,46 +475,47 @@ gd_direction_combo_new(const GdDirection initial)
 	GtkWidget *combo;
 	static GtkListStore *store=NULL;
 	GtkCellRenderer *renderer;
+	int i;
 	
+	/* create list, if did not do so far. */
 	if (!store) {
 		GtkTreeIter iter;
 		GtkWidget *cellview;
 		GdkPixbuf *pixbuf;
 		
-		cellview=gtk_cell_view_new ();
+		cellview=gtk_cell_view_new();
 		store=gtk_list_store_new (NUM_DIR_COLS, GDK_TYPE_PIXBUF, G_TYPE_STRING);
 
-		gtk_list_store_append (store, &iter);
-		pixbuf=gtk_widget_render_icon(cellview, GTK_STOCK_GO_UP, GTK_ICON_SIZE_MENU, NULL);
-		gtk_list_store_set (store, &iter, DIR_PIXBUF_COL, pixbuf, DIR_TEXT_COL, _(gd_direction_name[MV_UP]), -1);
-		gtk_list_store_append (store, &iter);
-		pixbuf=gtk_widget_render_icon(cellview, GTK_STOCK_GO_FORWARD, GTK_ICON_SIZE_MENU, NULL);
-		gtk_list_store_set (store, &iter, DIR_PIXBUF_COL, pixbuf, DIR_TEXT_COL, _(gd_direction_name[MV_RIGHT]), -1);
-		gtk_list_store_append (store, &iter);
-		pixbuf=gtk_widget_render_icon(cellview, GTK_STOCK_GO_DOWN, GTK_ICON_SIZE_MENU, NULL);
-		gtk_list_store_set (store, &iter, DIR_PIXBUF_COL, pixbuf, DIR_TEXT_COL, _(gd_direction_name[MV_DOWN]), -1);
-		gtk_list_store_append (store, &iter);
-		pixbuf=gtk_widget_render_icon(cellview, GTK_STOCK_GO_BACK, GTK_ICON_SIZE_MENU, NULL);
-		gtk_list_store_set (store, &iter, DIR_PIXBUF_COL, pixbuf, DIR_TEXT_COL, _(gd_direction_name[MV_LEFT]), -1);
+		for (i=0; i<G_N_ELEMENTS(shown_dirs); i++) {
+			gtk_list_store_append (store, &iter);
+			pixbuf=gtk_widget_render_icon(cellview, dir_icons[i], GTK_ICON_SIZE_MENU, NULL);
+			gtk_list_store_set (store, &iter, DIR_PIXBUF_COL, pixbuf, DIR_TEXT_COL, _(gd_direction_get_visible_name(shown_dirs[i])), -1);
+		}
 
 		gtk_widget_destroy(cellview);
 	}
-	combo = gtk_combo_box_new_with_model (GTK_TREE_MODEL(store));
-    
+
+	/* create combo box and renderer for icon and text */
+	combo=gtk_combo_box_new_with_model (GTK_TREE_MODEL(store));
     renderer=gtk_cell_renderer_pixbuf_new ();
     gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, FALSE);
     gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "pixbuf", DIR_PIXBUF_COL, NULL);
     renderer=gtk_cell_renderer_text_new ();
     gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, FALSE);
     gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "text", DIR_TEXT_COL, NULL);
-	gtk_combo_box_set_active(GTK_COMBO_BOX(combo), (initial-1)/2);
+
+	/* set to initial value */
+	for (i=0; i<G_N_ELEMENTS(shown_dirs); i++)
+		if (shown_dirs[i]==initial)
+			gtk_combo_box_set_active(GTK_COMBO_BOX(combo), i);
+
 	return combo;
 }
 
 GdDirection
 gd_direction_combo_get(GtkWidget *combo)
 {
-	return (GdDirection)(gtk_combo_box_get_active(GTK_COMBO_BOX(combo))*2+1);
+	return (GdDirection) shown_dirs[gtk_combo_box_get_active(GTK_COMBO_BOX(combo))];
 }
 
 

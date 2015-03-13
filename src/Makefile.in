@@ -57,26 +57,30 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am__objects_1 = gdash-cave.$(OBJEXT) gdash-caveengine.$(OBJEXT) \
-	gdash-caveobject.$(OBJEXT) gdash-caveset.$(OBJEXT) \
-	gdash-c64import.$(OBJEXT) gdash-game.$(OBJEXT) \
-	gdash-settings.$(OBJEXT) gdash-util.$(OBJEXT) \
-	gdash-about.$(OBJEXT)
-am__objects_2 = gdash-gtk_gfx.$(OBJEXT) gdash-gtk_ui.$(OBJEXT) \
-	gdash-gtk_main.$(OBJEXT) gdash-editor-widgets.$(OBJEXT) \
-	gdash-editor-export.$(OBJEXT) gdash-editor.$(OBJEXT) \
+am__objects_1 = gdash-cave.$(OBJEXT) gdash-cavedb.$(OBJEXT) \
+	gdash-caveengine.$(OBJEXT) gdash-caveobject.$(OBJEXT) \
+	gdash-cavesound.$(OBJEXT) gdash-bdcff.$(OBJEXT) \
+	gdash-caveset.$(OBJEXT) gdash-c64import.$(OBJEXT) \
+	gdash-gameplay.$(OBJEXT) gdash-settings.$(OBJEXT) \
+	gdash-util.$(OBJEXT) gdash-about.$(OBJEXT) \
+	gdash-gfxutil.$(OBJEXT)
+am__objects_2 = gdash-gtkgfx.$(OBJEXT) gdash-gtkui.$(OBJEXT) \
+	gdash-gtkmain.$(OBJEXT) gdash-editorwidgets.$(OBJEXT) \
+	gdash-editorexport.$(OBJEXT) gdash-editor.$(OBJEXT) \
 	gdash-help.$(OBJEXT)
 am__objects_3 = gdash-sound.$(OBJEXT)
 am_gdash_OBJECTS = $(am__objects_1) $(am__objects_2) $(am__objects_3)
 gdash_OBJECTS = $(am_gdash_OBJECTS)
 gdash_DEPENDENCIES =
-am__objects_4 = sdash-cave.$(OBJEXT) sdash-caveengine.$(OBJEXT) \
-	sdash-caveobject.$(OBJEXT) sdash-caveset.$(OBJEXT) \
-	sdash-c64import.$(OBJEXT) sdash-game.$(OBJEXT) \
-	sdash-settings.$(OBJEXT) sdash-util.$(OBJEXT) \
-	sdash-about.$(OBJEXT)
-am__objects_5 = sdash-sdl_gfx.$(OBJEXT) sdash-sdl_main.$(OBJEXT) \
-	sdash-sdl_ui.$(OBJEXT)
+am__objects_4 = sdash-cave.$(OBJEXT) sdash-cavedb.$(OBJEXT) \
+	sdash-caveengine.$(OBJEXT) sdash-caveobject.$(OBJEXT) \
+	sdash-cavesound.$(OBJEXT) sdash-bdcff.$(OBJEXT) \
+	sdash-caveset.$(OBJEXT) sdash-c64import.$(OBJEXT) \
+	sdash-gameplay.$(OBJEXT) sdash-settings.$(OBJEXT) \
+	sdash-util.$(OBJEXT) sdash-about.$(OBJEXT) \
+	sdash-gfxutil.$(OBJEXT)
+am__objects_5 = sdash-sdlgfx.$(OBJEXT) sdash-sdlmain.$(OBJEXT) \
+	sdash-sdlui.$(OBJEXT)
 am__objects_6 = sdash-sound.$(OBJEXT)
 am_sdash_OBJECTS = $(am__objects_4) $(am__objects_5) $(am__objects_6)
 sdash_OBJECTS = $(am_sdash_OBJECTS)
@@ -228,25 +232,33 @@ INCLUDES = \
 #   the gdash engine.
 base_headers = \
 	cave.h \
+	cavedb.h \
 	caveengine.h \
 	caveobject.h \
+	cavesound.h \
+	bdcff.h \
 	caveset.h \
 	c64import.h \
-	game.h \
+	gameplay.h \
 	settings.h \
 	util.h \
-	about.h
+	about.h \
+	gfxutil.h
 
 base_sources = \
 	cave.c \
+	cavedb.c \
 	caveengine.c \
 	caveobject.c \
+	cavesound.c \
+	bdcff.c \
 	caveset.c \
 	c64import.c \
-	game.c \
+	gameplay.c \
 	settings.c \
 	util.c \
-	about.c
+	about.c \
+	gfxutil.c
 
 
 # sdl-mixer generated sounds.
@@ -260,40 +272,40 @@ sound_sources = \
 
 # gtk sources and headers:
 #   the gdash gtk ui, with editor.
-gtk_sources = \
-	gtk_gfx.c \
-	gtk_ui.c \
-	gtk_main.c \
-	editor-widgets.c \
-	editor-export.c \
+gtksources = \
+	gtkgfx.c \
+	gtkui.c \
+	gtkmain.c \
+	editorwidgets.c \
+	editorexport.c \
 	editor.c \
 	help.c
 
-gtk_headers = \
-	gtk_gfx.h\
-	gtk_ui.h\
-	gtk_main.h \
+gtkheaders = \
+	gtkgfx.h\
+	gtkui.h\
+	gtkmain.h \
 	editor.h \
-	editor-widgets.h\
-	editor-export.h\
+	editorwidgets.h\
+	editorexport.h\
 	help.h
 
 
 # sdl sources and headers:
 #   the gdash sdl ui with sounds.
-sdl_sources = \
-	sdl_gfx.c \
-	sdl_main.c \
-	sdl_ui.c
+sdlsources = \
+	sdlgfx.c \
+	sdlmain.c \
+	sdlui.c
 
-sdl_headers = \
-	sdl_gfx.h \
-	sdl_ui.h
+sdlheaders = \
+	sdlgfx.h \
+	sdlui.h
 
 noinst_HEADERS = \
 	$(base_headers) \
-	$(gtk_headers) \
-	$(sdl_headers) \
+	$(gtkheaders) \
+	$(sdlheaders) \
 	$(sound_headers)
 
 gdash_CFLAGS = -g -Wall @GTK_CFLAGS@ @SDL_CFLAGS@
@@ -301,7 +313,7 @@ gdash_LDFLAGS = -g -Wall -lSDL_mixer
 gdash_LDADD = @GTK_LIBS@ @LIBINTL@ @SDL_LIBS@
 gdash_SOURCES = \
 	$(base_sources) \
-	$(gtk_sources) \
+	$(gtksources) \
 	$(sound_sources)
 
 sdash_CFLAGS = -g -Wall @GLIB_CFLAGS@ @SDL_CFLAGS@
@@ -309,7 +321,7 @@ sdash_LDFLAGS = -g -Wall -lSDL_mixer
 sdash_LDADD = @GLIB_LIBS@ @SDL_LIBS@
 sdash_SOURCES = \
 	$(base_sources) \
-	$(sdl_sources) \
+	$(sdlsources) \
 	$(sound_sources)
 
 all: all-am
@@ -382,32 +394,40 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-about.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-bdcff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-c64import.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-cave.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-cavedb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-caveengine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-caveobject.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-caveset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-editor-export.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-editor-widgets.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-cavesound.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-editor.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-game.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtk_gfx.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtk_main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtk_ui.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-editorexport.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-editorwidgets.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gameplay.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gfxutil.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkgfx.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkmain.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkui.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-help.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-settings.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sound.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-about.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-bdcff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-c64import.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-cave.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-cavedb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-caveengine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-caveobject.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-caveset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-game.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-sdl_gfx.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-sdl_main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-sdl_ui.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-cavesound.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-gameplay.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-gfxutil.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-sdlgfx.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-sdlmain.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-sdlui.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-settings.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-sound.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-util.Po@am__quote@
@@ -440,6 +460,20 @@ gdash-cave.obj: cave.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-cave.obj `if test -f 'cave.c'; then $(CYGPATH_W) 'cave.c'; else $(CYGPATH_W) '$(srcdir)/cave.c'; fi`
 
+gdash-cavedb.o: cavedb.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-cavedb.o -MD -MP -MF "$(DEPDIR)/gdash-cavedb.Tpo" -c -o gdash-cavedb.o `test -f 'cavedb.c' || echo '$(srcdir)/'`cavedb.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-cavedb.Tpo" "$(DEPDIR)/gdash-cavedb.Po"; else rm -f "$(DEPDIR)/gdash-cavedb.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cavedb.c' object='gdash-cavedb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-cavedb.o `test -f 'cavedb.c' || echo '$(srcdir)/'`cavedb.c
+
+gdash-cavedb.obj: cavedb.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-cavedb.obj -MD -MP -MF "$(DEPDIR)/gdash-cavedb.Tpo" -c -o gdash-cavedb.obj `if test -f 'cavedb.c'; then $(CYGPATH_W) 'cavedb.c'; else $(CYGPATH_W) '$(srcdir)/cavedb.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-cavedb.Tpo" "$(DEPDIR)/gdash-cavedb.Po"; else rm -f "$(DEPDIR)/gdash-cavedb.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cavedb.c' object='gdash-cavedb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-cavedb.obj `if test -f 'cavedb.c'; then $(CYGPATH_W) 'cavedb.c'; else $(CYGPATH_W) '$(srcdir)/cavedb.c'; fi`
+
 gdash-caveengine.o: caveengine.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-caveengine.o -MD -MP -MF "$(DEPDIR)/gdash-caveengine.Tpo" -c -o gdash-caveengine.o `test -f 'caveengine.c' || echo '$(srcdir)/'`caveengine.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-caveengine.Tpo" "$(DEPDIR)/gdash-caveengine.Po"; else rm -f "$(DEPDIR)/gdash-caveengine.Tpo"; exit 1; fi
@@ -467,6 +501,34 @@ gdash-caveobject.obj: caveobject.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='caveobject.c' object='gdash-caveobject.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-caveobject.obj `if test -f 'caveobject.c'; then $(CYGPATH_W) 'caveobject.c'; else $(CYGPATH_W) '$(srcdir)/caveobject.c'; fi`
+
+gdash-cavesound.o: cavesound.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-cavesound.o -MD -MP -MF "$(DEPDIR)/gdash-cavesound.Tpo" -c -o gdash-cavesound.o `test -f 'cavesound.c' || echo '$(srcdir)/'`cavesound.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-cavesound.Tpo" "$(DEPDIR)/gdash-cavesound.Po"; else rm -f "$(DEPDIR)/gdash-cavesound.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cavesound.c' object='gdash-cavesound.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-cavesound.o `test -f 'cavesound.c' || echo '$(srcdir)/'`cavesound.c
+
+gdash-cavesound.obj: cavesound.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-cavesound.obj -MD -MP -MF "$(DEPDIR)/gdash-cavesound.Tpo" -c -o gdash-cavesound.obj `if test -f 'cavesound.c'; then $(CYGPATH_W) 'cavesound.c'; else $(CYGPATH_W) '$(srcdir)/cavesound.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-cavesound.Tpo" "$(DEPDIR)/gdash-cavesound.Po"; else rm -f "$(DEPDIR)/gdash-cavesound.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cavesound.c' object='gdash-cavesound.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-cavesound.obj `if test -f 'cavesound.c'; then $(CYGPATH_W) 'cavesound.c'; else $(CYGPATH_W) '$(srcdir)/cavesound.c'; fi`
+
+gdash-bdcff.o: bdcff.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-bdcff.o -MD -MP -MF "$(DEPDIR)/gdash-bdcff.Tpo" -c -o gdash-bdcff.o `test -f 'bdcff.c' || echo '$(srcdir)/'`bdcff.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-bdcff.Tpo" "$(DEPDIR)/gdash-bdcff.Po"; else rm -f "$(DEPDIR)/gdash-bdcff.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bdcff.c' object='gdash-bdcff.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-bdcff.o `test -f 'bdcff.c' || echo '$(srcdir)/'`bdcff.c
+
+gdash-bdcff.obj: bdcff.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-bdcff.obj -MD -MP -MF "$(DEPDIR)/gdash-bdcff.Tpo" -c -o gdash-bdcff.obj `if test -f 'bdcff.c'; then $(CYGPATH_W) 'bdcff.c'; else $(CYGPATH_W) '$(srcdir)/bdcff.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-bdcff.Tpo" "$(DEPDIR)/gdash-bdcff.Po"; else rm -f "$(DEPDIR)/gdash-bdcff.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bdcff.c' object='gdash-bdcff.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-bdcff.obj `if test -f 'bdcff.c'; then $(CYGPATH_W) 'bdcff.c'; else $(CYGPATH_W) '$(srcdir)/bdcff.c'; fi`
 
 gdash-caveset.o: caveset.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-caveset.o -MD -MP -MF "$(DEPDIR)/gdash-caveset.Tpo" -c -o gdash-caveset.o `test -f 'caveset.c' || echo '$(srcdir)/'`caveset.c; \
@@ -496,19 +558,19 @@ gdash-c64import.obj: c64import.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-c64import.obj `if test -f 'c64import.c'; then $(CYGPATH_W) 'c64import.c'; else $(CYGPATH_W) '$(srcdir)/c64import.c'; fi`
 
-gdash-game.o: game.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-game.o -MD -MP -MF "$(DEPDIR)/gdash-game.Tpo" -c -o gdash-game.o `test -f 'game.c' || echo '$(srcdir)/'`game.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-game.Tpo" "$(DEPDIR)/gdash-game.Po"; else rm -f "$(DEPDIR)/gdash-game.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='game.c' object='gdash-game.o' libtool=no @AMDEPBACKSLASH@
+gdash-gameplay.o: gameplay.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gameplay.o -MD -MP -MF "$(DEPDIR)/gdash-gameplay.Tpo" -c -o gdash-gameplay.o `test -f 'gameplay.c' || echo '$(srcdir)/'`gameplay.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gameplay.Tpo" "$(DEPDIR)/gdash-gameplay.Po"; else rm -f "$(DEPDIR)/gdash-gameplay.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gameplay.c' object='gdash-gameplay.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-game.o `test -f 'game.c' || echo '$(srcdir)/'`game.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gameplay.o `test -f 'gameplay.c' || echo '$(srcdir)/'`gameplay.c
 
-gdash-game.obj: game.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-game.obj -MD -MP -MF "$(DEPDIR)/gdash-game.Tpo" -c -o gdash-game.obj `if test -f 'game.c'; then $(CYGPATH_W) 'game.c'; else $(CYGPATH_W) '$(srcdir)/game.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-game.Tpo" "$(DEPDIR)/gdash-game.Po"; else rm -f "$(DEPDIR)/gdash-game.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='game.c' object='gdash-game.obj' libtool=no @AMDEPBACKSLASH@
+gdash-gameplay.obj: gameplay.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gameplay.obj -MD -MP -MF "$(DEPDIR)/gdash-gameplay.Tpo" -c -o gdash-gameplay.obj `if test -f 'gameplay.c'; then $(CYGPATH_W) 'gameplay.c'; else $(CYGPATH_W) '$(srcdir)/gameplay.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gameplay.Tpo" "$(DEPDIR)/gdash-gameplay.Po"; else rm -f "$(DEPDIR)/gdash-gameplay.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gameplay.c' object='gdash-gameplay.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-game.obj `if test -f 'game.c'; then $(CYGPATH_W) 'game.c'; else $(CYGPATH_W) '$(srcdir)/game.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gameplay.obj `if test -f 'gameplay.c'; then $(CYGPATH_W) 'gameplay.c'; else $(CYGPATH_W) '$(srcdir)/gameplay.c'; fi`
 
 gdash-settings.o: settings.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-settings.o -MD -MP -MF "$(DEPDIR)/gdash-settings.Tpo" -c -o gdash-settings.o `test -f 'settings.c' || echo '$(srcdir)/'`settings.c; \
@@ -552,75 +614,89 @@ gdash-about.obj: about.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-about.obj `if test -f 'about.c'; then $(CYGPATH_W) 'about.c'; else $(CYGPATH_W) '$(srcdir)/about.c'; fi`
 
-gdash-gtk_gfx.o: gtk_gfx.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gtk_gfx.o -MD -MP -MF "$(DEPDIR)/gdash-gtk_gfx.Tpo" -c -o gdash-gtk_gfx.o `test -f 'gtk_gfx.c' || echo '$(srcdir)/'`gtk_gfx.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gtk_gfx.Tpo" "$(DEPDIR)/gdash-gtk_gfx.Po"; else rm -f "$(DEPDIR)/gdash-gtk_gfx.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gtk_gfx.c' object='gdash-gtk_gfx.o' libtool=no @AMDEPBACKSLASH@
+gdash-gfxutil.o: gfxutil.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gfxutil.o -MD -MP -MF "$(DEPDIR)/gdash-gfxutil.Tpo" -c -o gdash-gfxutil.o `test -f 'gfxutil.c' || echo '$(srcdir)/'`gfxutil.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gfxutil.Tpo" "$(DEPDIR)/gdash-gfxutil.Po"; else rm -f "$(DEPDIR)/gdash-gfxutil.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gfxutil.c' object='gdash-gfxutil.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gtk_gfx.o `test -f 'gtk_gfx.c' || echo '$(srcdir)/'`gtk_gfx.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gfxutil.o `test -f 'gfxutil.c' || echo '$(srcdir)/'`gfxutil.c
 
-gdash-gtk_gfx.obj: gtk_gfx.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gtk_gfx.obj -MD -MP -MF "$(DEPDIR)/gdash-gtk_gfx.Tpo" -c -o gdash-gtk_gfx.obj `if test -f 'gtk_gfx.c'; then $(CYGPATH_W) 'gtk_gfx.c'; else $(CYGPATH_W) '$(srcdir)/gtk_gfx.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gtk_gfx.Tpo" "$(DEPDIR)/gdash-gtk_gfx.Po"; else rm -f "$(DEPDIR)/gdash-gtk_gfx.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gtk_gfx.c' object='gdash-gtk_gfx.obj' libtool=no @AMDEPBACKSLASH@
+gdash-gfxutil.obj: gfxutil.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gfxutil.obj -MD -MP -MF "$(DEPDIR)/gdash-gfxutil.Tpo" -c -o gdash-gfxutil.obj `if test -f 'gfxutil.c'; then $(CYGPATH_W) 'gfxutil.c'; else $(CYGPATH_W) '$(srcdir)/gfxutil.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gfxutil.Tpo" "$(DEPDIR)/gdash-gfxutil.Po"; else rm -f "$(DEPDIR)/gdash-gfxutil.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gfxutil.c' object='gdash-gfxutil.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gtk_gfx.obj `if test -f 'gtk_gfx.c'; then $(CYGPATH_W) 'gtk_gfx.c'; else $(CYGPATH_W) '$(srcdir)/gtk_gfx.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gfxutil.obj `if test -f 'gfxutil.c'; then $(CYGPATH_W) 'gfxutil.c'; else $(CYGPATH_W) '$(srcdir)/gfxutil.c'; fi`
 
-gdash-gtk_ui.o: gtk_ui.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gtk_ui.o -MD -MP -MF "$(DEPDIR)/gdash-gtk_ui.Tpo" -c -o gdash-gtk_ui.o `test -f 'gtk_ui.c' || echo '$(srcdir)/'`gtk_ui.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gtk_ui.Tpo" "$(DEPDIR)/gdash-gtk_ui.Po"; else rm -f "$(DEPDIR)/gdash-gtk_ui.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gtk_ui.c' object='gdash-gtk_ui.o' libtool=no @AMDEPBACKSLASH@
+gdash-gtkgfx.o: gtkgfx.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gtkgfx.o -MD -MP -MF "$(DEPDIR)/gdash-gtkgfx.Tpo" -c -o gdash-gtkgfx.o `test -f 'gtkgfx.c' || echo '$(srcdir)/'`gtkgfx.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gtkgfx.Tpo" "$(DEPDIR)/gdash-gtkgfx.Po"; else rm -f "$(DEPDIR)/gdash-gtkgfx.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gtkgfx.c' object='gdash-gtkgfx.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gtk_ui.o `test -f 'gtk_ui.c' || echo '$(srcdir)/'`gtk_ui.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gtkgfx.o `test -f 'gtkgfx.c' || echo '$(srcdir)/'`gtkgfx.c
 
-gdash-gtk_ui.obj: gtk_ui.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gtk_ui.obj -MD -MP -MF "$(DEPDIR)/gdash-gtk_ui.Tpo" -c -o gdash-gtk_ui.obj `if test -f 'gtk_ui.c'; then $(CYGPATH_W) 'gtk_ui.c'; else $(CYGPATH_W) '$(srcdir)/gtk_ui.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gtk_ui.Tpo" "$(DEPDIR)/gdash-gtk_ui.Po"; else rm -f "$(DEPDIR)/gdash-gtk_ui.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gtk_ui.c' object='gdash-gtk_ui.obj' libtool=no @AMDEPBACKSLASH@
+gdash-gtkgfx.obj: gtkgfx.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gtkgfx.obj -MD -MP -MF "$(DEPDIR)/gdash-gtkgfx.Tpo" -c -o gdash-gtkgfx.obj `if test -f 'gtkgfx.c'; then $(CYGPATH_W) 'gtkgfx.c'; else $(CYGPATH_W) '$(srcdir)/gtkgfx.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gtkgfx.Tpo" "$(DEPDIR)/gdash-gtkgfx.Po"; else rm -f "$(DEPDIR)/gdash-gtkgfx.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gtkgfx.c' object='gdash-gtkgfx.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gtk_ui.obj `if test -f 'gtk_ui.c'; then $(CYGPATH_W) 'gtk_ui.c'; else $(CYGPATH_W) '$(srcdir)/gtk_ui.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gtkgfx.obj `if test -f 'gtkgfx.c'; then $(CYGPATH_W) 'gtkgfx.c'; else $(CYGPATH_W) '$(srcdir)/gtkgfx.c'; fi`
 
-gdash-gtk_main.o: gtk_main.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gtk_main.o -MD -MP -MF "$(DEPDIR)/gdash-gtk_main.Tpo" -c -o gdash-gtk_main.o `test -f 'gtk_main.c' || echo '$(srcdir)/'`gtk_main.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gtk_main.Tpo" "$(DEPDIR)/gdash-gtk_main.Po"; else rm -f "$(DEPDIR)/gdash-gtk_main.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gtk_main.c' object='gdash-gtk_main.o' libtool=no @AMDEPBACKSLASH@
+gdash-gtkui.o: gtkui.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gtkui.o -MD -MP -MF "$(DEPDIR)/gdash-gtkui.Tpo" -c -o gdash-gtkui.o `test -f 'gtkui.c' || echo '$(srcdir)/'`gtkui.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gtkui.Tpo" "$(DEPDIR)/gdash-gtkui.Po"; else rm -f "$(DEPDIR)/gdash-gtkui.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gtkui.c' object='gdash-gtkui.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gtk_main.o `test -f 'gtk_main.c' || echo '$(srcdir)/'`gtk_main.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gtkui.o `test -f 'gtkui.c' || echo '$(srcdir)/'`gtkui.c
 
-gdash-gtk_main.obj: gtk_main.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gtk_main.obj -MD -MP -MF "$(DEPDIR)/gdash-gtk_main.Tpo" -c -o gdash-gtk_main.obj `if test -f 'gtk_main.c'; then $(CYGPATH_W) 'gtk_main.c'; else $(CYGPATH_W) '$(srcdir)/gtk_main.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gtk_main.Tpo" "$(DEPDIR)/gdash-gtk_main.Po"; else rm -f "$(DEPDIR)/gdash-gtk_main.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gtk_main.c' object='gdash-gtk_main.obj' libtool=no @AMDEPBACKSLASH@
+gdash-gtkui.obj: gtkui.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gtkui.obj -MD -MP -MF "$(DEPDIR)/gdash-gtkui.Tpo" -c -o gdash-gtkui.obj `if test -f 'gtkui.c'; then $(CYGPATH_W) 'gtkui.c'; else $(CYGPATH_W) '$(srcdir)/gtkui.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gtkui.Tpo" "$(DEPDIR)/gdash-gtkui.Po"; else rm -f "$(DEPDIR)/gdash-gtkui.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gtkui.c' object='gdash-gtkui.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gtk_main.obj `if test -f 'gtk_main.c'; then $(CYGPATH_W) 'gtk_main.c'; else $(CYGPATH_W) '$(srcdir)/gtk_main.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gtkui.obj `if test -f 'gtkui.c'; then $(CYGPATH_W) 'gtkui.c'; else $(CYGPATH_W) '$(srcdir)/gtkui.c'; fi`
 
-gdash-editor-widgets.o: editor-widgets.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-editor-widgets.o -MD -MP -MF "$(DEPDIR)/gdash-editor-widgets.Tpo" -c -o gdash-editor-widgets.o `test -f 'editor-widgets.c' || echo '$(srcdir)/'`editor-widgets.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-editor-widgets.Tpo" "$(DEPDIR)/gdash-editor-widgets.Po"; else rm -f "$(DEPDIR)/gdash-editor-widgets.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editor-widgets.c' object='gdash-editor-widgets.o' libtool=no @AMDEPBACKSLASH@
+gdash-gtkmain.o: gtkmain.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gtkmain.o -MD -MP -MF "$(DEPDIR)/gdash-gtkmain.Tpo" -c -o gdash-gtkmain.o `test -f 'gtkmain.c' || echo '$(srcdir)/'`gtkmain.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gtkmain.Tpo" "$(DEPDIR)/gdash-gtkmain.Po"; else rm -f "$(DEPDIR)/gdash-gtkmain.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gtkmain.c' object='gdash-gtkmain.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-editor-widgets.o `test -f 'editor-widgets.c' || echo '$(srcdir)/'`editor-widgets.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gtkmain.o `test -f 'gtkmain.c' || echo '$(srcdir)/'`gtkmain.c
 
-gdash-editor-widgets.obj: editor-widgets.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-editor-widgets.obj -MD -MP -MF "$(DEPDIR)/gdash-editor-widgets.Tpo" -c -o gdash-editor-widgets.obj `if test -f 'editor-widgets.c'; then $(CYGPATH_W) 'editor-widgets.c'; else $(CYGPATH_W) '$(srcdir)/editor-widgets.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-editor-widgets.Tpo" "$(DEPDIR)/gdash-editor-widgets.Po"; else rm -f "$(DEPDIR)/gdash-editor-widgets.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editor-widgets.c' object='gdash-editor-widgets.obj' libtool=no @AMDEPBACKSLASH@
+gdash-gtkmain.obj: gtkmain.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-gtkmain.obj -MD -MP -MF "$(DEPDIR)/gdash-gtkmain.Tpo" -c -o gdash-gtkmain.obj `if test -f 'gtkmain.c'; then $(CYGPATH_W) 'gtkmain.c'; else $(CYGPATH_W) '$(srcdir)/gtkmain.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-gtkmain.Tpo" "$(DEPDIR)/gdash-gtkmain.Po"; else rm -f "$(DEPDIR)/gdash-gtkmain.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gtkmain.c' object='gdash-gtkmain.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-editor-widgets.obj `if test -f 'editor-widgets.c'; then $(CYGPATH_W) 'editor-widgets.c'; else $(CYGPATH_W) '$(srcdir)/editor-widgets.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-gtkmain.obj `if test -f 'gtkmain.c'; then $(CYGPATH_W) 'gtkmain.c'; else $(CYGPATH_W) '$(srcdir)/gtkmain.c'; fi`
 
-gdash-editor-export.o: editor-export.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-editor-export.o -MD -MP -MF "$(DEPDIR)/gdash-editor-export.Tpo" -c -o gdash-editor-export.o `test -f 'editor-export.c' || echo '$(srcdir)/'`editor-export.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-editor-export.Tpo" "$(DEPDIR)/gdash-editor-export.Po"; else rm -f "$(DEPDIR)/gdash-editor-export.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editor-export.c' object='gdash-editor-export.o' libtool=no @AMDEPBACKSLASH@
+gdash-editorwidgets.o: editorwidgets.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-editorwidgets.o -MD -MP -MF "$(DEPDIR)/gdash-editorwidgets.Tpo" -c -o gdash-editorwidgets.o `test -f 'editorwidgets.c' || echo '$(srcdir)/'`editorwidgets.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-editorwidgets.Tpo" "$(DEPDIR)/gdash-editorwidgets.Po"; else rm -f "$(DEPDIR)/gdash-editorwidgets.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editorwidgets.c' object='gdash-editorwidgets.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-editor-export.o `test -f 'editor-export.c' || echo '$(srcdir)/'`editor-export.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-editorwidgets.o `test -f 'editorwidgets.c' || echo '$(srcdir)/'`editorwidgets.c
 
-gdash-editor-export.obj: editor-export.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-editor-export.obj -MD -MP -MF "$(DEPDIR)/gdash-editor-export.Tpo" -c -o gdash-editor-export.obj `if test -f 'editor-export.c'; then $(CYGPATH_W) 'editor-export.c'; else $(CYGPATH_W) '$(srcdir)/editor-export.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-editor-export.Tpo" "$(DEPDIR)/gdash-editor-export.Po"; else rm -f "$(DEPDIR)/gdash-editor-export.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editor-export.c' object='gdash-editor-export.obj' libtool=no @AMDEPBACKSLASH@
+gdash-editorwidgets.obj: editorwidgets.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-editorwidgets.obj -MD -MP -MF "$(DEPDIR)/gdash-editorwidgets.Tpo" -c -o gdash-editorwidgets.obj `if test -f 'editorwidgets.c'; then $(CYGPATH_W) 'editorwidgets.c'; else $(CYGPATH_W) '$(srcdir)/editorwidgets.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-editorwidgets.Tpo" "$(DEPDIR)/gdash-editorwidgets.Po"; else rm -f "$(DEPDIR)/gdash-editorwidgets.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editorwidgets.c' object='gdash-editorwidgets.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-editor-export.obj `if test -f 'editor-export.c'; then $(CYGPATH_W) 'editor-export.c'; else $(CYGPATH_W) '$(srcdir)/editor-export.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-editorwidgets.obj `if test -f 'editorwidgets.c'; then $(CYGPATH_W) 'editorwidgets.c'; else $(CYGPATH_W) '$(srcdir)/editorwidgets.c'; fi`
+
+gdash-editorexport.o: editorexport.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-editorexport.o -MD -MP -MF "$(DEPDIR)/gdash-editorexport.Tpo" -c -o gdash-editorexport.o `test -f 'editorexport.c' || echo '$(srcdir)/'`editorexport.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-editorexport.Tpo" "$(DEPDIR)/gdash-editorexport.Po"; else rm -f "$(DEPDIR)/gdash-editorexport.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editorexport.c' object='gdash-editorexport.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-editorexport.o `test -f 'editorexport.c' || echo '$(srcdir)/'`editorexport.c
+
+gdash-editorexport.obj: editorexport.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-editorexport.obj -MD -MP -MF "$(DEPDIR)/gdash-editorexport.Tpo" -c -o gdash-editorexport.obj `if test -f 'editorexport.c'; then $(CYGPATH_W) 'editorexport.c'; else $(CYGPATH_W) '$(srcdir)/editorexport.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-editorexport.Tpo" "$(DEPDIR)/gdash-editorexport.Po"; else rm -f "$(DEPDIR)/gdash-editorexport.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editorexport.c' object='gdash-editorexport.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-editorexport.obj `if test -f 'editorexport.c'; then $(CYGPATH_W) 'editorexport.c'; else $(CYGPATH_W) '$(srcdir)/editorexport.c'; fi`
 
 gdash-editor.o: editor.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-editor.o -MD -MP -MF "$(DEPDIR)/gdash-editor.Tpo" -c -o gdash-editor.o `test -f 'editor.c' || echo '$(srcdir)/'`editor.c; \
@@ -678,6 +754,20 @@ sdash-cave.obj: cave.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-cave.obj `if test -f 'cave.c'; then $(CYGPATH_W) 'cave.c'; else $(CYGPATH_W) '$(srcdir)/cave.c'; fi`
 
+sdash-cavedb.o: cavedb.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-cavedb.o -MD -MP -MF "$(DEPDIR)/sdash-cavedb.Tpo" -c -o sdash-cavedb.o `test -f 'cavedb.c' || echo '$(srcdir)/'`cavedb.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-cavedb.Tpo" "$(DEPDIR)/sdash-cavedb.Po"; else rm -f "$(DEPDIR)/sdash-cavedb.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cavedb.c' object='sdash-cavedb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-cavedb.o `test -f 'cavedb.c' || echo '$(srcdir)/'`cavedb.c
+
+sdash-cavedb.obj: cavedb.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-cavedb.obj -MD -MP -MF "$(DEPDIR)/sdash-cavedb.Tpo" -c -o sdash-cavedb.obj `if test -f 'cavedb.c'; then $(CYGPATH_W) 'cavedb.c'; else $(CYGPATH_W) '$(srcdir)/cavedb.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-cavedb.Tpo" "$(DEPDIR)/sdash-cavedb.Po"; else rm -f "$(DEPDIR)/sdash-cavedb.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cavedb.c' object='sdash-cavedb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-cavedb.obj `if test -f 'cavedb.c'; then $(CYGPATH_W) 'cavedb.c'; else $(CYGPATH_W) '$(srcdir)/cavedb.c'; fi`
+
 sdash-caveengine.o: caveengine.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-caveengine.o -MD -MP -MF "$(DEPDIR)/sdash-caveengine.Tpo" -c -o sdash-caveengine.o `test -f 'caveengine.c' || echo '$(srcdir)/'`caveengine.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-caveengine.Tpo" "$(DEPDIR)/sdash-caveengine.Po"; else rm -f "$(DEPDIR)/sdash-caveengine.Tpo"; exit 1; fi
@@ -705,6 +795,34 @@ sdash-caveobject.obj: caveobject.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='caveobject.c' object='sdash-caveobject.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-caveobject.obj `if test -f 'caveobject.c'; then $(CYGPATH_W) 'caveobject.c'; else $(CYGPATH_W) '$(srcdir)/caveobject.c'; fi`
+
+sdash-cavesound.o: cavesound.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-cavesound.o -MD -MP -MF "$(DEPDIR)/sdash-cavesound.Tpo" -c -o sdash-cavesound.o `test -f 'cavesound.c' || echo '$(srcdir)/'`cavesound.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-cavesound.Tpo" "$(DEPDIR)/sdash-cavesound.Po"; else rm -f "$(DEPDIR)/sdash-cavesound.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cavesound.c' object='sdash-cavesound.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-cavesound.o `test -f 'cavesound.c' || echo '$(srcdir)/'`cavesound.c
+
+sdash-cavesound.obj: cavesound.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-cavesound.obj -MD -MP -MF "$(DEPDIR)/sdash-cavesound.Tpo" -c -o sdash-cavesound.obj `if test -f 'cavesound.c'; then $(CYGPATH_W) 'cavesound.c'; else $(CYGPATH_W) '$(srcdir)/cavesound.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-cavesound.Tpo" "$(DEPDIR)/sdash-cavesound.Po"; else rm -f "$(DEPDIR)/sdash-cavesound.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cavesound.c' object='sdash-cavesound.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-cavesound.obj `if test -f 'cavesound.c'; then $(CYGPATH_W) 'cavesound.c'; else $(CYGPATH_W) '$(srcdir)/cavesound.c'; fi`
+
+sdash-bdcff.o: bdcff.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-bdcff.o -MD -MP -MF "$(DEPDIR)/sdash-bdcff.Tpo" -c -o sdash-bdcff.o `test -f 'bdcff.c' || echo '$(srcdir)/'`bdcff.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-bdcff.Tpo" "$(DEPDIR)/sdash-bdcff.Po"; else rm -f "$(DEPDIR)/sdash-bdcff.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bdcff.c' object='sdash-bdcff.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-bdcff.o `test -f 'bdcff.c' || echo '$(srcdir)/'`bdcff.c
+
+sdash-bdcff.obj: bdcff.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-bdcff.obj -MD -MP -MF "$(DEPDIR)/sdash-bdcff.Tpo" -c -o sdash-bdcff.obj `if test -f 'bdcff.c'; then $(CYGPATH_W) 'bdcff.c'; else $(CYGPATH_W) '$(srcdir)/bdcff.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-bdcff.Tpo" "$(DEPDIR)/sdash-bdcff.Po"; else rm -f "$(DEPDIR)/sdash-bdcff.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bdcff.c' object='sdash-bdcff.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-bdcff.obj `if test -f 'bdcff.c'; then $(CYGPATH_W) 'bdcff.c'; else $(CYGPATH_W) '$(srcdir)/bdcff.c'; fi`
 
 sdash-caveset.o: caveset.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-caveset.o -MD -MP -MF "$(DEPDIR)/sdash-caveset.Tpo" -c -o sdash-caveset.o `test -f 'caveset.c' || echo '$(srcdir)/'`caveset.c; \
@@ -734,19 +852,19 @@ sdash-c64import.obj: c64import.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-c64import.obj `if test -f 'c64import.c'; then $(CYGPATH_W) 'c64import.c'; else $(CYGPATH_W) '$(srcdir)/c64import.c'; fi`
 
-sdash-game.o: game.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-game.o -MD -MP -MF "$(DEPDIR)/sdash-game.Tpo" -c -o sdash-game.o `test -f 'game.c' || echo '$(srcdir)/'`game.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-game.Tpo" "$(DEPDIR)/sdash-game.Po"; else rm -f "$(DEPDIR)/sdash-game.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='game.c' object='sdash-game.o' libtool=no @AMDEPBACKSLASH@
+sdash-gameplay.o: gameplay.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-gameplay.o -MD -MP -MF "$(DEPDIR)/sdash-gameplay.Tpo" -c -o sdash-gameplay.o `test -f 'gameplay.c' || echo '$(srcdir)/'`gameplay.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-gameplay.Tpo" "$(DEPDIR)/sdash-gameplay.Po"; else rm -f "$(DEPDIR)/sdash-gameplay.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gameplay.c' object='sdash-gameplay.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-game.o `test -f 'game.c' || echo '$(srcdir)/'`game.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-gameplay.o `test -f 'gameplay.c' || echo '$(srcdir)/'`gameplay.c
 
-sdash-game.obj: game.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-game.obj -MD -MP -MF "$(DEPDIR)/sdash-game.Tpo" -c -o sdash-game.obj `if test -f 'game.c'; then $(CYGPATH_W) 'game.c'; else $(CYGPATH_W) '$(srcdir)/game.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-game.Tpo" "$(DEPDIR)/sdash-game.Po"; else rm -f "$(DEPDIR)/sdash-game.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='game.c' object='sdash-game.obj' libtool=no @AMDEPBACKSLASH@
+sdash-gameplay.obj: gameplay.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-gameplay.obj -MD -MP -MF "$(DEPDIR)/sdash-gameplay.Tpo" -c -o sdash-gameplay.obj `if test -f 'gameplay.c'; then $(CYGPATH_W) 'gameplay.c'; else $(CYGPATH_W) '$(srcdir)/gameplay.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-gameplay.Tpo" "$(DEPDIR)/sdash-gameplay.Po"; else rm -f "$(DEPDIR)/sdash-gameplay.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gameplay.c' object='sdash-gameplay.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-game.obj `if test -f 'game.c'; then $(CYGPATH_W) 'game.c'; else $(CYGPATH_W) '$(srcdir)/game.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-gameplay.obj `if test -f 'gameplay.c'; then $(CYGPATH_W) 'gameplay.c'; else $(CYGPATH_W) '$(srcdir)/gameplay.c'; fi`
 
 sdash-settings.o: settings.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-settings.o -MD -MP -MF "$(DEPDIR)/sdash-settings.Tpo" -c -o sdash-settings.o `test -f 'settings.c' || echo '$(srcdir)/'`settings.c; \
@@ -790,47 +908,61 @@ sdash-about.obj: about.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-about.obj `if test -f 'about.c'; then $(CYGPATH_W) 'about.c'; else $(CYGPATH_W) '$(srcdir)/about.c'; fi`
 
-sdash-sdl_gfx.o: sdl_gfx.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdl_gfx.o -MD -MP -MF "$(DEPDIR)/sdash-sdl_gfx.Tpo" -c -o sdash-sdl_gfx.o `test -f 'sdl_gfx.c' || echo '$(srcdir)/'`sdl_gfx.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-sdl_gfx.Tpo" "$(DEPDIR)/sdash-sdl_gfx.Po"; else rm -f "$(DEPDIR)/sdash-sdl_gfx.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl_gfx.c' object='sdash-sdl_gfx.o' libtool=no @AMDEPBACKSLASH@
+sdash-gfxutil.o: gfxutil.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-gfxutil.o -MD -MP -MF "$(DEPDIR)/sdash-gfxutil.Tpo" -c -o sdash-gfxutil.o `test -f 'gfxutil.c' || echo '$(srcdir)/'`gfxutil.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-gfxutil.Tpo" "$(DEPDIR)/sdash-gfxutil.Po"; else rm -f "$(DEPDIR)/sdash-gfxutil.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gfxutil.c' object='sdash-gfxutil.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdl_gfx.o `test -f 'sdl_gfx.c' || echo '$(srcdir)/'`sdl_gfx.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-gfxutil.o `test -f 'gfxutil.c' || echo '$(srcdir)/'`gfxutil.c
 
-sdash-sdl_gfx.obj: sdl_gfx.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdl_gfx.obj -MD -MP -MF "$(DEPDIR)/sdash-sdl_gfx.Tpo" -c -o sdash-sdl_gfx.obj `if test -f 'sdl_gfx.c'; then $(CYGPATH_W) 'sdl_gfx.c'; else $(CYGPATH_W) '$(srcdir)/sdl_gfx.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-sdl_gfx.Tpo" "$(DEPDIR)/sdash-sdl_gfx.Po"; else rm -f "$(DEPDIR)/sdash-sdl_gfx.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl_gfx.c' object='sdash-sdl_gfx.obj' libtool=no @AMDEPBACKSLASH@
+sdash-gfxutil.obj: gfxutil.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-gfxutil.obj -MD -MP -MF "$(DEPDIR)/sdash-gfxutil.Tpo" -c -o sdash-gfxutil.obj `if test -f 'gfxutil.c'; then $(CYGPATH_W) 'gfxutil.c'; else $(CYGPATH_W) '$(srcdir)/gfxutil.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-gfxutil.Tpo" "$(DEPDIR)/sdash-gfxutil.Po"; else rm -f "$(DEPDIR)/sdash-gfxutil.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gfxutil.c' object='sdash-gfxutil.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdl_gfx.obj `if test -f 'sdl_gfx.c'; then $(CYGPATH_W) 'sdl_gfx.c'; else $(CYGPATH_W) '$(srcdir)/sdl_gfx.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-gfxutil.obj `if test -f 'gfxutil.c'; then $(CYGPATH_W) 'gfxutil.c'; else $(CYGPATH_W) '$(srcdir)/gfxutil.c'; fi`
 
-sdash-sdl_main.o: sdl_main.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdl_main.o -MD -MP -MF "$(DEPDIR)/sdash-sdl_main.Tpo" -c -o sdash-sdl_main.o `test -f 'sdl_main.c' || echo '$(srcdir)/'`sdl_main.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-sdl_main.Tpo" "$(DEPDIR)/sdash-sdl_main.Po"; else rm -f "$(DEPDIR)/sdash-sdl_main.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl_main.c' object='sdash-sdl_main.o' libtool=no @AMDEPBACKSLASH@
+sdash-sdlgfx.o: sdlgfx.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdlgfx.o -MD -MP -MF "$(DEPDIR)/sdash-sdlgfx.Tpo" -c -o sdash-sdlgfx.o `test -f 'sdlgfx.c' || echo '$(srcdir)/'`sdlgfx.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-sdlgfx.Tpo" "$(DEPDIR)/sdash-sdlgfx.Po"; else rm -f "$(DEPDIR)/sdash-sdlgfx.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlgfx.c' object='sdash-sdlgfx.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdl_main.o `test -f 'sdl_main.c' || echo '$(srcdir)/'`sdl_main.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdlgfx.o `test -f 'sdlgfx.c' || echo '$(srcdir)/'`sdlgfx.c
 
-sdash-sdl_main.obj: sdl_main.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdl_main.obj -MD -MP -MF "$(DEPDIR)/sdash-sdl_main.Tpo" -c -o sdash-sdl_main.obj `if test -f 'sdl_main.c'; then $(CYGPATH_W) 'sdl_main.c'; else $(CYGPATH_W) '$(srcdir)/sdl_main.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-sdl_main.Tpo" "$(DEPDIR)/sdash-sdl_main.Po"; else rm -f "$(DEPDIR)/sdash-sdl_main.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl_main.c' object='sdash-sdl_main.obj' libtool=no @AMDEPBACKSLASH@
+sdash-sdlgfx.obj: sdlgfx.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdlgfx.obj -MD -MP -MF "$(DEPDIR)/sdash-sdlgfx.Tpo" -c -o sdash-sdlgfx.obj `if test -f 'sdlgfx.c'; then $(CYGPATH_W) 'sdlgfx.c'; else $(CYGPATH_W) '$(srcdir)/sdlgfx.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-sdlgfx.Tpo" "$(DEPDIR)/sdash-sdlgfx.Po"; else rm -f "$(DEPDIR)/sdash-sdlgfx.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlgfx.c' object='sdash-sdlgfx.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdl_main.obj `if test -f 'sdl_main.c'; then $(CYGPATH_W) 'sdl_main.c'; else $(CYGPATH_W) '$(srcdir)/sdl_main.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdlgfx.obj `if test -f 'sdlgfx.c'; then $(CYGPATH_W) 'sdlgfx.c'; else $(CYGPATH_W) '$(srcdir)/sdlgfx.c'; fi`
 
-sdash-sdl_ui.o: sdl_ui.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdl_ui.o -MD -MP -MF "$(DEPDIR)/sdash-sdl_ui.Tpo" -c -o sdash-sdl_ui.o `test -f 'sdl_ui.c' || echo '$(srcdir)/'`sdl_ui.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-sdl_ui.Tpo" "$(DEPDIR)/sdash-sdl_ui.Po"; else rm -f "$(DEPDIR)/sdash-sdl_ui.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl_ui.c' object='sdash-sdl_ui.o' libtool=no @AMDEPBACKSLASH@
+sdash-sdlmain.o: sdlmain.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdlmain.o -MD -MP -MF "$(DEPDIR)/sdash-sdlmain.Tpo" -c -o sdash-sdlmain.o `test -f 'sdlmain.c' || echo '$(srcdir)/'`sdlmain.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-sdlmain.Tpo" "$(DEPDIR)/sdash-sdlmain.Po"; else rm -f "$(DEPDIR)/sdash-sdlmain.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlmain.c' object='sdash-sdlmain.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdl_ui.o `test -f 'sdl_ui.c' || echo '$(srcdir)/'`sdl_ui.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdlmain.o `test -f 'sdlmain.c' || echo '$(srcdir)/'`sdlmain.c
 
-sdash-sdl_ui.obj: sdl_ui.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdl_ui.obj -MD -MP -MF "$(DEPDIR)/sdash-sdl_ui.Tpo" -c -o sdash-sdl_ui.obj `if test -f 'sdl_ui.c'; then $(CYGPATH_W) 'sdl_ui.c'; else $(CYGPATH_W) '$(srcdir)/sdl_ui.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-sdl_ui.Tpo" "$(DEPDIR)/sdash-sdl_ui.Po"; else rm -f "$(DEPDIR)/sdash-sdl_ui.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl_ui.c' object='sdash-sdl_ui.obj' libtool=no @AMDEPBACKSLASH@
+sdash-sdlmain.obj: sdlmain.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdlmain.obj -MD -MP -MF "$(DEPDIR)/sdash-sdlmain.Tpo" -c -o sdash-sdlmain.obj `if test -f 'sdlmain.c'; then $(CYGPATH_W) 'sdlmain.c'; else $(CYGPATH_W) '$(srcdir)/sdlmain.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-sdlmain.Tpo" "$(DEPDIR)/sdash-sdlmain.Po"; else rm -f "$(DEPDIR)/sdash-sdlmain.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlmain.c' object='sdash-sdlmain.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdl_ui.obj `if test -f 'sdl_ui.c'; then $(CYGPATH_W) 'sdl_ui.c'; else $(CYGPATH_W) '$(srcdir)/sdl_ui.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdlmain.obj `if test -f 'sdlmain.c'; then $(CYGPATH_W) 'sdlmain.c'; else $(CYGPATH_W) '$(srcdir)/sdlmain.c'; fi`
+
+sdash-sdlui.o: sdlui.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdlui.o -MD -MP -MF "$(DEPDIR)/sdash-sdlui.Tpo" -c -o sdash-sdlui.o `test -f 'sdlui.c' || echo '$(srcdir)/'`sdlui.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-sdlui.Tpo" "$(DEPDIR)/sdash-sdlui.Po"; else rm -f "$(DEPDIR)/sdash-sdlui.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlui.c' object='sdash-sdlui.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdlui.o `test -f 'sdlui.c' || echo '$(srcdir)/'`sdlui.c
+
+sdash-sdlui.obj: sdlui.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdlui.obj -MD -MP -MF "$(DEPDIR)/sdash-sdlui.Tpo" -c -o sdash-sdlui.obj `if test -f 'sdlui.c'; then $(CYGPATH_W) 'sdlui.c'; else $(CYGPATH_W) '$(srcdir)/sdlui.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-sdlui.Tpo" "$(DEPDIR)/sdash-sdlui.Po"; else rm -f "$(DEPDIR)/sdash-sdlui.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlui.c' object='sdash-sdlui.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdlui.obj `if test -f 'sdlui.c'; then $(CYGPATH_W) 'sdlui.c'; else $(CYGPATH_W) '$(srcdir)/sdlui.c'; fi`
 
 sdash-sound.o: sound.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sound.o -MD -MP -MF "$(DEPDIR)/sdash-sound.Tpo" -c -o sdash-sound.o `test -f 'sound.c' || echo '$(srcdir)/'`sound.c; \
@@ -1013,6 +1145,9 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
 	uninstall-am uninstall-binPROGRAMS uninstall-info-am
 
+
+strip: $(bin_PROGRAMS)
+	strip $(bin_PROGRAMS)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

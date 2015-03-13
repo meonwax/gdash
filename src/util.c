@@ -159,7 +159,12 @@ gd_find_file(const char *filename)
 	return NULL;
 }
 
-char *gd_wrap_text(const char *orig, int width)
+
+
+
+
+char *
+gd_wrap_text(const char *orig, int width)
 {
 	GString *wrapped;
 	char **lines;
@@ -199,4 +204,5 @@ char *gd_wrap_text(const char *orig, int width)
 	
 	return g_string_free(wrapped, FALSE);
 }
+
 
