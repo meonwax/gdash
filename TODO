@@ -4,11 +4,13 @@ DONE
 - pal emulation fix
 - translation fixes
 - windows xp/vista file open dialog fix
-- pre-calculate cave speed before cover to have the scrolling speed correct
-- new scrolling: gufst (gdash ultra fine scrolling thechnology)
+- cave loading and editor thumbnail generation speedup
+- new scrolling: gufst (gdash ultra fine scrolling technology)
 
 TO DO
 -----
+But I can't hear any sound after changing the graphics engine/video mode. I have to restart the application. The reason might be a missing initialization!? 
+
 editor render lassú - visszahozni a régi változatot?
 
 Another small bug: When creating a new cave, leaving the editor 

@@ -78,6 +78,13 @@ CaveRandomFill *CaveRandomFill::clone_from_bdcff(const std::string &name, std::i
         s2 = "";
         j++;
     }
+    /* if we could read s1, but not read s2, now s1 contains a "replace only" element. */
+    /* so process it later. */
+    /* if j=4, no more reads took place, but there might be still one string at the end. */
+    /* so read if j=4 is the case. */
+    if (j == 4)
+        is >> s1;
+    /* ok now try if we have a replace only element. */
     if (s1 != "") {
         std::istringstream is(s1);
         // one string left - must be a replace only element

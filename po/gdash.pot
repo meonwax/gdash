@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: gdash 20130427unstable\n"
+"Project-Id-Version: gdash 20130623unstable\n"
 "Report-Msgid-Bugs-To: http://code.google.com/p/gdash/\n"
-"POT-Creation-Date: 2013-04-27 14:43+0200\n"
+"POT-Creation-Date: 2013-06-23 10:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1402,7 +1402,7 @@ msgstr ""
 msgid "The maze like that in PacMan: there are no dead ends."
 msgstr ""
 
-#: src/misc/helptext.cpp:436 src/cave/object/caveobjectrandomfill.cpp:192
+#: src/misc/helptext.cpp:436 src/cave/object/caveobjectrandomfill.cpp:199
 msgid "Random Fill"
 msgstr ""
 
@@ -3289,50 +3289,50 @@ msgstr ""
 msgid "Random fill"
 msgstr ""
 
-#: src/cave/cavestored.cpp:335 src/cave/object/caveobjectrandomfill.cpp:199
+#: src/cave/cavestored.cpp:335 src/cave/object/caveobjectrandomfill.cpp:206
 msgid "Random seed"
 msgstr ""
 
-#: src/cave/cavestored.cpp:336 src/cave/object/caveobjectrandomfill.cpp:199
+#: src/cave/cavestored.cpp:336 src/cave/object/caveobjectrandomfill.cpp:206
 msgid ""
 "Random seed value controls the predictable random number generator, which "
 "fills the cave initially. If set to -1, cave is totally random every time it "
 "is played."
 msgstr ""
 
-#: src/cave/cavestored.cpp:338 src/cave/object/caveobjectrandomfill.cpp:200
+#: src/cave/cavestored.cpp:338 src/cave/object/caveobjectrandomfill.cpp:207
 msgid "Initial fill"
 msgstr ""
 
-#: src/cave/cavestored.cpp:339 src/cave/object/caveobjectrandomfill.cpp:201
+#: src/cave/cavestored.cpp:339 src/cave/object/caveobjectrandomfill.cpp:208
 msgid "Probability 1"
 msgstr ""
 
-#: src/cave/cavestored.cpp:340 src/cave/object/caveobjectrandomfill.cpp:202
+#: src/cave/cavestored.cpp:340 src/cave/object/caveobjectrandomfill.cpp:209
 msgid "Random fill 1"
 msgstr ""
 
-#: src/cave/cavestored.cpp:341 src/cave/object/caveobjectrandomfill.cpp:203
+#: src/cave/cavestored.cpp:341 src/cave/object/caveobjectrandomfill.cpp:210
 msgid "Probability 2"
 msgstr ""
 
-#: src/cave/cavestored.cpp:342 src/cave/object/caveobjectrandomfill.cpp:204
+#: src/cave/cavestored.cpp:342 src/cave/object/caveobjectrandomfill.cpp:211
 msgid "Random fill 2"
 msgstr ""
 
-#: src/cave/cavestored.cpp:343 src/cave/object/caveobjectrandomfill.cpp:205
+#: src/cave/cavestored.cpp:343 src/cave/object/caveobjectrandomfill.cpp:212
 msgid "Probability 3"
 msgstr ""
 
-#: src/cave/cavestored.cpp:344 src/cave/object/caveobjectrandomfill.cpp:206
+#: src/cave/cavestored.cpp:344 src/cave/object/caveobjectrandomfill.cpp:213
 msgid "Random fill 3"
 msgstr ""
 
-#: src/cave/cavestored.cpp:345 src/cave/object/caveobjectrandomfill.cpp:207
+#: src/cave/cavestored.cpp:345 src/cave/object/caveobjectrandomfill.cpp:214
 msgid "Probability 4"
 msgstr ""
 
-#: src/cave/cavestored.cpp:346 src/cave/object/caveobjectrandomfill.cpp:208
+#: src/cave/cavestored.cpp:346 src/cave/object/caveobjectrandomfill.cpp:215
 msgid "Random fill 4"
 msgstr ""
 
@@ -3436,7 +3436,7 @@ msgstr ""
 #: src/cave/object/caveobjectraster.cpp:85
 #: src/cave/object/caveobjectfloodfill.cpp:83
 #: src/cave/object/caveobjectboundaryfill.cpp:102
-#: src/cave/object/caveobjectrandomfill.cpp:193
+#: src/cave/object/caveobjectrandomfill.cpp:200
 #: src/cave/object/caveobjectrectangle.cpp:82
 #: src/cave/object/caveobjectline.cpp:100
 #: src/cave/object/caveobjectmaze.cpp:368
@@ -3450,7 +3450,7 @@ msgstr ""
 #: src/cave/object/caveobjectraster.cpp:85
 #: src/cave/object/caveobjectfloodfill.cpp:83
 #: src/cave/object/caveobjectboundaryfill.cpp:102
-#: src/cave/object/caveobjectrandomfill.cpp:193
+#: src/cave/object/caveobjectrandomfill.cpp:200
 #: src/cave/object/caveobjectrectangle.cpp:82
 #: src/cave/object/caveobjectline.cpp:100
 #: src/cave/object/caveobjectmaze.cpp:368
@@ -3536,7 +3536,7 @@ msgid "Point of <b>%ms</b> at %d,%d"
 msgstr ""
 
 #: src/cave/object/caveobjectraster.cpp:86
-#: src/cave/object/caveobjectrandomfill.cpp:194
+#: src/cave/object/caveobjectrandomfill.cpp:201
 #: src/cave/object/caveobjectrectangle.cpp:83
 #: src/cave/object/caveobjectmaze.cpp:370
 msgid "Start corner"
@@ -3544,8 +3544,8 @@ msgstr ""
 
 #: src/cave/object/caveobjectraster.cpp:86
 #: src/cave/object/caveobjectraster.cpp:87
-#: src/cave/object/caveobjectrandomfill.cpp:194
-#: src/cave/object/caveobjectrandomfill.cpp:195
+#: src/cave/object/caveobjectrandomfill.cpp:201
+#: src/cave/object/caveobjectrandomfill.cpp:202
 #: src/cave/object/caveobjectrectangle.cpp:83
 #: src/cave/object/caveobjectrectangle.cpp:84
 #: src/cave/object/caveobjectmaze.cpp:370
@@ -3556,7 +3556,7 @@ msgid "Specifies one of the corners of the object."
 msgstr ""
 
 #: src/cave/object/caveobjectraster.cpp:87
-#: src/cave/object/caveobjectrandomfill.cpp:195
+#: src/cave/object/caveobjectrandomfill.cpp:202
 #: src/cave/object/caveobjectrectangle.cpp:84
 #: src/cave/object/caveobjectmaze.cpp:371
 msgid "End corner"
@@ -3637,38 +3637,38 @@ msgstr ""
 msgid "Boundary fill from %d,%d of <b>%ms</b>, border <b>%ms</b>"
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:196
+#: src/cave/object/caveobjectrandomfill.cpp:203
 msgid "Replace only"
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:196
+#: src/cave/object/caveobjectrandomfill.cpp:203
 msgid ""
 "If this setting is set to 'no element' but another one, only that will be "
 "replaced when drawing the fill, and other elements will not be overwritten. "
 "Otherwise the whole block is filled."
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:197
+#: src/cave/object/caveobjectrandomfill.cpp:204
 msgid "Generator"
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:198
+#: src/cave/object/caveobjectrandomfill.cpp:205
 msgid "C64 random"
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:198
+#: src/cave/object/caveobjectrandomfill.cpp:205
 msgid ""
 "Controls if the C64 random generator is used for the fill, or a more "
 "advanced one. By using the C64 generator, you can recreate the patterns of "
 "the original game."
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:218
+#: src/cave/object/caveobjectrandomfill.cpp:225
 #, c-format
 msgid "Random fill from %d,%d to %d,%d"
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:221
+#: src/cave/object/caveobjectrandomfill.cpp:228
 #, c-format
 msgid "Random fill from %d,%d to %d,%d, replacing %ms"
 msgstr ""
