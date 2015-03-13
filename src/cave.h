@@ -19,10 +19,10 @@
 #include <glib.h>
 
 #include "config.h"
+#include "colors.h"
 
 
-
-/*******************************************
+/******************************************
  *
  * BIG STRUCT HANDLING
  *
@@ -77,22 +77,13 @@ typedef struct _gd_property_default {
 #define NUM_OF_CELLS_X 8
 #define NUM_OF_CELLS_Y 38
 
-/* +64: placeholder for cells which are rendered by the game; for example diamond+arrow = falling diamond */
+/* +72: placeholder for cells which are rendered by the game; for example diamond+arrow = falling diamond */
 #define NUM_OF_CELLS (NUM_OF_CELLS_X*NUM_OF_CELLS_Y+72)
 
 
 
 
-
-
-typedef guint32 GdColor;
 extern const GdColor gd_flash_color;
-
-typedef struct _c64_colors {
-	const char *name;
-	const GdColor rgb;
-	guint32 p;
-} GdC64Color;
 extern const GdColor gd_select_color;
 
 
@@ -217,7 +208,6 @@ typedef enum _element {
 	O_BLADDER_6,
 	O_BLADDER_7,
 	O_BLADDER_8,
-	O_BLADDER_9,
 
 	O_WAITING_STONE,
 	O_CHASING_STONE,
@@ -356,26 +346,27 @@ typedef enum _element {
 
 typedef enum _element_property {
 	/* properties */
-	P_SLOPED_LEFT = 1 << 0,	/* stones and diamonds roll down to left on this */
-	P_SLOPED_RIGHT = 1 << 1,	/* stones and diamonds roll down to right on this */
-	P_SLOPED_UP = 1 << 2,
-	P_SLOPED_DOWN = 1 << 3,
-	P_SLOPED = P_SLOPED_LEFT|P_SLOPED_RIGHT|P_SLOPED_UP|P_SLOPED_DOWN,			/* stones and diamonds roll down on this in any direction */
+	P_SLOPED_LEFT = 1<<0,	/* stones and diamonds roll down to left on this */
+	P_SLOPED_RIGHT = 1<<1,	/* stones and diamonds roll down to right on this */
+	P_SLOPED_UP = 1<<2,
+	P_SLOPED_DOWN = 1<<3,
+	P_SLOPED = P_SLOPED_LEFT|P_SLOPED_RIGHT|P_SLOPED_UP|P_SLOPED_DOWN,			/* flag to say "any direction" */
+	P_BLADDER_SLOPED = 1<<4,	/* element act sloped also for the bladder */
 	
-	P_AMOEBA_CONSUMES = 1 << 4,		/* amoeba can eat this */
-	P_DIRT = 1 << 5,				/* it is dirt, or something similar (dirt2 or sloped dirt) */
-	P_BLOWS_UP_FLIES = 1 << 6,			/* flies blow up, if they touch this */
+	P_AMOEBA_CONSUMES = 1<<5,		/* amoeba can eat this */
+	P_DIRT = 1<<6,					/* it is dirt, or something similar (dirt2 or sloped dirt) */
+	P_BLOWS_UP_FLIES = 1<<7,		/* flies blow up, if they touch this */
 
-	P_EXPLODES_TO_SPACE = 1 << 7,			/* explodes if hit by a rock */
-	P_EXPLODES_TO_DIAMONDS = 1 << 8,/* explodes to diamonds if hit by a rock */
-	P_EXPLODES_TO_STONES = 1 << 9,		/* explodes to rocks if hit by a rock */
-	P_EXPLODES_AS_NITRO = 1 << 10,		/* explodes as nitro pack */
+	P_EXPLODES_TO_SPACE = 1<<8,			/* explodes if hit by a rock */
+	P_EXPLODES_TO_DIAMONDS = 1<<9,		/* explodes to diamonds if hit by a rock */
+	P_EXPLODES_TO_STONES = 1<<10,		/* explodes to rocks if hit by a rock */
+	P_EXPLODES_AS_NITRO = 1<<11,		/* explodes as nitro pack */
 	P_EXPLODES=P_EXPLODES_TO_SPACE|P_EXPLODES_TO_DIAMONDS|P_EXPLODES_TO_STONES|P_EXPLODES_AS_NITRO,	/* explodes to something if hit */
 
-	P_NON_EXPLODABLE = 1 << 11,		/* selfexplaining */
-	P_CCW = 1 << 12,			/* this creature has a default counterclockwise rotation (for example, o_fire_1) */
-	P_CAN_BE_HAMMERED = 1 << 13,	/* can be broken by pneumatic hammer */
-	P_VISUAL_EFFECT = 1 << 14,		/* if the element can use a visual effect. used to check consistency of the code */
+	P_NON_EXPLODABLE = 1<<12,		/* selfexplaining */
+	P_CCW = 1<<13,					/* this creature has a default counterclockwise rotation (for example, o_fire_1) */
+	P_CAN_BE_HAMMERED = 1<<14,		/* can be broken by pneumatic hammer */
+	P_VISUAL_EFFECT = 1<<15,		/* if the element can use a visual effect. used to check consistency of the code */
 } GdElementProperties;
 
 
@@ -384,21 +375,29 @@ typedef enum _element_property {
 
 
 
-/** These are states of the magic wall. */
+/* These are states of the magic wall. */
 typedef enum _magic_wall_state {
-	GD_MW_DORMANT,					/* Starting with this. */
+	GD_MW_DORMANT=0,					/* Starting with this. */
 	GD_MW_ACTIVE,					/* Boulder or diamond dropped into. */
 	GD_MW_EXPIRED					/* Turned off after magic_wall_milling_time. */
 } GdMagicWallState;
 
-/** These are states of Player. */
+/* These are states of Player. */
 typedef enum _player_state {
-	GD_PL_NOT_YET,				/* Not yet living. Beginning of cave time. */
+	GD_PL_NOT_YET=0,				/* Not yet living. Beginning of cave time. */
 	GD_PL_LIVING,				/* Ok. */
 	GD_PL_TIMEOUT,				/* Time is up */
 	GD_PL_DIED,				/* Died. */
 	GD_PL_EXITED				/* Exited the cave, proceed to next one */
 } GdPlayerState;
+
+/* States of amoeba */
+typedef enum _amoeba_state {
+	GD_AM_SLEEPING=0,		/* sleeping - not yet let out. */
+	GD_AM_AWAKE,		/* living, growing */
+	GD_AM_TOO_BIG,	/* grown too big, will convert to stones */
+	GD_AM_ENCLOSED,	/* enclosed, will convert to diamonds */
+} GdAmoebaState;
 
 typedef enum _direction {
 	/* not moving */
@@ -435,6 +434,7 @@ typedef enum _sound {
 	GD_S_NONE,
 
 	GD_S_STONE,
+	GD_S_NITRO,
 	GD_S_FALLING_WALL,
 	GD_S_EXPANDING_WALL,
 	GD_S_WALL_REAPPEAR,
@@ -454,6 +454,7 @@ typedef enum _sound {
 	GD_S_CLOCK_COLLECT,
 	GD_S_SWEET_COLLECT,
 	GD_S_KEY_COLLECT,
+	GD_S_DIAMOND_KEY_COLLECT,
 	GD_S_SLIME,
 	GD_S_ACID_SPREAD,
 	GD_S_BLADDER_MOVE,
@@ -506,7 +507,7 @@ typedef enum _sound {
 typedef struct _elements {
 	GdElement element;		/* element number. for example O_DIRT */
 	char *name;				/* name in editor, for example "Dirt". some have different names than their real engine meaning! */
-	unsigned int properties;/* engine properties, like P_ROUNDED or P_EXPLODES */
+	unsigned int properties;/* engine properties, like P_SLOPED or P_EXPLODES */
 	char *filename;			/* name in bdcff file, like "DIRT" */
 	char character;			/* character representation in bdcff file, like '.' */
 	int image;				/* image in editor (index in cells.png) */
@@ -547,10 +548,16 @@ typedef enum _gd_scheduling {
 	GD_SCHEDULING_BD2,
 	GD_SCHEDULING_PLCK,
 	GD_SCHEDULING_CRDR,
+	GD_SCHEDULING_BD1_ATARI,
 	GD_SCHEDULING_MAX
 } GdScheduling;
 
-/**
+
+typedef struct _gd_c64_random_generator {
+	int rand_seed_1, rand_seed_2;
+} GdC64RandomGenerator;
+
+/*
 	Structure holding all data belonging to a cave.
 */
 #define GD_HIGHSCORE_NUM 20
@@ -606,11 +613,19 @@ typedef struct _cave {
 
 	int w, h;				/* Sizes of cave, width and height. */
 	int x1,y1,x2,y2;		/* Visible part of the cave */
-	guint32 colorb;			/* border color */
-	guint32 color0, color1, color2, color3, color4, color5;	/* c64-style colors; 4 and 5 are amoeba and slime. */
+	GdColor colorb;			/* border color */
+	GdColor color0, color1, color2, color3, color4, color5;	/* c64-style colors; 4 and 5 are amoeba and slime. */
 
 	int diamond_value;			/* Score for a diamond. */
 	int extra_diamond_value;	/* Score for a diamond, when gate is open. */
+	
+	gboolean stone_sound;
+	gboolean diamond_sound;
+	gboolean nitro_sound;
+	gboolean falling_wall_sound;
+	gboolean expanding_wall_sound;
+	gboolean bladder_spender_sound;
+	gboolean bladder_convert_sound;
 
 	int level_magic_wall_time[5];	/* magic wall 'on' state for each level (seconds) */
 	gboolean magic_wall_stops_amoeba;	/* Turning on magic wall changes amoeba to diamonds. Original BD: yes, constkit: no */
@@ -630,9 +645,9 @@ typedef struct _cave {
 	int level_amoeba_2_threshold[5];		/* amoeba turns to stones; if count is bigger than this (number of cells) */
 	GdElement enclosed_amoeba_2_to;	/* an enclosed amoeba converts to this element */
 	GdElement too_big_amoeba_2_to;	/* an amoeba grown too big converts to this element */
-	GdElement amoeba_2_looks_like;	/* an amoeba 2 looks like this element */
-	GdElement amoeba_2_explodes_to;	/* amoeba 2 explodes to element, when touched by amoeba1 */
 	gboolean amoeba_2_explodes_by_amoeba;	/* amoeba 2 will explode if touched by amoeba1 */
+	GdElement amoeba_2_explodes_to;	/* amoeba 2 explodes to element, when touched by amoeba1 */
+	GdElement amoeba_2_looks_like;	/* an amoeba 2 looks like this element */
 
 	gboolean amoeba_timer_started_immediately;	/* FALSE: amoeba will start life at the first possibility of growing. */
 	gboolean amoeba_timer_wait_for_hatching;	/* amoeba timer does not start before player's birth */
@@ -670,6 +685,8 @@ typedef struct _cave {
 	GdElement biter_eat;		/* biters eat this */
 	gboolean biter_sound;		/* biters have sound */	
 
+	gboolean expanding_wall_changed;	/* expanding wall direction is changed */
+
 	/* effects */
 	GdElement explosion_to;			/* explosion converts to this element */
 	GdElement diamond_birth_to;		/* a diamond birth converts to this element */
@@ -685,6 +702,7 @@ typedef struct _cave {
 	GdElement magic_diamond_to;		/* magic wall converts falling diamond to */
 
 	GdElement bomb_explode_to;		/* bombs explode to this element */
+	GdElement nitro_explode_to;		/* nitro packs explode to this element */
 
 	double pushing_stone_prob;		/* probability of pushing stone */
 	double pushing_stone_prob_sweet;	/* probability of pushing, after eating sweet */
@@ -704,6 +722,7 @@ typedef struct _cave {
 	gboolean hammered_walls_reappear;
 	int pneumatic_hammer_frame;
 	int hammered_wall_reappear_frame;
+	gboolean pneumatic_hammer_sound;
 	
 	/* internal variables, used during the game. private data :) */
 	GdElement* (*getp) (const struct _cave*, int x, int y);	/* returns a pointer to the element at x, y. this points to a perfect border or a line shifting get function. */
@@ -736,14 +755,10 @@ typedef struct _cave {
 	int score;					/* Score got this frame. */
 	int amoeba_time;			/* Amoeba growing slow (low probability, default 3%) for seconds. After that, fast growth default (25%) */
 	int amoeba_2_time;			/* Amoeba growing slow (low probability, default 3%) for seconds. After that, fast growth default (25%) */
-	gboolean amoeba_too_big;	/* Too much amoeba found, and amoeba will convert into stones next frame. */
-	gboolean amoeba_enclosed;		/* Amoeba closed, so will convert into diamonds next frame */
-	gboolean amoeba_started;		/* amoeba started. */
-	int amoeba_max_count;			/* selected amoeba threshold for this level */
-	gboolean amoeba_2_too_big;	/* Too much amoeba found, and amoeba will convert into stones next frame. */
-	gboolean amoeba_2_enclosed;		/* Amoeba closed, so will convert into diamonds next frame */
-	gboolean amoeba_2_started;		/* amoeba started. */
-	int amoeba_2_max_count;			/* selected amoeba threshold for this level */
+	int amoeba_max_count;			/* selected amoeba 1 threshold for this level */
+	int amoeba_2_max_count;			/* selected amoeba 2 threshold for this level */
+	GdAmoebaState amoeba_state;		/* state of amoeba 1 */
+	GdAmoebaState amoeba_2_state;	/* state of amoeba 2 */
 	int magic_wall_time;			/* magic wall 'on' state for seconds */
 	double slime_permeability;		/* true random slime */
 	int slime_permeability_c64;		/* Appearing in bd 2 */
@@ -756,14 +771,12 @@ typedef struct _cave {
 	int px[16], py[16];				/* coordinates of player, for chasing stone */
 	int key1, key2, key3;			/* The player is holding this number of keys of each color */
 	gboolean diamond_key_collected;	/* Key collected, so trapped diamonds convert to diamonds */
-	gboolean expanding_wall_changed;	/* expanding wall direction is changed */
-
 	gboolean inbox_flash_toggle;	/* negated every scan. helps drawing inboxes, and making players be born at different times. */
 	GdDirection last_direction;		/* last direction player moved. used by draw routines */
 	GdDirection last_horizontal_direction;
 	int biters_wait_frame;				/* number of frames to wait until biteres will move again */
 	int creatures_direction_will_change;	/* creatures automatically change direction every x seconds */
-	unsigned int rand_seed_1, rand_seed_2;	/* used for predictable random generator during the game. */
+	GdC64RandomGenerator c64_rand;	/* used for predictable random generator during the game. */
 
 	gboolean gravity_switch_active;	/* true if gravity switch is activated, and can be used. */
 	int gravity_will_change;	/* gravity will change in this number of seconds */
@@ -839,7 +852,9 @@ void gd_cave_easy(Cave *cave);
 void gd_cave_set_random_colors(Cave *cave);
 void gd_cave_setup_for_game(Cave *cave);
 void gd_cave_count_diamonds(Cave *cave);
+unsigned int gd_c64_random(GdC64RandomGenerator *rand);
 unsigned int gd_cave_c64_random(Cave *);
+void gd_c64_random_set_seed(GdC64RandomGenerator *rand, int seed1, int seed2);
 
 /* support */
 gpointer gd_cave_map_new_for_cave(const Cave *cave, const int cell_size);
@@ -856,11 +871,6 @@ gd_cave_get_rc (const Cave *cave, const int x, const int y)
 
 	return cave->map[y][x];
 }
-
-/* i/o */
-const char* gd_get_color_name(GdColor color);
-int gd_get_c64_color_index(GdColor color);
-GdColor gd_get_color_from_string(const char *color);
 
 const char *gd_direction_get_visible_name(GdDirection dir);
 const char *gd_direction_get_filename(GdDirection dir);

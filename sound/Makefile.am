@@ -23,6 +23,7 @@ sounddata = \
 	diamond_7.ogg \
 	diamond_8.ogg \
 	diamond_collect.ogg \
+	diamond_key_collect.ogg \
 	door_open.ogg \
 	expanding_wall.ogg \
 	explosion.ogg \
@@ -32,6 +33,7 @@ sounddata = \
 	gravity_change.ogg \
 	key_collect.ogg \
 	magic_wall.ogg \
+	nitro.ogg \
 	nitro_explosion.ogg \
 	pneumatic_collect.ogg \
 	pneumatic.ogg \
@@ -62,7 +64,8 @@ sounddata = \
 	water.ogg
 
 if SOUND
-  pkgdata_DATA = $(sounddata)
+  sounddir = $(pkgdatadir)/sound
+  sound_DATA = $(sounddata)
 endif
 
 EXTRA_DIST = $(sounddata)

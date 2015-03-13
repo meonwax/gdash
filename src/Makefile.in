@@ -57,13 +57,13 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am__objects_1 = gdash-cave.$(OBJEXT) gdash-cavedb.$(OBJEXT) \
-	gdash-caveengine.$(OBJEXT) gdash-caveobject.$(OBJEXT) \
-	gdash-cavesound.$(OBJEXT) gdash-bdcff.$(OBJEXT) \
-	gdash-caveset.$(OBJEXT) gdash-c64import.$(OBJEXT) \
-	gdash-gameplay.$(OBJEXT) gdash-settings.$(OBJEXT) \
-	gdash-util.$(OBJEXT) gdash-about.$(OBJEXT) \
-	gdash-gfxutil.$(OBJEXT)
+am__objects_1 = gdash-colors.$(OBJEXT) gdash-cave.$(OBJEXT) \
+	gdash-cavedb.$(OBJEXT) gdash-caveengine.$(OBJEXT) \
+	gdash-caveobject.$(OBJEXT) gdash-cavesound.$(OBJEXT) \
+	gdash-bdcff.$(OBJEXT) gdash-caveset.$(OBJEXT) \
+	gdash-c64import.$(OBJEXT) gdash-gameplay.$(OBJEXT) \
+	gdash-settings.$(OBJEXT) gdash-util.$(OBJEXT) \
+	gdash-about.$(OBJEXT) gdash-gfxutil.$(OBJEXT)
 am__objects_2 = gdash-gtkgfx.$(OBJEXT) gdash-gtkui.$(OBJEXT) \
 	gdash-gtkmain.$(OBJEXT) gdash-editorwidgets.$(OBJEXT) \
 	gdash-editorexport.$(OBJEXT) gdash-editor.$(OBJEXT) \
@@ -72,13 +72,13 @@ am__objects_3 = gdash-sound.$(OBJEXT)
 am_gdash_OBJECTS = $(am__objects_1) $(am__objects_2) $(am__objects_3)
 gdash_OBJECTS = $(am_gdash_OBJECTS)
 gdash_DEPENDENCIES =
-am__objects_4 = sdash-cave.$(OBJEXT) sdash-cavedb.$(OBJEXT) \
-	sdash-caveengine.$(OBJEXT) sdash-caveobject.$(OBJEXT) \
-	sdash-cavesound.$(OBJEXT) sdash-bdcff.$(OBJEXT) \
-	sdash-caveset.$(OBJEXT) sdash-c64import.$(OBJEXT) \
-	sdash-gameplay.$(OBJEXT) sdash-settings.$(OBJEXT) \
-	sdash-util.$(OBJEXT) sdash-about.$(OBJEXT) \
-	sdash-gfxutil.$(OBJEXT)
+am__objects_4 = sdash-colors.$(OBJEXT) sdash-cave.$(OBJEXT) \
+	sdash-cavedb.$(OBJEXT) sdash-caveengine.$(OBJEXT) \
+	sdash-caveobject.$(OBJEXT) sdash-cavesound.$(OBJEXT) \
+	sdash-bdcff.$(OBJEXT) sdash-caveset.$(OBJEXT) \
+	sdash-c64import.$(OBJEXT) sdash-gameplay.$(OBJEXT) \
+	sdash-settings.$(OBJEXT) sdash-util.$(OBJEXT) \
+	sdash-about.$(OBJEXT) sdash-gfxutil.$(OBJEXT)
 am__objects_5 = sdash-sdlgfx.$(OBJEXT) sdash-sdlmain.$(OBJEXT) \
 	sdash-sdlui.$(OBJEXT)
 am__objects_6 = sdash-sound.$(OBJEXT)
@@ -119,6 +119,7 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
 GLIB_CFLAGS = @GLIB_CFLAGS@
 GLIB_GENMARSHAL = @GLIB_GENMARSHAL@
 GLIB_LIBS = @GLIB_LIBS@
@@ -173,6 +174,7 @@ USE_NLS = @USE_NLS@
 VERSION = @VERSION@
 XGETTEXT = @XGETTEXT@
 XGETTEXT_015 = @XGETTEXT_015@
+XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
 ac_ct_CC = @ac_ct_CC@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -231,6 +233,7 @@ INCLUDES = \
 # base sources and headers:
 #   the gdash engine.
 base_headers = \
+	colors.h \
 	cave.h \
 	cavedb.h \
 	caveengine.h \
@@ -246,6 +249,7 @@ base_headers = \
 	gfxutil.h
 
 base_sources = \
+	colors.c \
 	cave.c \
 	cavedb.c \
 	caveengine.c \
@@ -402,6 +406,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-caveobject.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-caveset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-cavesound.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-colors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-editor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-editorexport.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-editorwidgets.Po@am__quote@
@@ -423,6 +428,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-caveobject.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-caveset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-cavesound.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-colors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-gameplay.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-gfxutil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-sdlgfx.Po@am__quote@
@@ -445,6 +451,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+gdash-colors.o: colors.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-colors.o -MD -MP -MF "$(DEPDIR)/gdash-colors.Tpo" -c -o gdash-colors.o `test -f 'colors.c' || echo '$(srcdir)/'`colors.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-colors.Tpo" "$(DEPDIR)/gdash-colors.Po"; else rm -f "$(DEPDIR)/gdash-colors.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='colors.c' object='gdash-colors.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-colors.o `test -f 'colors.c' || echo '$(srcdir)/'`colors.c
+
+gdash-colors.obj: colors.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-colors.obj -MD -MP -MF "$(DEPDIR)/gdash-colors.Tpo" -c -o gdash-colors.obj `if test -f 'colors.c'; then $(CYGPATH_W) 'colors.c'; else $(CYGPATH_W) '$(srcdir)/colors.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/gdash-colors.Tpo" "$(DEPDIR)/gdash-colors.Po"; else rm -f "$(DEPDIR)/gdash-colors.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='colors.c' object='gdash-colors.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-colors.obj `if test -f 'colors.c'; then $(CYGPATH_W) 'colors.c'; else $(CYGPATH_W) '$(srcdir)/colors.c'; fi`
 
 gdash-cave.o: cave.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-cave.o -MD -MP -MF "$(DEPDIR)/gdash-cave.Tpo" -c -o gdash-cave.o `test -f 'cave.c' || echo '$(srcdir)/'`cave.c; \
@@ -739,6 +759,20 @@ gdash-sound.obj: sound.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sound.c' object='gdash-sound.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-sound.obj `if test -f 'sound.c'; then $(CYGPATH_W) 'sound.c'; else $(CYGPATH_W) '$(srcdir)/sound.c'; fi`
+
+sdash-colors.o: colors.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-colors.o -MD -MP -MF "$(DEPDIR)/sdash-colors.Tpo" -c -o sdash-colors.o `test -f 'colors.c' || echo '$(srcdir)/'`colors.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-colors.Tpo" "$(DEPDIR)/sdash-colors.Po"; else rm -f "$(DEPDIR)/sdash-colors.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='colors.c' object='sdash-colors.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-colors.o `test -f 'colors.c' || echo '$(srcdir)/'`colors.c
+
+sdash-colors.obj: colors.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-colors.obj -MD -MP -MF "$(DEPDIR)/sdash-colors.Tpo" -c -o sdash-colors.obj `if test -f 'colors.c'; then $(CYGPATH_W) 'colors.c'; else $(CYGPATH_W) '$(srcdir)/colors.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/sdash-colors.Tpo" "$(DEPDIR)/sdash-colors.Po"; else rm -f "$(DEPDIR)/sdash-colors.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='colors.c' object='sdash-colors.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-colors.obj `if test -f 'colors.c'; then $(CYGPATH_W) 'colors.c'; else $(CYGPATH_W) '$(srcdir)/colors.c'; fi`
 
 sdash-cave.o: cave.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-cave.o -MD -MP -MF "$(DEPDIR)/sdash-cave.Tpo" -c -o sdash-cave.o `test -f 'cave.c' || echo '$(srcdir)/'`cave.c; \

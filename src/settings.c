@@ -15,6 +15,7 @@
  */
 #include <glib.h>
 #include <glib/gi18n.h>
+#include <stdlib.h>
 #include "config.h"
 #include "settings.h"
 
@@ -23,9 +24,47 @@
 
 /* names of scaling types supported. */
 /* scale2x and scale3x are not translated: the license says that we should call it in its original name. */
-const gchar *gd_scaling_name[]={N_("Original"), N_("2x nearest"), N_("2x bilinear"), "Scale2x", N_("3x nearest"), N_("3x bilinear"), "Scale3x"};
+const gchar *gd_scaling_name[]={N_("Original"), N_("2x nearest"), N_("2x bilinear"), "Scale2x", N_("3x nearest"), N_("3x bilinear"), "Scale3x", N_("4x nearest"), N_("4x bilinear"), "Scale4x", NULL};
 /* scaling factors of scaling types supported. */
-const int gd_scaling_scale[]={1, 2, 2, 2, 3, 3, 3};
+const int gd_scaling_scale[]={1, 2, 2, 2, 3, 3, 3, 4, 4, 4};
+
+/* possible languages. */
+const gchar *gd_languages_names[]={N_("System default"), "English", "Deutsch", "Magyar", NULL};
+/* this should correspond to the above one. */
+#ifdef G_OS_WIN32
+/* locale names used in windows. */
+static const gchar *language_locale[][7]={
+	{ "", NULL, },
+	{ "English", NULL, },
+	{ "German", NULL, },
+	{ "Hungarian", NULL, },
+};
+/* these will be used on windows for a putenv to trick gtk. */
+/* on linux, the setlocale call works correctly, and this is not needed. */
+static const gchar *languages_for_env[]={
+	NULL, "en", "de", "hu"
+};
+#else
+/* locale names used in unix. */
+/* anyone, a better solution for this? */
+static const gchar *language_locale_default[]=
+	{ "", NULL, };
+static const gchar *language_locale_en[]=
+	{ "en_US.UTF-8", "en_US.UTF8", "en_US.ISO8859-15", "en_US.ISO8859-1", "en_US.US-ASCII", "en_US", "en", NULL, };
+static const gchar *language_locale_de[]=
+	{ "de_DE.UTF-8", "de_DE.UTF8", "de_DE.ISO8859-15", "de_DE.ISO8859-1", "de_DE",
+	  "de_AT.UTF-8", "de_AT.UTF8", "de_AT.ISO8859-15", "de_AT.ISO8859-1", "de_AT",
+	  "de_CH.UTF-8", "de_CH.UTF8", "de_CH.ISO8859-15", "de_CH.ISO8859-1", "de_CH",
+	  "de", NULL, };
+static const gchar *language_locale_hu[]=
+	{ "hu_HU.UTF-8", "hu_HU.ISO8859-2", "hu_HU", "hu", NULL, };
+static const gchar **language_locale[]={
+	language_locale_default,
+	language_locale_en,
+	language_locale_de,
+	language_locale_hu,
+};
+#endif
 
 /* editor settings */
 #define SETTING_GAME_VIEW "game_view"
@@ -36,10 +75,14 @@ gboolean gd_colored_objects=TRUE;	/* show objects with different color */
 gboolean gd_show_object_list=TRUE;	/* show object list */
 #define SETTING_SHOW_TEST_LABEL "show_test_label"
 gboolean gd_show_test_label=TRUE;	/* show a label with some variables, for testing */
+
 #define SETTING_EDITOR_WINDOW_WIDTH "editor_window_width"
 int gd_editor_window_width=800;	/* window size */
 #define SETTING_EDITOR_WINDOW_HEIGHT "editor_window_height"
 int gd_editor_window_height=520;	/* window size */
+
+#define SETTING_LANGUAGE "language"
+int gd_language=0;
 
 /* settings */
 #define SETTING_EASY_PLAY "easy_play"
@@ -58,6 +101,13 @@ gboolean gd_random_colors=FALSE;
 gboolean gd_allow_dirt_mod=TRUE;
 #define SETTING_SHOW_PREVIEW "show_preview"
 gboolean gd_show_preview=TRUE;
+#define SETTING_USE_BDCFF_HIGHSCORE "use_bdcff_highscore"
+gboolean gd_use_bdcff_highscore=FALSE;
+#define SETTING_SHOW_NAME_OF_GAME "show_name_of_game"
+gboolean gd_show_name_of_game=TRUE;
+#define SETTING_THEME "theme"
+char *gd_theme;
+
 #define SETTING_CELL_SCALE_GAME "cell_scale_game"
 GdScalingType gd_cell_scale_game=GD_SCALING_ORIGINAL;
 #define SETTING_PAL_EMULATION_GAME "pal_emulation_game"
@@ -66,15 +116,13 @@ gboolean gd_pal_emulation_game=FALSE;
 GdScalingType gd_cell_scale_editor=GD_SCALING_ORIGINAL;
 #define SETTING_PAL_EMULATION_EDITOR "pal_emulation_editor"
 gboolean gd_pal_emulation_editor=FALSE;
-#define SETTING_THEME "theme"
-char *gd_theme;
-#define SETTING_USE_BDCFF_HIGHSCORE "use_bdcff_highscore"
-gboolean gd_use_bdcff_highscore=FALSE;
-#define SETTING_SHOW_NAME_OF_GAME "show_name_of_game"
-gboolean gd_show_name_of_game=TRUE;
 
 #define SETTING_PAL_EMU_SCANLINE_SHADE "pal_emu_scanline_shade"
 int gd_pal_emu_scanline_shade=85;
+#define SETTING_C64_PALETTE "c64_palette"
+int gd_c64_palette=0;
+#define SETTING_ATARI_PALETTE "atari_palette"
+int gd_atari_palette=0;
 
 /* sound settings */
 #define SETTING_SDL_SOUND "sdl_sound"
@@ -99,6 +147,8 @@ gboolean gd_sdl_pal_emulation=FALSE;
 char *gd_user_config_dir;
 char *gd_system_data_dir;
 char *gd_system_caves_dir;
+char *gd_system_sound_dir;
+char *gd_system_music_dir;
 
 /* command line parameters */
 int gd_param_cave=0, gd_param_level=1, gd_param_internal=0;
@@ -138,36 +188,81 @@ keyfile_get_integer_with_default(GKeyFile *keyfile, const char *group, const cha
 }
 
 /* sets up directiories and loads translations */
-void gd_settings_init_with_language()
+void gd_settings_init_dirs()
 {
-	g_assert(G_N_ELEMENTS(gd_scaling_name)==GD_SCALING_MAX);
+	g_assert(G_N_ELEMENTS(gd_scaling_name)==GD_SCALING_MAX+1);	/* +1 is the terminating NULL */
 	g_assert(G_N_ELEMENTS(gd_scaling_scale)==GD_SCALING_MAX);
 #ifdef G_OS_WIN32
 	/* on win32, use the glib function. */
 	gd_system_data_dir=g_win32_get_package_installation_directory (NULL, NULL);
-	gd_system_caves_dir=g_build_path (G_DIR_SEPARATOR_S, gd_system_data_dir, "caves", NULL);
-	/* these would not be needed for the sdl version, but they do not hurt */
-	bindtextdomain ("gtk20-properties", gd_system_data_dir);
-	bindtextdomain ("gtk20", gd_system_data_dir);
-	bindtextdomain ("glib20", gd_system_data_dir);
-	bind_textdomain_codeset ("gtk20-properties", "UTF-8");
-	bind_textdomain_codeset ("gtk20", "UTF-8");
-	bind_textdomain_codeset ("glib20", "UTF-8");
-	/* gdash strings */
-	bindtextdomain (PACKAGE, gd_system_data_dir);
-	/* gtk always uses utf8, so convert translated strings to utf8 if needed */
-	bind_textdomain_codeset (PACKAGE, "UTF-8");
 #else
 	/* on linux, this is a defined, built-in string, $perfix/share/locale */
 	gd_system_data_dir=PKGDATADIR;
-	gd_system_caves_dir=PKGDATADIR;
-	/* and translated strings here. */
-	bindtextdomain (PACKAGE, LOCALEDIR);
-	bind_textdomain_codeset (PACKAGE, "UTF-8");
 #endif
+	gd_system_caves_dir=g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "caves", NULL);
+	gd_system_sound_dir=g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "sound", NULL);
+	gd_system_music_dir=g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "music", NULL);
 	gd_user_config_dir=g_build_path(G_DIR_SEPARATOR_S, g_get_user_config_dir(), PACKAGE, NULL);
+}
+
+/* set locale from the gdash setting variable. */
+void
+gd_settings_set_locale()
+{
+	int i;
+	char *result;
+
+	if (gd_language<0 || gd_language>=G_N_ELEMENTS(language_locale))
+		gd_language=0;	/* switch to default, if out of bounds. */
+
+	/* on windows, we put the LANGUAGE variable into the environment. that seems to be the only
+	thing gtk+ reacts upon. we also set the locale below. */
+#ifdef G_OS_WIN32
+	g_assert(G_N_ELEMENTS(language_locale)==G_N_ELEMENTS(languages_for_env));
+	if (languages_for_env[gd_language]) {
+		char *env;
+		
+		env=g_strdup_printf("LANGUAGE=%s", languages_for_env[gd_language]);
+		putenv(env);
+		g_free(env);
+	}
+#endif
 	
-	/* do not call textdomain() here. it is needed only for the gdash (gtk) version, not sdash (sdl) */
+	/* try to set the locale. */
+	i=0;
+	result=NULL;
+	while(result==NULL && language_locale[gd_language][i]!=NULL) {
+		result=setlocale(LC_ALL, language_locale[gd_language][i]);
+		i++;
+	}
+	if (result==NULL) {
+		/* failed to set */
+		g_warning("Failed to set language to '%s'. Switching to system default locale.", gd_languages_names[gd_language]);
+		setlocale(LC_ALL, "");
+	}
+}
+
+/* sets up directiories and loads translations */
+void gd_settings_init_translation()
+{
+#ifdef G_OS_WIN32
+	/* these would not be needed for the sdl version, but they do not hurt */
+	bindtextdomain("gtk20-properties", gd_system_data_dir);
+	bindtextdomain("gtk20", gd_system_data_dir);
+	bindtextdomain("glib20", gd_system_data_dir);
+	bind_textdomain_codeset("gtk20-properties", "UTF-8");
+	bind_textdomain_codeset("gtk20", "UTF-8");
+	bind_textdomain_codeset("glib20", "UTF-8");
+	/* gdash strings */
+	bindtextdomain (PACKAGE, gd_system_data_dir);
+	/* gtk always uses utf8, so convert translated strings to utf8 if needed */
+	bind_textdomain_codeset(PACKAGE, "UTF-8");
+#else
+	/* and translated strings here. */
+	bindtextdomain(PACKAGE, LOCALEDIR);
+	bind_textdomain_codeset(PACKAGE, "UTF-8");
+#endif
+	textdomain(PACKAGE);
 }
 
 
@@ -215,6 +310,7 @@ gd_load_settings()
     gd_show_test_label=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_TEST_LABEL, gd_show_test_label);
     gd_editor_window_width=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_WIDTH, gd_editor_window_width);
     gd_editor_window_height=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_HEIGHT, gd_editor_window_height);
+    gd_language=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_LANGUAGE, gd_language);
     gd_easy_play=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_EASY_PLAY, gd_easy_play);
     gd_time_min_sec=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_TIME_MIN_SEC, gd_time_min_sec);
     gd_all_caves_selectable=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_ALL_CAVES_SELECTABLE, gd_all_caves_selectable);
@@ -239,6 +335,8 @@ gd_load_settings()
     if (gd_cell_scale_editor<0 || gd_cell_scale_editor>=GD_SCALING_MAX)
     	gd_cell_scale_editor=0;
     gd_pal_emulation_editor=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_EDITOR, gd_pal_emulation_editor);
+    gd_c64_palette=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_C64_PALETTE, gd_c64_palette);
+    gd_atari_palette=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_ATARI_PALETTE, gd_atari_palette);
 	gd_theme=g_key_file_get_string(ini, SETTINGS_GDASH_GROUP, SETTING_THEME, NULL);
 	gd_sdl_theme=g_key_file_get_string(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_THEME, NULL);
     gd_sdl_scale=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_SCALE, gd_sdl_scale);
@@ -266,6 +364,7 @@ gd_save_settings()
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_TEST_LABEL, gd_show_test_label);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_WIDTH, gd_editor_window_width);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_HEIGHT, gd_editor_window_height);
+    g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_LANGUAGE, gd_language);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_EASY_PLAY, gd_easy_play);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_TIME_MIN_SEC, gd_time_min_sec);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_ALL_CAVES_SELECTABLE, gd_all_caves_selectable);
@@ -275,6 +374,8 @@ gd_save_settings()
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_RANDOM_COLORS, gd_random_colors);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_GAME, gd_pal_emulation_game);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMU_SCANLINE_SHADE, gd_pal_emu_scanline_shade);
+    g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_C64_PALETTE, gd_c64_palette);
+    g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_ATARI_PALETTE, gd_atari_palette);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_EDITOR, gd_pal_emulation_editor);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_PREVIEW, gd_show_preview);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_NAME_OF_GAME, gd_show_name_of_game);

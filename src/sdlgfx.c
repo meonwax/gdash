@@ -15,6 +15,7 @@
  */
 #include <SDL.h>
 #include <glib.h>
+#include "colors.h"
 #include "gameplay.h"
 #include "cave.h"
 #include "settings.h"
@@ -313,7 +314,7 @@ scale3x(SDL_Surface *src, SDL_Surface *dst)
 SDL_Surface *
 surface_scale(SDL_Surface *orig)
 {
-	SDL_Surface *dest;
+	SDL_Surface *dest, *dest2x;
 	
 	dest=SDL_CreateRGBSurface(orig->flags, orig->w*gd_scale, orig->h*gd_scale, orig->format->BitsPerPixel, orig->format->Rmask, orig->format->Gmask, orig->format->Bmask, orig->format->Amask);
 	
@@ -344,6 +345,22 @@ surface_scale(SDL_Surface *orig)
 
 		case GD_SCALING_3X_SCALE3X:
 			scale3x(orig, dest);
+			break;
+			
+		case GD_SCALING_4X:
+			zoomSurfaceRGBA(orig, dest, FALSE);
+			break;
+
+		case GD_SCALING_4X_BILINEAR:
+			zoomSurfaceRGBA(orig, dest, TRUE);
+			break;
+
+		case GD_SCALING_4X_SCALE4X:
+			/* scale2x applied twice. */
+			dest2x=SDL_CreateRGBSurface(orig->flags, orig->w*2, orig->h*2, orig->format->BitsPerPixel, orig->format->Rmask, orig->format->Gmask, orig->format->Bmask, orig->format->Amask);
+			scale2x(orig, dest2x);
+			scale2x(dest2x, dest);
+			SDL_FreeSurface(dest2x);
 			break;
 			
 		/* not a valid case, but to avoid compiler warning */
@@ -759,9 +776,9 @@ static void
 setpalette(SDL_Surface *image, int index, GdColor col)
 {
 	SDL_Color c;
-	c.r=(col>>16)&255;
-	c.g=(col>>8)&255;
-	c.b=col&255;
+	c.r=gd_color_get_r(col);
+	c.g=gd_color_get_g(col);
+	c.b=gd_color_get_b(col);
 	
 	SDL_SetPalette(image, SDL_LOGPAL|SDL_PHYSPAL, &c, index, 1);
 }
@@ -959,11 +976,7 @@ gd_load_theme()
 static guint32
 rgba_pixel_from_gdcolor(SDL_PixelFormat *format, GdColor col, guint8 a)
 {
-	guint8 r=(col>>16)&255;
-	guint8 g=(col>>8)&255;
-	guint8 b=col&255;
-
-	return SDL_MapRGBA(format, r, g, b, a);
+	return SDL_MapRGBA(format, gd_color_get_r(col), gd_color_get_g(col), gd_color_get_b(col), a);
 }
 
 
@@ -1226,9 +1239,18 @@ void
 gd_select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5)
 {
 	/* if non-c64 gfx, nothing to do */
-	if (using_png_gfx) {
-		/* nothing to do */
-	} else
+	if (using_png_gfx)
+		return;
+
+	/* convert to rgb value */
+	c0=gd_color_get_rgb(c0);
+	c1=gd_color_get_rgb(c1);
+	c2=gd_color_get_rgb(c2);
+	c3=gd_color_get_rgb(c3);
+	c4=gd_color_get_rgb(c4);
+	c5=gd_color_get_rgb(c5);
+
+	/* and compare rgb values! */
 	if (c0!=color0 || c1!=color1 || c2!=color2 || c3!=color3 || c4!=color4 || c5!=color5) {
 		/* if not the same colors as requested before */
 		color0=c0;

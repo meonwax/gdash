@@ -1,6 +1,7 @@
 # List of source files which contain translatable strings.
 src/about.c
 src/bdcff.c
+src/colors.c
 src/c64import.c
 src/cave.c
 src/cavedb.c

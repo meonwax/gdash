@@ -199,7 +199,9 @@ struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const cha
 					g_warning("invalid parameter '%s' for attribute %s", params[paramindex], attrib);
 			}
 		}
-	if (!was_string && paramindex<paramcount)
+	/* if we found the identifier, but still could not process all parameters... */
+	/* of course, not for strings, as the whole line is the string */
+	if (identifier_found && !was_string && paramindex<paramcount)
 		g_warning("excess parameters for attribute '%s': '%s'", attrib, params[paramindex]);
 	g_strfreev(params);
 	
@@ -282,31 +284,31 @@ cave_process_tags_func(const char *attrib, const char *param, Cave *cave)
 			/* only color1,2,3 */
 			cave->colorb=GD_C64_BLACK;	/* border */
 			cave->color0=GD_C64_BLACK;	/* background */
-			cave->color1=gd_get_color_from_string (params[0]);
-			cave->color2=gd_get_color_from_string (params[1]);
-			cave->color3=gd_get_color_from_string (params[2]);
+			cave->color1=gd_color_get_from_string(params[0]);
+			cave->color2=gd_color_get_from_string(params[1]);
+			cave->color3=gd_color_get_from_string(params[2]);
 			cave->color4=cave->color3;	/* amoeba */
 			cave->color5=cave->color1;	/* slime */
 		} else
 		if (paramcount==5) {
 			/* bg,color0,1,2,3 */
-			cave->colorb=gd_get_color_from_string (params[0]);
-			cave->color0=gd_get_color_from_string (params[1]);
-			cave->color1=gd_get_color_from_string (params[2]);
-			cave->color2=gd_get_color_from_string (params[3]);
-			cave->color3=gd_get_color_from_string (params[4]);
+			cave->colorb=gd_color_get_from_string(params[0]);
+			cave->color0=gd_color_get_from_string(params[1]);
+			cave->color1=gd_color_get_from_string(params[2]);
+			cave->color2=gd_color_get_from_string(params[3]);
+			cave->color3=gd_color_get_from_string(params[4]);
 			cave->color4=cave->color3;	/* amoeba */
 			cave->color5=cave->color1;	/* slime */
 		} else
 		if (paramcount==7) {
 			/* bg,color0,1,2,3,amoeba,slime */
-			cave->colorb=gd_get_color_from_string (params[0]);
-			cave->color0=gd_get_color_from_string (params[1]);
-			cave->color1=gd_get_color_from_string (params[2]);
-			cave->color2=gd_get_color_from_string (params[3]);
-			cave->color3=gd_get_color_from_string (params[4]);
-			cave->color4=gd_get_color_from_string (params[5]);	/* amoeba */
-			cave->color5=gd_get_color_from_string (params[6]);	/* slime */
+			cave->colorb=gd_color_get_from_string(params[0]);
+			cave->color0=gd_color_get_from_string(params[1]);
+			cave->color1=gd_color_get_from_string(params[2]);
+			cave->color2=gd_color_get_from_string(params[3]);
+			cave->color3=gd_color_get_from_string(params[4]);
+			cave->color4=gd_color_get_from_string(params[5]);	/* amoeba */
+			cave->color5=gd_color_get_from_string(params[6]);	/* slime */
 		} else {
 			g_warning("invalid number of color strings: %s", param);
 			gd_cave_set_random_colors(cave);	/* just create some random */
@@ -989,7 +991,7 @@ save_properties(GPtrArray *out, gpointer str, gpointer str_def, const GdStructDe
 					should_write=TRUE;
 				break;
 			case GD_TYPE_COLOR:
-				g_string_append_printf (line, "%s", gd_get_color_name(((GdColor *) value)[j]));
+				g_string_append_printf (line, "%s", gd_color_get_string(((GdColor *) value)[j]));
 				should_write=TRUE;
 				break;
 			case GD_TYPE_DIRECTION:

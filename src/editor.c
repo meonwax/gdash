@@ -73,6 +73,7 @@ static GList *selected_objects=NULL;
 /* objects index */
 enum {
 	INDEX_COLUMN,
+	LEVELS_PIXBUF_COLUMN,
 	TYPE_PIXBUF_COLUMN,
 	ELEMENT_PIXBUF_COLUMN,
 	FILL_PIXBUF_COLUMN,
@@ -378,6 +379,10 @@ undo_save()
 
 	/* we also use this function to set the edited flag, as it is called for any action */
 	gd_caveset_edited=TRUE;
+
+	/* remove from pixbuf hash: delete its pixbuf */
+	/* as now we know that this cave is really edited. */
+	g_hash_table_remove(cave_pixbufs, edited_cave);
 	
 	undo_save_current_state();
 	redo_free();	
@@ -495,7 +500,7 @@ set_default(GtkWidget *widget, gpointer data)
 	GList *iter;
 	
 	for (iter=rowwidgets; iter!=NULL; iter=iter->next) {
-		gpointer defvalue=g_object_get_data (G_OBJECT (iter->data), GDASH_DEFAULT_VALUE);
+		gpointer defvalue=g_object_get_data (G_OBJECT(iter->data), GDASH_DEFAULT_VALUE);
 
 		switch (GPOINTER_TO_INT (g_object_get_data (iter->data, GDASH_TYPE))) {
 		case GD_TYPE_BOOLEAN:
@@ -587,7 +592,7 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 		
 		if (prop_desc[i].type==GD_LABEL) {
 			/* create a label. */
-			label=gd_label_new_printf(gettext(prop_desc[i].name));
+			label=gd_label_new_printf("<b>%s</b>", _(prop_desc[i].name));
 			gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
 			gtk_table_attach(GTK_TABLE(table), label, 0, 7, row, row+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
 			
@@ -660,7 +665,7 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 				value=((GdColor *) value) + j;
 				defpoint=((GdColor *) defpoint) + j;
 				widget=gd_color_combo_new(*(GdColor *) value);
-				defval=g_strdup_printf("%s", gd_get_color_name(*(GdColor *) defpoint));
+				defval=g_strdup_printf("%s", gd_color_get_string(*(GdColor *) defpoint));
 				break;
 			case GD_TYPE_DIRECTION:
 				value=((GdDirection *) value)+j;
@@ -728,8 +733,8 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 			gtk_widget_set_tooltip_text(entry, tooltip_text);
 			g_free(tooltip_text);
 			widgets=g_list_prepend (widgets, entry);
-			g_object_set_data (G_OBJECT (entry), GDASH_TYPE, GINT_TO_POINTER (-1));
-			g_object_set_data (G_OBJECT (entry), GDASH_VALUE, key);
+			g_object_set_data(G_OBJECT(entry), GDASH_TYPE, GINT_TO_POINTER (-1));
+			g_object_set_data(G_OBJECT(entry), GDASH_VALUE, key);
 			gtk_table_attach(GTK_TABLE(table), entry, 2, 3, row, row+1, GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_SHRINK, 3, 0);
 			row++;
 		}
@@ -746,17 +751,19 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 
 		/* read values from different spin buttons and ranges etc */
 		for (iter=widgets; iter; iter=g_list_next (iter)) {
-			gpointer value=g_object_get_data (G_OBJECT (iter->data), GDASH_VALUE);
+			gpointer value=g_object_get_data(G_OBJECT(iter->data), GDASH_VALUE);
 
 			switch (GPOINTER_TO_INT (g_object_get_data (iter->data, GDASH_TYPE))) {
 			case -1:	/* from hash table */
 				if (!g_str_equal(gtk_entry_get_text(GTK_ENTRY(iter->data)), ""))
-					g_hash_table_insert(other_tags, value, g_strdup(gtk_entry_get_text(GTK_ENTRY(iter->data))));
+					/* "value" here is the key; the entry stores the value. */
+					/* both need to be copies */
+					g_hash_table_insert(other_tags, g_strdup(value), g_strdup(gtk_entry_get_text(GTK_ENTRY(iter->data))));
 				else
 					g_hash_table_remove(other_tags, value);
 				break;
 			case GD_TYPE_BOOLEAN:
-				*(gboolean *) value=gtk_toggle_button_get_active (iter->data);
+				*(gboolean *) value=gtk_toggle_button_get_active(iter->data);
 				break;
 			case GD_TYPE_STRING:
 				gd_strcpy((char *) value, gtk_entry_get_text(iter->data));
@@ -888,7 +895,7 @@ caveset_properties(gboolean show_cancel)
 	so it can be presented to the user.
 */
 static void
-render_cave ()
+render_cave()
 {
 	int i;
 	int x, y;
@@ -920,6 +927,7 @@ render_cave ()
 		GtkTreeIter treeiter;
 		GdkPixbuf *fillelement;
 		gchar *text;
+		const char *levels_stock;
 
 		text=gd_get_object_coordinates_text (object);
 		switch(object->type) {
@@ -936,9 +944,19 @@ render_cave ()
 				fillelement=NULL;
 				break;
 		}
+		
+		/* if on all levels */
+		if (object->levels==GD_OBJECT_LEVEL_ALL)
+			levels_stock=GD_ICON_OBJECT_ON_ALL;
+		else
+			/* not on all levels... visible on current level? */
+			if (object->levels&gd_levels_mask[edit_level])
+				levels_stock=GD_ICON_OBJECT_NOT_ON_ALL;
+			else
+				levels_stock=GD_ICON_OBJECT_NOT_ON_CURRENT;
 
 		/* use atomic insert with values */
-		gtk_list_store_insert_with_values (object_list, &treeiter, i, INDEX_COLUMN, i, TYPE_PIXBUF_COLUMN, action_objects[object->type].stock_id, ELEMENT_PIXBUF_COLUMN, gd_get_element_pixbuf_with_border (object->element), FILL_PIXBUF_COLUMN, fillelement, TEXT_COLUMN, text, POINTER_COLUMN, object, -1);
+		gtk_list_store_insert_with_values (object_list, &treeiter, i, INDEX_COLUMN, i, LEVELS_PIXBUF_COLUMN, levels_stock, TYPE_PIXBUF_COLUMN, action_objects[object->type].stock_id, ELEMENT_PIXBUF_COLUMN, gd_get_element_pixbuf_with_border (object->element), FILL_PIXBUF_COLUMN, fillelement, TEXT_COLUMN, text, POINTER_COLUMN, object, -1);
 
 		/* also do selection as now we have the iter in hand */
 		if (g_list_index(selected, object)!=-1)
@@ -1229,6 +1247,32 @@ element_button_new_with_update(GdElement *value)
 	return button;
 }
 #undef GDASH_DATA_POINTER
+
+/*****************************************************
+ *
+ * check button with instant update
+ *
+ */
+static void
+checkbutton_changed(GtkWidget *widget, gpointer data)
+{
+	gboolean *value=(gboolean *) data;
+	
+	*value=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+	render_cave();	
+}
+
+static GtkWidget *
+check_button_new_with_update(gboolean *value)
+{
+	GtkWidget *button;
+	
+	button=gtk_check_button_new();
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), *value);
+	g_signal_connect(button, "toggled", G_CALLBACK(checkbutton_changed), value);
+
+	return button;
+}
 
 
 
@@ -1554,7 +1598,6 @@ object_properties (GdObject *object)
 	GtkWidget *dialog, *table, *hbox, *scale;
 	int i=0;
 	int n;
-	char *title;
 	int result;
 
 	if (object==NULL) {
@@ -1562,9 +1605,7 @@ object_properties (GdObject *object)
 		object=object_list_first_selected();	/* select first from list... should be only one selected */
 	}
 
-	title=g_strdup_printf(_("%s Properties"), _(gd_object_description[object->type].name));
-	dialog=gtk_dialog_new_with_buttons (title, GTK_WINDOW (editor_window), GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
-	g_free (title);
+	dialog=gtk_dialog_new_with_buttons (_("Object Properties"), GTK_WINDOW (editor_window), GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
 	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
 	gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
 
@@ -1578,6 +1619,14 @@ object_properties (GdObject *object)
 	 * then i is incremented. this is to avoid empty lines. the table
 	 * seemed nicer than hboxes. and it expands automatically. */
 
+	/* object type */
+	hbox=gtk_hbox_new(FALSE, 6);
+	gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_("Type")), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
+	gtk_table_attach_defaults(GTK_TABLE(table), hbox, 1, 3, i, i+1);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_image_new_from_stock(action_objects[object->type].stock_id, GTK_ICON_SIZE_MENU), FALSE, FALSE, 0);
+	gtk_box_pack_start_defaults(GTK_BOX(hbox), gd_label_new_printf(_(gd_object_description[object->type].name)));
+	i++;
+
 	/* LEVEL INFO ****************/
 	/* hscale which selects current level shown */
 	gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_("Level currently shown")), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
@@ -1585,6 +1634,11 @@ object_properties (GdObject *object)
 	gtk_table_attach(GTK_TABLE(table), scale, 1, 3, i, i+1, GTK_FILL, GTK_SHRINK, 0, 0);
 	i++;
 
+	/* separator */
+	gtk_table_attach(GTK_TABLE(table), gtk_hseparator_new(), 0, 3, i, i+1, GTK_FILL, GTK_SHRINK, 0, 0);
+	i++;
+
+	/* levels checkboxes */
 	hbox=gtk_hbox_new(TRUE, 6);
 	gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_("Enabled on levels")), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
 	gtk_table_attach_defaults(GTK_TABLE(table), hbox, 1, 3, i, i+1);
@@ -1595,9 +1649,6 @@ object_properties (GdObject *object)
 		widget_focus_in_set_level(wid, GTK_SCALE(scale), n+1);
 		gtk_box_pack_start_defaults(GTK_BOX(hbox), wid);
 	}
-	i++;
-
-	gtk_table_attach(GTK_TABLE(table), gtk_hseparator_new(), 0, 3, i, i+1, GTK_FILL, GTK_SHRINK, 0, 0);
 	i++;
 	
 	/* OBJECT PROPERTIES ************/
@@ -1657,19 +1708,20 @@ object_properties (GdObject *object)
 		
 		for (j=0; j<5; j++) {
 			GtkWidget *spin;
-			int spin_max;
-			
-			if (object->type==RANDOM_FILL)
-				spin_max=255;
-			else
-				spin_max=1<<24;
 			
 			gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_(gd_object_description[object->type].seed), j+1), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
-			gtk_table_attach_defaults(GTK_TABLE(table), spin=spin_button_new_with_update(-1, spin_max, &object->seed[j]), 1, 3, i, i+1);
+			gtk_table_attach_defaults(GTK_TABLE(table), spin=spin_button_new_with_update(-1, 1<<24, &object->seed[j]), 1, 3, i, i+1);
 			widget_focus_in_set_level(spin, GTK_SCALE(scale), j+1);
 			gtk_widget_set_tooltip_text(spin, _("Random seed value controls the predictable random number generator. If set to -1, cave is totally random every time it is played."));
 		i++;
 		}
+	}
+
+	/* random fill object has a c64 random toggle */
+	if (gd_object_description[object->type].c64_random!=NULL) {
+		gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_(gd_object_description[object->type].c64_random)), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
+		gtk_table_attach_defaults(GTK_TABLE(table), check_button_new_with_update(&object->c64_random), 1, 3, i, i+1);
+		i++;
 	}
 
 	if (object->type==RANDOM_FILL)
@@ -2222,17 +2274,26 @@ destroy_event (GtkWidget *widget, GdkEvent *event, gpointer data)
  *
  *
  */
-
-static void
-icon_view_update_pixbufs()
+ 
+static gboolean
+icon_view_update_pixbufs_timeout(gpointer data)
 {
 	GtkTreePath *path;
 	GtkTreeModel *model;
 	GtkTreeIter iter;
+	int created;
+	gboolean finish;
+
+	/* if no icon view found, remove interrupt. */
+	if (!iconview_cavelist)
+		return FALSE;
 
 	model=gtk_icon_view_get_model(GTK_ICON_VIEW(iconview_cavelist));
 	path=gtk_tree_path_new_first();
-	while (gtk_tree_model_get_iter (model, &iter, path)) {
+	
+	created=0;
+	/* render a maximum of 5 pixbufs at a time */
+	while (created<5 && (finish=gtk_tree_model_get_iter (model, &iter, path))) {
 		Cave *cave;
 		GdkPixbuf *pixbuf, *pixbuf_in_icon_view;
 
@@ -2255,6 +2316,8 @@ icon_view_update_pixbufs()
 			}
 			gd_cave_free (rendered);
 			g_hash_table_insert(cave_pixbufs, cave, pixbuf);
+
+			created++;	/* created at least one, it took time */
 		}
 
 		/* if generated a new pixbuf, or the icon view does not contain the pixbuf: */
@@ -2264,14 +2327,21 @@ icon_view_update_pixbufs()
 		gtk_tree_path_next (path);
 	}
 	gtk_tree_path_free (path);
+	
+	return finish;
+}
+
+static void
+icon_view_update_pixbufs()
+{
+	g_timeout_add_full(G_PRIORITY_LOW, 10, icon_view_update_pixbufs_timeout, NULL, NULL);
 }
 
 
-/* this is also called as an item activated signal.
-	so don't use data! that function has another parameters.
-	also do not use widget, as it is once an icon view, once a gtkmenu */
+/* this is also called as an item activated signal. */
+/* so we do not use its parameters. */
 static void
-edit_cave_cb ()
+edit_cave_cb()
 {
 	GList *list;
 	GtkTreeIter iter;
@@ -2290,7 +2360,7 @@ edit_cave_cb ()
 }
 
 static void
-rename_cave_cb (GtkWidget *widget, gpointer data)
+rename_cave_cb(GtkWidget *widget, gpointer data)
 {
 	GList *list;
 	GtkTreeIter iter;
@@ -2345,6 +2415,7 @@ cave_make_selectable_cb (GtkWidget *widget, gpointer data)
 	g_list_free (list);
 	if (!cave->selectable) {
 		cave->selectable=TRUE;
+		/* we remove its pixbuf, as its color will be different */
 		g_hash_table_remove(cave_pixbufs, cave);
 	}
 	icon_view_update_pixbufs();
@@ -2368,6 +2439,7 @@ cave_make_unselectable_cb (GtkWidget *widget, gpointer data)
 	g_list_free (list);
 	if (cave->selectable) {
 		cave->selectable=FALSE;
+		/* we remove its pixbuf, as its color will be different */
 		g_hash_table_remove(cave_pixbufs, cave);
 	}
 	icon_view_update_pixbufs();
@@ -2432,8 +2504,18 @@ static void
 add_cave_to_icon_view(GtkListStore *store, Cave *cave)
 {
 	GtkTreeIter treeiter;
+	GdkPixbuf *cave_pixbuf;
+	static GdkPixbuf *missing_image=NULL;
 	
-	gtk_list_store_insert_with_values (store, &treeiter, -1, CAVE_COLUMN, cave, NAME_COLUMN, cave->name, -1);
+	if (!missing_image) {
+		missing_image=gtk_widget_render_icon(editor_window, GTK_STOCK_MISSING_IMAGE, GTK_ICON_SIZE_DIALOG, NULL);
+	}
+	
+	/* if we already know the pixbuf, set it. */
+	cave_pixbuf=g_hash_table_lookup(cave_pixbufs, cave);
+	if (cave_pixbuf==NULL)
+		cave_pixbuf=missing_image;
+	gtk_list_store_insert_with_values (store, &treeiter, -1, CAVE_COLUMN, cave, NAME_COLUMN, cave->name, PIXBUF_COLUMN, cave_pixbuf, -1);
 }
 
 /* does nothing else but sets caveset_edited to true. called by "reordering" (drag&drop), which is implemented by gtk+ by inserting and deleting */
@@ -2528,9 +2610,6 @@ select_cave_for_edit (Cave * cave)
 		}
 		render_cave();
 		gtk_widget_set_size_request(drawing_area, edited_cave->w * gd_cell_size_editor, edited_cave->h * gd_cell_size_editor);
-
-		/* remove from pixbuf hash: delete its pixbuf */
-		g_hash_table_remove(cave_pixbufs, cave);
 	}
 	else {
 		/* if no cave given, show selector. */
@@ -2974,7 +3053,7 @@ delete_selected_cb (GtkWidget *widget, gpointer data)
 			g_free(iter->data);
 		}
 		object_list_clear_selection();
-		render_cave ();
+		render_cave();
 	}
 }
 
@@ -2997,11 +3076,10 @@ bottom_selected_cb (GtkWidget *widget, gpointer data)
 		/* put to beginning */
 		edited_cave->objects=g_list_prepend(edited_cave->objects, iter->data);
 	}
-	render_cave ();
+	render_cave();
 }
 
-/* bring selected drawing element to top.
-*/
+/* bring selected drawing element to top. */
 static void
 top_selected_cb (GtkWidget *widget, gpointer data)
 {
@@ -3017,7 +3095,90 @@ top_selected_cb (GtkWidget *widget, gpointer data)
 		/* put to beginning */
 		edited_cave->objects=g_list_append(edited_cave->objects, iter->data);
 	}
-	render_cave ();
+	render_cave();
+}
+
+/* enable currently selected objects on the currently viewed level only. */
+static void
+show_object_this_level_only_cb (GtkWidget *widget, gpointer data)
+{
+	GList *iter;
+	
+	g_return_if_fail (object_list_is_any_selected());
+
+	undo_save();
+
+	for (iter=selected_objects; iter!=NULL; iter=iter->next) {
+		GdObject *obj=(GdObject *)iter->data;
+		
+		obj->levels=gd_levels_mask[edit_level];
+	}
+	render_cave();
+}
+
+/* enable currently selected objects on all levels */
+static void
+show_object_all_levels_cb (GtkWidget *widget, gpointer data)
+{
+	GList *iter;
+	
+	g_return_if_fail (object_list_is_any_selected());
+
+	undo_save();
+
+	for (iter=selected_objects; iter!=NULL; iter=iter->next) {
+		GdObject *obj=(GdObject *)iter->data;
+		
+		obj->levels=GD_OBJECT_LEVEL_ALL;
+	}
+	render_cave();
+}
+
+/* enable currently selected objects on the currently viewed level only. */
+static void
+show_object_on_this_level_cb (GtkWidget *widget, gpointer data)
+{
+	GList *iter;
+	
+	g_return_if_fail (object_list_is_any_selected());
+
+	undo_save();
+
+	for (iter=selected_objects; iter!=NULL; iter=iter->next) {
+		GdObject *obj=(GdObject *)iter->data;
+		
+		obj->levels|=gd_levels_mask[edit_level];
+	}
+	render_cave();
+}
+
+/* enable currently selected objects on the currently viewed level only. */
+static void
+hide_object_on_this_level_cb (GtkWidget *widget, gpointer data)
+{
+	GList *iter;
+	int disappear;
+	
+	g_return_if_fail (object_list_is_any_selected());
+
+	undo_save();
+
+	disappear=0;
+	for (iter=selected_objects; iter!=NULL; iter=iter->next) {
+		GdObject *obj=(GdObject *)iter->data;
+		
+		obj->levels &= ~gd_levels_mask[edit_level];
+		/* an object should be visible on at least one level. */
+		/* if it disappeared, switch it back, and remember that we will show an error message. */
+		if (obj->levels==0) {
+			obj->levels=gd_levels_mask[edit_level];
+			disappear++;
+		}
+	}
+	render_cave();
+	
+	if (disappear>0)
+		gd_warningmessage(_("At least one object would have been totally hidden (not visible on any of the levels)."), _("Enabled those objects on the current level."));
 }
 
 /* copy selected object or caves to clipboard.
@@ -3185,7 +3346,7 @@ cut_selected_cb (GtkWidget *widget, gpointer data)
 		gtk_action_group_set_sensitive (actions_clipboard_paste, TRUE);
 
 		object_list_clear_selection();
-		render_cave ();
+		render_cave();
 	}
 }
 
@@ -3260,7 +3421,7 @@ flatten_cave_cb (GtkWidget *widget, gpointer data)
 		undo_save();	/* changing; save for undo */
 
 		gd_flatten_cave (edited_cave, edit_level);
-		render_cave ();
+		render_cave();
 	}
 }
 
@@ -4051,6 +4212,10 @@ gd_open_cave_editor()
 	static const GtkActionEntry action_entries_edit_object[]={
 		{"Bottom", GD_ICON_TO_BOTTOM, N_("To _bottom"), "<control>End", N_("Push object to bottom"), G_CALLBACK(bottom_selected_cb)},
 		{"Top", GD_ICON_TO_TOP, N_("To t_op"), "<control>Home", N_("Bring object to top"), G_CALLBACK(top_selected_cb)},
+		{"ShowOnThisLevel", GTK_STOCK_ADD, N_("Show on this level"), NULL, N_("Enable object on currently visible level"), G_CALLBACK(show_object_on_this_level_cb)},
+		{"HideOnThisLevel", GTK_STOCK_REMOVE, N_("Hide on this level"), NULL, N_("Disable object on currently visible level"), G_CALLBACK(hide_object_on_this_level_cb)},
+		{"OnlyOnThisLevel", NULL, N_("Only on this level"), NULL, N_("Enable object only on the currently visible level"), G_CALLBACK(show_object_this_level_only_cb)},
+		{"ShowOnAllLevels", NULL, N_("Show on all levels"), NULL, N_("Enable object on all levels"), G_CALLBACK(show_object_all_levels_cb)},
 	};
 
 	static const GtkActionEntry action_entries_edit_one_object[]={
@@ -4119,6 +4284,12 @@ gd_open_cave_editor()
 			"<separator/>"
 			"<menuitem action='Top'/>"
 			"<menuitem action='Bottom'/>"
+			"<separator/>"
+			"<menuitem action='ShowOnThisLevel'/>"
+			"<menuitem action='HideOnThisLevel'/>"
+			"<menuitem action='OnlyOnThisLevel'/>"
+			"<menuitem action='ShowOnAllLevels'/>"
+			"<separator/>"
 			"<menuitem action='ObjectProperties'/>"
 			"<separator/>"
 			"<menuitem action='CaveProperties'/>"
@@ -4142,6 +4313,11 @@ gd_open_cave_editor()
 			"<menuitem action='Copy'/>"
 			"<menuitem action='Paste'/>"
 			"<menuitem action='Delete'/>"
+			"<separator/>"
+			"<menuitem action='ShowOnThisLevel'/>"
+			"<menuitem action='HideOnThisLevel'/>"
+			"<menuitem action='OnlyOnThisLevel'/>"
+			"<menuitem action='ShowOnAllLevels'/>"
 			"<separator/>"
 			"<menuitem action='Top'/>"
 			"<menuitem action='Bottom'/>"
@@ -4193,6 +4369,10 @@ gd_open_cave_editor()
 				"<separator/>"
 				"<menuitem action='Top'/>"
 				"<menuitem action='Bottom'/>"
+				"<menuitem action='ShowOnThisLevel'/>"
+				"<menuitem action='HideOnThisLevel'/>"
+				"<menuitem action='OnlyOnThisLevel'/>"
+				"<menuitem action='ShowOnAllLevels'/>"
 				"<menuitem action='ObjectProperties'/>"
 				"<separator/>"
 				"<menuitem action='SetupRandom'/>"
@@ -4443,7 +4623,7 @@ gd_open_cave_editor()
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scroll_window_objects), GTK_SHADOW_ETCHED_IN);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll_window_objects), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
-	object_list=gtk_list_store_new(NUM_EDITOR_COLUMNS, G_TYPE_INT, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_POINTER);
+	object_list=gtk_list_store_new(NUM_EDITOR_COLUMNS, G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_POINTER);
 	object_tree_view=gtk_tree_view_new_with_model (GTK_TREE_MODEL (object_list));
 	g_object_unref (object_list);
 	g_signal_connect (G_OBJECT (gtk_tree_view_get_selection (GTK_TREE_VIEW (object_tree_view))), "changed", G_CALLBACK(object_list_selection_changed_signal), NULL);
@@ -4463,6 +4643,9 @@ gd_open_cave_editor()
 	column=gtk_tree_view_column_new();
 	gtk_tree_view_column_set_spacing (column, 1);
 	gtk_tree_view_column_set_title (column, _("_Objects"));
+	renderer=gtk_cell_renderer_pixbuf_new();
+	gtk_tree_view_column_pack_start (column, renderer, FALSE);
+	gtk_tree_view_column_set_attributes (column, renderer, "stock-id", LEVELS_PIXBUF_COLUMN, NULL);
 	renderer=gtk_cell_renderer_pixbuf_new();
 	gtk_tree_view_column_pack_start (column, renderer, FALSE);
 	gtk_tree_view_column_set_attributes (column, renderer, "stock-id", TYPE_PIXBUF_COLUMN, NULL);

@@ -132,7 +132,7 @@ find_file_try_path(const char *path, const char *filename)
 }
 
 
-/* tries to find a file in the gdash installation and returns a path (owned by this function, not to be g_free()d) */
+/* tries to find a file in the gdash installation and returns a path (owned by the above function, not to be g_free()d) */
 const char *
 gd_find_file(const char *filename)
 {
@@ -143,6 +143,10 @@ gd_find_file(const char *filename)
 		return result;
 		
 	result=find_file_try_path(gd_system_data_dir, filename);
+	if (result!=NULL)
+		return result;
+
+	result=find_file_try_path(gd_system_sound_dir, filename);
 	if (result!=NULL)
 		return result;
 		

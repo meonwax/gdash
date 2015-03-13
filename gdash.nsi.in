@@ -44,9 +44,8 @@ Section "GDash (required)"
   File "include\c64_gfx.png"
   File "gdash.ico"
   File /oname=README.txt "README"
+  File /oname=TODO.txt "TODO"
   
-  File "sound\*.ogg"
-
   ; Profram files, Glib dlls
   SetOutPath $INSTDIR
   File ${MINGWDIR}\bin\intl.dll
@@ -103,6 +102,15 @@ Section "Cave sets"
 
 SectionEnd
 
+Section "Sound files"
+  SetOutPath $INSTDIR\sound
+  File "sound\*.ogg"
+
+  SetOutPath $INSTDIR\music
+  File "music\*.ogg"
+
+SectionEnd
+
 Section "Translations"
   ; Translations
   SetOutPath $INSTDIR\hu\LC_MESSAGES
@@ -124,10 +132,11 @@ Section "Start Menu Shortcuts"
 
   SetOutPath $INSTDIR
   CreateDirectory "$SMPROGRAMS\GDash"
-  CreateShortCut "$SMPROGRAMS\GDash\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\GDash\GDash.lnk" "$INSTDIR\gdash.exe" "" "$INSTDIR\gdash.ico" 0
   CreateShortCut "$SMPROGRAMS\GDash\GDash (C64-like).lnk" "$INSTDIR\sdash.exe" "" "$INSTDIR\gdash.ico" 0
   CreateShortCut "$SMPROGRAMS\GDash\README.lnk" "$INSTDIR\README.txt" "" "" 0
+  CreateShortCut "$SMPROGRAMS\GDash\TODO.lnk" "$INSTDIR\TODO.txt" "" "" 0
+  CreateShortCut "$SMPROGRAMS\GDash\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   
 SectionEnd
 

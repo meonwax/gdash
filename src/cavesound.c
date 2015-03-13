@@ -40,6 +40,7 @@ static SoundProperty sound_flags[] = {
 	/* diamond collect sound has precedence over everything. */
 	/* CHANNEL 1 SOUNDS ARE ALWAYS RESTARTED, so no need for GD_SP_FORCE flag. */
 	{ GD_S_STONE, GD_SP_CLASSIC, 1, 10},
+	{ GD_S_NITRO, 0, 1, 10},
 	{ GD_S_FALLING_WALL, 0, 1, 10, GD_S_STONE},
 	{ GD_S_EXPANDING_WALL, 0, 1, 10, GD_S_STONE},
 	{ GD_S_WALL_REAPPEAR, 0, 1, 10},
@@ -59,6 +60,7 @@ static SoundProperty sound_flags[] = {
 	{ GD_S_CLOCK_COLLECT, GD_SP_CLASSIC, 1, 50},
 	{ GD_S_SWEET_COLLECT, 0, 1, 50, GD_S_NONE},
 	{ GD_S_KEY_COLLECT, 0, 1, 50, GD_S_DIAMOND_RANDOM},
+	{ GD_S_DIAMOND_KEY_COLLECT, 0, 1, 50, GD_S_DIAMOND_RANDOM},
 	{ GD_S_SLIME, 0,  1, 5, GD_S_NONE},		/* slime has lower precedence than diamond and stone falling sounds. */
 	{ GD_S_ACID_SPREAD, 0,  1, 3, GD_S_NONE},	/* same for acid, even lower. */
 	{ GD_S_BLADDER_MOVE, 0, 1, 5, GD_S_NONE},	/* same for bladder. */

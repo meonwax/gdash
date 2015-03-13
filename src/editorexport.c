@@ -179,13 +179,13 @@ crli_export (Cave *to_convert, const int level, guint8 *compressed)
 		g_warning("cannot precisely export amoeba fast growth probability");
 	output[0x383]=prob;
 	
-	output[0x384]=gd_get_c64_color_index(cave->colorb);	
-	output[0x385]=gd_get_c64_color_index(cave->color0);	
-	output[0x386]=gd_get_c64_color_index(cave->color1);	
-	output[0x387]=gd_get_c64_color_index(cave->color2);
-	x=gd_get_c64_color_index(cave->color3);
+	output[0x384]=gd_color_get_c64_index_try(cave->colorb);	
+	output[0x385]=gd_color_get_c64_index_try(cave->color0);	
+	output[0x386]=gd_color_get_c64_index_try(cave->color1);	
+	output[0x387]=gd_color_get_c64_index_try(cave->color2);
+	x=gd_color_get_c64_index_try(cave->color3);
 	if (x>7)
-		g_warning("allowed colors for color3 are 0..7, but it is %d", x);
+		g_warning("allowed colors for color3 are Black..Yellow, but it is %d", x);
 	output[0x388]=x|8;
 	
 	output[0x389]=cave->intermission?1:0;
@@ -195,6 +195,15 @@ crli_export (Cave *to_convert, const int level, guint8 *compressed)
 	output[0x38c]=0;	/* always "normal" intermission, scrolling intermission is said to be buggy */
 	output[0x38d]=0xf1;	/* magic wall sound on */
 	
+	/* if changed direction, we swap the flags here. */
+	/* effects are already converted by element_to_crli */
+	if (cave->expanding_wall_changed) {
+		gboolean temp;
+		
+		temp=has_horizontal;
+		has_horizontal=has_vertical;
+		has_vertical=temp;
+	}
 	output[0x38e]=0x2e;
 	if (has_vertical && !has_horizontal)
 		output[0x38e]=0x2f;

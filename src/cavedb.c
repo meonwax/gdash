@@ -26,7 +26,7 @@
 	the identifier in the saved file might also not match, reading an "outbox" from
 	the file should store an O_PRE_OUTBOX.
 	
-   images are: image in editor, image in editor - animated, image pixbuf, game image
+   images are: image in editor, image in editor - animated, game image
 */
 GdElements gd_elements[] = {
 	{O_SPACE, N_("Space"), P_AMOEBA_CONSUMES, "SPACE", ' ', 0, 0, 0},
@@ -36,11 +36,11 @@ GdElements gd_elements[] = {
 	{O_DIRT_SLOPED_DOWN_LEFT, N_("Sloped dirt (down & left)"), P_DIRT|P_SLOPED_DOWN|P_SLOPED_LEFT|P_AMOEBA_CONSUMES, "DIRTSLOPEDDOWNLEFT", 0, 282, 282, 282},
 	{O_DIRT_SLOPED_DOWN_RIGHT, N_("Sloped dirt (down & right)"), P_DIRT|P_SLOPED_DOWN|P_SLOPED_RIGHT|P_AMOEBA_CONSUMES, "DIRTSLOPEDDOWNRIGHT", 0, 283, 283, 283},
 	{O_DIRT2, N_("Dirt 2"), P_DIRT|P_AMOEBA_CONSUMES, "DIRT2", 0, 3, 3, 3},
-	{O_BRICK, N_("Brick wall"), P_SLOPED|P_CAN_BE_HAMMERED, "WALL", 'w', 5, 5, 5},
-	{O_BRICK_SLOPED_UP_RIGHT, N_("Sloped brick wall (up & right)"), P_SLOPED_UP|P_SLOPED_RIGHT|P_CAN_BE_HAMMERED, "WALLSLOPEDUPRIGHT", 0, 276, 276, 276},
-	{O_BRICK_SLOPED_UP_LEFT, N_("Sloped brick wall (up & left)"), P_SLOPED_UP|P_SLOPED_LEFT|P_CAN_BE_HAMMERED, "WALLSLOPEDUPLEFT", 0, 277, 277, 277},
-	{O_BRICK_SLOPED_DOWN_LEFT, N_("Sloped brick wall (down & left)"), P_SLOPED_DOWN|P_SLOPED_LEFT|P_CAN_BE_HAMMERED, "WALLSLOPEDDOWNLEFT", 0, 278, 278, 278},
-	{O_BRICK_SLOPED_DOWN_RIGHT, N_("Sloped brick wall (down & right)"), P_SLOPED_DOWN|P_SLOPED_RIGHT|P_CAN_BE_HAMMERED, "WALLSLOPEDDOWNRIGHT", 0, 279, 279, 279},
+	{O_BRICK, N_("Brick wall"), P_SLOPED|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED, "WALL", 'w', 5, 5, 5},
+	{O_BRICK_SLOPED_UP_RIGHT, N_("Sloped brick wall (up & right)"), P_SLOPED_UP|P_SLOPED_RIGHT|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED, "WALLSLOPEDUPRIGHT", 0, 276, 276, 276},
+	{O_BRICK_SLOPED_UP_LEFT, N_("Sloped brick wall (up & left)"), P_SLOPED_UP|P_SLOPED_LEFT|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED, "WALLSLOPEDUPLEFT", 0, 277, 277, 277},
+	{O_BRICK_SLOPED_DOWN_LEFT, N_("Sloped brick wall (down & left)"), P_SLOPED_DOWN|P_SLOPED_LEFT|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED, "WALLSLOPEDDOWNLEFT", 0, 278, 278, 278},
+	{O_BRICK_SLOPED_DOWN_RIGHT, N_("Sloped brick wall (down & right)"), P_SLOPED_DOWN|P_SLOPED_RIGHT|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED, "WALLSLOPEDDOWNRIGHT", 0, 279, 279, 279},
 	{O_BRICK_NON_SLOPED, N_("Non-sloped brick wall"), P_CAN_BE_HAMMERED, "WALLNONSLOPED", 0, 352, 352, 5},
 	{O_MAGIC_WALL, N_("Magic wall"), P_CAN_BE_HAMMERED, "MAGICWALL", 'M', 184, -184, -184},
 	{O_PRE_OUTBOX, N_("Outbox"), 0, "OUTBOX", 'X', 351, -364, 22},	/* 364, 365, 366, 367, 368, 369, 370, 371 */
@@ -63,15 +63,15 @@ GdElements gd_elements[] = {
 	{O_DIAMOND_F, N_("Diamond, falling"), 0, "DIAMONDf", 'D', 315, 315, -248, 156},	/* has ckdelay */
 	{O_BLADDER_SPENDER, N_("Bladder Spender"), 0, "BLADDERSPENDER", 0, 6, 6, 6, 20},	/* has ckdelay */
 	{O_INBOX, N_("Inbox"), 0, "INBOX", 'P', 35, 35, 22},
-	{O_H_EXPANDING_WALL, N_("Expanding wall, horizontal"), P_VISUAL_EFFECT, "HEXPANDINGWALL", 'x', 316, 316, 5, 111},	/* has ckdelay */
-	{O_V_EXPANDING_WALL, N_("Expanding wall, vertical"), P_VISUAL_EFFECT, "VEXPANDINGWALL", 'v', 326, 326, 5, 111},	/* has ckdelay */
-	{O_EXPANDING_WALL, N_("Expanding wall"), P_VISUAL_EFFECT, "EXPANDINGWALL", 'e', 343, 343, 5, 111},	/* has ckdelay */
+	{O_H_EXPANDING_WALL, N_("Expanding wall, horizontal"), P_VISUAL_EFFECT | P_CAN_BE_HAMMERED, "HEXPANDINGWALL", 'x', 316, 316, 5, 111},	/* has ckdelay */
+	{O_V_EXPANDING_WALL, N_("Expanding wall, vertical"), P_VISUAL_EFFECT | P_CAN_BE_HAMMERED, "VEXPANDINGWALL", 'v', 326, 326, 5, 111},	/* has ckdelay */
+	{O_EXPANDING_WALL, N_("Expanding wall"), P_VISUAL_EFFECT | P_CAN_BE_HAMMERED, "EXPANDINGWALL", 'e', 343, 343, 5, 111},	/* has ckdelay */
 	{O_EXPANDING_WALL_SWITCH, N_("Expanding wall switch"), 0, "EXPANDINGWALLSWITCH", 0, 40, 40, 40},
 	{O_CREATURE_SWITCH, N_("Creature direction switch"), 0, "FIREFLYBUTTERFLYSWITCH", 0, 18, 18, 18},
 	{O_BITER_SWITCH, N_("Biter switch"), 0, "BITERSWITCH", 0, 12, 12, 12},
 	{O_ACID, N_("Acid"), 0, "ACID", 0, 20, 20, 20, 128},	/* has ckdelay */
-	{O_FALLING_WALL, N_("Falling wall"), 0, "FALLINGWALL", 0, 342, 342, 5, 80},	/* has ckdelay */
-	{O_FALLING_WALL_F, N_("Falling wall, falling"), 0, "FALLINGWALLf", 0, 344, 344, 5, 80},	/* has ckdelay */
+	{O_FALLING_WALL, N_("Falling wall"), P_CAN_BE_HAMMERED, "FALLINGWALL", 0, 342, 342, 5, 80},	/* has ckdelay */
+	{O_FALLING_WALL_F, N_("Falling wall, falling"), P_CAN_BE_HAMMERED, "FALLINGWALLf", 0, 344, 344, 5, 80},	/* has ckdelay */
 	{O_BOX, N_("Box"), 0, "SOKOBANBOX", 0, 21, 21, 21},
 	{O_TIME_PENALTY, N_("Time penalty"), P_NON_EXPLODABLE, "TIMEPENALTY", 0, 346, 346, 9},
 	{O_GRAVESTONE, N_("Gravestone"), P_NON_EXPLODABLE, "GRAVESTONE", 'G', 9, 9, 9},
@@ -140,7 +140,6 @@ GdElements gd_elements[] = {
 	{O_BLADDER_6, N_("Bladder (6)"), 0, "BLADDERd6", 0, 176, -176, -176},
 	{O_BLADDER_7, N_("Bladder (7)"), 0, "BLADDERd7", 0, 176, -176, -176},
 	{O_BLADDER_8, N_("Bladder (8)"), 0, "BLADDERd8", 0, 176, -176, -176},
-	{O_BLADDER_9, N_("Bladder (9)"), 0, "BLADDERd9", 0, 176, -176, -176},
 
 	{O_WAITING_STONE, N_("Waiting stone"), P_SLOPED, "WAITINGBOULDER", 0, 363, 363, 1, 176},	/* has ckdelay */
 	{O_CHASING_STONE, N_("Chasing stone"), P_SLOPED, "CHASINGBOULDER", 0, 17, 17, 17, 269},	/* has ckdelay */
@@ -294,24 +293,24 @@ gd_cave_properties[] = {
 	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, upper"), G_STRUCT_OFFSET(Cave, y1), 1, N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
 	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, right"), G_STRUCT_OFFSET(Cave, x2), 1, N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
 	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, lower"), G_STRUCT_OFFSET(Cave, y2), 1, N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
-	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Border color"), G_STRUCT_OFFSET(Cave, colorb), 1, N_("Border color for C64 graphics. Only for compatibility, not used by GDash.")},
-	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Background color"), G_STRUCT_OFFSET(Cave, color0), 1, N_("Background color for C64 graphics")},
-	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Color 1 (dirt)"), G_STRUCT_OFFSET(Cave, color1), 1, N_("Foreground color 1 for C64 graphics")},
-	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Color 2 (steel wall)"), G_STRUCT_OFFSET(Cave, color2), 1, N_("Foreground color 2 for C64 graphics")},
-	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Color 3 (brick wall)"), G_STRUCT_OFFSET(Cave, color3), 1, N_("Foreground color 3 for C64 graphics")},
-	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Amoeba color"), G_STRUCT_OFFSET(Cave, color4), 1, N_("Amoeba color for C64 graphics")},
-	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Slime color"), G_STRUCT_OFFSET(Cave, color5), 1, N_("Slime color for C64 graphics")},
+	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Border color"), G_STRUCT_OFFSET(Cave, colorb), 1, N_("Border color for C64 graphics. Only for compatibility, not used by GDash.")},
+	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Background color"), G_STRUCT_OFFSET(Cave, color0), 1, N_("Background color for C64 graphics")},
+	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Color 1 (dirt)"), G_STRUCT_OFFSET(Cave, color1), 1, N_("Foreground color 1 for C64 graphics")},
+	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Color 2 (steel wall)"), G_STRUCT_OFFSET(Cave, color2), 1, N_("Foreground color 2 for C64 graphics")},
+	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Color 3 (brick wall)"), G_STRUCT_OFFSET(Cave, color3), 1, N_("Foreground color 3 for C64 graphics")},
+	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Amoeba color"), G_STRUCT_OFFSET(Cave, color4), 1, N_("Amoeba color for C64 graphics")},
+	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Slime color"), G_STRUCT_OFFSET(Cave, color5), 1, N_("Slime color for C64 graphics")},
 	{"Charset", GD_TYPE_STRING, 0, N_("Character set"), G_STRUCT_OFFSET(Cave, charset), 1, N_("Theme used for displaying the game. Not used by GDash.")},
 	{"Fontset", GD_TYPE_STRING, 0, N_("Font set"), G_STRUCT_OFFSET(Cave, fontset), 1, N_("Font used during the game. Not used by GDash.")},
 
 
 	/* difficulty */
 	{"", GD_TAB, 0, N_("Difficulty")},
-	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("<b>Diamonds</b>")},
+	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("Diamonds")},
 	{"DiamondsRequired", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Diamonds needed"), CAVE_OFFSET(level_diamonds[0]), 5, N_("Here zero means automatically count diamonds before level start. If negative, the value is subtracted from that. This is useful for totally random caves."), -100, 999},
 	{"DiamondValue", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Score for diamonds"), CAVE_OFFSET(diamond_value), 1, N_("Number of points per diamond collected, before opening the exit."), 0, 100},
 	{"DiamondValue", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Score for extra diamonds"), CAVE_OFFSET(extra_diamond_value), 1, N_("Number of points per diamond collected, after opening the exit."), 0, 100},
-	{"", GD_LABEL, 0, N_("<b>Time</b>")},
+	{"", GD_LABEL, 0, N_("Time")},
 	{"CaveTime", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Time (s)"), CAVE_OFFSET(level_time[0]), 5, N_("Time available to solve cave, in seconds."), 1, 999},
 	{"CaveMaxTime", GD_TYPE_INT, 0, N_("Maximum time (s)"), CAVE_OFFSET(max_time), 1, N_("If you reach this time by collecting too many clocks, the timer will overflow."), 60, 999},
 	{"TimeValue", GD_TYPE_INT, 0, N_("Score for time"), CAVE_OFFSET(level_timevalue[0]), 5, N_("Points for each seconds remaining, when the player exits the level."), 0, 50},
@@ -339,24 +338,24 @@ gd_cave_properties[] = {
 	/* PLAYER */
 	{"", GD_TAB, 0, N_("Player")},
 	/* player */
-	{"", GD_LABEL, 0, N_("<b>Player movements</b>")},
+	{"", GD_LABEL, 0, N_("Player movements")},
 	{"DiagonalMovement", GD_TYPE_BOOLEAN, 0, N_("Diagonal movements"), CAVE_OFFSET(diagonal_movements), 1, N_("Controls if the player can move diagonally.")},
 	{"ActiveGuyIsFirst", GD_TYPE_BOOLEAN, 0, N_("Uppermost player active"), CAVE_OFFSET(active_is_first_found), 1, N_("In 1stB, cave is scrolled to the uppermost and leftmost player found, whereas in the original game to the last one. Chasing stones also follow the active player.")},
 	{"SnapEffect", GD_TYPE_ELEMENT, 0, N_("Snap element"), CAVE_OFFSET(snap_element), 1, N_("Snapping (pressing fire while moving) usually creates space, but it can create any other element.")},
 	{"PushingBoulderProb", GD_TYPE_PROBABILITY, 0, N_("Probability of pushing (%)"), CAVE_OFFSET(pushing_stone_prob), 1, N_("Chance of player managing to push a stone, every game cycle he tries. This is the normal probability.")},
-	{"", GD_LABEL, 0, N_("<b>Sweet</b>")},
+	{"", GD_LABEL, 0, N_("Sweet")},
 	{"PushingBoulderProb", GD_TYPE_PROBABILITY, 0, N_("Probability of pushing (%)"), CAVE_OFFSET(pushing_stone_prob_sweet), 1, N_("Chance of player managing to push a stone, every game cycle he tries. This is used after eating sweet.")},
 	{"PushingMegaStonesAfterSweet", GD_TYPE_BOOLEAN, 0, N_("Mega stones pushable"), CAVE_OFFSET(mega_stones_pushable_with_sweet), 1, N_("If it is true, mega stones can be pushed after eating sweet.")},
 	/* pneumatic hammer */
-	{"", GD_LABEL, 0, N_("<b>Pneumatic hammer</b>")},
+	{"", GD_LABEL, 0, N_("Pneumatic hammer")},
 	{"PneumaticHammer.frames", GD_TYPE_INT, 0, N_("Time for hammer (frames)"), CAVE_OFFSET(pneumatic_hammer_frame), 1, N_("This is the number of game frames, a pneumatic hammer is required to break a wall."), 1, 100},
 	{"PneumaticHammer.wallsreappear", GD_TYPE_BOOLEAN, 0, N_("Hammered walls reappear"), CAVE_OFFSET(hammered_walls_reappear), 1, N_("If this is set to true, walls broken with a pneumatic hammer will reappear later.")},
 	{"PneumaticHammer.wallsreappearframes", GD_TYPE_INT, 0, N_("   Timer for reappear (frames)"), CAVE_OFFSET(hammered_wall_reappear_frame), 1, N_("This sets the number of game frames, after hammered walls reappear, when the above setting is true."), 1, 200},
 	/* clock */
-	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("<b>Clock</b>")},
-	{"BonusTime", GD_TYPE_INT, 0, N_("Time bonus for clock (s)"), CAVE_OFFSET(level_bonus_time), 5, N_("Bonus time when a clock is collected."), -100, 100},
+	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("Clock")},
+	{"BonusTime", GD_TYPE_INT, 0, N_("Time bonus (s)"), CAVE_OFFSET(level_bonus_time), 5, N_("Bonus time when a clock is collected."), -100, 100},
 	/* voodoo */
-	{"", GD_LABEL, 0, N_("<b>Voodoo Doll</b>")},
+	{"", GD_LABEL, 0, N_("Voodoo Doll")},
 	{"DummyProperties.diamondcollector", GD_TYPE_BOOLEAN, 0, N_("Can collect diamonds"), CAVE_OFFSET(voodoo_collects_diamonds), 1, N_("Controls if a voodoo doll can collect diamonds for the player.")},
 	{"DummyProperties.destructable", GD_TYPE_BOOLEAN, 0, N_("Can be destroyed by explosion"), CAVE_OFFSET(voodoo_can_be_destroyed), 1, N_("Controls if the voodoo can be destroyed by an explosion nearby. If not, it is converted to a gravestone, and you get a time penalty.")},
 	{"DummyProperties.penalty", GD_TYPE_BOOLEAN, 0, N_("Dies if hit by a stone"), CAVE_OFFSET(voodoo_dies_by_stone), 1, N_("Controls if the voodoo doll dies if it is hit by a stone. Then the player gets a time penalty.")},
@@ -367,14 +366,14 @@ gd_cave_properties[] = {
 	{"AmoebaProperties.waitforhatching", GD_TYPE_BOOLEAN, 0, N_("Timer waits for hatching"), CAVE_OFFSET(amoeba_timer_wait_for_hatching), 1, N_("This determines if the amoeba timer starts before the player appearing. Amoeba can always be activated before that; but if this is set to true, the timer will not start.")},
 	{"AmoebaProperties.immediately", GD_TYPE_BOOLEAN, 0, N_("Timer started immediately"), CAVE_OFFSET(amoeba_timer_started_immediately), 1, N_("If this flag is enabled, the amoeba slow growth timer will start at the beginning of the cave, regardless of the amoeba being let free or not.")},
 	/* amoeba */
-	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("<b>Amoeba</b>")},
+	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("Amoeba")},
 	{"AmoebaThreshold", GD_TYPE_RATIO, 0, N_("Threshold (cells)"), CAVE_OFFSET(level_amoeba_threshold), 5, N_("If the amoeba grows more than this fraction of the cave, it is considered too big."), 0, 16383},
 	{"AmoebaTime", GD_TYPE_INT, 0, N_("Slow growth time (s)"), CAVE_OFFSET(level_amoeba_time), 5, N_("After this time, amoeba will grow very quickly."), 0, 999},
 	{"AmoebaGrowthProb", GD_TYPE_PROBABILITY, 0, N_("Growth ratio, slow (%)"), CAVE_OFFSET(amoeba_growth_prob), 1, N_("This sets the speed at which a slow amoeba grows.")},
 	{"AmoebaGrowthProb", GD_TYPE_PROBABILITY, 0, N_("Growth ratio, fast (%)"), CAVE_OFFSET(amoeba_fast_growth_prob), 1, N_("This sets the speed at which a fast amoeba grows.")},
 	{"AMOEBABOULDEReffect", GD_TYPE_EFFECT, 0, N_("If too big, converts to"), CAVE_OFFSET(too_big_amoeba_to), 1, N_("Controls which element an overgrown amoeba converts to.")},
 	{"AMOEBADIAMONDeffect", GD_TYPE_EFFECT, 0, N_("If enclosed, converts to"), CAVE_OFFSET(enclosed_amoeba_to), 1, N_("Controls which element an enclosed amoeba converts to.")},
-	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("<b>Amoeba 2</b>")},
+	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("Amoeba 2")},
 	{"Amoeba2Threshold", GD_TYPE_RATIO, 0, N_("Threshold (cells)"), CAVE_OFFSET(level_amoeba_2_threshold), 5, N_("If the amoeba grows more than this fraction of the cave, it is considered too big."), 0, 16383},
 	{"Amoeba2Time", GD_TYPE_INT, 0, N_("Slow growth time (s)"), CAVE_OFFSET(level_amoeba_2_time), 5, N_("After this time, amoeba will grow very quickly."), 0, 999},
 	{"Amoeba2GrowthProb", GD_TYPE_PROBABILITY, 0, N_("Growth ratio, slow (%)"), CAVE_OFFSET(amoeba_2_growth_prob), 1, N_("This sets the speed at which a slow amoeba grows.")},
@@ -388,7 +387,7 @@ gd_cave_properties[] = {
 	/* ACTIVE 1 */
 	{"", GD_TAB, 0, N_("Active elements")},
 	/* magic wall */
-	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("<b>Magic Wall</b>")},
+	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("Magic Wall")},
 	{"MagicWallTime", GD_TYPE_INT, 0, N_("Milling time (s)"), CAVE_OFFSET(level_magic_wall_time), 5, N_("Magic wall will stop after this time, and it cannot be activated again."), 0, 999},
 	{"MagicWallProperties", GD_TYPE_ELEMENT, 0, N_("Converts diamond to"), CAVE_OFFSET(magic_diamond_to), 1, N_("As a special effect, magic walls can convert diamonds to any other element.")},
 	{"MagicWallProperties", GD_TYPE_ELEMENT, 0, N_("Converts stone to"), CAVE_OFFSET(magic_stone_to), 1, N_("As a special effect, magic walls can convert stones to any other element.")},
@@ -396,7 +395,7 @@ gd_cave_properties[] = {
 	{"MagicWallProperties.waitforhatching", GD_TYPE_BOOLEAN, 0, N_("Timer waits for hatching"), CAVE_OFFSET(magic_timer_wait_for_hatching), 1, N_("This determines if the magic wall timer starts before the player appearing. Magic can always be activated before that; but if this is set to true, the timer will not start.")},
 
 	/* slime */
-	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("<b>Slime</b>")},
+	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("Slime")},
 	{"", GD_TYPE_BOOLEAN, GD_DONT_SAVE, N_("Predictable"), CAVE_OFFSET(slime_predictable), 1, N_("Controls if the predictable random generator is used for slime. It is required for compatibility with some older caves.")},
 	/* permeabilities are "always" saved; and according to the predictability, one of them is removed. */
 	{"SlimePermeability", GD_TYPE_PROBABILITY, GD_ALWAYS_SAVE, N_("Permeability (unpredictable, %)"), CAVE_OFFSET(level_slime_permeability[0]), 5, N_("This controls the rate at which elements go through the slime. Higher values represent higher probability of passing. This one is for unpredictable slime.")},
@@ -405,58 +404,68 @@ gd_cave_properties[] = {
 	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("Eats this..."), CAVE_OFFSET(slime_eats_1), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though.")},
 	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("  ... and converts to"), CAVE_OFFSET(slime_converts_1), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though.")},
 	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("Eats this..."), CAVE_OFFSET(slime_eats_2), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though.")},
-	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_(" ... and converts to"), CAVE_OFFSET(slime_converts_2), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though.")},
+	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("  ... and converts to"), CAVE_OFFSET(slime_converts_2), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though.")},
 
 	/* ACTIVE 2 */
 	{"", GD_TAB, 0, N_("More elements")},
 	/* water */
-	{"", GD_LABEL, 0, N_("<b>Water</b>")},
+	{"", GD_LABEL, 0, N_("Water")},
 	{"WaterProperties.doesnotflowdown", GD_TYPE_BOOLEAN, 0, N_("Does not flow downwards"), CAVE_OFFSET(water_does_not_flow_down), 1, N_("In CrDr, the water element had the odd property that it did not flow downwards, only in other directions. This flag emulates this behaviour.")},
 
 	/* acid */
-	{"", GD_LABEL, 0, N_("<b>Acid</b>")},
+	{"", GD_LABEL, 0, N_("Acid")},
 	{"AcidProperties", GD_TYPE_ELEMENT, 0, N_("Eats this element"), CAVE_OFFSET(acid_eats_this), 1, N_("The element which acid eats. If it cannot find any, it simply disappears.")},
 	{"AcidProperties", GD_TYPE_PROBABILITY, 0, N_("Spread ratio (%)"), CAVE_OFFSET(acid_spread_ratio), 1, N_("The probability at which an acid will explode and eat neighbouring elements.")},
 	{"ACIDEffect", GD_TYPE_EFFECT, 0, N_("Leaves this behind"), CAVE_OFFSET(acid_turns_to), 1, N_("If acid converts to an explosion puff on spreading or any other element.")},
 
 	/* biter */
-	{"", GD_LABEL, 0, N_("<b>Biter</b>")},
+	{"", GD_LABEL, 0, N_("Biter")},
 	{"BiterProperties", GD_TYPE_INT, 0, N_("Delay (frame)"), CAVE_OFFSET(biter_delay_frame), 1, N_("Number of frames biters wait between movements."), 0, 3},
 	{"BiterProperties", GD_TYPE_ELEMENT, 0, N_("Eats this"), CAVE_OFFSET(biter_eat), 1, N_("Biters eat this element. (They always eat dirt.)")},
 
 	/* bladder */
-	{"", GD_LABEL, 0, N_("<b>Bladder</b>")},
+	{"", GD_LABEL, 0, N_("Bladder")},
 	{"BladderProperties", GD_TYPE_ELEMENT, 0, N_("Converts to clock by touching"), CAVE_OFFSET(bladder_converts_by), 1, NULL},
+
+	/* expanding wall */
+	{"", GD_LABEL, 0, N_("Expanding wall")},
+	{"ExpandingWallDirection.changed", GD_TYPE_BOOLEAN, 0, N_("Direction changed"), CAVE_OFFSET(expanding_wall_changed), 1, N_("If this option is enabled, the direction of growing for the horizontal and vertical expanding wall is switched.")},
 
 	/* EFFECTS */
 	{"", GD_TAB, 0, N_("Effects")},
 	/* creature effects */
-	{"", GD_LABEL, 0, N_("<b>Creature effects</b>")},
+	{"", GD_LABEL, 0, N_("Creature effects")},
 	{"EnemyDirectionProperties.startbackwards", GD_TYPE_BOOLEAN, 0, N_("Start backwards"), CAVE_OFFSET(creatures_backwards), 1, NULL},
 	{"EnemyDirectionProperties.time", GD_TYPE_INT, 0, N_("Automatically turn (s)"), CAVE_OFFSET(creatures_direction_auto_change_time), 1, N_("If this is greater than zero, creatures will automatically change direction in every x seconds."), 0, 999},
 	{"EnemyDirectionProperties.changeathatching", GD_TYPE_BOOLEAN, 0, N_("Automatically turn on start"), CAVE_OFFSET(creatures_direction_auto_change_on_start), 1, N_("If this is set to true, creatures also turn at the start signal. If false, the first change in direction occurs only later.")},
 	/* cave effects */
-	{"", GD_LABEL, 0, N_("<b>Cave effects</b>")},
+	{"", GD_LABEL, 0, N_("Cave effects")},
 	{"EXPLOSIONEffect", GD_TYPE_EFFECT, 0, N_("Explosions convert to"), CAVE_OFFSET(explosion_to), 1, N_("This element appears in places where an explosion happens.")},
 	{"DIAMONDBIRTHEffect", GD_TYPE_EFFECT, 0, N_("Diamond births convert to"), CAVE_OFFSET(diamond_birth_to), 1, NULL},
 	{"BOMBEXPLOSIONeffect", GD_TYPE_EFFECT, 0, N_("Bombs explode to"), CAVE_OFFSET(bomb_explode_to), 1, NULL},
+	{"NITROEXPLOSIONeffect", GD_TYPE_EFFECT, 0, N_("Nitro packs explode to"), CAVE_OFFSET(nitro_explode_to), 1, NULL},
 	{"BOULDERfallingeffect", GD_TYPE_EFFECT, 0, N_("Falling stones convert to"), CAVE_OFFSET(falling_stone_to), 1, N_("When a stone begins falling, it converts to this element.")},
 	{"BOULDERbouncingeffect", GD_TYPE_EFFECT, 0, N_("Bouncing stones convert to"), CAVE_OFFSET(bouncing_stone_to), 1, N_("When a stone stops falling and rolling, it converts to this element.")},
 	{"DIAMONDfallingeffect", GD_TYPE_EFFECT, 0, N_("Falling diamonds convert to"), CAVE_OFFSET(falling_diamond_to), 1, N_("When a diamond begins falling, it converts to this element.")},
 	{"DIAMONDbouncingeffect", GD_TYPE_EFFECT, 0, N_("Bouncing diamonds convert to"), CAVE_OFFSET(bouncing_diamond_to), 1, N_("When a diamond stops falling and rolling, it converts to this element.")},
 	/* visual effects */
-	{"", GD_LABEL, 0, N_("<b>Visual effects</b>")},
+	{"", GD_LABEL, 0, N_("Visual effects")},
 	{"EXPANDINGWALLLOOKSLIKEeffect", GD_TYPE_EFFECT, 0, N_("Expanding wall looks like"), CAVE_OFFSET(expanding_wall_looks_like), 1, NULL},
 	{"DIRTLOOKSLIKEeffect", GD_TYPE_EFFECT, 0, N_("Dirt looks like"), CAVE_OFFSET(dirt_looks_like), 1, NULL},
 	/* gravity */
-	{"", GD_LABEL, 0, N_("<b>Gravitation effects</b>")},
+	{"", GD_LABEL, 0, N_("Gravitation effects")},
 	{"Gravitation", GD_TYPE_DIRECTION, 0, N_("Gravitation"), CAVE_OFFSET(gravity), 1, N_("The direction where stones and diamonds fall.")},
 	{"SkeletonsForPot", GD_TYPE_INT, 0, N_("Skeletons needed for pot"), CAVE_OFFSET(skeletons_needed_for_pot), 1, N_("The number of skeletons to be collected to be able to use a pot."), 0, 50},
 	{"GravitationChangeDelay", GD_TYPE_INT, 0, N_("Gravitation switch delay"), CAVE_OFFSET(gravity_change_time), 1, N_("The gravitation changes after a while using the gravitation switch. This option sets the number of seconds to wait."), 1, 60},
 
-	/* COMPATIBILITY */
-	{"", GD_TAB, 0, N_("Compatibility")},
-	{"", GD_LABEL, 0, N_("<b>Sound</b>")},
+	/* SOUND */
+	{"", GD_TAB, 0, N_("Sound")},
+	{"", GD_LABEL, 0, N_("Sound for elements")},
+	{"Diamond.sound", GD_TYPE_BOOLEAN, 0, N_("Diamond"), CAVE_OFFSET(diamond_sound), 1, N_("If true, falling diamonds will have sound.")},
+	{"Stone.sound", GD_TYPE_BOOLEAN, 0, N_("Stone"), CAVE_OFFSET(stone_sound), 1, N_("If true, falling and pushed stones will have sound.")},
+	{"NitroPack.sound", GD_TYPE_BOOLEAN, 0, N_("Nitro pack"), CAVE_OFFSET(nitro_sound), 1, N_("If true, falling and pushed nitro packs will have sound.")},
+	{"ExpandingWall.sound", GD_TYPE_BOOLEAN, 0, N_("Expanding wall"), CAVE_OFFSET(expanding_wall_sound), 1, N_("If true, expanding wall will have sound.")},
+	{"FallingWall.sound", GD_TYPE_BOOLEAN, 0, N_("Falling wall"), CAVE_OFFSET(falling_wall_sound), 1, N_("If true, falling wall will have sound.")},
 	{"AmoebaProperties.sound", GD_TYPE_BOOLEAN, 0, N_("Amoeba"), CAVE_OFFSET(amoeba_sound), 1, N_("Controls if the living amoeba has sound or not.")},
 	{"MagicWallProperties.sound", GD_TYPE_BOOLEAN, 0, N_("Magic wall"), CAVE_OFFSET(magic_wall_sound), 1, N_("If true, the activated magic wall will have sound.")},
 	{"SlimeProperties.sound", GD_TYPE_BOOLEAN, 0, N_("Slime"), CAVE_OFFSET(slime_sound), 1, N_("If true, the elements passing slime will have sound.")},
@@ -464,7 +473,14 @@ gd_cave_properties[] = {
 	{"BiterProperties.sound", GD_TYPE_BOOLEAN, 0, N_("Biter"), CAVE_OFFSET(biter_sound), 1, N_("Biters eating something or pushing a stone will have sound.")},
 	{"BladderProperties.sound", GD_TYPE_BOOLEAN, 0, N_("Bladder"), CAVE_OFFSET(bladder_sound), 1, N_("Bladders moving and being pushed can have sound.")},
 	{"WaterProperties.sound", GD_TYPE_BOOLEAN, 0, N_("Water"), CAVE_OFFSET(water_sound), 1, N_("If true, the cave containing water will have sound.")},
-	{"", GD_LABEL, 0, N_("<b>Compatibility</b>")},
+	{"PneumaticHammer.sound", GD_TYPE_BOOLEAN, 0, N_("Pneumatic hammer"), CAVE_OFFSET(pneumatic_hammer_sound), 1, N_("If true, using the pneumatic hammer will have sound.")},
+	{"BladderSpender.sound", GD_TYPE_BOOLEAN, 0, N_("Bladder spender"), CAVE_OFFSET(bladder_spender_sound), 1, N_("If true, the bladder spender will make sound, when the bladder appears.")},
+	{"BladderConvert.sound", GD_TYPE_BOOLEAN, 0, N_("Bladder convert"), CAVE_OFFSET(bladder_convert_sound), 1, N_("If true, the bladder converting to a clock will make sound.")},
+
+
+	/* COMPATIBILITY */
+	{"", GD_TAB, 0, N_("Compatibility")},
+	{"", GD_LABEL, 0, N_("Compatibility")},
 	{"BorderProperties.lineshift", GD_TYPE_BOOLEAN, 0, N_("Line shifting border"), CAVE_OFFSET(lineshift), 1, N_("If this is set to true, the player exiting on either side will appear one row lower or upper on the other side.")},
 	{"BorderProperties.scan", GD_TYPE_BOOLEAN, 0, N_("Scan first and last row"), CAVE_OFFSET(border_scan_first_and_last), 1, N_("Elements move on first and last row, too.")},
 	{"ShortExplosions", GD_TYPE_BOOLEAN, 0, N_("Short explosions"), CAVE_OFFSET(short_explosions), 1, N_("In 1stB, explosions were longer, took five cave frames to complete, as opposed to four in the original.")},
@@ -598,6 +614,14 @@ GdPropertyDefault gd_cave_defaults_gdash[] = {
 	{CAVE_OFFSET(biter_sound), TRUE},
 	{CAVE_OFFSET(bladder_sound), TRUE},
 	{CAVE_OFFSET(water_sound), TRUE},
+	{CAVE_OFFSET(stone_sound), TRUE},
+	{CAVE_OFFSET(diamond_sound), TRUE},
+	{CAVE_OFFSET(falling_wall_sound), TRUE},
+	{CAVE_OFFSET(expanding_wall_sound), TRUE},
+	{CAVE_OFFSET(nitro_sound), TRUE},
+	{CAVE_OFFSET(pneumatic_hammer_sound), TRUE},
+	{CAVE_OFFSET(bladder_spender_sound), TRUE},
+	{CAVE_OFFSET(bladder_convert_sound), TRUE},
 
 	/* creature effects */
 	{CAVE_OFFSET(creatures_backwards), FALSE},
@@ -607,6 +631,7 @@ GdPropertyDefault gd_cave_defaults_gdash[] = {
 	{CAVE_OFFSET(explosion_to), O_SPACE},
 	{CAVE_OFFSET(diamond_birth_to), O_DIAMOND},
 	{CAVE_OFFSET(bomb_explode_to), O_BRICK},
+	{CAVE_OFFSET(nitro_explode_to), O_SPACE},
 	{CAVE_OFFSET(falling_stone_to), O_STONE_F},
 	{CAVE_OFFSET(bouncing_stone_to), O_STONE},
 	{CAVE_OFFSET(falling_diamond_to), O_DIAMOND_F},
@@ -628,63 +653,6 @@ GdPropertyDefault gd_cave_defaults_gdash[] = {
 	{-1},
 };
 
-GdC64Color gd_c64_colors[16]= {
-#if 0
-	{ "Black", 0x000000 },
-	{ "White", 0xfcfcfc },
-	{ "Red", 0xa80000 },
-	{ "Cyan", 0x54fcfc },
-	{ "Purple", 0xa800a8 },
-	{ "Green", 0x00a800 },
-	{ "Blue", 0x0000a8 },
-	{ "Yellow", 0xfcfc00 },
-	{ "Orange", 0xa85400 },
-	{ "Brown", 0x802c00 },
-	{ "LightRed", 0xfc5454 },
-	{ "Gray1", 0x545454 },
-	{ "Gray2", 0x808080 },
-	{ "LightGreen", 0x54fc54 },
-	{ "LightBlue", 0x5454fc },
-	{ "Gray3", 0xa8a8a8 }
-#endif
-
-#if 0
-	00 00 00
-	FF FF FF
-	68 37 2B
-	70 A4 B2
-	6F 3D 86
-	58 8D 43
-	35 28 79
-	B8 C7 6F
-	6F 4F 25
-	43 39 00
-	9A 67 59
-	44 44 44
-	6C 6C 6C
-	9A D2 84
-	6C 5E B5
-	95 95 95
-#endif
-
-    /* vice new luminances */
-	{ "Black", 0x000000 },
-	{ "White", 0xffffff },
-	{ "Red", 0x894036 },
-	{ "Cyan", 0x7abfc7 },
-	{ "Purple", 0x8a46ae },
-	{ "Green", 0x68a941 },
-	{ "Blue", 0x3e31a2 },
-	{ "Yellow", 0xd0dc71 },
-	{ "Orange", 0x905f25 },
-	{ "Brown", 0x5c4700 },
-	{ "LightRed", 0xbb776d },
-	{ "Gray1", 0x555555 },
-	{ "Gray2", 0x808080 },
-	{ "LightGreen", 0xacea88 },
-	{ "LightBlue", 0x7c70da },
-	{ "Gray3", 0xababab }
-};
 
 
 /* return new element, which appears after elem is hammered. */
@@ -709,6 +677,11 @@ gd_get_hammered_element(GdElement elem)
 		case O_BRICK_NON_SLOPED:
 		case O_MAGIC_WALL:
 		case O_STEEL_EXPLODABLE:
+		case O_EXPANDING_WALL:
+		case O_V_EXPANDING_WALL:
+		case O_H_EXPANDING_WALL:
+		case O_FALLING_WALL:
+		case O_FALLING_WALL_F:
 			return O_SPACE;
 		default:
 			return O_NONE;

@@ -60,6 +60,7 @@
 static Mix_Chunk *sounds[GD_S_MAX];
 static gboolean mixer_started=FALSE;
 static GdSound snd_playing[5];
+static Mix_Music *music=NULL;
 #endif
 
 #ifdef GD_SOUND
@@ -78,11 +79,8 @@ loadsound(GdSound which, const char *filename)
 
 	g_assert(!gd_sound_is_fake(which));	
 	g_assert(mixer_started);
-	
-	if (sounds[which]!=NULL) {
-		Mix_FreeChunk(sounds[which]);
-		sounds[which]=NULL;
-	}
+	/* make sure sound isn't already loaded */	
+	g_assert(sounds[which]==NULL);
 	
 	full_filename=gd_find_file(filename);
 	if (!full_filename)	/* if cannot find file, exit now */
@@ -203,6 +201,7 @@ gd_sound_init()
 	loadsound(GD_S_TELEPORTER, "teleporter.ogg");
 
 	loadsound(GD_S_STONE, "stone.ogg");
+	loadsound(GD_S_NITRO, "nitro.ogg");
 	loadsound(GD_S_FALLING_WALL, "falling_wall.ogg");
 	loadsound(GD_S_EXPANDING_WALL, "expanding_wall.ogg");
 	loadsound(GD_S_DIAMOND_1, "diamond_1.ogg");
@@ -215,6 +214,7 @@ gd_sound_init()
 	loadsound(GD_S_DIAMOND_8, "diamond_8.ogg");
 	loadsound(GD_S_SLIME, "slime.ogg");
 	loadsound(GD_S_KEY_COLLECT, "key_collect.ogg");
+	loadsound(GD_S_DIAMOND_KEY_COLLECT, "diamond_key_collect.ogg");
 	loadsound(GD_S_BLADDER_SPENDER, "bladder_spender.ogg");
 	loadsound(GD_S_BLADDER_CONVERT, "bladder_convert.ogg");
 	loadsound(GD_S_BLADDER_MOVE, "bladder_move.ogg");
@@ -325,13 +325,78 @@ play_sounds(GdSound sound1, GdSound sound2, GdSound sound3)
 		if (gd_sound_is_looped(sound_playing(3)))
 			halt_channel(3);
 	}
-
 #endif
 }
-
 
 void
 gd_cave_play_sounds(Cave *cave)
 {
 	play_sounds(cave->sound1, cave->sound2, cave->sound3);
 }
+
+
+
+
+void
+gd_music_play_random()
+{
+#ifdef GD_SOUND
+	static GPtrArray *music_filenames=NULL;
+
+	if (!mixer_started || !gd_sdl_sound)
+		return;
+
+	/* if already playing, do nothing */	
+	if (Mix_PlayingMusic())
+		return;
+		
+	Mix_FreeMusic(music);
+	music=NULL;
+
+	if (!music_filenames) {
+		const char *name;	/* name of file */
+		const char *opened;		/* directory we use */
+		GDir *musicdir;
+		
+		music_filenames=g_ptr_array_new();
+		opened=gd_system_music_dir;
+		musicdir=g_dir_open(opened, 0, NULL);
+		if (!musicdir) {
+			/* for testing: open "music" dir in current directory. */
+			opened="music";
+			musicdir=g_dir_open(opened, 0, NULL);
+		}
+		if (!musicdir)
+			/* if still cannot open, return now */
+			return;
+		
+		while ((name=g_dir_read_name(musicdir))) {
+			if (g_str_has_suffix(name, ".ogg"))
+				g_ptr_array_add(music_filenames, g_build_filename(opened, name, NULL));
+		}
+		g_dir_close(musicdir);
+	}
+	
+	/* if loaded dir contents, but no file found */
+	if (music_filenames->len==0)
+		return;
+	
+	music=Mix_LoadMUS(g_ptr_array_index(music_filenames, g_random_int_range(0, music_filenames->len)));
+	
+	if (music)
+		Mix_PlayMusic(music, -1);
+#endif
+}
+
+void
+gd_music_stop()
+{
+#ifdef GD_SOUND
+	if (!mixer_started)
+		return;
+	
+	if (Mix_PlayingMusic())
+		Mix_HaltMusic();
+#endif
+}
+

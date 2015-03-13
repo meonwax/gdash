@@ -73,15 +73,29 @@ static void
 showheader_uncover()
 {
 	int cavename_y;
+	int len;
+	char *str;
+
 	showheader_new();
-	if (gd_show_name_of_game) {
-		/* if showing the name of the cave... */
-		gd_blittext_n(gd_screen, -1, statusbar_y1, GD_C64_WHITE, gd_caveset_data->name);
+	/* show name of game */
+	if (gd_show_name_of_game) {		/* if showing the name of the cave... */
+		len=g_utf8_strlen(gd_caveset_data->name, -1);
+		if (gd_screen->w/gd_font_width()>=len)	/* if have place for double-width font */
+			gd_blittext(gd_screen, -1, statusbar_y1, GD_C64_WHITE, gd_caveset_data->name);
+		else
+			gd_blittext_n(gd_screen, -1, statusbar_y1, GD_C64_WHITE, gd_caveset_data->name);
 		cavename_y=statusbar_y2;	/* show cave name in the second line */
-	} else
-		/* otherwise, cave name in the middle. */
+	} else		/* otherwise, cave name in the middle. */
 		cavename_y=statusbar_mid;
-	gd_blittext_printf_n(gd_screen, -1, cavename_y, GD_C64_WHITE, "%d%c, %s/%d", gd_gameplay.player_lives, GD_PLAYER_CHAR, gd_gameplay.cave->name, gd_gameplay.cave->rendered);
+
+	/* "xy players, cave ab/3" */
+	str=g_strdup_printf("%d%c, %s/%d", gd_gameplay.player_lives, GD_PLAYER_CHAR, gd_gameplay.cave->name, gd_gameplay.cave->rendered);
+	len=g_utf8_strlen(str, -1);
+	if (gd_screen->w/gd_font_width()>=len)	/* if have place for double-width font */
+		gd_blittext(gd_screen, -1, cavename_y, GD_C64_WHITE, str);
+	else
+		gd_blittext_n(gd_screen, -1, cavename_y, GD_C64_WHITE, str);
+	g_free(str);
 }
 
 static void
@@ -207,6 +221,8 @@ play_game(int start_cave, int start_level)
 	g_free(username);
 	username=name;
 	
+	gd_music_stop();
+	
 	gd_new_game(username, start_cave, start_level);
 
 	exit_game=FALSE;
@@ -238,6 +254,7 @@ play_game(int start_cave, int start_level)
 			int wait;
 			int speed_div;
 			
+			/* this is to implement fast forward */
 			speed_div=1;
 			if (gd_keystate[SDLK_f])
 				speed_div=5;
@@ -309,9 +326,11 @@ play_game(int start_cave, int start_level)
 				/* set this to false here. */
 				/* this is to prevent holding the suicide key for longer than cave->speed killing many players. */
 				suicide=FALSE;
-				
-				/* we do not do last_iterate=getticks, as do not want to miss iterate cycles */
-				last_iterate+=gd_gameplay.cave->speed/speed_div;
+
+				/* add n*cave_speed to the last_iterate, until we see that no iteration needs to be done. */
+				/* this is to handle the timer such a way that we do not try to "catch up" our lost "interrupts". */
+				while (SDL_GetTicks()>=last_iterate+gd_gameplay.cave->speed/speed_div)
+					last_iterate+=gd_gameplay.cave->speed/speed_div;
 			}
 			
 			/* CAVE DRAWING, BONUS POINTS, ... ********************************************************************* */
@@ -334,7 +353,7 @@ play_game(int start_cave, int start_level)
 						break;
 					case GD_GAME_START_ITERATE:
 						iterate=TRUE;	/* start cave movements */
-						last_iterate=SDL_GetTicks();
+						last_iterate=SDL_GetTicks();	/* remember moment we started the cave */
 						break;
 					case GD_GAME_NEXT_LEVEL:
 						caveloop=FALSE;
@@ -378,8 +397,11 @@ play_game(int start_cave, int start_level)
 						showheader_game();
 						break;
 				}
-
-				last_draw+=40;
+				
+				/* add n*40ms to the last_draw, until we see that no drawing needs to be done. */
+				/* this is to handle the timer such a way that we do not try to "catch up" our lost "interrupts". */
+				while (SDL_GetTicks()>=last_draw+40)
+					last_draw+=40;
 			}
 
 			SDL_Flip(gd_screen);
@@ -451,7 +473,7 @@ main_menu()
 	State s;
 	int x, y;
 	int waitcycle=0;
-	
+
 	SDL_FillRect(gd_screen, NULL, SDL_MapRGB(gd_screen->format, 0, 0, 0));	/* fill whole gd_screen with black */
 	animation=gd_get_title_animation();
 	animcycle=0;
@@ -459,6 +481,9 @@ main_menu()
 	count=0;
 	while(animation[count]!=NULL)
 		count++;
+
+	/* start playing after creating title animation above */
+	gd_music_play_random();
 
 	y=gd_screen->h-3*gd_line_height();
 	x=gd_blittext_n(gd_screen, 0, y, GD_C64_WHITE, "GAME: ");
@@ -678,7 +703,7 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	gd_settings_init_with_language();
+	gd_settings_init_dirs();
 
 	gd_install_log_handler();
 

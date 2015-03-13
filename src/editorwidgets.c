@@ -35,7 +35,7 @@
  * creates a small pixbuf with the specified color
  */
 static GdkPixbuf *
-color_pixbuf(GdColor rgb)
+color_pixbuf(GdColor col)
 {
 	int x, y;
     guint32 pixel;
@@ -43,8 +43,8 @@ color_pixbuf(GdColor rgb)
 	
 	gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &x, &y);
 
-    pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, FALSE, 8, x, y);
-    pixel=(((rgb>>16)&255)<<24) + (((rgb>>8)&255)<<16) + ((rgb&255)<<8);
+    pixbuf=gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, x, y);
+    pixel=(gd_color_get_r(col)<<24) + (gd_color_get_g(col)<<16) + (gd_color_get_b(col)<<8);
     gdk_pixbuf_fill (pixbuf, pixel);
 	return pixbuf;
 }
@@ -64,7 +64,7 @@ color_combo_select_custom(GtkComboBox *combo, GdColor color)
 
 	g_object_set_data(G_OBJECT(combo), GDASH_COLOR, GUINT_TO_POINTER(color));
 
-	sprintf(text, "#%02x%02x%02x", (color>>16)&255, (color>>8)&255, color&255);
+	sprintf(text, "#%02x%02x%02x", gd_color_get_r(color), gd_color_get_g(color), gd_color_get_b(color));
 	pixbuf=color_pixbuf(color);
 	gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 2, pixbuf, 1, text, -1);
 	g_object_unref(pixbuf);
@@ -77,16 +77,10 @@ color_combo_select_custom(GtkComboBox *combo, GdColor color)
 void
 gd_color_combo_set (GtkComboBox *combo, GdColor color)
 {
-	int i;
-	
-	for (i=0; i<16; i++) {
-		if (gd_c64_colors[i].rgb==color) {
-			gtk_combo_box_set_active(combo, i);
-			return;
-		}
-	}
-	
-	color_combo_select_custom(combo, color);
+	if (gd_color_is_c64(color))
+		gtk_combo_box_set_active(combo, gd_color_get_c64_index(color));
+	else
+		color_combo_select_custom(combo, color);
 }
 
 /* changed signal. for selected row 17, pops up color selection dialog;
@@ -113,9 +107,9 @@ color_combo_changed (GtkWidget *combo, gpointer data)
 		colorsel=GTK_COLOR_SELECTION (GTK_COLOR_SELECTION_DIALOG (dialog)->colorsel);
 		
 		prevcol=GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(combo), GDASH_COLOR));
-		gc.red=((prevcol>>16)&255)<<8;
-		gc.green=((prevcol>>8)&255)<<8;
-		gc.blue=((prevcol>>0)&255)<<8;
+		gc.red=gd_color_get_r(prevcol)<<8;
+		gc.green=gd_color_get_g(prevcol)<<8;
+		gc.blue=gd_color_get_b(prevcol)<<8;
 
 		gtk_color_selection_set_previous_color (colorsel, &gc);
 		gtk_color_selection_set_current_color (colorsel, &gc);
@@ -129,7 +123,7 @@ color_combo_changed (GtkWidget *combo, gpointer data)
 			GdColor color;
 			
 			gtk_color_selection_get_current_color (colorsel, &gc);
-			color=((gc.red>>8)<<16) + ((gc.green>>8)<<8) + (gc.blue>>8);
+			color=gd_color_get_from_rgb(gc.red>>8, gc.green>>8, gc.blue>>8);
 			color_combo_select_custom(GTK_COMBO_BOX(combo), color);
 		} else {
 			gd_color_combo_set(GTK_COMBO_BOX(combo), prevcol);
@@ -139,9 +133,11 @@ color_combo_changed (GtkWidget *combo, gpointer data)
 
 	} else
 	if (i<16) {
+		GdColor c;
+		
 		gtk_combo_box_get_active_iter(GTK_COMBO_BOX(combo), &iter);
-		gtk_tree_model_get(model, &iter, 0, &i, -1);
-		g_object_set_data(G_OBJECT(combo), GDASH_COLOR, GUINT_TO_POINTER(i));
+		gtk_tree_model_get(model, &iter, 0, &c, -1);
+		g_object_set_data(G_OBJECT(combo), GDASH_COLOR, GUINT_TO_POINTER(c));
 	}	
 }
 
@@ -176,12 +172,12 @@ gd_color_combo_new (const GdColor color)
 
 	/* tree store for colors. every combo has its own, as the custom color can be different. */
     store = gtk_tree_store_new (3, G_TYPE_UINT, G_TYPE_STRING, GDK_TYPE_PIXBUF);
-    for (i = 0; i < 16; i++) {
+    for (i = 0; i<16; i++) {
         GdkPixbuf *pixbuf;
 
-        pixbuf=color_pixbuf(gd_c64_colors[i].rgb);
+        pixbuf=color_pixbuf(gd_c64_color(i));
         gtk_tree_store_append (store, &iter, NULL);
-        gtk_tree_store_set (store, &iter, 0, gd_c64_colors[i].rgb, 1, _(gd_c64_colors[i].name), 2, pixbuf, -1);
+        gtk_tree_store_set (store, &iter, 0, gd_c64_color(i), 1, _(gd_color_get_visible_name(gd_c64_color(i))), 2, pixbuf, -1);
         g_object_unref (pixbuf);
     }
     gtk_tree_store_append (store, &iter, NULL);	/* will be the separator */
@@ -329,8 +325,8 @@ element_button_da_clicked(GtkWidget *da, GdkEventButton *event, gpointer data)
 		gtk_dialog_response(dialog, element);
 	else {
 		/* if not modal, it is a stay-open element box. */
-		/* close if right mouse button; stay open for others. */
-		if (event->button==3)
+		/* close if left mouse button; stay open for others. */
+		if (event->button==1)
 			gtk_widget_destroy(GTK_WIDGET(dialog));
 	}
 }
@@ -385,7 +381,7 @@ element_button_clicked_func(GtkWidget *button, gboolean stay_open)
 		/* for effects */		
 		O_DIRT2, O_DIAMOND_F, O_STONE_F, O_MEGA_STONE_F, O_FALLING_WALL_F, O_NITRO_PACK_F, O_PRE_PL_1, O_PRE_PL_2, O_PRE_PL_3, O_PLAYER, O_PLAYER_BOMB, O_PLAYER_STIRRING, O_OUTBOX, O_INVIS_OUTBOX, O_TIME_PENALTY, O_GRAVESTONE,
 
-		O_BLADDER_1, O_BLADDER_2, O_BLADDER_3, O_BLADDER_4, O_BLADDER_5, O_BLADDER_6, O_BLADDER_7, O_BLADDER_8, O_BLADDER_9,
+		O_BLADDER_1, O_BLADDER_2, O_BLADDER_3, O_BLADDER_4, O_BLADDER_5, O_BLADDER_6, O_BLADDER_7, O_BLADDER_8, O_SPACE,
 		O_COW_ENCLOSED_1, O_COW_ENCLOSED_2, O_COW_ENCLOSED_3, O_COW_ENCLOSED_4, O_COW_ENCLOSED_5, O_COW_ENCLOSED_6, O_COW_ENCLOSED_7,
 
 		O_WATER_1, O_WATER_2, O_WATER_3, O_WATER_4, O_WATER_5, O_WATER_6, O_WATER_7, O_WATER_8,

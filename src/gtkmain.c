@@ -67,9 +67,9 @@ static int mouse_cell_x=-1, mouse_cell_y=-1, mouse_cell_click=0;
 static void init_mainwindow (Cave *);
 
 static gboolean
-fullscreen_idle_func (gpointer data)
+fullscreen_idle_func(gpointer data)
 {
-	gtk_window_fullscreen (GTK_WINDOW(data));
+	gtk_window_fullscreen(GTK_WINDOW(data));
 	return FALSE;
 }
 
@@ -78,18 +78,18 @@ fullscreen_idle_func (gpointer data)
    so we put fullscreening call into a low priority idle function, which will be called
    after all window resizing & the like did take place. */
 void
-set_fullscreen (void)
+set_fullscreen(void)
 {
 	if (gd_gameplay.cave && fullscreen) {
-		gtk_widget_hide (main_window.menubar);
-		gtk_widget_hide (main_window.toolbar);
+		gtk_widget_hide(main_window.menubar);
+		gtk_widget_hide(main_window.toolbar);
 		g_idle_add_full(G_PRIORITY_LOW, (GSourceFunc) fullscreen_idle_func, main_window.window, NULL);
 	}
 	else {
 		g_idle_remove_by_data (main_window.window);
 		gtk_window_unfullscreen (GTK_WINDOW (main_window.window));
-		gtk_widget_show (main_window.menubar);
-		gtk_widget_show (main_window.toolbar);
+		gtk_widget_show(main_window.menubar);
+		gtk_widget_show(main_window.toolbar);
 	}
 }
 
@@ -172,7 +172,7 @@ game_over_without_highscore()
 /************************************************
  *
  *	EVENTS
- *	
+ *
  */
 
 /* closing the window by the window manager */
@@ -184,7 +184,7 @@ delete_event (GtkWidget * widget, GdkEvent * event, gpointer data)
 	return TRUE;
 }
 
-/* keypress. key_* can be event_type==gdk_key_press, as we 
+/* keypress. key_* can be event_type==gdk_key_press, as we
    connected this function to key press and key release.
  */
 static gboolean
@@ -263,7 +263,7 @@ static gboolean
 drawing_area_expose_event (const GtkWidget * widget, const GdkEventExpose * event, const gpointer data)
 {
 	int x, y, x1, y1, x2, y2;
-	
+
 	if (!widget->window)
 		return FALSE;
 
@@ -305,7 +305,7 @@ focus_out_event (const GtkWidget * widget, const GdkEvent * event, const gpointe
 /**********************************-
  *
  *	CALLBACKS
- *	
+ *
  */
 
 static void
@@ -399,7 +399,7 @@ static void
 toggle_pause_cb (GtkWidget * widget, gpointer data)
 {
 	paused=gtk_toggle_action_get_active (GTK_TOGGLE_ACTION (widget));
-	
+
 	if (paused)
 		gd_no_sound();
 }
@@ -423,7 +423,7 @@ showheader()
 	Cave *cave=gd_gameplay.cave;
 	int time;
 
-	/* show time */	
+	/* show time */
 	time=gd_cave_time_show(cave, cave->time);
 	if (gd_time_min_sec)
 		gd_label_set_markup_printf(GTK_LABEL(main_window.label_time), _("Time: <b>%02d:%02d</b>"), time/60, time%60);
@@ -442,11 +442,11 @@ showheader()
 	else
 		/* did not already count diamonds */
 		gd_label_set_markup_printf (GTK_LABEL(main_window.label_diamonds), _("Diamonds: <b>??""?</b>"));	/* to avoid trigraph ??< */
-	
+
 
 	/* skeletons collected */
 	gd_label_set_markup_printf (GTK_LABEL(main_window.label_skeletons), _("Skeletons: <b>%d</b>"), cave->skeletons_collected);
-	
+
 	/* keys label */
 	gd_label_set_markup_printf (GTK_LABEL(main_window.label_key1), _("Key 1: <b>%d</b>"), cave->key1);
 	gd_label_set_markup_printf (GTK_LABEL(main_window.label_key2), _("Key 2: <b>%d</b>"), cave->key2);
@@ -454,21 +454,21 @@ showheader()
 
 	/* gravity label */
 	gd_label_set_markup_printf (GTK_LABEL(main_window.label_gravity_will_change), _("Gravity changes: <b>%d</b>"), gd_cave_time_show(cave, cave->gravity_will_change));
-	
+
 
 	/* lives reamining in game */
 	gd_label_set_markup_printf (GTK_LABEL(main_window.label_lives), _("Lives: <b>%d</b>"), gd_gameplay.player_lives);
 
 	if (editor_window && gd_show_test_label) {
 		gd_label_set_markup_printf(GTK_LABEL(main_window.label_variables),
-								"Speed: %dms, Amoeba timer: %ds (%s), %ds (%s), Magic wall timer: %ds\n"
+								"Speed: %dms, Amoeba timer: %ds %d, %ds %d, Magic wall timer: %ds\n"
 								"Expanding wall: %s, Creatures: %ds, %s, Gravity: %s\n"
 								"Kill player: %s, Sweet eaten: %s, Diamond key: %s",
 								cave->speed,
 								gd_cave_time_show(cave, cave->amoeba_time),
-								cave->amoeba_started?"alive":"sleeping",
+								cave->amoeba_state,
 								gd_cave_time_show(cave, cave->amoeba_2_time),
-								cave->amoeba_2_started?"alive":"sleeping",
+								cave->amoeba_2_state,
 								gd_cave_time_show(cave, cave->magic_wall_time),
 // XXX							cave->magic_wall_state,
 								cave->expanding_wall_changed?"vertical":"horizontal",
@@ -492,7 +492,7 @@ gboolean title_animation_func(gpointer data)
 {
 	static int animcycle=0;
 	int count;
-	
+
 	/* count the number of frames. */
 	count=0;
 	while (main_window.title_pixmaps[count]!=NULL)
@@ -508,7 +508,7 @@ gboolean title_animation_func(gpointer data)
 void title_animation_remove()
 {
 	int i;
-	
+
 	g_source_remove_by_user_data(title_animation_func);
 	i=0;
 	while (main_window.title_pixmaps[i]!=NULL) {
@@ -518,14 +518,13 @@ void title_animation_remove()
 	g_free(main_window.title_pixmaps);
 	main_window.title_pixmaps=NULL;
 }
- 
+
 static void
 init_mainwindow (Cave *cave)
 {
-
 	if (cave) {
 		char *name_escaped;
-		
+
 		/* cave drawing */
 		if (main_window.title_image)
 			gtk_widget_destroy (main_window.title_image->parent);	/* bit tricky, destroy the viewport which was automatically added */
@@ -555,11 +554,11 @@ init_mainwindow (Cave *cave)
 		gtk_widget_set_size_request(main_window.drawing_area, (cave->x2-cave->x1+1)*gd_cell_size_game, (cave->y2-cave->y1+1)*gd_cell_size_game);
 
 		/* show cave data */
-		gtk_widget_show (main_window.labels);
+		gtk_widget_show(main_window.labels);
 		if (editor_window && gd_show_test_label)
-			gtk_widget_show (main_window.label_variables);
+			gtk_widget_show(main_window.label_variables);
 		else
-			gtk_widget_hide (main_window.label_variables);
+			gtk_widget_hide(main_window.label_variables);
 		gtk_widget_hide(main_window.error_hbox);
 
 		name_escaped=g_markup_escape_text(cave->name, -1);
@@ -573,7 +572,7 @@ init_mainwindow (Cave *cave)
 
 		if (!main_window.title_image) {
 			int w, h;
-			
+
 			/* title screen */
 			main_window.title_pixmaps=gd_create_title_animation();
 			main_window.title_image=gtk_image_new();
@@ -582,14 +581,14 @@ init_mainwindow (Cave *cave)
 			g_timeout_add(40, title_animation_func, title_animation_func);
 			gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (main_window.scroll_window), main_window.title_image);
 
-			/* resize the scrolling window so the image fits */			
+			/* resize the scrolling window so the image fits - a bit larger than the image so scroll bars do not appear*/
 			gdk_drawable_get_size(GDK_DRAWABLE(main_window.title_pixmaps[0]), &w, &h);
 			gtk_widget_set_size_request(main_window.scroll_window, w+24, h+24);
 		}
 
 		/* hide cave data */
-		gtk_widget_hide (main_window.labels);
-		gtk_widget_hide (main_window.label_variables);
+		gtk_widget_hide(main_window.labels);
+		gtk_widget_hide(main_window.label_variables);
 		if (gd_has_new_error()) {
 			gtk_widget_show(main_window.error_hbox);
 			gtk_label_set(GTK_LABEL(main_window.error_label), ((GdErrorMessage *)(g_list_last(gd_errors)->data))->message);
@@ -605,11 +604,16 @@ init_mainwindow (Cave *cave)
 	set_fullscreen ();
 
 	/* enable menus and buttons of game */
-	gtk_action_group_set_sensitive (main_window.actions_title, cave==NULL && !editor_window);
-	gtk_action_group_set_sensitive (main_window.actions_game, cave!=NULL);
-	gtk_action_group_set_sensitive (main_window.actions_snapshot, gd_gameplay.snapshot_cave!=NULL);
+	gtk_action_group_set_sensitive(main_window.actions_title, cave==NULL && !editor_window);
+	gtk_action_group_set_sensitive(main_window.actions_game, cave!=NULL);
+	gtk_action_group_set_sensitive(main_window.actions_snapshot, gd_gameplay.snapshot_cave!=NULL);
+	/* if playing a cave or editor window exists, no music. */
+	if (cave || editor_window)
+		gd_music_stop();
+	else
+		gd_music_play_random();
 	if (editor_window)
-		gtk_widget_set_sensitive (editor_window, cave == NULL);
+		gtk_widget_set_sensitive(editor_window, cave == NULL);
 }
 
 /* SCROLLING
@@ -628,15 +632,15 @@ scroll(const Cave *cave, gboolean exact_scroll)
 	gboolean out_of_window=FALSE;
 	int i;
 	int player_x, player_y;
-	
+
 	player_x=cave->player_x-cave->x1;
 	player_y=cave->player_y-cave->y1;
 	/* hystheresis size is this, multiplied by two.
 	 * so player can move half the window without scrolling. */
-	int scroll_start_x=main_window.scroll_window->allocation.width / 4;
-	int scroll_to_x=main_window.scroll_window->allocation.width / 8;
-	int scroll_start_y=main_window.scroll_window->allocation.height / 4;
-	int scroll_to_y=main_window.scroll_window->allocation.height / 8;
+	int scroll_start_x=main_window.scroll_window->allocation.width/4;
+	int scroll_to_x=main_window.scroll_window->allocation.width/8;
+	int scroll_start_y=main_window.scroll_window->allocation.height/4;
+	int scroll_to_y=main_window.scroll_window->allocation.height/8;
 
 	/* get the size of the window so we know where to place player.
 	 * first guess is the middle of the screen.
@@ -653,10 +657,10 @@ scroll(const Cave *cave, gboolean exact_scroll)
 	if (exact_scroll)
 		scroll_desired_x=scroll_center_x;
 	else {
-		if (adjustment->value + scroll_start_x < scroll_center_x)
+		if (adjustment->value+scroll_start_x<scroll_center_x)
 			scroll_desired_x=scroll_center_x-scroll_to_x;
-		if (adjustment->value-scroll_start_x > scroll_center_x)
-			scroll_desired_x=scroll_center_x + scroll_to_x;
+		if (adjustment->value-scroll_start_x>scroll_center_x)
+			scroll_desired_x=scroll_center_x+scroll_to_x;
 	}
 	scroll_desired_x=CLAMP(scroll_desired_x, 0, adjustment->upper-adjustment->step_increment-adjustment->page_increment);
 	/* check if active player is outside drawing area. if yes, we should wait for scrolling */
@@ -669,19 +673,19 @@ scroll(const Cave *cave, gboolean exact_scroll)
 	 * gets faster with distance.
 	 * minimum speed is 1, to allow scrolling precisely to the desired positions (important at borders).
 	 */
-	if (scroll_speed_x<ABS (scroll_desired_x-adjustment->value)/12+1)
+	if (scroll_speed_x<ABS(scroll_desired_x-adjustment->value)/12+1)
 		scroll_speed_x++;
-	if (scroll_speed_x>ABS (scroll_desired_x-adjustment->value)/12+1)
+	if (scroll_speed_x>ABS(scroll_desired_x-adjustment->value)/12+1)
 		scroll_speed_x--;
-	if (adjustment->value < scroll_desired_x) {
-		for (i=0; i < scroll_speed_x; i++)
-			if (adjustment->value < scroll_desired_x)
+	if (adjustment->value<scroll_desired_x) {
+		for (i=0; i<scroll_speed_x; i++)
+			if ((int)adjustment->value<scroll_desired_x)
 				adjustment->value++;
 		gtk_adjustment_value_changed (adjustment);
 	}
 	if (adjustment->value > scroll_desired_x) {
 		for (i=0; i < scroll_speed_x; i++)
-			if (adjustment->value > scroll_desired_x)
+			if ((int)adjustment->value>scroll_desired_x)
 				adjustment->value--;
 		gtk_adjustment_value_changed (adjustment);
 	}
@@ -703,23 +707,23 @@ scroll(const Cave *cave, gboolean exact_scroll)
 		if (cave->player_y>=cave->y1 && cave->player_y<=cave->y2)
 			out_of_window=TRUE;
 
-	if (scroll_speed_y < ABS (scroll_desired_y-adjustment->value) / 12 + 1)
+	if (scroll_speed_y<ABS(scroll_desired_y-adjustment->value)/12+1)
 		scroll_speed_y++;
-	if (scroll_speed_y > ABS (scroll_desired_y-adjustment->value) / 12 + 1)
+	if (scroll_speed_y>ABS(scroll_desired_y-adjustment->value)/12+1)
 		scroll_speed_y--;
 	if (adjustment->value < scroll_desired_y) {
 		for (i=0; i < scroll_speed_y; i++)
-			if (adjustment->value < scroll_desired_y)
+			if ((int)adjustment->value < scroll_desired_y)
 				adjustment->value++;
 		gtk_adjustment_value_changed (adjustment);
 	}
 	if (adjustment->value > scroll_desired_y) {
 		for (i=0; i < scroll_speed_y; i++)
-			if (adjustment->value > scroll_desired_y)
+			if ((int)adjustment->value > scroll_desired_y)
 				adjustment->value--;
 		gtk_adjustment_value_changed (adjustment);
 	}
-	
+
 	return out_of_window;
 }
 
@@ -733,7 +737,7 @@ drawcave (Cave *cave)
 
 	g_return_if_fail(gd_gameplay.cave!=NULL);
 	g_return_if_fail(gd_gameplay.gfx_buffer!=NULL);
-	
+
 	gd_drawcave_game(gd_gameplay.cave, gd_gameplay.gfx_buffer, gd_gameplay.bonus_life_flash!=0, paused);
 
 	for (y=cave->y1, yd=0; y <= cave->y2; y++, yd++) {
@@ -794,14 +798,14 @@ typedef struct _gd_jump_dialog {
 	GtkWidget *image;
 } GDJumpDialog;
 
-/* keypress. key_* can be event_type==gdk_key_press, as we 
+/* keypress. key_* can be event_type==gdk_key_press, as we
    connected this function to key press and key release.
  */
 static gboolean
 new_game_keypress_event (const GtkWidget * widget, const GdkEventKey * event, const GDJumpDialog * jump_dialog)
 {
 	int level=gtk_range_get_value (GTK_RANGE (jump_dialog->spin_level));
-	
+
 	switch (event->keyval) {
 	case GDK_Left:
 		level--;
@@ -861,7 +865,7 @@ new_game_cb (const GtkWidget * widget, const gpointer data)
 		return;
 	}
 
-	jump_dialog.dialog=gtk_dialog_new_with_buttons (_("Select cave to play"), GTK_WINDOW (main_window.window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_JUMP_TO, GTK_RESPONSE_ACCEPT, NULL);
+	jump_dialog.dialog=gtk_dialog_new_with_buttons(_("Select cave to play"), GTK_WINDOW(main_window.window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_JUMP_TO, GTK_RESPONSE_ACCEPT, NULL);
 	gtk_dialog_set_default_response (GTK_DIALOG (jump_dialog.dialog), GTK_RESPONSE_ACCEPT);
 	gtk_window_set_resizable (GTK_WINDOW (jump_dialog.dialog), FALSE);
 
@@ -970,7 +974,7 @@ iterate_int (const gpointer data)
 	/* iterate cave if needed */
 	if (!paused && !gd_gameplay.out_of_window) {
 		GdDirection player_move;
-		
+
 		player_move=gd_direction_from_keypress(up, down, left, right);
 		no_more=gd_game_iterate_cave(player_move, fire, key_suicide, restart);
 		showheader();
@@ -994,20 +998,20 @@ main_int (const gpointer data)
 	/* if no cave to work on, just stop. */
 	if (!gd_gameplay.cave)
 		return FALSE;
-	
+
 	state=gd_game_main_int();
 	drawcave (gd_gameplay.cave);
-	
+
 	switch (state) {
 		case GD_GAME_NOTHING:
 		case GD_GAME_BONUS_SCORE:
 			/* we should continue. */
 			showheader();
 			break;
-		
+
 		case GD_GAME_COVER_START:
 			break;
-	
+
 		case GD_GAME_STOP:
 			gd_main_stop_game();
 			return FALSE;	/* remove interrupt */
@@ -1018,12 +1022,12 @@ main_int (const gpointer data)
 				game_over_highscore();			/* achieved a high score! */
 			else
 				game_over_without_highscore();			/* no high score */
-			return FALSE;		
+			return FALSE;
 
 		case GD_GAME_START_ITERATE:
 			g_timeout_add (gd_gameplay.cave->speed, iterate_int, main_window.window);
 			break;
-	
+
 		case GD_GAME_NEXT_LEVEL:
 			gd_main_start_level(NULL);
 			return FALSE;
@@ -1042,10 +1046,10 @@ void
 gd_main_start_level(const Cave *snapshot_cave)
 {
 	gboolean success;
-	
+
 	uninstall_timers();
 	success=gd_game_start_level(snapshot_cave);
-	
+
 	restart=FALSE;
 
 	if (!success) {
@@ -1054,7 +1058,7 @@ gd_main_start_level(const Cave *snapshot_cave)
 		g_warning("refused to start level");
 		return;
 	}
-	
+
 	gd_select_pixbuf_colors(gd_gameplay.cave->color0, gd_gameplay.cave->color1, gd_gameplay.cave->color2, gd_gameplay.cave->color3, gd_gameplay.cave->color4, gd_gameplay.cave->color5);
 	init_mainwindow(gd_gameplay.cave);
 	showheader();
@@ -1063,7 +1067,7 @@ gd_main_start_level(const Cave *snapshot_cave)
 	g_timeout_add (40, main_int, main_window.window);	/* 40 ms=25 fps */
 	if (!paused)
 		gtk_window_present(GTK_WINDOW(main_window.window));
-	
+
 }
 
 
@@ -1078,6 +1082,7 @@ static void
 cave_editor_cb()
 {
 	gd_open_cave_editor();
+	/* to be sure no cave is playing. this will also stop music. */
 	init_mainwindow(NULL);
 }
 
@@ -1087,7 +1092,7 @@ recent_chooser_activated_cb(GtkRecentChooser *chooser, gpointer data)
 {
 	GtkRecentInfo *current;
 	char *filename_utf8, *filename;
-	
+
 	current=gtk_recent_chooser_get_current_item(chooser);
 	/* we do not support non-local files */
 	if (!gtk_recent_info_is_local(current)) {
@@ -1099,15 +1104,15 @@ recent_chooser_activated_cb(GtkRecentChooser *chooser, gpointer data)
 		return;
 	}
 
-	/* if the edited caveset is to be saved, but user cancels */	
+	/* if the edited caveset is to be saved, but user cancels */
 	if (!gd_discard_changes(main_window.window))
 		return;
-	
+
 	filename_utf8=gtk_recent_info_get_uri_display(current);
 	filename=g_filename_from_utf8(filename_utf8, -1, NULL, NULL, NULL);
 	/* ask for save first? */
 	gd_open_caveset_in_ui(filename, gd_use_bdcff_highscore);
-	
+
 	/* things to do after loading. */
 	gd_main_window_set_title();
 	if (gd_has_new_error())
@@ -1163,7 +1168,7 @@ gd_create_main_window (void)
 	static GtkActionEntry action_entries_snapshot[]={
 		{"RevertToSnapshot", GTK_STOCK_UNDO, N_("_Revert to snapshot"), "F6", NULL, G_CALLBACK(load_snapshot_cb)},
 	};
-	
+
 	static GtkToggleActionEntry action_entries_toggle[]={
 		{"PauseGame", GTK_STOCK_MEDIA_PAUSE, NULL, "space", N_("Pause game"), G_CALLBACK(toggle_pause_cb), FALSE},
 		{"FullScreen", GTK_STOCK_FULLSCREEN, NULL, "F11", N_("Fullscreen mode during play"), G_CALLBACK(toggle_fullscreen_cb), FALSE},
@@ -1180,7 +1185,7 @@ gd_create_main_window (void)
 		"<menuitem action='OpenCavesDir'/>"
 		"<menuitem action='LoadInternal'/>"
 		"<separator/>"
-		"<menuitem action='CaveEditor'/>" 
+		"<menuitem action='CaveEditor'/>"
 		"<separator/>"
 		"<menuitem action='SaveFile'/>"
 		"<menuitem action='SaveAsFile'/>"
@@ -1208,7 +1213,7 @@ gd_create_main_window (void)
 		"<menuitem action='About'/>"
 		"</menu>"
 		"</menubar>"
-		
+
 		"<toolbar name='ToolBar'>"
 		"<toolitem action='NewGame'/>"
 		"<toolitem action='EndGame'/>"
@@ -1284,7 +1289,7 @@ gd_create_main_window (void)
 		GtkWidget *menuitem=gtk_menu_item_new_with_label (names[i]);
 
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menuitem);
-		gtk_widget_show (menuitem);
+		gtk_widget_show(menuitem);
 		g_signal_connect (G_OBJECT (menuitem), "activate", G_CALLBACK(load_internal_cb), GINT_TO_POINTER (i));
 		i++;
 	}
@@ -1300,7 +1305,7 @@ gd_create_main_window (void)
 	g_signal_connect(G_OBJECT(recent_chooser), "item-activated", G_CALLBACK(recent_chooser_activated_cb), NULL);
 
 	g_object_unref (ui);
-	
+
 	main_window.labels=gtk_vbox_new(FALSE, 0);
 	gtk_box_pack_start (GTK_BOX(vbox), main_window.labels, FALSE, FALSE, 0);
 
@@ -1336,7 +1341,7 @@ gd_create_main_window (void)
 
 	main_window.label_variables=gtk_label_new(NULL);
 	gtk_box_pack_start (GTK_BOX (vbox), main_window.label_variables, FALSE, FALSE, 0);
-	
+
 	hbox=gtk_hbox_new(FALSE, 6);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox), gtk_image_new_from_stock(GTK_STOCK_DIALOG_ERROR, GTK_ICON_SIZE_MENU), FALSE, FALSE, 0);
@@ -1348,7 +1353,7 @@ gd_create_main_window (void)
 }
 
 
-/**
+/*
 	main()
 	function
  */
@@ -1387,29 +1392,33 @@ main (int argc, char *argv[])
 	/* show license? */
 	if (gd_param_license) {
 		char *wrapped=gd_wrap_text(gd_about_license, 72);
-		
+
 		g_print("%s", wrapped);
 		g_free(wrapped);
 		return 0;
 	}
 
+	gd_install_log_handler();
+
+	gd_settings_init_dirs();
+	gd_load_settings();
+
+	gtk_set_locale();
+	gd_settings_set_locale();
+	
 	gtk_init (&argc, &argv);
-	
-	gd_settings_init_with_language();
-	textdomain(PACKAGE);
-	
-	gd_install_log_handler();	
+
+	gd_settings_init_translation();
 
 	gd_cave_init();
 	gd_cave_db_init();
 	gd_cave_sound_db_init();
 	gd_c64_import_init_tables();
 
-	gd_load_settings();
 	gd_caveset_clear();	/* this also creates the default cave */
-	
+
 	gd_clear_error_flag();
-	
+
 	gd_gameplay.wait_before_game_over=FALSE;
 
 	/* LOAD A CAVESET FROM A FILE, OR AN INTERNAL ONE */
@@ -1424,7 +1433,7 @@ main (int argc, char *argv[])
 		if (!gd_caveset_load_from_internal (gd_param_internal-1, gd_user_config_dir))
 			g_critical (_("%d: no such internal caveset"), gd_param_internal);
 	}
-	
+
 	/* if failed or nothing requested, load default */
 	if (gd_caveset==NULL)
 		gd_caveset_load_from_internal (0, gd_user_config_dir);
@@ -1432,7 +1441,7 @@ main (int argc, char *argv[])
 	/* always load c64 graphics, as it is the builtin, and we need an icon for the theme selector. */
 	gd_loadcells_default();
 	gd_create_pixbuf_for_builtin_gfx();
-	
+
 	/* load other theme, if specified in config. */
 	if (gd_theme!=NULL && !g_str_equal(gd_theme, "")) {
 		if (!gd_loadcells_file(gd_theme)) {
@@ -1495,7 +1504,7 @@ main (int argc, char *argv[])
 	gd_main_window_set_title ();
 
 	gd_sound_init();
-	
+
 	init_mainwindow (NULL);
 
 	if (gd_param_cave) {
@@ -1504,13 +1513,13 @@ main (int argc, char *argv[])
 	}
 	else if (editor)
 		cave_editor_cb (NULL, &main_window);
-
-	gtk_main ();
 	
+	gtk_main ();
+
 	gd_save_highscore(gd_user_config_dir);
 
 	gd_save_settings();
-	
+
 	return 0;
 }
 

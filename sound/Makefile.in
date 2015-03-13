@@ -57,9 +57,9 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(pkgdatadir)"
-pkgdataDATA_INSTALL = $(INSTALL_DATA)
-DATA = $(pkgdata_DATA)
+am__installdirs = "$(DESTDIR)$(sounddir)"
+soundDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(sound_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
@@ -82,6 +82,7 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
 GLIB_CFLAGS = @GLIB_CFLAGS@
 GLIB_GENMARSHAL = @GLIB_GENMARSHAL@
 GLIB_LIBS = @GLIB_LIBS@
@@ -136,6 +137,7 @@ USE_NLS = @USE_NLS@
 VERSION = @VERSION@
 XGETTEXT = @XGETTEXT@
 XGETTEXT_015 = @XGETTEXT_015@
+XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
 ac_ct_CC = @ac_ct_CC@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -203,6 +205,7 @@ sounddata = \
 	diamond_7.ogg \
 	diamond_8.ogg \
 	diamond_collect.ogg \
+	diamond_key_collect.ogg \
 	door_open.ogg \
 	expanding_wall.ogg \
 	explosion.ogg \
@@ -212,6 +215,7 @@ sounddata = \
 	gravity_change.ogg \
 	key_collect.ogg \
 	magic_wall.ogg \
+	nitro.ogg \
 	nitro_explosion.ogg \
 	pneumatic_collect.ogg \
 	pneumatic.ogg \
@@ -241,7 +245,8 @@ sounddata = \
 	wall_reappear.ogg \
 	water.ogg
 
-@SOUND_TRUE@pkgdata_DATA = $(sounddata)
+@SOUND_TRUE@sounddir = $(pkgdatadir)/sound
+@SOUND_TRUE@sound_DATA = $(sounddata)
 EXTRA_DIST = $(sounddata)
 all: all-am
 
@@ -276,22 +281,22 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 uninstall-info-am:
-install-pkgdataDATA: $(pkgdata_DATA)
+install-soundDATA: $(sound_DATA)
 	@$(NORMAL_INSTALL)
-	test -z "$(pkgdatadir)" || $(mkdir_p) "$(DESTDIR)$(pkgdatadir)"
-	@list='$(pkgdata_DATA)'; for p in $$list; do \
+	test -z "$(sounddir)" || $(mkdir_p) "$(DESTDIR)$(sounddir)"
+	@list='$(sound_DATA)'; for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  f=$(am__strip_dir) \
-	  echo " $(pkgdataDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(pkgdatadir)/$$f'"; \
-	  $(pkgdataDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(pkgdatadir)/$$f"; \
+	  echo " $(soundDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(sounddir)/$$f'"; \
+	  $(soundDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(sounddir)/$$f"; \
 	done
 
-uninstall-pkgdataDATA:
+uninstall-soundDATA:
 	@$(NORMAL_UNINSTALL)
-	@list='$(pkgdata_DATA)'; for p in $$list; do \
+	@list='$(sound_DATA)'; for p in $$list; do \
 	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(pkgdatadir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(pkgdatadir)/$$f"; \
+	  echo " rm -f '$(DESTDIR)$(sounddir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(sounddir)/$$f"; \
 	done
 tags: TAGS
 TAGS:
@@ -331,7 +336,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(DATA)
 installdirs:
-	for dir in "$(DESTDIR)$(pkgdatadir)"; do \
+	for dir in "$(DESTDIR)$(sounddir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -376,7 +381,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-pkgdataDATA
+install-data-am: install-soundDATA
 
 install-exec-am:
 
@@ -402,16 +407,16 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-info-am uninstall-pkgdataDATA
+uninstall-am: uninstall-info-am uninstall-soundDATA
 
 .PHONY: all all-am check check-am clean clean-generic distclean \
 	distclean-generic distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-exec \
 	install-exec-am install-info install-info-am install-man \
-	install-pkgdataDATA install-strip installcheck installcheck-am \
+	install-soundDATA install-strip installcheck installcheck-am \
 	installdirs maintainer-clean maintainer-clean-generic \
 	mostlyclean mostlyclean-generic pdf pdf-am ps ps-am uninstall \
-	uninstall-am uninstall-info-am uninstall-pkgdataDATA
+	uninstall-am uninstall-info-am uninstall-soundDATA
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

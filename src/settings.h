@@ -25,11 +25,16 @@ typedef enum _scaling_type {
 	GD_SCALING_3X,
 	GD_SCALING_3X_BILINEAR,	/* 3x with interpolation */
 	GD_SCALING_3X_SCALE3X,	/* 3x with scale3x */
+	GD_SCALING_4X,
+	GD_SCALING_4X_BILINEAR,	/* 4x with interpolation */
+	GD_SCALING_4X_SCALE4X,	/* 4x with scale2x applied twice */
 	GD_SCALING_MAX,
 } GdScalingType;
 
 extern const gchar *gd_scaling_name[];
 extern const int gd_scaling_scale[];
+
+extern const gchar *gd_languages_names[];
 
 /* command line parameters */
 extern int gd_param_cave, gd_param_level, gd_param_internal;
@@ -45,6 +50,8 @@ extern gboolean gd_show_test_label;	/* label with cave variables in tests */
 extern int gd_editor_window_width;	/* window size */
 extern int gd_editor_window_height;	/* window size */
 
+extern int gd_language;
+
 /* settings */
 extern gboolean gd_easy_play;
 extern gboolean gd_time_min_sec;
@@ -56,12 +63,13 @@ extern gboolean gd_show_preview;
 extern gboolean gd_allow_dirt_mod;
 extern gboolean gd_use_bdcff_highscore;
 extern gboolean gd_show_name_of_game;
+
+extern char *gd_theme;
+
 extern GdScalingType gd_cell_scale_game;
 extern gboolean gd_pal_emulation_game;
-extern int gd_pal_emu_scanline_shade;		/* in percent */
 extern GdScalingType gd_cell_scale_editor;
 extern gboolean gd_pal_emulation_editor;
-extern char *gd_theme;
 
 extern gboolean gd_sdl_fullscreen;
 extern GdScalingType gd_sdl_scale;
@@ -73,14 +81,22 @@ extern gboolean gd_sdl_16bit_mixing;
 extern gboolean gd_sdl_44khz_mixing;
 extern gboolean gd_classic_sound;
 
+extern int gd_pal_emu_scanline_shade;		/* in percent */
+extern int gd_c64_palette;
+extern int gd_atari_palette;
+
 
 /* gdash directories */
 extern char *gd_user_config_dir;
 extern char *gd_system_data_dir;
 extern char *gd_system_caves_dir;
+extern char *gd_system_sound_dir;
+extern char *gd_system_music_dir;
 
 /* init settings (directories), and load language files */
-void gd_settings_init_with_language();
+void gd_settings_init_dirs();
+void gd_settings_set_locale();
+void gd_settings_init_translation();
 
 /* settings loading and saving */
 void gd_save_settings();

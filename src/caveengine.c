@@ -193,6 +193,13 @@ sloped_dir (const Cave *cave, const int x, const int y, const GdDirection dir, c
 	return FALSE;
 }
 
+/* returns true if the element is sloped for bladder movement (brick=yes, diamond=no, for example) */
+static inline gboolean
+sloped_for_bladder_dir (const Cave *cave, const int x, const int y, const GdDirection dir)
+{
+	return (gd_elements[get_dir(cave, x, y, dir)&O_MASK].properties&P_BLADDER_SLOPED)!=0;
+}
+
 static inline gboolean
 blows_up_flies_dir(const Cave *cave, const int x, const int y, const GdDirection dir)
 {
@@ -266,37 +273,69 @@ sound_play_element(Cave *cave, GdElement element)
 {
 	/* stone and diamond fall sounds. */
 	switch(element) {
+		case O_WATER:
+			if (cave->water_sound)
+				gd_sound_play(cave, GD_S_WATER);
+			break;
+		
+		case O_MAGIC_WALL:
+			if (cave->magic_wall_sound)
+				gd_sound_play(cave, GD_S_MAGIC_WALL);
+			break;
+		
+		case O_AMOEBA:
+			if (cave->amoeba_sound)
+				gd_sound_play(cave, GD_S_AMOEBA);
+			break;
+
+		case O_PNEUMATIC_HAMMER:
+			if (cave->pneumatic_hammer_sound)
+				gd_sound_play(cave, GD_S_PNEUMATIC_HAMMER);
+			break;
+			
 		case O_STONE:
 		case O_STONE_F:
 		case O_MEGA_STONE:
 		case O_MEGA_STONE_F:
 		case O_WAITING_STONE:
 		case O_CHASING_STONE:
-			gd_sound_play(cave, GD_S_STONE);
+			if (cave->stone_sound)
+				gd_sound_play(cave, GD_S_STONE);
+			break;
+			
+		case O_NITRO_PACK:
+		case O_NITRO_PACK_F:
+			if (cave->nitro_sound)
+				gd_sound_play(cave, GD_S_NITRO);
 			break;
 
 		case O_FALLING_WALL:
 		case O_FALLING_WALL_F:
-			gd_sound_play(cave, GD_S_FALLING_WALL);
+			if (cave->falling_wall_sound)
+				gd_sound_play(cave, GD_S_FALLING_WALL);
 			break;
 
 		case O_H_EXPANDING_WALL:
 		case O_V_EXPANDING_WALL:
 		case O_EXPANDING_WALL:
-			gd_sound_play(cave, GD_S_EXPANDING_WALL);
+			if (cave->expanding_wall_sound)
+				gd_sound_play(cave, GD_S_EXPANDING_WALL);
 			break;
 			
 		case O_DIAMOND:
 		case O_DIAMOND_F:
-			gd_sound_play(cave, GD_S_DIAMOND_RANDOM);
+			if (cave->diamond_sound)
+				gd_sound_play(cave, GD_S_DIAMOND_RANDOM);
 			break;
 			
 		case O_BLADDER_SPENDER:
-			gd_sound_play(cave, GD_S_BLADDER_SPENDER);
+			if (cave->bladder_spender_sound)
+				gd_sound_play(cave, GD_S_BLADDER_SPENDER);
 			break;
 		
-		case O_CLOCK:
-			gd_sound_play(cave, GD_S_BLADDER_CONVERT);
+		case O_PRE_CLOCK_1:
+			if (cave->bladder_convert_sound)
+				gd_sound_play(cave, GD_S_BLADDER_CONVERT);
 			break;
 			
 		case O_SLIME:
@@ -312,6 +351,15 @@ sound_play_element(Cave *cave, GdElement element)
 		case O_BLADDER:
 			if (cave->bladder_sound)
 				gd_sound_play(cave, GD_S_BLADDER_MOVE);
+			break;
+				
+		case O_BITER_1:
+		case O_BITER_2:
+		case O_BITER_3:
+		case O_BITER_4:
+			if (cave->biter_sound)
+				gd_sound_play(cave, GD_S_BITER_EAT);
+			break;
 
 		default:
 			/* do nothing. */
@@ -485,7 +533,7 @@ player_get_element (Cave* cave, const GdElement object)
 	switch (object) {
 	case O_DIAMOND_KEY:
 		cave->diamond_key_collected=TRUE;
-		gd_sound_play(cave, GD_S_KEY_COLLECT);
+		gd_sound_play(cave, GD_S_DIAMOND_KEY_COLLECT);
 		return O_SPACE;
 
 	/* KEYS AND DOORS */
@@ -551,7 +599,6 @@ player_get_element (Cave* cave, const GdElement object)
 	case O_SWEET:
 		gd_sound_play(cave, GD_S_SWEET_COLLECT);
 		cave->sweet_eaten=TRUE;
-		cave->pushing_stone_prob=cave->pushing_stone_prob_sweet;
 		return O_SPACE;
 
 	case O_PNEUMATIC_HAMMER:
@@ -657,19 +704,42 @@ do_push(Cave *cave, int x, int y, GdDirection player_move, gboolean player_fire)
 		case O_CHASING_STONE:
 		case O_MEGA_STONE:
 			/* pushing some kind of stone */
+			/* directions possible: 90degrees cw or ccw to current gravity. */
+			/* only push if player dir is orthogonal to gravity, ie. gravity down, pushing left&right possible */
 			if (player_move==ccw_fourth[cave->gravity] || player_move==cw_fourth[cave->gravity]) {
-				/* only push if player dir is orthogonal to gravity, ie. gravity down, pushing left&right possible */
-				if ((what==O_WAITING_STONE)	/* waiting stones are light, can always push */
-					||(what==O_CHASING_STONE && cave->sweet_eaten)	/* chasing can be pushed if player is turbo */
-					||(what==O_MEGA_STONE && cave->sweet_eaten && cave->mega_stones_pushable_with_sweet)	/* mega may(!) be pushed if player is turbo */
-					||((what==O_STONE || what==O_NITRO_PACK) && g_rand_int_range(cave->random, 0, 1000000)<cave->pushing_stone_prob*1000000)) {	/* stones are heavy, maybe push */
+				int prob;
+				
+				prob=0;
+				/* different probabilities for different elements. */
+				switch(what) {
+					case O_WAITING_STONE:
+						prob=1000000; /* waiting stones are light, can always push */
+						break;
+					case O_CHASING_STONE:
+						if (cave->sweet_eaten) /* chasing can be pushed if player is turbo */
+							prob=1000000;
+						break;
+					case O_MEGA_STONE:
+						if (cave->mega_stones_pushable_with_sweet && cave->sweet_eaten) /* mega may(!) be pushed if player is turbo */
+							prob=1000000;
+						break;
+					case O_STONE:
+					case O_NITRO_PACK:
+						if (cave->sweet_eaten)
+							prob=cave->pushing_stone_prob_sweet*1000000;	/* probability with sweet */
+						else
+							prob=cave->pushing_stone_prob*1000000;	/* probability without sweet. */
+						break;
+					default:
+						break;
+				}
+				
+				if (is_space_dir(cave, x, y, MV_TWICE+player_move) && g_rand_int_range(cave->random, 0, 1000000)<prob) {
 					/* if decided that he will be able to push, */
-						if (is_space_dir(cave, x, y, MV_TWICE + player_move)) {
-							store_dir(cave, x, y, MV_TWICE + player_move, what);
-							sound_play_element(cave, O_STONE);
-							result=TRUE;
-						}
-					}
+					store_dir(cave, x, y, MV_TWICE+player_move, what);
+					sound_play_element(cave, what);
+					result=TRUE;
+				}
 			}
 			break;
 			
@@ -682,7 +752,6 @@ do_push(Cave *cave, int x, int y, GdDirection player_move, gboolean player_fire)
 		case O_BLADDER_6:
 		case O_BLADDER_7:
 		case O_BLADDER_8:
-		case O_BLADDER_9:
 			/* pushing a bladder. keep in mind that after pushing, we always get an O_BLADDER,
 			 * not an O_BLADDER_x. */
 			/* there is no "delayed" state of a bladder, so we use store_dir_no_scanned! */
@@ -732,41 +801,27 @@ do_push(Cave *cave, int x, int y, GdDirection player_move, gboolean player_fire)
 					sound_play_element(cave, O_BLADDER);
 			}
 			break;
+
 		case O_BOX:
 			/* a box is only pushed with the fire pressed */
 			if (player_fire) {
+				/* but always with 100% probability */
 				switch (player_move) {
-				case MV_LEFT:
-					if (is_space_dir(cave, x, y, MV_LEFT_2)) {
-						store_dir(cave, x, y, MV_LEFT_2, O_BOX);
-						result=TRUE;
-						gd_sound_play(cave, GD_S_BOX_PUSH);
-					}
-					break;
-				case MV_RIGHT:
-					if (is_space_dir(cave, x, y, MV_RIGHT_2)) {
-						store_dir(cave, x, y, MV_RIGHT_2, O_BOX);
-						result=TRUE;
-						gd_sound_play(cave, GD_S_BOX_PUSH);
-					}
-					break;
-				case MV_UP:
-					if (is_space_dir(cave, x, y, MV_UP_2)) {
-						store_dir(cave, x, y, MV_UP_2, O_BOX);
-						result=TRUE;
-						gd_sound_play(cave, GD_S_BOX_PUSH);
-					}
-					break;
-				case MV_DOWN:
-					if (is_space_dir(cave, x, y, MV_DOWN_2)) {
-						store_dir(cave, x, y, MV_DOWN_2, O_BOX);
-						result=TRUE;
-						gd_sound_play(cave, GD_S_BOX_PUSH);
-					}
-					break;
-				default:
-					/* push in no other directions possible */
-					break;
+					case MV_LEFT:
+					case MV_RIGHT:
+					case MV_UP:
+					case MV_DOWN:
+						/* pushing in some dir, two steps in that dir - is there space? */
+						if (is_space_dir(cave, x, y, player_move+MV_TWICE)) {
+							/* yes, so push. */
+							store_dir(cave, x, y, player_move+MV_TWICE, O_BOX);
+							result=TRUE;
+							gd_sound_play(cave, GD_S_BOX_PUSH);
+						}
+						break;
+					default:
+						/* push in no other directions possible */
+						break;
 				}
 			}
 			break;
@@ -1336,13 +1391,12 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 						move(cave, x, y, cave->gravity, get(cave, x, y));
 					else if (is_element_dir(cave, x, y, cave->gravity, O_DIRT)) {
 						/* falling on a dirt, it does NOT explode - just stops at its place. */
+						sound_play_element(cave, bouncing);
 						store(cave, x, y, bouncing);
 					}
-					else {
+					else
 						/* falling on any other element it explodes */
-						sound_play_element(cave, get(cave, x, y));
 						explode(cave, x, y);
-					}
 				}
 				break;
 			case O_NITRO_PACK_EXPLODE:	/* a triggered nitro pack */
@@ -1618,25 +1672,25 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 					int dirn=(dir+3)&3;
 					int dirp=(dir+1)&3;
 					int i;
-					GdSound made_sound=GD_S_NONE;
+					GdElement made_sound_of=O_NONE;
 
 					for (i=0; i<G_N_ELEMENTS (biter_try); i++) {
 						if (is_element_dir(cave, x, y, biter_move[dir], biter_try[i])) {
 							move(cave, x, y, biter_move[dir], O_BITER_1+dir);
 							if (biter_try[i]!=O_SPACE)
-								made_sound=GD_S_BITER_EAT;
+								made_sound_of=O_BITER_1;	/* sound of a biter eating */
 							break;
 						}
 						else if (is_element_dir(cave, x, y, biter_move[dirn], biter_try[i])) {
 							move(cave, x, y, biter_move[dirn], O_BITER_1+dirn);
 							if (biter_try[i]!=O_SPACE)
-								made_sound=GD_S_BITER_EAT;
+								made_sound_of=O_BITER_1;	/* sound of a biter eating */
 							break;
 						}
 						else if (is_element_dir(cave, x, y, biter_move[dirp], biter_try[i])) {
 							move(cave, x, y, biter_move[dirp], O_BITER_1+dirp);
 							if (biter_try[i]!=O_SPACE)
-								made_sound=GD_S_BITER_EAT;
+								made_sound_of=O_BITER_1;	/* sound of a biter eating */
 							break;
 						}
 					}
@@ -1646,17 +1700,19 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 					else if (biter_try[i]==O_STONE) {
 						/* if there was a stone there, where we moved... do not eat stones, just throw them back */
 						store(cave, x, y, O_STONE);
-						made_sound=GD_S_STONE;
+						made_sound_of=O_STONE;
 					}
 					
 					/* if biter did move, we had sound. play it. */
-					if (cave->biter_sound && made_sound!=GD_S_NONE)
-						gd_sound_play(cave, made_sound);
-						
+					if (made_sound_of!=O_NONE)
+						sound_play_element(cave, made_sound_of);
 				}
 				break;
 
 			case O_BLADDER:
+				store(cave, x, y, O_BLADDER_1);
+				break;
+				
 			case O_BLADDER_1:
 			case O_BLADDER_2:
 			case O_BLADDER_3:
@@ -1665,30 +1721,57 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 			case O_BLADDER_6:
 			case O_BLADDER_7:
 			case O_BLADDER_8:
-				next (cave, x, y);
-				break;
-			case O_BLADDER_9:
-				/* bladders roll 'up', like stones roll down on brick. but: bladders do roll only brick, they
-				 * float in place holding a diamond or a stone! or any other element. */
-				if (is_element_dir(cave, x, y, MV_UP, cave->bladder_converts_by) || is_element_dir(cave, x, y, MV_DOWN, cave->bladder_converts_by) || is_element_dir(cave, x, y, MV_LEFT, cave->bladder_converts_by) || is_element_dir(cave, x, y, MV_RIGHT, cave->bladder_converts_by)) {
+				/* bladder with any delay state: try to convert to clock. */
+				if (is_element_dir(cave, x, y, opposite[grav_compat], cave->bladder_converts_by)
+					|| is_element_dir(cave, x, y, cw_fourth[grav_compat], cave->bladder_converts_by)
+					|| is_element_dir(cave, x, y, ccw_fourth[grav_compat], cave->bladder_converts_by)) {
 					/* if touches the specified element, let it be a clock */
 					store(cave, x, y, O_PRE_CLOCK_1);
-					sound_play_element(cave, O_CLOCK);
-				}
-				else if (is_space_dir(cave, x, y, opposite[grav_compat])) {
-					/* if able to go up */
-					move(cave, x, y, opposite[grav_compat], O_BLADDER);
-					sound_play_element(cave, O_BLADDER);
-				}
-				else if (sloped_dir(cave, x, y, opposite[grav_compat], grav_compat) && sloped_dir(cave, x, y, opposite[grav_compat], ccw_fourth[opposite[grav_compat]]) && is_space_dir(cave, x, y, ccw_fourth[opposite[grav_compat]]) && is_space_dir(cave, x, y, ccw_eighth[opposite[grav_compat]])) {
-					/* rolling up, to left */
-					move(cave, x, y, ccw_fourth[opposite[grav_compat]], O_BLADDER_9);
-					sound_play_element(cave, O_BLADDER);
-				}
-				else if (sloped_dir(cave, x, y, opposite[grav_compat], grav_compat) && sloped_dir(cave, x, y, opposite[grav_compat], cw_fourth[opposite[grav_compat]]) && is_space_dir(cave, x, y, cw_fourth[opposite[grav_compat]]) && is_space_dir(cave, x, y, cw_eighth[opposite[grav_compat]])) {
-					/* rolling up, to left */
-					move(cave, x, y, cw_fourth[opposite[grav_compat]], O_BLADDER_9);
-					sound_play_element(cave, O_BLADDER);
+					sound_play_element(cave, O_PRE_CLOCK_1);	/* plays the bladder convert sound */
+				} else {
+					/* is space over the bladder? */
+					if (is_space_dir(cave, x, y, opposite[grav_compat])) {
+						if (get(cave, x, y)==O_BLADDER_8) {
+							/* if it is a bladder 8, really move up */
+							move(cave, x, y, opposite[grav_compat], O_BLADDER_1);
+							sound_play_element(cave, O_BLADDER);
+						}
+						else
+							/* if smaller delay, just increase delay. */
+							next(cave, x, y);
+					}
+					else
+					/* if not space, is something sloped over the bladder? */
+					if (sloped_for_bladder_dir(cave, x, y, opposite[grav_compat]) && sloped_dir(cave, x, y, opposite[grav_compat], opposite[grav_compat])) {
+						if (sloped_dir(cave, x, y, opposite[grav_compat], ccw_fourth[opposite[grav_compat]])
+							&& is_space_dir(cave, x, y, ccw_fourth[opposite[grav_compat]])
+							&& is_space_dir(cave, x, y, ccw_eighth[opposite[grav_compat]])) {
+							/* rolling up, to left */
+							if (get(cave, x, y)==O_BLADDER_8) {
+								/* if it is a bladder 8, really roll */
+								move(cave, x, y, ccw_fourth[opposite[grav_compat]], O_BLADDER_8);
+								sound_play_element(cave, O_BLADDER);
+							} else
+								/* if smaller delay, just increase delay. */
+								next(cave, x, y);
+						}
+						else
+						if (sloped_dir(cave, x, y, opposite[grav_compat], cw_fourth[opposite[grav_compat]])
+							&& is_space_dir(cave, x, y, cw_fourth[opposite[grav_compat]])
+							&& is_space_dir(cave, x, y, cw_eighth[opposite[grav_compat]])) {
+							/* rolling up, to left */
+							if (get(cave, x, y)==O_BLADDER_8) {
+								/* if it is a bladder 8, really roll */
+								move(cave, x, y, cw_fourth[opposite[grav_compat]], O_BLADDER_8);
+								sound_play_element(cave, O_BLADDER);
+							} else
+								/* if smaller delay, just increase delay. */
+								next(cave, x, y);
+						}
+					}
+					/* no space, no sloped thing over it - store bladder 1 and that is for now. */
+					else
+						store(cave, x, y, O_BLADDER_1);
 				}
 				break;
 
@@ -1721,86 +1804,99 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 
 			case O_AMOEBA:
 				amoeba_count++;
-				if (cave->amoeba_too_big)
-					store(cave, x, y, cave->too_big_amoeba_to);
-				else if (cave->amoeba_enclosed)
-					store(cave, x, y, cave->enclosed_amoeba_to);
-				else {
-					if (amoeba_found_enclosed)
-						/* if still found enclosed, check all four directions, if this one is able to grow. */
-						if (amoeba_eats_dir(cave, x, y, MV_UP) || amoeba_eats_dir(cave, x, y, MV_DOWN)
-							|| amoeba_eats_dir(cave, x, y, MV_LEFT) || amoeba_eats_dir(cave, x, y, MV_RIGHT)) {
-							amoeba_found_enclosed=FALSE;	/* not enclosed. this is a local (per scan) flag! */
-							cave->amoeba_started=TRUE;
-						}
+				switch (cave->amoeba_state) {
+					case GD_AM_TOO_BIG:
+						store(cave, x, y, cave->too_big_amoeba_to);
+						break;
+					case GD_AM_ENCLOSED:
+						store(cave, x, y, cave->enclosed_amoeba_to);
+						break;
+					case GD_AM_SLEEPING:
+					case GD_AM_AWAKE:
+						/* if no amoeba found during THIS SCAN yet, which was able to grow, check this one. */
+						if (amoeba_found_enclosed)
+							/* if still found enclosed, check all four directions, if this one is able to grow. */
+							if (amoeba_eats_dir(cave, x, y, MV_UP) || amoeba_eats_dir(cave, x, y, MV_DOWN)
+								|| amoeba_eats_dir(cave, x, y, MV_LEFT) || amoeba_eats_dir(cave, x, y, MV_RIGHT)) {
+								amoeba_found_enclosed=FALSE;	/* not enclosed. this is a local (per scan) flag! */
+								cave->amoeba_state=GD_AM_AWAKE;
+							}
 
-					if (cave->amoeba_started)	/* if it is alive, decide if it attempts to grow */
-						if (g_rand_int_range(cave->random, 0, 1000000)<cave->amoeba_growth_prob*1000000) {
-							switch (g_rand_int_range(cave->random, 0, 4)) {	/* decided to grow, choose a random direction. */
-							case 0:	/* let this be up. numbers indifferent. */
-								if (amoeba_eats_dir(cave, x, y, MV_UP))
-									store_dir(cave, x, y, MV_UP, O_AMOEBA);
-								break;
-							case 1:	/* down */
-								if (amoeba_eats_dir(cave, x, y, MV_DOWN))
-									store_dir(cave, x, y, MV_DOWN, O_AMOEBA);
-								break;
-							case 2:	/* left */
-								if (amoeba_eats_dir(cave, x, y, MV_LEFT))
-									store_dir(cave, x, y, MV_LEFT, O_AMOEBA);
-								break;
-							case 3:	/* right */
-								if (amoeba_eats_dir(cave, x, y, MV_RIGHT))
-									store_dir(cave, x, y, MV_RIGHT, O_AMOEBA);
-								break;
+						/* if alive, check in which dir to grow (or not) */							
+						if (cave->amoeba_state==GD_AM_AWAKE) {
+							if (g_rand_int_range(cave->random, 0, 1000000)<cave->amoeba_growth_prob*1000000) {
+								switch (g_rand_int_range(cave->random, 0, 4)) {	/* decided to grow, choose a random direction. */
+								case 0:	/* let this be up. numbers indifferent. */
+									if (amoeba_eats_dir(cave, x, y, MV_UP))
+										store_dir(cave, x, y, MV_UP, O_AMOEBA);
+									break;
+								case 1:	/* down */
+									if (amoeba_eats_dir(cave, x, y, MV_DOWN))
+										store_dir(cave, x, y, MV_DOWN, O_AMOEBA);
+									break;
+								case 2:	/* left */
+									if (amoeba_eats_dir(cave, x, y, MV_LEFT))
+										store_dir(cave, x, y, MV_LEFT, O_AMOEBA);
+									break;
+								case 3:	/* right */
+									if (amoeba_eats_dir(cave, x, y, MV_RIGHT))
+										store_dir(cave, x, y, MV_RIGHT, O_AMOEBA);
+									break;
+								}
 							}
 						}
-				}
+						break;
+					}
 				break;
 
 			case O_AMOEBA_2:
 				amoeba_2_count++;
+				/* check if it is touching an amoeba, and explosion is enabled */
 				if (cave->amoeba_2_explodes_by_amoeba
 					&& (is_element_dir(cave, x, y, MV_DOWN, O_AMOEBA) || is_element_dir(cave, x, y, MV_UP, O_AMOEBA)
 						|| is_element_dir(cave, x, y, MV_LEFT, O_AMOEBA) || is_element_dir(cave, x, y, MV_RIGHT, O_AMOEBA)))
 						explode (cave, x, y);
-				else {
-					if (cave->amoeba_2_too_big)
-						store(cave, x, y, cave->too_big_amoeba_2_to);
-					else if (cave->amoeba_2_enclosed)
-						store(cave, x, y, cave->enclosed_amoeba_2_to);
-					else {
-						if (amoeba_2_found_enclosed)
-							/* if still found enclosed, check all four directions, if this one is able to grow. */
-							if (amoeba_eats_dir(cave, x, y, MV_UP) || amoeba_eats_dir(cave, x, y, MV_DOWN)
-								|| amoeba_eats_dir(cave, x, y, MV_LEFT) || amoeba_eats_dir(cave, x, y, MV_RIGHT)) {
-								amoeba_2_found_enclosed=FALSE;	/* not enclosed. this is a local (per scan) flag! */
-								cave->amoeba_2_started=TRUE;
-							}
-
-						if (cave->amoeba_2_started)	/* if it is alive, decide if it attempts to grow */
-							if (g_rand_int_range(cave->random, 0, 1000000)<cave->amoeba_2_growth_prob*1000000) {
-								switch (g_rand_int_range(cave->random, 0, 4)) {	/* decided to grow, choose a random direction. */
-								case 0:	/* let this be up. numbers indifferent. */
-									if (amoeba_eats_dir(cave, x, y, MV_UP))
-										store_dir(cave, x, y, MV_UP, O_AMOEBA_2);
-									break;
-								case 1:	/* down */
-									if (amoeba_eats_dir(cave, x, y, MV_DOWN))
-										store_dir(cave, x, y, MV_DOWN, O_AMOEBA_2);
-									break;
-								case 2:	/* left */
-									if (amoeba_eats_dir(cave, x, y, MV_LEFT))
-										store_dir(cave, x, y, MV_LEFT, O_AMOEBA_2);
-									break;
-								case 3:	/* right */
-									if (amoeba_eats_dir(cave, x, y, MV_RIGHT))
-										store_dir(cave, x, y, MV_RIGHT, O_AMOEBA_2);
-									break;
+				else
+					switch (cave->amoeba_2_state) {
+						case GD_AM_TOO_BIG:
+							store(cave, x, y, cave->too_big_amoeba_2_to);
+							break;
+						case GD_AM_ENCLOSED:
+							store(cave, x, y, cave->enclosed_amoeba_2_to);
+							break;
+						case GD_AM_SLEEPING:
+						case GD_AM_AWAKE:
+							/* if no amoeba found during THIS SCAN yet, which was able to grow, check this one. */
+							if (amoeba_2_found_enclosed)
+								if (amoeba_eats_dir(cave, x, y, MV_UP) || amoeba_eats_dir(cave, x, y, MV_DOWN)
+									|| amoeba_eats_dir(cave, x, y, MV_LEFT) || amoeba_eats_dir(cave, x, y, MV_RIGHT)) {
+									amoeba_2_found_enclosed=FALSE;	/* not enclosed. this is a local (per scan) flag! */
+									cave->amoeba_2_state=GD_AM_AWAKE;
 								}
-							}
+
+							if (cave->amoeba_2_state==GD_AM_AWAKE)	/* if it is alive, decide if it attempts to grow */
+								if (g_rand_int_range(cave->random, 0, 1000000)<cave->amoeba_2_growth_prob*1000000) {
+									switch (g_rand_int_range(cave->random, 0, 4)) {	/* decided to grow, choose a random direction. */
+									case 0:	/* let this be up. numbers indifferent. */
+										if (amoeba_eats_dir(cave, x, y, MV_UP))
+											store_dir(cave, x, y, MV_UP, O_AMOEBA_2);
+										break;
+									case 1:	/* down */
+										if (amoeba_eats_dir(cave, x, y, MV_DOWN))
+											store_dir(cave, x, y, MV_DOWN, O_AMOEBA_2);
+										break;
+									case 2:	/* left */
+										if (amoeba_eats_dir(cave, x, y, MV_LEFT))
+											store_dir(cave, x, y, MV_LEFT, O_AMOEBA_2);
+										break;
+									case 3:	/* right */
+										if (amoeba_eats_dir(cave, x, y, MV_RIGHT))
+											store_dir(cave, x, y, MV_RIGHT, O_AMOEBA_2);
+										break;
+									}
+								}
+							break;
 					}
-				}
 				break;
 
 			case O_ACID:
@@ -2029,7 +2125,7 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 				store(cave, x, y, O_PLAYER);
 				break;
 			case O_NITRO_EXPL_4:
-				store(cave, x, y, O_SPACE);
+				store(cave, x, y, cave->nitro_explode_to);
 				break;
 
 			case O_PRE_DIA_1:
@@ -2187,6 +2283,11 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 				/* intermissions were quicker, as only lines 1-12 were processed by the engine. */
 				cave->speed=(60+3.66*cave->c64_timing+(cave->ckdelay+cave->ckdelay_extra_for_animation)/1000);
 			break;
+
+		case GD_SCHEDULING_BD1_ATARI:
+			/* about 20ms/frame faster than c64 version; also intermissions are same speed as normal caves */
+			cave->speed=(68+3.66*cave->c64_timing+(cave->ckdelay+cave->ckdelay_extra_for_animation)/1000);
+			break;
 			
 		case GD_SCHEDULING_BD2:
 			cave->speed=(88+3.66*cave->c64_timing+(cave->ckdelay+cave->ckdelay_extra_for_animation)/1000);
@@ -2209,49 +2310,49 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 	}
 	
 	/* cave 3 sounds. precedence is controlled by the sound_play function. */
-	if (found_water && cave->water_sound)
-		gd_sound_play(cave, GD_S_WATER);
-	if (cave->magic_wall_state==GD_MW_ACTIVE && cave->magic_wall_sound)
-		gd_sound_play(cave, GD_S_MAGIC_WALL);
-	if (cave->hatched && cave->amoeba_sound)
-		if ((amoeba_count>0 && cave->amoeba_started)
-			|| (amoeba_2_count>0 && cave->amoeba_2_started))
-			gd_sound_play(cave, GD_S_AMOEBA);
+	if (found_water)
+		sound_play_element(cave, O_WATER);
+	if (cave->magic_wall_state==GD_MW_ACTIVE)
+		sound_play_element(cave, O_MAGIC_WALL);
+	if (cave->hatched)
+		if ((amoeba_count>0 && cave->amoeba_state==GD_AM_AWAKE)
+			|| (amoeba_2_count>0 && cave->amoeba_2_state==GD_AM_AWAKE))
+			sound_play_element(cave, O_AMOEBA);
 	/* pneumatic hammer sound - overrides everything. */
 	if (cave->pneumatic_hammer_active_delay>0)
-		gd_sound_play(cave, GD_S_PNEUMATIC_HAMMER);
+		sound_play_element(cave, O_PNEUMATIC_HAMMER);
 	
 	/* CAVE VARIABLES */
-	
-	if (cave->amoeba_started) {
-		/* check flags after evaluating. */
-		/* amoeba turns into diamond in the next frame, if enclosed */
-		cave->amoeba_enclosed=amoeba_found_enclosed;
-		/* too many amoeba found, it turns into stones in the next frame. */
-		cave->amoeba_too_big=(amoeba_count>=cave->amoeba_max_count);
-	}
-	/* amoeba can also be turned into diamond by magic wall */
-	if (cave->magic_wall_stops_amoeba && cave->magic_wall_state==GD_MW_ACTIVE)
-		cave->amoeba_enclosed=TRUE;
 
-	if (cave->amoeba_2_started) {
-		/* check flags after evaluating. */
-		/* amoeba turns into diamond in the next frame, if enclosed */
-		cave->amoeba_2_enclosed=amoeba_2_found_enclosed;
-		/* too many amoeba found, it turns into stones in the next frame. */
-		cave->amoeba_2_too_big=(amoeba_2_count>=cave->amoeba_2_max_count);
-	}
-	/* amoeba can also be turned into diamond by magic wall */
-	if (cave->magic_wall_stops_amoeba && cave->magic_wall_state==GD_MW_ACTIVE)
-		cave->amoeba_2_enclosed=TRUE;
-
-	if ((cave->player_state==GD_PL_LIVING && cave->player_seen_ago>15) || cave->kill_player)
-	/* check if player is alive. */
+	/* PLAYER */
+	if ((cave->player_state==GD_PL_LIVING && cave->player_seen_ago>15) || cave->kill_player)	/* check if player is alive. */
 		cave->player_state=GD_PL_DIED;
-
-	/* check if any voodoo exploded, and kill players the next scan if that happended. */
-	if (voodoo_touched)
+	if (voodoo_touched)	/* check if any voodoo exploded, and kill players the next scan if that happended. */
 		cave->kill_player=TRUE;
+
+	/* AMOEBA */	
+	if (cave->amoeba_state==GD_AM_AWAKE) {
+		/* check flags after evaluating. */
+		if (amoeba_count>=cave->amoeba_max_count)
+			cave->amoeba_state=GD_AM_TOO_BIG;
+		if (amoeba_found_enclosed)
+			cave->amoeba_state=GD_AM_ENCLOSED;
+	}
+	/* amoeba can also be turned into diamond by magic wall */
+	if (cave->magic_wall_stops_amoeba && cave->magic_wall_state==GD_MW_ACTIVE)
+		cave->amoeba_state=GD_AM_ENCLOSED;
+	/* AMOEBA 2 */
+	if (cave->amoeba_2_state==GD_AM_AWAKE) {
+		/* check flags after evaluating. */
+		if (amoeba_2_count>=cave->amoeba_2_max_count)
+			cave->amoeba_2_state=GD_AM_TOO_BIG;
+		if (amoeba_2_found_enclosed)
+			cave->amoeba_2_state=GD_AM_ENCLOSED;
+	}
+	/* amoeba 2 can also be turned into diamond by magic wall */
+	if (cave->magic_wall_stops_amoeba && cave->magic_wall_state==GD_MW_ACTIVE)
+		cave->amoeba_2_state=GD_AM_ENCLOSED;
+
 
 	/* now check times. --------------------------- */
 	/* decrement time if a voodoo was killed. */
@@ -2307,7 +2408,7 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 			cave->magic_wall_state=GD_MW_EXPIRED;
 	}
 	/* we may wait for hatching, when starting amoeba */
-	if (cave->amoeba_timer_started_immediately || (cave->amoeba_started && (cave->hatched || !cave->amoeba_timer_wait_for_hatching))) {
+	if (cave->amoeba_timer_started_immediately || (cave->amoeba_state==GD_AM_AWAKE && (cave->hatched || !cave->amoeba_timer_wait_for_hatching))) {
 		cave->amoeba_time-=cave->speed;
 		if (cave->amoeba_time<0)
 			cave->amoeba_time=0;
@@ -2315,7 +2416,7 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 			cave->amoeba_growth_prob=cave->amoeba_fast_growth_prob;
 	}
 	/* we may wait for hatching, when starting amoeba */
-	if (cave->amoeba_timer_started_immediately || (cave->amoeba_2_started && (cave->hatched || !cave->amoeba_timer_wait_for_hatching))) {
+	if (cave->amoeba_timer_started_immediately || (cave->amoeba_2_state==GD_AM_AWAKE && (cave->hatched || !cave->amoeba_timer_wait_for_hatching))) {
 		cave->amoeba_2_time-=cave->speed;
 		if (cave->amoeba_2_time<0)
 			cave->amoeba_2_time=0;

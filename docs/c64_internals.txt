@@ -1551,3 +1551,138 @@ crazy dream 9 - all the way
 .C:caf3   D0 EC      BNE $CAE1
 .C:caf5   60         RTS
 
+
+
+bladder
+-------
+(taken from crazy dream 2, an 1stb engine)
+$40 = bladder, code 467a
+$41-$48->bladder stages, code 481f
+$49 = 467a
+$4a = 467a
+
+bladder-467a
+------------
+.C:467a   B1 6D      LDA ($6D),Y		; what is at current position
+.C:467c   AA         TAX
+.C:467d   BD 80 42   LDA $4280,X		; load from effect table
+.C:4680   91 6D      STA ($6D),Y		; store
+.C:4682   E6 6D      INC $6D			; increment coordinates
+.C:4684   D0 02      BNE $4688			; ...
+.C:4686   E6 6E      INC $6E			; ... not important from here.
+.C:4688   E6 8B      INC $8B
+.C:468a   A5 8B      LDA $8B
+.C:468c   C9 28      CMP #$28
+
+table used:
+... removes "scanned" bits.
+>C:4280  00 01 02 03  04 05 06 07  08 09 0a 0b  08 09 0a 0b   ................
+>C:4290  10 10 12 12  14 14 16 16  19 19 1a 1b  1c 1d 1e 20   ............... 
+>C:42a0  20 21 22 23  24 25 26 27  28 29 2a 2a  2c 2d 2e 2f    !"#$%&'()**,-./
+>C:42b0  30 31 32 33  30 31 32 33  38 39 3a 3b  3d 3d 3e 3f   0123012389:;==>?
+>C:42c0  41 41 42 43  44 45 46 47  48 48 4b 4b  4c 4d 4e 4f   AABCDEFGHHKKLMNO
+>C:42d0  50 50 52 52  54 54 56 57  57 5a 5a 5b  5c 5d 5e 5f   PPRRTTVWWZZ[\]^_
+>C:42e0  61 61 62 63  64 64 67 67  68 69 6a 6b  6c 6d 6e 6f   aabcddgghijklmno
+>C:42f0  70 70 72 72  75 75 76 77  78 79 7a 7b  78 79 7a 7b   pprruuvwxyz{xyz{
+>C:4300  f0 2e e0 17  f0 10 a6 8b  f0 4d e0 26  90 4f f0 53   .........M.&.O.S
+
+so $40 is translated to $41
+   $49 translated to $48
+   others are not translated.
+
+
+bladder-481f
+------------
+.C:481a   A9 19      LDA #$19			; found a mrs rockford, store CLOCK BIRTH STAGE 2!!!
+.C:481c   4C 31 25   JMP $2531
+
+.C:481f   A2 03      LDX #$03
+.C:4821   BC F5 49   LDY $49F5,X		; >C:49f5  01 28 2a 51
+.C:4824   B1 6D      LDA ($6D),Y
+.C:4826   C9 56      CMP #$56			; is a mrs rockford _over_ the bladder?
+.C:4828   F0 F0      BEQ $481A			; if yes, convert.
+.C:482a   CA         DEX				; right to it? left to it?
+.C:482b   10 F4      BPL $4821			; check other directions
+
+										; NOT TOUCHING MRS ROCKFORD,
+										; let's see if it can move.
+.C:482d   A0 29      LDY #$29
+.C:482f   B1 6D      LDA ($6D),Y		; loads current element (bladder_n)
+.C:4831   AA         TAX				; puts to x
+.C:4832   A0 01      LDY #$01			; what is over?
+.C:4834   B1 6D      LDA ($6D),Y
+.C:4836   D0 19      BNE $4851			; if not space, 4851	 (that checks if brick wall)
+
+		; IF SPACE over bladder...
+.C:4838   E0 48      CPX #$48			; is it bladder stage8?
+.C:483a   F0 0D      BEQ $4849			; if yes (store $40 to x,y and finish)
+.C:483c   D0 02      BNE $4840			; if not, this always jumps; increments its waiting stage, stays at in place
+.C:483e   A2 40      LDX #$40			; X=$40
+
+.C:4840   E8         INX				; X++ - add one
+.C:4841   A0 29      LDY #$29
+.C:4843   8A         TXA
+.C:4844   91 6D      STA ($6D),Y		; store X to x,y.
+.C:4846   4C 82 46   JMP $4682			; finish
+
+.C:4849   A9 40      LDA #$40			; $40=bladder0
+.C:484b   20 69 43   JSR $4369			; translate and finish
+.C:484e   4C 2F 25   JMP $252F
+
+		; we jump here if NOT A SPACE the bladder.
+.C:4851   C9 02      CMP #$02			; is it brick wall;
+.C:4853   D0 E9      BNE $483E			; not a brick wall; store a bladder$41 and finish.
+
+										; it is brick wall over bladder.
+.C:4855   A0 00      LDY #$00			; ... if space at x-1, y-1
+.C:4857   B1 6D      LDA ($6D),Y
+.C:4859   D0 0C      BNE $4867
+.C:485b   A0 28      LDY #$28			; ... and space at x-1, x
+.C:485d   B1 6D      LDA ($6D),Y
+.C:485f   D0 06      BNE $4867
+.C:4861   E0 48      CPX #$48			; ... and it is a bladder_8
+.C:4863   F0 12      BEQ $4877			; jump to 4877, which adds 1 and does some effect translation
+.C:4865   D0 D9      BNE $4840			; always jumps; if not bladder_8. adds one to X, stores to x,y, and finish
+.C:4867   A0 02      LDY #$02			; what is at x+1, y-1
+.C:4869   B1 6D      LDA ($6D),Y
+.C:486b   D0 D1      BNE $483E			; not space - store a $41
+.C:486d   A0 2A      LDY #$2A
+.C:486f   B1 6D      LDA ($6D),Y
+.C:4871   D0 CB      BNE $483E			; not space - store a $41
+.C:4873   E0 48      CPX #$48
+.C:4875   D0 C9      BNE $4840			; if not $48, increment waiting stage
+.C:4877   E8         INX				; it is $48. add 1, then $49
+.C:4878   8A         TXA				; to accu
+.C:4879   20 69 43   JSR $4369			; do some effect translation - it becomes $48 again
+.C:487c   4C 2F 25   JMP $252F			; done
+
+
+4369
+----
+.C:4369   A6 8C      LDX $8C
+.C:436b   E0 05      CPX #$05
+.C:436d   90 2C      BCC $439B
+.C:436f   E0 16      CPX #$16
+.C:4371   B0 8D      BCS $4300
+.C:4373   C0 2A      CPY #$2A
+.C:4375   B0 04      BCS $437B
+.C:4377   AA         TAX
+.C:4378   BD 80 42   LDA $4280,X		; put scanned or normal element?
+.C:437b   85 84      STA $84
+.C:437d   91 6D      STA ($6D),Y
+.C:437f   A5 8C      LDA $8C
+.C:4381   0A         ASL A
+.C:4382   AA         TAX
+.C:4383   A5 8B      LDA $8B
+.C:4385   0A         ASL A
+.C:4386   18         CLC
+.C:4387   7D C8 25   ADC $25C8,X
+.C:438a   85 6F      STA $6F
+.C:438c   A9 00      LDA #$00
+.C:438e   7D C9 25   ADC $25C9,X
+.C:4391   85 70      STA $70
+.C:4393   20 1A 50   JSR $501A
+.C:4396   4C 00 3B   JMP $3B00
+.C:4399   8A         TXA
+.C:439a   60         RTS
+

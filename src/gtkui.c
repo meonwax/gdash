@@ -54,27 +54,30 @@ gd_create_stock_icons (void)
 		{ add_raster, GD_ICON_EDITOR_RASTER},
 		{ add_fill_border, GD_ICON_EDITOR_FILL_BORDER},
 		{ add_fill_replace, GD_ICON_EDITOR_FILL_REPLACE},
-		{ add_maze, GD_ICON_EDITOR_MAZE}, 
+		{ add_maze, GD_ICON_EDITOR_MAZE},
 		{ add_maze_uni, GD_ICON_EDITOR_MAZE_UNI},
 		{ add_maze_braid, GD_ICON_EDITOR_MAZE_BRAID},
 		{ snapshot, GD_ICON_SNAPSHOT},
 		{ restart_level, GD_ICON_RESTART_LEVEL},
 		{ random_fill, GD_ICON_RANDOM_FILL},
+		{ award, GD_ICON_AWARD},
 		{ to_top, GD_ICON_TO_TOP},
 		{ to_bottom, GD_ICON_TO_BOTTOM},
-		{ award, GD_ICON_AWARD},
+		{ object_on_all, GD_ICON_OBJECT_ON_ALL},
+		{ object_not_on_all, GD_ICON_OBJECT_NOT_ON_ALL},
+		{ object_not_on_current, GD_ICON_OBJECT_NOT_ON_CURRENT},
 	};
 
 	GtkIconFactory *factory;
 	int i;
 
-	factory=gtk_icon_factory_new ();
+	factory=gtk_icon_factory_new();
 	for (i=0; i < G_N_ELEMENTS (icons); i++) {
 		GtkIconSet *iconset;
 		GdkPixbuf *pixbuf;
 
 		pixbuf=gdk_pixbuf_new_from_inline (-1, icons[i].data, FALSE, NULL);
-		iconset=gtk_icon_set_new_from_pixbuf (pixbuf);
+		iconset=gtk_icon_set_new_from_pixbuf(pixbuf);
 		g_object_unref (pixbuf);
 		gtk_icon_factory_add (factory, icons[i].stock_id, iconset);
 	}
@@ -105,7 +108,7 @@ gd_create_title_animation (void)
 	int x, y;
 	int w, h, tw, th;
 
-	/* the screen */	
+	/* the screen */
 	screen=gdk_pixbuf_new_from_inline (-1, gdash_screen, FALSE, NULL);
 	w=gdk_pixbuf_get_width(screen);
 	h=gdk_pixbuf_get_height(screen);
@@ -114,7 +117,7 @@ gd_create_title_animation (void)
 	tile=gdk_pixbuf_new_from_inline (-1, gdash_tile, FALSE, NULL);
 	tw=gdk_pixbuf_get_width(tile);
 	th=gdk_pixbuf_get_height(tile);
-	
+
 	/* do not allow more than 40 frames of animation */
 	g_assert(th<40);
 
@@ -126,7 +129,7 @@ gd_create_title_animation (void)
 			gdk_pixbuf_copy_area(tile, 0, 0, tw, th, bigone, x, y);
 
 	g_object_unref(tile);
-	
+
 	pixmaps=g_new0(GdkPixmap *, th+1);	/* 'th' number of images, and a NULL to the end */
 	frame=gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, w, h);
 	for (i=0; i<th; i++) {
@@ -135,7 +138,7 @@ gd_create_title_animation (void)
 		gdk_pixbuf_copy_area(bigone, 0, i, w, h, frame, 0, 0);
 		/* and composite it with the title image */
 		gdk_pixbuf_composite(screen, frame, 0, 0, w, h, 0, 0, 1, 1, GDK_INTERP_NEAREST, 255);
-	
+
 		/* scale the title screen the same way as we scale the game */
 		scaled=gd_pixbuf_scale(frame, gd_cell_scale_game);
 		if (gd_pal_emulation_game)
@@ -146,7 +149,7 @@ gd_create_title_animation (void)
 	}
 	g_object_unref(bigone);
 	g_object_unref(frame);
-		
+
 	g_object_unref(screen);
 
 	return pixmaps;
@@ -173,12 +176,12 @@ static gboolean
 find_image_in_store(GtkTreeModel *store, const gchar *find_name, GtkTreeIter *set_iter)
 {
 	GtkTreeIter iter;
-	
+
 	if (gtk_tree_model_get_iter_first(store, &iter)) {
 		do {
 			char *stored_name;
 
-			/* get filename from store */			
+			/* get filename from store */
 			gtk_tree_model_get(store, &iter, THEME_COL_FILENAME, &stored_name, -1);
 			/* if find_name is null and stored_name is null: that is the builtin theme, so they are equal! */
 			/* otherwise, compare the strings. */
@@ -189,7 +192,7 @@ find_image_in_store(GtkTreeModel *store, const gchar *find_name, GtkTreeIter *se
 			}
 		} while (gtk_tree_model_iter_next(store, &iter));
 	}
-	
+
 	/* not found: return false */
 	return FALSE;
 }
@@ -223,11 +226,11 @@ add_image_to_store (GtkListStore *store, const char *filename)
 	cell_pixbuf=gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, cell_size, cell_size);
 	gdk_pixbuf_copy_area(pixbuf, (cell_num % NUM_OF_CELLS_X) * cell_size, (cell_num / NUM_OF_CELLS_X) * cell_size, cell_size, cell_size, cell_pixbuf, 0, 0);
 	g_object_unref(pixbuf);
-	
+
 	/* check list store to find if this file is already added. may happen if a theme is overwritten by the add theme button */
 	if (find_image_in_store(GTK_TREE_MODEL(store), filename, &iter))
 		gtk_list_store_remove(store, &iter);
-	
+
 	/* add to list */
 	seen_name=g_filename_display_basename(filename);
 	if (strrchr(seen_name, '.'))	/* remove extension */
@@ -272,7 +275,7 @@ gd_create_themes_list()
 {
 	GtkListStore *store;
 	GtkTreeIter iter;
-	
+
 	store=gtk_list_store_new(NUM_THEME_COLS, G_TYPE_STRING, G_TYPE_STRING, GDK_TYPE_PIXBUF);
 
 	/* default builtin theme */
@@ -282,17 +285,17 @@ gd_create_themes_list()
 	/* add themes found in config directories */
 	add_dir_to_store(store, gd_system_data_dir);
 	add_dir_to_store(store, gd_user_config_dir);
-	
+
 	/* if the current theme cannot be found in the store for some reason, add it now. */
 	if (!find_image_in_store(GTK_TREE_MODEL(store), gd_theme, NULL))
 		add_image_to_store(store, gd_theme);
-	
+
 	return store;
 }
 
 
 
-/**************************** 
+/****************************
  *
  * settings window
  *
@@ -310,7 +313,7 @@ settings_window_update(pref_info* info)
 	GdkPixbuf *pb;
 	GtkTreeIter iter;
 	GtkTreeModel *model;
-	
+
 	if (!gtk_tree_selection_get_selected(gtk_tree_view_get_selection(GTK_TREE_VIEW(info->treeview)), &model, &iter))
 		return;
 	gtk_tree_model_get(model, &iter, THEME_COL_PIXBUF, &orig_pb, -1);
@@ -341,7 +344,7 @@ static void
 settings_window_toggle(GtkWidget *widget, gpointer data)
 {
 	gboolean *bl=(gboolean *)data;
-	
+
 	*bl=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
 }
 
@@ -350,7 +353,7 @@ static void
 settings_window_value_change(GtkWidget *widget, gpointer data)
 {
 	int *value=(int *) data;
-	
+
 	*value=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(widget));
 }
 
@@ -364,40 +367,40 @@ image_load_filters()
 	GSList *iter;
 	GtkFileFilter *all_filter;
 	GList *filters=NULL;	/* new list of filters */
-	
+
 	all_filter=gtk_file_filter_new();
 	gtk_file_filter_set_name(all_filter, _("All image files"));
-	
+
 	/* iterate the list of formats given by gdk. create file filters for each. */
 	for (iter=formats; iter!=NULL; iter=iter->next) {
 		GdkPixbufFormat *frm=iter->data;
-		
+
 		if (!gdk_pixbuf_format_is_disabled(frm)) {
 			GtkFileFilter *filter;
 			char **extensions;
 			int i;
-			
+
 			filter=gtk_file_filter_new();
 			gtk_file_filter_set_name(filter, gdk_pixbuf_format_get_description(frm));
 			extensions=gdk_pixbuf_format_get_extensions(frm);
 			for (i=0; extensions[i]!=NULL; i++) {
 				char *pattern;
-				
+
 				pattern=g_strdup_printf("*.%s", extensions[i]);
 				gtk_file_filter_add_pattern(filter, pattern);
 				gtk_file_filter_add_pattern(all_filter, pattern);
 				g_free(pattern);
 			}
 			g_strfreev(extensions);
-			
+
 			filters=g_list_append(filters, filter);
 		}
 	}
 	g_slist_free(formats);
-	
+
 	/* add "all image files" filter */
 	filters=g_list_prepend(filters, all_filter);
-	
+
 	return filters;
 }
 
@@ -410,7 +413,7 @@ add_theme_cb(GtkWidget *widget, gpointer data)
 	int result;
 	char *filename=NULL;
 	pref_info *info=(pref_info *)data;
-	
+
 	dialog=gtk_file_chooser_dialog_new (_("Add Theme from Image File"), GTK_WINDOW(info->dialog), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
 	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
 
@@ -426,7 +429,7 @@ add_theme_cb(GtkWidget *widget, gpointer data)
 
 	if (filename) {
 		const char *error_msg;
-		
+
 		error_msg=gd_is_image_ok_for_theme(filename);
 		if (error_msg==NULL) {
 			/* make up new filename */
@@ -439,12 +442,12 @@ add_theme_cb(GtkWidget *widget, gpointer data)
 			new_filename=g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir, basename, NULL);
 			g_free(basename);
 
-			/* if file not exists, or exists BUT overwrite allowed */			
+			/* if file not exists, or exists BUT overwrite allowed */
 			if (!g_file_test(new_filename, G_FILE_TEST_EXISTS) || gd_ask_overwrite(new_filename)) {
 				/* copy theme to user config directory */
 				if (g_file_get_contents(filename, &contents, &length, &error) && g_file_set_contents(new_filename, contents, length, &error)) {
 					GtkTreeIter *iter;
-					
+
 					iter=add_image_to_store(GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(info->treeview))), new_filename);
 					if (iter)						/* select newly added. if there was an error, the old selection was not cleared */
 						gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(info->treeview)), iter);
@@ -474,7 +477,7 @@ remove_theme_cb(GtkWidget *widget, gpointer data)
 	char *filename, *seen_name;
 	GtkWidget *dialog;
 	int result;
-	
+
 	selection=gtk_tree_view_get_selection(GTK_TREE_VIEW(info->treeview));
 	/* if no row selected for some reason, don't care. return now. */
 	if (!gtk_tree_selection_get_selected(selection, &model, &iter))
@@ -501,6 +504,31 @@ remove_theme_cb(GtkWidget *widget, gpointer data)
 	}
 }
 
+GtkWidget *
+gd_combo_box_new_from_stringv(const char **str)
+{
+	GtkWidget *combo;
+	int i;
+	
+	combo=gtk_combo_box_new_text();
+	for (i=0; str[i]!=NULL; i++)
+		gtk_combo_box_append_text(GTK_COMBO_BOX(combo), _(str[i]));	/* also translate */
+	
+	return combo;
+}
+
+/* when a combo box created from a stringv gets updated. data should point to the integer to be changed. */
+static void
+combo_box_stringv_changed(GtkWidget *widget, gpointer data)
+{
+	int *ptr=(int *) data;
+	
+	*ptr=gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
+	/* if nothing selected (for some reason), set to zero. */
+	if (*ptr==-1)
+		*ptr=0;
+}
+
 
 void
 gd_preferences (GtkWidget *parent)
@@ -508,15 +536,20 @@ gd_preferences (GtkWidget *parent)
 	typedef enum _settingtype {
 		TypeLabel,
 		TypeBoolean,
-		TypeByte,
+		TypePercent,
+		TypeStringv,
+		TypeNewColumn,
 	} SettingType;
-	static struct {
+	struct {
 		SettingType type;
-		char *name;
-		char *description;
+		const char *name;
+		const char *description;
 		gpointer value;
 		gboolean update;			/* if sample pixbuf should be updated when changing this option */
+		const char **stringv;
 	} check_buttons[]={
+		{TypeLabel, N_("<b>Language</b> (requires restart)"), NULL, NULL},
+		{TypeStringv, NULL, N_("The language of the application. Requires restart!"), &gd_language, FALSE, gd_languages_names},
 		{TypeLabel, N_("<b>Cave options</b>"), NULL, NULL},
 		{TypeBoolean, N_("Ease levels"), N_("Make caves easier to play. Only one diamonds to collect, more time available, no expanding walls... This might render some caves unplayable!"), &gd_easy_play},
 		{TypeBoolean, N_("Mouse play (experimental!)"), N_("Use the mouse to play. The player will follow the cursor!"), &gd_mouse_play, FALSE},
@@ -524,34 +557,39 @@ gd_preferences (GtkWidget *parent)
 		{TypeBoolean, N_("Import as all caves selectable"), N_("Original, C64 games are imported not with A, E, I, M caves selectable, but all caves (ABCD, EFGH... excluding intermissions). This does not affect BDCFF caves."), &gd_import_as_all_caves_selectable, FALSE},
 		{TypeBoolean, N_("Use BDCFF highscore"), N_("Use BDCFF highscores. GDash rather stores highscores in its own configuration directory, instead of saving them in "
 			" the *.bd file."), &gd_use_bdcff_highscore, FALSE},
-		{TypeLabel, N_("<b>Display options</b>"), NULL, NULL},
-		{TypeBoolean, N_("Time as min:sec"), N_("Show times in minutes and seconds, instead of seconds only."), &gd_time_min_sec, FALSE},
-		{TypeBoolean, N_("Random colors"), N_("Use randomly selected colors for C64 graphics."), &gd_random_colors, FALSE},
-/*
-   XXX currently dirt mod is not shown to the user.
-		{N_("Allow dirt mod"), N_("Enable caves to use alternative dirt graphics. This applies only to imported caves, not BDCFF (*.bd) files."), &allow_dirt_mod, FALSE},
-*/
-		{TypeBoolean, N_("PAL emulation for game"), N_("Use PAL emulated graphics, ie. lines are striped."), &gd_pal_emulation_game, TRUE},
-		{TypeBoolean, N_("PAL emulation for editor"), N_("Use PAL emulated graphics, ie. lines are striped."), &gd_pal_emulation_editor, TRUE},
-		{TypeByte,    N_("PAL scanline shade (%)"), N_("Darker rows for PAL emulation."), &gd_pal_emu_scanline_shade, TRUE},
 #ifdef GD_SOUND
+		{TypeBoolean, N_("Time as min:sec"), N_("Show times in minutes and seconds, instead of seconds only."), &gd_time_min_sec, FALSE},
 		{TypeLabel, N_("<b>Sound options</b> (require restart)"), NULL, NULL},
 		{TypeBoolean, N_("Sound"), N_("Play sounds. Enabling this setting requires a restart!"), &gd_sdl_sound, FALSE},
 		{TypeBoolean, N_("Classic sounds only"), N_("Play only classic sounds taken from the original game."), &gd_classic_sound, FALSE},
 		{TypeBoolean, N_("16-bit mixing"), N_("Use 16-bit mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_16bit_mixing, FALSE},
 		{TypeBoolean, N_("44kHz mixing"), N_("Use 44kHz mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_44khz_mixing, FALSE},
 #endif
+		{TypeNewColumn, },
+		{TypeLabel, N_("<b>Display options</b>"), NULL, NULL},
+		{TypeBoolean, N_("Random colours"), N_("Use randomly selected colours for C64 graphics."), &gd_random_colors, FALSE},
+/*
+   XXX currently dirt mod is not shown to the user.
+		{N_("Allow dirt mod"), N_("Enable caves to use alternative dirt graphics. This applies only to imported caves, not BDCFF (*.bd) files."), &allow_dirt_mod, FALSE},
+*/
+		{TypeBoolean, N_("PAL emulation for game"), N_("Use PAL emulated graphics, ie. lines are striped."), &gd_pal_emulation_game, TRUE},
+		{TypeBoolean, N_("PAL emulation for editor"), N_("Use PAL emulated graphics, ie. lines are striped."), &gd_pal_emulation_editor, TRUE},
+		{TypePercent,    N_("PAL scanline shade (%)"), N_("Darker rows for PAL emulation."), &gd_pal_emu_scanline_shade, TRUE},
+		{TypeLabel, N_("<b>C64 palette</b>"), NULL, NULL},
+		{TypeStringv, NULL, N_("The colour palette for games imported from C64 files. Also affects BDCFF games, which have C64 colors!"), &gd_c64_palette, FALSE, gd_color_get_c64_palette_names()},
+		{TypeLabel, N_("<b>Atari palette</b>"), NULL, NULL},
+		{TypeStringv, NULL, N_("The colour palette for imported Atari games."), &gd_atari_palette, FALSE, gd_color_get_atari_palette_names()},
 	};
 
 	GtkWidget *dialog, *table, *label, *button;
 	pref_info info;
-	int i, row;
+	int i, row, col;
 	GtkWidget *sw, *align, *hbox;
 	GtkListStore *store;
 	GtkTreeSelection *selection;
 	GtkTreeIter iter;
 	char *filename;
-	
+
 	dialog=gtk_dialog_new_with_buttons (_("GDash Preferences"), (GtkWindow *) parent, GTK_DIALOG_DESTROY_WITH_PARENT, NULL);
 	info.dialog=dialog;
 	gtk_window_set_resizable (GTK_WINDOW(dialog), FALSE);
@@ -580,29 +618,30 @@ gd_preferences (GtkWidget *parent)
 
 	/* game booleans */
 	row=0;
+	col=0;
 	for (i=0; i<G_N_ELEMENTS(check_buttons); i++) {
 		GtkWidget *widget, *hbox;
-			
+
 		switch (check_buttons[i].type) {
 			case TypeLabel:
 				label=gtk_label_new(NULL);
 				gtk_label_set_markup(GTK_LABEL(label), _(check_buttons[i].name));
 				gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
-				gtk_table_attach_defaults (GTK_TABLE (table), label, 0, 2, row, row + 1);
+				gtk_table_attach_defaults (GTK_TABLE (table), label, col, col+2, row, row+1);
 				break;
-				
+
 			case TypeBoolean:
 				widget=gtk_check_button_new_with_label(_(check_buttons[i].name));
 				gtk_widget_set_tooltip_text(widget, _(check_buttons[i].description));
 				gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), *(gboolean *)check_buttons[i].value);
-				gtk_table_attach_defaults (GTK_TABLE (table), widget, 1, 2, row, row + 1);
+				gtk_table_attach_defaults (GTK_TABLE (table), widget, col+1, col+2, row, row+1);
 				g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(settings_window_toggle), check_buttons[i].value);
 				/* if sample pixbuf should be updated */
 				if (check_buttons[i].update)
 					g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(settings_window_changed), &info);
 				break;
-		
-			case TypeByte:
+
+			case TypePercent:
 				hbox=gtk_hbox_new(FALSE, 6);
 				widget=gtk_spin_button_new_with_range(0, 100, 5);
 				gtk_widget_set_tooltip_text(widget, _(check_buttons[i].description));
@@ -613,10 +652,23 @@ gd_preferences (GtkWidget *parent)
 				gtk_box_pack_start(GTK_BOX(hbox), widget, FALSE, FALSE, 0);
 				gtk_box_pack_start_defaults(GTK_BOX(hbox), gd_label_new_printf(_(check_buttons[i].name)));
 
-				gtk_table_attach_defaults (GTK_TABLE (table), hbox, 1, 2, row, row + 1);
+				gtk_table_attach_defaults (GTK_TABLE (table), hbox, col+1, col+2, row, row+1);
 				break;
-		}		
-		row ++;
+			
+			case TypeStringv:
+				g_assert(!check_buttons[i].update);
+				widget=gd_combo_box_new_from_stringv(check_buttons[i].stringv);
+				gtk_combo_box_set_active(GTK_COMBO_BOX(widget), *(int *)check_buttons[i].value);
+				g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(combo_box_stringv_changed), check_buttons[i].value);
+				gtk_table_attach_defaults(GTK_TABLE(table), widget, col+1, col+2, row, row+1);
+				break;
+
+			case TypeNewColumn:
+				col+=2;
+				row=-1;	/* so row++ under will result in zero */
+				break;
+		}
+		row++;
 	}
 
 	/* gfx */
@@ -650,15 +702,19 @@ gd_preferences (GtkWidget *parent)
 	gtk_table_attach(GTK_TABLE (table), label, 0, 3, 0, 1, GTK_EXPAND|GTK_FILL, 0, 0, 0);
 
 	gtk_table_attach_defaults(GTK_TABLE(table), sw, 1, 3, 1, 2);
-	
+
 	/* cells size combo for game */
 	gtk_table_attach(GTK_TABLE(table), gd_label_new_printf("<b>Game</b>"), 1, 2, 2, 3, GTK_EXPAND|GTK_FILL, 0, 0, 0);
-	info.sizecombo_game=gtk_combo_box_new_text();
+	info.sizecombo_game=gd_combo_box_new_from_stringv(gd_scaling_name);
+	gtk_combo_box_set_active(GTK_COMBO_BOX(info.sizecombo_game), gd_cell_scale_game);
+#if 0	
+	gtk_combo_box_new_text();
 	for (i=0; i<GD_SCALING_MAX; i++) {
 		gtk_combo_box_append_text(GTK_COMBO_BOX(info.sizecombo_game), gettext(gd_scaling_name[i]));
 		if (gd_cell_scale_game==i)
 			gtk_combo_box_set_active(GTK_COMBO_BOX(info.sizecombo_game), i);
 	}
+#endif
 	gtk_table_attach(GTK_TABLE(table), info.sizecombo_game, 1, 2, 3, 4, GTK_EXPAND|GTK_FILL, 0, 0, 0);
 	/* image for game */
 	align=gtk_alignment_new(0.5, 0.5, 0, 0);
@@ -666,27 +722,25 @@ gd_preferences (GtkWidget *parent)
 	info.image_game=gtk_image_new();
 	gtk_container_add(GTK_CONTAINER(align), info.image_game);
 	gtk_table_attach(GTK_TABLE(table), align, 1, 2, 4, 5, GTK_EXPAND|GTK_FILL, 0, 0, 0);
-	
+
 	/* cells size combo for editor */
 	gtk_table_attach(GTK_TABLE(table), gd_label_new_printf("<b>Editor</b>"), 2, 3, 2, 3, GTK_EXPAND|GTK_FILL, 0, 0, 0);
-	info.sizecombo_editor=gtk_combo_box_new_text();
-	for (i=0; i<GD_SCALING_MAX; i++) {
-		gtk_combo_box_append_text(GTK_COMBO_BOX(info.sizecombo_editor), gettext(gd_scaling_name[i]));
-		if (gd_cell_scale_editor==i)
-			gtk_combo_box_set_active(GTK_COMBO_BOX(info.sizecombo_editor), i);
-	}
+	info.sizecombo_editor=gd_combo_box_new_from_stringv(gd_scaling_name);
+	gtk_combo_box_set_active(GTK_COMBO_BOX(info.sizecombo_editor), gd_cell_scale_editor);
 	gtk_table_attach(GTK_TABLE(table), info.sizecombo_editor, 2, 3, 3, 4, GTK_EXPAND|GTK_FILL, 0, 0, 0);
-	/* image for editor */	
+	/* image for editor */
 	align=gtk_alignment_new(0.5, 0.5, 0, 0);
 	gtk_widget_set_size_request(align, 64, 64);
 	info.image_editor=gtk_image_new();
 	gtk_container_add(GTK_CONTAINER(align), info.image_editor);
 	gtk_table_attach(GTK_TABLE(table), align, 2, 3, 4, 5, GTK_EXPAND|GTK_FILL, 0, 0, 0);
-	
+
 	/* add the "changed" signal handlers only here, as by appending the texts, the changes signal whould have been called */
 	g_signal_connect(G_OBJECT(info.sizecombo_game), "changed", G_CALLBACK(settings_window_changed), &info);
 	g_signal_connect(G_OBJECT(info.sizecombo_editor), "changed", G_CALLBACK(settings_window_changed), &info);
 	g_signal_connect(G_OBJECT(selection), "changed", G_CALLBACK(settings_window_changed), &info);
+
+	/* update images (for the first time) before showing the window */
 	settings_window_update (&info);
 
 	/* run dialog */
@@ -758,7 +812,7 @@ hs_cave_combo_changed(GtkComboBox *widget, gpointer data)
 	int highlight_rank=GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), GD_HIGHLIGHT_RANK));
 	int i;
 	GdHighScore *scores;
-	
+
 	gtk_list_store_clear(store);
 	i=gtk_combo_box_get_active(widget);
 	if (i==0)
@@ -769,7 +823,7 @@ hs_cave_combo_changed(GtkComboBox *widget, gpointer data)
 	for (i=0; i<GD_HIGHSCORE_NUM; i++)
 		if (scores[i].score>0) {
 			GtkTreeIter iter;
-			
+
 			gtk_list_store_append(store, &iter);
 			gtk_list_store_set(store, &iter, HS_COLUMN_RANK, i+1, HS_COLUMN_NAME, scores[i].name, HS_COLUMN_SCORE, scores[i].score,
 				HS_COLUMN_BOLD, (i==highlight_cave && i==highlight_rank)?PANGO_WEIGHT_BOLD:PANGO_WEIGHT_NORMAL, -1);
@@ -783,7 +837,7 @@ hs_clear_highscore(GtkWidget *widget, gpointer data)
 	GtkListStore *store=GTK_LIST_STORE(g_object_get_data(G_OBJECT(combo), GD_LISTSTORE));
 	int i;
 	GdHighScore *scores;
-	
+
 	i=gtk_combo_box_get_active(combo);
 	if (i==0)
 		scores=gd_caveset_data->highscore;
@@ -792,9 +846,9 @@ hs_clear_highscore(GtkWidget *widget, gpointer data)
 
 	/* if there is any entry, delete */
 	gd_clear_highscore(scores);
-	gtk_list_store_clear(store);		
+	gtk_list_store_clear(store);
 }
-	
+
 void
 gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, Cave *highlight_cave, int highlight_rank)
 {
@@ -811,7 +865,7 @@ gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, Cav
 
 	/* dialog window */
 	dialog=gtk_dialog_new_with_buttons(_("Highscores"), (GtkWindow *) parent, GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL | GTK_DIALOG_NO_SEPARATOR, NULL);
-	
+
 	store=gtk_list_store_new(NUM_COLUMNS, G_TYPE_INT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT);
 	treeview=gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 
@@ -861,7 +915,7 @@ gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, Cav
 	/* clear button */
 	if (show_clear_button) {
 		GtkWidget *button;
-		
+
 		button=gtk_button_new_from_stock(GTK_STOCK_CLEAR);
 		gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->action_area), button, FALSE, FALSE, 0);
 		g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(hs_clear_highscore), combo);
@@ -885,14 +939,14 @@ guess_active_toplevel()
 {
     GtkWidget *parent=NULL;
     GList *toplevels, *iter;
-    
+
     /* try to guess which window is active */
     toplevels=gtk_window_list_toplevels();
     for (iter=toplevels; iter!=NULL; iter=iter->next)
     	if (gtk_window_has_toplevel_focus(GTK_WINDOW(iter->data)))
     		parent=iter->data;
     g_list_free(toplevels);
-    
+
     return parent;
 }
 
@@ -970,7 +1024,7 @@ gd_ask_overwrite(const char *filename)
 {
 	gboolean result;
 	char *sec;
-	
+
 	/* ask if overwrite file */
 	sec=g_strdup_printf(_("The file (%s) already exists, and will be overwritten."), filename);
 	result=gd_question_yesno(_("The file already exists. Do you want to overwrite it?"), sec);
@@ -995,7 +1049,7 @@ caveset_file_operation_successful(const char *filename)
 		/* make an absolute filename if needed */
 		char *absolute;
 		char *currentdir;
-		
+
 		currentdir=g_get_current_dir();
 		absolute=g_build_path(G_DIR_SEPARATOR_S, currentdir, filename, NULL);
 		g_free(currentdir);
@@ -1025,7 +1079,7 @@ static void
 caveset_save (const gchar *filename)
 {
 	gboolean saved;
-	
+
 	saved=gd_caveset_save(filename);
 	if (!saved)
 		gd_show_last_error(guess_active_toplevel());
@@ -1043,7 +1097,7 @@ gd_save_caveset_as (GtkWidget *parent)
 
 	dialog=gtk_file_chooser_dialog_new (_("Save File As"), GTK_WINDOW(parent), GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
 	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
-	
+
 	filter=gtk_file_filter_new ();
 	gtk_file_filter_set_name (filter, _("BDCFF cave sets (*.bd)"));
 	gtk_file_filter_add_pattern (filter, "*.bd");
@@ -1053,7 +1107,7 @@ gd_save_caveset_as (GtkWidget *parent)
 	gtk_file_filter_set_name (filter, _("All files (*)"));
 	gtk_file_filter_add_pattern (filter, "*");
 	gtk_file_chooser_add_filter (GTK_FILE_CHOOSER(dialog), filter);
-	
+
 	suggested_name=g_strdup_printf("%s.bd", gd_caveset_data->name);
 	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), suggested_name);
 	g_free(suggested_name);
@@ -1064,11 +1118,11 @@ gd_save_caveset_as (GtkWidget *parent)
 	/* check if .bd extension should be added */
 	if (filename) {
 		char *suffixed;
-		
+
 		/* if it has no .bd extension, add one */
 		if (!g_str_has_suffix(filename, ".bd")) {
 			suffixed=g_strdup_printf("%s.bd", filename);
-			
+
 			g_free(filename);
 			filename=suffixed;
 		}
@@ -1108,9 +1162,9 @@ gboolean
 gd_open_caveset_in_ui(const char *filename, gboolean highscore_load_from_bdcff)
 {
 	gboolean loaded;
-	
+
 	gd_clear_error_flag();
-	
+
 	loaded=gd_caveset_load_from_file (filename, gd_user_config_dir);
 	if (loaded)
 		caveset_file_operation_successful(filename);
@@ -1118,7 +1172,7 @@ gd_open_caveset_in_ui(const char *filename, gboolean highscore_load_from_bdcff)
 	/* if successful loading and this is a bd file, and we load highscores from our own config dir */
 	if (!gd_has_new_error() && g_str_has_suffix(filename, ".bd") && !highscore_load_from_bdcff)
 		gd_load_highscore(gd_user_config_dir);
-		
+
 	/* return true if successful, false if any error */
 	return !gd_has_new_error();
 }
@@ -1135,7 +1189,7 @@ gd_open_caveset (GtkWidget *parent, const char *directory)
 	char *filename=NULL;
 	gboolean highscore_load_from_bdcff;
 	int i;
-	
+
 	/* if caveset is edited, and user does not want to discard changes */
 	if (!gd_discard_changes(parent))
 		return;
@@ -1143,7 +1197,7 @@ gd_open_caveset (GtkWidget *parent, const char *directory)
 	dialog=gtk_file_chooser_dialog_new (_("Open File"), (GtkWindow *) parent, GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
 	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
 	check=gtk_check_button_new_with_mnemonic(_("Load _highscores from BDCFF file"));
-	
+
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), check, FALSE, FALSE, 6);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), gd_use_bdcff_highscore);
 	gtk_widget_show(check);
@@ -1181,7 +1235,7 @@ gd_open_caveset (GtkWidget *parent, const char *directory)
 #ifdef G_OS_WIN32
 	gd_clear_error_flag();
 #endif
-	
+
 	if (filename)
 		gd_open_caveset_in_ui(filename, highscore_load_from_bdcff);
 	g_free (filename);
@@ -1210,7 +1264,7 @@ static void
 label_set_markup_vprintf(GtkLabel *label, const char *format, va_list args)
 {
 	char *text;
-	
+
 	text=g_strdup_vprintf(format, args);
 	gtk_label_set_markup(label, text);
 	g_free(text);
@@ -1222,7 +1276,7 @@ gd_label_new_printf_centered(const char *format, ...)
 {
 	va_list args;
 	GtkWidget *label;
-	
+
 	label=gtk_label_new(NULL);
 
 	va_start(args, format);
@@ -1238,7 +1292,7 @@ gd_label_new_printf(const char *format, ...)
 {
 	va_list args;
 	GtkWidget *label;
-	
+
 	label=gtk_label_new(NULL);
 	gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
 
@@ -1254,7 +1308,7 @@ void
 gd_label_set_markup_printf(GtkLabel *label, const char *format, ...)
 {
 	va_list args;
-	
+
 	va_start(args, format);
 	label_set_markup_vprintf(label, format, args);
 	va_end(args);
@@ -1272,7 +1326,7 @@ gd_show_errors (GtkWidget *parent)
 	GList *liter;
 	int result;
 	GdkPixbuf *pixbuf_error, *pixbuf_warning, *pixbuf_info;
-	
+
 	dialog=gtk_dialog_new_with_buttons (_("GDash Errors"), (GtkWindow *) parent, GTK_DIALOG_NO_SEPARATOR, GTK_STOCK_CLEAR, 1, GTK_STOCK_CLOSE, GTK_RESPONSE_OK, NULL);
 	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 	gtk_window_set_default_size (GTK_WINDOW (dialog), 512, 384);
@@ -1291,7 +1345,7 @@ gd_show_errors (GtkWidget *parent)
 	pixbuf_info=gtk_widget_render_icon(view, GTK_STOCK_DIALOG_INFO, GTK_ICON_SIZE_MENU, NULL);
 	for (liter=gd_errors; liter!=NULL; liter=liter->next) {
 		GdErrorMessage *error=liter->data;
-		
+
 		gtk_text_buffer_get_iter_at_offset(buffer, &iter, -1);
 		if (error->flags>=G_LOG_LEVEL_MESSAGE)
 			gtk_text_buffer_insert_pixbuf(buffer, &iter, pixbuf_info);
@@ -1316,7 +1370,7 @@ gd_show_errors (GtkWidget *parent)
 	gtk_widget_show_all (dialog);
 	result=gtk_dialog_run (GTK_DIALOG (dialog));
 	gtk_widget_destroy (dialog);
-	
+
 	/* the user has seen the errors, clear the "has new error" flag */
 	gd_clear_error_flag();
 	/* maybe clearing the whole error list requested? */
@@ -1330,13 +1384,13 @@ gd_show_last_error(GtkWidget *parent)
     GtkWidget *dialog;
     int result;
     GdErrorMessage *m;
-    
+
     if (!gd_errors)
     	return;
-    	
+
     /* set new error flag to false, as the user now knows that some error has happened */
 	gd_clear_error_flag();
-	
+
 	m=g_list_last(gd_errors)->data;
 
     dialog=gtk_message_dialog_new ((GtkWindow *) parent,
@@ -1359,13 +1413,13 @@ gd_question_yesno(const char *primary, const char *secondary)
 {
 	GtkWidget *dialog;
 	int response;
-	
+
 	dialog=gtk_message_dialog_new ((GtkWindow *) guess_active_toplevel(), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, primary);
 	if (secondary && !g_str_equal(secondary, ""))
 		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), secondary);
 	response=gtk_dialog_run (GTK_DIALOG (dialog));
 	gtk_widget_destroy (dialog);
-	
+
 	return response==GTK_RESPONSE_YES;
 }
 

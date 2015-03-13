@@ -5,7 +5,7 @@ echo >>Makefile.am
 
 for a in $SUBDIRS; do
     CAVES=$(find $a -type f -name \*.gds)
-    echo ${a}dir = '$(pkgdatadir)'/${a} >> Makefile.am
+    echo ${a}dir = '$(pkgdatadir)'/caves/${a} >> Makefile.am
     echo ${a}_CAVES = $CAVES >>Makefile.am
     DIST=$DIST\ \$\(${a}_CAVES\)
     echo ${a}_DATA = \$\(${a}_CAVES\) >>Makefile.am

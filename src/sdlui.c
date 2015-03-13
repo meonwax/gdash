@@ -420,24 +420,28 @@ gd_settings_menu()
 		TypeScale,
 		TypeTheme,
 		TypePercent,
+		TypeStringv,
 	} SettingType;
 	struct _setting {
 		SettingType type;
 		char *name;
 		void *var;
+		const char **stringv;
 	} settings[]= {
 		{ TypeBoolean, "Fullscreen", &gd_sdl_fullscreen },
 		{ TypeTheme,   "Theme", NULL },
 		{ TypeScale,   "Scale", &gd_sdl_scale },
 		{ TypeBoolean, "PAL emulation", &gd_sdl_pal_emulation },
 		{ TypePercent, "PAL scanline shade", &gd_pal_emu_scanline_shade },
+		{ TypeStringv, "C64 palette", &gd_c64_palette, gd_color_get_c64_palette_names() },
+		{ TypeStringv, "Atari palette", &gd_atari_palette, gd_color_get_atari_palette_names() },
 		{ TypeBoolean, "Sound", &gd_sdl_sound },
 		{ TypeBoolean, "Classic sounds only", &gd_classic_sound },
 		{ TypeBoolean, "16-bit mixing", &gd_sdl_16bit_mixing },
 		{ TypeBoolean, "44kHz mixing", &gd_sdl_44khz_mixing },
 		{ TypeBoolean, "Easy play", &gd_easy_play },
 		{ TypeBoolean, "Use BDCFF highscore", &gd_use_bdcff_highscore },
-		{ TypeBoolean, "Show name of game", &gd_show_name_of_game },
+		{ TypeBoolean, "Show name of game at cover", &gd_show_name_of_game },
 		{ TypeBoolean, "All caves selectable", &gd_all_caves_selectable },
 		{ TypeBoolean, "Import as all selectable", &gd_import_as_all_caves_selectable },
 		{ TypeBoolean, "Random colors", &gd_random_colors },
@@ -467,8 +471,8 @@ gd_settings_menu()
 	gd_backup_and_dark_screen();
 	gd_title_line("GDASH OPTIONS");
 	gd_status_line("CRSR: MOVE   FIRE: CHANGE   ESC: EXIT");
-	gd_blittext_n(gd_screen, -1, gd_screen->h-4*gd_line_height(), GD_C64_GRAY2, "Some changes require restart.");
-	gd_blittext_n(gd_screen, -1, gd_screen->h-3*gd_line_height(), GD_C64_GRAY2, "Use T in the menu for a new theme.");
+	gd_blittext_n(gd_screen, -1, gd_screen->h-3*gd_line_height(), GD_C64_GRAY1, "Some changes require restart.");
+	gd_blittext_n(gd_screen, -1, gd_screen->h-2*gd_line_height(), GD_C64_GRAY1, "Use T in the title for a new theme.");
 	
 	current=0;
 	finished=FALSE;
@@ -479,7 +483,7 @@ gd_settings_menu()
 
 			gd_clear_line(gd_screen, y1+n*yd);
 			x=x1;
-			x=gd_blittext_n(gd_screen, x, y1+n*yd, current==n?GD_C64_LIGHTRED:GD_C64_BLUE, settings[n].name);
+			x=gd_blittext_n(gd_screen, x, y1+n*yd, current==n?GD_C64_LIGHTRED:GD_C64_LIGHTBLUE, settings[n].name);
 			x+=2*gd_font_width();
 			switch(settings[n].type) {	
 				case TypeBoolean:
@@ -502,6 +506,10 @@ gd_settings_menu()
 						x=gd_blittext_n(gd_screen, x, y1+n*yd, GD_C64_YELLOW, thm);
 						g_free(thm);
 					}
+					break;
+				case TypeStringv:
+					x=gd_blittext_n(gd_screen, x, y1+n*yd, GD_C64_YELLOW, settings[n].stringv[*(int *)settings[n].var]);
+					break;
 			}
 		}
 		SDL_Flip(gd_screen);
@@ -550,6 +558,15 @@ gd_settings_menu()
 				if (gd_space_or_enter_or_fire())
 					themenum=(themenum+1)%themes->len;
 				break;
+			case TypeStringv:
+				if (gd_left())
+					*(int *)settings[current].var=clamp(*(int *)settings[current].var-1, 0, g_strv_length((char **) settings[current].stringv));
+				if (gd_right())
+					*(int *)settings[current].var=clamp(*(int *)settings[current].var+1, 0, g_strv_length((char **) settings[current].stringv));
+				if (gd_space_or_enter_or_fire())
+					*(int *)settings[current].var=(*(int *)settings[current].var+1)%g_strv_length((char **) settings[current].stringv);
+				break;
+					
 		}
 
 		SDL_Delay(160);

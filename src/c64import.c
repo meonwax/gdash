@@ -72,7 +72,7 @@ static const GdElement firstboulder_import_table[]={
 	/* 3c */ O_PRE_STONE_1, O_PRE_STONE_2, O_PRE_STONE_3, O_PRE_STONE_4,
 	/* 40 */ O_BLADDER, O_BLADDER_1, O_BLADDER_2, O_BLADDER_3,
 	/* 44 */ O_BLADDER_4, O_BLADDER_5, O_BLADDER_6, O_BLADDER_7,
-	/* 48 */ O_BLADDER_8, O_BLADDER_9, O_EXPLODE_1, O_EXPLODE_1,
+	/* 48 */ O_BLADDER_8, O_BLADDER_8, O_EXPLODE_1, O_EXPLODE_1,
 	/* 4c */ O_EXPLODE_2, O_EXPLODE_3, O_EXPLODE_4, O_EXPLODE_5,
 	/* 50 */ O_PLAYER, O_PLAYER, O_PLAYER_BOMB, O_PLAYER_BOMB,
 	/* 54 */ O_PLAYER_GLUED, O_PLAYER_GLUED, O_VOODOO, O_AMOEBA,
@@ -108,7 +108,7 @@ static const GdElement crazydream_import_table[]={
 	/* 3c */ O_PRE_STONE_1, O_PRE_STONE_2, O_PRE_STONE_3, O_PRE_STONE_4,
 	/* 40 */ O_BLADDER, O_BLADDER_1, O_BLADDER_2, O_BLADDER_3,
 	/* 44 */ O_BLADDER_4, O_BLADDER_5, O_BLADDER_6, O_BLADDER_7,
-	/* 48 */ O_BLADDER_8, O_BLADDER_9, O_EXPLODE_1, O_EXPLODE_1,
+	/* 48 */ O_BLADDER_8, O_BLADDER_8|SCANNED, O_EXPLODE_1, O_EXPLODE_1,
 	/* 4c */ O_EXPLODE_2, O_EXPLODE_3, O_EXPLODE_4, O_EXPLODE_5,
 	/* 50 */ O_PLAYER, O_PLAYER, O_PLAYER_BOMB, O_PLAYER_BOMB,
 	/* 54 */ O_PLAYER_GLUED, O_PLAYER_GLUED, O_VOODOO, O_AMOEBA,
@@ -179,7 +179,7 @@ const GdElement gd_crazylight_import_table[]={
 	/* 3c */ O_PRE_STONE_1, O_PRE_STONE_2, O_PRE_STONE_3, O_PRE_STONE_4,
 	/* 40 */ O_BLADDER, O_BLADDER_1, O_BLADDER_2, O_BLADDER_3,
 	/* 44 */ O_BLADDER_4, O_BLADDER_5, O_BLADDER_6, O_BLADDER_7,
-	/* 48 */ O_BLADDER_8, O_BLADDER_9, O_EXPLODE_1, O_EXPLODE_1,
+	/* 48 */ O_BLADDER_8, O_BLADDER_8|SCANNED, O_EXPLODE_1, O_EXPLODE_1,
 	/* 4c */ O_EXPLODE_2, O_EXPLODE_3, O_EXPLODE_4, O_EXPLODE_5,
 	/* 50 */ O_PLAYER, O_PLAYER|SCANNED, O_PLAYER_BOMB, O_PLAYER_BOMB|SCANNED,
 	/* 54 */ O_PLAYER_GLUED, O_PLAYER_GLUED|SCANNED, O_VOODOO, O_AMOEBA,
@@ -203,62 +203,6 @@ static guint8 no1_default_colors[]={
 	14, 2, 3, 3, 11, 1, 7, 5, 1, 11, 10, 7, 9, 8, 1
 };
 #endif
-
-/* atari800 "real.act" palette */
-static GdColor atari_colortable[256] = {
-
-/* 0 */
-0x323132, 0x3f3e3f, 0x4d4c4d, 0x5b5b5b, 0x6a696a, 0x797879, 0x888788, 0x979797, 
-0xa1a0a1, 0xafafaf, 0xbebebe, 0xcecdce, 0xdbdbdb, 0xebeaeb, 0xfafafa, 0xffffff, 
-/* 1 */
-0x612e00, 0x6c3b00, 0x7a4a00, 0x885800, 0x94670c, 0xa5761b, 0xb2842a, 0xc1943a, 
-0xca9d43, 0xdaad53, 0xe8bb62, 0xf8cb72, 0xffd87f, 0xffe88f, 0xfff79f, 0xffffae, 
-/* 2 */
-0x6c2400, 0x773000, 0x844003, 0x924e11, 0x9e5d22, 0xaf6c31, 0xbc7b41, 0xcc8a50, 
-0xd5935b, 0xe4a369, 0xf2b179, 0xffc289, 0xffcf97, 0xffdfa6, 0xffedb5, 0xfffdc4, 
-/* 3 */
-0x751618, 0x812324, 0x8f3134, 0x9d4043, 0xaa4e50, 0xb85e60, 0xc66d6f, 0xd57d7f, 
-0xde8787, 0xed9596, 0xfca4a5, 0xffb4b5, 0xffc2c4, 0xffd1d3, 0xffe0e1, 0xffeff0, 
-/* 4 */
-0x620e71, 0x6e1b7c, 0x7b2a8a, 0x8a3998, 0x9647a5, 0xa557b5, 0xb365c3, 0xc375d1, 
-0xcd7eda, 0xdc8de9, 0xea97f7, 0xf9acff, 0xffbaff, 0xffc9ff, 0xffd9ff, 0xffe8ff, 
-/* 5 */
-0x560f87, 0x611d90, 0x712c9e, 0x7f3aac, 0x8d48ba, 0x9b58c7, 0xa967d5, 0xb877e5, 
-0xc280ed, 0xd090fc, 0xdf9fff, 0xeeafff, 0xfcbdff, 0xffccff, 0xffdbff, 0xffeaff, 
-/* 6 */
-0x461695, 0x5122a0, 0x6032ac, 0x6e41bb, 0x7c4fc8, 0x8a5ed6, 0x996de3, 0xa87cf2, 
-0xb185fb, 0xc095ff, 0xcfa3ff, 0xdfb3ff, 0xeec1ff, 0xfcd0ff, 0xffdfff, 0xffefff, 
-/* 7 */
-0x212994, 0x2d359f, 0x3d44ad, 0x4b53ba, 0x5961c7, 0x686fd5, 0x777ee2, 0x878ef2, 
-0x9097fa, 0x96a6ff, 0xaeb5ff, 0xbfc4ff, 0xcdd2ff, 0xdae3ff, 0xeaf1ff, 0xfafeff, 
-/* 8 */
-0x0f3584, 0x1c418d, 0x2c509b, 0x3a5eaa, 0x486cb7, 0x587bc5, 0x678ad2, 0x7699e2, 
-0x80a2eb, 0x8fb2f9, 0x9ec0ff, 0xadd0ff, 0xbdddff, 0xcbecff, 0xdbfcff, 0xeaffff, 
-/* 9 */
-0x043f70, 0x114b79, 0x215988, 0x2f6896, 0x3e75a4, 0x4d83b2, 0x5c92c1, 0x6ca1d2, 
-0x74abd9, 0x83bae7, 0x93c9f6, 0xa2d8ff, 0xb1e6ff, 0xc0f5ff, 0xd0ffff, 0xdeffff, 
-/* a */
-0x005918, 0x006526, 0x0f7235, 0x1d8144, 0x2c8e50, 0x3b9d60, 0x4aac6f, 0x59bb7e, 
-0x63c487, 0x72d396, 0x82e2a5, 0x92f1b5, 0x9ffec3, 0xaeffd2, 0xbeffe2, 0xcefff1, 
-/* b */
-0x075c00, 0x146800, 0x227500, 0x328300, 0x3f910b, 0x4fa01b, 0x5eae2a, 0x6ebd3b, 
-0x77c644, 0x87d553, 0x96e363, 0xa7f373, 0xb3fe80, 0xc3ff8f, 0xd3ffa0, 0xe3ffb0, 
-/* c */
-0x1a5600, 0x286200, 0x367000, 0x457e00, 0x538c00, 0x629b07, 0x70a916, 0x80b926, 
-0x89c22f, 0x99d13e, 0xa8df4d, 0xb7ef5c, 0xc5fc6b, 0xd5ff7b, 0xe3ff8b, 0xf3ff99, 
-/* d */
-0x334b00, 0x405700, 0x4d6500, 0x5d7300, 0x6a8200, 0x7a9100, 0x889e0f, 0x98ae1f, 
-0xa1b728, 0xbac638, 0xbfd548, 0xcee458, 0xdcf266, 0xebff75, 0xfaff85, 0xffff95, 
-/* e */
-0x4b3c00, 0x584900, 0x655700, 0x746500, 0x817400, 0x908307, 0x9f9116, 0xaea126, 
-0xb7aa2e, 0xc7ba3e, 0xd5c74d, 0xe5d75d, 0xf2e56b, 0xfef47a, 0xffff8b, 0xffff9a, 
-/* f */
-0x602e00, 0x6d3a00, 0x7a4900, 0x895800, 0x95670a, 0xa4761b, 0xb2832a, 0xc2943a, 
-0xcb9d44, 0xdaac53, 0xe8ba62, 0xf8cb73, 0xffd77f, 0xffe791, 0xfff69f, 0xffffaf,
-};
-
-
-
 
 
 
@@ -693,6 +637,8 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, GdCavefi
 		return -1;
 	}
 	gd_cave_set_engine_defaults(cave, GD_ENGINE_BD1);
+	if (format==GD_FORMAT_BD1_ATARI)
+		cave->scheduling=GD_SCHEDULING_BD1_ATARI;
 	/* set visible size for intermission */
 	if (cave->intermission) {
 		int i;
@@ -731,20 +677,20 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, GdCavefi
 	
 	if (format==GD_FORMAT_BD1_ATARI) {
 		/* atari colors */
-		cave->color1=atari_colortable[data[0x13]];
-		cave->color2=atari_colortable[data[0x14]];
-		cave->color3=atari_colortable[data[0x15]];
-		cave->color4=atari_colortable[data[0x16]];	/* in atari, amoeba was green */
-		cave->color5=atari_colortable[data[0x16]];	/* in atari, slime was green */
-		cave->colorb=atari_colortable[data[0x17]];	/* border = background */
-		cave->color0=atari_colortable[data[0x17]];	/* background */
+		cave->color1=gd_atari_color(data[0x13]);
+		cave->color2=gd_atari_color(data[0x14]);
+		cave->color3=gd_atari_color(data[0x15]);
+		cave->color4=gd_atari_color(data[0x16]);	/* in atari, amoeba was green */
+		cave->color5=gd_atari_color(data[0x16]);	/* in atari, slime was green */
+		cave->colorb=gd_atari_color(data[0x17]);	/* border = background */
+		cave->color0=gd_atari_color(data[0x17]);	/* background */
 	} else {
 		/* c64 colors */
-		cave->colorb=gd_c64_colors[0].rgb;	/* border = background, fixed color */
-		cave->color0=gd_c64_colors[0].rgb;	/* background, fixed color */
-		cave->color1=gd_c64_colors[data[0x13]&0xf].rgb;
-		cave->color2=gd_c64_colors[data[0x14]&0xf].rgb;
-		cave->color3=gd_c64_colors[data[0x15]&0x7].rgb; 	/* lower 3 bits only (vic-ii worked this way) */
+		cave->colorb=gd_c64_color(0);	/* border = background, fixed color */
+		cave->color0=gd_c64_color(0);	/* background, fixed color */
+		cave->color1=gd_c64_color(data[0x13]&0xf);
+		cave->color2=gd_c64_color(data[0x14]&0xf);
+		cave->color3=gd_c64_color(data[0x15]&0x7); 	/* lower 3 bits only (vic-ii worked this way) */
 		cave->color4=cave->color3;	/* in bd1, amoeba was color3 */
 		cave->color5=cave->color3;	/* no slime, but let it be color 3 */
 	}
@@ -869,6 +815,8 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes, GdCavef
 		return -1;
 	}
 	gd_cave_set_engine_defaults(cave, GD_ENGINE_BD2);
+	if (format==GD_FORMAT_BD2_ATARI)
+		cave->scheduling=GD_SCHEDULING_BD1_ATARI;
 	/* set visible size for intermission */
 	if (cave->intermission) {
 		cave->x2=19;
@@ -1065,22 +1013,22 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes, GdCavef
 	/* the colors from the memory dump are appended here */
 	if (format==GD_FORMAT_BD2) {
 		/* c64 colors */
-		cave->color0=gd_c64_colors[0].rgb;
-		cave->color1=gd_c64_colors[data[index+0]&0xf].rgb;
-		cave->color2=gd_c64_colors[data[index+1]&0xf].rgb;
-		cave->color3=gd_c64_colors[data[index+2]&0x7].rgb; 	/* lower 3 bits only! */
+		cave->color0=gd_c64_color(0);
+		cave->color1=gd_c64_color(data[index+0]&0xf);
+		cave->color2=gd_c64_color(data[index+1]&0xf);
+		cave->color3=gd_c64_color(data[index+2]&0x7); 	/* lower 3 bits only! */
 		cave->color4=cave->color1;	/* in bd2, amoeba was color1 */
 		cave->color5=cave->color1;	/* slime too */
 		index+=3;
 	} else {
 		/* atari colors */
-		cave->color1=atari_colortable[data[index+0]];
-		cave->color2=atari_colortable[data[index+1]];
-		cave->color3=atari_colortable[data[index+2]];
-		cave->color4=atari_colortable[data[index+3]];	/* amoeba and slime */
-		cave->color5=atari_colortable[data[index+3]];
-		cave->colorb=atari_colortable[data[index+4]];	/* background and border */
-		cave->color0=atari_colortable[data[index+4]];
+		cave->color1=gd_atari_color(data[index+0]);
+		cave->color2=gd_atari_color(data[index+1]);
+		cave->color3=gd_atari_color(data[index+2]);
+		cave->color4=gd_atari_color(data[index+3]);	/* amoeba and slime */
+		cave->color5=gd_atari_color(data[index+3]);
+		cave->colorb=gd_atari_color(data[index+4]);	/* background and border */
+		cave->color0=gd_atari_color(data[index+4]);
 		index+=5;
 	}
 	
@@ -1166,26 +1114,26 @@ cave_copy_from_plck (Cave *cave, const guint8 *data, int remaining_bytes, GdCave
 
 	if (format==GD_FORMAT_PLC_ATARI) {
 		/* use atari colors */
-		cave->colorb=atari_colortable[0];	/* border */
+		cave->colorb=gd_atari_color(0);	/* border */
 		/* indexes in data are not the same order as on c64!!! */
-		cave->color0=atari_colortable[data[0x1e3]];	/* background */
-		cave->color1=atari_colortable[data[0x1db]];
-		cave->color2=atari_colortable[data[0x1dd]];
-		cave->color3=atari_colortable[data[0x1df]];
+		cave->color0=gd_atari_color(data[0x1e3]);	/* background */
+		cave->color1=gd_atari_color(data[0x1db]);
+		cave->color2=gd_atari_color(data[0x1dd]);
+		cave->color3=gd_atari_color(data[0x1df]);
 		/* in atari plck, slime and amoeba could not coexist in the same cave. */
 		/* if amoeba was used, the graphics turned to green, and data at 0x1e1 was set to 0xd4. */
 		/* if slime was used, graphics to blue, and data at 0x1e1 was set to 0x72. */
 		/* these two colors could not be changed in the editor at all. */
 		/* (maybe they could have been changed in a hex editor) */
-		cave->color4=atari_colortable[data[0x1e1]];
-		cave->color5=atari_colortable[data[0x1e1]];
+		cave->color4=gd_atari_color(data[0x1e1]);
+		cave->color5=gd_atari_color(data[0x1e1]);
 	} else {
 		/* use c64 colors */
-		cave->colorb=gd_c64_colors[data[0x1db]&0xf].rgb;	/* border */
-		cave->color0=gd_c64_colors[data[0x1dd]&0xf].rgb;
-		cave->color1=gd_c64_colors[data[0x1df]&0xf].rgb;
-		cave->color2=gd_c64_colors[data[0x1e1]&0xf].rgb;
-		cave->color3=gd_c64_colors[data[0x1e3]&0x7].rgb; 	/* lower 3 bits only! */
+		cave->colorb=gd_c64_color(data[0x1db]&0xf);	/* border */
+		cave->color0=gd_c64_color(data[0x1dd]&0xf);
+		cave->color1=gd_c64_color(data[0x1df]&0xf);
+		cave->color2=gd_c64_color(data[0x1e1]&0xf);
+		cave->color3=gd_c64_color(data[0x1e3]&0x7); 	/* lower 3 bits only! */
 		cave->color4=cave->color3;	/* in plck, amoeba was color3 */
 		cave->color5=cave->color3;	/* same for slime */
 	}
@@ -1267,11 +1215,11 @@ cave_copy_from_dlb (Cave *cave, const guint8 *data, int remaining_bytes)
 	cave->extra_diamond_value=data[4];
 
 	/* then 5 color bytes follow */
-	cave->colorb=gd_c64_colors[data[8]&0xf].rgb;	/* border */
-	cave->color0=gd_c64_colors[data[9]&0xf].rgb;
-	cave->color1=gd_c64_colors[data[10]&0xf].rgb;
-	cave->color2=gd_c64_colors[data[11]&0xf].rgb;
-	cave->color3=gd_c64_colors[data[12]&0x7].rgb; 	/* lower 3 bits only! */
+	cave->colorb=gd_c64_color(data[8]&0xf);	/* border */
+	cave->color0=gd_c64_color(data[9]&0xf);
+	cave->color1=gd_c64_color(data[10]&0xf);
+	cave->color2=gd_c64_color(data[11]&0xf);
+	cave->color3=gd_c64_color(data[12]&0x7); 	/* lower 3 bits only! */
 	cave->color4=cave->color3;	/* in plck, amoeba was color3 */
 	cave->color5=cave->color3;	/* same for slime */
 
@@ -1413,11 +1361,11 @@ cave_copy_from_1stb (Cave *cave, const guint8 *data, int remaining_bytes)
 	}
 	/* also has no random data... */
 
-	cave->colorb=gd_c64_colors[data[0x384]&0xf].rgb;	/* border */
-	cave->color0=gd_c64_colors[data[0x385]&0xf].rgb;
-	cave->color1=gd_c64_colors[data[0x386]&0xf].rgb;
-	cave->color2=gd_c64_colors[data[0x387]&0xf].rgb;
-	cave->color3=gd_c64_colors[data[0x388]&0x7].rgb; 	/* lower 3 bits only! */
+	cave->colorb=gd_c64_color(data[0x384]&0xf);	/* border */
+	cave->color0=gd_c64_color(data[0x385]&0xf);
+	cave->color1=gd_c64_color(data[0x386]&0xf);
+	cave->color2=gd_c64_color(data[0x387]&0xf);
+	cave->color3=gd_c64_color(data[0x388]&0x7); 	/* lower 3 bits only! */
 	cave->color4=cave->color1;
 	cave->color5=cave->color1;
 
@@ -1442,13 +1390,8 @@ cave_copy_from_1stb (Cave *cave, const guint8 *data, int remaining_bytes)
 	cave->magic_wall_sound=data[0x38d]==0xf1;
 	/* 2d was a normal switch, 2e a changed one. */
 	cave->creatures_backwards=data[0x38f]==0x2d;
-	/* 2e horizontal, 2f vertical. we implement this by changing them */
-	if (data[0x38e]==0x2f)
-		for (y=0; y<cave->h; y++)
-			for (x=0; x<cave->w; x++) {
-				if (cave->map[y][x]==O_H_EXPANDING_WALL)
-					cave->map[y][x]=O_V_EXPANDING_WALL;
-			}
+	/* 2e horizontal, 2f vertical. */
+	cave->expanding_wall_changed=data[0x38e]==0x2f;
 
 	cave->biter_delay_frame=data[0x394];
 	cave->magic_wall_stops_amoeba=data[0x395]==0;	/* negated!! */
@@ -1479,7 +1422,6 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 	int i, index;
 	guint8 checksum;
 	GdObject object;
-	gboolean growing_wall_dir_change;
 	
 	/* if we have name, convert */
 	gd_strcpy(cave->name, "              ");
@@ -1534,11 +1476,11 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 	cave->diamond_value=(int)data[0x9] * 100 + data[0xA] * 10 + data[0xB];
 	if (data[0x10])
 		cave->creatures_direction_auto_change_time=data[0x11];
-	cave->colorb=gd_c64_colors[data[0x14]&0xf].rgb;	/* border */
-	cave->color0=gd_c64_colors[data[0x15]&0xf].rgb;
-	cave->color1=gd_c64_colors[data[0x16]&0xf].rgb;
-	cave->color2=gd_c64_colors[data[0x17]&0xf].rgb;
-	cave->color3=gd_c64_colors[data[0x18]&0x7].rgb; 	/* lower 3 bits only! */
+	cave->colorb=gd_c64_color(data[0x14]&0xf);	/* border */
+	cave->color0=gd_c64_color(data[0x15]&0xf);
+	cave->color1=gd_c64_color(data[0x16]&0xf);
+	cave->color2=gd_c64_color(data[0x17]&0xf);
+	cave->color3=gd_c64_color(data[0x18]&0x7); 	/* lower 3 bits only! */
 	cave->color4=cave->color3;
 	cave->color5=cave->color1;
 	cave->intermission=data[0x19]!=0;
@@ -1564,9 +1506,8 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 	cave->amoeba_fast_growth_prob=4.0/(data[0x13]+1);
 	if (cave->amoeba_fast_growth_prob>1)
 		cave->amoeba_fast_growth_prob=1;
-	/* growing wall direction change */
-	/* 2e horizontal, 2f vertical */
-	growing_wall_dir_change=data[0x1e]==0x2f;
+	/* expanding wall direction change - 2e horizontal, 2f vertical */
+	cave->expanding_wall_changed=data[0x1e]==0x2f;
 	/* 2c was a normal switch, 2d a changed one. */
 	cave->creatures_backwards=data[0x1f]==0x2d;
 	cave->biter_delay_frame=data[0x24];
@@ -1737,28 +1678,6 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 			cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(GdObject)));
 	}
 	index++;	/* skip $ff */
-
-	/* growing wall direction change */
-	if (growing_wall_dir_change) {
-		GList *iter;
-		int x, y;
-		
-		if (cave->map)
-			for (y=0; y<cave->h; y++)
-				for (x=0; x<cave->w; x++) {
-					if (cave->map[y][x]==O_H_EXPANDING_WALL)
-						cave->map[y][x]=O_V_EXPANDING_WALL;
-				}
-				
-		for (iter=cave->objects; iter!=NULL; iter=iter->next) {
-			GdObject *object=(GdObject *)iter->data;
-
-			if (object->element==O_H_EXPANDING_WALL)
-				object->element=O_V_EXPANDING_WALL;
-			if (object->fill_element==O_H_EXPANDING_WALL)
-				object->fill_element=O_V_EXPANDING_WALL;
-		}
-	}
 
 	/* crazy dream 7 hack */	
 	checksum=0;
@@ -2049,11 +1968,11 @@ cave_copy_from_crli (Cave *cave, const guint8 *data, int remaining_bytes)
 	cave->diamond_value=(int)uncompressed[0x379] * 100 + uncompressed[0x37A] * 10 + uncompressed[0x37B];
 	if (uncompressed[0x380])
 		cave->creatures_direction_auto_change_time=uncompressed[0x381];
-	cave->colorb=gd_c64_colors[uncompressed[0x384]&0xf].rgb;	/* border */
-	cave->color0=gd_c64_colors[uncompressed[0x385]&0xf].rgb;
-	cave->color1=gd_c64_colors[uncompressed[0x386]&0xf].rgb;
-	cave->color2=gd_c64_colors[uncompressed[0x387]&0xf].rgb;
-	cave->color3=gd_c64_colors[uncompressed[0x388]&0x7].rgb; 	/* lower 3 bits only! */
+	cave->colorb=gd_c64_color(uncompressed[0x384]&0xf);	/* border */
+	cave->color0=gd_c64_color(uncompressed[0x385]&0xf);
+	cave->color1=gd_c64_color(uncompressed[0x386]&0xf);
+	cave->color2=gd_c64_color(uncompressed[0x387]&0xf);
+	cave->color3=gd_c64_color(uncompressed[0x388]&0x7); 	/* lower 3 bits only! */
 	cave->color4=cave->color3;
 	cave->color5=cave->color1;
 	cave->intermission=uncompressed[0x389]!=0;

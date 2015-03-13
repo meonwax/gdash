@@ -33,8 +33,8 @@ const int gd_dy[]={ 0, -1, -1, 0, 1, 1, 1, 0, -1, -2, -2, 0, 2, 2, 2, 0, -2 };
 
 const char* gd_direction_name[]={ NULL, N_("Up"), N_("Up+right"), N_("Right"), N_("Down+right"), N_("Down"), N_("Down+left"), N_("Left"), N_("Up+left") };
 const char* gd_direction_filename[]={ NULL, "up", "upright", "right", "downright", "down", "downleft", "left", "upleft" };
-const char* gd_scheduling_name[]={ N_("Milliseconds"), N_("BD1"), N_("BD2"), N_("Construction Kit"), N_("Crazy Dream 7") };
-const char* gd_scheduling_filename[]={ "ms", "bd1", "bd2", "plck", "crdr7" };
+const char* gd_scheduling_name[]={ N_("Milliseconds"), "BD1", "BD2", "Construction Kit", "Crazy Dream 7", "BD1 Atari" };
+const char* gd_scheduling_filename[]={ "ms", "bd1", "bd2", "plck", "crdr7", "bd1atari" };
 
 static GHashTable *name_to_element;
 GdElement gd_char_to_element[256];
@@ -161,6 +161,8 @@ gd_cave_init()
 	g_hash_table_insert(name_to_element, "EXPLOSION4D", GINT_TO_POINTER(O_PRE_DIA_4));
 	g_hash_table_insert(name_to_element, "EXPLOSION5D", GINT_TO_POINTER(O_PRE_DIA_5));
 	g_hash_table_insert(name_to_element, "WALL2", GINT_TO_POINTER(O_STEEL_EXPLODABLE));
+	/* compatibility with old bd-faq (pre disassembly of bladder) */
+	g_hash_table_insert(name_to_element, "BLADDERd9", GINT_TO_POINTER(O_BLADDER_8));
 
 	/* create table to show errors at the start of the application */
 	gd_create_char_to_element_table();
@@ -248,7 +250,7 @@ gd_struct_set_defaults_from_array(gpointer str, const GdStructDescriptor *proper
 				evalue[j]=(GdElement) defaults[i].defval;
 				break;
 			case GD_TYPE_COLOR:
-				cvalue[j]=gd_c64_colors[defaults[i].defval].rgb;
+				cvalue[j]=gd_c64_color(defaults[i].defval);
 				break;
 			case GD_TYPE_DIRECTION:
 				dvalue[j]=(GdDirection) defaults[i].defval;
@@ -312,7 +314,7 @@ gd_struct_explain_defaults_in_string(const GdStructDescriptor *properties, GdPro
 				g_string_append_printf(defs, "%s", _(gd_elements[defaults[i].defval].name));
 				break;
 			case GD_TYPE_COLOR:
-				g_string_append_printf(defs, "%s", gd_get_color_name(gd_c64_colors[defaults[i].defval].rgb));
+				g_string_append_printf(defs, "%s", gd_get_color_name(gd_c64_color(defaults[i].defval)));
 				break;
 			case GD_TYPE_DIRECTION:
 				g_string_append_printf(defs, "%s", gd_direction_name[defaults[i].defval]);
@@ -448,52 +450,6 @@ gd_str_case_hash(gconstpointer v)
 
 
 
-GdColor
-gd_get_color_from_string (const char *color)
-{
-	int i, r, g, b;
-
-	for (i=0; i<16; i++)
-		if (g_ascii_strcasecmp(color, gd_c64_colors[i].name)==0)
-			return gd_c64_colors[i].rgb;
-
-	if (color[0]=='#')
-		color++;
-	if (sscanf(color, "%02x%02x%02x", &r, &g, &b)!=3) {
-		i=g_random_int_range(0, 16);
-		g_warning("Unkonwn color %s, using randomly chosen %s\n", color, gd_c64_colors[i].name);
-		return gd_c64_colors[i].rgb;
-	}
-	return (r<<16)+(g<<8)+b;
-}
-
-const char*
-gd_get_color_name (GdColor color)
-{
-	static char text[16];
-	int i;
-
-	for (i=0; i<G_N_ELEMENTS(gd_c64_colors); i++) {
-		if (gd_c64_colors[i].rgb==color)
-			return gd_c64_colors[i].name;
-	}
-	sprintf(text, "%02x%02x%02x", (color>>16)&255, (color>>8)&255, color&255);
-	return text;
-}
-
-/* used for exporting to crli caves. */
-int
-gd_get_c64_color_index (GdColor color)
-{
-	int i;
-
-	for (i=0; i<G_N_ELEMENTS(gd_c64_colors); i++) {
-		if (gd_c64_colors[i].rgb==color)
-			return i;
-	}
-	g_warning("non-c64 color %02x%02x%02x", (color>>16)&255, (color>>8)&255, color&255);
-	return g_random_int_range(1, 8);
-}
 
 
 
@@ -690,6 +646,28 @@ gd_cave_store_rc (Cave *cave, const int x, const int y, const GdElement element,
 
 
 
+unsigned int
+gd_c64_random(GdC64RandomGenerator *rand)
+{
+	unsigned int temp_rand_1, temp_rand_2, carry, result;
+
+	temp_rand_1=(rand->rand_seed_1&0x0001) << 7;
+	temp_rand_2=(rand->rand_seed_2 >> 1)&0x007F;
+	result=(rand->rand_seed_2)+((rand->rand_seed_2&0x0001) << 7);
+	carry=(result >> 8);
+	result=result&0x00FF;
+	result=result+carry+0x13;
+	carry=(result >> 8);
+	rand->rand_seed_2=result&0x00FF;
+	result=rand->rand_seed_1+carry+temp_rand_1;
+	carry=(result >> 8);
+	result=result&0x00FF;
+	result=result+carry+temp_rand_2;
+	rand->rand_seed_1=result&0x00FF;
+
+	return rand->rand_seed_1;
+}
+
 
 /*
 	C64 BD predictable random number generator.
@@ -699,25 +677,15 @@ gd_cave_store_rc (Cave *cave, const int x, const int y, const GdElement element,
 unsigned int
 gd_cave_c64_random (Cave *cave)
 {
-	unsigned int temp_rand_1, temp_rand_2, carry, result;
-
-	temp_rand_1=(cave->rand_seed_1&0x0001) << 7;
-	temp_rand_2=(cave->rand_seed_2 >> 1)&0x007F;
-	result=(cave->rand_seed_2)+((cave->rand_seed_2&0x0001) << 7);
-	carry=(result >> 8);
-	result=result&0x00FF;
-	result=result+carry+0x13;
-	carry=(result >> 8);
-	cave->rand_seed_2=result&0x00FF;
-	result=cave->rand_seed_1+carry+temp_rand_1;
-	carry=(result >> 8);
-	result=result&0x00FF;
-	result=result+carry+temp_rand_2;
-	cave->rand_seed_1=result&0x00FF;
-
-	return cave->rand_seed_1;
+	return gd_c64_random(&cave->c64_rand);
 }
 
+void
+gd_c64_random_set_seed(GdC64RandomGenerator *rand, int seed1, int seed2)
+{
+	rand->rand_seed_1=seed1;
+	rand->rand_seed_2=seed2;
+}
 
 
 
@@ -738,13 +706,13 @@ gd_cave_set_random_colors(Cave *cave)
 	const int bright_colors[]={1, 3, 7};
 	const int dark_colors[]={2, 6, 8, 9, 11};
 
-	cave->color0=gd_c64_colors[0].rgb;
-	cave->color3=gd_c64_colors[bright_colors[g_random_int_range(0, G_N_ELEMENTS(bright_colors))]].rgb;
+	cave->color0=gd_c64_color(0);
+	cave->color3=gd_c64_color(bright_colors[g_random_int_range(0, G_N_ELEMENTS(bright_colors))]);
 	do {
-		cave->color1=gd_c64_colors[dark_colors[g_random_int_range(0, G_N_ELEMENTS(dark_colors))]].rgb;
+		cave->color1=gd_c64_color(dark_colors[g_random_int_range(0, G_N_ELEMENTS(dark_colors))]);
 	} while (cave->color1==cave->color3);
 	do {
-		cave->color2=gd_c64_colors[g_random_int_range(1, 16)].rgb;
+		cave->color2=gd_c64_color(g_random_int_range(1, 16));
 	} while (cave->color1==cave->color2 || cave->color2==cave->color3);
 	cave->color4=cave->color3;
 	cave->color5=cave->color1;
@@ -1232,7 +1200,7 @@ gd_cave_scroll(int width, int visible, int center, gboolean exact, int start, in
 				(*current)--;
 		changed=TRUE;
 	}
-
+	
 	return changed;
 }
 

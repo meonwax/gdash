@@ -37,7 +37,7 @@ GdObjectDescription gd_object_description[]={
 	{ /* maze */  N_("Maze"), N_("Starting coordinates"), N_("Ending coordinates"), N_("Wall and path"), N_("Random seed %d"), N_("Wall element"), N_("Path element"), N_("Wall"), N_("Path") , N_("Horizontal (%)")},
 	{ /* umaze */ N_("Unicursal maze"), N_("Starting coordinates"), N_("Ending coordinates"), N_("Wall and path"), N_("Random seed %d"), N_("Wall element"), N_("Path element"), N_("Wall"), N_("Path") , N_("Horizontal (%)")},
 	{ /* Bmaze */ N_("Braid maze"), N_("Starting coordinates"), N_("Ending coordinates"), N_("Wall and path"), N_("Random seed %d"), N_("Wall element"), N_("Path element"), N_("Wall"), N_("Path") , N_("Horizontal (%)")},
-	{ /* random */N_("Random fill"), N_("Starting coordinates"), N_("Ending coordinates"), NULL, N_("Random seed %d"), N_("Replace only this element"), NULL, N_("Random 1"), N_("Initial"), NULL},
+	{ /* random */N_("Random fill"), N_("Starting coordinates"), N_("Ending coordinates"), NULL, N_("Random seed %d"), N_("Replace only this element"), NULL, N_("Random 1"), N_("Initial"), NULL, N_("C64 random numbers")},
 };
 
 
@@ -97,7 +97,7 @@ gd_object_to_bdcff(const GdObject *object)
 		
 	case RANDOM_FILL:
 		str=g_string_new(NULL);
-		g_string_append_printf(str, "RandomFill=%d %d %d %d %d %d %d %d %d %s", object->x1, object->y1, object->x2, object->y2, object->seed[0], object->seed[1], object->seed[2], object->seed[3], object->seed[4], gd_elements[object->fill_element].filename);	/* seed and initial fill */
+		g_string_append_printf(str, "%s=%d %d %d %d %d %d %d %d %d %s", object->c64_random?"RandomFillC64":"RandomFill", object->x1, object->y1, object->x2, object->y2, object->seed[0], object->seed[1], object->seed[2], object->seed[3], object->seed[4], gd_elements[object->fill_element].filename);	/* seed and initial fill */
 		for (j=0; j<4; j++)
 			if (object->random_fill_probability[j]!=0)
 				g_string_append_printf(str, " %s %d", gd_elements[object->random_fill[j]].filename, object->random_fill_probability[j]);
@@ -255,11 +255,13 @@ gd_object_new_from_string(char *str)
 	}
 	
 	/* RANDOM FILL OBJECT */
-	if (g_ascii_strcasecmp(name, "RandomFill")==0) {
+	if (g_ascii_strcasecmp(name, "RandomFill")==0 || g_ascii_strcasecmp(name, "RandomFillC64")==0) {
 		static char **words=NULL;
 		int l, i;
 
 		object.type=RANDOM_FILL;
+		if (g_ascii_strcasecmp(name, "RandomFillC64")==0)	/* totally the same, but uses c64 random generator */
+			object.c64_random=TRUE;
 		if (sscanf(param, "%d %d %d %d", &object.x1, &object.y1, &object.x2, &object.y2)!=4)
 			return NULL;
 		if (words)
@@ -874,7 +876,7 @@ braidmaze(GRand *rand, gboolean **maze, int w, int h)
 
 
 static void
-draw_maze(Cave *cave, const GdObject *object, int seed)
+draw_maze(Cave *cave, const GdObject *object, int level)
 {
 	int x, y;
 	gboolean **map;
@@ -936,7 +938,7 @@ draw_maze(Cave *cave, const GdObject *object, int seed)
 	/* start generation, if map is big enough.
 	   otherwise the application would crash, as the editor places maze objects during mouse click&drag that
 	   have no sense */
-	rand=g_rand_new_with_seed(seed==-1?g_rand_int(cave->random):seed);
+	rand=g_rand_new_with_seed(object->seed[level]==-1?g_rand_int(cave->random):object->seed[level]);
 	if (w>=1 && h>=1)
 		mazegen(rand, map, w, h, 0, 0, object->horiz);
 	if (object->type==MAZE_BRAID)
@@ -1029,7 +1031,7 @@ draw_maze(Cave *cave, const GdObject *object, int seed)
 
 
 static void
-draw_random_fill(Cave *cave, const GdObject *object, int seed)
+draw_random_fill(Cave *cave, const GdObject *object, int level)
 {
 	int x, y;
 	int x1=object->x1;
@@ -1037,8 +1039,19 @@ draw_random_fill(Cave *cave, const GdObject *object, int seed)
 	int x2=object->x2;
 	int y2=object->y2;
 	GRand *rand;
+	GdC64RandomGenerator c64_rand;
+	guint32 seed;
 	
-	rand=g_rand_new_with_seed(seed==-1?g_rand_int(cave->random):seed);
+	/* -1 means that it should be different every time played. */
+	if (object->seed[level]==-1)
+		seed=g_rand_int(cave->random);
+	else
+		seed=object->seed[level];
+	
+	rand=g_rand_new_with_seed(seed);
+	/* for c64 random, use the 2*8 lsb. */
+	gd_c64_random_set_seed(&c64_rand, seed/256%256, seed%256);
+	
 
 	/* change coordinates if not in correct order */
 	if (y1>y2) {
@@ -1060,7 +1073,10 @@ draw_random_fill(Cave *cave, const GdObject *object, int seed)
 			unsigned int randm;
 			GdElement element;
 			
-			randm=g_rand_int_range(rand, 0, 256);
+			if (object->c64_random)	/* use c64 random generator */
+				randm=gd_c64_random(&c64_rand);
+			else	/* use the much better glib random generator */
+				randm=g_rand_int_range(rand, 0, 256);
 
 			element=object->fill_element;
 			if (randm<object->random_fill_probability[0])
@@ -1089,6 +1105,7 @@ gd_cave_draw_object (Cave * cave, const GdObject *object, int level)
 	g_assert (cave->map!=NULL);
 	g_assert (cave->objects_order!=NULL);
 	g_assert (object!=NULL);
+	g_assert (level==cave->rendered-1);
 
 	switch (object->type) {
 		case POINT:
@@ -1127,11 +1144,11 @@ gd_cave_draw_object (Cave * cave, const GdObject *object, int level)
 		case MAZE:
 		case MAZE_UNICURSAL:
 		case MAZE_BRAID:
-			draw_maze(cave, object, object->seed[level]);
+			draw_maze(cave, object, level);
 			break;
 
 		case RANDOM_FILL:
-			draw_random_fill(cave, object, object->seed[level]);
+			draw_random_fill(cave, object, level);
 			break;
 			
 		case NONE:
@@ -1187,15 +1204,11 @@ gd_cave_new_rendered (const Cave *data, const int level, const guint32 seed)
 		cave->map=gd_cave_map_new (cave, GdElement);
 		/* IF CAVE HAS NO MAP, USE THE RANDOM NUMBER GENERATOR */
 		/* init c64 randomgenerator */
-		if (data->level_rand[level]<0) {
-			/* random seed=-1 -> totally random */
-			cave->rand_seed_1=g_rand_int_range(cave->random, 0, 256);
-			cave->rand_seed_2=g_rand_int_range(cave->random, 0, 256);
-		}
-		else {
-			cave->rand_seed_1=0;
-			cave->rand_seed_2=data->level_rand[level];
-		}
+		if (data->level_rand[level]<0)
+			gd_c64_random_set_seed(&cave->c64_rand, g_rand_int_range(cave->random, 0, 256), g_rand_int_range(cave->random, 0, 256));
+		else
+			gd_c64_random_set_seed(&cave->c64_rand, 0, data->level_rand[level]);
+
 		/* generate random fill
 		 * start from row 1 (0 skipped), and fill also the borders on left and right hand side,
 		 * as c64 did. this way works the original random generator the right way.
@@ -1238,15 +1251,13 @@ gd_cave_new_rendered (const Cave *data, const int level, const guint32 seed)
 		/* IF CAVE HAS A MAP, SIMPLY USE IT... no need to fill with random elements */
 		
 		/* initialize c64 predictable random for slime. the values were taken from afl bd, see docs/internals.txt */
-		cave->rand_seed_1=0;
-		cave->rand_seed_2=0x1e;
+		gd_c64_random_set_seed(&cave->c64_rand, 0, 0x1e);
 	}
 	
 	if (data->level_slime_seed_c64[level]!=-1) {
 		/* if a specific slime seed is requested, change it now. */
-		
-		cave->rand_seed_1=data->level_slime_seed_c64[level]/256;
-		cave->rand_seed_2=data->level_slime_seed_c64[level]%256;
+
+		gd_c64_random_set_seed(&cave->c64_rand, data->level_slime_seed_c64[level]/256, data->level_slime_seed_c64[level]%256);
 	}
 	
 	/* render cave objects above random data or map */

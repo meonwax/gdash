@@ -32,9 +32,15 @@ restart_level
 restart_level.png
 random_fill
 random_fill.png
+award
+award.png
 to_top
 to_top.png
 to_bottom
 to_bottom.png
-award
-award.png
+object_on_all
+object_on_all.png
+object_not_on_all
+object_not_on_all.png
+object_not_on_current
+object_not_on_current.png

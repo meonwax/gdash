@@ -46,7 +46,7 @@
 
 
 typedef struct _yuv {
-	/* we use values *256 here, so 8bits is not enough */
+	/* we use values *256 here for fixed point math, so 8bits is not enough */
 	int y, u, v;
 } YUV;
 
@@ -58,16 +58,15 @@ luma_blur (YUV **yuv, YUV **work, int width, int height)
 	   pal_emus cells, not complete screens */
 	/* convolution "matrix" for luminance */
 	static const int lconv[] = {
-//		1, 2, 1,	/* 2 4 2 */
-		1, 2, 1
+		1, 3, 1,	/* 2 4 2 */
 	};
 	/* for left edge of image. */
 	static const int lconv_left[] = {
-		1, 4, 2,
+		1, 5, 3,
 	};
 	/* for right edge of image. */
 	static const int lconv_right[] = {
-		2, 4, 1,
+		3, 5, 1,
 	};
 	static int ldiv=0, ldiv_left=0, ldiv_right=0;
 	static gboolean first_run_done=FALSE;
@@ -161,8 +160,9 @@ chroma_crosstalk_to_luma(YUV **yuv, YUV **work, int width, int height)
 	static int crosstalk_sin[CROSSTALK_SIZE];
 	static int crosstalk_cos[CROSSTALK_SIZE];
 	/* crosstalk will be amplitude/div; we use these two to have integer arithmetics */
-	const int crosstalk_amplitude=256;
+	const int crosstalk_amplitude=192;
 	const int crosstalk_div=256;
+	const int crosstalk_div_edge=384;
 	static gboolean crosstalk_calculated=FALSE;
 
 	if (!crosstalk_calculated) {
@@ -183,12 +183,9 @@ chroma_crosstalk_to_luma(YUV **yuv, YUV **work, int width, int height)
 	/* apply edge detection matrix */
 	for (y=0; y<height; y++) {
 		for (x=0; x<width; x++) {
-			int xm, xm2, xp, xp2;
 			const int conv[]={-1, 1, 0, 0, 0,};
+			int xm, xm2, xp, xp2;
 
-			/* non-turnaround coordinates */
-//			xm=x==0?0:x-1;
-//			xp=x==width-1?width-1:x+1;
 			/* turnaround coordinates */
 			xm2=(x-2+width)%width;
 			xm=(x-1+width)%width;
@@ -196,8 +193,6 @@ chroma_crosstalk_to_luma(YUV **yuv, YUV **work, int width, int height)
 			xp2=(x+2)%width;
 
 			/* edge detect */
-//			work[y][x].u=yuv[y][xm].u-2*yuv[y][x].u+yuv[y][xp].u;
-//			work[y][x].v=yuv[y][xm].v-2*yuv[y][x].v+yuv[y][xp].v;
 			work[y][x].u=yuv[y][xm2].u*conv[0]+yuv[y][xm].u*conv[1]+yuv[y][x].u*conv[2]+yuv[y][xp].u*conv[3]+yuv[y][xp2].u*conv[4];
 			work[y][x].v=yuv[y][xm2].v*conv[0]+yuv[y][xm].v*conv[1]+yuv[y][x].v*conv[2]+yuv[y][xp].v*conv[3]+yuv[y][xp2].v*conv[4];
 		}
@@ -205,10 +200,11 @@ chroma_crosstalk_to_luma(YUV **yuv, YUV **work, int width, int height)
 	
 	for (y=0; y<height; y++)
 		for (x=0; x<width; x++) {
+			int div=(x==0 || x==width-1)?crosstalk_div_edge:crosstalk_div;
 			if (y/2%2==1)		/* y/2: for interlacing. */
-				yuv[y][x].y+=(crosstalk_sin[x%CROSSTALK_SIZE]*work[y][x].u-crosstalk_cos[x%CROSSTALK_SIZE]*work[y][x].v)/crosstalk_div;	/* odd lines (/2) */
+				yuv[y][x].y+=(crosstalk_sin[x%CROSSTALK_SIZE]*work[y][x].u-crosstalk_cos[x%CROSSTALK_SIZE]*work[y][x].v)/div;	/* odd lines (/2) */
 			else
-				yuv[y][x].y+=(crosstalk_sin[x%CROSSTALK_SIZE]*work[y][x].u+crosstalk_cos[x%CROSSTALK_SIZE]*work[y][x].v)/crosstalk_div;	/* even lines (/2) */
+				yuv[y][x].y+=(crosstalk_sin[x%CROSSTALK_SIZE]*work[y][x].u+crosstalk_cos[x%CROSSTALK_SIZE]*work[y][x].v)/div;	/* even lines (/2) */
 		}
 }
 

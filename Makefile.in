@@ -107,6 +107,7 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
 GLIB_CFLAGS = @GLIB_CFLAGS@
 GLIB_GENMARSHAL = @GLIB_GENMARSHAL@
 GLIB_LIBS = @GLIB_LIBS@
@@ -161,6 +162,7 @@ USE_NLS = @USE_NLS@
 VERSION = @VERSION@
 XGETTEXT = @XGETTEXT@
 XGETTEXT_015 = @XGETTEXT_015@
+XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
 ac_ct_CC = @ac_ct_CC@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -204,11 +206,11 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-SUBDIRS = po include src caves util docs sound
+SUBDIRS = po include src caves util docs sound music
 ACLOCAL_AMFLAGS = -I m4
 desktopdir = $(datadir)/applications
 desktop_DATA = gdash.desktop
-EXTRA_DIST = config.rpath mkinstalldirs m4/ChangeLog gdash.ico gdash.nsi.in $(desktop_DATA) gdk-pixbuf.loaders
+EXTRA_DIST = config.rpath mkinstalldirs m4/ChangeLog gdash.ico gdash.nsi.in $(desktop_DATA) gdk-pixbuf.loaders engine_tests.bd
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

@@ -13,3 +13,5 @@ oldbin2gdash_SOURCES = \
 
 palette2c_SOURCES = \
 	palette2c.c
+
+EXTRA_DIST = palettetoact.c

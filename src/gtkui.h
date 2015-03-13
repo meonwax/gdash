@@ -36,11 +36,14 @@
 #define GD_ICON_SNAPSHOT "snapshot"
 #define GD_ICON_RESTART_LEVEL "restart-level"
 #define GD_ICON_RANDOM_FILL "random-fill"
-#define GD_ICON_TO_TOP "to-top"
-#define GD_ICON_TO_BOTTOM "to-bottom"
 #define GD_ICON_REMOVE_MAP "remove-map"
 #define GD_ICON_FLATTEN_CAVE "flatten-cave"
 #define GD_ICON_AWARD "icon-award"
+#define GD_ICON_TO_TOP "icon-to-top"
+#define GD_ICON_TO_BOTTOM "icon-to-botton"
+#define GD_ICON_OBJECT_ON_ALL "icon-object-on-all"
+#define GD_ICON_OBJECT_NOT_ON_ALL "icon-object-not-on-all"
+#define GD_ICON_OBJECT_NOT_ON_CURRENT "icon-object-not-on-current"
 
 void gd_create_stock_icons(void);
 
@@ -77,3 +80,4 @@ void gd_show_errors(GtkWidget *parent);
 void gd_show_last_error(GtkWidget *parent);
 
 #endif
+

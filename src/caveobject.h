@@ -54,8 +54,9 @@ typedef struct _object {
 	int dx, dy;				/* distance of elements for raster or join */
 	GdElement element, fill_element;		/* element type */
 	gint32 seed[5];			/* for maze and random fill */
-	int horiz;			/* for maze */
-	
+	int horiz;				/* for maze */
+
+	gboolean c64_random;	/* random fill objects: use c64 random generator */	
 	GdElement random_fill[4];
 	int random_fill_probability[4];
 } GdObject;
@@ -70,6 +71,7 @@ typedef struct _objdesc {
 	char *fill_element;
 	char *first_button, *second_button;
 	char *horiz;
+	char *c64_random;
 } GdObjectDescription;
 
 extern GdObjectDescription gd_object_description[];

@@ -18,6 +18,7 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 #include "gfxutil.h"
+#include "colors.h"
 #include "cave.h"
 #include "cavedb.h"
 #include "caveset.h"
@@ -56,7 +57,7 @@ static GdkPixbuf *
 scale2x(GdkPixbuf *src)
 {
    	GdkPixbuf *dst;
-   	
+
    	g_assert(gdk_pixbuf_get_colorspace(src)==GDK_COLORSPACE_RGB);
    	g_assert(gdk_pixbuf_get_has_alpha(src));
    	g_assert(gdk_pixbuf_get_n_channels(src)==4);
@@ -65,7 +66,7 @@ scale2x(GdkPixbuf *src)
 	dst=gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 2*gdk_pixbuf_get_width(src), 2*gdk_pixbuf_get_height(src));
 
 	gd_scale2x(gdk_pixbuf_get_pixels(src), gdk_pixbuf_get_width(src), gdk_pixbuf_get_height(src), gdk_pixbuf_get_rowstride(src), gdk_pixbuf_get_pixels(dst), gdk_pixbuf_get_rowstride(dst));
-	
+
 	return dst;
 }
 
@@ -73,7 +74,7 @@ static GdkPixbuf *
 scale3x(GdkPixbuf *src)
 {
    	GdkPixbuf *dst;
-   	
+
    	g_assert(gdk_pixbuf_get_colorspace(src)==GDK_COLORSPACE_RGB);
    	g_assert(gdk_pixbuf_get_has_alpha(src));
    	g_assert(gdk_pixbuf_get_n_channels(src)==4);
@@ -82,7 +83,30 @@ scale3x(GdkPixbuf *src)
 	dst=gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 3*gdk_pixbuf_get_width(src), 3*gdk_pixbuf_get_height(src));
 
 	gd_scale3x(gdk_pixbuf_get_pixels(src), gdk_pixbuf_get_width(src), gdk_pixbuf_get_height(src), gdk_pixbuf_get_rowstride(src), gdk_pixbuf_get_pixels(dst), gdk_pixbuf_get_rowstride(dst));
+
+	return dst;
+}
+
+/* scale4x is essentially a scale2x applied twice */
+static GdkPixbuf *
+scale4x(GdkPixbuf *src)
+{
+   	GdkPixbuf *dst2x, *dst;
+
+   	g_assert(gdk_pixbuf_get_colorspace(src)==GDK_COLORSPACE_RGB);
+   	g_assert(gdk_pixbuf_get_has_alpha(src));
+   	g_assert(gdk_pixbuf_get_n_channels(src)==4);
+   	g_assert(gdk_pixbuf_get_bits_per_sample(src)==8);
+
+	dst2x=gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 2*gdk_pixbuf_get_width(src), 2*gdk_pixbuf_get_height(src));
+	dst=gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 4*gdk_pixbuf_get_width(src), 4*gdk_pixbuf_get_height(src));
+
+	gd_scale2x(gdk_pixbuf_get_pixels(src), gdk_pixbuf_get_width(src), gdk_pixbuf_get_height(src), gdk_pixbuf_get_rowstride(src), gdk_pixbuf_get_pixels(dst2x), gdk_pixbuf_get_rowstride(dst2x));
+
+	gd_scale2x(gdk_pixbuf_get_pixels(dst2x), gdk_pixbuf_get_width(dst2x), gdk_pixbuf_get_height(dst2x), gdk_pixbuf_get_rowstride(dst2x), gdk_pixbuf_get_pixels(dst), gdk_pixbuf_get_rowstride(dst));
 	
+	g_object_unref(dst2x);
+
 	return dst;
 }
 
@@ -94,12 +118,12 @@ GdkPixbuf *
 gd_pixbuf_scale(GdkPixbuf *orig, GdScalingType type)
 {
 	GdkPixbuf *pixbuf=NULL;
-	
+
 	switch (type) {
 		case GD_SCALING_ORIGINAL:
 			pixbuf=gdk_pixbuf_copy(orig);
 			break;
-		
+
 		case GD_SCALING_2X:
 			pixbuf=gdk_pixbuf_scale_simple(orig, 2*gdk_pixbuf_get_width(orig), 2*gdk_pixbuf_get_height(orig), GDK_INTERP_NEAREST);
 			break;
@@ -123,13 +147,25 @@ gd_pixbuf_scale(GdkPixbuf *orig, GdScalingType type)
 		case GD_SCALING_3X_SCALE3X:
 			pixbuf=scale3x(orig);
 			break;
-			
+
+		case GD_SCALING_4X:
+			pixbuf=gdk_pixbuf_scale_simple(orig, 4*gdk_pixbuf_get_width(orig), 4*gdk_pixbuf_get_height(orig), GDK_INTERP_NEAREST);
+			break;
+
+		case GD_SCALING_4X_BILINEAR:
+			pixbuf=gdk_pixbuf_scale_simple(orig, 4*gdk_pixbuf_get_width(orig), 4*gdk_pixbuf_get_height(orig), GDK_INTERP_BILINEAR);
+			break;
+
+		case GD_SCALING_4X_SCALE4X:
+			pixbuf=scale4x(orig);
+			break;
+
 		case GD_SCALING_MAX:
 			/* to avoid compiler warning */
 			g_assert_not_reached();
 			break;
 	}
-	
+
 	return pixbuf;
 }
 
@@ -200,15 +236,15 @@ gd_is_pixbuf_ok_for_theme(GdkPixbuf *pixbuf)
 {
 	static char *error=NULL;
 	int width, height;
-	
+
 	g_assert(pixbuf!=NULL);
-	
+
 	g_free(error);
 	error=NULL;
-	
+
 	width=gdk_pixbuf_get_width(pixbuf);
 	height=gdk_pixbuf_get_height(pixbuf);
-	
+
 	if ((width % NUM_OF_CELLS_X != 0) || (height % NUM_OF_CELLS_Y != 0) || (width / NUM_OF_CELLS_X != height / NUM_OF_CELLS_Y)) {
 		error=g_strdup_printf("Image should contain %d cells in a row and %d in a column!", NUM_OF_CELLS_X, NUM_OF_CELLS_Y);
 		return error;
@@ -217,7 +253,7 @@ gd_is_pixbuf_ok_for_theme(GdkPixbuf *pixbuf)
 		error=g_strdup_printf("Image should have an alpha channel!");
 		return error;
 	}
-	
+
 	/* passes tests */
 	return NULL;
 }
@@ -235,7 +271,7 @@ gd_is_image_ok_for_theme(const char *filename)
 	const char *error_from_pixbuf;
 
 	g_assert(filename!=NULL);
-	
+
 	g_free(error_msg);
 	error_msg=NULL;
 
@@ -248,7 +284,7 @@ gd_is_image_ok_for_theme(const char *filename)
 	}
 	error_from_pixbuf=gd_is_pixbuf_ok_for_theme(pixbuf);
 	g_object_unref(pixbuf);
-	
+
 	if (error_from_pixbuf) {
 		error_msg=g_strdup(error_from_pixbuf);
 		return error_msg;
@@ -262,7 +298,7 @@ static void
 free_pixmaps()
 {
 	int i;
-	
+
 	/* if cells already loaded, unref them */
 	for (i=0; i<G_N_ELEMENTS(cells_game); i++) {
 		if (cells_game[i])
@@ -414,7 +450,7 @@ loadcells(GdkPixbuf *cells_pixbuf)
 
 	add_arrow_to_cell(O_UNKNOWN, O_STEEL, O_QUESTION_MARK, GDK_PIXBUF_ROTATE_NONE);
 	add_arrow_to_cell(O_WAITING_STONE, O_STONE, O_EXCLAMATION_MARK, GDK_PIXBUF_ROTATE_NONE);
-	
+
 	/* blinking outbox: helps editor, drawing the cave is more simple */
 	copy_cell(ABS(gd_elements[O_PRE_OUTBOX].image_simple)+0, gd_elements[O_OUTBOX_OPEN].image_game);
 	copy_cell(ABS(gd_elements[O_PRE_OUTBOX].image_simple)+1, gd_elements[O_OUTBOX_OPEN].image_game);
@@ -429,9 +465,9 @@ loadcells(GdkPixbuf *cells_pixbuf)
 static guint32
 rgba_pixel_from_color(GdColor col, guint8 a)
 {
-	guint8 r=(col>>16)&255;
-	guint8 g=(col>>8)&255;
-	guint8 b=col&255;
+	guint8 r=gd_color_get_r(col);
+	guint8 g=gd_color_get_g(col);
+	guint8 b=gd_color_get_b(col);
 #if G_BYTE_ORDER==G_LITTLE_ENDIAN
 	return r+(g<<8)+(b<<16)+(a<<24);
 #else
@@ -460,12 +496,12 @@ loadcells_c64 (GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdCol
 	cols[6]=rgba_pixel_from_color(c5, 0xff); /* slime */
 	cols[7]=rgba_pixel_from_color(0, 0xff);	/* black, opaque*/
 	cols[8]=rgba_pixel_from_color(0xffffff, 0xff);	/* white, opaque*/
-	
+
 	cells_pixbuf=gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, NUM_OF_CELLS_X*gfx[0], NUM_OF_CELLS_Y*gfx[0]);
 	n_channels=gdk_pixbuf_get_n_channels (cells_pixbuf);
 	rowstride=gdk_pixbuf_get_rowstride (cells_pixbuf);	/* bytes / row */
 	pixels=gdk_pixbuf_get_pixels (cells_pixbuf);	/* pointer to pixbuf memory */
-	
+
 	pos=1;	/* index to gfx array */
 	/* create colored pixbuf from c64 graphics, using c0, c1, c2, c3 */
 	for (y=0; y<NUM_OF_CELLS_Y*gfx[0]; y++) {
@@ -474,7 +510,7 @@ loadcells_c64 (GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdCol
 		for (x=0; x<NUM_OF_CELLS_X*gfx[0]; x++)
 			p[x]=cols[(int) gfx[pos++]];
 	}
-	
+
 	/* from here, same as any other png */
 	loadcells(cells_pixbuf);
 	g_object_unref(cells_pixbuf);
@@ -509,7 +545,7 @@ c64_gfx_data_from_pixbuf(GdkPixbuf *pixbuf)
 	int x, y;
 	guchar *data;
 	int out;
-	
+
 	g_assert (gdk_pixbuf_get_colorspace (pixbuf) == GDK_COLORSPACE_RGB);
 	g_assert (gdk_pixbuf_get_bits_per_sample (pixbuf) == 8);
 	g_assert (gdk_pixbuf_get_has_alpha (pixbuf));
@@ -521,11 +557,11 @@ c64_gfx_data_from_pixbuf(GdkPixbuf *pixbuf)
 	pixels=gdk_pixbuf_get_pixels (pixbuf);
 
 	g_assert (n_channels == 4);
-	
+
 	data=g_new(guchar, width*height+1);
 	out=0;
 	data[out++]=width/NUM_OF_CELLS_X;
-	
+
 	for (y=0; y<height; y++)
 		for (x=0; x<width; x++) {
 			int r, g, b, a, c;
@@ -559,7 +595,7 @@ gd_loadcells_file (const char *filename)
 		g_error_free(error);
 		return FALSE;
 	}
-	/* check if file has the properties which we need for a theme */	
+	/* check if file has the properties which we need for a theme */
 	error_msg=gd_is_pixbuf_ok_for_theme(cells_pixbuf);
 	if (error_msg) {
 		g_object_unref(cells_pixbuf);
@@ -581,7 +617,7 @@ gd_loadcells_file (const char *filename)
 	}
 	g_object_unref(cells_pixbuf);
 
-	return TRUE;	
+	return TRUE;
 }
 
 void
@@ -590,7 +626,8 @@ gd_loadcells_default()
 	g_free(c64_custom_gfx);
 	c64_custom_gfx=NULL;
 	using_png_gfx=FALSE;
-	gd_select_pixbuf_colors(gd_c64_colors[0].rgb, gd_c64_colors[8].rgb, gd_c64_colors[12].rgb, gd_c64_colors[1].rgb, gd_c64_colors[1].rgb, gd_c64_colors[1].rgb);	/* just to set some default */
+	/* just to set some default - this will also be the color of the builtin gfx in the preferences window */
+	gd_select_pixbuf_colors(0x000000, 0x5555aa, 0xc68e71, 0xffffff, 0xffffff, 0xffffff);
 }
 
 /* wrapper */
@@ -598,18 +635,18 @@ void
 gd_pal_pixbuf(GdkPixbuf *pixbuf)
 {
 #if G_BYTE_ORDER == G_BIG_ENDIAN
-    guint32 rshift = 24;
-    guint32 gshift = 16;
-    guint32 bshift = 8;
-    guint32 ashift = 0;
+    guint32 rshift=24;
+    guint32 gshift=16;
+    guint32 bshift=8;
+    guint32 ashift=0;
 #else
-    guint32 rshift = 0;
-    guint32 gshift = 8;
-    guint32 bshift = 16;
-    guint32 ashift = 24;
+    guint32 rshift=0;
+    guint32 gshift=8;
+    guint32 bshift=16;
+    guint32 ashift=24;
 #endif
 	g_assert(gdk_pixbuf_get_has_alpha(pixbuf));
-	
+
 	gd_pal_emu(gdk_pixbuf_get_pixels(pixbuf), gdk_pixbuf_get_width(pixbuf), gdk_pixbuf_get_height(pixbuf), gdk_pixbuf_get_rowstride(pixbuf), rshift, gshift, bshift, ashift);
 }
 
@@ -627,7 +664,7 @@ create_pixmap(GdkPixmap **cells, int index, int cell_size, GdScalingType type, g
 	g_assert(cells_pb[index]!=NULL);
 
 	window=gdk_get_default_root_window();
-	
+
 	/* scale the cell.
 	 * scale every cell on its own, or else some pixels might be merged on borders */
 	normal=gd_pixbuf_scale(cells_pb[index], type);
@@ -641,18 +678,18 @@ create_pixmap(GdkPixmap **cells, int index, int cell_size, GdScalingType type, g
 	cells[index]=gdk_pixmap_new (window, cell_size, cell_size, -1);
 	gdk_draw_pixbuf(cells[index], NULL, normal, 0, 0, 0, 0, cell_size, cell_size, GDK_RGB_DITHER_MAX, 0, 0);
 
-	element=gdk_pixbuf_composite_color_simple (normal, cell_size, cell_size, GDK_INTERP_NEAREST, 128, 1, gd_flash_color, gd_flash_color);
+	element=gdk_pixbuf_composite_color_simple(normal, cell_size, cell_size, GDK_INTERP_NEAREST, 128, 1, gd_flash_color, gd_flash_color);
 	cells[NUM_OF_CELLS + index]=gdk_pixmap_new (window, cell_size, cell_size, -1);
 	gdk_draw_pixbuf(cells[NUM_OF_CELLS + index], NULL, element, 0, 0, 0, 0, cell_size, cell_size, GDK_RGB_DITHER_MAX, 0, 0);
 	g_object_unref(element);
 
 	if (render_selected) {
-		selected=gdk_pixbuf_composite_color_simple (normal, cell_size, cell_size, GDK_INTERP_NEAREST, 128, 1, gd_select_color, gd_select_color);
+		selected=gdk_pixbuf_composite_color_simple(normal, cell_size, cell_size, GDK_INTERP_NEAREST, 128, 1, gd_select_color, gd_select_color);
 		cells[2 * NUM_OF_CELLS + index]=gdk_pixmap_new (window, cell_size, cell_size, -1);
 		gdk_draw_pixbuf(cells[2 * NUM_OF_CELLS + index], NULL, selected, 0, 0, 0, 0, cell_size, cell_size, GDK_RGB_DITHER_MAX, 0, 0);
 		g_object_unref(selected);
 	}
-	
+
 	/* forget scaled pixbufs, as only the pixmaps are needed */
 	g_object_unref(normal);
 }
@@ -662,7 +699,7 @@ GdkPixmap *
 gd_game_pixmap(int index)
 {
 	int i;
-	
+
 	g_assert(index<2*NUM_OF_CELLS);	/* make sure that no blue/"selected" pixbuf is requested for a game */
 	i=index%NUM_OF_CELLS;	/* might request a colored, so we do a % NUM_OF_CELLS */
 	if (cells_game[i]==NULL)	/* check if pixmap already exists */
@@ -675,7 +712,7 @@ GdkPixmap *
 gd_editor_pixmap(int index)
 {
 	int i;
-	
+
 	i=index%NUM_OF_CELLS;	/* might request a colored, so we do a % NUM_OF_CELLS */
 	if (cells_editor[i]==NULL)	/* check if pixmap already exists */
 		create_pixmap(cells_editor, i, gd_cell_size_editor, gd_cell_scale_editor, TRUE, gd_pal_emulation_editor);
@@ -688,9 +725,18 @@ void
 gd_select_pixbuf_colors (GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5)
 {
 	/* if non-c64 gfx, nothing to do */
-	if (using_png_gfx) {
-		/* nothing to do */
-	} else
+	if (using_png_gfx)
+		return;
+
+	/* convert to rgb value */
+	c0=gd_color_get_rgb(c0);
+	c1=gd_color_get_rgb(c1);
+	c2=gd_color_get_rgb(c2);
+	c3=gd_color_get_rgb(c3);
+	c4=gd_color_get_rgb(c4);
+	c5=gd_color_get_rgb(c5);
+
+	/* and compare rgb values! */
 	if (c0!=color0 || c1!=color1 || c2!=color2 || c3!=color3 || c4!=color4 || c5!=color5) {
 		/* if not the same colors as requested before */
 		color0=c0;
@@ -717,7 +763,7 @@ get_element_pixbuf_with_border(int index)
 		gtk_icon_size_lookup (GTK_ICON_SIZE_MENU, &x, &y);
 		pixbuf=gdk_pixbuf_scale_simple (cells_pb[index], x, y, GDK_INTERP_BILINEAR);
 		/* draw a little black border around image, makes the icons look much better */
-		pixbuf_border=gdk_pixbuf_new (GDK_COLORSPACE_RGB, gdk_pixbuf_get_has_alpha (pixbuf), 8, x + 2, y + 2);
+		pixbuf_border=gdk_pixbuf_new (GDK_COLORSPACE_RGB, gdk_pixbuf_get_has_alpha (pixbuf), 8, x+2, y+2);
 		gdk_pixbuf_fill (pixbuf_border, 0x000000ff);	/* RGBA: opaque black */
 		gdk_pixbuf_copy_area (pixbuf, 0, 0, x, y, pixbuf_border, 1, 1);
 		g_object_unref (pixbuf);
@@ -768,7 +814,7 @@ gd_drawcave_to_pixbuf(const Cave * cave, const int width, const int height, cons
 	GdkPixbuf *pixbuf, *scaled;
 	float scale;
 	int x1, y1, x2, y2;
-	
+
 	g_assert(cave->map!=NULL);
 	if (game_view) {
 		/* if showing the visible part only */
@@ -792,13 +838,13 @@ gd_drawcave_to_pixbuf(const Cave * cave, const int width, const int height, cons
 	/* add two pixels black border: +4 +4 for width and height */
 	pixbuf=gdk_pixbuf_new (GDK_COLORSPACE_RGB, gdk_pixbuf_get_has_alpha (cells_pb[0]), 8, (x2-x1+1)*cell_size+4, (y2-y1+1)*cell_size+4);
 	gdk_pixbuf_fill (pixbuf, 0x000000ff);	/* fill with opaque black */
-	
+
 	/* take visible part into consideration */
 	for (y=y1; y<=y2; y++)
 		for (x=x1; x<=x2; x++) {
 			GdElement element=cave->map[y][x]&O_MASK;
 			int draw;
-			
+
 			if (game_view) {
 				/* visual effects */
 				switch(element) {
@@ -840,7 +886,7 @@ gd_drawcave_to_pixbuf(const Cave * cave, const int width, const int height, cons
 	/* scale to specified size */
 	scaled=gdk_pixbuf_scale_simple (pixbuf, gdk_pixbuf_get_width (pixbuf)*scale, gdk_pixbuf_get_height (pixbuf)*scale, GDK_INTERP_BILINEAR);
 	g_object_unref (pixbuf);
-	
+
 	return scaled;
 }
 

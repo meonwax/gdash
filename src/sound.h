@@ -22,5 +22,8 @@ void gd_no_sound();
 void gd_cave_play_sounds(Cave *cave);
 void gd_play_bonus_life_sound();
 
+void gd_music_play_random();
+void gd_music_stop();
+
 #endif
 

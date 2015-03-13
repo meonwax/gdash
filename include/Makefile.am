@@ -11,6 +11,16 @@ CAVES = \
 	No_One_09.gds \
 	No_One_10.gds
 
+ATARIPALETTES = \
+	BuiltIn.act \
+	BuiltIn_contrast.act \
+	Default.act \
+	Jakub.act \
+	Jakub_contrast.act \
+	Real.act \
+	Real_contrast.act \
+	XFormer.act
+
 ICONS = \
 	add_filled_rectangle.png \
 	add_freehand.png \
@@ -29,9 +39,12 @@ ICONS = \
 	snapshot.png \
 	restart_level.png \
 	random_fill.png \
+	award.png \
 	to_top.png \
 	to_bottom.png \
-	award.png
+	object_on_all.png \
+	object_not_on_all.png \
+	object_not_on_current.png
 
 TITLE = \
 	gdash_screen.png \
@@ -44,7 +57,8 @@ noinst_HEADERS = \
 	c64_gfx.h \
 	c64_font.h \
 	title.h \
-	levels.h
+	levels.h \
+	ataripal.h
 
 icondir = $(datadir)/pixmaps
 icon_DATA = gdash.png
@@ -53,8 +67,10 @@ pkgdata_DATA = boulder_rush.png c64_gfx.png c64_font.png
 
 EXTRA_DIST = $(ICONS) $(TITLE) $(icon_DATA) \
 	icons.list title.list \
+	files2c.sh \
 	$(pkgdata_DATA) \
-	$(CAVES) levels.h process.sh
+	$(CAVES) levels.h \
+	$(ATARIPALETTES) ataripal.h
 
 
 # for included ICONS
@@ -123,5 +139,7 @@ file2c_SOURCES = \
 	file2c.c
 
 levels.h: $(CAVES) file2c Makefile.am
-	sh process.sh $(CAVES)
+	sh files2c.sh $@ level $(CAVES)
 
+ataripal.h: $(ATARIPALETTES) file2c Makefile.am
+	sh files2c.sh $@ atari_palettes $(ATARIPALETTES)

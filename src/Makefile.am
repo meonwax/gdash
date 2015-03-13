@@ -31,6 +31,7 @@ strip: $(bin_PROGRAMS)
 # base sources and headers:
 #   the gdash engine.
 base_headers = \
+	colors.h \
 	cave.h \
 	cavedb.h \
 	caveengine.h \
@@ -46,6 +47,7 @@ base_headers = \
 	gfxutil.h
 
 base_sources = \
+	colors.c \
 	cave.c \
 	cavedb.c \
 	caveengine.c \
