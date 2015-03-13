@@ -22,8 +22,12 @@ void gd_show_highscore(gpointer highlight);
 void gd_help(const char **strings);
 
 void gd_error_console();
+void gd_show_error(GdErrorMessage *error);
 
 char *gd_input_string(const char *title, const char *current);
+
+void gd_about();
+void gd_show_license();
 
 #endif
 

@@ -31,6 +31,8 @@
 #include "game.h"
 #include "editor-export.h"
 #include "about.h"
+#include "sound.h"
+
 
 #include "gtk_main.h"
 
@@ -351,7 +353,7 @@ restart_level_cb (GtkWidget * widget, gpointer data)
 static void
 about_cb(GtkWidget *widget, gpointer data)
 {
-	gtk_show_about_dialog (GTK_WINDOW(main_window.window), "program-name", "GDash", "license", gd_about_license, "authors", gd_about_authors, "version", PACKAGE_VERSION, "comments", _(gd_about_comments), "translator-credits", _(gd_about_translator_credits), "website", gd_about_website, "artists", gd_about_artists, "documenters", gd_about_documenters, NULL);
+	gtk_show_about_dialog (GTK_WINDOW(main_window.window), "program-name", "GDash", "license", gd_about_license, "wrap-license", TRUE, "authors", gd_about_authors, "version", PACKAGE_VERSION, "comments", _(gd_about_comments), "translator-credits", _(gd_about_translator_credits), "website", gd_about_website, "artists", gd_about_artists, "documenters", gd_about_documenters, NULL);
 }
 
 static void
@@ -890,6 +892,7 @@ iterate_int (const gpointer data)
 	/* iterate cave if needed */
 	if (!paused && !game.out_of_window) {
 		no_more=gd_game_iterate_cave(up, down, left, right, fire, key_suicide, restart);
+		gd_play_sounds(game.cave->sound1, game.cave->sound2, game.cave->sound3);
 		showheader();
 	} else
 		no_more=FALSE;
@@ -1239,7 +1242,10 @@ main (int argc, char *argv[])
 
 	/* show license? */
 	if (gd_param_license) {
-		g_print("%s", gd_about_license);
+		char *wrapped=gd_wrap_text(gd_about_license, 72);
+		
+		g_print("%s", wrapped);
+		g_free(wrapped);
 		return 0;
 	}
 
@@ -1338,6 +1344,8 @@ main (int argc, char *argv[])
 	gd_create_stock_icons ();
 	gd_create_main_window ();
 	main_window_set_title ();
+
+	gd_sound_init();
 
 	init_mainwindow (NULL);
 

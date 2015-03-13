@@ -22,6 +22,8 @@
 #include "settings.h"
 #include "game.h"
 
+#include "sound.h"
+
 /* start uncovering */
 #define GAME_INT_UNCOVER_START -70
 /* ...70 frames until full uncover... */
@@ -69,6 +71,9 @@ gd_stop_game()
 		gd_cave_free(game.cave);
 	game.cave=NULL;
 	game.original_cave=NULL;
+
+	/* stop sounds */
+	gd_no_sound();
 }
 
 /* returns TRUE on success */
@@ -129,6 +134,9 @@ gd_game_start_level (const Cave *snapshot_cave)
 			game.cave->map[y][x] |= COVERED;
 
 	game.cover_counter=GAME_INT_UNCOVER_START;
+
+	gd_play_sounds(GD_S_NONE, GD_S_NONE, GD_S_COVER);
+
 	return TRUE;
 }
 
@@ -159,8 +167,6 @@ gd_new_game (const char *player_name, const int cave, const int level)
 
 	game.player_lives=3;
 	game.player_score=0;
-
-	gd_game_start_level (NULL);
 }
 
 static void
@@ -203,6 +209,8 @@ gd_game_iterate_cave(gboolean up, gboolean down, gboolean left, gboolean right, 
 	/* if already time=0, skip iterating */
 	if (game.cave->player_state!=PL_TIMEOUT)
 		gd_cave_iterate (game.cave, up, down, left, right, fire, key_suicide);
+
+	gd_play_sounds(game.cave->sound1, game.cave->sound2, game.cave->sound3);
 		
 	if (game.cave->score)
 		increment_score (game.cave->score);
@@ -281,6 +289,7 @@ gd_game_main_int()
 			for (y=0; y < game.cave->h; y++)
 				for (x=0; x < game.cave->w; x++)
 					game.cave->map[y][x] &= ~COVERED;
+			gd_no_sound();	/* when the uncover animation is over, we must stop sounds. */
 			/* and signal to install game interrupt. */
 			return GD_GAME_START_ITERATE;
 		}
@@ -301,6 +310,10 @@ gd_game_main_int()
 		}
 		else
 			game.cover_counter++;	/* if no more points, start. */
+
+		/* play bonus sound */
+		if (gd_cave_set_seconds_sound(game.cave))
+			gd_play_sounds(game.cave->sound1, game.cave->sound2, game.cave->sound3);
 		
 		return GD_GAME_BONUS_SCORE;
 	}
@@ -317,6 +330,10 @@ gd_game_main_int()
 		game.cave->sound1=GD_S_NONE;
 		game.cave->sound2=GD_S_NONE;
 		game.cave->sound3=GD_S_COVER;	/* cover sound */
+
+		/* to play cover sound */
+		gd_play_sounds(game.cave->sound1, game.cave->sound2, game.cave->sound3);
+
 		return GD_GAME_COVER_START;
 	}
 	

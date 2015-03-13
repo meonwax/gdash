@@ -386,12 +386,12 @@ gd_show_highscore(gpointer highlight)
 				gd_quit=TRUE;
 
 		/* cursor movement */
-		if (gd_left() && gd_up()) {
+		if (gd_left() || gd_up()) {
 			/* if not showing game, step one cave back. if no previous cave, will be null, so we show game */
 			if (current!=NULL)
 				current=current->prev;
 		}
-		if (gd_right() && gd_down()) {
+		if (gd_right() || gd_down()) {
 			if (current!=NULL) {
 				/* if showing a cave, go to next cave (if any) */
 				if (current->next!=NULL)
@@ -411,39 +411,13 @@ gd_show_highscore(gpointer highlight)
 	gd_restore_screen();
 }
 
-void
-gd_help(const char **strings)
+
+
+static void
+wait_for_keypress()
 {
-	int y, n;
-	int numstrings;
 	gboolean stop;
-	int charwidth, x1;
-	
-	/* remember screen contents */
-	gd_backup_and_dark_screen();
-	
-	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, "GDASH HELP");
-	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "SPACE: EXIT");
 
-	numstrings=g_strv_length((gchar **) strings);
-
-	charwidth=0;
-	for (n=0; n<numstrings; n+=2)
-		charwidth=MAX(charwidth, strlen(strings[n])+1+strlen(strings[n+1]));
-	x1=gd_screen->w/2-charwidth*8/2;	/* FIXME 8 */
-
-	y=(gd_screen->h-numstrings*10/2)/2;
-	for (n=0; n<numstrings; n+=2) {
-		int x;
-		
-		x=gd_blittext_printf_n(gd_screen, x1, y, 7, "%s ", strings[n]);
-		x=gd_blittext_printf_n(gd_screen, x, y, 14, "%s", strings[n+1]);
-		
-		y+=10;
-	}
-
-	SDL_Flip(gd_screen);
-	
 	stop=FALSE;
 	while (!gd_quit && !stop) {
 		SDL_Event event;
@@ -466,6 +440,45 @@ gd_help(const char **strings)
 	}
 
 	gd_wait_for_key_releases();
+}
+
+
+
+
+
+void
+gd_help(const char **strings)
+{
+	int y, n;
+	int numstrings;
+	int charwidth, x1;
+	
+	/* remember screen contents */
+	gd_backup_and_dark_screen();
+	
+	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, "GDASH HELP");
+	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "SPACE: EXIT");
+
+	numstrings=g_strv_length((gchar **) strings);
+
+	charwidth=0;
+	for (n=0; n<numstrings; n+=2)
+		charwidth=MAX(charwidth, strlen(strings[n])+1+strlen(strings[n+1]));
+	x1=gd_screen->w/2-charwidth*8/2;	/* FIXME 8 */
+
+	y=(gd_screen->h-numstrings*10/2)/2;
+	for (n=0; n<numstrings; n+=2) {
+		int x;
+		
+		x=gd_blittext_printf_n(gd_screen, x1, y, GD_C64_YELLOW, "%s ", strings[n]);
+		x=gd_blittext_printf_n(gd_screen, x, y, GD_C64_LIGHTBLUE, "%s", strings[n+1]);
+		
+		y+=10;
+	}
+
+	SDL_Flip(gd_screen);
+	
+	wait_for_keypress();
 
 	/* copy screen contents back */
 	gd_restore_screen();
@@ -634,11 +647,14 @@ gd_error_console()
 			sel=0, redraw=TRUE;
 		if (gd_keystate[SDLK_END])
 			sel=err->len-1, redraw=TRUE;
+			
+		if (gd_fire())
+			gd_show_error(g_ptr_array_index(err, sel));
 	
 		if (gd_keystate[SDLK_c])
 			clear=TRUE;
 			
-		if (gd_space_or_fire() || gd_keystate[SDLK_ESCAPE])
+		if (gd_keystate[SDLK_ESCAPE])
 			exit=TRUE;
 
 		SDL_Delay(100);
@@ -654,5 +670,126 @@ gd_error_console()
 		gd_clear_errors();
 	
 	gd_restore_screen();
+}
+
+
+void
+gd_show_license()
+{
+	char *wrapped;
+	
+	/* remember screen contents */
+	gd_backup_and_dark_screen();
+	
+	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, "GDASH LICENSE");
+	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "SPACE: EXIT");
+
+	wrapped=gd_wrap_text(gd_about_license, 40);
+	gd_blittext_n(gd_screen, 0, 12, GD_C64_LIGHTBLUE, wrapped);
+	g_free(wrapped);
+	SDL_Flip(gd_screen);
+
+	wait_for_keypress();	
+
+	/* copy screen contents back */
+	gd_restore_screen();
+}
+
+
+
+static int
+help_writeattrib(int x, int y, const char *name, const char *content)
+{
+	const int yd=10;
+	
+	gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, name);
+	gd_blittext_n(gd_screen, x+10, y+yd, GD_C64_LIGHTBLUE, content);
+	if (strchr(content, '\n'))
+		y+=yd;
+	
+	return y+2*yd+yd/2;
+}
+
+static int
+help_writeattribs(int x, int y, const char *name, const char *content[])
+{
+	const int yd=10;
+	
+	if (content!=NULL && content[0]!=NULL) {
+		int i;
+		
+		gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, name);
+
+		y+=yd;
+		for (i=0; content[i]!=NULL; i++) {
+			gd_blittext_n(gd_screen, x+10, y, GD_C64_LIGHTBLUE, content[i]);
+			
+			y+=yd;
+		}
+	}
+	
+	return y+yd/2;
+}
+
+
+void
+gd_about()
+{
+	int y;
+	
+	/* remember screen contents */
+	gd_backup_and_dark_screen();
+	
+	gd_blittext_printf_n(gd_screen, -1, 0, GD_C64_WHITE, "GDASH %s", PACKAGE_VERSION);
+	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "SPACE: EXIT");
+
+	y=20;
+	
+	y=help_writeattrib(-1, y, "", gd_about_comments);
+	y=help_writeattrib(10, y, "WEBSITE", gd_about_website);
+	y=help_writeattribs(10, y, "AUTHORS", gd_about_authors);
+	y=help_writeattribs(10, y, "ARTISTS", gd_about_artists);
+	y=help_writeattribs(10, y, "DOCUMENTERS", gd_about_documenters);
+	// extern char *gd_about_translator_credits;
+	SDL_Flip(gd_screen);
+	
+	wait_for_keypress();
+	
+	/* copy screen contents back */
+	gd_restore_screen();
+}
+
+
+void
+gd_show_error(GdErrorMessage *error)
+{
+	char *wrapped;
+	char **lines;
+	int linenum;
+	int y1, i;
+	SDL_Rect rect;
+
+	wrapped=gd_wrap_text(error->message, 78);	/* FIXME */
+	gd_backup_and_dark_screen();
+	lines=g_strsplit_set(wrapped, "\n", -1);
+	linenum=g_strv_length(lines);
+
+	y1=gd_screen->h/2-(linenum+2)*10/2;
+	rect.x=8;
+	rect.w=gd_screen->w-16;
+	rect.y=y1;
+	rect.h=(linenum+2)*10/2;
+	SDL_FillRect(gd_screen, &rect, SDL_MapRGB(gd_screen->format, 0, 0, 0));
+
+	gd_blittext_n(gd_screen, -1, 0, GD_C64_LIGHTRED, "GDASH ERROR");
+	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_LIGHTRED, "ANY KEY: CONTINUE");
+	for (i=0; lines[i]!=NULL; i++)
+		gd_blittext_n(gd_screen, 8, y1+(1+i)*10, GD_C64_WHITE, lines[i]);
+	SDL_Flip(gd_screen);
+	
+	wait_for_keypress();
+	
+	gd_restore_screen();
+	g_free(wrapped);
 }
 

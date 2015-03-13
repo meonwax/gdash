@@ -4,6 +4,9 @@
    language is requested. */
 #undef ENABLE_NLS
 
+/* Enable sound. */
+#undef GD_SOUND
+
 /* Define to 1 if you have the MacOS X function CFLocaleCopyCurrent in the
    CoreFoundation framework. */
 #undef HAVE_CFLOCALECOPYCURRENT
@@ -87,6 +90,12 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
+
+/* Use GTK. */
+#undef USE_GTK
+
+/* Use SDL. */
+#undef USE_SDL
 
 /* Version number of package */
 #undef VERSION

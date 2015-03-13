@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-pkgdata_DATA = \
+sounddata = \
 	amoeba.wav \
 	cover.wav \
 	crack.wav \
@@ -28,4 +28,8 @@ pkgdata_DATA = \
 	walk_empty.wav \
 	finished.wav
 
-EXTRA_DIST = $(pkgdata_DATA)
+if SOUND
+  pkgdata_DATA = $(sounddata)
+endif
+
+EXTRA_DIST = $(sounddata)

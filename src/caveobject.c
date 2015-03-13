@@ -935,7 +935,7 @@ draw_maze(Cave *cave, const GdObject *object, int seed)
 	/* start generation, if map is big enough.
 	   otherwise the application would crash, as the editor places maze objects during mouse click&drag that
 	   have no sense */
-	rand=g_rand_new_with_seed(seed==-1?g_random_int():seed);
+	rand=g_rand_new_with_seed(seed==-1?g_rand_int(cave->random):seed);
 	if (w>=1 && h>=1)
 		mazegen(rand, map, w, h, 0, 0, object->horiz);
 	if (object->type==MAZE_BRAID)
@@ -1037,7 +1037,7 @@ draw_random_fill(Cave *cave, const GdObject *object, int seed)
 	int y2=object->y2;
 	GRand *rand;
 	
-	rand=g_rand_new_with_seed(seed==-1?g_random_int():seed);
+	rand=g_rand_new_with_seed(seed==-1?g_rand_int(cave->random):seed);
 
 	/* change coordinates if not in correct order */
 	if (y1>y2) {
@@ -1158,6 +1158,8 @@ gd_cave_new_rendered (const Cave *data, const int level)
 	/* make a copy */
 	cave=gd_cave_new_from_cave (data);
 	cave->rendered=level+1;
+	
+	cave->random=g_rand_new();	/* XXX seed value goes here */
 
 	/* maps needed during drawing and gameplay */
 	cave->objects_order=gd_cave_map_new(cave, gpointer);
@@ -1173,8 +1175,8 @@ gd_cave_new_rendered (const Cave *data, const int level)
 		/* init c64 randomgenerator */
 		if (data->level_rand[level]<0) {
 			/* random seed=-1 -> totally random */
-			cave->rand_seed_1=g_random_int_range(0, 256);
-			cave->rand_seed_2=g_random_int_range(0, 256);
+			cave->rand_seed_1=g_rand_int_range(cave->random, 0, 256);
+			cave->rand_seed_2=g_rand_int_range(cave->random, 0, 256);
 		}
 		else {
 			cave->rand_seed_1=0;
@@ -1190,7 +1192,7 @@ gd_cave_new_rendered (const Cave *data, const int level)
 				unsigned int randm;
 				
 				if (data->level_rand[level]<0)
-					randm=g_random_int_range(0, 256);	/* use the much better glib random generator */
+					randm=g_rand_int_range(cave->random, 0, 256);	/* use the much better glib random generator */
 				else
 					randm=gd_c64_predictable_random(cave);	/* use c64 */
 
@@ -1231,7 +1233,7 @@ gd_cave_new_rendered (const Cave *data, const int level)
 		GdObject *object=(GdObject *)iter->data;
 
 		if (object->levels & gd_levels_mask[level])
-			gd_cave_draw_object (cave, iter->data, level);
+			gd_cave_draw_object(cave, iter->data, level);
 	}
 
 	/* check if we use c64 ckdelay or milliseconds for timing */

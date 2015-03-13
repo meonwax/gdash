@@ -9,7 +9,7 @@ desktopdir = $(datadir)/applications
 desktop_DATA = gdash.desktop
 
 gdash.nsi: gdash.nsi.in
-	sed s/GDASH-VERSION/$(PACKAGE_VERSION)/ <gdash.nsi.in >gdash.nsi
+	sed s/GDASH-VERSION/$(PACKAGE_VERSION)/ <$^ >$@
 
 EXTRA_DIST = config.rpath mkinstalldirs m4/ChangeLog gdash.ico gdash.nsi.in $(desktop_DATA) gdk-pixbuf.loaders
 

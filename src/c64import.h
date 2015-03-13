@@ -21,6 +21,21 @@
 extern const char *gd_bd_internal_chars;
 extern const GdElement gd_crazylight_import_table[];
 
+/* file formats */
+typedef enum {
+	UNKNOWN,	/* unknown format */
+	BD1,	/* boulder dash 1 */
+	BD2,	/* boulder dash 2 with rockford's extensions */
+	PLC,	/* peter liepa construction kit */
+	DLB,	/* no one's delight boulder dash */
+	ATG,	/* atari game */
+	CRLI,	/* crazy light construction kit */
+	CRDR,	/* crazy dream */
+	FIRSTB,	/* first boulder */
+} GdCavefileFormat;
+
+GdCavefileFormat gd_caveset_imported_format(const guint8 *buf);
+
 GList* gd_caveset_import_from_buffer (const guint8 *buf, gsize length);
 
 void gd_cave_set_crli_defaults(Cave *cave);

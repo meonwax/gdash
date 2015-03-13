@@ -150,28 +150,6 @@ static guint8 no1_default_colors[]={
    used for converting names of caves imported from crli and other types of binary data */
 const char *gd_bd_internal_chars="            ,!./0123456789:*<=>  ABCDEFGHIJKLMNOPQRSTUVWXYZ( ) _";
 
-/* file formats */
-typedef enum {
-	BD1,	/**< boulder dash 1 */
-	BD2,	/**< boulder dash 2 with rockford's extensions */
-	PLC,	/**< peter liepa construction kit */
-	DLB,	/**< no one's delight boulder dash */
-	ATG,	/**< atari game */
-	CRLI,	/**< crazy light construction kit */
-	CRDR,	/**< crazy dream */
-	FIRSTB,	/**< first boulder */
-} GdCavefileFormat;
-
-static const char *s_bd1="GDashBD1";
-static const char *s_bd2="GDashBD2";
-static const char *s_plc="GDashPLC";
-static const char *s_dlb="GDashDLB";
-static const char *s_atg="GDashATG";
-static const char *s_crl="GDashCRL";
-static const char *s_crd="GDashCRD";
-static const char *s_1st="GDash1ST";
-
-	
 typedef enum _dirt_mod {
 	DIRT_MOD_NEVER,
 	DIRT_MOD_SLIME,
@@ -1916,6 +1894,38 @@ cave_copy_from_crli (Cave *cave, const guint8 *data, int remaining_bytes)
 }
 
 
+GdCavefileFormat
+gd_caveset_imported_format(const guint8 *buf)
+{
+	const char *s_bd1="GDashBD1";
+	const char *s_bd2="GDashBD2";
+	const char *s_plc="GDashPLC";
+	const char *s_dlb="GDashDLB";
+	const char *s_atg="GDashATG";
+	const char *s_crl="GDashCRL";
+	const char *s_crd="GDashCRD";
+	const char *s_1st="GDash1ST";
+
+	if (strncmp((char *)buf, s_bd1, 8)==0)	/* 8 bytes in s_... */
+		return BD1;
+	if (strncmp((char *)buf, s_bd2, 8)==0)	/* 8 bytes in s_... */
+		return BD2;
+	if (strncmp((char *)buf, s_plc, 8)==0)	/* 8 bytes in s_... */
+		return PLC;
+	if (strncmp((char *)buf, s_dlb, 8)==0)	/* 8 bytes in s_... */
+		return DLB;
+	if (strncmp((char *)buf, s_crl, 8)==0)	/* 8 bytes in s_... */
+		return CRLI;
+	if (strncmp((char *)buf, s_crd, 8)==0)	/* 8 bytes in s_... */
+		return CRDR;
+	if (strncmp((char *)buf, s_atg, 8)==0)	/* 8 bytes in s_... */
+		return ATG;
+	if (strncmp((char *)buf, s_1st, 8)==0)	/* 8 bytes in s_... */
+		return FIRSTB;
+
+	return UNKNOWN;
+}
+
 
 /** Load caveset from memory buffer.
 	Loads the caveset from a memory buffer.
@@ -1936,40 +1946,14 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 		g_warning("buffer too short to be a GDash datafile");
 		return NULL;
 	}
-	if (strncmp((char *)buf, "GDash", 5) != 0) {	/* 5 = strlen("gdash") */
-		g_warning("buffer does not contain a GDash datafile");
-		return NULL;
-	}
 	encodedlength=GUINT32_FROM_LE(*((guint32 *)(buf+8)));
 	if (length!=-1 && encodedlength!=length-12) {
 		g_warning("file length and data size mismatch in GDash datafile");
 		return NULL;
 	}
-	if (strncmp((char *)buf, s_bd1, 8)==0)	/* 8 bytes in s_... */
-		format=BD1;
-	else
-	if (strncmp((char *)buf, s_bd2, 8)==0)	/* 8 bytes in s_... */
-		format=BD2;
-	else
-	if (strncmp((char *)buf, s_plc, 8)==0)	/* 8 bytes in s_... */
-		format=PLC;
-	else
-	if (strncmp((char *)buf, s_dlb, 8)==0)	/* 8 bytes in s_... */
-		format=DLB;
-	else
-	if (strncmp((char *)buf, s_crl, 8)==0)	/* 8 bytes in s_... */
-		format=CRLI;
-	else
-	if (strncmp((char *)buf, s_crd, 8)==0)	/* 8 bytes in s_... */
-		format=CRDR;
-	else
-	if (strncmp((char *)buf, s_atg, 8)==0)	/* 8 bytes in s_... */
-		format=ATG;
-	else
-	if (strncmp((char *)buf, s_1st, 8)==0)	/* 8 bytes in s_... */
-		format=FIRSTB;
-	else {
-		g_warning("unknown file format in buffer");
+	format=gd_caveset_imported_format(buf);
+	if (format==UNKNOWN) {
+		g_warning("buffer does not contain a GDash datafile");
 		return NULL;
 	}
 	

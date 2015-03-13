@@ -38,5 +38,7 @@ const char *gd_filename_to_utf8(const char *filename);
 /* tries to find a file in the gdash installation and returns a path (owned by this function, not to be g_free()d) */
 const char *gd_find_file(const char *filename);
 
+char *gd_wrap_text(const char *orig, int width);
+
 #endif
 

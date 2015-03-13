@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
 #include <SDL/SDL.h>
 #include <glib.h>
 #include <glib/gi18n.h>
@@ -10,7 +25,7 @@
 #include "util.h"
 #include "game.h"
 #include "sdl_gfx.h"
-#include "sdl_sound.h"
+#include "sound.h"
 #include "sdl_ui.h"
 #include "about.h"
 
@@ -18,6 +33,8 @@
 typedef enum _state {
 	M_NONE,
 	M_QUIT,
+	M_ABOUT,
+	M_LICENSE,
 	M_PLAY,
 	M_OPTIONS,
 	M_HIGHSCORE,
@@ -164,7 +181,6 @@ play_game(int start_cave, int start_level)
 		iterate=FALSE;
 		suicide=FALSE;
 		paused=FALSE;
-		gd_play_sounds(GD_S_NONE, GD_S_NONE, GD_S_COVER);
 		showheader_uncover();
 		while (caveloop) {
 			SDL_Event event;
@@ -224,7 +240,6 @@ play_game(int start_cave, int start_level)
 					if (pl!=PL_TIMEOUT && game.cave->player_state==PL_TIMEOUT)
 						/* cave did timeout at this moment */
 						outoftime_since=SDL_GetTicks();
-					gd_play_sounds(game.cave->sound1, game.cave->sound2, game.cave->sound3);
 				}
 				
 				if (paused)
@@ -249,12 +264,8 @@ play_game(int start_cave, int start_level)
 						/* nothing to do */
 						break;
 					case GD_GAME_BONUS_SCORE:
-						if (gd_cave_set_seconds_sound(game.cave))
-							gd_play_sounds(game.cave->sound1, game.cave->sound2, game.cave->sound3);
 						break;
 					case GD_GAME_COVER_START:
-						/* to play cover sound */
-						gd_play_sounds(game.cave->sound1, game.cave->sound2, game.cave->sound3);
 						break;
 					case GD_GAME_STOP:
 						/* game finished, add highscore */
@@ -262,7 +273,6 @@ play_game(int start_cave, int start_level)
 						caveloop=FALSE;
 						break;
 					case GD_GAME_START_ITERATE:
-						gd_no_sound();	/* when the uncover animation is over, we must stop sounds. */
 						iterate=TRUE;	/* start cave movements */
 							/* XXX delete conver header */
 						last_iterate=SDL_GetTicks();
@@ -319,7 +329,6 @@ play_game(int start_cave, int start_level)
 		}
 	}
 	gd_stop_game();
-	gd_no_sound();
 
 	/* (if stopped because of a quit event, do not bother highscore at all) */
 	if (!gd_quit && show_highscore && gd_score_is_highscore(gd_default_cave->highscore, game.player_score)) {
@@ -433,6 +442,14 @@ main_menu()
 							s=M_LOAD_FROM_INSTALLED;
 							break;
 							
+						case SDLK_a:
+							s=M_ABOUT;
+							break;
+							
+						case SDLK_i:
+							s=M_LICENSE;
+							break;
+							
 						case SDLK_o:	/* s: settings */
 							s=M_OPTIONS;
 							break;
@@ -502,6 +519,8 @@ main_help()
 		"", "",
 		"O", "OPTIONS",
 		"E", "ERROR CONSOLE", 
+		"A", "ABOUT GDASH",
+		"I", "LICENSE",
 		"", "",
 		"ESCAPE", "QUIT",
 		NULL
@@ -558,7 +577,10 @@ int main(int argc, char *argv[])
 
 	/* show license? */
 	if (gd_param_license) {
-		g_print("%s", gd_about_license);
+		char *wrapped=gd_wrap_text(gd_about_license, 72);
+		
+		g_print("%s", wrapped);
+		g_free(wrapped);
 		return 0;
 	}
 
@@ -629,6 +651,14 @@ int main(int argc, char *argv[])
 				
 			case M_PLAY:
 				play_game(cavenum, levelnum);	
+				break;
+				
+			case M_ABOUT:
+				gd_about();
+				break;
+
+			case M_LICENSE:
+				gd_show_license();
 				break;
 
 			case M_LOAD:

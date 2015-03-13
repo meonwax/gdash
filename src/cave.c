@@ -987,6 +987,9 @@ gd_cave_free (Cave *cave)
 	if (cave->tags)
 		g_hash_table_destroy(cave->tags);
 	gd_cave_clear_highscore(cave);
+	
+	if (cave->random)
+		g_rand_free(cave->random);
 
 	/* map */
 	gd_cave_map_free (cave->map);
@@ -1051,6 +1054,10 @@ gd_cave_copy(Cave *dest, const Cave *src)
 		for (iter=src->hammered_walls; iter!=NULL; iter=iter->next)	/* deep copy list */
 			dest->hammered_walls=g_list_append(dest->hammered_walls, g_memdup(iter->data, sizeof(HammeredWall)));
 	}
+	
+	/* copy random number generator */
+	if (src->random)
+		dest->random=g_rand_copy(src->random);
 }
 
 /* create new cave, which is a copy of the cave given. */

@@ -56,13 +56,16 @@ char *gd_theme;
 #define SETTING_USE_BDCFF_HIGHSCORE "use_bdcff_highscore"
 gboolean gd_use_bdcff_highscore=FALSE;
 
-/* sdl settings */
-#define SETTING_SDL_FULLSCREEN "sdl_fullscreen"
-gboolean gd_sdl_fullscreen=FALSE;
+/* sound settings */
 #define SETTING_SDL_SOUND "sdl_sound"
 gboolean gd_sdl_sound=TRUE;
 #define SETTING_SDL_16BIT_MIXING "sdl_16bit_mixing"
 gboolean gd_sdl_16bit_mixing=FALSE;
+
+
+/* sdl game settings */
+#define SETTING_SDL_FULLSCREEN "sdl_fullscreen"
+gboolean gd_sdl_fullscreen=FALSE;
 
 char *gd_user_config_dir;
 char *gd_system_data_dir;

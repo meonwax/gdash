@@ -619,14 +619,14 @@ gd_blittext_font(SDL_Surface *screen, SDL_Surface *font[16][GD_NUM_OF_CHARS], in
 			if (c==GD_PLAYER_CHAR || c==GD_DIAMOND_CHAR)	/* special, by gdash */
 				i=c;
 			else
+			if (c=='@')
+				i=0;
+			else
 			if (c>=' ' && c<='Z')	/* from space to Z, petscii=ascii */
 				i=c;
 			else
 			if (c>='a' && c<='z')
 				i=c-'a'+1;
-			else
-			if (c=='@')
-				i=0;
 			else
 			if (c=='\\')
 				i=GD_BACKSLASH_CHAR;
@@ -933,4 +933,8 @@ void gd_wait_for_key_releases()
 		}
 	}
 }
+
+
+
+
 

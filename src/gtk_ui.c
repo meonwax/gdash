@@ -21,6 +21,7 @@
 #include "settings.h"
 #include "util.h"
 #include "gtk_ui.h"
+#include "config.h"
 
 /* pixbufs of icons and the like */
 #include "icons.h"
@@ -337,6 +338,11 @@ gd_preferences (GtkWidget *parent)
 */
 		{N_("TV emulation"), N_("Use TV emulated graphics, ie. lines are striped."), &gd_tv_emulation, TRUE},
 		{N_("Interpolation"), N_("Use interpolation for scaling of graphics."), &gd_gfx_interpolation, TRUE},
+#ifdef GD_SOUND
+		{N_("<b>Sound options</b>"), NULL, NULL},
+		{N_("Sound"), N_("Play sounds. Enabling this setting requires a restart!"), &gd_sdl_sound, FALSE},
+		{N_("16-bit mixing"), N_("Use 16-bit mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_16bit_mixing, FALSE},
+#endif
 	};
 
 	GtkWidget *dialog, *table, *label, *button;

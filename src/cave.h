@@ -427,7 +427,7 @@ typedef struct _cave {
 
 	GdElement **map;			/* pointer to data for map, non-null if has a map */
 	GList *objects;
-
+	
 	gboolean intermission;		/* is this cave an intermission? */
 	gboolean intermission_instantlife;	/* one life extra, if the intermission is reached */
 	gboolean intermission_rewardlife;	/* one life extra, if the intermission is successfully finished */
@@ -535,6 +535,7 @@ typedef struct _cave {
 	int hammered_wall_reappear_frame;
 	
 	/* internal variables, used during the game. private data :) */
+	GRand *random;				/* random number generator of rendered cave */
 	int rendered;				/* if not null, rendered at level x */
 	int timing_factor;			/* number of "milliseconds" in each second :) 1000 for ntsc, 1200 for pal. */
 	GList *hammered_walls;		/* hammered walls data */

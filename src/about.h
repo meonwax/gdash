@@ -16,12 +16,12 @@
 #ifndef _GD_ABOUT_H
 #define _GD_ABOUT_H
 
-extern char *gd_about_license;
-extern char *gd_about_artists[];
-extern char *gd_about_authors[];
-extern char *gd_about_documenters[];
-extern char *gd_about_comments;
-extern char *gd_about_translator_credits;
-extern char *gd_about_website;
+extern const char *gd_about_license;
+extern const char *gd_about_artists[];
+extern const char *gd_about_authors[];
+extern const char *gd_about_documenters[];
+extern const char *gd_about_comments;
+extern const char *gd_about_translator_credits;
+extern const char *gd_about_website;
 
 #endif

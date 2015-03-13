@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gdash 0.1\n"
 "Report-Msgid-Bugs-To: cirix@fw.hu\n"
-"POT-Creation-Date: 2008-07-16 18:31+0200\n"
+"POT-Creation-Date: 2008-07-22 15:58+0200\n"
 "PO-Revision-Date: 2008-06-21 17:58+0200\n"
 "Last-Translator:  <>\n"
 "Language-Team: \n"
@@ -950,7 +950,7 @@ msgstr "Nincs elem"
 msgid "Cave data"
 msgstr "Pálya adatai"
 
-#: src/cave.c:302 src/gtk_ui.c:574
+#: src/cave.c:302 src/gtk_ui.c:580
 msgid "Name"
 msgstr "Név"
 
@@ -1903,7 +1903,7 @@ msgstr "Csontvázak ennyi gyémántot érnek"
 msgid "The number of diamonds each skeleton is worth."
 msgstr "A gyémántok száma, amennyit egy csontváz ér."
 
-#: src/game.c:149
+#: src/game.c:157
 #, c-format
 msgid "Snapshot of %s"
 msgstr "Pillanatfelvétel %s pályáról"
@@ -2837,7 +2837,7 @@ msgstr ""
 "irányú léptetés után! Objektum alapú pályák esetén az összes objektum "
 "egyszerre kiválasztható és mozgatható!"
 
-#: src/help.c:185 src/gtk_ui.c:564
+#: src/help.c:185 src/gtk_ui.c:570
 msgid "Highscores"
 msgstr "Pontok"
 
@@ -2931,291 +2931,291 @@ msgstr ""
 msgid "GDash Help"
 msgstr "GDash Súgó"
 
-#: src/gtk_main.c:140
+#: src/gtk_main.c:142
 #, c-format
 msgid "You have %d points, and achieved a highscore."
 msgstr "%d pontod van, és felkerültél a dicsőség listára."
 
-#: src/gtk_main.c:141 src/gtk_main.c:158
+#: src/gtk_main.c:143 src/gtk_main.c:160
 msgid "Game over!"
 msgstr "Játék vége!"
 
-#: src/gtk_main.c:157
+#: src/gtk_main.c:159
 #, c-format
 msgid "You have %d points."
 msgstr "%d pontod van."
 
-#: src/gtk_main.c:405
+#: src/gtk_main.c:407
 #, c-format
 msgid "Time: <b>%02d:%02d</b>"
 msgstr "Idő: <b>%02d:%02d</b>"
 
-#: src/gtk_main.c:407
+#: src/gtk_main.c:409
 #, c-format
 msgid "Time: <b>%03d</b>"
 msgstr "Idő: <b>%03d</b>"
 
-#: src/gtk_main.c:410
+#: src/gtk_main.c:412
 #, c-format
 msgid "Score: <b>%d</b>"
 msgstr "Pont: <b>%d</b>"
 
-#: src/gtk_main.c:413
+#: src/gtk_main.c:415
 #, c-format
 msgid "Value: <b>%d</b>"
 msgstr "Érték: <b>%d</b>"
 
-#: src/gtk_main.c:416
+#: src/gtk_main.c:418
 #, c-format
 msgid "Diamonds: <b>%d</b>"
 msgstr "Gyémántok: <b>%d</b>"
 
-#: src/gtk_main.c:419
+#: src/gtk_main.c:421
 #, c-format
 msgid "Skeletons: <b>%d</b>"
 msgstr "Csontváz: <b>%d</b>"
 
-#: src/gtk_main.c:422
+#: src/gtk_main.c:424
 #, c-format
 msgid "Key 1: <b>%d</b>"
 msgstr "1. kulcs: <b>%d</b>"
 
-#: src/gtk_main.c:423
+#: src/gtk_main.c:425
 #, c-format
 msgid "Key 2: <b>%d</b>"
 msgstr "2. kulcs: <b>%d</b>"
 
-#: src/gtk_main.c:424
+#: src/gtk_main.c:426
 #, c-format
 msgid "Key 3: <b>%d</b>"
 msgstr "3. kulcs: <b>%d</b>"
 
-#: src/gtk_main.c:427
+#: src/gtk_main.c:429
 #, c-format
 msgid "Gravity changes: <b>%d</b>"
 msgstr "Gravitáció változik: <b>%d</b>"
 
-#: src/gtk_main.c:431
+#: src/gtk_main.c:433
 #, c-format
 msgid "Lives: <b>%d</b>"
 msgstr "Élet: <b>%d</b>"
 
-#: src/gtk_main.c:500
+#: src/gtk_main.c:502
 #, fuzzy, c-format
 msgid "<b>%s</b>, level %d"
 msgstr "%s, %d. szint"
 
-#: src/gtk_main.c:779
+#: src/gtk_main.c:781
 msgid "There are no caves in this cave set!"
 msgstr "Nincs még pálya ebben a játékban!"
 
-#: src/gtk_main.c:786
+#: src/gtk_main.c:788
 msgid "Select cave to play"
 msgstr "Pálya kiválasztása"
 
-#: src/gtk_main.c:797
+#: src/gtk_main.c:799
 msgid "Name:"
 msgstr "Név:"
 
-#: src/gtk_main.c:808
+#: src/gtk_main.c:810
 msgid "Cave:"
 msgstr "Pálya:"
 
-#: src/gtk_main.c:828
+#: src/gtk_main.c:830
 msgid "Level:"
 msgstr "Szint:"
 
-#: src/gtk_main.c:839
+#: src/gtk_main.c:841
 msgid "Preview"
 msgstr "Előnézet"
 
-#: src/gtk_main.c:1006
+#: src/gtk_main.c:1009
 msgid "_Play"
 msgstr "_Játék"
 
-#: src/gtk_main.c:1007 src/editor.c:3631
+#: src/gtk_main.c:1010 src/editor.c:3631
 msgid "_File"
 msgstr "_Fájl"
 
-#: src/gtk_main.c:1008
+#: src/gtk_main.c:1011
 msgid "_Settings"
 msgstr "_Beállítások"
 
-#: src/gtk_main.c:1009 src/editor.c:3636
+#: src/gtk_main.c:1012 src/editor.c:3636
 msgid "_Help"
 msgstr "_Súgó"
 
-#: src/gtk_main.c:1012
+#: src/gtk_main.c:1015
 msgid "_Error console"
 msgstr ""
 
-#: src/gtk_main.c:1018
+#: src/gtk_main.c:1021
 msgid "_New game"
 msgstr "Új _játék"
 
-#: src/gtk_main.c:1018
+#: src/gtk_main.c:1021
 msgid "Start new game"
 msgstr "Új játék indítása"
 
-#: src/gtk_main.c:1019
+#: src/gtk_main.c:1022
 msgid "Cave _editor"
 msgstr "Pálya_szerkesztő"
 
-#: src/gtk_main.c:1021
+#: src/gtk_main.c:1024
 msgid "Load _internal game"
 msgstr "Beé_pített játék betöltése"
 
-#: src/gtk_main.c:1022
+#: src/gtk_main.c:1025
 msgid "O_pen shipped"
 msgstr "_Telepített játék megnyitása"
 
-#: src/gtk_main.c:1025 src/editor.c:3643
+#: src/gtk_main.c:1028 src/editor.c:3643
 msgid "Hi_ghscores"
 msgstr "P_ontok"
 
-#: src/gtk_main.c:1029
+#: src/gtk_main.c:1032
 msgid "_Take snapshot"
 msgstr "_Pillanatfelvétel"
 
-#: src/gtk_main.c:1030
+#: src/gtk_main.c:1033
 msgid "Re_start level"
 msgstr "Pálya új_rakezdése"
 
-#: src/gtk_main.c:1030
+#: src/gtk_main.c:1033
 msgid "Restart current level"
 msgstr "Pálya újrakezdése"
 
-#: src/gtk_main.c:1031
+#: src/gtk_main.c:1034
 msgid "_End game"
 msgstr "Játék vég_e"
 
-#: src/gtk_main.c:1031
+#: src/gtk_main.c:1034
 msgid "End current game"
 msgstr "Aktuális játék befejezése"
 
-#: src/gtk_main.c:1035
+#: src/gtk_main.c:1038
 msgid "_Revert to snapshot"
 msgstr "_Pillanatfelvétel visszatöltése"
 
-#: src/gtk_main.c:1039
+#: src/gtk_main.c:1042
 msgid "Pause game"
 msgstr "Játék szünet"
 
-#: src/gtk_main.c:1040
+#: src/gtk_main.c:1043
 msgid "Fullscreen mode during play"
 msgstr "Teljes képernyős mód a játék közben"
 
-#: src/gtk_main.c:1041
+#: src/gtk_main.c:1044
 msgid "Fast for_ward"
 msgstr "Gyor_sított játék"
 
-#: src/gtk_main.c:1041
+#: src/gtk_main.c:1044
 msgid "Fast forward (5x speed)"
 msgstr "Gyorsított játék (5x sebesség)"
 
-#: src/gtk_main.c:1221
+#: src/gtk_main.c:1224
 msgid "Start editor"
 msgstr "Pályaszerkesztő elindítása"
 
-#: src/gtk_main.c:1222
+#: src/gtk_main.c:1225
 msgid "Save caveset in a HTML gallery"
 msgstr "Játék pályáinak mentése egy HTML galériában"
 
-#: src/gtk_main.c:1223
+#: src/gtk_main.c:1226
 msgid ""
 "Save cave C, level L in a PNG image. If no cave selected, uses a random one"
 msgstr ""
 "C. pálya, L. szint mentése PNG képben. Ha nincs pálya kijelölve, "
 "véletlenszerűen választ"
 
-#: src/gtk_main.c:1224
+#: src/gtk_main.c:1227
 msgid "Set PNG image size. Default is 128x96, set to 0x0 for unscaled"
 msgstr "PNG kép méretének állítása. Alap 128x96, az eredeti mérethez 0x0"
 
-#: src/gtk_main.c:1225
+#: src/gtk_main.c:1228
 msgid "Save caveset in a BDCFF file"
 msgstr "Játék pályáinak mentése egy BDCFF fájlban"
 
-#: src/gtk_main.c:1226
+#: src/gtk_main.c:1229
 msgid "Batch mode: quit after specified tasks"
 msgstr "Kötegelt üzemmód: a megadott műveletek után kilépés"
 
-#: src/gtk_main.c:1266 src/sdl_main.c:583
+#: src/gtk_main.c:1272 src/sdl_main.c:605
 #, fuzzy, c-format
 msgid "Errors during loading caveset from file %s"
 msgstr "Nem lehetett betölteni a játékot a %s fájlból"
 
-#: src/gtk_main.c:1271 src/sdl_main.c:588
+#: src/gtk_main.c:1277 src/sdl_main.c:610
 #, c-format
 msgid "%d: no such internal caveset"
 msgstr "%d: nincs ilyen számú beépített játék!"
 
-#: src/gtk_main.c:1300 src/sdl_main.c:598
+#: src/gtk_main.c:1306 src/sdl_main.c:620
 msgid "Invalid cave or level number!\n"
 msgstr "Hibás számú pálya vagy szint!\n"
 
-#: src/gtk_main.c:1313
+#: src/gtk_main.c:1319
 #, c-format
 msgid "Invalid image size: %s"
 msgstr "%s: hibás képméret"
 
-#: src/c64import.c:1995 src/c64import.c:2032 src/c64import.c:2126
+#: src/c64import.c:1979 src/c64import.c:2016 src/c64import.c:2110
 #, c-format
 msgid "Intermission %d"
 msgstr "%d. jutalom pálya"
 
-#: src/c64import.c:1997 src/c64import.c:2034 src/c64import.c:2131
+#: src/c64import.c:1981 src/c64import.c:2018 src/c64import.c:2115
 #, c-format
 msgid "Cave %c"
 msgstr "%c. pálya"
 
-#: src/c64import.c:2124
+#: src/c64import.c:2108
 #, c-format
 msgid "Intermission %02d"
 msgstr "%02d. jutalom pálya"
 
-#: src/c64import.c:2129
+#: src/c64import.c:2113
 #, c-format
 msgid "Cave %02d"
 msgstr "%02d. pálya"
 
-#: src/gtk_ui.c:194
+#: src/gtk_ui.c:195
 msgid "Default C64 theme"
 msgstr "Eredeti C64 téma"
 
-#: src/gtk_ui.c:214
+#: src/gtk_ui.c:215
 msgid "Original"
 msgstr "Eredeti"
 
-#: src/gtk_ui.c:215
+#: src/gtk_ui.c:216
 msgid "Double"
 msgstr "Dupla"
 
-#: src/gtk_ui.c:216
+#: src/gtk_ui.c:217
 msgid "Triple"
 msgstr "Tripla"
 
-#: src/gtk_ui.c:267
+#: src/gtk_ui.c:268
 msgid "Add Theme from PNG Image"
 msgstr "Téma hozzáadása PNG képből"
 
-#: src/gtk_ui.c:271 src/editor.c:2466
+#: src/gtk_ui.c:272 src/editor.c:2466
 msgid "PNG files"
 msgstr "PNG képek"
 
-#: src/gtk_ui.c:311
+#: src/gtk_ui.c:312
 msgid "The PNG image cannot be used as a GDash theme."
 msgstr "A PNG kép nem használható GDash témaként."
 
-#: src/gtk_ui.c:325
+#: src/gtk_ui.c:326
 msgid "<b>Cave options</b>"
 msgstr "<b>Pálya hatások</b>"
 
-#: src/gtk_ui.c:326
+#: src/gtk_ui.c:327
 msgid "Ease levels"
 msgstr "Könnyített pályák"
 
-#: src/gtk_ui.c:326
+#: src/gtk_ui.c:327
 msgid ""
 "Make caves easier to play. Only one diamonds to collect, more time "
 "available, no expanding walls... This might render some caves unplayable!"
@@ -3223,27 +3223,27 @@ msgstr ""
 "Pályák könnyítése. Kevesebb gyémántot kell gyűjteni, több idő van, nincsenek "
 "épülő falak... Viszont ez játszhatatlanná tehet néhány pályát!"
 
-#: src/gtk_ui.c:327
+#: src/gtk_ui.c:328
 msgid "All caves selectable"
 msgstr "Összes pálya kiválasztható"
 
-#: src/gtk_ui.c:327
+#: src/gtk_ui.c:328
 msgid "All caves can be selected at game start."
 msgstr "Összes pálya kiválasztható kezdőpályának."
 
-#: src/gtk_ui.c:328
+#: src/gtk_ui.c:329
 msgid "Mouse play (experimental!)"
 msgstr "Játék egérrel (kísérleti!)"
 
-#: src/gtk_ui.c:328
+#: src/gtk_ui.c:329
 msgid "Use the mouse to play. The player will follow the cursor!"
 msgstr "Játék az egérrel. A játékos követni fogja a mutatót!"
 
-#: src/gtk_ui.c:329
+#: src/gtk_ui.c:330
 msgid "Use BDCFF highscore"
 msgstr "BDCFF dicsőséglista használata"
 
-#: src/gtk_ui.c:329
+#: src/gtk_ui.c:330
 msgid ""
 "Use BDCFF highscores. GDash rather stores highscores in its own "
 "configuration directory, instead of saving them in  the *.bd file."
@@ -3251,51 +3251,75 @@ msgstr ""
 "BDCFF dicsőséglista hasznáata. A GDash a dicsőség listát inkább a saját "
 "konfigurációs fájljai között tárolja, nem a *.bd fájlba menti."
 
-#: src/gtk_ui.c:331
+#: src/gtk_ui.c:332
 msgid "<b>Display options</b>"
 msgstr "<b>Megjelenítés</b>"
 
-#: src/gtk_ui.c:332
+#: src/gtk_ui.c:333
 msgid "Time as min:sec"
 msgstr "Idő óra:perc formában"
 
-#: src/gtk_ui.c:332
+#: src/gtk_ui.c:333
 msgid "Show times in minutes and seconds, instead of seconds only."
 msgstr "Az idő mutatása perc:másodperc alakban, csupán másodpercek helyett."
 
-#: src/gtk_ui.c:333
+#: src/gtk_ui.c:334
 msgid "Random colors"
 msgstr "Véletlen színek"
 
-#: src/gtk_ui.c:333
+#: src/gtk_ui.c:334
 msgid "Use randomly selected colors for C64 graphics."
 msgstr "Véletlenszerűen kiválasztott színek használata C64 grafikához"
 
-#: src/gtk_ui.c:338
+#: src/gtk_ui.c:339
 msgid "TV emulation"
 msgstr "TV emuláció"
 
-#: src/gtk_ui.c:338
+#: src/gtk_ui.c:339
 msgid "Use TV emulated graphics, ie. lines are striped."
 msgstr "TV emulált grafika, vagyis a rajzok csíkosak."
 
-#: src/gtk_ui.c:339
+#: src/gtk_ui.c:340
 msgid "Interpolation"
 msgstr "Interpoláció"
 
-#: src/gtk_ui.c:339
+#: src/gtk_ui.c:340
 msgid "Use interpolation for scaling of graphics."
 msgstr "Interpoláció használata a grafikai elemek átméretezésekor."
 
-#: src/gtk_ui.c:353
+#: src/gtk_ui.c:342
+#, fuzzy
+msgid "<b>Sound options</b>"
+msgstr "<b>Pálya hatások</b>"
+
+#: src/gtk_ui.c:343
+#, fuzzy
+msgid "Sound"
+msgstr "Kő"
+
+#: src/gtk_ui.c:343
+msgid "Play sounds. Enabling this setting requires a restart!"
+msgstr ""
+
+#: src/gtk_ui.c:344
+msgid "16-bit mixing"
+msgstr ""
+
+#: src/gtk_ui.c:344
+msgid ""
+"Use 16-bit mixing of sounds. Try changing this setting if sound is clicky. "
+"Changing this setting requires a restart!"
+msgstr ""
+
+#: src/gtk_ui.c:359
 msgid "GDash Preferences"
 msgstr "A GDash beállításai"
 
-#: src/gtk_ui.c:355
+#: src/gtk_ui.c:361
 msgid "_Add theme"
 msgstr "_Téma hozzáadása"
 
-#: src/gtk_ui.c:405
+#: src/gtk_ui.c:411
 #, c-format
 msgid ""
 "This is the list of available themes. You can put .png files into the "
@@ -3304,111 +3328,106 @@ msgstr ""
 "Ez a rendelkezésre álló témák listája. A(z) %s és könyvtárakba .png fájlt "
 "másolva használhatók továbbiak."
 
-#: src/gtk_ui.c:427
+#: src/gtk_ui.c:433
 msgid "<b>Theme</b>"
 msgstr "<b>Téma</b>"
 
-#: src/gtk_ui.c:570
+#: src/gtk_ui.c:576
 msgid "Rank"
 msgstr "Rang"
 
-#: src/gtk_ui.c:579
+#: src/gtk_ui.c:585
 msgid "Score"
 msgstr "Pont"
 
-#: src/gtk_ui.c:682
+#: src/gtk_ui.c:688
 msgid "Cave set is edited. Discard changes?"
 msgstr "A pályák megváltoztak. Dobjam el a változtatásokat?"
 
-#: src/gtk_ui.c:687
+#: src/gtk_ui.c:693
 msgid "_Discard"
 msgstr "El_dob"
 
-#: src/gtk_ui.c:705
+#: src/gtk_ui.c:711
 msgid "The file already exists. Do you want to overwrite it?"
 msgstr "A fájl már létezik. Felülírjam?"
 
-#: src/gtk_ui.c:706
+#: src/gtk_ui.c:712
 #, c-format
 msgid "The file (%s) already exists, and will be overwritten."
 msgstr "A fájl (%s) már létezik, és felül lesz írva."
 
-#: src/gtk_ui.c:743
+#: src/gtk_ui.c:749
 msgid "Save File As"
 msgstr "Játék mentése másként"
 
-#: src/gtk_ui.c:747
+#: src/gtk_ui.c:753
 msgid "BDCFF cave sets (*.bd)"
 msgstr "BDCFF pályák (*.bd)"
 
-#: src/gtk_ui.c:752
+#: src/gtk_ui.c:758
 msgid "All files (*)"
 msgstr "Összes fájl (*)"
 
-#: src/gtk_ui.c:819
+#: src/gtk_ui.c:825
 msgid "Open File"
 msgstr "Fájl megnyitása"
 
-#: src/gtk_ui.c:821
+#: src/gtk_ui.c:827
 msgid "Load _highscores from BDCFF file"
 msgstr "_Dicsőséglista betöltése a BDCFF fájlból"
 
-#: src/gtk_ui.c:828
+#: src/gtk_ui.c:834
 msgid "GDash cave sets"
 msgstr "GDash pályák"
 
-#: src/gtk_ui.c:882
+#: src/gtk_ui.c:888
 msgid "Loaded game:"
 msgstr "Betöltött játék:"
 
-#: src/gtk_ui.c:956
+#: src/gtk_ui.c:962
 #, fuzzy
 msgid "GDash Errors"
 msgstr "A GDash beállításai"
 
-#: src/gtk_ui.c:1024
+#: src/gtk_ui.c:1030
 msgid "_Show all"
 msgstr ""
 
-#: src/caveset.c:279
+#: src/caveset.c:280
 msgid "New caveset"
 msgstr "Új játék"
 
-#: src/caveset.c:351 src/caveset.c:485
+#: src/caveset.c:352 src/caveset.c:486
 #, c-format
 msgid "invalid parameter \"%s\" for attribute %s"
 msgstr "\"%s\": hibás paraméter %s attribútumhoz."
 
-#: src/caveset.c:786
+#: src/caveset.c:788
 msgid "highscore format incorrect"
 msgstr "Dicsőséglista formátum hiba"
 
-#: src/caveset.c:824
+#: src/caveset.c:826
 msgid "Only one-character map codes are currently supported!"
 msgstr "Jelenleg csak egy karakteres pályakódokat támogat a program!"
 
-#: src/caveset.c:914
+#: src/caveset.c:916
 #, c-format
 msgid "invalid effect name \"%s\""
 msgstr "hibás pálya hatás név: \"%s\""
 
-#: src/caveset.c:917
+#: src/caveset.c:919
 #, c-format
 msgid "Invalid effect specification \"%s\""
 msgstr "hibás pálya hatás specifikáció: \"%s\""
 
-#: src/caveset.c:943
+#: src/caveset.c:945
 msgid "Invalid BDCFF: [game] section has a map"
 msgstr "Hibás BDCFF: a [game] részben térkép van"
 
-#: src/caveset.c:948
+#: src/caveset.c:950
 msgid "Invalid BDCFF: [game] section has drawing objects defined"
 msgstr "Hibás·BDCFF:·a·[game]·részben·objektumok·vannak"
-
-#: src/caveset.c:1041
-#, fuzzy
-msgid "could not determine file format from filename extension"
-msgstr "Nem lehetett meghatározni a fájl formátumát a kiterjesztésből"
 
 #: src/editor-export.c:443
 msgid "Saving HTML gallery"
@@ -3482,7 +3501,7 @@ msgstr "Normál karakterek"
 msgid "For effects"
 msgstr "Hatásokhoz"
 
-#: src/about.c:36
+#: src/about.c:38
 msgid ""
 "Classic game similar to Emerald Mines.\n"
 "Collect diamonds and find exit!"
@@ -3490,7 +3509,7 @@ msgstr ""
 "Emerald Mine-szerű klasszikus játék. Gyűjtsd össze a gyémántokat és keresd a "
 "kijáratot!"
 
-#: src/about.c:37
+#: src/about.c:39
 msgid "translator-credits"
 msgstr "cirix <cirix@fw.hu>"
 
@@ -4089,29 +4108,33 @@ msgstr ""
 msgid "_Objects"
 msgstr "_Objektumok"
 
-#: src/settings.c:255
+#: src/settings.c:258
 msgid "Select cave number C"
 msgstr "C. pálya kiválasztása"
 
-#: src/settings.c:256
+#: src/settings.c:259
 msgid "Select level number L"
 msgstr "A játék indítása az L. szinten"
 
-#: src/settings.c:257
+#: src/settings.c:260
 msgid "Load internal caveset number I"
 msgstr "I. beépített játék betöltése"
 
-#: src/settings.c:258
+#: src/settings.c:261
 msgid "Show license and quit"
 msgstr ""
 
-#: src/settings.c:259
+#: src/settings.c:262
 msgid "Cave names"
 msgstr "Pálya nevek"
 
-#: src/settings.c:264
+#: src/settings.c:267
 msgid "[FILE NAME]"
 msgstr "[fájlnév]"
+
+#, fuzzy
+#~ msgid "could not determine file format from filename extension"
+#~ msgstr "Nem lehetett meghatározni a fájl formátumát a kiterjesztésből"
 
 #~ msgid "_Show errors"
 #~ msgstr "_Hibák mutatása"

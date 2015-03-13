@@ -15,6 +15,7 @@
  */
 #include <glib.h>
 #include <glib/gi18n.h>
+#include <string.h>
 #include "util.h"
 #include "settings.h"
 
@@ -155,5 +156,46 @@ gd_find_file(const char *filename)
 		return result;
 		
 	g_critical("cannot find file: %s", gd_filename_to_utf8(filename));
+}
+
+char *gd_wrap_text(const char *orig, int width)
+{
+	GString *wrapped;
+	char **lines;
+	int l;
+	
+	wrapped=g_string_new(NULL);
+	lines=g_strsplit_set(orig, "\n", -1);
+	for (l=0; lines[l]!=NULL; l++) {
+		char **words;
+		int w;
+		int curwidth;
+		
+		words=g_strsplit_set(lines[l], " ", -1);
+		curwidth=0;
+		for (w=0; words[w]!=NULL; w++) {
+			int curlen;
+			
+			curlen=strlen(words[w]);
+			if (curwidth==0 || curwidth+curlen<width) {
+				if (w!=0) {
+					curwidth++;
+					g_string_append_c(wrapped, ' ');
+				}
+				g_string_append(wrapped, words[w]);
+				curwidth+=curlen;
+			} else {
+				g_string_append_c(wrapped, '\n');
+				g_string_append(wrapped, words[w]);
+				curwidth=curlen;
+			}
+		}
+		g_strfreev(words);
+		
+		g_string_append_c(wrapped, '\n');
+	}
+	g_strfreev(lines);
+	
+	return g_string_free(wrapped, FALSE);
 }
 

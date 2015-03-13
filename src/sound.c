@@ -13,19 +13,24 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+#include "config.h"
+#ifdef USE_SDL
 #include <SDL/SDL.h>
 #include <SDL/SDL_mixer.h>
+#endif
 #include <glib.h>
 #include "settings.h"
 #include "cave.h"
 #include "util.h"
 
 
-
+#ifdef GD_SOUND
 static Mix_Chunk *sounds[GD_S_MAX];
 static GdSound sound2_last=GD_S_NONE, sound3_last=GD_S_NONE;
 static gboolean mixer_started=FALSE;
+#endif
 
+#ifdef GD_SOUND
 static void
 loadsound(GdSound which, const char *filename)
 {
@@ -47,10 +52,12 @@ loadsound(GdSound which, const char *filename)
 	if (sounds[which]==NULL)
 		g_warning("%s: %s", filename, Mix_GetError());
 }
+#endif
 
 gboolean
 gd_sound_init()
 {
+#ifdef GD_SOUND
 	if(Mix_OpenAudio(22050, gd_sdl_16bit_mixing?AUDIO_S16:AUDIO_U8, 1, 4096)==-1) {
 		g_warning("%s", Mix_GetError());
 		return FALSE;
@@ -89,20 +96,27 @@ gd_sound_init()
 	loadsound(GD_S_DIAMOND_8, "diamond_8.wav");
 
 	return TRUE;
+#else
+	/* if compiled without sound support, return TRUE, "sound init successful" */
+	return TRUE;
+#endif
 }
 
 void gd_no_sound()
 {
+#ifdef GD_SOUND
 	if (!mixer_started)
 		return;
 
 	sound2_last=GD_S_NONE;
 	sound3_last=GD_S_NONE;
 	Mix_HaltChannel(-1);
+#endif
 }
 
 void gd_play_sounds(GdSound sound1, GdSound sound2, GdSound sound3)
 {
+#ifdef GD_SOUND
 	static GdSound diamond_sounds[]={
 		GD_S_DIAMOND_1,
 		GD_S_DIAMOND_2,
@@ -156,7 +170,6 @@ void gd_play_sounds(GdSound sound1, GdSound sound2, GdSound sound3)
 	/* channel 1 is for small sounds */
 	if (sound1!=GD_S_NONE)
 		Mix_PlayChannel(1, sounds[sound1], 0);
+#endif
 }
-
-
 

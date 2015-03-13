@@ -948,7 +948,7 @@ gd_cave_iterate(Cave *cave, const gboolean up, const gboolean down, const gboole
 							/* only push if player dir is orthogonal to gravity, ie. gravity down, pushing left&right possible */
 							if ((what==O_WAITING_STONE)	/* waiting stones are light, can always push */
 								||(what==O_CHASING_STONE && cave->sweet_eaten)	/* chasing can be pushed if player is turbo */
-								||(what==O_STONE && g_random_int_range(0, 1000000)<cave->pushing_stone_prob*1000000)) {	/* stones are heavy, maybe push */
+								||(what==O_STONE && g_rand_int_range(cave->random, 0, 1000000)<cave->pushing_stone_prob*1000000)) {	/* stones are heavy, maybe push */
 								/* if decided that he will be able to push, */
 									if (is_space_dir(cave, x, y, MV_TWICE + player_move)) {
 										store_dir(cave, x, y, MV_TWICE + player_move, what);
@@ -1123,7 +1123,7 @@ gd_cave_iterate(Cave *cave, const gboolean up, const gboolean down, const gboole
 							/* only push if player dir is orthogonal to gravity, ie. gravity down, pushing left&right possible */
 							if ((what==O_WAITING_STONE)	/* waiting stones are light, can always push */
 								||(what==O_CHASING_STONE && cave->sweet_eaten)	/* chasing can be pushed if player is turbo */
-								||(what==O_STONE && g_random_int_range(0, 1000000)<cave->pushing_stone_prob*1000000)) {	/* stones are heavy, maybe push */
+								||(what==O_STONE && g_rand_int_range(cave->random, 0, 1000000)<cave->pushing_stone_prob*1000000)) {	/* stones are heavy, maybe push */
 								/* if decided that he will be able to push, */
 									if (is_space_dir(cave, x, y, MV_TWICE + player_move)) {
 										store_dir(cave, x, y, MV_TWICE + player_move, what);
@@ -1224,8 +1224,8 @@ gd_cave_iterate(Cave *cave, const gboolean up, const gboolean down, const gboole
 						}
 
 					if (cave->amoeba_started)	/* if it is alive, decide if it attempts to grow */
-						if (g_random_int_range(0, 1000000)<cave->amoeba_growth_prob*1000000) {
-							switch (g_random_int_range (0, 4)) {	/* decided to grow, choose a random direction. */
+						if (g_rand_int_range(cave->random, 0, 1000000)<cave->amoeba_growth_prob*1000000) {
+							switch (g_rand_int_range(cave->random, 0, 4)) {	/* decided to grow, choose a random direction. */
 							case 0:	/* let this be up. numbers indifferent. */
 								if (amoeba_eats_dir(cave, x, y, MV_UP))
 									store_dir(cave, x, y, MV_UP, O_AMOEBA);
@@ -1279,12 +1279,12 @@ gd_cave_iterate(Cave *cave, const gboolean up, const gboolean down, const gboole
 
 			case O_SLIME:
 				/*
-				 * unpredictable: g_random_int
+				 * unpredictable: g_rand_int
 				 * predictable: c64 predictable random generator.
 				 *    for predictable, a random number is generated, whether or not it is even possible that the stone
 				 *    will be able to pass. 
 				 */
-				if (cave->slime_predictable? ((gd_c64_predictable_random (cave)&cave->slime_permeability_c64)==0) : g_random_int_range(0, 1000000)<cave->slime_permeability*1000000) {
+				if (cave->slime_predictable? ((gd_c64_predictable_random (cave)&cave->slime_permeability_c64)==0) : g_rand_int_range(cave->random, 0, 1000000)<cave->slime_permeability*1000000) {
 					if (is_space_dir(cave, x, y, MV_DOWN)) {
 						if (get_dir(cave, x, y, MV_UP)==cave->slime_eats_1) {
 							store_dir(cave, x, y, MV_DOWN, cave->slime_converts_1);	/* output a falling xy under */
@@ -1313,7 +1313,7 @@ gd_cave_iterate(Cave *cave, const gboolean up, const gboolean down, const gboole
 
 			case O_ACID:
 				/* choose randomly, if it spreads */
-				if (g_random_int_range(0, 1000000)<=cave->acid_spread_ratio*1000000) {
+				if (g_rand_int_range(cave->random, 0, 1000000)<=cave->acid_spread_ratio*1000000) {
 					/* the current one explodes */
 					store(cave, x, y, cave->acid_turns_to);
 					/* and if neighbours are eaten, put acid there. */
@@ -1354,7 +1354,7 @@ gd_cave_iterate(Cave *cave, const gboolean up, const gboolean down, const gboole
 				{
 					int px=cave->px[0];
 					int py=cave->py[0];
-					gboolean horizontal=g_random_boolean();
+					gboolean horizontal=g_rand_boolean(cave->random);
 					gboolean dont_move=FALSE;
 					int i=3;
 
@@ -1558,7 +1558,7 @@ gd_cave_iterate(Cave *cave, const gboolean up, const gboolean down, const gboole
 						O_WAITING_STONE, O_BITER_1
 					};
 
-					store(cave, x, y, ghost_explode[g_random_int_range(0, G_N_ELEMENTS (ghost_explode))]);
+					store(cave, x, y, ghost_explode[g_rand_int_range(cave->random, 0, G_N_ELEMENTS (ghost_explode))]);
 				}
 				break;
 			case O_BOMB_EXPL_4:
@@ -1602,7 +1602,7 @@ gd_cave_iterate(Cave *cave, const gboolean up, const gboolean down, const gboole
 						static GdDirection dirs[]={MV_UP, MV_DOWN, MV_LEFT, MV_RIGHT};
 						GdDirection random_dir;
 
-						random_dir=dirs[g_random_int_range(0, G_N_ELEMENTS(dirs))];
+						random_dir=dirs[g_rand_int_range(cave->random, 0, G_N_ELEMENTS(dirs))];
 						if (is_space_dir(cave, x, y, random_dir)) {
 							move(cave, x, y, random_dir, O_GHOST);
 							break;	/* ghost did move -> exit loop */

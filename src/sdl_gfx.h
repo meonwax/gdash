@@ -36,7 +36,6 @@ int gd_drawcave(SDL_Surface *dest, const Cave *cave, int **gfx_buffer);
 gboolean gd_sdl_init();
 gboolean gd_scroll(const Cave *cave, gboolean exact_scroll);
 
-
 void gd_select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5);
 void gd_loadcells_default();
 gboolean gd_loadcells_file(const char *filename);
@@ -63,19 +62,12 @@ gboolean gd_fire();
 
 gboolean gd_space_or_fire();
 
-char *gd_select_file(const char *title, const char *directory, const char *glob);
-
-char *gd_wraptext(const char *orig, int width);
-
-
 void gd_create_dark_background();
 void gd_backup_and_dark_screen();
 void gd_backup_and_black_screen();
 void gd_restore_screen();
 
 void gd_wait_for_key_releases();
-
-
 
 #endif
 

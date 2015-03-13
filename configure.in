@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(GDash, 20080715, cirix@fw.hu)
+AC_INIT(GDash, 20080722, cirix@fw.hu)
 AC_CONFIG_SRCDIR([src/game.c])
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
@@ -24,11 +24,46 @@ AC_CHECK_HEADERS([stdlib.h unistd.h string.h])
 AC_CHECK_FUNCS([strchr strrchr memset strtol])
 AC_FUNC_MEMCMP
 
+AC_ARG_WITH(gtk,
+  [AS_HELP_STRING([--without-gtk], [disables gtk+ version (gdash)])],
+  [with_gtk=$withval],
+  [with_gtk=yes])
+AC_ARG_WITH(sdl,
+  [AS_HELP_STRING([--without-sdl], [disables sdl version (sdash)])],
+  [with_sdl=$withval],
+  [with_sdl=yes])
+AC_ARG_ENABLE(sound,
+  [AS_HELP_STRING([--disable-sound], [disables sound support])],
+  [enable_sound=$enableval],
+  [enable_sound=yes])
+
+if test x"$with_gtk" = "xno" -a x"$with_sdl" = "xno"; then
+  AC_MSG_ERROR(You cannot disable both SDL and GTK. Rerun with --with-gtk or --with-sdl.)
+fi
+
+if test x"$enable_sound" = "xyes" -a x"$with_sdl" = "xno"; then
+  AC_MSG_ERROR(Sound support requires the SDL libraries. Rerun with --with-sdl or --disable-sound.)
+fi
+
 AM_PATH_GLIB_2_0(2.6.0, :, AC_MSG_ERROR(Test for GLIB failed. See the file 'INSTALL' for help.))
 
-AM_PATH_GTK_2_0(2.12.0, :, AC_MSG_ERROR(Test for GTK+ failed. See the file 'INSTALL' for help.))
+dnl this conditional must ALWAYS be run, not inside the if below.
+AM_CONDITIONAL(GTK, test x"$with_gtk" = "xyes")
+if test x"$with_gtk" = "xyes" ; then
+  AC_DEFINE(USE_GTK,,[Use GTK.])
+  AM_PATH_GTK_2_0(2.12.0, :, AC_MSG_ERROR(Test for GTK+ failed. See the file 'INSTALL' for help.))
+fi
 
-AM_PATH_SDL(1.2.0, :, AC_MSG_ERROR(Test for SDL failed. See the file 'INSTALL' for help.))
+AM_CONDITIONAL(SDL, test x"$with_sdl" = "xyes")
+if test x"$with_sdl" = "xyes" ; then
+  AC_DEFINE(USE_SDL,,[Use SDL.])
+  AM_PATH_SDL(1.2.0, :, AC_MSG_ERROR(Test for SDL failed. See the file 'INSTALL' for help.))
+fi
+
+AM_CONDITIONAL(SOUND, test x"$enable_sound" = "xyes")
+if test x"$enable_sound" = "xyes" ; then
+  AC_DEFINE(GD_SOUND,,[Enable sound.])
+fi
 
 AC_CONFIG_FILES([
 Makefile

@@ -15,6 +15,7 @@
  */
 #include <glib.h>
 #include <glib/gi18n.h>
+#include <glib/gstdio.h>
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
@@ -772,6 +773,7 @@ caveset_load_from_bdcff (const char *contents)
 			continue;
 		}
 
+		/* strip leading and trailing spaces AFTER checking if we are reading a map. map lines might begin or end with spaces */
 		g_strstrip(line);
 		
 		if (reading_highscore) {
@@ -1027,31 +1029,34 @@ gd_caveset_load_from_file (const char *filename, const char *configdir)
 	char *name;
 	char *c;
 	gboolean read;
-	gboolean bdcff_format;
 	GList *new_caveset;
+	struct stat st;
 
 	gd_clear_error_flag();
 	gd_error_set_context(gd_filename_to_utf8(filename));
 	
-	if (g_str_has_suffix (filename, ".gds"))
-		bdcff_format=FALSE;
-	else if (g_str_has_suffix (filename, ".bd"))
-		bdcff_format=TRUE;
-	else {
-		g_critical(_("could not determine file format from filename extension"));	/* unknown cave format */
+	if (g_stat(filename, &st)!=0) {
+		g_warning("cannot stat() file");
+		gd_error_set_context(NULL);
 		return FALSE;
 	}
-
+	if (st.st_size>1048576) {
+		g_warning("file bigger than 1MiB, refusing to load");
+		gd_error_set_context(NULL);
+		return FALSE;
+	}
 	read=g_file_get_contents (filename, &buf, &length, &error);
 	if (!read) {
 		g_warning("%s", error->message);
 		g_error_free(error);
+		gd_error_set_context(NULL);
 		return FALSE;
 	}
 	gd_error_set_context(NULL);
 
-	/* try to load as bdcff */
-	if (bdcff_format) {
+	/* BDCFF */
+	if (gd_caveset_imported_format((guint8 *) buf)==UNKNOWN) {
+		/* try to load as bdcff */
 		gboolean result;
 
 		result=caveset_load_from_bdcff(buf);	/* bdcff: start another function */
@@ -1059,7 +1064,7 @@ gd_caveset_load_from_file (const char *filename, const char *configdir)
 		return result;
 	}
 
-	/* try to load as a binary file */
+	/* try to load as a binary file, as we know the format */
 	new_caveset=gd_caveset_import_from_buffer ((guint8 *) buf, length);
 	g_free(buf);
 

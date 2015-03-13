@@ -79,20 +79,29 @@ icons.h: $(ICONS) icons.list
 title.h: $(TITLE) title.list
 	gdk-pixbuf-csource --raw --build-list `cat title.list` > $@
 
-# own programs which generate include files
-AM_CFLAGS=@GTK_CFLAGS@
+if GTK
+  CELLS2C = cells2c
+else
+  CELLS2C = 
+endif
 
+# own programs which generate include files
 noinst_PROGRAMS = \
-	cells_c64_to_c \
+	$(CELLS2C) \
 	file2c
 
 # this one creates inlined original c64 graphics
-cells_c64_to_c_LDADD =  @GTK_LIBS@
-cells_c64_to_c_SOURCES = \
-	cells_c64_to_c.c
+cells2c_CFLAGS = @GTK_CFLAGS@
+cells2c_LDADD =  @GTK_LIBS@
+cells2c_SOURCES = \
+	cells2c.c
 
-c64_gfx.h: cells_c64.png cells_c64_to_c
-	./cells_c64_to_c >c64_gfx.h
+c64_gfx.h: cells_c64.png $(CELLS2C)
+	( if test x$(CELLS2C) = x; then \
+		echo; echo; echo "*** GTK+ is needed to regenerate $@"; \
+		false; \
+	  fi )
+	./cells2c >c64_gfx.h
 
 # this utility creates an include file for any datafile
 file2c_SOURCES = \

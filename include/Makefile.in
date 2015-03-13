@@ -38,7 +38,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = cells_c64_to_c$(EXEEXT) file2c$(EXEEXT)
+noinst_PROGRAMS = $(am__EXEEXT_1) file2c$(EXEEXT)
 subdir = include
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -53,10 +53,11 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
+@GTK_TRUE@am__EXEEXT_1 = cells2c$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
-am_cells_c64_to_c_OBJECTS = cells_c64_to_c.$(OBJEXT)
-cells_c64_to_c_OBJECTS = $(am_cells_c64_to_c_OBJECTS)
-cells_c64_to_c_DEPENDENCIES =
+am_cells2c_OBJECTS = cells2c-cells2c.$(OBJEXT)
+cells2c_OBJECTS = $(am_cells2c_OBJECTS)
+cells2c_DEPENDENCIES =
 am_file2c_OBJECTS = file2c.$(OBJEXT)
 file2c_OBJECTS = $(am_file2c_OBJECTS)
 file2c_LDADD = $(LDADD)
@@ -67,8 +68,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(cells_c64_to_c_SOURCES) $(file2c_SOURCES)
-DIST_SOURCES = $(cells_c64_to_c_SOURCES) $(file2c_SOURCES)
+SOURCES = $(cells2c_SOURCES) $(file2c_SOURCES)
+DIST_SOURCES = $(cells2c_SOURCES) $(file2c_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -113,7 +114,9 @@ GMSGFMT_015 = @GMSGFMT_015@
 GOBJECT_QUERY = @GOBJECT_QUERY@
 GREP = @GREP@
 GTK_CFLAGS = @GTK_CFLAGS@
+GTK_FALSE = @GTK_FALSE@
 GTK_LIBS = @GTK_LIBS@
+GTK_TRUE = @GTK_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -144,9 +147,13 @@ PKG_CONFIG = @PKG_CONFIG@
 POSUB = @POSUB@
 SDL_CFLAGS = @SDL_CFLAGS@
 SDL_CONFIG = @SDL_CONFIG@
+SDL_FALSE = @SDL_FALSE@
 SDL_LIBS = @SDL_LIBS@
+SDL_TRUE = @SDL_TRUE@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+SOUND_FALSE = @SOUND_FALSE@
+SOUND_TRUE = @SOUND_TRUE@
 STRIP = @STRIP@
 USE_NLS = @USE_NLS@
 VERSION = @VERSION@
@@ -250,14 +257,14 @@ EXTRA_DIST = $(ICONS) $(TITLE) $(icon_DATA) \
 	$(CAVES) levels.h process.sh \
 	chargen
 
-
-# own programs which generate include files
-AM_CFLAGS = @GTK_CFLAGS@
+@GTK_FALSE@CELLS2C = 
+@GTK_TRUE@CELLS2C = cells2c
 
 # this one creates inlined original c64 graphics
-cells_c64_to_c_LDADD = @GTK_LIBS@
-cells_c64_to_c_SOURCES = \
-	cells_c64_to_c.c
+cells2c_CFLAGS = @GTK_CFLAGS@
+cells2c_LDADD = @GTK_LIBS@
+cells2c_SOURCES = \
+	cells2c.c
 
 
 # this utility creates an include file for any datafile
@@ -300,9 +307,9 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
-cells_c64_to_c$(EXEEXT): $(cells_c64_to_c_OBJECTS) $(cells_c64_to_c_DEPENDENCIES) 
-	@rm -f cells_c64_to_c$(EXEEXT)
-	$(LINK) $(cells_c64_to_c_LDFLAGS) $(cells_c64_to_c_OBJECTS) $(cells_c64_to_c_LDADD) $(LIBS)
+cells2c$(EXEEXT): $(cells2c_OBJECTS) $(cells2c_DEPENDENCIES) 
+	@rm -f cells2c$(EXEEXT)
+	$(LINK) $(cells2c_LDFLAGS) $(cells2c_OBJECTS) $(cells2c_LDADD) $(LIBS)
 file2c$(EXEEXT): $(file2c_OBJECTS) $(file2c_DEPENDENCIES) 
 	@rm -f file2c$(EXEEXT)
 	$(LINK) $(file2c_LDFLAGS) $(file2c_OBJECTS) $(file2c_LDADD) $(LIBS)
@@ -313,7 +320,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cells_c64_to_c.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cells2c-cells2c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file2c.Po@am__quote@
 
 .c.o:
@@ -329,6 +336,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+cells2c-cells2c.o: cells2c.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cells2c_CFLAGS) $(CFLAGS) -MT cells2c-cells2c.o -MD -MP -MF "$(DEPDIR)/cells2c-cells2c.Tpo" -c -o cells2c-cells2c.o `test -f 'cells2c.c' || echo '$(srcdir)/'`cells2c.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/cells2c-cells2c.Tpo" "$(DEPDIR)/cells2c-cells2c.Po"; else rm -f "$(DEPDIR)/cells2c-cells2c.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cells2c.c' object='cells2c-cells2c.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cells2c_CFLAGS) $(CFLAGS) -c -o cells2c-cells2c.o `test -f 'cells2c.c' || echo '$(srcdir)/'`cells2c.c
+
+cells2c-cells2c.obj: cells2c.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cells2c_CFLAGS) $(CFLAGS) -MT cells2c-cells2c.obj -MD -MP -MF "$(DEPDIR)/cells2c-cells2c.Tpo" -c -o cells2c-cells2c.obj `if test -f 'cells2c.c'; then $(CYGPATH_W) 'cells2c.c'; else $(CYGPATH_W) '$(srcdir)/cells2c.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/cells2c-cells2c.Tpo" "$(DEPDIR)/cells2c-cells2c.Po"; else rm -f "$(DEPDIR)/cells2c-cells2c.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cells2c.c' object='cells2c-cells2c.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cells2c_CFLAGS) $(CFLAGS) -c -o cells2c-cells2c.obj `if test -f 'cells2c.c'; then $(CYGPATH_W) 'cells2c.c'; else $(CYGPATH_W) '$(srcdir)/cells2c.c'; fi`
 uninstall-info-am:
 install-iconDATA: $(icon_DATA)
 	@$(NORMAL_INSTALL)
@@ -556,8 +577,12 @@ icons.h: $(ICONS) icons.list
 title.h: $(TITLE) title.list
 	gdk-pixbuf-csource --raw --build-list `cat title.list` > $@
 
-c64_gfx.h: cells_c64.png cells_c64_to_c
-	./cells_c64_to_c >c64_gfx.h
+c64_gfx.h: cells_c64.png $(CELLS2C)
+	( if test x$(CELLS2C) = x; then \
+		echo; echo; echo "*** GTK+ is needed to regenerate $@"; \
+		false; \
+	  fi )
+	./cells2c >c64_gfx.h
 
 levels.h: $(CAVES) file2c Makefile.am
 	sh process.sh $(CAVES)
