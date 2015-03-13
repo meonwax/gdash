@@ -896,7 +896,7 @@ Scserbin_Zoltan_CAVES = Scserbin_Zoltan/Atlantis_52.gds \
 	Scserbin_Zoltan/Ninja_Dash_06.gds
 Scserbin_Zoltan_DATA = $(Scserbin_Zoltan_CAVES)
 Dustindir = $(pkgdatadir)/caves/Dustin
-Dustin_CAVES = Dustin/RockFort_3-Rockford_s_Dream.bd Dustin/RockFort_1-The_Long_Way.bd Dustin/Rock_Fort_2.brc Dustin/Rock_Fort_1.brc
+Dustin_CAVES = Dustin/RockFort_3-Rockford_s_Dream.bd Dustin/RockFort_1-The_Long_Way.bd Dustin/Rock_Fort_2.brc Dustin/Rock_Fort_1.brc Dustin/Boulder_Dash_2-The_Expert_Levels.bd Dustin/Boulder_Dash-The_Expert_Levels.bd
 Dustin_DATA = $(Dustin_CAVES)
 Phoenixdir = $(pkgdatadir)/caves/Phoenix
 Phoenix_CAVES = Phoenix/Fun_Dash_12.gds Phoenix/Fun_Dash_13.gds Phoenix/Fun_Dash_16.gds Phoenix/Fun_Dash_11.gds Phoenix/Fun_Dash_04.gds Phoenix/Fun_Dash_19.gds Phoenix/Fun_Dash_05.gds Phoenix/Fun_Dash_09.gds Phoenix/Fun_Dash_18.gds Phoenix/Hawk_Dash_01.gds Phoenix/Fun_Dash_20.gds Phoenix/Hawk_Dash_03.gds Phoenix/Fun_Dash_08.gds Phoenix/Fun_Dash_02.gds Phoenix/Fun_Dash_14.gds

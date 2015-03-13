@@ -61,7 +61,7 @@ am__objects_1 = gdash-colors.$(OBJEXT) gdash-cave.$(OBJEXT) \
 am__objects_2 = gdash-gtkgfx.$(OBJEXT) gdash-gtkui.$(OBJEXT) \
 	gdash-gtkmain.$(OBJEXT) gdash-editorwidgets.$(OBJEXT) \
 	gdash-editorexport.$(OBJEXT) gdash-editor.$(OBJEXT) \
-	gdash-help.$(OBJEXT)
+	gdash-editorbits.$(OBJEXT) gdash-help.$(OBJEXT)
 am__objects_3 = gdash-sound.$(OBJEXT)
 am_gdash_OBJECTS = $(am__objects_1) $(am__objects_2) $(am__objects_3)
 gdash_OBJECTS = $(am_gdash_OBJECTS)
@@ -305,6 +305,7 @@ gtksources = \
 	editorwidgets.c \
 	editorexport.c \
 	editor.c \
+	editorbits.c \
 	help.c
 
 gtkheaders = \
@@ -312,8 +313,9 @@ gtkheaders = \
 	gtkui.h\
 	gtkmain.h \
 	editor.h \
-	editorwidgets.h\
-	editorexport.h\
+	editorwidgets.h \
+	editorexport.h \
+	editorbits.h \
 	help.h
 
 
@@ -488,6 +490,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-cavesound.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-colors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-editor.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-editorbits.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-editorexport.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-editorwidgets.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gameplay.Po@am__quote@
@@ -830,6 +833,20 @@ gdash-editor.obj: editor.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editor.c' object='gdash-editor.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-editor.obj `if test -f 'editor.c'; then $(CYGPATH_W) 'editor.c'; else $(CYGPATH_W) '$(srcdir)/editor.c'; fi`
+
+gdash-editorbits.o: editorbits.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-editorbits.o -MD -MP -MF $(DEPDIR)/gdash-editorbits.Tpo -c -o gdash-editorbits.o `test -f 'editorbits.c' || echo '$(srcdir)/'`editorbits.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/gdash-editorbits.Tpo $(DEPDIR)/gdash-editorbits.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editorbits.c' object='gdash-editorbits.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-editorbits.o `test -f 'editorbits.c' || echo '$(srcdir)/'`editorbits.c
+
+gdash-editorbits.obj: editorbits.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-editorbits.obj -MD -MP -MF $(DEPDIR)/gdash-editorbits.Tpo -c -o gdash-editorbits.obj `if test -f 'editorbits.c'; then $(CYGPATH_W) 'editorbits.c'; else $(CYGPATH_W) '$(srcdir)/editorbits.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/gdash-editorbits.Tpo $(DEPDIR)/gdash-editorbits.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editorbits.c' object='gdash-editorbits.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -c -o gdash-editorbits.obj `if test -f 'editorbits.c'; then $(CYGPATH_W) 'editorbits.c'; else $(CYGPATH_W) '$(srcdir)/editorbits.c'; fi`
 
 gdash-help.o: help.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gdash_CFLAGS) $(CFLAGS) -MT gdash-help.o -MD -MP -MF $(DEPDIR)/gdash-help.Tpo -c -o gdash-help.o `test -f 'help.c' || echo '$(srcdir)/'`help.c

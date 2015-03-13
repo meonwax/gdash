@@ -18,6 +18,8 @@
 
 #include <gtk/gtkwidget.h>
 #include <gtk/gtklabel.h>
+#include <gtk/gtkdialog.h>
+#include "cave.h"
 
 #define GD_ICON_CAVE_EDITOR "cave-editor"
 #define GD_ICON_EDITOR_MOVE "editor-move"

@@ -29,11 +29,11 @@ typedef guint32 GdColor;
 */
 
 typedef enum _color_type {
-	GD_COLOR_TYPE_RGB=0,
-	GD_COLOR_TYPE_C64=1,
-	GD_COLOR_TYPE_C64DTV=2,
-	GD_COLOR_TYPE_ATARI=3,
-	GD_COLOR_TYPE_UNKNOWN	/* should be the last one */
+    GD_COLOR_TYPE_RGB=0,
+    GD_COLOR_TYPE_C64=1,
+    GD_COLOR_TYPE_C64DTV=2,
+    GD_COLOR_TYPE_ATARI=3,
+    GD_COLOR_TYPE_UNKNOWN    /* should be the last one */
 } GdColorType;
 
 const char ** gd_color_get_c64_palette_names();

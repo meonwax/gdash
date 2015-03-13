@@ -20,29 +20,29 @@
 #include "cave.h"
 
 typedef struct _gd_caveset_data {
-	GdString name;				/* Name of caveset */
-	GdString description;		/* Some words about the caveset */
-	GdString author;			/* Author */
-	GdString difficulty;		/* difficulty of the caveset, for info purposes */
-	GdString www;				/* link to author's webpage */
-	GdString date;				/* date of creation */
+    GdString name;                /* Name of caveset */
+    GdString description;        /* Some words about the caveset */
+    GdString author;            /* Author */
+    GdString difficulty;        /* difficulty of the caveset, for info purposes */
+    GdString www;                /* link to author's webpage */
+    GdString date;                /* date of creation */
 
-	GString *story;				/* story for the caves */
-	GString *remark;			/* notes about the game */
-	
-	GString *title_screen;		/* base64-encoded title screen image */
-	GString *title_screen_scroll;	/* scrolling background for title screen image */
+    GString *story;                /* story for the caves */
+    GString *remark;            /* notes about the game */
+    
+    GString *title_screen;        /* base64-encoded title screen image */
+    GString *title_screen_scroll;    /* scrolling background for title screen image */
 
-	GdString charset;			/* these are not used by gdash */
-	GdString fontset;
+    GdString charset;            /* these are not used by gdash */
+    GdString fontset;
 
-	/* these are only for a game. */
-	int initial_lives;			/* initial lives at game start */
-	int maximum_lives;			/* maximum lives */
-	int bonus_life_score;		/* bonus life / number of points */
+    /* these are only for a game. */
+    int initial_lives;            /* initial lives at game start */
+    int maximum_lives;            /* maximum lives */
+    int bonus_life_score;        /* bonus life / number of points */
 
-	/* and this one the highscores */
-	GdHighScore highscore[GD_HIGHSCORE_NUM];
+    /* and this one the highscores */
+    GdHighScore highscore[GD_HIGHSCORE_NUM];
 } GdCavesetData;
 
 extern const GdStructDescriptor gd_caveset_properties[];
@@ -83,5 +83,5 @@ int gd_cave_check_replays(GdCave *cave, gboolean report, gboolean remove, gboole
 gboolean gd_caveset_has_replays();
 
 
-#endif							/* _CAVESET_H */
+#endif                            /* _CAVESET_H */
 

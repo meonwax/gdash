@@ -137,7 +137,7 @@ Scserbin_Zoltan_CAVES = Scserbin_Zoltan/Atlantis_52.gds Scserbin_Zoltan/Batman30
 Scserbin_Zoltan_DATA = $(Scserbin_Zoltan_CAVES)
 
 Dustindir = $(pkgdatadir)/caves/Dustin
-Dustin_CAVES = Dustin/RockFort_3-Rockford_s_Dream.bd Dustin/RockFort_1-The_Long_Way.bd Dustin/Rock_Fort_2.brc Dustin/Rock_Fort_1.brc
+Dustin_CAVES = Dustin/RockFort_3-Rockford_s_Dream.bd Dustin/RockFort_1-The_Long_Way.bd Dustin/Rock_Fort_2.brc Dustin/Rock_Fort_1.brc Dustin/Boulder_Dash_2-The_Expert_Levels.bd Dustin/Boulder_Dash-The_Expert_Levels.bd
 Dustin_DATA = $(Dustin_CAVES)
 
 Phoenixdir = $(pkgdatadir)/caves/Phoenix

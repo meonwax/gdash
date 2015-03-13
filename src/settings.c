@@ -43,36 +43,36 @@ const int gd_scaling_scale[]={1, 2, 2, 2, 3, 3, 3, 4, 4, 4};
 const gchar *gd_languages_names[]={N_("System default"), "English", "Deutsch", "Magyar", NULL};
 /* this should correspond to the above one. */
 #ifdef G_OS_WIN32
-	/* locale names used in windows. */
-	static const gchar *language_locale_default[]= { "", NULL, };
-	static const gchar *language_locale_en[]= { "English", NULL, };
-	static const gchar *language_locale_de[]= { "German", NULL, };
-	static const gchar *language_locale_hu[]= { "Hungarian", NULL, };
-	/* these will be used on windows for a putenv to trick gtk. */
-	/* on linux, the setlocale call works correctly, and this is not needed. */
-	static const gchar *languages_for_env[]={ NULL, "en", "de", "hu" };
+    /* locale names used in windows. */
+    static const gchar *language_locale_default[]= { "", NULL, };
+    static const gchar *language_locale_en[]= { "English", NULL, };
+    static const gchar *language_locale_de[]= { "German", NULL, };
+    static const gchar *language_locale_hu[]= { "Hungarian", NULL, };
+    /* these will be used on windows for a putenv to trick gtk. */
+    /* on linux, the setlocale call works correctly, and this is not needed. */
+    static const gchar *languages_for_env[]={ NULL, "en", "de", "hu" };
 #else
-	/* locale names used in unix. */
-	/* anyone, a better solution for this? */
-	static const gchar *language_locale_default[]=
-		{ "", NULL, };
-	static const gchar *language_locale_en[]=
-		{ "en_US.UTF-8", "en_US.UTF8", "en_US.ISO8859-15", "en_US.ISO8859-1", "en_US.US-ASCII", "en_US", "en", NULL, };
-	static const gchar *language_locale_de[]=
-		{ "de_DE.UTF-8", "de_DE.UTF8", "de_DE.ISO8859-15", "de_DE.ISO8859-1", "de_DE",
-		  "de_AT.UTF-8", "de_AT.UTF8", "de_AT.ISO8859-15", "de_AT.ISO8859-1", "de_AT",
-		  "de_CH.UTF-8", "de_CH.UTF8", "de_CH.ISO8859-15", "de_CH.ISO8859-1", "de_CH",
-		  "de", NULL, };
-	static const gchar *language_locale_hu[]=
-		{ "hu_HU.UTF-8", "hu_HU.ISO8859-2", "hu_HU", "hu", NULL, };
-#endif	/* ifdef g_os_win32 else */
+    /* locale names used in unix. */
+    /* anyone, a better solution for this? */
+    static const gchar *language_locale_default[]=
+        { "", NULL, };
+    static const gchar *language_locale_en[]=
+        { "en_US.UTF-8", "en_US.UTF8", "en_US.ISO8859-15", "en_US.ISO8859-1", "en_US.US-ASCII", "en_US", "en", NULL, };
+    static const gchar *language_locale_de[]=
+        { "de_DE.UTF-8", "de_DE.UTF8", "de_DE.ISO8859-15", "de_DE.ISO8859-1", "de_DE",
+          "de_AT.UTF-8", "de_AT.UTF8", "de_AT.ISO8859-15", "de_AT.ISO8859-1", "de_AT",
+          "de_CH.UTF-8", "de_CH.UTF8", "de_CH.ISO8859-15", "de_CH.ISO8859-1", "de_CH",
+          "de", NULL, };
+    static const gchar *language_locale_hu[]=
+        { "hu_HU.UTF-8", "hu_HU.ISO8859-2", "hu_HU", "hu", NULL, };
+#endif    /* ifdef g_os_win32 else */
 
 /* put the locales to be tried in an array - same for windows and unix */
 static const gchar **language_locale[]={
-	language_locale_default,
-	language_locale_en,
-	language_locale_de,
-	language_locale_hu,
+    language_locale_default,
+    language_locale_en,
+    language_locale_de,
+    language_locale_hu,
 };
 #endif /* ifdef use_gtk */
 
@@ -82,21 +82,21 @@ static const gchar **language_locale[]={
 
 
 /* GTK settings */
-#ifdef USE_GTK	/* only if having gtk */
+#ifdef USE_GTK    /* only if having gtk */
 
 /* editor settings */
 #define SETTING_GAME_VIEW "game_view"
-gboolean gd_game_view=TRUE;	/* show animated cells instead of arrows & ... */
+gboolean gd_game_view=TRUE;    /* show animated cells instead of arrows & ... */
 #define SETTING_COLORED_OBJECTS "colored_objects"
-gboolean gd_colored_objects=TRUE;	/* show objects with different color */
+gboolean gd_colored_objects=TRUE;    /* show objects with different color */
 #define SETTING_SHOW_OBJECT_LIST "show_object_list"
-gboolean gd_show_object_list=TRUE;	/* show object list */
+gboolean gd_show_object_list=TRUE;    /* show object list */
 #define SETTING_SHOW_TEST_LABEL "show_test_label"
-gboolean gd_show_test_label=TRUE;	/* show a label with some variables, for testing */
+gboolean gd_show_test_label=TRUE;    /* show a label with some variables, for testing */
 #define SETTING_EDITOR_WINDOW_WIDTH "editor_window_width"
-int gd_editor_window_width=800;	/* window size */
+int gd_editor_window_width=800;    /* window size */
 #define SETTING_EDITOR_WINDOW_HEIGHT "editor_window_height"
-int gd_editor_window_height=520;	/* window size */
+int gd_editor_window_height=520;    /* window size */
 
 /* preferences */
 #define SETTING_LANGUAGE "language"
@@ -141,7 +141,7 @@ guint gd_gtk_key_suicide=GDK_F2;
 char *gd_html_stylesheet_filename=NULL;
 char *gd_html_favicon_filename=NULL;
 
-#endif	/* only if having gtk */
+#endif    /* only if having gtk */
 
 
 
@@ -175,7 +175,7 @@ GdColorType gd_preferred_palette=GD_COLOR_TYPE_RGB;
 
 
 
-#ifdef USE_SDL	/* only if having sdl */
+#ifdef USE_SDL    /* only if having sdl */
 #define SETTING_SDL_KEY_LEFT "sdl_key_left"
 guint gd_sdl_key_left=SDLK_LEFT;
 #define SETTING_SDL_KEY_RIGHT "sdl_key_right"
@@ -204,7 +204,7 @@ gboolean gd_sdl_pal_emulation=FALSE;
 gboolean gd_show_name_of_game=TRUE;
 #define SETTING_STATUS_BAR_TYPE "status_bar_type"
 GdStatusBarType gd_status_bar_type=GD_STATUS_BAR_ORIGINAL;
-#endif	/* use_sdl */
+#endif    /* use_sdl */
 
 
 
@@ -220,10 +220,10 @@ gboolean gd_sdl_44khz_mixing=TRUE;
 #define SETTING_CLASSIC_SOUND "classic_sound"
 gboolean gd_classic_sound=FALSE;
 #define SETTING_SOUND_CHUNKS_VOLUME_PERCENT "sound_chunks_volume_percent"
-int gd_sound_chunks_volume_percent=75;
+int gd_sound_chunks_volume_percent=50;
 #define SETTING_SOUND_MUSIC_VOLUME_PERCENT "sound_music_volume_percent"
-int gd_sound_music_volume_percent=75;
-#endif	/* if gd_sound */
+int gd_sound_music_volume_percent=50;
+#endif    /* if gd_sound */
 
 
 
@@ -245,16 +245,16 @@ char **gd_param_cavenames=NULL;
 #ifdef USE_SDL
 const char **gd_status_bar_type_get_names()
 {
-	/* these are used only in the sdl version, so are not translated */
-	static const char *types[]={
-		"Original",
-		"1stB",
-		"CrLi",
-		"Final BD",
-		"Atari original",
-		NULL
-	};	
-	return types;
+    /* these are used only in the sdl version, so are not translated */
+    static const char *types[]={
+        "Original",
+        "1stB",
+        "CrLi",
+        "Final BD",
+        "Atari original",
+        NULL
+    };    
+    return types;
 }
 #endif
 
@@ -262,48 +262,48 @@ const char **gd_status_bar_type_get_names()
 static gboolean
 keyfile_get_boolean_with_default(GKeyFile *keyfile, const char *group, const char *key, gboolean def)
 {
-	GError *error=NULL;
-	gboolean result;
-	
-	result=g_key_file_get_boolean(keyfile, group, key, &error);
-	if (!error)
-		return result;
-	g_warning("%s", error->message);
-	g_error_free(error);
-	return def;
+    GError *error=NULL;
+    gboolean result;
+    
+    result=g_key_file_get_boolean(keyfile, group, key, &error);
+    if (!error)
+        return result;
+    g_warning("%s", error->message);
+    g_error_free(error);
+    return def;
 }
 
 /* gets integer value from key file; returns def if not found or unreadable */
 static int
 keyfile_get_integer_with_default(GKeyFile *keyfile, const char *group, const char *key, int def)
 {
-	GError *error=NULL;
-	int result;
-	
-	result=g_key_file_get_integer(keyfile, group, key, &error);
-	if (!error)
-		return result;
-	g_warning("%s", error->message);
-	g_error_free(error);
-	return def;
+    GError *error=NULL;
+    int result;
+    
+    result=g_key_file_get_integer(keyfile, group, key, &error);
+    if (!error)
+        return result;
+    g_warning("%s", error->message);
+    g_error_free(error);
+    return def;
 }
 
 /* sets up directiories and loads translations */
 void gd_settings_init_dirs()
 {
-	g_assert(G_N_ELEMENTS(gd_scaling_name)==GD_SCALING_MAX+1);	/* +1 is the terminating NULL */
-	g_assert(G_N_ELEMENTS(gd_scaling_scale)==GD_SCALING_MAX);
+    g_assert(G_N_ELEMENTS(gd_scaling_name)==GD_SCALING_MAX+1);    /* +1 is the terminating NULL */
+    g_assert(G_N_ELEMENTS(gd_scaling_scale)==GD_SCALING_MAX);
 #ifdef G_OS_WIN32
-	/* on win32, use the glib function. */
-	gd_system_data_dir=g_win32_get_package_installation_directory (NULL, NULL);
+    /* on win32, use the glib function. */
+    gd_system_data_dir=g_win32_get_package_installation_directory (NULL, NULL);
 #else
-	/* on linux, this is a defined, built-in string, $perfix/share/locale */
-	gd_system_data_dir=PKGDATADIR;
+    /* on linux, this is a defined, built-in string, $perfix/share/locale */
+    gd_system_data_dir=PKGDATADIR;
 #endif
-	gd_system_caves_dir=g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "caves", NULL);
-	gd_system_sound_dir=g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "sound", NULL);
-	gd_system_music_dir=g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "music", NULL);
-	gd_user_config_dir=g_build_path(G_DIR_SEPARATOR_S, g_get_user_config_dir(), PACKAGE, NULL);
+    gd_system_caves_dir=g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "caves", NULL);
+    gd_system_sound_dir=g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "sound", NULL);
+    gd_system_music_dir=g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "music", NULL);
+    gd_user_config_dir=g_build_path(G_DIR_SEPARATOR_S, g_get_user_config_dir(), PACKAGE, NULL);
 }
 
 /* set locale from the gdash setting variable. */
@@ -314,40 +314,40 @@ void
 gd_settings_set_locale()
 {
 #ifdef USE_GTK
-	int i;
-	char *result;
+    int i;
+    char *result;
 
-	if (gd_language<0 || gd_language>=G_N_ELEMENTS(language_locale))
-		gd_language=0;	/* switch to default, if out of bounds. */
+    if (gd_language<0 || gd_language>=G_N_ELEMENTS(language_locale))
+        gd_language=0;    /* switch to default, if out of bounds. */
 
-	/* on windows, we put the LANGUAGE variable into the environment. that seems to be the only
-	thing gtk+ reacts upon. we also set the locale below. */
+    /* on windows, we put the LANGUAGE variable into the environment. that seems to be the only
+    thing gtk+ reacts upon. we also set the locale below. */
 #ifdef G_OS_WIN32
-	g_assert(G_N_ELEMENTS(language_locale)==G_N_ELEMENTS(languages_for_env));
-	if (languages_for_env[gd_language]) {
-		char *env;
-		
-		env=g_strdup_printf("LANGUAGE=%s", languages_for_env[gd_language]);
-		putenv(env);
-		g_free(env);
-	}
+    g_assert(G_N_ELEMENTS(language_locale)==G_N_ELEMENTS(languages_for_env));
+    if (languages_for_env[gd_language]) {
+        char *env;
+        
+        env=g_strdup_printf("LANGUAGE=%s", languages_for_env[gd_language]);
+        putenv(env);
+        g_free(env);
+    }
 #endif
-	
-	/* try to set the locale. */
-	i=0;
-	result=NULL;
-	while(result==NULL && language_locale[gd_language][i]!=NULL) {
-		result=setlocale(LC_ALL, language_locale[gd_language][i]);
-		i++;
-	}
-	if (result==NULL) {
-		/* failed to set */
-		g_warning("Failed to set language to '%s'. Switching to system default locale.", gd_languages_names[gd_language]);
-		setlocale(LC_ALL, "");
-	}
+    
+    /* try to set the locale. */
+    i=0;
+    result=NULL;
+    while(result==NULL && language_locale[gd_language][i]!=NULL) {
+        result=setlocale(LC_ALL, language_locale[gd_language][i]);
+        i++;
+    }
+    if (result==NULL) {
+        /* failed to set */
+        g_warning("Failed to set language to '%s'. Switching to system default locale.", gd_languages_names[gd_language]);
+        setlocale(LC_ALL, "");
+    }
 #else
-	/* if no gtk, just set the system default locale. */
-	setlocale(LC_ALL, "");
+    /* if no gtk, just set the system default locale. */
+    setlocale(LC_ALL, "");
 #endif
 }
 
@@ -356,23 +356,23 @@ gd_settings_set_locale()
 void gd_settings_init_translation()
 {
 #ifdef G_OS_WIN32
-	/* these would not be needed for the sdl version, but they do not hurt */
-	bindtextdomain("gtk20-properties", gd_system_data_dir);
-	bindtextdomain("gtk20", gd_system_data_dir);
-	bindtextdomain("glib20", gd_system_data_dir);
-	bind_textdomain_codeset("gtk20-properties", "UTF-8");
-	bind_textdomain_codeset("gtk20", "UTF-8");
-	bind_textdomain_codeset("glib20", "UTF-8");
-	/* gdash strings */
-	bindtextdomain (PACKAGE, gd_system_data_dir);
-	/* gtk always uses utf8, so convert translated strings to utf8 if needed */
-	bind_textdomain_codeset(PACKAGE, "UTF-8");
+    /* these would not be needed for the sdl version, but they do not hurt */
+    bindtextdomain("gtk20-properties", gd_system_data_dir);
+    bindtextdomain("gtk20", gd_system_data_dir);
+    bindtextdomain("glib20", gd_system_data_dir);
+    bind_textdomain_codeset("gtk20-properties", "UTF-8");
+    bind_textdomain_codeset("gtk20", "UTF-8");
+    bind_textdomain_codeset("glib20", "UTF-8");
+    /* gdash strings */
+    bindtextdomain (PACKAGE, gd_system_data_dir);
+    /* gtk always uses utf8, so convert translated strings to utf8 if needed */
+    bind_textdomain_codeset(PACKAGE, "UTF-8");
 #else
-	/* and translated strings here. */
-	bindtextdomain(PACKAGE, LOCALEDIR);
-	bind_textdomain_codeset(PACKAGE, "UTF-8");
+    /* and translated strings here. */
+    bindtextdomain(PACKAGE, LOCALEDIR);
+    bind_textdomain_codeset(PACKAGE, "UTF-8");
 #endif
-	textdomain(PACKAGE);	/* set default textdomain to gdash */
+    textdomain(PACKAGE);    /* set default textdomain to gdash */
 }
 
 
@@ -400,9 +400,9 @@ gd_load_settings()
     }
     g_free(filename);
 
-	/* if zero length file, also return */
+    /* if zero length file, also return */
     if (length==0)
-    	return;
+        return;
 
     ini=g_key_file_new();
     success=g_key_file_load_from_data(ini, data, length, 0, &error);
@@ -414,8 +414,8 @@ gd_load_settings()
         return;
     }
 
-#ifdef USE_GTK	/* only if having gtk */
-	/* editor settings */
+#ifdef USE_GTK    /* only if having gtk */
+    /* editor settings */
     gd_game_view=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GAME_VIEW, gd_game_view);
     gd_colored_objects=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_COLORED_OBJECTS, gd_colored_objects);
     gd_show_object_list=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_OBJECT_LIST, gd_show_object_list);
@@ -423,34 +423,34 @@ gd_load_settings()
     gd_editor_window_width=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_WIDTH, gd_editor_window_width);
     gd_editor_window_height=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_HEIGHT, gd_editor_window_height);
 
-	/* preferences */
+    /* preferences */
     gd_language=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_LANGUAGE, gd_language);
     gd_time_min_sec=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_TIME_MIN_SEC, gd_time_min_sec);
     gd_mouse_play=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_MOUSE_PLAY, gd_mouse_play);
     gd_show_preview=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_PREVIEW, gd_show_preview);
 
-	/* graphics */
-	gd_theme=g_key_file_get_string(ini, SETTINGS_GDASH_GROUP, SETTING_THEME, NULL);
+    /* graphics */
+    gd_theme=g_key_file_get_string(ini, SETTINGS_GDASH_GROUP, SETTING_THEME, NULL);
     gd_cell_scale_game=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_CELL_SCALE_GAME, gd_cell_scale_game);
     if (gd_cell_scale_game<0 || gd_cell_scale_game>=GD_SCALING_MAX)
-    	gd_cell_scale_game=0;
+        gd_cell_scale_game=0;
     gd_pal_emulation_game=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_GAME, gd_pal_emulation_game);
     gd_cell_scale_editor=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_CELL_SCALE_EDITOR, gd_cell_scale_editor);
     if (gd_cell_scale_editor<0 || gd_cell_scale_editor>=GD_SCALING_MAX)
-    	gd_cell_scale_editor=0;
+        gd_cell_scale_editor=0;
     gd_pal_emulation_editor=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_EDITOR, gd_pal_emulation_editor);
 
-	/* keyboard */
-	gd_gtk_key_left=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_LEFT, gd_gtk_key_left);
-	gd_gtk_key_right=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_RIGHT, gd_gtk_key_right);
-	gd_gtk_key_up=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_UP, gd_gtk_key_up);
-	gd_gtk_key_down=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_DOWN, gd_gtk_key_down);
-	gd_gtk_key_fire_1=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_FIRE_1, gd_gtk_key_fire_1);
-	gd_gtk_key_fire_2=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_FIRE_2, gd_gtk_key_fire_2);
-	gd_gtk_key_suicide=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_SUICIDE, gd_gtk_key_suicide);
-#endif	/* only if having gtk */
+    /* keyboard */
+    gd_gtk_key_left=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_LEFT, gd_gtk_key_left);
+    gd_gtk_key_right=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_RIGHT, gd_gtk_key_right);
+    gd_gtk_key_up=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_UP, gd_gtk_key_up);
+    gd_gtk_key_down=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_DOWN, gd_gtk_key_down);
+    gd_gtk_key_fire_1=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_FIRE_1, gd_gtk_key_fire_1);
+    gd_gtk_key_fire_2=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_FIRE_2, gd_gtk_key_fire_2);
+    gd_gtk_key_suicide=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_SUICIDE, gd_gtk_key_suicide);
+#endif    /* only if having gtk */
 
-	/* universal settings */
+    /* universal settings */
     gd_no_invisible_outbox=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_NO_INVISIBLE_OUTBOX, gd_no_invisible_outbox);
     gd_all_caves_selectable=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_ALL_CAVES_SELECTABLE, gd_all_caves_selectable);
     gd_import_as_all_caves_selectable=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_IMPORT_AS_ALL_CAVES_SELECTABLE, gd_import_as_all_caves_selectable);
@@ -460,44 +460,44 @@ gd_load_settings()
     gd_fine_scroll=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_FINE_SCROLL, gd_fine_scroll);
     gd_show_story=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_STORY, gd_show_story);
 
-	/* palette settings */
+    /* palette settings */
     gd_c64_palette=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_C64_PALETTE, gd_c64_palette);
     gd_c64dtv_palette=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_C64DTV_PALETTE, gd_c64dtv_palette);
     gd_atari_palette=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_ATARI_PALETTE, gd_atari_palette);
     gd_preferred_palette=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PREFERRED_PALETTE, gd_preferred_palette);
     if (gd_preferred_palette<0 || gd_preferred_palette>=GD_COLOR_TYPE_UNKNOWN)
-    	gd_preferred_palette=GD_COLOR_TYPE_RGB;
+        gd_preferred_palette=GD_COLOR_TYPE_RGB;
 
-#ifdef USE_SDL	/* only if having sdl */
-	gd_sdl_key_left=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_LEFT, gd_sdl_key_left);
-	gd_sdl_key_right=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_RIGHT, gd_sdl_key_right);
-	gd_sdl_key_up=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_UP, gd_sdl_key_up);
-	gd_sdl_key_down=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_DOWN, gd_sdl_key_down);
-	gd_sdl_key_fire_1=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_FIRE_1, gd_sdl_key_fire_1);
-	gd_sdl_key_fire_2=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_FIRE_2, gd_sdl_key_fire_2);
-	gd_sdl_key_suicide=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_SUICIDE, gd_sdl_key_suicide);
+#ifdef USE_SDL    /* only if having sdl */
+    gd_sdl_key_left=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_LEFT, gd_sdl_key_left);
+    gd_sdl_key_right=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_RIGHT, gd_sdl_key_right);
+    gd_sdl_key_up=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_UP, gd_sdl_key_up);
+    gd_sdl_key_down=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_DOWN, gd_sdl_key_down);
+    gd_sdl_key_fire_1=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_FIRE_1, gd_sdl_key_fire_1);
+    gd_sdl_key_fire_2=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_FIRE_2, gd_sdl_key_fire_2);
+    gd_sdl_key_suicide=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_SUICIDE, gd_sdl_key_suicide);
 
     gd_even_line_pal_emu_vertical_scroll=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_EVEN_LINE_PAL_EMU_VERTICAL_SCROLL, gd_even_line_pal_emu_vertical_scroll);
     gd_sdl_fullscreen=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_FULLSCREEN, gd_sdl_fullscreen);
     gd_sdl_scale=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_SCALE, gd_sdl_scale);
     if (gd_sdl_scale<0 || gd_sdl_scale>=GD_SCALING_MAX)
-    	gd_sdl_scale=0;
-	gd_sdl_theme=g_key_file_get_string(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_THEME, NULL);
+        gd_sdl_scale=0;
+    gd_sdl_theme=g_key_file_get_string(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_THEME, NULL);
     gd_sdl_pal_emulation=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_PAL_EMULATION, gd_sdl_pal_emulation);
     gd_show_name_of_game=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_NAME_OF_GAME, gd_show_name_of_game);
     gd_status_bar_type=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_STATUS_BAR_TYPE, gd_status_bar_type);
     if (gd_status_bar_type<0 || gd_status_bar_type>=GD_STATUS_BAR_MAX)
-    	gd_status_bar_type=GD_STATUS_BAR_ORIGINAL;
-#endif	/* use_sdl */
+        gd_status_bar_type=GD_STATUS_BAR_ORIGINAL;
+#endif    /* use_sdl */
 
-#ifdef GD_SOUND	/* sound settings */
+#ifdef GD_SOUND    /* sound settings */
     gd_sdl_sound=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_SOUND, gd_sdl_sound);
     gd_sdl_16bit_mixing=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_16BIT_MIXING, gd_sdl_16bit_mixing);
     gd_sdl_44khz_mixing=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_44KHZ_MIXING, gd_sdl_44khz_mixing);
     gd_classic_sound=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_CLASSIC_SOUND, gd_classic_sound);
-	gd_sound_chunks_volume_percent=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SOUND_CHUNKS_VOLUME_PERCENT, gd_sound_chunks_volume_percent);
-	gd_sound_music_volume_percent=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SOUND_MUSIC_VOLUME_PERCENT, gd_sound_music_volume_percent);
-#endif	/* if gd_sound */
+    gd_sound_chunks_volume_percent=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SOUND_CHUNKS_VOLUME_PERCENT, gd_sound_chunks_volume_percent);
+    gd_sound_music_volume_percent=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SOUND_MUSIC_VOLUME_PERCENT, gd_sound_music_volume_percent);
+#endif    /* if gd_sound */
 
     g_key_file_free(ini);
 }
@@ -515,8 +515,8 @@ gd_save_settings()
     ini=g_key_file_new();
     
 /* GTK settings */
-#ifdef USE_GTK	/* only if having gtk */
-	/* editor settings */
+#ifdef USE_GTK    /* only if having gtk */
+    /* editor settings */
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_GAME_VIEW, gd_game_view);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_COLORED_OBJECTS, gd_colored_objects);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_OBJECT_LIST, gd_show_object_list);
@@ -524,21 +524,21 @@ gd_save_settings()
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_WIDTH, gd_editor_window_width);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_HEIGHT, gd_editor_window_height);
 
-	/* preferences */
+    /* preferences */
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_LANGUAGE, gd_language);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_TIME_MIN_SEC, gd_time_min_sec);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_MOUSE_PLAY, gd_mouse_play);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_PREVIEW, gd_show_preview);
 
-	/* graphics */
+    /* graphics */
     if (gd_theme)
-	    g_key_file_set_string(ini, SETTINGS_GDASH_GROUP, SETTING_THEME, gd_theme);
+        g_key_file_set_string(ini, SETTINGS_GDASH_GROUP, SETTING_THEME, gd_theme);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_CELL_SCALE_GAME, gd_cell_scale_game);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_GAME, gd_pal_emulation_game);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_CELL_SCALE_EDITOR, gd_cell_scale_editor);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_EDITOR, gd_pal_emulation_editor);
 
-	/* keyboard */
+    /* keyboard */
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_LEFT, gd_gtk_key_left);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_RIGHT, gd_gtk_key_right);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_UP, gd_gtk_key_up);
@@ -546,9 +546,9 @@ gd_save_settings()
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_FIRE_1, gd_gtk_key_fire_1);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_FIRE_2, gd_gtk_key_fire_2);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_GTK_KEY_SUICIDE, gd_gtk_key_suicide);
-#endif	/* only if having gtk */
+#endif    /* only if having gtk */
 
-	/* universal settings */
+    /* universal settings */
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_NO_INVISIBLE_OUTBOX, gd_no_invisible_outbox);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_ALL_CAVES_SELECTABLE, gd_all_caves_selectable);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_IMPORT_AS_ALL_CAVES_SELECTABLE, gd_import_as_all_caves_selectable);
@@ -558,13 +558,13 @@ gd_save_settings()
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_FINE_SCROLL, gd_fine_scroll);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_STORY, gd_show_story);
 
-	/* palette settings */
+    /* palette settings */
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_C64_PALETTE, gd_c64_palette);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_C64DTV_PALETTE, gd_c64dtv_palette);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_ATARI_PALETTE, gd_atari_palette);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_PREFERRED_PALETTE, gd_preferred_palette);
 
-#ifdef USE_SDL	/* only if having sdl */
+#ifdef USE_SDL    /* only if having sdl */
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_LEFT, gd_sdl_key_left);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_RIGHT, gd_sdl_key_right);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_KEY_UP, gd_sdl_key_up);
@@ -577,26 +577,26 @@ gd_save_settings()
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_FULLSCREEN, gd_sdl_fullscreen);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_SCALE, gd_sdl_scale);
     if (gd_sdl_theme)
-	    g_key_file_set_string(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_THEME, gd_sdl_theme);
+        g_key_file_set_string(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_THEME, gd_sdl_theme);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_PAL_EMULATION, gd_sdl_pal_emulation);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_NAME_OF_GAME, gd_show_name_of_game);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_STATUS_BAR_TYPE, gd_status_bar_type);
-#endif	/* use_sdl */
+#endif    /* use_sdl */
 
-#ifdef GD_SOUND	/* sound settings */
+#ifdef GD_SOUND    /* sound settings */
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_SOUND, gd_sdl_sound);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_16BIT_MIXING, gd_sdl_16bit_mixing);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_44KHZ_MIXING, gd_sdl_44khz_mixing);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_CLASSIC_SOUND, gd_classic_sound);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_SOUND_CHUNKS_VOLUME_PERCENT, gd_sound_chunks_volume_percent);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_SOUND_MUSIC_VOLUME_PERCENT, gd_sound_music_volume_percent);
-#endif	/* if gd_sound */
+#endif    /* if gd_sound */
 
-	/* convert to string and free */
+    /* convert to string and free */
     data=g_key_file_to_data(ini, NULL, &error);
     g_key_file_free(ini);
        if (error) {
-    	/* this is highly unlikely - why would g_key_file_to_data report error? docs do not mention. */
+        /* this is highly unlikely - why would g_key_file_to_data report error? docs do not mention. */
         g_warning("Unable to save settings: %s", error->message);
         g_error_free(error);
         g_free(data);
@@ -604,11 +604,11 @@ gd_save_settings()
     }
     
     filename=g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir, SETTINGS_INI_FILE, NULL);
-	g_mkdir_with_parents(gd_user_config_dir, 0700);
+    g_mkdir_with_parents(gd_user_config_dir, 0700);
     g_file_set_contents(filename, data, -1, &error);
     g_free(filename);
     if (error) {
-    	/* error saving the file */
+        /* error saving the file */
         g_warning("Unable to save settings: %s", error->message);
         g_error_free(error);
         g_free(data);
@@ -623,21 +623,21 @@ gd_save_settings()
 GOptionContext *
 gd_option_context_new()
 {
-	GOptionEntry entries[]={
-		{"cave", 'c', 0, G_OPTION_ARG_INT, &gd_param_cave, N_("Select cave number C"), "C"},
-		{"level", 'l', 0, G_OPTION_ARG_INT, &gd_param_level, N_("Select level number L"), "L"},
-		{"internal", 'i', 0, G_OPTION_ARG_INT, &gd_param_internal, N_("Load internal caveset number I"), "I"},
-		{"license", 'L', 0, G_OPTION_ARG_NONE, &gd_param_license, N_("Show license and quit")},
-		{G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &gd_param_cavenames, N_("Cave names")},
-		{NULL}
-	};
-	GOptionContext *context;
+    GOptionEntry entries[]={
+        {"cave", 'c', 0, G_OPTION_ARG_INT, &gd_param_cave, N_("Select cave number C"), "C"},
+        {"level", 'l', 0, G_OPTION_ARG_INT, &gd_param_level, N_("Select level number L"), "L"},
+        {"internal", 'i', 0, G_OPTION_ARG_INT, &gd_param_internal, N_("Load internal caveset number I"), "I"},
+        {"license", 'L', 0, G_OPTION_ARG_NONE, &gd_param_license, N_("Show license and quit")},
+        {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &gd_param_cavenames, N_("Cave names")},
+        {NULL}
+    };
+    GOptionContext *context;
 
-	context=g_option_context_new (_("[FILE NAME]"));
-	g_option_context_set_help_enabled (context, TRUE);
-	g_option_context_add_main_entries (context, entries, PACKAGE);	/* gdash parameters */
-	
-	return context;
+    context=g_option_context_new (_("[FILE NAME]"));
+    g_option_context_set_help_enabled (context, TRUE);
+    g_option_context_add_main_entries (context, entries, PACKAGE);    /* gdash parameters */
+    
+    return context;
 }
 
 

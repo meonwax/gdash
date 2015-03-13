@@ -79,6 +79,7 @@ gtksources = \
 	editorwidgets.c \
 	editorexport.c \
 	editor.c \
+	editorbits.c \
 	help.c
 
 gtkheaders = \
@@ -86,8 +87,9 @@ gtkheaders = \
 	gtkui.h\
 	gtkmain.h \
 	editor.h \
-	editorwidgets.h\
-	editorexport.h\
+	editorwidgets.h \
+	editorexport.h \
+	editorbits.h \
 	help.h
 
 

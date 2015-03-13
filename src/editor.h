@@ -16,8 +16,10 @@
 #ifndef _GD_EDITOR_H
 #define _GD_EDITOR_H
 
+#include <gtk/gtk.h>
+
 extern GtkWidget *gd_editor_window;
 
 extern void gd_open_cave_editor();
 
-#endif							/* _CAVE_EDITOR_H */
+#endif                            /* _CAVE_EDITOR_H */

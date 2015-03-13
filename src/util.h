@@ -24,8 +24,8 @@
  *
  */
 typedef struct _gd_error_message {
-	GLogLevelFlags flags;
-	char *message;
+    GLogLevelFlags flags;
+    char *message;
 } GdErrorMessage;
 
 extern GList *gd_errors;

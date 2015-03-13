@@ -16,25 +16,27 @@
 #ifndef _GD_SDL_UI_H
 #define _GD_SDL_UI_H
 
+#include <glib.h>
+
 /* for main menu */
 typedef enum _gd_main_menu_selected {
-	M_NONE,
-	M_QUIT,	/* quit immediately */
-	M_EXIT, /* normal quit */
-	M_ABOUT,
-	M_LICENSE,
-	M_PLAY,
-	M_SAVE,
-	M_INFO,
-	M_SAVE_AS_NEW,
-	M_REPLAYS,
-	M_OPTIONS,
-	M_INSTALL_THEME,
-	M_HIGHSCORE,
-	M_LOAD,
-	M_LOAD_FROM_INSTALLED,
-	M_ERRORS,
-	M_HELP,
+    M_NONE,
+    M_QUIT,    /* quit immediately */
+    M_EXIT, /* normal quit */
+    M_ABOUT,
+    M_LICENSE,
+    M_PLAY,
+    M_SAVE,
+    M_INFO,
+    M_SAVE_AS_NEW,
+    M_REPLAYS,
+    M_OPTIONS,
+    M_INSTALL_THEME,
+    M_HIGHSCORE,
+    M_LOAD,
+    M_LOAD_FROM_INSTALLED,
+    M_ERRORS,
+    M_HELP,
 } GdMainMenuSelected;
 
 
@@ -53,6 +55,7 @@ void gd_message(const char *message);
 
 void gd_title_line(const char *format, ...);
 void gd_status_line(const char *text);
+void gd_status_line_red(const char *text);
 
 void gd_error_console();
 void gd_show_error(GdErrorMessage *error);

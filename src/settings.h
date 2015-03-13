@@ -20,17 +20,17 @@
 #include "colors.h"
 
 typedef enum _scaling_type {
-	GD_SCALING_ORIGINAL,
-	GD_SCALING_2X,
-	GD_SCALING_2X_BILINEAR,	/* 2x with interpolation */
-	GD_SCALING_2X_SCALE2X,	/* 2x with scale2x algorithm */
-	GD_SCALING_3X,
-	GD_SCALING_3X_BILINEAR,	/* 3x with interpolation */
-	GD_SCALING_3X_SCALE3X,	/* 3x with scale3x */
-	GD_SCALING_4X,
-	GD_SCALING_4X_BILINEAR,	/* 4x with interpolation */
-	GD_SCALING_4X_SCALE4X,	/* 4x with scale2x applied twice */
-	GD_SCALING_MAX,
+    GD_SCALING_ORIGINAL,
+    GD_SCALING_2X,
+    GD_SCALING_2X_BILINEAR,    /* 2x with interpolation */
+    GD_SCALING_2X_SCALE2X,    /* 2x with scale2x algorithm */
+    GD_SCALING_3X,
+    GD_SCALING_3X_BILINEAR,    /* 3x with interpolation */
+    GD_SCALING_3X_SCALE3X,    /* 3x with scale3x */
+    GD_SCALING_4X,
+    GD_SCALING_4X_BILINEAR,    /* 4x with interpolation */
+    GD_SCALING_4X_SCALE4X,    /* 4x with scale2x applied twice */
+    GD_SCALING_MAX,
 } GdScalingType;
 
 extern const gchar *gd_scaling_name[];
@@ -47,15 +47,15 @@ extern char **gd_param_cavenames;
 
 
 /* GTK settings */
-#ifdef USE_GTK	/* only if having gtk */
+#ifdef USE_GTK    /* only if having gtk */
 
 /* editor settings */
-extern gboolean gd_game_view;	/* show animated cells instead of arrows & ... */
-extern gboolean gd_colored_objects;	/* show objects with different color */
-extern gboolean gd_show_object_list;	/* show object list */
-extern gboolean gd_show_test_label;	/* show a label with some variables, for testing */
-extern int gd_editor_window_width;	/* window size */
-extern int gd_editor_window_height;	/* window size */
+extern gboolean gd_game_view;    /* show animated cells instead of arrows & ... */
+extern gboolean gd_colored_objects;    /* show objects with different color */
+extern gboolean gd_show_object_list;    /* show object list */
+extern gboolean gd_show_test_label;    /* show a label with some variables, for testing */
+extern int gd_editor_window_width;    /* window size */
+extern int gd_editor_window_height;    /* window size */
 
 /* preferences */
 extern int gd_language;
@@ -84,7 +84,7 @@ char *gd_html_stylesheet_filename;
 char *gd_html_favicon_filename;
 
 
-#endif	/* only if having gtk */
+#endif    /* only if having gtk */
 
 
 
@@ -106,7 +106,7 @@ extern GdColorType gd_preferred_palette;
 
 
 
-#ifdef USE_SDL	/* only if having sdl */
+#ifdef USE_SDL    /* only if having sdl */
 extern guint gd_sdl_key_left;
 extern guint gd_sdl_key_right;
 extern guint gd_sdl_key_up;
@@ -121,15 +121,15 @@ extern char *gd_sdl_theme;
 extern gboolean gd_sdl_pal_emulation;
 extern gboolean gd_show_name_of_game;
 typedef enum _gd_status_bar_type {
-	GD_STATUS_BAR_ORIGINAL,
-	GD_STATUS_BAR_1STB,
-	GD_STATUS_BAR_CRLI,
-	GD_STATUS_BAR_FINAL,
-	GD_STATUS_BAR_ATARI_ORIGINAL,
-	GD_STATUS_BAR_MAX,
+    GD_STATUS_BAR_ORIGINAL,
+    GD_STATUS_BAR_1STB,
+    GD_STATUS_BAR_CRLI,
+    GD_STATUS_BAR_FINAL,
+    GD_STATUS_BAR_ATARI_ORIGINAL,
+    GD_STATUS_BAR_MAX,
 } GdStatusBarType;
 extern GdStatusBarType gd_status_bar_type;
-#endif	/* use_sdl */
+#endif    /* use_sdl */
 
 
 
@@ -142,7 +142,7 @@ extern gboolean gd_sdl_44khz_mixing;
 extern gboolean gd_classic_sound;
 extern int gd_sound_chunks_volume_percent;
 extern int gd_sound_music_volume_percent;
-#endif	/* if gd_sound */
+#endif    /* if gd_sound */
 
 
 
@@ -169,7 +169,7 @@ GOptionContext *gd_option_context_new();
 
 #ifdef USE_SDL
 const char **gd_status_bar_type_get_names();
-#endif	/* use_sdl */
+#endif    /* use_sdl */
 
 #endif
 

@@ -34,6 +34,7 @@
 #define GD_DIAMOND_CHAR 9
 #define GD_SKELETON_CHAR 11
 #define GD_KEY_CHAR 12
+#define GD_COMMENT_CHAR 13
 
 
 extern SDL_Surface *gd_screen;
@@ -50,12 +51,12 @@ extern gboolean gd_quit;
 
 /* color sets for different status bar types. */
 typedef struct _status_bar_colors {
-	GdColor background;
-	GdColor diamond_needed;
-	GdColor diamond_value;
-	GdColor diamond_collected;
-	GdColor score;
-	GdColor default_color;
+    GdColor background;
+    GdColor diamond_needed;
+    GdColor diamond_value;
+    GdColor diamond_collected;
+    GdColor score;
+    GdColor default_color;
 } GdStatusBarColors;
 
 int gd_drawcave(SDL_Surface *dest, GdGame *gameplay);
@@ -87,6 +88,7 @@ int gd_blittext(SDL_Surface *screen, int x, int y, GdColor color, const char *te
 int gd_blittext_n(SDL_Surface *screen, int x, int y, GdColor color, const char *text);
 int gd_blittext_printf(SDL_Surface *screen, int x, int y, GdColor color, const char *format, ...);
 int gd_blittext_printf_n(SDL_Surface *screen, int x, int y, GdColor color, const char *format, ...);
+void gd_blitlines_n(SDL_Surface *screen, int x, int y, GdColor color, char **text, int maxlines, int first);
 
 void gd_clear_line(SDL_Surface *screen, int y);
 

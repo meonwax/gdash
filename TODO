@@ -1,34 +1,28 @@
 DONE
 -----
-magic nut to
-I also want to mention that a third element in the slime properties would be nice - not only for the nut but any other third element could be added... Smile
+integer values everywhere in cave engine
+accented characters in sdash
+replay long comment
 
-About the new element "nut" - I'm still missing the magic wall and slime option for it (convert to .../eats... converts to...). And also the object property in which element it will convert to when it's hit by a boulder. This would make the new nut element just perfect... :) I know I already requested that - I just want to say it here again... ;) 
-
-In the editor the status information on the bottom of the screen is not updated if another level (2, 3, 4, 5) is selected. Time and diamonds needed are always shown for level 1.
-
-Is there a certain mode one can enable, such that the objects you are placing will ONLY appear on a certain level? 
-
+element buttonon túlmegy a szöveg, ha túl hosszú az element neve.
+- ellipsize?
+- mégiscsak nekem kéne összerakni gtkimage+label? akkor van ellipsize,
+és megszűnik a gtkrc hack is
+long story for caves in sdash
 
 
 TO DO
 -----
-lehessen csak nézni is - ez mire vonatkozott, a replay converterre?
+In "Boulder Dash 6 Padajici Balvany" in D1.CAV time seems to be incorrect as it is 00:00. 
 
-fragile diamonds
-
-How about a gate that shuts after a certain amount of diamonds have been collected? Just put the gate in front of the exit and have a number somewhere that counts down the diamonds until it closes. 
-
-
-replay long comment
-
-portable conveyor belts?	destructible, convey each other.
+NEW ELEMENTS
+    fragile diamonds
+    How about a gate that shuts after a certain amount of diamonds have been collected? Just put the gate in front of the exit and have a number somewhere that counts down the diamonds until it closes. 
+    portable conveyor belts?	destructible, convey each other.
 
 Amoeba2 sound
 new slime sound
 replicator sound
-
-theme image glob pattern
 
 amikor bezárja az editor ablakot, akkor kéne egy replay checksum update?
 vagy a delete event, és akkor rákérdez
@@ -37,11 +31,6 @@ STATUS BAR
 	As for the status bar in GDash: Maybe a little bit larger font would do the thing. There is enough space to use a larger font.
 
 Maybe game notes can be displayed under the title screen as soon as the game is loaded. Optionally at least if someone does not like to show it automatically.
-
-Already suggested I think: Atari sounds.
-
-amoeba threshold - belül %-ban tárolódik,
-de az editor átállítja?
 
 bdcff beolvasás miért hash table?
   size és hasonló szarok miatt
@@ -56,5 +45,4 @@ option "More than 1 bomb" in the cave settings
 compat:
 	*) magicwall breakscan; De Luxe Caves 1 Cave L, De Luxe Caves 2 Cave A, Deluxe Caves 3 Cave A
 	*) frustidash
-
 

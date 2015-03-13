@@ -13,15 +13,31 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef _GD_GTK_MAIN_H
-#define _GD_GTK_MAIN_H
 
-#include "cave.h"
+#ifndef _EDITORBITS_H
+#define _EDITORBITS_H
 
-void gd_main_new_game_test(GdCave *test, int level);
-void gd_main_stop_game();    /* stop game if running, also used by editor */
+#include "caveobject.h"
 
-void gd_main_window_set_title();    /* set the title to the name of the caveset or the cave currently played. also used by editor */
-void gd_main_window_set_title_animation();    /* exported for the editor, and also for settings window. */
+char *gd_object_get_coordinates_text(GdObject *selected);
+char *gd_object_get_description_markup(GdObject *selected);
 
-#endif /* _GAME_H */
+typedef struct _gd_object_description {
+    char *name;
+    char *x1;
+    char *x2;
+    char *dx;
+    char *seed;
+    char *element;
+    char *fill_element;
+    char *first_button, *second_button;
+    char *horiz;
+    char *c64_random;
+    char *mirror;
+    char *flip;
+} GdObjectDescription;
+
+extern GdObjectDescription gd_object_description[];
+
+#endif
+
