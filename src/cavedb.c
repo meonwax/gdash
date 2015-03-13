@@ -101,6 +101,7 @@ enum _generated_cells_indexes {
 	i_walled_key_3,
 	i_player,
 	i_player_glued,
+	i_nut_f,
 
 	i_max_cell_num
 };
@@ -156,6 +157,8 @@ GdElements gd_elements[] = {
 	{O_DIAMOND_F, N_("Diamond, falling"), 0, "DIAMONDf", 'D', i_diamond_f, i_diamond_f, -248, 156},	/* has ckdelay */
 	{O_FLYING_DIAMOND, N_("Flying diamond"), P_SLOPED|P_MOVED_BY_CONVEYOR_BOTTOM, "FLYINGDIAMOND", 0, 344, -344, -344, 156},	/* has ckdelay */
 	{O_FLYING_DIAMOND_F, N_("Flying diamond, flying"), 0, "FLYINGDIAMONDf", 0, i_flying_diamond_f, i_flying_diamond_f, -344, 156},	/* has ckdelay */
+	{O_NUT, N_("Nut"), P_SLOPED|P_MOVED_BY_CONVEYOR_TOP, "NUT", 0, 358, 358, 358, 156},	/* has ckdelay */
+	{O_NUT_F, N_("Nut, falling"), 0, "NUTf", 0, i_nut_f, i_nut_f, 358, 156},	/* has ckdelay */
 	{O_BLADDER_SPENDER, N_("Bladder Spender"), 0, "BLADDERSPENDER", 0, 6, 6, 6, 20},	/* has ckdelay */
 	{O_INBOX, N_("Inbox"), 0, "INBOX", 'P', 35, 35, 22},
 	{O_H_EXPANDING_WALL, N_("Expanding wall, horizontal"), P_VISUAL_EFFECT | P_CAN_BE_HAMMERED, "HEXPANDINGWALL", 'x', i_h_expanding_wall, i_h_expanding_wall, 5, 111},	/* has ckdelay */
@@ -337,6 +340,10 @@ GdElements gd_elements[] = {
 	{O_AMOEBA_2_EXPL_2, N_("Amoeba 2 explosion (2)"), 0, "AMOEBA2EXPLOSION2", 0, 293, 293, 293, 280},	/* has ckdelay */
 	{O_AMOEBA_2_EXPL_3, N_("Amoeba 2 explosion (3)"), 0, "AMOEBA2EXPLOSION3", 0, 294, 294, 294, 280},	/* has ckdelay */
 	{O_AMOEBA_2_EXPL_4, N_("Amoeba 2 explosion (4)"), 0, "AMOEBA2EXPLOSION4", 0, 295, 295, 295, 280},	/* has ckdelay */
+	{O_NUT_EXPL_1, N_("Nut explosion (1)"), P_SLOPED | P_EXPLOSION_FIRST_STAGE, "NUTEXPLOSION1", 0, 360, 360, 360, 280},	/* has ckdelay */
+	{O_NUT_EXPL_2, N_("Nut explosion (2)"), P_SLOPED, "NUTEXPLOSION2", 0, 361, 361, 361, 280},	/* has ckdelay */		/* these are rounded!! */
+	{O_NUT_EXPL_3, N_("Nut explosion (3)"), P_SLOPED, "NUTEXPLOSION3", 0, 362, 362, 362, 280},	/* has ckdelay */
+	{O_NUT_EXPL_4, N_("Nut explosion (4)"), P_SLOPED, "NUTEXPLOSION4", 0, 363, 363, 363, 280},	/* has ckdelay */
 
 	{O_PLAYER_PNEUMATIC_LEFT, NULL /* Player using hammer, left */, P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT | P_PLAYER, "GUYHAMMERl", 0, 265, 265, 265},
 	{O_PLAYER_PNEUMATIC_RIGHT, NULL /* Player using hammer, right */, P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT | P_PLAYER, "GUYHAMMERr", 0, 268, 268, 268},
@@ -477,8 +484,9 @@ gd_cave_properties[] = {
 	/* voodoo */
 	{"", GD_LABEL, 0, N_("Voodoo Doll")},
 	{"DummyProperties.diamondcollector", GD_TYPE_BOOLEAN, 0, N_("Can collect diamonds"), CAVE_OFFSET(voodoo_collects_diamonds), 1, N_("Controls if a voodoo doll can collect diamonds for the player.")},
-	{"DummyProperties.destructable", GD_TYPE_BOOLEAN, 0, N_("Can be destroyed by explosion"), CAVE_OFFSET(voodoo_can_be_destroyed), 1, N_("Controls if the voodoo can be destroyed by an explosion nearby. If not, it is converted to a gravestone, and you get a time penalty.")},
-	{"DummyProperties.penalty", GD_TYPE_BOOLEAN, 0, N_("Dies if hit by a stone"), CAVE_OFFSET(voodoo_dies_by_stone), 1, N_("Controls if the voodoo doll dies if it is hit by a stone. Then the player gets a time penalty.")},
+	{"DummyProperties.penalty", GD_TYPE_BOOLEAN, 0, N_("Dies if hit by a stone"), CAVE_OFFSET(voodoo_dies_by_stone), 1, N_("Controls if the voodoo doll dies if it is hit by a stone. Then the player gets a time penalty, and it is turned to a gravestone surrounded by steel wall.")},
+	{"DummyProperties.destructable", GD_TYPE_BOOLEAN, 0, N_("Disappear in explosion"), CAVE_OFFSET(voodoo_disappear_in_explosion), 1, N_("Controls if the voodoo can be destroyed by an explosion nearby. If not, it is converted to a gravestone, and you get a time penalty. If yes, the voodoo simply disappears.")},
+	{"DummyProperties.alwayskillsplayer", GD_TYPE_BOOLEAN, 0, N_("Any way hurt, player explodes"), CAVE_OFFSET(voodoo_any_hurt_kills_player), 1, N_("If this setting is enabled, the player will explode if the voodoo is hurt in any possible way, ie. touched by a firefly, hit by a stone or an explosion.")},
 	{"PenaltyTime", GD_TYPE_INT, 0, N_("Time penalty (s)"), CAVE_OFFSET(level_penalty_time), 5, N_("Penalty time when the voodoo is destroyed by a stone."), 0, 100},
 
 	/* AMOEBA */
@@ -608,6 +616,7 @@ gd_cave_properties[] = {
 	{"", GD_LABEL, 0, N_("Sound for elements")},
 	{"Diamond.sound", GD_TYPE_BOOLEAN, 0, N_("Diamond"), CAVE_OFFSET(diamond_sound), 1, N_("If true, falling diamonds will have sound.")},
 	{"Stone.sound", GD_TYPE_BOOLEAN, 0, N_("Stone"), CAVE_OFFSET(stone_sound), 1, N_("If true, falling and pushed stones will have sound.")},
+	{"Nut.sound", GD_TYPE_BOOLEAN, 0, N_("Nut"), CAVE_OFFSET(nut_sound), 1, N_("If true, falling and cracked nuts have sound.")},
 	{"NitroPack.sound", GD_TYPE_BOOLEAN, 0, N_("Nitro pack"), CAVE_OFFSET(nitro_sound), 1, N_("If true, falling and pushed nitro packs will have sound.")},
 	{"ExpandingWall.sound", GD_TYPE_BOOLEAN, 0, N_("Expanding wall"), CAVE_OFFSET(expanding_wall_sound), 1, N_("If true, expanding wall will have sound.")},
 	{"FallingWall.sound", GD_TYPE_BOOLEAN, 0, N_("Falling wall"), CAVE_OFFSET(falling_wall_sound), 1, N_("If true, falling wall will have sound.")},
@@ -726,8 +735,9 @@ GdPropertyDefault gd_cave_defaults_gdash[] = {
 	{CAVE_OFFSET(hammered_walls_reappear), FALSE},
 	{CAVE_OFFSET(hammered_wall_reappear_frame), 100},
 	{CAVE_OFFSET(voodoo_collects_diamonds), FALSE},
-	{CAVE_OFFSET(voodoo_can_be_destroyed), TRUE},
+	{CAVE_OFFSET(voodoo_disappear_in_explosion), TRUE},
 	{CAVE_OFFSET(voodoo_dies_by_stone), FALSE},
+	{CAVE_OFFSET(voodoo_any_hurt_kills_player), FALSE},
 	{CAVE_OFFSET(level_penalty_time), 30},
 
 	/* magic wall */
@@ -807,6 +817,7 @@ GdPropertyDefault gd_cave_defaults_gdash[] = {
 	{CAVE_OFFSET(bladder_sound), TRUE},
 	{CAVE_OFFSET(water_sound), TRUE},
 	{CAVE_OFFSET(stone_sound), TRUE},
+	{CAVE_OFFSET(nut_sound), TRUE},
 	{CAVE_OFFSET(diamond_sound), TRUE},
 	{CAVE_OFFSET(falling_wall_sound), TRUE},
 	{CAVE_OFFSET(expanding_wall_sound), TRUE},

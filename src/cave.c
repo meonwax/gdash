@@ -45,6 +45,7 @@ const GdColor gd_flash_color=0xFFFFC0;
 const GdColor gd_select_color=0x8080FF;
 
 
+
 /* direction to string and vice versa */
 const char *
 gd_direction_get_visible_name(GdDirection dir)

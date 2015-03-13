@@ -22,7 +22,7 @@
  *
  * Lava absorbs everything going into it. Everything.
  * But it does not "pull" elements; only the things disappear which
- * DO go directly into it. So if the player steps into the lava,
+ * _do_ go directly into it. So if the player steps into the lava,
  * he will die. If a dragonfly flies over it, it will not.
  *
  * This behavior is implemented in the is_space_dir and the store
@@ -76,26 +76,11 @@ play_sound_of_element(GdCave *cave, GdElement element)
 {
 	/* stone and diamond fall sounds. */
 	switch(element) {
-		case O_WATER:
-			if (cave->water_sound)
-				gd_sound_play(cave, GD_S_WATER);
+		case O_NUT:
+		case O_NUT_F:
+			if (cave->nut_sound)
+				gd_sound_play(cave, GD_S_NUT);
 			break;
-
-		case O_MAGIC_WALL:
-			if (cave->magic_wall_sound)
-				gd_sound_play(cave, GD_S_MAGIC_WALL);
-			break;
-
-		case O_AMOEBA:
-			if (cave->amoeba_sound)
-				gd_sound_play(cave, GD_S_AMOEBA);
-			break;
-
-		case O_PNEUMATIC_HAMMER:
-			if (cave->pneumatic_hammer_sound)
-				gd_sound_play(cave, GD_S_PNEUMATIC_HAMMER);
-			break;
-
 		case O_STONE:
 		case O_STONE_F:
 		case O_FLYING_STONE:
@@ -461,8 +446,11 @@ cell_explode(GdCave *cave, int x, int y, GdElement explode_to)
 {
 	if (non_explodable (cave, x, y))
 		return;
+		
+	if (cave->voodoo_any_hurt_kills_player && get(cave, x, y)==O_VOODOO)
+		cave->voodoo_touched=TRUE;
 
-	if (get(cave, x, y)==O_VOODOO && !cave->voodoo_can_be_destroyed)
+	if (get(cave, x, y)==O_VOODOO && !cave->voodoo_disappear_in_explosion)
 		/* voodoo turns into a time penalty */
 		store_sc(cave, x, y, O_TIME_PENALTY);
 	else if (get(cave, x, y)==O_NITRO_PACK || get(cave, x, y)==O_NITRO_PACK_F)
@@ -510,10 +498,12 @@ voodoo_explode(GdCave *cave, int x, int y)
 {
 	int xx, yy;
 
-	gd_sound_play(cave, GD_S_VOODOO_EXPLOSION);
-
 	/* the processing of an explosion took pretty much time: processing 3x3=9 elements */
 	cave->ckdelay+=1000;
+
+	gd_sound_play(cave, GD_S_VOODOO_EXPLOSION);
+	if (cave->voodoo_any_hurt_kills_player)
+		cave->voodoo_touched=TRUE;
 
 	/* voodoo explodes to 3x3 steel */
 	for (yy=y-1; yy<=y+1; yy++)
@@ -525,15 +515,17 @@ voodoo_explode(GdCave *cave, int x, int y)
 
 /* a bomb does not explode the voodoo, neither does the ghost.
    this function check this, and stores the new element or not.
-   destroying the voodoo is also controlled by the voodoo_can_be_destroyed flag. */
+   destroying the voodoo is also controlled by the voodoo_disappear_in_explosion flag. */
 static void
 explode_try_skip_voodoo(GdCave *cave, const int x, const int y, const GdElement expl)
 {
 	if (non_explodable (cave, x, y))
 		return;
 	/* bomb does not explode voodoo */
-	if (!cave->voodoo_can_be_destroyed && get(cave, x, y)==O_VOODOO)
+	if (!cave->voodoo_disappear_in_explosion && get(cave, x, y)==O_VOODOO)
 		return;
+	if (cave->voodoo_any_hurt_kills_player && get(cave, x, y)==O_VOODOO)
+		cave->voodoo_touched=TRUE;
 	store_sc (cave, x, y, expl);
 }
 
@@ -575,7 +567,7 @@ bomb_explode(GdCave *cave, const int x, const int y)
 static void
 explode(GdCave *cave, int x, int y)
 {
-	GdElement e=get(cave, x, y);
+	GdElement e=get(cave, x, y)&O_MASK;
 	
 	switch (e) {
 		case O_GHOST:
@@ -869,7 +861,8 @@ do_push(GdCave *cave, int x, int y, GdDirection player_move, gboolean player_fir
 		case O_CHASING_STONE:
 		case O_MEGA_STONE:
 		case O_FLYING_STONE:
-			/* pushing some kind of stone */
+		case O_NUT:
+			/* pushing some kind of stone or nut */
 			/* directions possible: 90degrees cw or ccw to current gravity. */
 			/* only push if player dir is orthogonal to gravity, ie. gravity down, pushing left&right possible */
 			if (player_move==ccw_fourth[cave->gravity] || player_move==cw_fourth[cave->gravity]) {
@@ -890,6 +883,7 @@ do_push(GdCave *cave, int x, int y, GdDirection player_move, gboolean player_fir
 							prob=1000000;
 						break;
 					case O_STONE:
+					case O_NUT:
 					case O_FLYING_STONE:
 					case O_NITRO_PACK:
 						if (cave->sweet_eaten)
@@ -898,6 +892,7 @@ do_push(GdCave *cave, int x, int y, GdDirection player_move, gboolean player_fir
 							prob=cave->pushing_stone_prob*1000000;	/* probability without sweet. */
 						break;
 					default:
+						g_assert_not_reached();
 						break;
 				}
 
@@ -1048,7 +1043,6 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 	int ymin, ymax;	/* for border scan */
 	gboolean amoeba_found_enclosed, amoeba_2_found_enclosed;	/* amoeba found to be enclosed. if not, this is cleared */
 	int amoeba_count, amoeba_2_count;		/* counting the number of amoebas. after scan, check if too much */
-	gboolean voodoo_touched;	/* voodoo was touched this frame */
 	gboolean found_water;		/* cave scan found water - for sound */
 	gboolean inbox_toggle;
 	gboolean start_signal;
@@ -1058,6 +1052,7 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 	static const GdDirection creature_chdir[]={ MV_RIGHT, MV_DOWN, MV_LEFT, MV_UP };
 	int time_decrement_sec;
 	GdElement biter_try[]={ O_DIRT, cave->biter_eat, O_SPACE, O_STONE };	/* biters eating elements preference, they try to go in this order */
+	gboolean amoeba_sound, magic_sound;
 
 	gd_cave_clear_sounds(cave);
 
@@ -1130,7 +1125,6 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 	amoeba_2_found_enclosed=TRUE;
 	amoeba_count=0;
 	amoeba_2_count=0;
-	voodoo_touched=FALSE;
 	found_water=FALSE;
 	cave->ckdelay=0;
 	time_decrement_sec=0;
@@ -1277,7 +1271,7 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 
 					if (player_fire) {
 						/* placing a bomb into empty space or dirt */
-						if (what==O_SPACE || what==O_DIRT) {
+						if (is_space_dir(cave, x, y, player_move) || is_element_dir(cave, x, y, player_move, O_DIRT)) {
 							store_dir(cave, x, y, player_move, O_BOMB_TICK_1);
 							/* placed bomb, he is normal player again */
 							store(cave, x, y, O_PLAYER);
@@ -1386,6 +1380,7 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 			case O_STONE:	/* standing stone */
 			case O_MEGA_STONE:	/* standing mega_stone */
 			case O_DIAMOND:	/* standing diamond */
+			case O_NUT:	/* standing nut */
 				if (!cave->gravity_disabled) {
 					/* if gravity is enabled, the stone might fall. */
 					GdElement falling;
@@ -1399,6 +1394,9 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 							break;
 						case O_DIAMOND:
 							falling=cave->diamond_falling_effect;
+							break;
+						case O_NUT:
+							falling=O_NUT_F;
 							break;
 						default:
 							g_assert_not_reached();
@@ -1433,21 +1431,16 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 			case O_STONE_F:	/* falling stone */
 			case O_MEGA_STONE_F:	/* falling mega stone */
 			case O_DIAMOND_F:	/* falling diamond */
+			case O_NUT_F:	/* falling nut */
 				if (!cave->gravity_disabled) {
 					GdElement bouncing;
 
 					switch (get(cave, x, y)) {
-						case O_STONE_F:
-							bouncing=cave->stone_bouncing_effect;
-							break;
-						case O_MEGA_STONE_F:
-							bouncing=O_MEGA_STONE;
-							break;
-						case O_DIAMOND_F:
-							bouncing=cave->diamond_bouncing_effect;
-							break;
-						default:
-							g_assert_not_reached();
+						case O_STONE_F: bouncing=cave->stone_bouncing_effect; break;
+						case O_MEGA_STONE_F: bouncing=O_MEGA_STONE; break;
+						case O_DIAMOND_F: bouncing=cave->diamond_bouncing_effect; break;
+						case O_NUT_F: bouncing=O_NUT; break;
+						default: g_assert_not_reached();
 					}
 
 					if (is_space_dir(cave, x, y, cave->gravity))	/* falling further */
@@ -1456,6 +1449,13 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 						/* this is a 1stB-style voodoo. explodes by stone, collects diamonds */
 						player_get_element (cave, O_DIAMOND);	/* as if player got diamond */
 						store(cave, x, y, O_SPACE);	/* diamond disappears */
+					}
+					else if ((get(cave, x, y)==O_STONE_F || get(cave, x, y)==O_MEGA_STONE_F) && get_dir(cave, x, y, cave->gravity)==O_NUT) {
+						/* mega stones and normal stones crack nuts */
+						store(cave, x, y, bouncing);
+						store_dir(cave, x, y, cave->gravity, O_NUT_EXPL_1);
+						if (cave->nut_sound)
+							gd_sound_play(cave, GD_S_NUT_CRACK);
 					}
 					else if ((get(cave, x, y)==O_STONE_F || get(cave, x, y)==O_MEGA_STONE_F) && get_dir(cave, x, y, cave->gravity)==O_VOODOO && cave->voodoo_dies_by_stone) {
 						/* this is a 1stB-style vodo. explodes by stone, collects diamonds */
@@ -1479,6 +1479,9 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 									break;
 								case O_DIAMOND_F:
 									magic=cave->magic_diamond_to;
+									break;
+								case O_NUT_F:
+									magic=O_NUT_F;
 									break;
 								default:
 									g_assert_not_reached();
@@ -1852,7 +1855,7 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 			case O_STONEFLY_4:
 				/* check if touches a voodoo */
 				if (get_dir(cave, x, y, MV_LEFT)==O_VOODOO || get_dir(cave, x, y, MV_RIGHT)==O_VOODOO || get_dir(cave, x, y, MV_UP)==O_VOODOO || get_dir(cave, x, y, MV_DOWN)==O_VOODOO)
-					voodoo_touched=TRUE;
+					cave->voodoo_touched=TRUE;
 				/* check if touches something bad and should explode (includes voodoo by the flags) */
 				if (blows_up_flies_dir(cave, x, y, MV_DOWN) || blows_up_flies_dir(cave, x, y, MV_UP)
 					|| blows_up_flies_dir(cave, x, y, MV_LEFT) || blows_up_flies_dir(cave, x, y, MV_RIGHT))
@@ -2090,7 +2093,7 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 			case O_DRAGONFLY_4:
 				/* check if touches a voodoo */
 				if (get_dir(cave, x, y, MV_LEFT)==O_VOODOO || get_dir(cave, x, y, MV_RIGHT)==O_VOODOO || get_dir(cave, x, y, MV_UP)==O_VOODOO || get_dir(cave, x, y, MV_DOWN)==O_VOODOO)
-					voodoo_touched=TRUE;
+					cave->voodoo_touched=TRUE;
 				/* check if touches something bad and should explode (includes voodoo by the flags) */
 				if (blows_up_flies_dir(cave, x, y, MV_DOWN) || blows_up_flies_dir(cave, x, y, MV_UP)
 					|| blows_up_flies_dir(cave, x, y, MV_LEFT) || blows_up_flies_dir(cave, x, y, MV_RIGHT))
@@ -2544,6 +2547,9 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
  			case O_EXPLODE_5:
 				store(cave, x, y, cave->explosion_effect);
 				break;
+ 			case O_NUT_EXPL_4:
+				store(cave, x, y, O_DIAMOND);
+				break;
 			case O_PRE_DIA_5:
 				store(cave, x, y, cave->diamond_birth_effect);
 				break;
@@ -2623,6 +2629,9 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 			case O_BOMB_EXPL_1:
 			case O_BOMB_EXPL_2:
 			case O_BOMB_EXPL_3:
+			case O_NUT_EXPL_1:
+			case O_NUT_EXPL_2:
+			case O_NUT_EXPL_3:
 			case O_GHOST_EXPL_1:
 			case O_GHOST_EXPL_2:
 			case O_GHOST_EXPL_3:
@@ -2796,24 +2805,33 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 	}
 
 	/* cave 3 sounds. precedence is controlled by the sound_play function. */
-	if (found_water)
-		play_sound_of_element(cave, O_WATER);
-	if (cave->magic_wall_state==GD_MW_ACTIVE)
-		play_sound_of_element(cave, O_MAGIC_WALL);
+	/* but we have to check amoeba&magic together as they had a different gritty sound when mixed */
+	if (found_water && cave->water_sound)
+		gd_sound_play(cave, GD_S_WATER);
+	magic_sound=cave->magic_wall_state==GD_MW_ACTIVE && cave->magic_wall_sound;
+	amoeba_sound=cave->hatched && cave->amoeba_sound && ((amoeba_count>0 && cave->amoeba_state==GD_AM_AWAKE) || (amoeba_2_count>0 && cave->amoeba_2_state==GD_AM_AWAKE));
+	if (amoeba_sound && magic_sound)
+		gd_sound_play(cave, GD_S_AMOEBA_MAGIC);
+	else
+		if (amoeba_sound)
+			gd_sound_play(cave, GD_S_AMOEBA);
+		else
+			if (magic_sound)
+				gd_sound_play(cave, GD_S_MAGIC_WALL);
 	if (cave->hatched)
 		if ((amoeba_count>0 && cave->amoeba_state==GD_AM_AWAKE)
 			|| (amoeba_2_count>0 && cave->amoeba_2_state==GD_AM_AWAKE))
 			play_sound_of_element(cave, O_AMOEBA);
 	/* pneumatic hammer sound - overrides everything. */
-	if (cave->pneumatic_hammer_active_delay>0)
-		play_sound_of_element(cave, O_PNEUMATIC_HAMMER);
+	if (cave->pneumatic_hammer_active_delay>0 && cave->pneumatic_hammer_sound)
+		gd_sound_play(cave, GD_S_PNEUMATIC_HAMMER);
 
 	/* CAVE VARIABLES */
 
 	/* PLAYER */
 	if ((cave->player_state==GD_PL_LIVING && cave->player_seen_ago>15) || cave->kill_player)	/* check if player is alive. */
 		cave->player_state=GD_PL_DIED;
-	if (voodoo_touched)	/* check if any voodoo exploded, and kill players the next scan if that happended. */
+	if (cave->voodoo_touched)	/* check if any voodoo exploded, and kill players the next scan if that happended. */
 		cave->kill_player=TRUE;
 
 	/* AMOEBA */

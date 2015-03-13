@@ -66,11 +66,12 @@ noinst_HEADERS = \
 icondir = $(datadir)/pixmaps
 icon_DATA = gdash.png
 
-pkgdata_DATA = boulder_rush.png c64_gfx.png c64_font.png
+pkgdata_DATA = boulder_rush.png c64_gfx.png
 
 EXTRA_DIST = $(ICONS) $(TITLE) $(icon_DATA) \
 	icons.list title.list \
 	files2c.sh \
+	c64_font.png \
 	$(pkgdata_DATA) \
 	$(CAVES) levels.h \
 	$(ATARIPALETTES) ataripal.h \

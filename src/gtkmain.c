@@ -210,6 +210,8 @@ drawing_area_draw_cave()
 {
 	int x, y, xd, yd;
 
+	if (!main_window.drawing_area)
+		return;
 	if (!main_window.drawing_area->window)
 		return;
 	if (!main_window.game)
@@ -241,6 +243,31 @@ drawing_area_draw_cave()
 		}
 	}
 }
+
+
+
+/* CAVE DRAWING is done in an idle func. it requires much time, especially on windows. */
+static gboolean draw_idle_func_installed=FALSE;
+
+static gboolean draw_idle_func(gpointer data)
+{
+	drawing_area_draw_cave();
+	
+	draw_idle_func_installed=FALSE;
+	return FALSE;
+}
+
+static void schedule_draw()
+{
+	/* update in an idle func, so we do not slow down the application, when there is no time to draw. */
+	/* the priority must be very low, as gtk also does its things in idle funcs, ie. window resizing and */
+	/* expose events. otherwise we would mess up the scrolling */
+	if (!draw_idle_func_installed) {
+		draw_idle_func_installed=TRUE;
+		g_idle_add_full(G_PRIORITY_LOW, (GSourceFunc) draw_idle_func, NULL, NULL);
+	}
+}
+
 
 
 
@@ -291,7 +318,8 @@ drawing_area_expose_event(GtkWidget *widget, GdkEventExpose *event, gpointer dat
 				main_window.game->gfx_buffer[y][x] |= GD_REDRAW;
 		}
 	}
-	drawing_area_draw_cave();
+	/* schedule drawing as an idle func. */
+	schedule_draw();
 
 	return TRUE;
 }
@@ -342,6 +370,27 @@ main_window_set_fullscreen(gboolean ingame)
  * creates title screen or drawing area
  *
  */
+ 
+static gboolean main_window_title_animation_idle_func_installed=FALSE;
+
+static gboolean
+main_window_title_animation_idle_func(gpointer data)
+{
+	gtk_image_set_from_pixmap(GTK_IMAGE(main_window.title_image), (GdkPixmap *) data, NULL);
+
+	main_window_title_animation_idle_func_installed=FALSE;
+	return FALSE;
+}
+
+static void
+main_window_title_animation_install_idle(GdkPixmap *pixbuf)
+{
+	if (!main_window_title_animation_idle_func_installed) {
+		g_idle_add_full(G_PRIORITY_LOW, main_window_title_animation_idle_func, pixbuf, NULL);
+		main_window_title_animation_idle_func_installed=TRUE;
+	}
+}
+
 static gboolean
 main_window_title_animation_func(gpointer data)
 {
@@ -359,7 +408,8 @@ main_window_title_animation_func(gpointer data)
 
 	if (gtk_window_has_toplevel_focus(GTK_WINDOW(main_window.window))) {
 		animcycle=(animcycle+1)%count;
-		gtk_image_set_from_pixmap(GTK_IMAGE(main_window.title_image), main_window.title_pixmaps[animcycle], NULL);
+		/* do the drawing when we have time. */
+		main_window_title_animation_install_idle(main_window.title_pixmaps[animcycle]);
 	}
 	return TRUE;
 }
@@ -612,6 +662,31 @@ game_over_without_highscore()
 }
 
 
+/* amoeba state to string */
+static const char *
+amoeba_state_string(GdAmoebaState a)
+{
+	switch(a) {
+	case GD_AM_SLEEPING: return _("sleeping");			/* sleeping - not yet let out. */
+	case GD_AM_AWAKE: return _("awake");				/* living, growing */
+	case GD_AM_TOO_BIG: return _("too big");			/* grown too big, will convert to stones */
+	case GD_AM_ENCLOSED: return _("enclosed");			/* enclosed, will convert to diamonds */
+	}
+	return _("unknown");
+}
+
+/* amoeba state to string */
+static const char *
+magic_wall_state_string(GdMagicWallState m)
+{
+	switch(m) {
+	case GD_MW_DORMANT: return _("dormant");
+	case GD_MW_ACTIVE: return _("active");
+	case GD_MW_EXPIRED: return _("expired");
+	}
+	return _("unknown");
+}
+
 
 
 static void
@@ -672,16 +747,16 @@ main_int_set_labels()
 
 	if (gd_editor_window && gd_show_test_label) {
 		gd_label_set_markup_printf(GTK_LABEL(main_window.label_variables),
-								_("Speed: %dms, Amoeba timer: %ds %d, %ds %d, Magic wall timer: %ds\n"
+								_("Speed: %dms, Amoeba 1: %ds %s, 2: %ds %s, Magic wall: %ds %s\n"
 								"Expanding wall: %s, Creatures: %ds, %s, Gravity: %s\n"
 								"Kill player: %s, Sweet eaten: %s, Diamond key: %s, Diamonds: %d"),
 								cave->speed,
 								gd_cave_time_show(cave, cave->amoeba_time),
-								cave->amoeba_state,
+								amoeba_state_string(cave->amoeba_state),
 								gd_cave_time_show(cave, cave->amoeba_2_time),
-								cave->amoeba_2_state,
+								amoeba_state_string(cave->amoeba_2_state),
 								gd_cave_time_show(cave, cave->magic_wall_time),
-// XXX							cave->magic_wall_state,
+								magic_wall_state_string(cave->magic_wall_state),
 								cave->expanding_wall_changed?_("vertical"):_("horizontal"),
 								gd_cave_time_show(cave, cave->creatures_direction_will_change),
 								cave->creatures_backwards?_("backwards"):_("forwards"),
@@ -704,6 +779,8 @@ main_int_set_labels()
 static GTimer *timer=NULL;
 static int called=0;
 #endif
+
+
 
 /* SCROLLING
  *
@@ -852,12 +929,12 @@ main_int_scroll()
 	if (main_window.game->cave->player_state==GD_PL_NOT_YET)
 		main_window.game->out_of_window=FALSE;
 		
-	gdk_window_process_updates(main_window.drawing_area->window, TRUE);
+	/* XXX	gdk_window_process_updates(main_window.drawing_area->window, TRUE); */
 }
 
 /* the timing thread runs in a separate thread. this variable is set to true,
  * then the function exits (and also the thread.) */
-static gboolean main_int_quit_thread;
+static gboolean main_int_quit_thread=FALSE;
 
 static gboolean
 main_int(gpointer data)
@@ -945,15 +1022,14 @@ main_int(gpointer data)
 	/* if drawing area already exists, draw cave. */
 	/* remember that the drawings are cached, so if we did no change, this will barely do anything - so will not slow down. */
 	if (main_window.drawing_area)
-		drawing_area_draw_cave();
+		schedule_draw();
 	/* do the scrolling at the given interval. */
 	/* but only if the drawing area already exists. */
 	/* if fine scrolling, drawing is called at a 50hz rate. */
 	/* if not, only at a 25hz rate */
 	toggle=!toggle;
-	if (main_window.drawing_area && (gd_fine_scroll || toggle)) {
+	if (main_window.drawing_area && (gd_fine_scroll || toggle))
 		main_int_scroll();
-	}
 
 	return TRUE;	/* call again */
 }
@@ -1018,7 +1094,7 @@ main_int_install_timer()
 
 	/* this makes the main int load the first cave, and then we do the drawing. */
 	main_int(main_window.window);
-	gdk_window_process_all_updates();
+	gdk_window_process_all_updates();	/* so resizes will be done (?) */
 	/* after that, install timer. create a thread with higher priority than normal: */
 	/* so its priority will be higher than the main thread, which does the drawing etc. */
 	/* if the scheduling thread wants to do something, it gets processed first. this makes */
@@ -2322,8 +2398,10 @@ main(int argc, char *argv[])
 
 	gd_sound_init(0);
 
+#ifdef GD_SOUND
 	gd_sound_set_music_volume(gd_sound_music_volume_percent);
 	gd_sound_set_chunk_volumes(gd_sound_chunks_volume_percent);
+#endif
 
 	main_window_init_title();
 

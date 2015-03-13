@@ -76,6 +76,12 @@ Section "GDash (required)"
   File ${MINGWDIR}\bin\libpng12-0.dll
   File ${MINGWDIR}\bin\libtiff3.dll
   File ${MINGWDIR}\bin\zlib1.dll
+  File ${MINGWDIR}\lib\gtk-2.0\2.10.0\loaders\libpixbufloader-png.dll
+  File ${MINGWDIR}\lib\gtk-2.0\2.10.0\loaders\libpixbufloader-jpeg.dll
+  File ${MINGWDIR}\lib\gtk-2.0\2.10.0\loaders\libpixbufloader-bmp.dll
+  File ${MINGWDIR}\lib\gtk-2.0\2.10.0\loaders\libpixbufloader-gif.dll
+  SetOutPath $INSTDIR\etc\gtk-2.0
+  File gdk-pixbuf.loaders
   
   ; Program files, SDL dlls
   SetOutPath $INSTDIR

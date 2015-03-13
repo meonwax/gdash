@@ -579,12 +579,14 @@ gd_settings_menu()
 		{ 0, TypeStringv, "Atari palette", &gd_atari_palette, gd_color_get_atari_palette_names() },
 		{ 0, TypeStringv, "Preferred palette", &gd_preferred_palette, gd_color_get_palette_types_names() },
 
+#ifdef GD_SOUND
 		{ 1, TypeBoolean, "Sound", &gd_sdl_sound },
 		{ 1, TypePercent, "Music volume", &gd_sound_music_volume_percent },
 		{ 1, TypePercent, "Cave volume", &gd_sound_chunks_volume_percent },
 		{ 1, TypeBoolean, "Classic sounds only", &gd_classic_sound },
 		{ 1, TypeBoolean, "16-bit mixing", &gd_sdl_16bit_mixing },
 		{ 1, TypeBoolean, "44kHz mixing", &gd_sdl_44khz_mixing },
+#endif
 		{ 1, TypeBoolean, "Use BDCFF highscore", &gd_use_bdcff_highscore },
 		{ 1, TypeBoolean, "Show caveset name at uncover", &gd_show_name_of_game },
 		{ 1, TypeBoolean, "Show story", &gd_show_story },
@@ -831,8 +833,10 @@ gd_settings_menu()
 
 	gd_restore_screen();
 
+#ifdef GD_SOUND
 	gd_sound_set_music_volume(gd_sound_music_volume_percent);
 	gd_sound_set_chunk_volumes(gd_sound_chunks_volume_percent);
+#endif
 }
 
 

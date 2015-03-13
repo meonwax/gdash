@@ -753,8 +753,10 @@ main(int argc, char *argv[])
 	gd_sdl_init(gd_sdl_scale);
 	gd_create_dark_background();
 	gd_sound_init(0);
+#ifdef GD_SOUND
 	gd_sound_set_music_volume(gd_sound_music_volume_percent);
 	gd_sound_set_chunk_volumes(gd_sound_chunks_volume_percent);
+#endif
 
 	gd_loadfont_default();
 	gd_load_theme();

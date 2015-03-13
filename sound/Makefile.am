@@ -2,6 +2,7 @@
 sounddata = \
 	acid_spread.ogg \
 	amoeba.ogg \
+	amoeba_and_magic.ogg \
 	bladder_convert.ogg \
 	bladder_move.ogg \
 	bladder_spender.ogg \
@@ -34,6 +35,8 @@ sounddata = \
 	gravity_change.ogg \
 	key_collect.ogg \
 	lava.ogg \
+	nut.ogg \
+	nut_crack.ogg \
 	replicator.ogg \
 	magic_wall.ogg \
 	nitro.ogg \

@@ -58,6 +58,7 @@ static const struct helpdata gamehelp[] = {
 		{NULL, N_("Dirt ball and loose dirt"), O_DIRT_BALL, N_("A rolling ball and a falling piece of dirt. You cannot push them, but you can dig them away. Sometimes they help you to solve puzzles.")},
 		{NULL, NULL, O_DIAMOND, N_("The main object of the game is to collect required number of diamonds.")},
 		{NULL, NULL, O_STONE, N_("Stones can be pushed by the player, and he can drop them on flies to make an explosion.")},
+		{NULL, NULL, O_NUT, N_("These nuts contain diamonds. If you crack them with a stone, they will be opened.")},
 		{NULL, NULL, O_FLYING_DIAMOND, N_("Exactly like a diamond, but instead of falling down, it flies upwards, as high as it can.")},
 		{NULL, NULL, O_FLYING_STONE, N_("The flying variant of a stone. Note that this one can also crush enemies as well as the player!")},
 		{NULL, NULL, O_MEGA_STONE, N_("Like ordinary stones, but these are so heavy, that you cannot push them.")},

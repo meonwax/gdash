@@ -41,6 +41,8 @@ static SoundProperty sound_flags[] = {
 	/* diamond collect sound has precedence over everything. */
 	/* CHANNEL 1 SOUNDS ARE ALWAYS RESTARTED, so no need for GD_SP_FORCE flag. */
 	{ GD_S_STONE, "stone.ogg", GD_SP_CLASSIC, 1, 10},
+	{ GD_S_NUT, "nut.ogg", 0, 1, 8},	/* nut falling is relatively silent, so low precedence. */
+	{ GD_S_NUT_CRACK, "nut_crack.ogg", 0, 1, 12},	/* higher precedence than a stone bouncing. */
 	{ GD_S_DIRT_BALL, "dirt_ball.ogg", 0, 1, 8},	/* sligthly lower precedence, as stones and diamonds should be "louder" */
 	{ GD_S_NITRO, "nitro.ogg", 0, 1, 10},
 	{ GD_S_FALLING_WALL, "falling_wall.ogg", 0, 1, 10, GD_S_STONE},
@@ -105,7 +107,8 @@ static SoundProperty sound_flags[] = {
 
 	/* channel 3 sounds. */
 	{ GD_S_AMOEBA, "amoeba.ogg", GD_SP_CLASSIC|GD_SP_LOOPED, 3, 30},
-	{ GD_S_MAGIC_WALL, "magic_wall.ogg", GD_SP_CLASSIC|GD_SP_LOOPED, 3, 40},
+	{ GD_S_AMOEBA_MAGIC, "amoeba_and_magic.ogg", GD_SP_CLASSIC|GD_SP_LOOPED, 3, 40},
+	{ GD_S_MAGIC_WALL, "magic_wall.ogg", GD_SP_CLASSIC|GD_SP_LOOPED, 3, 35},
 	{ GD_S_COVER, "cover.ogg", GD_SP_CLASSIC|GD_SP_LOOPED, 3, 100},
 	{ GD_S_PNEUMATIC_HAMMER, "pneumatic.ogg", GD_SP_CLASSIC|GD_SP_LOOPED, 3, 50},
 	{ GD_S_WATER, "water.ogg", GD_SP_LOOPED, 3, 20, GD_S_NONE},

@@ -533,9 +533,11 @@ main(int argc, char *argv[])
 
 	/* we setup mixing and other parameters for our own needs. */
 	/* this is why settings cannot be saved on exit! */
+#ifdef GD_SOUND
 	gd_sdl_sound=TRUE;
 	gd_sdl_44khz_mixing=TRUE;
 	gd_sdl_16bit_mixing=TRUE;
+#endif
 	gd_fine_scroll=FALSE;
 	gd_sdl_fullscreen=FALSE;
 	gd_sdl_scale=GD_SCALING_ORIGINAL;
@@ -565,8 +567,10 @@ main(int argc, char *argv[])
 	    default:
 	    	g_assert_not_reached();
 	}
+#ifdef GD_SOUND
 	gd_sound_set_music_volume(gd_sound_music_volume_percent);
 	gd_sound_set_chunk_volumes(gd_sound_chunks_volume_percent);
+#endif
 
 	gd_loadfont_default();
 	gd_load_theme();

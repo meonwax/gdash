@@ -77,10 +77,10 @@ typedef struct _gd_property_default {
 
 /* these define the number of the cells in the png file */
 #define NUM_OF_CELLS_X 8
-#define NUM_OF_CELLS_Y 45
+#define NUM_OF_CELLS_Y 46
 
 /* +74: placeholder for cells which are rendered by the game; for example diamond+arrow = falling diamond */
-#define NUM_OF_CELLS (NUM_OF_CELLS_X*NUM_OF_CELLS_Y+78)
+#define NUM_OF_CELLS (NUM_OF_CELLS_X*NUM_OF_CELLS_Y+80)
 
 
 
@@ -139,6 +139,8 @@ typedef enum _element {
 	O_DIAMOND_F,
 	O_FLYING_DIAMOND,
 	O_FLYING_DIAMOND_F,
+	O_NUT,
+	O_NUT_F,
 	O_BLADDER_SPENDER,
 	O_INBOX,
 	O_H_EXPANDING_WALL,
@@ -320,6 +322,10 @@ typedef enum _element {
 	O_AMOEBA_2_EXPL_2,
 	O_AMOEBA_2_EXPL_3,
 	O_AMOEBA_2_EXPL_4,
+	O_NUT_EXPL_1,
+	O_NUT_EXPL_2,
+	O_NUT_EXPL_3,
+	O_NUT_EXPL_4,
 
 	/* these are used internally for the pneumatic hammer, and should not be used in the editor! */
 	/* (not even as an effect destination or something like that) */
@@ -427,26 +433,26 @@ enum _element_property {
 
 /* These are states of the magic wall. */
 typedef enum _magic_wall_state {
-	GD_MW_DORMANT=0,					/* Starting with this. */
+	GD_MW_DORMANT,					/* Starting with this. */
 	GD_MW_ACTIVE,					/* Boulder or diamond dropped into. */
 	GD_MW_EXPIRED					/* Turned off after magic_wall_milling_time. */
 } GdMagicWallState;
 
 /* These are states of Player. */
 typedef enum _player_state {
-	GD_PL_NOT_YET=0,				/* Not yet living. Beginning of cave time. */
+	GD_PL_NOT_YET,				/* Not yet living. Beginning of cave time. */
 	GD_PL_LIVING,				/* Ok. */
 	GD_PL_TIMEOUT,				/* Time is up */
-	GD_PL_DIED,				/* Died. */
+	GD_PL_DIED,					/* Died. */
 	GD_PL_EXITED				/* Exited the cave, proceed to next one */
 } GdPlayerState;
 
 /* States of amoeba */
 typedef enum _amoeba_state {
-	GD_AM_SLEEPING=0,		/* sleeping - not yet let out. */
-	GD_AM_AWAKE,		/* living, growing */
-	GD_AM_TOO_BIG,	/* grown too big, will convert to stones */
-	GD_AM_ENCLOSED,	/* enclosed, will convert to diamonds */
+	GD_AM_SLEEPING,			/* sleeping - not yet let out. */
+	GD_AM_AWAKE,			/* living, growing */
+	GD_AM_TOO_BIG,			/* grown too big, will convert to stones */
+	GD_AM_ENCLOSED,			/* enclosed, will convert to diamonds */
 } GdAmoebaState;
 
 typedef enum _direction {
@@ -484,6 +490,8 @@ typedef enum _sound {
 	GD_S_NONE,
 
 	GD_S_STONE,
+	GD_S_NUT,
+	GD_S_NUT_CRACK,
 	GD_S_DIRT_BALL,
 	GD_S_NITRO,
 	GD_S_FALLING_WALL,
@@ -546,6 +554,7 @@ typedef enum _sound {
 	GD_S_SWITCH_REPLICATOR,
 
 	GD_S_AMOEBA,			/* loop */
+	GD_S_AMOEBA_MAGIC,		/* loop */
 	GD_S_MAGIC_WALL,		/* loop */
 	GD_S_COVER,				/* loop */
 	GD_S_PNEUMATIC_HAMMER,	/* loop */
@@ -688,6 +697,7 @@ typedef struct _gd_cave {
 	int extra_diamond_value;	/* Score for a diamond, when gate is open. */
 
 	gboolean stone_sound;
+	gboolean nut_sound;
 	gboolean diamond_sound;
 	gboolean nitro_sound;
 	gboolean falling_wall_sound;
@@ -743,7 +753,8 @@ typedef struct _gd_cave {
 	int level_penalty_time[5];				/* Time penalty when voodoo destroyed. */
 	gboolean voodoo_collects_diamonds;	/* Voodoo can collect diamonds */
 	gboolean voodoo_dies_by_stone;		/* Voodoo can be killed by a falling stone */
-	gboolean voodoo_can_be_destroyed;	/* Voodoo can be destroyed by and explosion */
+	gboolean voodoo_disappear_in_explosion;	/* Voodoo can be destroyed by and explosion */
+	gboolean voodoo_any_hurt_kills_player;	/* If any of the voodoos are hurt in any way, the player is killed. */
 
 	gboolean water_does_not_flow_down;	/* if true, water will not grow downwards, only in other directions. */
 	gboolean water_sound;			/* water has sound */
@@ -858,6 +869,7 @@ typedef struct _gd_cave {
 	GdMagicWallState magic_wall_state;		/* State of magic wall */
 	GdPlayerState player_state;		/* Player state. not yet living, living, exited... */
 	int player_seen_ago;			/* player was seen this number of scans ago */
+	gboolean voodoo_touched;		/* as its name says */
 	gboolean kill_player;			/* Voodoo died, or used pressed escape to restart level. */
 	gboolean sweet_eaten;			/* player ate sweet, he's strong. prob_sweet applies, and also able to push chasing stones */
 	int player_x, player_y;			/* Coordinates of player (for scrolling) */
@@ -993,7 +1005,6 @@ char *gd_replay_movements_to_bdcff(GdReplay *replay);
 
 guint32 gd_cave_adler_checksum(GdCave *cave);
 void gd_cave_adler_checksum_more(GdCave *cave, guint32 *a, guint32 *b);
-
 
 #endif							/* _CAVE_H */
 

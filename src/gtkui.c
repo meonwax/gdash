@@ -861,8 +861,10 @@ gd_preferences (GtkWidget *parent)
 	/* graphics settings might have changed (ie. pal emu or zoom), so recreate main winow. */
 	gd_main_window_set_title_animation();
 
+#ifdef GD_SOUND
 	gd_sound_set_music_volume(gd_sound_music_volume_percent);
 	gd_sound_set_chunk_volumes(gd_sound_chunks_volume_percent);
+#endif
 }
 
 

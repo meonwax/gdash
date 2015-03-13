@@ -100,7 +100,7 @@ crli_export(GdCave *to_convert, const int level, guint8 *compressed)
 		cave->amoeba_time+=2;
 		g_message("crli amoeba timer waits for hatching; added 2 seconds for correction");
 	}
-	if (!cave->voodoo_dies_by_stone || !cave->voodoo_collects_diamonds || cave->voodoo_can_be_destroyed)
+	if (!cave->voodoo_dies_by_stone || !cave->voodoo_collects_diamonds || cave->voodoo_disappear_in_explosion)
 		g_warning("crli voodoo dies by stone hit, can collect diamonds and can't be destroyed");
 	if (cave->short_explosions)
 		g_warning("crli explosions are slower than original");

@@ -453,6 +453,7 @@ loadcells_from_pixbuf(GdkPixbuf *cells_pixbuf)
 	add_arrow_to_cell(O_MEGA_STONE_F, O_MEGA_STONE, O_DOWN_ARROW, 0);
 	add_arrow_to_cell(O_DIAMOND_F, O_DIAMOND, O_DOWN_ARROW, 0);
 	add_arrow_to_cell(O_FLYING_DIAMOND_F, O_FLYING_DIAMOND, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_UPSIDEDOWN);
+	add_arrow_to_cell(O_NUT_F, O_NUT, O_DOWN_ARROW, 0);
 	add_arrow_to_cell(O_FALLING_WALL, O_BRICK, O_EXCLAMATION_MARK, 0);
 	add_arrow_to_cell(O_FALLING_WALL_F, O_BRICK, O_DOWN_ARROW, 0);
 	add_arrow_to_cell(O_TIME_PENALTY, O_GRAVESTONE, O_EXCLAMATION_MARK, 0);
