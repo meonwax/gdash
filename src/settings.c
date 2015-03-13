@@ -119,6 +119,10 @@ gboolean gd_pal_emulation_editor=FALSE;
 
 #define SETTING_PAL_EMU_SCANLINE_SHADE "pal_emu_scanline_shade"
 int gd_pal_emu_scanline_shade=85;
+#define SETTING_EVEN_LINE_PAL_EMU_VERTICAL_SCROLL "even_line_pal_emu_vertical_scroll"
+gboolean gd_even_line_pal_emu_vertical_scroll=FALSE;
+#define SETTING_FINE_SCROLL "fine_scroll"
+gboolean gd_fine_scroll=TRUE;
 #define SETTING_C64_PALETTE "c64_palette"
 int gd_c64_palette=0;
 #define SETTING_ATARI_PALETTE "atari_palette"
@@ -167,7 +171,7 @@ keyfile_get_boolean_with_default(GKeyFile *keyfile, const char *group, const cha
 	result=g_key_file_get_boolean(keyfile, group, key, &error);
 	if (!error)
 		return result;
-	g_warning(error->message);
+	g_warning("%s", error->message);
 	g_error_free(error);
 	return def;
 }
@@ -182,7 +186,7 @@ keyfile_get_integer_with_default(GKeyFile *keyfile, const char *group, const cha
 	result=g_key_file_get_integer(keyfile, group, key, &error);
 	if (!error)
 		return result;
-	g_warning(error->message);
+	g_warning("%s", error->message);
 	g_error_free(error);
 	return def;
 }
@@ -330,6 +334,7 @@ gd_load_settings()
     if (gd_cell_scale_game<0 || gd_cell_scale_game>=GD_SCALING_MAX)
     	gd_cell_scale_game=0;
     gd_pal_emu_scanline_shade=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMU_SCANLINE_SHADE, gd_pal_emu_scanline_shade);
+    gd_even_line_pal_emu_vertical_scroll=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_EVEN_LINE_PAL_EMU_VERTICAL_SCROLL, gd_even_line_pal_emu_vertical_scroll);
     gd_pal_emulation_game=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_GAME, gd_pal_emulation_game);
     gd_cell_scale_editor=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_CELL_SCALE_EDITOR, gd_cell_scale_editor);
     if (gd_cell_scale_editor<0 || gd_cell_scale_editor>=GD_SCALING_MAX)
@@ -374,6 +379,7 @@ gd_save_settings()
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_RANDOM_COLORS, gd_random_colors);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_GAME, gd_pal_emulation_game);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMU_SCANLINE_SHADE, gd_pal_emu_scanline_shade);
+    g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_EVEN_LINE_PAL_EMU_VERTICAL_SCROLL, gd_even_line_pal_emu_vertical_scroll);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_C64_PALETTE, gd_c64_palette);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_ATARI_PALETTE, gd_atari_palette);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_EDITOR, gd_pal_emulation_editor);

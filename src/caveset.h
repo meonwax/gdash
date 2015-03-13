@@ -27,8 +27,8 @@ typedef struct _gd_caveset_data {
 	GdString www;				/* link to author's webpage */
 	GdString date;				/* date of creation */
 	GdString remark;			/* some note */
-	
-	gchar *notes;				/* notes about the game */
+
+	GString *notes;				/* notes about the game */
 
 	GdString charset;			/* these are not used by gdash */
 	GdString fontset;

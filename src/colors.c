@@ -190,6 +190,18 @@ gd_color_get_from_string(const char *color)
 		if (g_ascii_strcasecmp(color, c64_color_names[i])==0)
 			return gd_c64_color(i);
 
+	/* we do not use sscanf(color, "atari..." as may be lowercase */
+	if (g_ascii_strncasecmp(color, "Atari", strlen("Atari"))==0) {
+		const char *b=color+strlen("Atari");
+		int c;
+		
+		if (sscanf(b, "%02x", &c)==1)
+			return gd_atari_color(c);
+		c=g_random_int_range(0, 256);
+		g_warning("Unknown Atari color: %s, using randomly chosen %02x\n", color, c);
+		return gd_c64_color(c);
+	}
+
 	/* may or may not have a # */
 	if (color[0]=='#')
 		color++;
@@ -211,6 +223,11 @@ gd_color_get_string(GdColor color)
 		g_assert((color & 0xff)<G_N_ELEMENTS(c64_color_names));
 		return c64_color_names[color&0xff];
 	}
+	
+	if (gd_color_is_atari(color)) {
+		sprintf(text, "Atari%02x", color&0xff);
+		return text;
+	}
 
 	sprintf(text, "#%02x%02x%02x", (color>>16)&255, (color>>8)&255, color&255);
 	return text;
@@ -226,6 +243,11 @@ gd_color_get_visible_name(GdColor color)
 		return c64_color_visible_names[color&0xff];
 	}
 
+	if (gd_color_is_atari(color)) {
+		sprintf(text, "Atari #%02x", color&0xff);
+		return text;
+	}
+
 	sprintf(text, "#%02x%02x%02x", (color>>16)&255, (color>>8)&255, color&255);
 	return text;
 }
@@ -234,6 +256,12 @@ gboolean
 gd_color_is_c64(GdColor color)
 {
 	return (color>>24)==1;
+}
+
+gboolean
+gd_color_is_atari(GdColor color)
+{
+	return (color>>24)==2;
 }
 
 /* get c64 color index from color; terminate app if not a c64 color. */

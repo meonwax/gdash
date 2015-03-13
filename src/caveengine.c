@@ -2293,16 +2293,19 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 			break;
 			
 		case GD_SCHEDULING_BD2:
-			cave->speed=(88+3.66*cave->c64_timing+(cave->ckdelay+cave->ckdelay_extra_for_animation)/1000);
+			/* 60 is a guess. */
+			cave->speed=MAX(60+(cave->ckdelay+cave->ckdelay_extra_for_animation)/1000, cave->c64_timing*20);
+			break;
+
+		case GD_SCHEDULING_PLCK:
+			/* 65 is totally empty cave in construction kit, with delay=0) */
+			cave->speed=MAX(65+cave->ckdelay/1000, cave->c64_timing*20);
 			break;
 
 		case GD_SCHEDULING_BD2_PLCK_ATARI:
 			/* a really fast engine; timing works like c64 plck. */
+			/* 40 ms was measured in the construction kit, with delay=0 */
 			cave->speed=MAX(40+cave->ckdelay/1000, cave->c64_timing*20);
-			break;
-			
-		case GD_SCHEDULING_PLCK:
-			cave->speed=MAX(65+cave->ckdelay/1000, cave->c64_timing*20);
 			break;
 			
 		case GD_SCHEDULING_CRDR:
@@ -2391,7 +2394,8 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 
 		if (cave->gravity_will_change==0) {
 			cave->gravity=cave->gravity_next_direction;
-			gd_sound_play(cave, GD_S_GRAVITY_CHANGE);	/* takes precedence over amoeba and magic wall sound */
+			if (cave->gravity_change_sound)
+				gd_sound_play(cave, GD_S_GRAVITY_CHANGE);	/* takes precedence over amoeba and magic wall sound */
 		}
 	}
 

@@ -165,7 +165,7 @@ static const struct helpdata editorhelp[] = {
 		N_("The elements which fill the cave initially are not really random. "
 		   "They are generated using a predictable random number generator, which can come up with the same series of number "
 		   "every time. Therefore the cave looks the same every time. The generator is configured by a seed number, which can be "
-		   "set in the cave properties dialog. Note that in this way, five different levels for each cave can easily be created! "
+		   "set in the cave random setup dialog. Note that in this way, five different levels for each cave can easily be created! "
 		   "Each of the levels will be a bit different, because they are filled with different random data. But the main challenge "
 		   "will be the same, as it is defined by the drawing object in essence. The level at which the cave is shown can be "
 		   "changed by the scale on the top right corner of the editor window.")},

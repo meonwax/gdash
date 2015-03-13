@@ -53,6 +53,7 @@ TITLE = \
 	gdash_32.png
 
 noinst_HEADERS = \
+	c64_png_colors.h \
 	icons.h \
 	c64_gfx.h \
 	c64_font.h \

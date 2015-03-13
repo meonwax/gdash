@@ -222,6 +222,7 @@ GdPropertyDefault gd_defaults_bd1[] = {
 	{CAVE_OFFSET(amoeba_timer_started_immediately), TRUE}, 
 	{CAVE_OFFSET(amoeba_timer_wait_for_hatching), FALSE}, 
 	{CAVE_OFFSET(lineshift), TRUE}, 
+	{CAVE_OFFSET(wraparound_objects), TRUE},
 	{CAVE_OFFSET(diagonal_movements), FALSE}, 
 	{CAVE_OFFSET(voodoo_collects_diamonds), FALSE}, 
 	{CAVE_OFFSET(voodoo_dies_by_stone), FALSE}, 
@@ -254,6 +255,7 @@ GdPropertyDefault gd_defaults_bd2[] = {
 	{CAVE_OFFSET(amoeba_timer_started_immediately), FALSE},
 	{CAVE_OFFSET(amoeba_timer_wait_for_hatching), FALSE},
 	{CAVE_OFFSET(lineshift), TRUE},
+	{CAVE_OFFSET(wraparound_objects), TRUE},
 	{CAVE_OFFSET(diagonal_movements), FALSE},
 	{CAVE_OFFSET(voodoo_collects_diamonds), FALSE},
 	{CAVE_OFFSET(voodoo_dies_by_stone), FALSE},
@@ -285,6 +287,7 @@ GdPropertyDefault gd_defaults_plck[] = {
 	{CAVE_OFFSET(amoeba_timer_started_immediately), FALSE},
 	{CAVE_OFFSET(amoeba_timer_wait_for_hatching), FALSE},
 	{CAVE_OFFSET(lineshift), TRUE},
+	{CAVE_OFFSET(wraparound_objects), TRUE},
 	{CAVE_OFFSET(border_scan_first_and_last), FALSE},
 	{CAVE_OFFSET(diagonal_movements), FALSE},
 	{CAVE_OFFSET(voodoo_collects_diamonds), FALSE},
@@ -316,6 +319,7 @@ GdPropertyDefault gd_defaults_1stb[] = {
 	{CAVE_OFFSET(amoeba_timer_started_immediately), FALSE},
 	{CAVE_OFFSET(amoeba_timer_wait_for_hatching), TRUE},
 	{CAVE_OFFSET(lineshift), TRUE},
+	{CAVE_OFFSET(wraparound_objects), TRUE},
 	{CAVE_OFFSET(voodoo_collects_diamonds), TRUE},
 	{CAVE_OFFSET(voodoo_dies_by_stone), TRUE},
 	{CAVE_OFFSET(voodoo_can_be_destroyed), FALSE},
@@ -345,6 +349,7 @@ GdPropertyDefault gd_defaults_crdr_7[] = {
 	{CAVE_OFFSET(amoeba_timer_started_immediately), FALSE},
 	{CAVE_OFFSET(amoeba_timer_wait_for_hatching), TRUE},
 	{CAVE_OFFSET(lineshift), TRUE},
+	{CAVE_OFFSET(wraparound_objects), TRUE},
 	{CAVE_OFFSET(voodoo_collects_diamonds), TRUE},
 	{CAVE_OFFSET(voodoo_dies_by_stone), TRUE},
 	{CAVE_OFFSET(voodoo_can_be_destroyed), FALSE},
@@ -376,6 +381,7 @@ GdPropertyDefault gd_defaults_crli[] = {
 	{CAVE_OFFSET(amoeba_timer_started_immediately), FALSE},
 	{CAVE_OFFSET(amoeba_timer_wait_for_hatching), TRUE},
 	{CAVE_OFFSET(lineshift), TRUE},
+	{CAVE_OFFSET(wraparound_objects), TRUE},
 	{CAVE_OFFSET(voodoo_collects_diamonds), TRUE},
 	{CAVE_OFFSET(voodoo_dies_by_stone), TRUE},
 	{CAVE_OFFSET(voodoo_can_be_destroyed), FALSE},
@@ -566,12 +572,19 @@ gd_cave_set_engine_defaults(Cave *cave, GdEngine engine)
 
 	/* these have hardcoded ckdelay. */	
 	/* setting this ckdelay array does not fit into the gd_struct_default scheme. */
-	if (engine==GD_ENGINE_BD1 || engine==GD_ENGINE_BD2) {
+	if (engine==GD_ENGINE_BD1) {
 		cave->level_ckdelay[0]=12;
 		cave->level_ckdelay[1]=6;
 		cave->level_ckdelay[2]=3;
 		cave->level_ckdelay[3]=1;
 		cave->level_ckdelay[4]=0;
+	}
+	if (engine==GD_ENGINE_BD2) {
+		cave->level_ckdelay[0]=9;	/* 180ms */
+		cave->level_ckdelay[1]=8;	/* 160ms */
+		cave->level_ckdelay[2]=7;	/* 140ms */
+		cave->level_ckdelay[3]=6;	/* 120ms */
+		cave->level_ckdelay[4]=6;	/* 120ms (!) */
 	}
 }
 
@@ -747,16 +760,21 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, GdCavefi
 				object.type=LINE;
 				object.x1=data[index+1];
 				object.y1=data[index+2]-2;
-				length=data[index+3]-1;
+				length=(gint8)data[index+3]-1;
 				direction=data[index+4];
-				if (direction>MV_UP_LEFT) {
-					g_warning("invalid line direction %d at byte %d", direction, index);
-					direction=MV_STILL;
+				if (length<0) {
+					g_warning("line length negative, not displaying line at all, at byte %d", index);
+					object.type=NONE;
+				} else {
+					if (direction>MV_UP_LEFT) {
+						g_warning("invalid line direction %d at byte %d", direction, index);
+						direction=MV_STILL;
+					}
+					object.x2=object.x1+length*gd_dx[direction+1];
+					object.y2=object.y1+length*gd_dy[direction+1];
+					if (object.x1>=cave->w || object.y1>=cave->h || object.x2>=cave->w || object.y2>=cave->h)
+						g_warning("invalid line coordinates %d,%d %d,%d at byte %d", object.x1, object.y1, object.x2, object.y2, index);
 				}
-				object.x2=object.x1+length*gd_dx[direction+1];
-				object.y2=object.y1+length*gd_dy[direction+1];
-				if (object.x1>=cave->w || object.y1>=cave->h || object.x2>=cave->w || object.y2>=cave->h)
-					g_warning("invalid line coordinates %d,%d %d,%d at byte %d", object.x1, object.y1, object.x2, object.y2, index-5);
 				index+=5;
 				break;
 			case 2:				/* 10: FILLED RECTANGLE */
@@ -812,14 +830,9 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes, GdCavef
 		return -1;
 	}
 	gd_cave_set_engine_defaults(cave, GD_ENGINE_BD2);
-	if (format==GD_FORMAT_BD2_ATARI) {
+	if (format==GD_FORMAT_BD2_ATARI)
 		cave->scheduling=GD_SCHEDULING_BD2_PLCK_ATARI;
-		cave->level_ckdelay[0]=9;	/* 180ms */
-		cave->level_ckdelay[1]=8;	/* 160ms */
-		cave->level_ckdelay[2]=7;	/* 140ms */
-		cave->level_ckdelay[3]=6;	/* 120ms */
-		cave->level_ckdelay[4]=6;	/* 120ms (!) */
-	}
+
 	/* set visible size for intermission */
 	if (cave->intermission) {
 		cave->x2=19;

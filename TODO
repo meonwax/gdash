@@ -1,45 +1,50 @@
 DONE
 ----- 
-each level own notepad
-Anyway... the cave delay settings for Atari could be improved.
-atari bd2 scheduling
-biters order in element box
-randomfillc64 bug fixed
-autoselect small/big font
+All drawing objects should wraparound, at least when lineshifted borders are activated.
+bd2 scheduling now correct for c64, atari
+german translation capital nouns
+c64 szineket egysegbe foglalni (a c64 grafika importnal)
+new imported games
+	*) boulder dash 1-2-3 plus  - TO BE TESTED
+- Atari colors.
+2x scroll for lcd
+50hz scroll (sdash only)
+gravity switch can be activated at cave start
+- Default timing values reflect a real-world setting to begin with. For example, default cave timing (ms) might be 180, 160, 140, 120, 120. There might be other things that occur to you.
+new cave dialog asks if intermission and sets size
+
+
+gtk+ dialog kijavitva
+
 
 TO DO
 -----
-german translation capital nouns
-
-As there is an Amoeba 2 now, I think it would be nice to be able to set a different color for that then Amoeba 1!
-
-Either way, though, I think that the player should always be notified they're playing an intermission from the start (even if it means not using the opening status bar at all) It's not like you need to keep track of your lives during an intermission anyway.
+amoeba threshold
 
 bdcff beolvasás miért hash table?
   size és hasonló szarok miatt
   de tobb értéket is kéne tárolni
   "multimap"
-dynstring beolvasást jobban beépíteni
+  dynstring beolvasást jobban beépíteni - mindenhol gstring?
 
-Also, it doesn't correctly remember the path from where the file was loaded. It always goes back to /Gdash.
-last used directory kicsit atgondolni
+1stB, CrLi uses 4 stages for ghost explosion, clock birth, steelwall birth, bomb explosion and boulder birth each. The first is for delay state purposes and has the same graphics assigned as the 2nd stage. The 3rd and 4th are for the following frames with the other two explosion graphics. That makes those explosions last for 3 frames actually.
+I noticed that GDash uses 4 different graphics for those and they also last 4 frames.
+Same with the bomb, once armed, it lasts 6 frames until it explodes while it is 7 in GDash.
 
-option to "fast scroll"
-2x scroll for lcd
-50hz scroll? (infrastrukturalis valtozasok)
+jatek/palya inditasanal latszodjanak dolgok?
+  - nev
+  - description
+  - remark?
+  - notes?
+	Either way, though, I think that the player should always be notified they're playing an intermission from the start (even if it means not using the opening status bar at all) It's not like you need to keep track of your lives during an intermission anyway.
+	- sdashban ez könnyű, bónús lífé felirat
+
+As there is an Amoeba 2 now, I think it would be nice to be able to set a different color for that then Amoeba 1!
 
 sound:
 	amoeba2
 	creature change dir
-	option to choose between C64 and Atari sound sets. 
-	Sound themes would make sense
-
-atari color names??
-
-All drawing objects should wraparound, at least when lineshifted borders are activated.
-deluxe caves 1 - wraparound miatt néhány cucc?
-
-check plck caves
+	option to choose between C64 and Atari sound sets. - Sound themes
 
 bottom border for plck caves	There is one key routine at 5dce in every PLCK based game, except for DLP1.55:
 	.C:5dce   A9 07      LDA #$07
@@ -69,12 +74,9 @@ record and playback of games
 
 option "More than 1 bomb" in the cave settings
 
-I think the way you implemented the Maze and RandomFill is okay. I assume the engine will expect as many seed values as there are levels, right?
-
 copy&paste objects?
 
 compat:
 	*) magicwall breakscan; De Luxe Caves 1 Cave L, De Luxe Caves 2 Cave A, Deluxe Caves 3 Cave A 
 	*) frustidash
-	*) boulder dash 1-2-3 plus
 

@@ -35,7 +35,7 @@ typedef enum _gd_type {
 	
 	/* gd types */
 	GD_TYPE_STRING,		/* static string, fixed array of characters */
-	GD_TYPE_DYNSTRING,	/* dynamic string which is a g_malloc'd pointer */
+	GD_TYPE_LONGSTRING,	/* long string which has its own notebook page in the editor */
 	GD_TYPE_INT,
 	GD_TYPE_RATIO,
 	GD_TYPE_ELEMENT,
@@ -573,7 +573,7 @@ typedef struct _cave {
 	GdString date;				/* date of creation */
 	GdString remark;			/* some note */
 	
-	gchar *notes;				/* a long description */
+	GString *notes;				/* a long description */
 
 	GdString charset;			/* these are not used by gdash */
 	GdString fontset;
@@ -600,6 +600,7 @@ typedef struct _cave {
 	gboolean active_is_first_found;	/* active player is the uppermost. */
 	gboolean lineshift;				/* true is line shifting emulation, false is perfect borders emulation */
 	gboolean border_scan_first_and_last;	/* if true, scans the first and last line of the border. false for plck */
+	gboolean wraparound_objects;	/* if this is true, object drawing (cave rendering) will wraparound as well. */
 
 	GdElement initial_fill;
 	GdElement initial_border;
@@ -721,7 +722,9 @@ typedef struct _cave {
 	
 	GdDirection gravity;
 	int gravity_change_time;
+	gboolean gravity_change_sound;
 	gboolean gravity_affects_all;	/* if true, gravity also affects falling wall, bladder and waiting stones */
+	gboolean gravity_switch_active;	/* true if gravity switch is activated, and can be used. */
 
 	gboolean hammered_walls_reappear;
 	int pneumatic_hammer_frame;
@@ -782,7 +785,6 @@ typedef struct _cave {
 	int creatures_direction_will_change;	/* creatures automatically change direction every x seconds */
 	GdC64RandomGenerator c64_rand;	/* used for predictable random generator during the game. */
 
-	gboolean gravity_switch_active;	/* true if gravity switch is activated, and can be used. */
 	int gravity_will_change;	/* gravity will change in this number of seconds */
 	gboolean gravity_disabled;	/* when the player is stirring the pot, there is no gravity. */
 	GdDirection gravity_next_direction;	/* next direction when the gravity changes. will be set by the player "getting" a gravity switch */
@@ -807,9 +809,6 @@ typedef struct _cave {
 /* also no1 and bd2 cave data import helpers; line direction coordinates */
 extern const int gd_dx[], gd_dy[];
 
-/* names of directions */
-extern const char* gd_direction_name[];
-extern const char* gd_direction_filename[];
 /* names of schedulings */
 extern const char* gd_scheduling_name[];
 extern const char* gd_scheduling_filename[];	/* identifiers in bdcff */
@@ -837,7 +836,7 @@ guint gd_str_case_hash(gconstpointer v);
 /* cave highscore functions */
 int gd_highscore_compare(gconstpointer a, gconstpointer b);
 gboolean gd_is_highscore(GdHighScore *scores, int score);
-int gd_add_highscore(GdHighScore *scores, GdHighScore hs);
+int gd_add_highscore(GdHighScore *highscores, const char *name, int score);
 void gd_clear_highscore(GdHighScore *hs);
 gboolean gd_has_highscore(GdHighScore *hs);
 
@@ -867,7 +866,7 @@ gpointer gd_cave_map_dup_size(const Cave * cave, const gpointer map, const int c
 #define gd_cave_map_dup(CAVE, MAP) ((gpointer)gd_cave_map_dup_size((CAVE), (gpointer *)(CAVE)->MAP, sizeof((CAVE)->MAP[0][0])))
 void gd_cave_map_free(gpointer map);
 
-void gd_cave_store_rc (Cave * cave, const int x, const int y, const GdElement element, const void* order);
+void gd_cave_store_rc (Cave * cave, int x, int y, const GdElement element, const void* order);
 static inline GdElement
 gd_cave_get_rc (const Cave *cave, const int x, const int y)
 {
@@ -876,14 +875,19 @@ gd_cave_get_rc (const Cave *cave, const int x, const int y)
 	return cave->map[y][x];
 }
 
+/* direction */
 const char *gd_direction_get_visible_name(GdDirection dir);
 const char *gd_direction_get_filename(GdDirection dir);
 GdDirection gd_direction_from_string(const char *str);
 
+/* scheduling */
+const char *gd_scheduling_get_filename(GdScheduling sched);
+GdScheduling gd_scheduling_from_string(const char *str);
+
 /* game playing helpers */
 #define GD_REDRAW (1<<10)
-void gd_drawcave_game (const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, gboolean paused);
-gboolean gd_cave_scroll(int width, int visible, int center, gboolean exact, int start, int to, int *current, int *desired, int *speed);
+void gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, gboolean paused, gboolean increment_animcycle);
+gboolean gd_cave_scroll(int width, int visible, int center, gboolean exact, int start, int to, int *current, int *desired, int *speed, int divisor);
 
 /* function to copy a GdString */
 static inline int

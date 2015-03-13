@@ -18,36 +18,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if 0
-static void
-put_pixel (GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green, guchar blue, guchar alpha)
-{
-  int width, height, rowstride, n_channels;
-  guchar *pixels, *p;
+#include "c64_png_colors.h"
 
-  n_channels = gdk_pixbuf_get_n_channels (pixbuf);
-
-  g_assert (gdk_pixbuf_get_colorspace (pixbuf) == GDK_COLORSPACE_RGB);
-  g_assert (gdk_pixbuf_get_bits_per_sample (pixbuf) == 8);
-  g_assert (gdk_pixbuf_get_has_alpha (pixbuf));
-  g_assert (n_channels == 4);
-
-  width = gdk_pixbuf_get_width (pixbuf);
-  height = gdk_pixbuf_get_height (pixbuf);
-
-  g_assert (x >= 0 && x < width);
-  g_assert (y >= 0 && y < height);
-
-  rowstride = gdk_pixbuf_get_rowstride (pixbuf);
-  pixels = gdk_pixbuf_get_pixels (pixbuf);
-
-  p = pixels + y * rowstride + x * n_channels;
-  p[0] = red;
-  p[1] = green;
-  p[2] = blue;
-  p[3] = alpha;
-}
-#endif
 
 GdkPixbuf *pixbuf=NULL;
 int width, height, rowstride, n_channels;
@@ -59,27 +31,6 @@ get_pixel (int x, int y)
 {
   guchar *p;
   int r, g, b, a;
-  int c;
-  /* rgba table */
-  int cols[]={
-    /* abgr */
-  	/* 0000 */ 0,
-  	/* 0001 */ 0,
-  	/* 0010 */ 0,
-  	/* 0011 */ 0,
-  	/* 0100 */ 0,
-  	/* 0101 */ 0,
-  	/* 0110 */ 0,
-  	/* 0111 */ 0,
-  	/* 1000 */ 1, /* black - background */
-  	/* 1001 */ 2, /* red - foreg1 */
-  	/* 1010 */ 5, /* green - amoeba xxxxx */
-  	/* 1011 */ 4, /* yellow - foreg3 */
-  	/* 1100 */ 6, /* blue - slime */
-  	/* 1101 */ 3,	/* purple - foreg2 */
-  	/* 1110 */ 7, /* black around arrows (used in editor) is coded as cyan */
-  	/* 1111 */ 8, /* white is the arrow */
-  };
 
   g_assert (x >= 0 && x < width);
   g_assert (y >= 0 && y < height);
@@ -89,8 +40,7 @@ get_pixel (int x, int y)
   g=p[1];
   b=p[2];
   a=p[3];
-  c=(a>>7)*8 + (b>>7)*4 + (g>>7)*2 + (r>>7)*1; /* lower 4 bits will be rgba */
-  return cols[c];
+  return c64_png_colors(r, g, b, a);
 }
 
 

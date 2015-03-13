@@ -65,7 +65,7 @@ gd_caveset_properties[] = {
 	{"Lives", GD_TYPE_INT, 0, N_("Maximum lives"), CAVESET_OFFSET(maximum_lives), 1, N_("Maximum number of lives you can have by collecting bonus points."), 3, 99},
 	{"BonusLife", GD_TYPE_INT, 0, N_("Bonus life score"), CAVESET_OFFSET(bonus_life_score), 1, N_("Number of points to collect for a bonus life."), 100, 5000},
 	
-	{"Notes", GD_TYPE_DYNSTRING, 0, N_("Notes"), CAVESET_OFFSET(notes), 1, N_("Long description of the game.")},
+	{"Notes", GD_TYPE_LONGSTRING, 0, N_("Notes"), CAVESET_OFFSET(notes), 1, N_("Long description of the game.")},
 	{NULL},
 };
 
@@ -83,8 +83,15 @@ GdCavesetData *
 gd_caveset_data_new()
 {
 	GdCavesetData *data;
+	int i;
 
 	data=g_new0(GdCavesetData, 1);
+
+	/* create strings */
+	for (i=0; gd_caveset_properties[i].identifier!=NULL; i++)
+		if (gd_caveset_properties[i].type==GD_TYPE_LONGSTRING)
+			G_STRUCT_MEMBER(GString *, data, gd_caveset_properties[i].offset)=g_string_new(NULL);
+
 	gd_struct_set_defaults_from_array(data, gd_caveset_properties, caveset_defaults);
 
 	return data;
@@ -94,7 +101,13 @@ gd_caveset_data_new()
 void
 gd_caveset_data_free(GdCavesetData *data)
 {
-	g_free(data->notes);
+	int i;
+	
+	/* free strings */
+	for (i=0; gd_caveset_properties[i].identifier!=NULL; i++)
+		if (gd_caveset_properties[i].type==GD_TYPE_LONGSTRING)
+			g_string_free(G_STRUCT_MEMBER(GString *, data, gd_caveset_properties[i].offset), TRUE);
+
 	g_free(data);
 }
 
@@ -263,13 +276,10 @@ cave_highscores_load_from_keyfile(GKeyFile *keyfile, int i, GdHighScore *scores)
 		if (!str)	/* ?! not really possible but who knows */
 			continue;
 
-		if (strchr(str, ' ')!=NULL && sscanf(str, "%d", &score)==1)	{
-			GdHighScore hs;
-
-			hs.score=score;
-			gd_strcpy(hs.name, strchr(str, ' ')+1);	/* we skip the space by adding +1 */
-			gd_add_highscore(scores, hs);	/* add to the list, sorted. does nothing, if no more space for this score */
-		} else
+		if (strchr(str, ' ')!=NULL && sscanf(str, "%d", &score)==1)
+			/* we skip the space by adding +1 */
+			gd_add_highscore(scores, strchr(str, ' ')+1, score);	/* add to the list, sorted. does nothing, if no more space for this score */
+		else
 			g_warning("Invalid line in highscore file: %s", str);
 		g_free(str);
 	}
@@ -806,7 +816,7 @@ gd_caveset_save(const char *filename)
 	gd_clear_error_flag();
 	success=g_file_set_contents(filename, contents, -1, &error);
 	if (!success) {
-		g_critical(error->message);
+		g_critical("%s", error->message);
 		g_error_free(error);
 	} else
 		/* remember that it is saved */

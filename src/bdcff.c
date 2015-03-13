@@ -113,10 +113,9 @@ struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const cha
 			for (j=0; j<prop_desc[i].count && params[paramindex]!=NULL; j++) {
 				gboolean success=FALSE;
 				gdouble res;
-				int n;
 
 				switch (prop_desc[i].type) {
-				case GD_TYPE_DYNSTRING:
+				case GD_TYPE_LONGSTRING:
 					/* handled outside */
 				case GD_TYPE_STRING:
 					/* handled above */
@@ -167,7 +166,7 @@ struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const cha
 					}
 					break;
 				case GD_TYPE_ELEMENT:
-					evalue[j]=gd_get_element_from_string (params[paramindex]);
+					evalue[j]=gd_get_element_from_string(params[paramindex]);
 					/* copy to all remaining elements in array */
 					for (k=j+1; k<prop_desc[i].count; k++)
 						evalue[k]=evalue[j];
@@ -181,13 +180,11 @@ struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const cha
 					success=TRUE;
 					break;
 				case GD_TYPE_SCHEDULING:
-					for (n=0; n<GD_SCHEDULING_MAX; n++)
-						if (g_ascii_strcasecmp(params[paramindex], gd_scheduling_filename[n])==0) {
-							/* copy to all remaining items in array */
-							for (k=j; k<prop_desc[i].count; k++)
-								svalue[k]=(GdScheduling)n;
-							success=TRUE;
-						}
+					svalue[j]=gd_scheduling_from_string(params[paramindex]);
+					/* copy to all remaining items in array */
+					for (k=j+1; k<prop_desc[i].count; k++)
+						svalue[k]=svalue[j];
+					success=TRUE;	/* if there was an error, already reported by gd_scheduling_from_string */
 					break;
 				case GD_TYPE_COLOR:
 				case GD_TYPE_EFFECT:
@@ -615,18 +612,18 @@ gd_caveset_load_from_bdcff(const char *contents)
 		g_strstrip(line);
 		
 		if (reading_highscore) {
-			GdHighScore hs;
+			int score;
 			
-			if (sscanf(line, "%d", &hs.score)!=1 || strchr(line, ' ')==NULL) {	/* first word is the score */
+			if (sscanf(line, "%d", &score)!=1 || strchr(line, ' ')==NULL) {	/* first word is the score */
 				g_warning ("highscore format incorrect");
 			} else {
-				gd_strcpy(hs.name, strchr(line, ' ')+1);	/* from first space: the name */
 				if (cave==default_cave)
 					/* if we are reading the [game], add highscore to that one. */
-					gd_add_highscore(gd_caveset_data->highscore, hs);
+					/* from first space: the name */
+					gd_add_highscore(gd_caveset_data->highscore, strchr(line, ' ')+1, score);
 				else
 					/* if a cave, add highscore to that. */
-					gd_add_highscore(cave->highscore, hs);
+					gd_add_highscore(cave->highscore, strchr(line, ' ')+1, score);
 			}
 			continue;
 		}
@@ -712,26 +709,14 @@ gd_caveset_load_from_bdcff(const char *contents)
 			if (g_ascii_strcasecmp(attrib, "Notes")==0) {
 				if (cave!=default_cave) {
 					/* reading attributes of a cave */
-					if (cave->notes==NULL)
-						cave->notes=g_strdup(param);
-					else {
-						char *newtext;
-						
-						newtext=g_strdup_printf("%s\n%s", cave->notes, param);
-						g_free(cave->notes);
-						cave->notes=newtext;
-					}
+					if (cave->notes->len!=0)
+						g_string_append_c(cave->notes, '\n');
+					g_string_append(cave->notes, param);
 				} else {
-					/* reading attributes of the caveset */
-					if (gd_caveset_data->notes==NULL)
-						gd_caveset_data->notes=g_strdup(param);
-					else {
-						char *newtext;
-						
-						newtext=g_strdup_printf("%s\n%s", gd_caveset_data->notes, param);
-						g_free(gd_caveset_data->notes);
-						gd_caveset_data->notes=newtext;
-					}
+					/* reading attributes of a cave */
+					if (gd_caveset_data->notes->len!=0)
+						g_string_append_c(gd_caveset_data->notes, '\n');
+					g_string_append(gd_caveset_data->notes, param);
 				}
 			}
 			else
@@ -928,7 +913,7 @@ save_properties(GPtrArray *out, gpointer str, gpointer str_def, const GdStructDe
 	GString *line;
 	const char *identifier=NULL;
 
-	line=g_string_new (NULL);
+	line=g_string_new(NULL);
 
 	for (i=0; prop_desc[i].identifier!=NULL; i++) {
 		gpointer value, default_value;
@@ -953,14 +938,14 @@ save_properties(GPtrArray *out, gpointer str, gpointer str_def, const GdStructDe
 		}
 		
 		/* dynamic string: split to lines */
-		if (prop_desc[i].type==GD_TYPE_DYNSTRING) {
-			char *text=G_STRUCT_MEMBER(char *, str, prop_desc[i].offset);
+		if (prop_desc[i].type==GD_TYPE_LONGSTRING) {
+			GString *string=G_STRUCT_MEMBER(GString *, str, prop_desc[i].offset);
 			char **lines;
 			int j;
 			
-			if (!text || g_str_equal(text, ""))
+			if (string->len==0)
 				continue;
-			lines=g_strsplit_set(text, "\n", -1);
+			lines=g_strsplit_set(string->str, "\n", -1);
 			for (j=0; lines[j]!=NULL; j++)
 				g_ptr_array_add(out, g_strdup_printf("%s=%s", prop_desc[i].identifier, lines[j]));
 			g_strfreev(lines);
@@ -1049,7 +1034,7 @@ save_properties(GPtrArray *out, gpointer str, gpointer str_def, const GdStructDe
 			case GD_TAB:
 			case GD_LABEL:
 			case GD_TYPE_STRING:
-			case GD_TYPE_DYNSTRING:
+			case GD_TYPE_LONGSTRING:
 				break;
 			}
 		}

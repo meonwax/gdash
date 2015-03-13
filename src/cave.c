@@ -30,8 +30,8 @@
 /* also no1 and bd2 cave data import helpers; line direction coordinates */
 const int gd_dx[]={ 0, 0, 1, 1, 1, 0, -1, -1, -1, 0, 2, 2, 2, 0, -2, -2, -2 };
 const int gd_dy[]={ 0, -1, -1, 0, 1, 1, 1, 0, -1, -2, -2, 0, 2, 2, 2, 0, -2 };
-
-const char* gd_direction_name[]={ NULL, N_("Up"), N_("Up+right"), N_("Right"), N_("Down+right"), N_("Down"), N_("Down+left"), N_("Left"), N_("Up+left") };
+/* TRANSLATORS: None here means "no direction to move"; when there is no gravity while stirring the pot. */
+const char* gd_direction_name[]={ N_("None"), N_("Up"), N_("Up+right"), N_("Right"), N_("Down+right"), N_("Down"), N_("Down+left"), N_("Left"), N_("Up+left") };
 const char* gd_direction_filename[]={ NULL, "up", "upright", "right", "downright", "down", "downleft", "left", "upleft" };
 const char* gd_scheduling_name[]={ N_("Milliseconds"), "BD1", "BD2", "Construction Kit", "Crazy Dream 7", "Atari BD1", "Atari BD2/Construction Kit" };
 const char* gd_scheduling_filename[]={ "ms", "bd1", "bd2", "plck", "crdr7", "bd1atari", "bd2ckatari" };
@@ -68,10 +68,31 @@ gd_direction_from_string(const char *str)
 		if (g_ascii_strcasecmp(str, gd_direction_filename[i])==0)
 			return (GdDirection) i;
 
-	g_warning ("invalid direction name '%s', defaulting to down", str);
+	g_warning("invalid direction name '%s', defaulting to down", str);
 	return MV_DOWN;
 }
 
+
+const char *
+gd_scheduling_get_filename(GdScheduling sched)
+{
+	g_assert(sched>0 && sched<G_N_ELEMENTS(gd_scheduling_filename));
+	return gd_scheduling_filename[sched];
+}
+
+GdScheduling
+gd_scheduling_from_string(const char *str)
+{
+	int i;
+
+	g_assert(str!=NULL);
+	for (i=0; i<G_N_ELEMENTS(gd_scheduling_filename); i++)
+		if (g_ascii_strcasecmp(str, gd_scheduling_filename[i])==0)
+			return (GdScheduling) i;
+
+	g_warning("invalid scheduling name '%s', defaulting to plck", str);
+	return GD_SCHEDULING_PLCK;
+}
 
 
 /* creates the character->element conversion table; using
@@ -221,7 +242,7 @@ gd_struct_set_defaults_from_array(gpointer str, const GdStructDescriptor *proper
 			/* remember so we will be fast later*/
 			defaults[i].property_index=n;
 		}
-
+		
 		/* some properties are arrays. this loop fills all with the same values */
 		for (j=0; j<properties[n].count; j++)
 			switch (properties[n].type) {
@@ -230,8 +251,7 @@ gd_struct_set_defaults_from_array(gpointer str, const GdStructDescriptor *proper
 			case GD_LABEL:
 			/* no default value for strings */
 			case GD_TYPE_STRING:
-			case GD_TYPE_DYNSTRING:
-				g_assert_not_reached();
+			case GD_TYPE_LONGSTRING:
 				break;
 
 			case GD_TYPE_RATIO:	/* this is also an integer, difference is only when saving to bdcff */
@@ -404,20 +424,21 @@ gboolean gd_is_highscore(GdHighScore *scores, int score)
 }
 
 int
-gd_add_highscore(GdHighScore *scores, GdHighScore hs)
+gd_add_highscore(GdHighScore *highscores, const char *name, int score)
 {
 	int i;
 
-	if (!gd_is_highscore(scores, hs.score))
+	if (!gd_is_highscore(highscores, score))
 		return -1;
 
 	/* overwrite the last one */
-	scores[GD_HIGHSCORE_NUM-1]=hs;
+	gd_strcpy(highscores[GD_HIGHSCORE_NUM-1].name, name);
+	highscores[GD_HIGHSCORE_NUM-1].score=score;
 	/* and sort */
-	qsort(scores, GD_HIGHSCORE_NUM, sizeof(GdHighScore), gd_highscore_compare);
+	qsort(highscores, GD_HIGHSCORE_NUM, sizeof(GdHighScore), gd_highscore_compare);
 
 	for (i=0; i<GD_HIGHSCORE_NUM; i++)
-		if (g_str_equal(scores[i].name, hs.name) && scores[i].score==hs.score)
+		if (g_str_equal(highscores[i].name, name) && highscores[i].score==score)
 			return i;
 
 	g_assert_not_reached();
@@ -466,10 +487,18 @@ gd_str_case_hash(gconstpointer v)
 Cave *
 gd_cave_new(void)
 {
-	Cave *cave=g_new0 (Cave, 1);
+	int i;
+	Cave *cave;
+	
+	cave=g_new0(Cave, 1);
 
 	/* hash table which stores unknown tags as strings. */
 	cave->tags=g_hash_table_new_full(gd_str_case_hash, gd_str_case_equal, g_free, g_free);
+	/* for strings */
+	for (i=0; gd_cave_properties[i].identifier!=NULL; i++)
+		if (gd_cave_properties[i].type==GD_TYPE_LONGSTRING)
+			G_STRUCT_MEMBER(GString *, cave, gd_cave_properties[i].offset)=g_string_new(NULL);
+	
 
 	gd_cave_set_gdash_defaults (cave);
 
@@ -552,6 +581,8 @@ gd_cave_map_free(gpointer map)
 void
 gd_cave_free (Cave *cave)
 {
+	int i;
+	
 	if (!cave)
 		return;
 
@@ -560,8 +591,10 @@ gd_cave_free (Cave *cave)
 
 	if (cave->random)
 		g_rand_free(cave->random);
-		
-	g_free(cave->notes);
+
+	for (i=0; gd_cave_properties[i].identifier!=NULL; i++)
+		if (gd_cave_properties[i].type==GD_TYPE_LONGSTRING)
+			g_string_free(G_STRUCT_MEMBER(GString *, cave, gd_cave_properties[i].offset), TRUE);
 
 	/* map */
 	gd_cave_map_free(cave->map);
@@ -587,6 +620,9 @@ hash_copy_foreach(const char *key, const char *value, GHashTable *dest)
 void
 gd_cave_copy(Cave *dest, const Cave *src)
 {
+	int i;
+	
+	/* copy entire data */
 	g_memmove(dest, src, sizeof(Cave));
 
 	/* but duplicate dynamic data */
@@ -595,7 +631,11 @@ gd_cave_copy(Cave *dest, const Cave *src)
 		g_hash_table_foreach(src->tags, (GHFunc) hash_copy_foreach, dest->tags);
 	dest->map=gd_cave_map_dup (src, map);
 	dest->hammered_reappear=gd_cave_map_dup(src, hammered_reappear);
-	dest->notes=g_strdup(src->notes);
+
+	/* for strings */
+	for (i=0; gd_cave_properties[i].identifier!=NULL; i++)
+		if (gd_cave_properties[i].type==GD_TYPE_LONGSTRING)
+			G_STRUCT_MEMBER(GString *, dest, gd_cave_properties[i].offset)=g_string_new(G_STRUCT_MEMBER(GString *, src, gd_cave_properties[i].offset)->str);
 
 	/* no reason to copy this */
 	dest->objects_order=NULL;
@@ -606,7 +646,7 @@ gd_cave_copy(Cave *dest, const Cave *src)
 
 		dest->objects=NULL;	/* new empty list */
 		for (iter=src->objects; iter!=NULL; iter=iter->next)		/* do a deep copy */
-			dest->objects=g_list_append (dest->objects, g_memdup (iter->data, sizeof (GdObject)));
+			dest->objects=g_list_append(dest->objects, g_memdup (iter->data, sizeof (GdObject)));
 	}
 
 	/* copy random number generator */
@@ -633,9 +673,37 @@ gd_cave_new_from_cave (const Cave *orig)
 	order is a pointer to the GdObject describing this object. Thus the editor can identify which cell was created by which object.
 */
 void
-gd_cave_store_rc (Cave *cave, const int x, const int y, const GdElement element, const void* order)
+gd_cave_store_rc (Cave *cave, int x, int y, const GdElement element, const void* order)
 {
 	/* check bounds */
+	if (cave->wraparound_objects) {
+		if (cave->lineshift) {
+			/* fit x coordinate within range, with correcting y at the same time */
+			while (x<0) {
+				x+=cave->w;	/* out of bounds on the left... */
+				y--;		/* previous row */
+			}
+			while (x>=cave->w) {
+				x-=cave->w;
+				y++;
+			}
+			/* lineshifting does not fix the y coordinates. if out of bounds, element will not be displayed. */
+			/* if such an object appeared in the c64 game, well, it was a buffer overrun. */
+		} else {
+			/* non lineshifting: changing x does not change y coordinate. */
+			while (x<0)
+				x+=cave->w;
+			while (x>=cave->w)
+				x-=cave->w;
+			/* after that, fix y coordinate */
+			while (y<0)
+				y+=cave->h;
+			while (y>=cave->h)
+				y-=cave->h;
+		}
+	}
+	
+	/* if the above wraparound code fixed the coordinates, this will always be true. (except for the element!=O_NONE) */
 	if (x>=0 && x<cave->w && y>=0 && y<cave->h && element!=O_NONE) {
 		cave->map[y][x]=element;
 		cave->objects_order[y][x]=(void *)order;
@@ -1043,7 +1111,7 @@ gd_cave_count_diamonds(Cave *cave)
 
 /* this one only updates the visible area! */
 void
-gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, gboolean paused)
+gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, gboolean paused, gboolean increment_animcycle)
 {
 	static int player_blinking=0;
 	static int player_tapping=0;
@@ -1055,7 +1123,8 @@ gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, 
 	g_assert(cave->map!=NULL);
 	g_assert(gfx_buffer!=NULL);
 
-	animcycle=(animcycle+1) & 7;
+	if (increment_animcycle)
+		animcycle=(animcycle+1) & 7;
 	if (cave->last_direction) {	/* he is moving, so stop blinking and tapping. */
 		player_blinking=0;
 		player_tapping=0;
@@ -1151,7 +1220,7 @@ gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, 
 	speed: the function stores its data here
 */
 gboolean
-gd_cave_scroll(int width, int visible, int center, gboolean exact, int start, int to, int *current, int *desired, int *speed)
+gd_cave_scroll(int width, int visible, int center, gboolean exact, int start, int to, int *current, int *desired, int *speed, int divisor)
 {
 	int i;
 	gboolean changed;
@@ -1187,9 +1256,9 @@ gd_cave_scroll(int width, int visible, int center, gboolean exact, int start, in
 	 * gets faster with distance.
 	 * minimum speed is 1, to allow scrolling precisely to the desired positions (important at borders).
 	 */
-	if (*speed<ABS (*desired-*current)/12+1)
+	if (*speed<ABS(*desired-*current)/divisor+1)
 		(*speed)++;
-	if (*speed>ABS (*desired-*current)/12+1)
+	if (*speed>ABS(*desired-*current)/divisor+1)
 		(*speed)--;
 	if (*current < *desired) {
 		for (i=0; i < *speed; i++)
@@ -1219,3 +1288,4 @@ gd_cave_time_show(Cave *cave, int internal_time)
 {
 	return (internal_time+cave->timing_factor-1)/cave->timing_factor;
 }
+

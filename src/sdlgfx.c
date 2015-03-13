@@ -26,6 +26,8 @@
 #include "c64_font.h"
 #include "gfxutil.h"
 
+#include "c64_png_colors.h"
+
 #define GD_NUM_OF_CHARS 128
 
 /* these can't be larger than 127, or they mess up with utf8 coding */
@@ -628,6 +630,7 @@ gd_scroll(const Cave *cave, gboolean exact_scroll)
 	gboolean out_of_window;
 	int player_x, player_y, visible_x, visible_y;
 	gboolean changed;
+	int scroll_divisor;
 
 	player_x=cave->player_x-cave->x1;	/* cell coordinates of player */
 	player_y=cave->player_y-cave->y1;
@@ -635,9 +638,12 @@ gd_scroll(const Cave *cave, gboolean exact_scroll)
 	visible_y=(cave->y2-cave->y1+1)*cell_size;
 
 	changed=FALSE;
-	if (gd_cave_scroll(visible_x, play_area_w, player_x*cell_size+cell_size/2-play_area_w/2, exact_scroll, play_area_w/4, play_area_w/8, &scroll_x, &scroll_desired_x, &scroll_speed_x))
+	scroll_divisor=12;
+	if (gd_fine_scroll)
+		scroll_divisor*=2;	/* as fine scrolling is 50hz, whereas normal is 25hz only */
+	if (gd_cave_scroll(visible_x, play_area_w, player_x*cell_size+cell_size/2-play_area_w/2, exact_scroll, play_area_w/4, play_area_w/8, &scroll_x, &scroll_desired_x, &scroll_speed_x, scroll_divisor))
 		changed=TRUE;
-	if (gd_cave_scroll(visible_y, play_area_h, player_y*cell_size+cell_size/2-play_area_h/2, exact_scroll, play_area_h/4, play_area_h/8, &scroll_y, &scroll_desired_y, &scroll_speed_y))
+	if (gd_cave_scroll(visible_y, play_area_h, player_y*cell_size+cell_size/2-play_area_h/2, exact_scroll, play_area_h/4, play_area_h/8, &scroll_y, &scroll_desired_y, &scroll_speed_y, scroll_divisor))
 		changed=TRUE;
 	
 	/* if scrolling, we should update entire gd_screen. */
@@ -676,10 +682,11 @@ gd_scroll_to_origin()
 
 
 int
-gd_drawcave(SDL_Surface *dest, const Cave *cave, int **gfx_buffer)
+gd_drawcave(SDL_Surface *dest, const Cave *cave, int **gfx_buffer, gboolean only_scroll)
 {
 	int x, y, xd, yd;
 	SDL_Rect cliprect;
+	int scroll_y_aligned;
 
 	/* do the scrolling. scroll exactly, if player is not yet alive */
 	gd_gameplay.out_of_window=gd_scroll(cave, cave->player_state==GD_PL_NOT_YET);
@@ -691,15 +698,20 @@ gd_drawcave(SDL_Surface *dest, const Cave *cave, int **gfx_buffer)
 	cliprect.h=play_area_h;
 	SDL_SetClipRect(dest, &cliprect);
 
-	gd_drawcave_game(cave, gfx_buffer, gd_gameplay.bonus_life_flash!=0, FALSE);
-
+	/* for the paused parameter, we set FALSE here, as the sdl version does not color the playfield when paused */
+	gd_drawcave_game(cave, gfx_buffer, gd_gameplay.bonus_life_flash!=0, FALSE, !only_scroll);
+	if (gd_sdl_pal_emulation && gd_even_line_pal_emu_vertical_scroll)
+		/* make it even (dividable by two) */
+		scroll_y_aligned=scroll_y/2*2;
+	else
+		scroll_y_aligned=scroll_y;
 	/* here we draw all cells to be redrawn. we do not take scrolling area into consideration - sdl will do the clipping. */
 	for (y=cave->y1, yd=0; y<=cave->y2; y++, yd++) {
 		for (x=cave->x1, xd=0; x<=cave->x2; x++, xd++) {
 			if (gd_gameplay.gfx_buffer[y][x] & GD_REDRAW) {	/* if it needs to be redrawn */
 				SDL_Rect offset;
 
-				offset.y=y*cell_size+statusbar_height-scroll_y;	/* sdl_blitsurface changes offset, so we have to set y here, too. */
+				offset.y=y*cell_size+statusbar_height-scroll_y_aligned;	/* sdl_blitsurface changes offset, so we have to set y here, too. */
 				offset.x=x*cell_size-scroll_x;
 
 				gd_gameplay.gfx_buffer[y][x]=gd_gameplay.gfx_buffer[y][x] & ~GD_REDRAW;	/* now we have drawn it */
@@ -815,25 +827,6 @@ loadcells_c64(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColo
 guchar *
 c64_gfx_data_from_pixbuf(SDL_Surface *image)
 {
-	int cols[]={
-	/* abgr */
-	/* 0000 */ 0,	/* transparent */
-	/* 0001 */ 0,
-	/* 0010 */ 0,
-	/* 0011 */ 0,
-	/* 0100 */ 0,
-	/* 0101 */ 0,
-	/* 0110 */ 0,
-	/* 0111 */ 0,
-	/* 1000 */ 1, /* black - background */
-	/* 1001 */ 2, /* red - foreg1 */
-	/* 1010 */ 5, /* green - amoeba */
-	/* 1011 */ 4, /* yellow - foreg3 */
-	/* 1100 */ 6, /* blue - slime */
-	/* 1101 */ 3, /* purple - foreg2 */
-	/* 1110 */ 7, /* black around arrows (used in editor) is coded as cyan */
-	/* 1111 */ 8, /* white is the arrow */
-	};
 	int x, y;
 	guint8 *data;
 	int out;
@@ -849,15 +842,14 @@ c64_gfx_data_from_pixbuf(SDL_Surface *image)
 		guint32 *p=(guint32 *)((char *)image->pixels+y*image->pitch);
 
 		for (x=0; x<image->w; x++) {
-			int r, g, b, a, c;
+			int r, g, b, a;
 
 			r=(p[x]&image->format->Rmask) >> image->format->Rshift << image->format->Rloss;
 			g=(p[x]&image->format->Gmask) >> image->format->Gshift << image->format->Gloss;
 			b=(p[x]&image->format->Bmask) >> image->format->Bshift << image->format->Bloss;
 			a=(p[x]&image->format->Amask) >> image->format->Ashift << image->format->Aloss;
 			
-			c=(a>>7)*8 + (b>>7)*4 + (g>>7)*2 + (r>>7)*1; /* lower 4 bits will be rgba */
-			data[out++]=cols[c];
+			data[out++]=c64_png_colors(r, g, b, a);
 		}
 	}
 	SDL_UnlockSurface(image);

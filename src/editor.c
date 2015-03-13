@@ -591,8 +591,8 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 			continue;
 		}
 
-		/* dynamic string: has its own notebook tab */		
-		if (prop_desc[i].type==GD_TYPE_DYNSTRING) {
+		/* long string: has its own notebook tab */		
+		if (prop_desc[i].type==GD_TYPE_LONGSTRING) {
 			GtkWidget *view;
 			GtkWidget *scroll;
 			
@@ -600,8 +600,8 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 			view=gtk_text_view_new_with_buffer(textbuffer);
 			gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(view), GTK_WRAP_WORD);
 			
-			if (G_STRUCT_MEMBER(gchar *, str, prop_desc[i].offset)!=NULL)
-				gtk_text_buffer_insert_at_cursor(textbuffer, G_STRUCT_MEMBER(gchar *, str, prop_desc[i].offset), -1);
+			if (G_STRUCT_MEMBER(GString *, str, prop_desc[i].offset)->len!=0)
+				gtk_text_buffer_insert_at_cursor(textbuffer, G_STRUCT_MEMBER(GString *, str, prop_desc[i].offset)->str, -1);
 
 			scroll=gtk_scrolled_window_new(NULL, NULL);
 			gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -648,7 +648,7 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 			switch (prop_desc[i].type) {
 			case GD_TAB:
 			case GD_LABEL:
-			case GD_TYPE_DYNSTRING:
+			case GD_TYPE_LONGSTRING:
 				/* handled above */
 				g_assert_not_reached();
 				break;
@@ -695,13 +695,13 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 				value=((GdColor *) value) + j;
 				defpoint=((GdColor *) defpoint) + j;
 				widget=gd_color_combo_new(*(GdColor *) value);
-				defval=g_strdup_printf("%s", _(gd_color_get_string(*(GdColor *) defpoint)));
+				defval=g_strdup_printf("%s", _(gd_color_get_visible_name(*(GdColor *) defpoint)));
 				break;
 			case GD_TYPE_DIRECTION:
 				value=((GdDirection *) value)+j;
 				defpoint=((GdDirection *) defpoint) + j;
 				widget=gd_direction_combo_new(*(GdDirection *) value);
-				defval=g_strdup_printf("%s", _(gd_direction_name[*(GdDirection *)defpoint]));
+				defval=g_strdup_printf("%s", _(gd_direction_get_visible_name(*(GdDirection *)defpoint)));
 				break;
 			case GD_TYPE_SCHEDULING:
 				value=((GdScheduling *) value)+j;
@@ -784,6 +784,7 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 			gpointer value=g_object_get_data(G_OBJECT(iter->data), GDASH_VALUE);
 			GtkTextIter iter_start, iter_end;
 			GtkTextBuffer *buffer;
+			char *text;
 
 			switch (GPOINTER_TO_INT (g_object_get_data (iter->data, GDASH_TYPE))) {
 			case -1:	/* from hash table */
@@ -794,13 +795,14 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 				else
 					g_hash_table_remove(other_tags, value);
 				break;
-			case GD_TYPE_DYNSTRING:
-				g_free(*(gpointer *)value);
+			case GD_TYPE_LONGSTRING:
 				/* the text_buffer_get_text needs a start and end iterator */
 				buffer=gtk_text_view_get_buffer(GTK_TEXT_VIEW(iter->data));
 				gtk_text_buffer_get_iter_at_offset(buffer, &iter_start, 0);
 				gtk_text_buffer_get_iter_at_offset(buffer, &iter_end, -1);
-				*(gpointer *)value=gtk_text_buffer_get_text(buffer, &iter_start, &iter_end, TRUE);
+				text=gtk_text_buffer_get_text(buffer, &iter_start, &iter_end, TRUE);
+				g_string_assign(*(GString **)value, text);
+				g_free(text);
 				break;
 			case GD_TYPE_BOOLEAN:
 				*(gboolean *) value=gtk_toggle_button_get_active(iter->data);
@@ -3790,23 +3792,78 @@ new_cave_cb (GtkWidget *widget, gpointer data)
 	Cave *newcave;
 	GDate *dat;
 	GdString dats;
+	GtkWidget *dialog, *entry_name, *entry_desc, *intermission_check, *table;
 
-	/* new cave */	
-	newcave=gd_cave_new();
+
+
+	dialog=gtk_dialog_new_with_buttons(_("Create New Cave"), GTK_WINDOW(editor_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_NEW, GTK_RESPONSE_ACCEPT, NULL);
+	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
+	gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
+
+	table=gtk_table_new(0, 0, FALSE);
+	gtk_box_pack_start(GTK_BOX (GTK_DIALOG (dialog)->vbox), table, FALSE, FALSE, 0);
+	gtk_container_set_border_width(GTK_CONTAINER (table), 6);
+	gtk_table_set_row_spacings(GTK_TABLE(table), 6);
+	gtk_table_set_col_spacings(GTK_TABLE(table), 6);
+
+	/* some properties - name */
+	gtk_table_attach_defaults (GTK_TABLE(table), gd_label_new_printf (_("Name:")), 0, 1, 0, 1);
+	entry_name=gtk_entry_new();
+	/* little inconsistency below: max length has unicode characters, while gdstring will have utf-8.
+	   however this does not make too much difference */
+	gtk_entry_set_max_length(GTK_ENTRY(entry_name), sizeof(GdString));
+	gtk_entry_set_activates_default(GTK_ENTRY(entry_name), TRUE);
+	gtk_entry_set_text(GTK_ENTRY(entry_name), _("New cave"));
+	gtk_table_attach_defaults (GTK_TABLE(table), entry_name, 1, 2, 0, 1);
 	
-	/* set some defaults */
-	gd_cave_set_random_colors(newcave);
-	gd_strcpy(newcave->name, _("New cave"));
-	gd_strcpy(newcave->author, g_get_real_name());
-	dat=g_date_new();
-	g_date_set_time_t(dat, time(NULL));
-	g_date_strftime(dats, sizeof(dats), "%Y-%m-%d", dat);
-	g_date_free(dat);
-	gd_strcpy(newcave->date, dats);
+	/* description */
+	gtk_table_attach_defaults (GTK_TABLE(table), gd_label_new_printf (_("Description:")), 0, 1, 1, 2);
+	entry_desc=gtk_entry_new();
+	/* little inconsistency below: max length has unicode characters, while gdstring will have utf-8.
+	   however this does not make too much difference */
+	gtk_entry_set_max_length(GTK_ENTRY(entry_desc), sizeof(GdString));
+	gtk_entry_set_activates_default(GTK_ENTRY(entry_desc), TRUE);
+	gtk_table_attach_defaults (GTK_TABLE(table), entry_desc, 1, 2, 1, 2);
 
-	select_cave_for_edit(newcave);		/* close caveset icon view, and show cave */
-	gd_caveset=g_list_append(gd_caveset, newcave);	/* append here, as the icon view may only be destroyed now by select_cave_for_edit */
-	gd_caveset_edited=TRUE;
+	/* intermission */
+	gtk_table_attach_defaults (GTK_TABLE(table), gd_label_new_printf (_("Intermission:")), 0, 1, 2, 3);
+	intermission_check=gtk_check_button_new();
+	gtk_widget_set_tooltip_text(intermission_check, _("Intermission caves are usually small and fast caves, which are not required to be solved. The player will not lose a life if he is not successful. The game always proceeds to the next cave. If you set this check box, the size of the cave will also be set to 20x12, as that is the standard size for intermissions."));
+	gtk_table_attach_defaults (GTK_TABLE(table), intermission_check, 1, 2, 2, 3);
+
+	gtk_widget_show_all(dialog);
+	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
+		/* new cave */	
+		newcave=gd_cave_new();
+		
+		/* set some defaults */
+		gd_cave_set_random_colors(newcave);
+		gd_strcpy(newcave->name, gtk_entry_get_text(GTK_ENTRY(entry_name)));
+		gd_strcpy(newcave->description, gtk_entry_get_text(GTK_ENTRY(entry_desc)));
+		gd_strcpy(newcave->author, g_get_real_name());
+		newcave->intermission=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(intermission_check));
+		if (newcave->intermission) {
+			newcave->w=20;
+			newcave->h=12;
+			newcave->x2=19;
+			newcave->y2=11;
+		}
+		dat=g_date_new();
+		g_date_set_time_t(dat, time(NULL));
+		g_date_strftime(dats, sizeof(dats), "%Y-%m-%d", dat);
+		g_date_free(dat);
+		gd_strcpy(newcave->date, dats);
+		newcave->level_speed[0]=180;
+		newcave->level_speed[1]=160;
+		newcave->level_speed[2]=140;
+		newcave->level_speed[3]=120;
+		newcave->level_speed[4]=120;
+
+		select_cave_for_edit(newcave);		/* close caveset icon view, and show cave */
+		gd_caveset=g_list_append(gd_caveset, newcave);	/* append here, as the icon view may only be destroyed now by select_cave_for_edit */
+		gd_caveset_edited=TRUE;
+	}
+	gtk_widget_destroy(dialog);
 }
 
 
@@ -4240,7 +4297,7 @@ gd_open_cave_editor()
 		{"Test", GTK_STOCK_MEDIA_PLAY, N_("_Test"), "<control>T", N_("Test cave"), G_CALLBACK(play_level_cb)},
 		{"CaveProperties", GTK_STOCK_PROPERTIES, N_("Ca_ve properties"), NULL, N_("Cave settings"), G_CALLBACK(cave_properties_cb)},
 		{"EngineDefaults", NULL, N_("Set engine defaults")},
-		{"CaveColors", GTK_STOCK_SELECT_COLOR, NULL, NULL, N_("Select cave colors"), G_CALLBACK(cave_colors_cb)},
+		{"CaveColors", GTK_STOCK_SELECT_COLOR, N_("Cave co_lors"), NULL, N_("Select cave colors"), G_CALLBACK(cave_colors_cb)},
 		{"RemoveObjects", GTK_STOCK_CLEAR, N_("Remove objects"), NULL, N_("Clear cave objects"), G_CALLBACK(clear_cave_elements_cb)},
 		{"FlattenCave", NULL, N_("Convert to map"), NULL, N_("Flatten cave to a single cave map without objects"), G_CALLBACK(flatten_cave_cb)},
 		{"Overview", GTK_STOCK_ZOOM_FIT, N_("O_verview"), NULL, N_("Full screen overview of cave"), G_CALLBACK(cave_overview_cb)},

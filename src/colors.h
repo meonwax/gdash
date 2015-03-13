@@ -45,6 +45,7 @@ GdColor gd_color_get_from_rgb(int r, int g, int b);
 GdColor gd_c64_color(int index);
 GdColor gd_atari_color(int index);
 gboolean gd_color_is_c64(GdColor color);
+gboolean gd_color_is_atari(GdColor color);
 int gd_color_get_c64_index(GdColor color);
 int gd_color_get_c64_index_try(GdColor color);
 

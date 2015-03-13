@@ -8,6 +8,11 @@ Version=0.5
 Name=Engine tests
 Description=Caves which test some element
 Lives=4 9
+Notes=caveset
+Notes=  data
+Notes=bla
+Notes=bla.
+Notes=
 Levels=5
 
 [cave]
@@ -626,43 +631,6 @@ SlimePermeabilityC64=0 0 0 0 0
 
 [objects]
 Point=4 3 INBOX
-[/objects]
-[/cave]
-
-[cave]
-Name=Új pálya
-Author=Czirkos Zoltan
-Date=2008-10-18
-Intermission=false
-Size=40 22 0 0 39 21
-Colors=Black Black Orange Cyan White White Orange
-DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
-CaveTime=999 999 999 999 999
-CaveScheduling=ms
-CaveDelay=0 0 0 0 0
-FrameTime=200 200 200 200 200
-SlimePermeabilityC64=0 0 0 0 0
-
-[objects]
-RandomFill=1 1 5 5 0 0 0 0 0 SPACE DIRT 32
-RandomFillC64=7 1 11 5 0 0 0 0 0 SPACE DIRT 32
-RandomFill=13 1 17 5 0 0 0 0 0 SPACE DIRT 32
-RandomFillC64=19 1 23 5 0 0 0 0 0 SPACE DIRT 32
-RandomFill=25 1 29 5 0 0 0 0 0 SPACE DIRT 32
-RandomFillC64=31 1 35 5 0 0 0 0 0 SPACE DIRT 32
-RandomFill=1 7 5 11 0 0 0 0 0 SPACE DIRT 32
-RandomFillC64=7 7 11 11 0 0 0 0 0 SPACE DIRT 32
-RandomFill=13 7 17 11 0 0 0 0 0 SPACE DIRT 32
-RandomFillC64=19 7 23 11 0 0 0 0 0 SPACE DIRT 32
-RandomFill=25 7 29 11 0 0 0 0 0 SPACE DIRT 32
-RandomFillC64=31 7 35 11 0 0 0 0 0 SPACE DIRT 32
-RandomFill=1 13 5 17 0 0 0 0 0 SPACE DIRT 32
-RandomFillC64=7 13 11 17 0 0 0 0 0 SPACE DIRT 32
-RandomFill=13 13 17 17 0 0 0 0 0 SPACE DIRT 32
-RandomFillC64=19 13 23 17 0 0 0 0 0 SPACE DIRT 32
-RandomFill=25 13 29 17 0 0 0 0 0 SPACE DIRT 32
-RandomFillC64=31 13 35 17 0 0 0 0 0 SPACE DIRT 32
 [/objects]
 [/cave]
 [/game]

@@ -35,7 +35,7 @@ extern SDL_Joystick *gd_joy;
 
 extern gboolean gd_quit;
 
-int gd_drawcave(SDL_Surface *dest, const Cave *cave, int **gfx_buffer);
+int gd_drawcave(SDL_Surface *dest, const Cave *cave, int **gfx_buffer, gboolean only_scroll);
 gboolean gd_sdl_init(GdScalingType scaling_type);
 gboolean gd_scroll(const Cave *cave, gboolean exact_scroll);
 void gd_scroll_to_origin();

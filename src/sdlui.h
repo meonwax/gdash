@@ -29,11 +29,10 @@ char *gd_input_string(const char *title, const char *current);
 void gd_about();
 void gd_show_license();
 
-void gd_title_line(const char *text);
+void gd_title_line(const char *format, ...);
 void gd_status_line(const char *text);
 
 void gd_install_theme();
 
 #endif
-
 

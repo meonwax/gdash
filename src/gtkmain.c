@@ -140,7 +140,6 @@ gd_main_window_set_title()
 static void
 game_over_highscore()
 {
-	GdHighScore hs;
 	char *text;
 	int rank;
 
@@ -149,10 +148,7 @@ game_over_highscore()
 	g_free(text);
 
 	/* enter to highscore table */
-	gd_strcpy(hs.name, gd_gameplay.player_name);
-	hs.score=gd_gameplay.player_score;
-
-	rank=gd_add_highscore(gd_caveset_data->highscore, hs);
+	rank=gd_add_highscore(gd_caveset_data->highscore, gd_gameplay.player_name, gd_gameplay.player_score);
 	gd_show_highscore(main_window.window, NULL, FALSE, NULL, rank);
 }
 
@@ -474,7 +470,7 @@ showheader()
 								cave->expanding_wall_changed?"vertical":"horizontal",
 								gd_cave_time_show(cave, cave->creatures_direction_will_change),
 								cave->creatures_backwards?"backwards":"forwards",
-								gd_direction_name[cave->gravity_disabled?MV_STILL:cave->gravity],
+								gd_direction_get_visible_name(cave->gravity_disabled?MV_STILL:cave->gravity),
 								cave->kill_player?"yes":"no",
 								cave->sweet_eaten?"yes":"no",
 								cave->diamond_key_collected?"yes":"no"
@@ -630,6 +626,7 @@ scroll(const Cave *cave, gboolean exact_scroll)
 	GtkAdjustment *adjustment;
 	int scroll_center_x, scroll_center_y;
 	gboolean out_of_window=FALSE;
+	gboolean changed;
 	int i;
 	int player_x, player_y;
 
@@ -677,18 +674,21 @@ scroll(const Cave *cave, gboolean exact_scroll)
 		scroll_speed_x++;
 	if (scroll_speed_x>ABS(scroll_desired_x-adjustment->value)/12+1)
 		scroll_speed_x--;
+	changed=FALSE;
 	if (adjustment->value<scroll_desired_x) {
 		for (i=0; i<scroll_speed_x; i++)
 			if ((int)adjustment->value<scroll_desired_x)
 				adjustment->value++;
-		gtk_adjustment_value_changed (adjustment);
+		changed=TRUE;
 	}
 	if (adjustment->value > scroll_desired_x) {
 		for (i=0; i < scroll_speed_x; i++)
 			if ((int)adjustment->value>scroll_desired_x)
 				adjustment->value--;
-		gtk_adjustment_value_changed (adjustment);
+		changed=TRUE;
 	}
+	if (changed)
+		gtk_adjustment_value_changed (adjustment);
 
 	/* VERTICAL */
 	adjustment=gtk_scrolled_window_get_vadjustment (GTK_SCROLLED_WINDOW (main_window.scroll_window));
@@ -711,18 +711,21 @@ scroll(const Cave *cave, gboolean exact_scroll)
 		scroll_speed_y++;
 	if (scroll_speed_y>ABS(scroll_desired_y-adjustment->value)/12+1)
 		scroll_speed_y--;
+	changed=FALSE;
 	if (adjustment->value < scroll_desired_y) {
 		for (i=0; i < scroll_speed_y; i++)
 			if ((int)adjustment->value < scroll_desired_y)
 				adjustment->value++;
-		gtk_adjustment_value_changed (adjustment);
+		changed=TRUE;
 	}
 	if (adjustment->value > scroll_desired_y) {
 		for (i=0; i < scroll_speed_y; i++)
 			if ((int)adjustment->value > scroll_desired_y)
 				adjustment->value--;
-		gtk_adjustment_value_changed (adjustment);
+		changed=TRUE;
 	}
+	if (changed)
+		gtk_adjustment_value_changed (adjustment);
 
 	return out_of_window;
 }
@@ -738,7 +741,7 @@ drawcave (Cave *cave)
 	g_return_if_fail(gd_gameplay.cave!=NULL);
 	g_return_if_fail(gd_gameplay.gfx_buffer!=NULL);
 
-	gd_drawcave_game(gd_gameplay.cave, gd_gameplay.gfx_buffer, gd_gameplay.bonus_life_flash!=0, paused);
+	gd_drawcave_game(gd_gameplay.cave, gd_gameplay.gfx_buffer, gd_gameplay.bonus_life_flash!=0, paused, TRUE);
 
 	for (y=cave->y1, yd=0; y <= cave->y2; y++, yd++) {
 		for (x=cave->x1, xd=0; x <= cave->x2; x++, xd++) {
@@ -1099,7 +1102,7 @@ recent_chooser_activated_cb(GtkRecentChooser *chooser, gpointer data)
 		char *display_name;
 
 		display_name=gtk_recent_info_get_uri_display(current);
-		gd_errormessage(_("Cannot load non-local file."), display_name);
+		gd_errormessage(_("Cannot load file from network link."), display_name);
 		g_free(display_name);
 		return;
 	}

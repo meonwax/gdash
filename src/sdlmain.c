@@ -338,74 +338,82 @@ play_game(int start_cave, int start_level)
 			}
 			
 			/* CAVE DRAWING, BONUS POINTS, ... ********************************************************************* */
-			/* drawing at 25fps, 1000ms/25fps=40ms */
-			if (SDL_GetTicks()>=last_draw+40) {
+			/* drawing/scrolling at 50fps, 1000ms/50fps=20ms */
+			if (SDL_GetTicks()>=last_draw+20) {
+				static gboolean toggle;
 				GdGameState state;
 				
-				state=gd_game_main_int();
-				switch(state) {
-					case GD_GAME_NOTHING:						/* nothing to do */
-						break;
-					case GD_GAME_BONUS_SCORE:
-						break;
-					case GD_GAME_COVER_START:
-						break;
-					case GD_GAME_STOP:
-						/* game finished, add highscore */
-						exit_game=TRUE;
-						caveloop=FALSE;
-						break;
-					case GD_GAME_START_ITERATE:
-						iterate=TRUE;	/* start cave movements */
-						last_iterate=SDL_GetTicks();	/* remember moment we started the cave */
-						break;
-					case GD_GAME_NEXT_LEVEL:
-						caveloop=FALSE;
-						break;
-					case GD_GAME_GAME_OVER:
-						show_highscore=TRUE;
-						caveloop=FALSE;
-						break;
+				toggle=!toggle;
+				
+				if (toggle) {
+					state=gd_game_main_int();
+					switch(state) {
+						case GD_GAME_NOTHING:						/* nothing to do */
+							break;
+						case GD_GAME_BONUS_SCORE:
+							break;
+						case GD_GAME_COVER_START:
+							break;
+						case GD_GAME_STOP:
+							/* game finished, add highscore */
+							exit_game=TRUE;
+							caveloop=FALSE;
+							break;
+						case GD_GAME_START_ITERATE:
+							iterate=TRUE;	/* start cave movements */
+							last_iterate=SDL_GetTicks();	/* remember moment we started the cave */
+							break;
+						case GD_GAME_NEXT_LEVEL:
+							caveloop=FALSE;
+							break;
+						case GD_GAME_GAME_OVER:
+							show_highscore=TRUE;
+							caveloop=FALSE;
+							break;
+					}
+
+					/* draw status bar */
+					if (gd_gameplay.player_lives==0)
+						showheader_gameover();
+					else
+					switch(gd_gameplay.cave->player_state) {
+						case GD_PL_TIMEOUT:
+							if ((SDL_GetTicks()-outoftime_since)/1000%4==0)
+								showheader_timeout();
+							else
+								showheader_game();
+							break;
+						case GD_PL_LIVING:
+						case GD_PL_DIED:
+							if (paused && (SDL_GetTicks()-paused_since)/1000%4==0)
+								showheader_pause();
+							else
+								showheader_game();
+							break;
+							
+						case GD_PL_NOT_YET:
+							if (paused && (SDL_GetTicks()-paused_since)/1000%4==0)
+								showheader_pause();
+							else
+								showheader_uncover();
+							break;
+							
+						case GD_PL_EXITED:
+							showheader_game();
+							break;
+					}
 				}
 
 				/* draw cave to gd_screen */
-				gd_drawcave(gd_screen, gd_gameplay.cave, gd_gameplay.gfx_buffer);
-
-				/* draw status bar */
-				if (gd_gameplay.player_lives==0)
-					showheader_gameover();
-				else
-				switch(gd_gameplay.cave->player_state) {
-					case GD_PL_TIMEOUT:
-						if ((SDL_GetTicks()-outoftime_since)/1000%4==0)
-							showheader_timeout();
-						else
-							showheader_game();
-						break;
-					case GD_PL_LIVING:
-					case GD_PL_DIED:
-						if (paused && (SDL_GetTicks()-paused_since)/1000%4==0)
-							showheader_pause();
-						else
-							showheader_game();
-						break;
-						
-					case GD_PL_NOT_YET:
-						if (paused && (SDL_GetTicks()-paused_since)/1000%4==0)
-							showheader_pause();
-						else
-							showheader_uncover();
-						break;
-						
-					case GD_PL_EXITED:
-						showheader_game();
-						break;
-				}
+				/* if fine scrolling, always call this; as it scrolls, too */
+				/* if no fine scrolling, call this for every 2*20ms=40ms */
+				if (gd_fine_scroll || toggle)
+					gd_drawcave(gd_screen, gd_gameplay.cave, gd_gameplay.gfx_buffer, !toggle);
 				
-				/* add n*40ms to the last_draw, until we see that no drawing needs to be done. */
+				/* add n*20ms to the last_draw, until we see that no drawing needs to be done. */
 				/* this is to handle the timer such a way that we do not try to "catch up" our lost "interrupts". */
-				while (SDL_GetTicks()>=last_draw+40)
-					last_draw+=40;
+				while (SDL_GetTicks()>=last_draw+20)
+					last_draw+=20;
 			}
 
 			SDL_Flip(gd_screen);
@@ -417,14 +425,10 @@ play_game(int start_cave, int start_level)
 
 	/* (if stopped because of a quit event, do not bother highscore at all) */
 	if (!gd_quit && show_highscore && gd_is_highscore(gd_caveset_data->highscore, gd_gameplay.player_score)) {
-		GdHighScore hs;
 		int rank;
 
 		/* enter to highscore table */
-		gd_strcpy(hs.name, gd_gameplay.player_name);
-		hs.score=gd_gameplay.player_score;
-		
-		rank=gd_add_highscore(gd_caveset_data->highscore, hs);
+		rank=gd_add_highscore(gd_caveset_data->highscore, gd_gameplay.player_name, gd_gameplay.player_score);
 		gd_show_highscore(NULL, rank);
 	}
 	else {
@@ -687,7 +691,7 @@ int main(int argc, char *argv[])
 	State s;
 	GOptionContext *context;
 	GError *error=NULL;
-
+	
 	/* command line parsing */
 	context=gd_option_context_new();
 	g_option_context_parse (context, &argc, &argv, &error);

@@ -56,7 +56,6 @@ color_combo_select_custom(GtkComboBox *combo, GdColor color)
 	GtkTreeModel *model=gtk_combo_box_get_model(GTK_COMBO_BOX(combo));
 	GtkTreePath *path;
 	GtkTreeIter iter;
-	char text[16];
 	GdkPixbuf *pixbuf;
 	
 	path=gtk_tree_path_new_from_indices(16, -1);
@@ -64,9 +63,8 @@ color_combo_select_custom(GtkComboBox *combo, GdColor color)
 
 	g_object_set_data(G_OBJECT(combo), GDASH_COLOR, GUINT_TO_POINTER(color));
 
-	sprintf(text, "#%02x%02x%02x", gd_color_get_r(color), gd_color_get_g(color), gd_color_get_b(color));
 	pixbuf=color_pixbuf(color);
-	gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 2, pixbuf, 1, text, -1);
+	gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 2, pixbuf, 1, gd_color_get_visible_name(color), -1);
 	g_object_unref(pixbuf);
 
 	gtk_tree_path_free(path);
@@ -182,7 +180,7 @@ gd_color_combo_new (const GdColor color)
     }
     gtk_tree_store_append (store, &iter, NULL);	/* will be the separator */
     gtk_tree_store_append (store, &iter, NULL);
-    gtk_tree_store_set (store, &iter, 0, 0, 1, "Other", 2, NULL, -1);
+    gtk_tree_store_set (store, &iter, 0, 0, 1, _("Other"), 2, NULL, -1);
 
 	combo = gtk_combo_box_new_with_model (GTK_TREE_MODEL (store));
     gtk_combo_box_set_row_separator_func (GTK_COMBO_BOX (combo), color_button_is_separator, NULL, NULL);

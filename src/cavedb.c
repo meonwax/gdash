@@ -284,11 +284,11 @@ gd_cave_properties[] = {
 	{"Remark", GD_TYPE_STRING, 0, N_("Remark"), G_STRUCT_OFFSET(Cave, remark), 1, N_("Remark (informative)")},
 
 	{"Selectable", GD_TYPE_BOOLEAN, 0, N_("Selectable as start"), G_STRUCT_OFFSET(Cave, selectable), 1, N_("This sets whether the game can be started at this cave.")},
-	{"Intermission", GD_TYPE_BOOLEAN, GD_ALWAYS_SAVE, N_("Intermission"), G_STRUCT_OFFSET(Cave, intermission), 1, NULL},
+	{"Intermission", GD_TYPE_BOOLEAN, GD_ALWAYS_SAVE, N_("Intermission"), G_STRUCT_OFFSET(Cave, intermission), 1, N_("Intermission caves are usually small and fast caves, which are not required to be solved. The player will not lose a life if he is not successful. The game always proceeds to the next cave.")},
 	{"IntermissionProperties.instantlife", GD_TYPE_BOOLEAN, 0, N_("   Instant life"), G_STRUCT_OFFSET(Cave, intermission_instantlife), 1, N_("If true, an extra life is given to the player, when the intermission cave is reached.")},
 	{"IntermissionProperties.rewardlife", GD_TYPE_BOOLEAN, 0, N_("   Reward life"), G_STRUCT_OFFSET(Cave, intermission_rewardlife), 1, N_("If true, an extra life is given to the player, when the intermission cave is successfully finished.")},
-	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Width"), G_STRUCT_OFFSET(Cave, w), 1, N_("Width and height of cave."), 12, 128},
-	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Height"), G_STRUCT_OFFSET(Cave, h), 1, N_("Width and height of cave."), 12, 128},
+	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Width"), G_STRUCT_OFFSET(Cave, w), 1, N_("Width of cave. The standard size for a cave is 40x22, and 20x12 for an intermission."), 12, 128},
+	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Height"), G_STRUCT_OFFSET(Cave, h), 1, N_("Height of cave. The standard size for a cave is 40x22, and 20x12 for an intermission."), 12, 128},
 	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, left"), G_STRUCT_OFFSET(Cave, x1), 1, N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
 	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, upper"), G_STRUCT_OFFSET(Cave, y1), 1, N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
 	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, right"), G_STRUCT_OFFSET(Cave, x2), 1, N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
@@ -304,7 +304,7 @@ gd_cave_properties[] = {
 	{"Fontset", GD_TYPE_STRING, 0, N_("Font set"), G_STRUCT_OFFSET(Cave, fontset), 1, N_("Font used during the game. Not used by GDash.")},
 
 	/* notes - a tab on its own */
-	{"Notes", GD_TYPE_DYNSTRING, 0, N_("Notes"), G_STRUCT_OFFSET(Cave, notes), 1, N_("Long description of the cave.")},
+	{"Notes", GD_TYPE_LONGSTRING, 0, N_("Notes"), G_STRUCT_OFFSET(Cave, notes), 1, N_("Long description of the cave.")},
 
 	/* difficulty */
 	{"", GD_TAB, 0, N_("Difficulty")},
@@ -456,7 +456,8 @@ gd_cave_properties[] = {
 	{"DIRTLOOKSLIKEeffect", GD_TYPE_EFFECT, 0, N_("Dirt looks like"), CAVE_OFFSET(dirt_looks_like), 1, NULL},
 	/* gravity */
 	{"", GD_LABEL, 0, N_("Gravitation effects")},
-	{"Gravitation", GD_TYPE_DIRECTION, 0, N_("Gravitation"), CAVE_OFFSET(gravity), 1, N_("The direction where stones and diamonds fall.")},
+	{"Gravitation", GD_TYPE_DIRECTION, 0, N_("Direction"), CAVE_OFFSET(gravity), 1, N_("The direction where stones and diamonds fall.")},
+	{"GravitationSwitchActive", GD_TYPE_BOOLEAN, 0, N_("Switch active at start"), CAVE_OFFSET(gravity_switch_active), 1, N_("If set to true, the gravitation switch will be already activated, when the cave is started, as if a pot has already been collected.")},
 	{"SkeletonsForPot", GD_TYPE_INT, 0, N_("Skeletons needed for pot"), CAVE_OFFSET(skeletons_needed_for_pot), 1, N_("The number of skeletons to be collected to be able to use a pot."), 0, 50},
 	{"GravitationChangeDelay", GD_TYPE_INT, 0, N_("Gravitation switch delay"), CAVE_OFFSET(gravity_change_time), 1, N_("The gravitation changes after a while using the gravitation switch. This option sets the number of seconds to wait."), 1, 60},
 
@@ -478,12 +479,15 @@ gd_cave_properties[] = {
 	{"PneumaticHammer.sound", GD_TYPE_BOOLEAN, 0, N_("Pneumatic hammer"), CAVE_OFFSET(pneumatic_hammer_sound), 1, N_("If true, using the pneumatic hammer will have sound.")},
 	{"BladderSpender.sound", GD_TYPE_BOOLEAN, 0, N_("Bladder spender"), CAVE_OFFSET(bladder_spender_sound), 1, N_("If true, the bladder spender will make sound, when the bladder appears.")},
 	{"BladderConvert.sound", GD_TYPE_BOOLEAN, 0, N_("Bladder convert"), CAVE_OFFSET(bladder_convert_sound), 1, N_("If true, the bladder converting to a clock will make sound.")},
+	{"", GD_LABEL, 0, N_("Event sounds")},
+	{"GravityChange.sound", GD_TYPE_BOOLEAN, 0, N_("Gravity change"), CAVE_OFFSET(gravity_change_sound), 1, N_("If true, the gravity changing will make sound.")},
 
 
 	/* COMPATIBILITY */
 	{"", GD_TAB, 0, N_("Compatibility")},
 	{"", GD_LABEL, 0, N_("Compatibility")},
 	{"BorderProperties.lineshift", GD_TYPE_BOOLEAN, 0, N_("Line shifting border"), CAVE_OFFSET(lineshift), 1, N_("If this is set to true, the player exiting on either side will appear one row lower or upper on the other side.")},
+	{"BorderProperties.objectwraparound", GD_TYPE_BOOLEAN, 0, N_("Objects wrap around"), CAVE_OFFSET(wraparound_objects), 1, N_("If true, object will wrap around the cave borders as well, ie. if you drag a line to the left, part of it will appear on the right hand side of the cave. The drawing in this case is also affected by the line shifting border property. If that one is enabled, too, crossing the left hand side or right hand side boundary will decrement or increment the row, and crossing the top or the bottom boundary will have no effect at all.")},
 	{"BorderProperties.scan", GD_TYPE_BOOLEAN, 0, N_("Scan first and last row"), CAVE_OFFSET(border_scan_first_and_last), 1, N_("Elements move on first and last row, too.")},
 	{"ShortExplosions", GD_TYPE_BOOLEAN, 0, N_("Short explosions"), CAVE_OFFSET(short_explosions), 1, N_("In 1stB, explosions were longer, took five cave frames to complete, as opposed to four in the original.")},
 	{"SkeletonsWorthDiamonds", GD_TYPE_INT, 0, N_("Skeletons worth diamonds"), CAVE_OFFSET(skeletons_worth_diamonds), 1, N_("The number of diamonds each skeleton is worth."), 0, 10},
@@ -624,6 +628,7 @@ GdPropertyDefault gd_cave_defaults_gdash[] = {
 	{CAVE_OFFSET(pneumatic_hammer_sound), TRUE},
 	{CAVE_OFFSET(bladder_spender_sound), TRUE},
 	{CAVE_OFFSET(bladder_convert_sound), TRUE},
+	{CAVE_OFFSET(gravity_change_sound), TRUE},
 
 	/* creature effects */
 	{CAVE_OFFSET(creatures_backwards), FALSE},
@@ -643,12 +648,14 @@ GdPropertyDefault gd_cave_defaults_gdash[] = {
 	{CAVE_OFFSET(dirt_looks_like), O_DIRT},
 	/* gravity */
 	{CAVE_OFFSET(gravity), MV_DOWN},
+	{CAVE_OFFSET(gravity_switch_active), FALSE},
 	{CAVE_OFFSET(skeletons_needed_for_pot), 5},
 	{CAVE_OFFSET(gravity_change_time), 10},
 
 	/* COMPATIBILITY */
 	{CAVE_OFFSET(border_scan_first_and_last), TRUE},
 	{CAVE_OFFSET(lineshift), FALSE},
+	{CAVE_OFFSET(wraparound_objects), FALSE},
 	{CAVE_OFFSET(short_explosions), TRUE},
 	{CAVE_OFFSET(skeletons_worth_diamonds), 0},
 	{CAVE_OFFSET(gravity_affects_all), TRUE},
@@ -697,9 +704,25 @@ gd_cave_db_init()
 	int i;
 	gboolean cell_used[NUM_OF_CELLS];
 	GHashTable *pointers;
+	gboolean lowercase_names=TRUE;
 	
 	for (i=0; i<NUM_OF_CELLS; i++)
 		cell_used[i]=FALSE;
+		
+	/* TRANSLATORS: some languages (for example, german) do not have lowercase nouns. */
+	/* When gdash generates the list of lowercase element names, this has to be */
+	/* taken into account. Therefore we have a string, which must be changed */
+	/* by the translator to select the behavior. */
+	/* For example, the name of the element is "Brick wall", as in a button, it has to be */
+	/* written with an uppercase initial. But if "Line of brick wall", the B is changed to b. */
+	/* However, this is not allowed in some languages, for example, German. */
+	/* So one writes "Ziegelmauer", and "Linie aus Ziegelmauer", the Z is not changed to z. */
+	/* Set the translated string to "lowercase-element-names-yes", if your language */
+	/* allows writing nouns with lowercase initials. Set it to "lowercase-element-names-no", */
+	/* if not: for example, german. Do not translate the string, but set the behavior! */
+	if (g_str_equal(_("lowercase-element-names-yes"), "lowercase-element-names-no"))
+		lowercase_names=FALSE;
+	
 		
 	/* check element database for faults. */
 	for (i=0; gd_elements[i].element!=-1; i++) {
@@ -708,9 +731,14 @@ gd_cave_db_init()
 		if (gd_elements[i].element!=i)
 			g_critical("element: i:0x%x!=0x%x", i, gd_elements[i].element);
 		/* if it has a name, create a lowercase name (of the translated one). will be used by the editor */
-		if (gd_elements[i].name)
-			/* the function allocates a new string, but it is needed as long as the app is running */
-			gd_elements[i].lowercase_name=g_utf8_strdown(gettext(gd_elements[i].name), -1);
+		if (gd_elements[i].name) {
+			if (lowercase_names)
+				/* the function allocates a new string, but it is needed as long as the app is running */
+				gd_elements[i].lowercase_name=g_utf8_strdown(gettext(gd_elements[i].name), -1);
+			else
+				/* only translate, no lowercase. */
+				gd_elements[i].lowercase_name=gettext(gd_elements[i].name);
+		}
 		
 		/* we do not like generated pixbufs for games. only those that are in the png. */
 		if (ABS(gd_elements[i].image_game)>NUM_OF_CELLS_X*NUM_OF_CELLS_Y)
@@ -776,13 +804,13 @@ gd_cave_db_init()
 				}
 				break;
 
-			case GD_TYPE_DYNSTRING:
+			case GD_TYPE_LONGSTRING:
 				if (gd_cave_properties[i].count!=1) {
-					g_critical ("dynstring arrays have no sense cave properties: %s", gd_cave_properties[i].identifier);
+					g_critical ("longstring arrays have no sense cave properties: %s", gd_cave_properties[i].identifier);
 					g_assert_not_reached();
 				}
 				if (gd_cave_properties[i+1].identifier!=NULL && gd_cave_properties[i+1].type!=GD_TAB) {
-					g_critical ("every dynstring must be followed by a new tab (this is for the editor): %s", gd_cave_properties[i].identifier);
+					g_critical ("every longstring must be followed by a new tab (this is for the editor): %s", gd_cave_properties[i].identifier);
 					g_assert_not_reached();
 				}
 				break;	

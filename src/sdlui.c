@@ -62,9 +62,16 @@ clamp(int val, int min, int max)
 
 /* set title line (the first line in the screen) to text */
 void
-gd_title_line(const char *text)
+gd_title_line(const char *format, ...)
 {
+	va_list args;
+	char *text;
+	
+	va_start(args, format);
+	text=g_strdup_vprintf(format, args);
 	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, text);
+	g_free(text);
+	va_end(args);
 }
 
 /* set status line (the last line in the screen) to text */
@@ -416,6 +423,7 @@ gd_settings_menu()
 	const char *yes="yes", *no="no";
 	int themenum;
 	typedef enum _settingtype {
+		TypeLabel,	/* nothing but a label */
 		TypeBoolean,
 		TypeScale,
 		TypeTheme,
@@ -423,32 +431,37 @@ gd_settings_menu()
 		TypeStringv,
 	} SettingType;
 	struct _setting {
+		int page;
 		SettingType type;
 		char *name;
 		void *var;
 		const char **stringv;
 	} settings[]= {
-		{ TypeBoolean, "Fullscreen", &gd_sdl_fullscreen },
-		{ TypeTheme,   "Theme", NULL },
-		{ TypeScale,   "Scale", &gd_sdl_scale },
-		{ TypeBoolean, "PAL emulation", &gd_sdl_pal_emulation },
-		{ TypePercent, "PAL scanline shade", &gd_pal_emu_scanline_shade },
-		{ TypeStringv, "C64 palette", &gd_c64_palette, gd_color_get_c64_palette_names() },
-		{ TypeStringv, "Atari palette", &gd_atari_palette, gd_color_get_atari_palette_names() },
-		{ TypeBoolean, "Sound", &gd_sdl_sound },
-		{ TypeBoolean, "Classic sounds only", &gd_classic_sound },
-		{ TypeBoolean, "16-bit mixing", &gd_sdl_16bit_mixing },
-		{ TypeBoolean, "44kHz mixing", &gd_sdl_44khz_mixing },
-		{ TypeBoolean, "Easy play", &gd_easy_play },
-		{ TypeBoolean, "Use BDCFF highscore", &gd_use_bdcff_highscore },
-		{ TypeBoolean, "Show name of game at cover", &gd_show_name_of_game },
-		{ TypeBoolean, "All caves selectable", &gd_all_caves_selectable },
-		{ TypeBoolean, "Import as all selectable", &gd_import_as_all_caves_selectable },
-		{ TypeBoolean, "Random colors", &gd_random_colors },
+		{ 0, TypeBoolean, "Fullscreen", &gd_sdl_fullscreen },
+		{ 0, TypeTheme,   "Theme", NULL },
+		{ 0, TypeScale,   "Scale", &gd_sdl_scale },
+		{ 0, TypeBoolean, "PAL emulation", &gd_sdl_pal_emulation },
+		{ 0, TypePercent, "PAL scanline shade", &gd_pal_emu_scanline_shade },
+		{ 0, TypeBoolean, "Even lines vertical scroll", &gd_even_line_pal_emu_vertical_scroll },
+		{ 0, TypeBoolean, "Fine scrolling", &gd_fine_scroll },
+		{ 0, TypeStringv, "C64 palette", &gd_c64_palette, gd_color_get_c64_palette_names() },
+		{ 0, TypeStringv, "Atari palette", &gd_atari_palette, gd_color_get_atari_palette_names() },
+
+		{ 1, TypeBoolean, "Sound", &gd_sdl_sound },
+		{ 1, TypeBoolean, "Classic sounds only", &gd_classic_sound },
+		{ 1, TypeBoolean, "16-bit mixing", &gd_sdl_16bit_mixing },
+		{ 1, TypeBoolean, "44kHz mixing", &gd_sdl_44khz_mixing },
+		{ 1, TypeBoolean, "Easy play", &gd_easy_play },
+		{ 1, TypeBoolean, "Use BDCFF highscore", &gd_use_bdcff_highscore },
+		{ 1, TypeBoolean, "Show name of game at cover", &gd_show_name_of_game },
+		{ 1, TypeBoolean, "All caves selectable", &gd_all_caves_selectable },
+		{ 1, TypeBoolean, "Import as all selectable", &gd_import_as_all_caves_selectable },
+		{ 1, TypeBoolean, "Random colors", &gd_random_colors },
 	};
-	int n;
+	const int numpages=2;
+	int n, page;
 	int current;
-	int width, x1, y1, yd;
+	int x1[numpages], y1[numpages], yd;
 	
 	/* optionally create the list of themes, and also find the current one in the list. */
 	themes=gd_create_themes_list();
@@ -460,16 +473,31 @@ gd_settings_menu()
 		g_warning("theme %s not found in array", gd_sdl_theme);
 		themenum=0;
 	}
-
-	width=0;
+	
 	for (n=0; n<G_N_ELEMENTS(settings); n++)
-		width=MAX(width, (strlen(settings[n].name)+1+strlen(yes))*gd_font_width());
-	x1=(gd_screen->w-width)/2;
-	yd=gd_font_height()+1;
-	y1=(gd_screen->h-(G_N_ELEMENTS(settings)+2)*yd)/2;
+		if (settings[n].page>numpages-1) {
+			g_critical("numpages constant too small");
+			g_assert_not_reached();
+		}
+
+	/* check pages, and x1,y1 coordinates for each */
+	yd=gd_font_height()+2;
+	for (page=0; page<numpages; page++) {
+		int width, num;
 		
+		width=0;
+		num=0;
+		
+		for (n=0; n<G_N_ELEMENTS(settings); n++)
+			if (settings[n].page==page) {
+				width=MAX(width, (strlen(settings[n].name)+1+strlen(yes))*gd_font_width());
+				num++;
+			}
+		x1[page]=(gd_screen->w-width)/2;
+		y1[page]=(gd_screen->h-num*yd)/2;
+	}
+			
 	gd_backup_and_dark_screen();
-	gd_title_line("GDASH OPTIONS");
 	gd_status_line("CRSR: MOVE   FIRE: CHANGE   ESC: EXIT");
 	gd_blittext_n(gd_screen, -1, gd_screen->h-3*gd_line_height(), GD_C64_GRAY1, "Some changes require restart.");
 	gd_blittext_n(gd_screen, -1, gd_screen->h-2*gd_line_height(), GD_C64_GRAY1, "Use T in the title for a new theme.");
@@ -477,55 +505,75 @@ gd_settings_menu()
 	current=0;
 	finished=FALSE;
 	while (!finished && !gd_quit) {
+		int linenum;
+		page=settings[current].page;	/* take the current page number from the current setting line */
+		gd_clear_line(gd_screen, 0);	/* clear for title line */
+		gd_title_line("GDASH OPTIONS, PAGE %d/%d", page+1, numpages);
+		
 		/* show settings */
+		linenum=0;
 		for (n=0; n<G_N_ELEMENTS(settings); n++) {
-			int x;
+			if (settings[n].page==page) {
+				int x, y;
 
-			gd_clear_line(gd_screen, y1+n*yd);
-			x=x1;
-			x=gd_blittext_n(gd_screen, x, y1+n*yd, current==n?GD_C64_LIGHTRED:GD_C64_LIGHTBLUE, settings[n].name);
-			x+=2*gd_font_width();
-			switch(settings[n].type) {	
-				case TypeBoolean:
-					x=gd_blittext_n(gd_screen, x, y1+n*yd, GD_C64_YELLOW, *(gboolean *)settings[n].var?yes:no);
-					break;
-				case TypeScale:
-					x=gd_blittext_n(gd_screen, x, y1+n*yd, GD_C64_YELLOW, gd_scaling_name[*(GdScalingType *)settings[n].var]);
-					break;
-				case TypePercent:
-					x=gd_blittext_printf_n(gd_screen, x, y1+n*yd, GD_C64_YELLOW, "%d%%", *(int *)settings[n].var);
-					break;
-				case TypeTheme:
-					if (themenum==0)
-						x=gd_blittext_n(gd_screen, x, y1+n*yd, GD_C64_YELLOW, "[Default]");
-					else {
-						char *thm;
-						thm=g_filename_display_basename(g_ptr_array_index(themes, themenum));
-						if (strrchr(thm, '.'))	/* remove extension */
-							*strrchr(thm, '.')='\0';
-						x=gd_blittext_n(gd_screen, x, y1+n*yd, GD_C64_YELLOW, thm);
-						g_free(thm);
-					}
-					break;
-				case TypeStringv:
-					x=gd_blittext_n(gd_screen, x, y1+n*yd, GD_C64_YELLOW, settings[n].stringv[*(int *)settings[n].var]);
-					break;
+				x=x1[page];
+				y=y1[page]+linenum*yd;
+				x=gd_blittext_n(gd_screen, x, y, current==n?GD_C64_LIGHTRED:GD_C64_LIGHTBLUE, settings[n].name);
+				x+=2*gd_font_width();
+				switch(settings[n].type) {	
+					case TypeLabel:
+						/* do nothing */
+						break;
+					case TypeBoolean:
+						x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, *(gboolean *)settings[n].var?yes:no);
+						break;
+					case TypeScale:
+						x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, gd_scaling_name[*(GdScalingType *)settings[n].var]);
+						break;
+					case TypePercent:
+						x=gd_blittext_printf_n(gd_screen, x, y, GD_C64_YELLOW, "%d%%", *(int *)settings[n].var);
+						break;
+					case TypeTheme:
+						if (themenum==0)
+							x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, "[Default]");
+						else {
+							char *thm;
+							thm=g_filename_display_basename(g_ptr_array_index(themes, themenum));
+							if (strrchr(thm, '.'))	/* remove extension */
+								*strrchr(thm, '.')='\0';
+							x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, thm);
+							g_free(thm);
+						}
+						break;
+					case TypeStringv:
+						x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, settings[n].stringv[*(int *)settings[n].var]);
+						break;
+				}
+				
+				linenum++;
 			}
 		}
 		SDL_Flip(gd_screen);
+
+		/* we don't leave text on the screen after us. */
+		/* so next iteration will have a nice empty screen to draw on :) */
+		linenum=0;
+		for (n=0; n<G_N_ELEMENTS(settings); n++) {
+			if (settings[n].page==page) {
+				gd_clear_line(gd_screen, y1[page]+linenum*yd);
+				linenum++;
+			}
+		}
+
+		SDL_Delay(160);
 		
 		/* do events; keys will be processed below */
 		gd_process_pending_events();
 
-		/* cursor movement */
-		if (gd_up())
-			current=clamp(current-1, 0, G_N_ELEMENTS(settings)-1);
-		if (gd_down())
-			current=clamp(current+1, 0, G_N_ELEMENTS(settings)-1);
-		if (gd_keystate[SDLK_ESCAPE])
-			finished=TRUE;
-
 		switch (settings[current].type) {
+			case TypeLabel:
+				/* do nothing */
+				break;
 			case TypeBoolean:
 				if (gd_left())
 					*(gboolean *)settings[current].var=FALSE;
@@ -569,7 +617,18 @@ gd_settings_menu()
 					
 		}
 
-		SDL_Delay(160);
+		/* cursor movement */
+		if (gd_up())
+			current=clamp(current-1, 0, G_N_ELEMENTS(settings)-1);
+		if (gd_down())
+			current=clamp(current+1, 0, G_N_ELEMENTS(settings)-1);
+		if (gd_keystate[SDLK_ESCAPE])
+			finished=TRUE;
+		/* XXX the code below only works for 2 screens, but that is enough currently. */
+		if (gd_keystate[SDLK_PAGEUP])
+			current=0;
+		if (gd_keystate[SDLK_PAGEDOWN])
+			current=G_N_ELEMENTS(settings)-1;
 	}
 	
 	/* set the theme. other variables are already set by the above code. */

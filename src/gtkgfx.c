@@ -28,6 +28,8 @@
 #include "settings.h"
 #include "util.h"
 
+#include "c64_png_colors.h"
+
 static GdkPixbuf *cells_pb[NUM_OF_CELLS];
 static GdkPixbuf *combo_pb[NUM_OF_CELLS];
 
@@ -521,25 +523,6 @@ loadcells_c64 (GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdCol
 guchar *
 c64_gfx_data_from_pixbuf(GdkPixbuf *pixbuf)
 {
-	int cols[]={
-	/* abgr */
-	/* 0000 */ 0,	/* transparent */
-	/* 0001 */ 0,
-	/* 0010 */ 0,
-	/* 0011 */ 0,
-	/* 0100 */ 0,
-	/* 0101 */ 0,
-	/* 0110 */ 0,
-	/* 0111 */ 0,
-	/* 1000 */ 1, /* black - background */
-	/* 1001 */ 2, /* red - foreg1 */
-	/* 1010 */ 5, /* green - amoeba xxxxx */
-	/* 1011 */ 4, /* yellow - foreg3 */
-	/* 1100 */ 6, /* blue - slime */
-	/* 1101 */ 3,	/* purple - foreg2 */
-	/* 1110 */ 7, /* black around arrows (used in editor) is coded as cyan */
-	/* 1111 */ 8, /* white is the arrow */
-	};
 	int width, height, rowstride, n_channels;
 	guchar *pixels;
 	int x, y;
@@ -564,16 +547,14 @@ c64_gfx_data_from_pixbuf(GdkPixbuf *pixbuf)
 
 	for (y=0; y<height; y++)
 		for (x=0; x<width; x++) {
-			int r, g, b, a, c;
+			int r, g, b, a;
 
 			guchar *p=pixels + y * rowstride + x * n_channels;
 			r=p[0];
 			g=p[1];
 			b=p[2];
 			a=p[3];
-			c=(a>>7)*8 + (b>>7)*4 + (g>>7)*2 + (r>>7)*1; /* lower 4 bits will be rgba */
-
-			data[out++]=cols[c];
+			data[out++]=c64_png_colors(r, g, b, a);
 		}
 	return data;
 }

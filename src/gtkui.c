@@ -547,7 +547,7 @@ gd_preferences (GtkWidget *parent)
 		gpointer value;
 		gboolean update;			/* if sample pixbuf should be updated when changing this option */
 		const char **stringv;
-	} check_buttons[]={
+	} options[]={
 		{TypeLabel, N_("<b>Language</b> (requires restart)"), NULL, NULL},
 		{TypeStringv, NULL, N_("The language of the application. Requires restart!"), &gd_language, FALSE, gd_languages_names},
 		{TypeLabel, N_("<b>Cave options</b>"), NULL, NULL},
@@ -555,8 +555,7 @@ gd_preferences (GtkWidget *parent)
 		{TypeBoolean, N_("Mouse play (experimental!)"), N_("Use the mouse to play. The player will follow the cursor!"), &gd_mouse_play, FALSE},
 		{TypeBoolean, N_("All caves selectable"), N_("All caves and intermissions can be selected at game start."), &gd_all_caves_selectable, FALSE},
 		{TypeBoolean, N_("Import as all caves selectable"), N_("Original, C64 games are imported not with A, E, I, M caves selectable, but all caves (ABCD, EFGH... excluding intermissions). This does not affect BDCFF caves."), &gd_import_as_all_caves_selectable, FALSE},
-		{TypeBoolean, N_("Use BDCFF highscore"), N_("Use BDCFF highscores. GDash rather stores highscores in its own configuration directory, instead of saving them in "
-			" the *.bd file."), &gd_use_bdcff_highscore, FALSE},
+		{TypeBoolean, N_("Use BDCFF highscore"), N_("Use BDCFF highscores. GDash saves highscores in its own configuration directory and also in the *.bd files. However, it prefers loading them from the configuration directory; as the *.bd files might be read-only. You can enable this setting to let GDash load them from the *.bd files. This can be selected for a specific file in the file open dialog, too."), &gd_use_bdcff_highscore, FALSE},
 #ifdef GD_SOUND
 		{TypeBoolean, N_("Time as min:sec"), N_("Show times in minutes and seconds, instead of seconds only."), &gd_time_min_sec, FALSE},
 		{TypeLabel, N_("<b>Sound options</b> (require restart)"), NULL, NULL},
@@ -619,47 +618,47 @@ gd_preferences (GtkWidget *parent)
 	/* game booleans */
 	row=0;
 	col=0;
-	for (i=0; i<G_N_ELEMENTS(check_buttons); i++) {
+	for (i=0; i<G_N_ELEMENTS(options); i++) {
 		GtkWidget *widget, *hbox;
 
-		switch (check_buttons[i].type) {
+		switch (options[i].type) {
 			case TypeLabel:
 				label=gtk_label_new(NULL);
-				gtk_label_set_markup(GTK_LABEL(label), _(check_buttons[i].name));
+				gtk_label_set_markup(GTK_LABEL(label), _(options[i].name));
 				gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
 				gtk_table_attach_defaults (GTK_TABLE (table), label, col, col+2, row, row+1);
 				break;
 
 			case TypeBoolean:
-				widget=gtk_check_button_new_with_label(_(check_buttons[i].name));
-				gtk_widget_set_tooltip_text(widget, _(check_buttons[i].description));
-				gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), *(gboolean *)check_buttons[i].value);
+				widget=gtk_check_button_new_with_label(_(options[i].name));
+				gtk_widget_set_tooltip_text(widget, _(options[i].description));
+				gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), *(gboolean *)options[i].value);
 				gtk_table_attach_defaults (GTK_TABLE (table), widget, col+1, col+2, row, row+1);
-				g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(settings_window_toggle), check_buttons[i].value);
+				g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(settings_window_toggle), options[i].value);
 				/* if sample pixbuf should be updated */
-				if (check_buttons[i].update)
+				if (options[i].update)
 					g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(settings_window_changed), &info);
 				break;
 
 			case TypePercent:
 				hbox=gtk_hbox_new(FALSE, 6);
 				widget=gtk_spin_button_new_with_range(0, 100, 5);
-				gtk_widget_set_tooltip_text(widget, _(check_buttons[i].description));
-				gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), *(int *)check_buttons[i].value);
-				g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(settings_window_value_change), check_buttons[i].value);
-				if (check_buttons[i].update)
+				gtk_widget_set_tooltip_text(widget, _(options[i].description));
+				gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), *(int *)options[i].value);
+				g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(settings_window_value_change), options[i].value);
+				if (options[i].update)
 					g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(settings_window_changed), &info);
 				gtk_box_pack_start(GTK_BOX(hbox), widget, FALSE, FALSE, 0);
-				gtk_box_pack_start_defaults(GTK_BOX(hbox), gd_label_new_printf(_(check_buttons[i].name)));
+				gtk_box_pack_start_defaults(GTK_BOX(hbox), gd_label_new_printf(_(options[i].name)));
 
 				gtk_table_attach_defaults (GTK_TABLE (table), hbox, col+1, col+2, row, row+1);
 				break;
 			
 			case TypeStringv:
-				g_assert(!check_buttons[i].update);
-				widget=gd_combo_box_new_from_stringv(check_buttons[i].stringv);
-				gtk_combo_box_set_active(GTK_COMBO_BOX(widget), *(int *)check_buttons[i].value);
-				g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(combo_box_stringv_changed), check_buttons[i].value);
+				g_assert(!options[i].update);
+				widget=gd_combo_box_new_from_stringv(options[i].stringv);
+				gtk_combo_box_set_active(GTK_COMBO_BOX(widget), *(int *)options[i].value);
+				g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(combo_box_stringv_changed), options[i].value);
 				gtk_table_attach_defaults(GTK_TABLE(table), widget, col+1, col+2, row, row+1);
 				break;
 
@@ -954,11 +953,11 @@ show_message (GtkMessageType type, const char *primary, const char *secondary)
     dialog=gtk_message_dialog_new ((GtkWindow *) guess_active_toplevel(),
         GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
         type, GTK_BUTTONS_OK,
-        primary);
+        "%s", primary);
     gtk_window_set_title(GTK_WINDOW(dialog), "GDash");
    	/* secondary message exists an is not empty string: */
     if (secondary && secondary[0]!=0)
-        gtk_message_dialog_format_secondary_markup (GTK_MESSAGE_DIALOG (dialog), secondary);
+        gtk_message_dialog_format_secondary_markup (GTK_MESSAGE_DIALOG (dialog), "%s", secondary);
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
 }
@@ -996,7 +995,7 @@ gd_discard_changes (GtkWidget *parent)
 		return TRUE;
 
 	dialog=gtk_message_dialog_new ((GtkWindow *) parent, 0, GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, _("Cave set is edited. Discard changes?"));
-	gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog), gd_caveset_data->name);
+	gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog), "%s", gd_caveset_data->name);
 	gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
 	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
 	/* create a discard button with a trash icon and Discard text */
@@ -1133,12 +1132,6 @@ gd_save_caveset_as (GtkWidget *parent)
 	}
 	g_free(filename);
 	gtk_widget_destroy (dialog);
-	/* WINDOWS GTK+ 20080926 HACK XXX XXX XXX XXX */
-	/* gtk bug - sometimes the above widget destroy creates an error message. */
-	/* so we delete the error flag here. */
-#ifdef G_OS_WIN32
-	gd_clear_error_flag();
-#endif
 }
 
 void
@@ -1395,7 +1388,7 @@ gd_show_last_error(GtkWidget *parent)
     dialog=gtk_message_dialog_new ((GtkWindow *) parent,
         GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
         GTK_MESSAGE_ERROR, GTK_BUTTONS_NONE,
-        m->message);
+        "%s", m->message);
     gtk_dialog_add_buttons(GTK_DIALOG(dialog), _("_Show all"), 1, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
     gtk_window_set_title(GTK_WINDOW(dialog), "GDash");
@@ -1413,9 +1406,9 @@ gd_question_yesno(const char *primary, const char *secondary)
 	GtkWidget *dialog;
 	int response;
 
-	dialog=gtk_message_dialog_new ((GtkWindow *) guess_active_toplevel(), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, primary);
+	dialog=gtk_message_dialog_new ((GtkWindow *) guess_active_toplevel(), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", primary);
 	if (secondary && !g_str_equal(secondary, ""))
-		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), secondary);
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "%s", secondary);
 	response=gtk_dialog_run (GTK_DIALOG (dialog));
 	gtk_widget_destroy (dialog);
 

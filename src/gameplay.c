@@ -47,13 +47,8 @@ GdGameplay gd_gameplay;
 static void
 cave_finished_highscore()
 {
-	GdHighScore hs;
-	
-	gd_strcpy(hs.name, gd_gameplay.player_name);
-	hs.score=gd_gameplay.cave_score;
-
 	/* enter to highscore table */
-	gd_add_highscore(gd_gameplay.original_cave->highscore, hs);
+	gd_add_highscore(gd_gameplay.original_cave->highscore, gd_gameplay.player_name, gd_gameplay.cave_score);
 }
 
 

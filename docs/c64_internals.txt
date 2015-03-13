@@ -357,6 +357,39 @@ bouldi dash, cave 14
 
 
 
+
+painting line
+-------------
+Deluxe Caves 1 contains a line with negative length.
+that is not displayed at all, because:
+
+
+paint_line:
+        LDY #0
+        ASL
+        TAX
+        LDA direction_tab,X
+        STA $C9
+        LDA direction_tab+1,X
+        STA $CA
+
+paint_line_loop:
+        DEC $C8					; decrementing length
+        BMI paint_line_quit		; if negative, jumps out of subroutine.
+        LDA $DA
+        STA ($3A),Y
+        CLC
+        LDA $3A
+        ADC $C9
+        STA $3A
+        LDA $3B
+        ADC $CA
+        STA $3B
+        JMP paint_line_loop
+paint_line_quit:
+        RTS
+
+
 code bytes
 ----------
 disassembly from: marek roth tutorial.

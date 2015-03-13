@@ -82,6 +82,8 @@ extern gboolean gd_sdl_44khz_mixing;
 extern gboolean gd_classic_sound;
 
 extern int gd_pal_emu_scanline_shade;		/* in percent */
+extern gboolean gd_even_line_pal_emu_vertical_scroll;
+extern gboolean gd_fine_scroll;
 extern int gd_c64_palette;
 extern int gd_atari_palette;
 
