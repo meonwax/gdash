@@ -21,6 +21,10 @@ ATARIPALETTES = \
 	Real_contrast.act \
 	XFormer.act
 
+DTVPALETTES = \
+	Spiff.act \
+	Murray.act
+
 ICONS = \
 	add_filled_rectangle.png \
 	add_freehand.png \
@@ -44,7 +48,8 @@ ICONS = \
 	to_bottom.png \
 	object_on_all.png \
 	object_not_on_all.png \
-	object_not_on_current.png
+	object_not_on_current.png \
+	replay.png
 
 TITLE = \
 	gdash_screen.png \
@@ -59,7 +64,8 @@ noinst_HEADERS = \
 	c64_font.h \
 	title.h \
 	levels.h \
-	ataripal.h
+	ataripal.h \
+	dtvpal.h
 
 icondir = $(datadir)/pixmaps
 icon_DATA = gdash.png
@@ -71,7 +77,8 @@ EXTRA_DIST = $(ICONS) $(TITLE) $(icon_DATA) \
 	files2c.sh \
 	$(pkgdata_DATA) \
 	$(CAVES) levels.h \
-	$(ATARIPALETTES) ataripal.h
+	$(ATARIPALETTES) ataripal.h \
+	$(DTVPALETTES) dtvpal.h
 
 
 # for included ICONS
@@ -144,3 +151,6 @@ levels.h: $(CAVES) file2c Makefile.am
 
 ataripal.h: $(ATARIPALETTES) file2c Makefile.am
 	sh files2c.sh $@ atari_palettes $(ATARIPALETTES)
+
+dtvpal.h: $(DTVPALETTES) file2c Makefile.am
+	sh files2c.sh $@ c64dtv_palettes $(DTVPALETTES)

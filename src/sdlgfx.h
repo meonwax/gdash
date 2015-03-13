@@ -20,9 +20,13 @@
 #include "settings.h"
 
 /* these can't be larger than 127, or they mess up with utf8 coding */
+#define GD_CHECKED_BOX_CHAR 1
+#define GD_CHECK_MARK_CHAR 3
+#define GD_BALL_CHAR 2
 #define GD_PLAYER_CHAR 28
 #define GD_KEY_CHAR 29
 #define GD_DIAMOND_CHAR 30
+#define GD_UNCHECKED_BOX_CHAR 31
 
 extern SDL_Surface *gd_screen;
 extern int gd_scale;
@@ -35,7 +39,7 @@ extern SDL_Joystick *gd_joy;
 
 extern gboolean gd_quit;
 
-int gd_drawcave(SDL_Surface *dest, const Cave *cave, int **gfx_buffer, gboolean only_scroll);
+int gd_drawcave(SDL_Surface *dest, const Cave *cave, int **gfx_buffer);
 gboolean gd_sdl_init(GdScalingType scaling_type);
 gboolean gd_scroll(const Cave *cave, gboolean exact_scroll);
 void gd_scroll_to_origin();

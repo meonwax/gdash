@@ -16,6 +16,6 @@
 #include <glib.h>
 
 gboolean gd_caveset_load_from_bdcff(const char *contents);
-void gd_caveset_save_to_bdcff(GPtrArray *out);
+void gd_caveset_save_to_bdcff(GPtrArray *out, gboolean caves_with_replay_only);
 
 

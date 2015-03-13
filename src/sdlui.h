@@ -16,7 +16,7 @@
 #ifndef _GD_SDL_UI_H
 #define _GD_SDL_UI_H
 
-char *gd_select_file(const char *title, const char *start_dir, const char *glob);
+char *gd_select_file(const char *title, const char *start_dir, const char *glob, gboolean allow_new);
 void gd_settings_menu();
 void gd_show_highscore(Cave *highlight_cave, int highlight_line);
 void gd_help(const char **strings);
@@ -24,7 +24,9 @@ void gd_help(const char **strings);
 void gd_error_console();
 void gd_show_error(GdErrorMessage *error);
 
+gboolean gd_ask_yes_no(const char *question, const char *answer1, const char *answer2, gboolean *result);
 char *gd_input_string(const char *title, const char *current);
+gboolean gd_discard_changes();
 
 void gd_about();
 void gd_show_license();

@@ -85,10 +85,10 @@ int gd_editor_window_height=520;	/* window size */
 int gd_language=0;
 
 /* settings */
-#define SETTING_EASY_PLAY "easy_play"
-gboolean gd_easy_play=FALSE;
 #define SETTING_TIME_MIN_SEC "time_min_sec"
 gboolean gd_time_min_sec=TRUE;
+#define SETTING_NO_INVISIBLE_OUTBOX "no_invisible_outbox"
+gboolean gd_no_invisible_outbox=FALSE;
 #define SETTING_ALL_CAVES_SELECTABLE "all_caves_selectable"
 gboolean gd_all_caves_selectable=FALSE;
 #define SETTING_IMPORT_AS_ALL_CAVES_SELECTABLE "import_as_all_caves_selectable"
@@ -122,11 +122,15 @@ int gd_pal_emu_scanline_shade=85;
 #define SETTING_EVEN_LINE_PAL_EMU_VERTICAL_SCROLL "even_line_pal_emu_vertical_scroll"
 gboolean gd_even_line_pal_emu_vertical_scroll=FALSE;
 #define SETTING_FINE_SCROLL "fine_scroll"
-gboolean gd_fine_scroll=TRUE;
+gboolean gd_fine_scroll=FALSE;
 #define SETTING_C64_PALETTE "c64_palette"
 int gd_c64_palette=0;
+#define SETTING_C64DTV_PALETTE "c64dtv_palette"
+int gd_c64dtv_palette=0;
 #define SETTING_ATARI_PALETTE "atari_palette"
 int gd_atari_palette=0;
+#define SETTING_PREFERRED_PALETTE "preferred_palette"
+GdColorType gd_preferred_palette=GD_COLOR_TYPE_ATARI;
 
 /* sound settings */
 #define SETTING_SDL_SOUND "sdl_sound"
@@ -315,8 +319,8 @@ gd_load_settings()
     gd_editor_window_width=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_WIDTH, gd_editor_window_width);
     gd_editor_window_height=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_HEIGHT, gd_editor_window_height);
     gd_language=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_LANGUAGE, gd_language);
-    gd_easy_play=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_EASY_PLAY, gd_easy_play);
     gd_time_min_sec=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_TIME_MIN_SEC, gd_time_min_sec);
+    gd_no_invisible_outbox=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_NO_INVISIBLE_OUTBOX, gd_no_invisible_outbox);
     gd_all_caves_selectable=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_ALL_CAVES_SELECTABLE, gd_all_caves_selectable);
     gd_import_as_all_caves_selectable=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_IMPORT_AS_ALL_CAVES_SELECTABLE, gd_import_as_all_caves_selectable);
     gd_mouse_play=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_MOUSE_PLAY, gd_mouse_play);
@@ -335,13 +339,18 @@ gd_load_settings()
     	gd_cell_scale_game=0;
     gd_pal_emu_scanline_shade=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMU_SCANLINE_SHADE, gd_pal_emu_scanline_shade);
     gd_even_line_pal_emu_vertical_scroll=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_EVEN_LINE_PAL_EMU_VERTICAL_SCROLL, gd_even_line_pal_emu_vertical_scroll);
+    gd_fine_scroll=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_FINE_SCROLL, gd_fine_scroll);
     gd_pal_emulation_game=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_GAME, gd_pal_emulation_game);
     gd_cell_scale_editor=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_CELL_SCALE_EDITOR, gd_cell_scale_editor);
     if (gd_cell_scale_editor<0 || gd_cell_scale_editor>=GD_SCALING_MAX)
     	gd_cell_scale_editor=0;
     gd_pal_emulation_editor=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_EDITOR, gd_pal_emulation_editor);
     gd_c64_palette=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_C64_PALETTE, gd_c64_palette);
+    gd_c64dtv_palette=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_C64DTV_PALETTE, gd_c64dtv_palette);
     gd_atari_palette=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_ATARI_PALETTE, gd_atari_palette);
+    gd_preferred_palette=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PREFERRED_PALETTE, gd_preferred_palette);
+    if (gd_preferred_palette<0 || gd_preferred_palette>=GD_COLOR_TYPE_UNKNOWN)
+    	gd_preferred_palette=0;
 	gd_theme=g_key_file_get_string(ini, SETTINGS_GDASH_GROUP, SETTING_THEME, NULL);
 	gd_sdl_theme=g_key_file_get_string(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_THEME, NULL);
     gd_sdl_scale=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_SCALE, gd_sdl_scale);
@@ -370,8 +379,8 @@ gd_save_settings()
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_WIDTH, gd_editor_window_width);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_EDITOR_WINDOW_HEIGHT, gd_editor_window_height);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_LANGUAGE, gd_language);
-    g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_EASY_PLAY, gd_easy_play);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_TIME_MIN_SEC, gd_time_min_sec);
+    g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_NO_INVISIBLE_OUTBOX, gd_no_invisible_outbox);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_ALL_CAVES_SELECTABLE, gd_all_caves_selectable);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_IMPORT_AS_ALL_CAVES_SELECTABLE, gd_import_as_all_caves_selectable);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_MOUSE_PLAY, gd_mouse_play);
@@ -380,8 +389,11 @@ gd_save_settings()
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_GAME, gd_pal_emulation_game);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMU_SCANLINE_SHADE, gd_pal_emu_scanline_shade);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_EVEN_LINE_PAL_EMU_VERTICAL_SCROLL, gd_even_line_pal_emu_vertical_scroll);
+    g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_FINE_SCROLL, gd_fine_scroll);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_C64_PALETTE, gd_c64_palette);
+    g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_C64DTV_PALETTE, gd_c64dtv_palette);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_ATARI_PALETTE, gd_atari_palette);
+    g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_PREFERRED_PALETTE, gd_preferred_palette);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_EDITOR, gd_pal_emulation_editor);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_PREVIEW, gd_show_preview);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_NAME_OF_GAME, gd_show_name_of_game);

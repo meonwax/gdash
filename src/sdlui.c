@@ -35,31 +35,6 @@ int filenamesort(gconstpointer a, gconstpointer b)
 
 
 
-/* runs a file selection dialog */
-/* returns new, full-path filename (to be freed later by the caller) */
-/* glob: semicolon separated list of globs */
-enum {
-	GD_NOT_YET,
-	GD_YES,
-	GD_JUMP,
-	GD_ESCAPE,
-	GD_QUIT,
-	
-};
-
-static int
-clamp(int val, int min, int max)
-{
-	g_assert(min<=max);
-	
-	if (val<min)
-		return min;
-	if (val>max)
-		return max;
-	return val;
-}
-
-
 /* set title line (the first line in the screen) to text */
 void
 gd_title_line(const char *format, ...)
@@ -69,7 +44,7 @@ gd_title_line(const char *format, ...)
 	
 	va_start(args, format);
 	text=g_strdup_vprintf(format, args);
-	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, text);
+	gd_blittext_n(gd_screen, -1, 0, GD_GDASH_WHITE, text);
 	g_free(text);
 	va_end(args);
 }
@@ -78,13 +53,27 @@ gd_title_line(const char *format, ...)
 void
 gd_status_line(const char *text)
 {
-	gd_blittext_n(gd_screen, -1, gd_screen->h-gd_font_height(), GD_C64_GRAY2, text);
+	gd_blittext_n(gd_screen, -1, gd_screen->h-gd_font_height(), GD_GDASH_GRAY2, text);
 }
 
 
+
+
+/* runs a file selection dialog */
+/* returns new, full-path filename (to be freed later by the caller) */
+/* glob: semicolon separated list of globs */
 char *
-gd_select_file(const char *title, const char *start_dir, const char *glob)
+gd_select_file(const char *title, const char *start_dir, const char *glob, gboolean allow_new)
 {
+	enum {
+		GD_NOT_YET,
+		GD_YES,
+		GD_JUMP,
+		GD_ESCAPE,
+		GD_QUIT,
+		GD_NEW,
+	};
+
 	static char *current_dir=NULL;	/* static to not worry about freeing */
 	const int yd=gd_line_height();
 	const int names_per_page=gd_screen->h/yd-3;
@@ -105,7 +94,11 @@ gd_select_file(const char *title, const char *start_dir, const char *glob)
 	
 	gd_backup_and_dark_screen();
 	gd_title_line(title);
-	gd_status_line("MOVE: SELECT   J: JUMP   ESC: CANCEL");
+	if (allow_new)
+		/* for saving, we allow the user to select a new filename. */
+		gd_status_line("CRSR:SELECT  N:NEW  J:JUMP  ESC:CANCEL");
+	else
+		gd_status_line("MOVE: SELECT   J: JUMP   ESC: CANCEL");
 
 	/* this is somewhat hackish; finds out the absolute path of start_dir. also tests is we can enter that directory */
 	if (g_chdir(start_dir)==-1) {
@@ -174,7 +167,7 @@ gd_select_file(const char *title, const char *start_dir, const char *glob)
 
 		/* show current directory */
 		gd_clear_line(gd_screen, 1*yd);
-		gd_blittext_n(gd_screen, -1, 1*yd, GD_C64_YELLOW, gd_filename_to_utf8(directory));
+		gd_blittext_n(gd_screen, -1, 1*yd, GD_GDASH_YELLOW, gd_filename_to_utf8(directory));
 		
 		/* do file selection menu */
 		sel=0;
@@ -189,7 +182,7 @@ gd_select_file(const char *title, const char *start_dir, const char *glob)
 				for (i=0, cur=page*names_per_page; i<names_per_page; i++, cur++) {
 					int col;
 					
-					col=cur==sel?GD_C64_YELLOW:GD_C64_LIGHTBLUE;
+					col=cur==sel?GD_GDASH_YELLOW:GD_GDASH_LIGHTBLUE;
 					
 					gd_clear_line(gd_screen, (i+2)*yd);
 					if (cur<files->len)	/* may not be as much filenames as it would fit on the screen */
@@ -207,17 +200,17 @@ gd_select_file(const char *title, const char *start_dir, const char *glob)
 			
 			/* cursor movement */
 			if (gd_up()) {
-				sel=clamp(sel-1, 0, files->len-1);
+				sel=gd_clamp(sel-1, 0, files->len-1);
 				redraw=TRUE;
 			}
 			if (gd_down()) {
-				sel=clamp(sel+1, 0, files->len-1);
+				sel=gd_clamp(sel+1, 0, files->len-1);
 				redraw=TRUE;
 			}
 			if (gd_keystate[SDLK_PAGEUP])
-				sel=clamp(sel-names_per_page, 0, files->len-1), redraw=TRUE;
+				sel=gd_clamp(sel-names_per_page, 0, files->len-1), redraw=TRUE;
 			if (gd_keystate[SDLK_PAGEDOWN])
-				sel=clamp(sel+names_per_page, 0, files->len-1), redraw=TRUE;
+				sel=gd_clamp(sel+names_per_page, 0, files->len-1), redraw=TRUE;
 			if (gd_keystate[SDLK_HOME])
 				sel=0, redraw=TRUE;
 			if (gd_keystate[SDLK_END])
@@ -225,6 +218,9 @@ gd_select_file(const char *title, const char *start_dir, const char *glob)
 				
 			if (gd_keystate[SDLK_j])
 				state=GD_JUMP;
+				
+			if (gd_keystate[SDLK_n] && allow_new)
+				state=GD_NEW;
 
 			if (gd_space_or_enter_or_fire())
 				state=GD_YES;
@@ -239,7 +235,29 @@ gd_select_file(const char *title, const char *start_dir, const char *glob)
 		/* also wait because we do not want to process one enter keypress more than once */
 		gd_wait_for_key_releases();
 
-		/* if selected any from the list, it can be a file or a directory. */		
+		/* user requested to enter a new filename */
+		if (state==GD_NEW) {
+			char *name;
+			char *new_name;
+			char *extension_added;
+			
+			/* make up a suggested filename */
+			if (!g_str_equal(gd_caveset_data->name, ""))
+				extension_added=g_strdup_printf("%s.bd", gd_caveset_data->name);
+			else
+				extension_added=NULL;
+			/* if extension added is null, g_build_path will sense that as the end of the list. */
+			name=g_build_path(G_DIR_SEPARATOR_S, directory, extension_added, NULL);
+			g_free(extension_added);
+			new_name=gd_input_string("ENTER NEW FILE NAME", name);
+			g_free(name);
+			/* if enters a file name, remember that, and exit the function via setting filestate variable */
+			if (new_name) {
+				result=new_name;
+				filestate=GD_YES;
+			}
+		}
+		/* user requested to ask for another directory name to jump to */
 		if (state==GD_JUMP) {
 			char *newdir;
 			
@@ -259,6 +277,7 @@ gd_select_file(const char *title, const char *start_dir, const char *glob)
 			}
 		}
 		else
+		/* if selected any from the list, it can be a file or a directory. */
 		if (state==GD_YES) {
 			if (g_str_has_suffix(g_ptr_array_index(files, sel), G_DIR_SEPARATOR_S)) {
 				/* directory selected */
@@ -445,17 +464,19 @@ gd_settings_menu()
 		{ 0, TypeBoolean, "Even lines vertical scroll", &gd_even_line_pal_emu_vertical_scroll },
 		{ 0, TypeBoolean, "Fine scrolling", &gd_fine_scroll },
 		{ 0, TypeStringv, "C64 palette", &gd_c64_palette, gd_color_get_c64_palette_names() },
+		{ 0, TypeStringv, "C64DTV palette", &gd_c64dtv_palette, gd_color_get_c64dtv_palette_names() },
 		{ 0, TypeStringv, "Atari palette", &gd_atari_palette, gd_color_get_atari_palette_names() },
+		{ 0, TypeStringv, "Preferred palette", &gd_preferred_palette, gd_color_get_palette_types_names() },
 
 		{ 1, TypeBoolean, "Sound", &gd_sdl_sound },
 		{ 1, TypeBoolean, "Classic sounds only", &gd_classic_sound },
 		{ 1, TypeBoolean, "16-bit mixing", &gd_sdl_16bit_mixing },
 		{ 1, TypeBoolean, "44kHz mixing", &gd_sdl_44khz_mixing },
-		{ 1, TypeBoolean, "Easy play", &gd_easy_play },
 		{ 1, TypeBoolean, "Use BDCFF highscore", &gd_use_bdcff_highscore },
-		{ 1, TypeBoolean, "Show name of game at cover", &gd_show_name_of_game },
+		{ 1, TypeBoolean, "Show caveset name at uncover", &gd_show_name_of_game },
 		{ 1, TypeBoolean, "All caves selectable", &gd_all_caves_selectable },
 		{ 1, TypeBoolean, "Import as all selectable", &gd_import_as_all_caves_selectable },
+		{ 1, TypeBoolean, "No invisible outbox", &gd_no_invisible_outbox },
 		{ 1, TypeBoolean, "Random colors", &gd_random_colors },
 	};
 	const int numpages=2;
@@ -499,8 +520,8 @@ gd_settings_menu()
 			
 	gd_backup_and_dark_screen();
 	gd_status_line("CRSR: MOVE   FIRE: CHANGE   ESC: EXIT");
-	gd_blittext_n(gd_screen, -1, gd_screen->h-3*gd_line_height(), GD_C64_GRAY1, "Some changes require restart.");
-	gd_blittext_n(gd_screen, -1, gd_screen->h-2*gd_line_height(), GD_C64_GRAY1, "Use T in the title for a new theme.");
+	gd_blittext_n(gd_screen, -1, gd_screen->h-3*gd_line_height(), GD_GDASH_GRAY1, "Some changes require restart.");
+	gd_blittext_n(gd_screen, -1, gd_screen->h-2*gd_line_height(), GD_GDASH_GRAY1, "Use T in the title for a new theme.");
 	
 	current=0;
 	finished=FALSE;
@@ -514,39 +535,43 @@ gd_settings_menu()
 		linenum=0;
 		for (n=0; n<G_N_ELEMENTS(settings); n++) {
 			if (settings[n].page==page) {
+				const GdColor c_name=GD_GDASH_LIGHTBLUE;
+				const GdColor c_selected=GD_GDASH_YELLOW;
+				const GdColor c_value=GD_GDASH_GREEN;
+				
 				int x, y;
 
 				x=x1[page];
 				y=y1[page]+linenum*yd;
-				x=gd_blittext_n(gd_screen, x, y, current==n?GD_C64_LIGHTRED:GD_C64_LIGHTBLUE, settings[n].name);
+				x=gd_blittext_n(gd_screen, x, y, current==n?c_selected:c_name, settings[n].name);
 				x+=2*gd_font_width();
 				switch(settings[n].type) {	
 					case TypeLabel:
 						/* do nothing */
 						break;
 					case TypeBoolean:
-						x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, *(gboolean *)settings[n].var?yes:no);
+						x=gd_blittext_n(gd_screen, x, y, c_value, *(gboolean *)settings[n].var?yes:no);
 						break;
 					case TypeScale:
-						x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, gd_scaling_name[*(GdScalingType *)settings[n].var]);
+						x=gd_blittext_n(gd_screen, x, y, c_value, gd_scaling_name[*(GdScalingType *)settings[n].var]);
 						break;
 					case TypePercent:
-						x=gd_blittext_printf_n(gd_screen, x, y, GD_C64_YELLOW, "%d%%", *(int *)settings[n].var);
+						x=gd_blittext_printf_n(gd_screen, x, y, c_value, "%d%%", *(int *)settings[n].var);
 						break;
 					case TypeTheme:
 						if (themenum==0)
-							x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, "[Default]");
+							x=gd_blittext_n(gd_screen, x, y, c_value, "[Default]");
 						else {
 							char *thm;
 							thm=g_filename_display_basename(g_ptr_array_index(themes, themenum));
 							if (strrchr(thm, '.'))	/* remove extension */
 								*strrchr(thm, '.')='\0';
-							x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, thm);
+							x=gd_blittext_n(gd_screen, x, y, c_value, thm);
 							g_free(thm);
 						}
 						break;
 					case TypeStringv:
-						x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, settings[n].stringv[*(int *)settings[n].var]);
+						x=gd_blittext_n(gd_screen, x, y, c_value, settings[n].stringv[*(int *)settings[n].var]);
 						break;
 				}
 				
@@ -600,17 +625,17 @@ gd_settings_menu()
 				break;
 			case TypeTheme:
 				if (gd_left())
-					themenum=clamp(themenum-1, 0, themes->len-1);
+					themenum=gd_clamp(themenum-1, 0, themes->len-1);
 				if (gd_right())
-					themenum=clamp(themenum+1, 0, themes->len-1);
+					themenum=gd_clamp(themenum+1, 0, themes->len-1);
 				if (gd_space_or_enter_or_fire())
 					themenum=(themenum+1)%themes->len;
 				break;
 			case TypeStringv:
 				if (gd_left())
-					*(int *)settings[current].var=clamp(*(int *)settings[current].var-1, 0, g_strv_length((char **) settings[current].stringv));
+					*(int *)settings[current].var=gd_clamp(*(int *)settings[current].var-1, 0, g_strv_length((char **) settings[current].stringv)-1);
 				if (gd_right())
-					*(int *)settings[current].var=clamp(*(int *)settings[current].var+1, 0, g_strv_length((char **) settings[current].stringv));
+					*(int *)settings[current].var=gd_clamp(*(int *)settings[current].var+1, 0, g_strv_length((char **) settings[current].stringv)-1);
 				if (gd_space_or_enter_or_fire())
 					*(int *)settings[current].var=(*(int *)settings[current].var+1)%g_strv_length((char **) settings[current].stringv);
 				break;
@@ -619,9 +644,9 @@ gd_settings_menu()
 
 		/* cursor movement */
 		if (gd_up())
-			current=clamp(current-1, 0, G_N_ELEMENTS(settings)-1);
+			current=gd_clamp(current-1, 0, G_N_ELEMENTS(settings)-1);
 		if (gd_down())
-			current=clamp(current+1, 0, G_N_ELEMENTS(settings)-1);
+			current=gd_clamp(current+1, 0, G_N_ELEMENTS(settings)-1);
 		if (gd_keystate[SDLK_ESCAPE])
 			finished=TRUE;
 		/* XXX the code below only works for 2 screens, but that is enough currently. */
@@ -652,7 +677,7 @@ gd_install_theme()
 {
 	char *filename;
 
-	filename=gd_select_file("SELECT .BMP IMAGE FOR THEME", g_get_home_dir(), "*.bmp");
+	filename=gd_select_file("SELECT .BMP IMAGE FOR THEME", g_get_home_dir(), "*.bmp", FALSE);
 	if (filename) {
 		gd_clear_errors();
 		if (is_image_ok_for_theme(filename)) {
@@ -713,16 +738,16 @@ gd_show_highscore(Cave *highlight_cave, int highlight_line)
 			scores=cave->highscore;
 
 		gd_clear_line(gd_screen, gd_font_height());
-		gd_blittext_n(gd_screen, -1, gd_font_height(), GD_C64_YELLOW, cave?cave->name:gd_caveset_data->name);
+		gd_blittext_n(gd_screen, -1, gd_font_height(), GD_GDASH_YELLOW, cave?cave->name:gd_caveset_data->name);
 
 		/* show scores */		
 		for (i=0; i<max; i++) {
 			int c;
 			
 			gd_clear_line(gd_screen, (i+2)*gd_line_height());
-			c=i/5%2?GD_C64_PURPLE:GD_C64_GREEN;
+			c=i/5%2?GD_GDASH_PURPLE:GD_GDASH_GREEN;
 			if (cave==highlight_cave && i==highlight_line)
-				c=GD_C64_WHITE;
+				c=GD_GDASH_WHITE;
 			if (scores[i].score!=0)
 				gd_blittext_printf_n(gd_screen, 0, (i+2)*gd_line_height(), c, "%2d %6d %s", i+1, scores[i].score, scores[i].name);
 		}
@@ -816,8 +841,8 @@ gd_help(const char **strings)
 	for (n=0; n<numstrings; n+=2) {
 		int x;
 		
-		x=gd_blittext_printf_n(gd_screen, x1, y, GD_C64_YELLOW, "%s ", strings[n]);
-		x=gd_blittext_printf_n(gd_screen, x, y, GD_C64_LIGHTBLUE, "%s", strings[n+1]);
+		x=gd_blittext_printf_n(gd_screen, x1, y, GD_GDASH_YELLOW, "%s ", strings[n]);
+		x=gd_blittext_printf_n(gd_screen, x, y, GD_GDASH_LIGHTBLUE, "%s", strings[n+1]);
 		
 		y+=gd_line_height();
 	}
@@ -852,7 +877,7 @@ gd_input_string(const char *title, const char *current)
 	gd_backup_and_black_screen();
 	SDL_FillRect(gd_screen, &rect, SDL_MapRGB(gd_screen->format, 0, 0, 0));
 
-	gd_blittext_n(gd_screen, -1, y1+gd_line_height(), GD_C64_WHITE, title);
+	gd_blittext_n(gd_screen, -1, y1+gd_line_height(), GD_GDASH_WHITE, title);
 	
 	text=g_string_new(current);
 
@@ -867,7 +892,7 @@ gd_input_string(const char *title, const char *current)
 		
 		n=(n+1)%10;
 		gd_clear_line(gd_screen, y1+3*gd_line_height());
-		gd_blittext_printf_n(gd_screen, -1, y1+3*gd_line_height(), GD_C64_WHITE, "%s%c", text->str, n>=5?'_':' ');
+		gd_blittext_printf_n(gd_screen, -1, y1+3*gd_line_height(), GD_GDASH_WHITE, "%s%c", text->str, n>=5?'_':' ');
 		SDL_Flip(gd_screen);
 		
 		while(SDL_PollEvent(&event))
@@ -961,7 +986,7 @@ gd_error_console()
 					GdErrorMessage *m=g_ptr_array_index(err, cur);
 					int col;
 					
-					col=cur==sel?GD_C64_YELLOW:GD_C64_LIGHTBLUE;
+					col=cur==sel?GD_GDASH_YELLOW:GD_GDASH_LIGHTBLUE;
 					
 					gd_clear_line(gd_screen, (i+2)*yd);
 					if (cur<err->len)	/* may not be as much filenames as it would fit on the screen */
@@ -977,13 +1002,13 @@ gd_error_console()
 
 		/* cursor movement */
 		if (gd_up())
-			sel=clamp(sel-1, 0, err->len-1), redraw=TRUE;
+			sel=gd_clamp(sel-1, 0, err->len-1), redraw=TRUE;
 		if (gd_down())
-			sel=clamp(sel+1, 0, err->len-1), redraw=TRUE;
+			sel=gd_clamp(sel+1, 0, err->len-1), redraw=TRUE;
 		if (gd_keystate[SDLK_PAGEUP])
-			sel=clamp(sel-names_per_page, 0, err->len-1), redraw=TRUE;
+			sel=gd_clamp(sel-names_per_page, 0, err->len-1), redraw=TRUE;
 		if (gd_keystate[SDLK_PAGEDOWN])
-			sel=clamp(sel+names_per_page, 0, err->len-1), redraw=TRUE;
+			sel=gd_clamp(sel+names_per_page, 0, err->len-1), redraw=TRUE;
 		if (gd_keystate[SDLK_HOME])
 			sel=0, redraw=TRUE;
 		if (gd_keystate[SDLK_END])
@@ -1018,6 +1043,88 @@ gd_error_console()
 }
 
 
+gboolean
+gd_ask_yes_no(const char *question, const char *answer1, const char *answer2, gboolean *result)
+{
+	const int height=5*gd_line_height();
+	int y1;
+	SDL_Rect rect;
+	gboolean success, escape;
+	int n;
+	
+	y1=(gd_screen->h-height)/2;
+	rect.x=0;
+	rect.w=gd_screen->w;
+	rect.y=y1;
+	rect.h=height;
+	gd_backup_and_black_screen();
+	SDL_FillRect(gd_screen, &rect, SDL_MapRGB(gd_screen->format, 0, 0, 0));
+
+	gd_blittext_n(gd_screen, -1, y1+gd_line_height(), GD_GDASH_WHITE, question);
+	gd_blittext_printf_n(gd_screen, -1, y1+3*gd_line_height(), GD_GDASH_WHITE, "N: %s, Y: %s", answer1, answer2);
+	SDL_Flip(gd_screen);
+	
+	success=escape=FALSE;
+	n=0;
+	while (!gd_quit && !success && !escape) {
+		SDL_Event event;
+		
+		n=(n+1)%10;
+		
+		while(SDL_PollEvent(&event))
+			switch(event.type) {
+				case SDL_QUIT:
+					gd_quit=TRUE;
+					break;
+				
+				case SDL_KEYDOWN:
+					if (event.key.keysym.sym==SDLK_y) {	/* user pressed yes */
+						*result=TRUE;
+						success=TRUE;
+					}
+					else
+					if (event.key.keysym.sym==SDLK_n) {	/* user pressed no */
+						*result=FALSE;
+						success=TRUE;
+					}
+					else
+					if (event.key.keysym.sym==SDLK_ESCAPE)	/* user pressed escape */
+						escape=TRUE;
+					break;
+			}
+		
+		SDL_Delay(100);
+	}
+	/* restore screen */
+	gd_restore_screen();
+
+	gd_wait_for_key_releases();
+	
+	/* this will return true, if y or n pressed. returns false, if escape, or quit event */
+	return success;
+}
+
+
+gboolean
+gd_discard_changes()
+{
+	gboolean answered, result;
+		
+	/* if not edited, simply answer yes. */
+	if (!gd_caveset_edited)
+		return TRUE;
+		
+	/* if the caveset is edited, ask the user if to save. */
+	answered=gd_ask_yes_no("Caveset edited. Discard changes?", "Cancel", "Discard", &result);
+	if (!answered || !result)
+		/* if does not want to discard, say false */
+		return FALSE;
+	
+	return TRUE;
+}
+
+
+
 void
 gd_show_license()
 {
@@ -1030,7 +1137,7 @@ gd_show_license()
 	gd_status_line("SPACE: EXIT");
 
 	wrapped=gd_wrap_text(gd_about_license, 40);
-	gd_blittext_n(gd_screen, 0, gd_line_height(), GD_C64_LIGHTBLUE, wrapped);
+	gd_blittext_n(gd_screen, 0, gd_line_height(), GD_GDASH_LIGHTBLUE, wrapped);
 	g_free(wrapped);
 	SDL_Flip(gd_screen);
 
@@ -1047,8 +1154,8 @@ help_writeattrib(int x, int y, const char *name, const char *content)
 {
 	const int yd=gd_line_height();
 	
-	gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, name);
-	gd_blittext_n(gd_screen, x+10, y+yd, GD_C64_LIGHTBLUE, content);
+	gd_blittext_n(gd_screen, x, y, GD_GDASH_YELLOW, name);
+	gd_blittext_n(gd_screen, x+10, y+yd, GD_GDASH_LIGHTBLUE, content);
 	if (strchr(content, '\n'))
 		y+=yd;
 	
@@ -1063,11 +1170,11 @@ help_writeattribs(int x, int y, const char *name, const char *content[])
 	if (content!=NULL && content[0]!=NULL) {
 		int i;
 		
-		gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, name);
+		gd_blittext_n(gd_screen, x, y, GD_GDASH_YELLOW, name);
 
 		y+=yd;
 		for (i=0; content[i]!=NULL; i++) {
-			gd_blittext_n(gd_screen, x+10, y, GD_C64_LIGHTBLUE, content[i]);
+			gd_blittext_n(gd_screen, x+10, y, GD_GDASH_LIGHTBLUE, content[i]);
 			
 			y+=yd;
 		}
@@ -1124,7 +1231,7 @@ gd_show_error(GdErrorMessage *error)
 	gd_title_line("GDASH ERROR");
 	gd_status_line("ANY KEY: CONTINUE");
 	for (i=0; lines[i]!=NULL; i++)
-		gd_blittext_n(gd_screen, 8, y1+(i+1)*yd, GD_C64_WHITE, lines[i]);
+		gd_blittext_n(gd_screen, 8, y1+(i+1)*yd, GD_GDASH_WHITE, lines[i]);
 	SDL_Flip(gd_screen);
 	
 	wait_for_keypress();

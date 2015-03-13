@@ -23,13 +23,29 @@
 
 /*
  * A COMBO BOX with c64 colors.
- * use color_combo_new for creating and color_button_get_color for getting color in gdash format.
+ * use color_combo_new for creating and color_combo_get_color for getting color in gdash format.
  *
- * combo store rows 0-15 are c64 colors, 16 is a separator and 17 is "other".
- * internally, 16 is set to a custom selected color, so it can be seen in the combo.
- * selecting 17 triggers this, and then 16 is automatically selected.
  */
+/* this data field always stores the previously selected color. */
+/* it is needed when a select atari or select rgb dialog is escaped, and we must set the original color. */
+/* the combo box itself cannot store it, as is is already set to the select atari... or select rgb... line. */
 #define GDASH_COLOR "gdash-color"
+
+static GtkTreePath *selected_color_path=NULL;
+
+enum {
+	COL_COLOR_ACTION,
+	COL_COLOR_CODE,
+	COL_COLOR_NAME,
+	COL_COLOR_PIXBUF,
+};
+
+typedef enum {
+	COLOR_ACTION_NONE,
+	COLOR_ACTION_SELECT_ATARI,
+	COLOR_ACTION_SELECT_DTV,
+	COLOR_ACTION_SELECT_RGB,
+} ColorAction;
 
 /*
  * creates a small pixbuf with the specified color
@@ -45,157 +61,247 @@ color_pixbuf(GdColor col)
 
     pixbuf=gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, x, y);
     pixel=(gd_color_get_r(col)<<24) + (gd_color_get_g(col)<<16) + (gd_color_get_b(col)<<8);
-    gdk_pixbuf_fill (pixbuf, pixel);
+    gdk_pixbuf_fill(pixbuf, pixel);
+
 	return pixbuf;
-}
-
-/* selects a custom color: creates pixbuf, text, and selects row number 16. */
-static void
-color_combo_select_custom(GtkComboBox *combo, GdColor color)
-{
-	GtkTreeModel *model=gtk_combo_box_get_model(GTK_COMBO_BOX(combo));
-	GtkTreePath *path;
-	GtkTreeIter iter;
-	GdkPixbuf *pixbuf;
-	
-	path=gtk_tree_path_new_from_indices(16, -1);
-	gtk_tree_model_get_iter(model, &iter, path);
-
-	g_object_set_data(G_OBJECT(combo), GDASH_COLOR, GUINT_TO_POINTER(color));
-
-	pixbuf=color_pixbuf(color);
-	gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 2, pixbuf, 1, gd_color_get_visible_name(color), -1);
-	g_object_unref(pixbuf);
-
-	gtk_tree_path_free(path);
-	gtk_combo_box_set_active_iter(GTK_COMBO_BOX(combo), &iter);
 }
 
 /* set to a color - first check if that is a c64 color. */
 void
-gd_color_combo_set (GtkComboBox *combo, GdColor color)
+gd_color_combo_set(GtkComboBox *combo, GdColor color)
 {
-	if (gd_color_is_c64(color))
-		gtk_combo_box_set_active(combo, gd_color_get_c64_index(color));
-	else
-		color_combo_select_custom(combo, color);
+	g_object_set_data(G_OBJECT(combo), GDASH_COLOR, GUINT_TO_POINTER(color));
+	
+	if (gd_color_is_c64(color)) {
+		char *path;
+		GtkTreeIter iter;
+		
+		path=g_strdup_printf("0:%d", gd_color_get_c64_index(color));
+		gtk_tree_model_get_iter_from_string(gtk_combo_box_get_model(combo), &iter, path);
+		g_free(path);
+		gtk_combo_box_set_active_iter(combo, &iter);
+	}
+	else {
+		GtkTreeModel *model=gtk_combo_box_get_model(GTK_COMBO_BOX(combo));
+		GtkTreeIter iter;
+		GdkPixbuf *pixbuf;
+		
+		gtk_tree_model_get_iter(model, &iter, selected_color_path);
+
+		pixbuf=color_pixbuf(color);
+		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, COL_COLOR_CODE, color, COL_COLOR_PIXBUF, pixbuf, COL_COLOR_NAME, gd_color_get_visible_name(color), -1);
+		g_object_unref(pixbuf);	/* now the tree store owns its own reference */
+
+		gtk_combo_box_set_active_iter(GTK_COMBO_BOX(combo), &iter);
+	}
 }
 
-/* changed signal. for selected row 17, pops up color selection dialog;
- * for <16, it is a normal c64 color.
- */
 static void
-color_combo_changed (GtkWidget *combo, gpointer data)
+set_sensitive (GtkCellLayout *cell_layout, GtkCellRenderer *cell, GtkTreeModel *tree_model, GtkTreeIter *iter, gpointer data)
+{
+  g_object_set(cell, "sensitive", !gtk_tree_model_iter_has_child(tree_model, iter), NULL);
+}
+
+static gboolean
+drawing_area_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+	GtkDialog *dialog=GTK_DIALOG(data);
+	
+	gtk_dialog_response(dialog, GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(widget), GDASH_COLOR)));
+
+	return TRUE;
+}
+
+
+
+static void
+color_combo_changed(GtkWidget *combo, gpointer data)
 {
 	GtkTreeModel *model=gtk_combo_box_get_model(GTK_COMBO_BOX(combo));
 	GtkTreeIter iter;
-	int i;
-	
-	i=gtk_combo_box_get_active(GTK_COMBO_BOX(combo));
-	if (i==17) {
-		GtkWidget *dialog;
-		GtkColorSelection *colorsel;
- 		gint response;
- 		GdkColor gc;
- 		GdColor prevcol;
- 		
-		dialog=gtk_color_selection_dialog_new (_("Select Color"));
-		gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (gtk_widget_get_toplevel(combo)));
+	ColorAction action;
 
-		colorsel=GTK_COLOR_SELECTION (GTK_COLOR_SELECTION_DIALOG (dialog)->colorsel);
+	gtk_combo_box_get_active_iter(GTK_COMBO_BOX(combo), &iter);
+	gtk_tree_model_get(model, &iter, COL_COLOR_ACTION, &action, -1);
+	switch (action) {
+		case COLOR_ACTION_SELECT_RGB:
+			{
+				GtkWidget *dialog;
+				GtkColorSelection *colorsel;
+		 		gint response;
+		 		GdkColor gc;
+		 		GdColor prevcol;
+		 		
+				dialog=gtk_color_selection_dialog_new (_("Select Color"));
+				gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (gtk_widget_get_toplevel(combo)));
+
+				colorsel=GTK_COLOR_SELECTION (GTK_COLOR_SELECTION_DIALOG (dialog)->colorsel);
+				
+				prevcol=GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(combo), GDASH_COLOR));
+				gc.red=gd_color_get_r(prevcol)<<8;
+				gc.green=gd_color_get_g(prevcol)<<8;
+				gc.blue=gd_color_get_b(prevcol)<<8;
+				gtk_color_selection_set_previous_color (colorsel, &gc);
+				gtk_color_selection_set_current_color (colorsel, &gc);
+				gtk_color_selection_set_has_palette (colorsel, TRUE);
+
+				gtk_window_present_with_time(GTK_WINDOW(dialog), gtk_get_current_event_time());
+				response=gtk_dialog_run(GTK_DIALOG (dialog));
+
+				if (response==GTK_RESPONSE_OK) {
+					GdkColor gc;
+					GdColor color;
+					
+					gtk_color_selection_get_current_color(colorsel, &gc);
+					color=gd_color_get_from_rgb(gc.red>>8, gc.green>>8, gc.blue>>8);
+					gd_color_combo_set(GTK_COMBO_BOX(combo), color);
+				} else {
+					gd_color_combo_set(GTK_COMBO_BOX(combo), prevcol);
+				}
+
+				gtk_widget_destroy (dialog);	
+			}
+			break;
 		
-		prevcol=GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(combo), GDASH_COLOR));
-		gc.red=gd_color_get_r(prevcol)<<8;
-		gc.green=gd_color_get_g(prevcol)<<8;
-		gc.blue=gd_color_get_b(prevcol)<<8;
+		case COLOR_ACTION_SELECT_ATARI:
+		case COLOR_ACTION_SELECT_DTV:
+			{
+				GtkWidget *dialog, *table, *frame;
+		 		GdColor prevcol;
+				int i;
+				int result;
+				GdColor (*colorfunc) (int i);
+				const char *title;
+				
+				switch (action) {
+					case COLOR_ACTION_SELECT_ATARI:
+						title=_("Select Atari Color");
+						colorfunc=gd_atari_color;
+						break;
+					case COLOR_ACTION_SELECT_DTV:
+						title=_("Select C64 DTV Color");
+						colorfunc=gd_c64dtv_color;
+						break;
+					default:
+						g_assert_not_reached();
+				}
+				
+				dialog=gtk_dialog_new_with_buttons(title, GTK_WINDOW (gtk_widget_get_toplevel(combo)), GTK_DIALOG_NO_SEPARATOR, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+				table=gtk_table_new(16, 16, TRUE);
+				for (i=0; i<256; i++) {
+					GtkWidget *da;
+					GdkColor color;
+					GdColor c;
+					
+					da=gtk_drawing_area_new();
+					c=colorfunc(i);
+					g_object_set_data(G_OBJECT(da), GDASH_COLOR, GUINT_TO_POINTER(i));	/* attach the color index as data */
+					gtk_widget_add_events(da, GDK_BUTTON_PRESS_MASK);
+					gtk_widget_set_tooltip_text(da, gd_color_get_visible_name(c));
+					g_signal_connect(G_OBJECT(da), "button_press_event", G_CALLBACK(drawing_area_button_press_event), dialog);	/* mouse click */
+					color.red=gd_color_get_r(c)*256;	/* 256 as gdk expect 16-bit/component */
+					color.green=gd_color_get_g(c)*256;
+					color.blue=gd_color_get_b(c)*256;
+					gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &color);
+					gtk_widget_set_size_request(da, 16, 16);
+					gtk_table_attach_defaults(GTK_TABLE(table), da, i%16, i%16+1, i/16, i/16+1);
+				}
+				frame=gtk_frame_new(NULL);
+				gtk_container_set_border_width(GTK_CONTAINER(frame), 6);
+				gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+				gtk_container_add(GTK_CONTAINER(frame), table);
+				gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), frame);
+				gtk_widget_show_all(GTK_DIALOG(dialog)->vbox);
+				
+				prevcol=GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(combo), GDASH_COLOR));
+				result=gtk_dialog_run(GTK_DIALOG(dialog));
+				if (result>=0)
+					gd_color_combo_set(GTK_COMBO_BOX(combo), colorfunc(result));
+				else
+					gd_color_combo_set(GTK_COMBO_BOX(combo), prevcol);
 
-		gtk_color_selection_set_previous_color (colorsel, &gc);
-		gtk_color_selection_set_current_color (colorsel, &gc);
-		gtk_color_selection_set_has_palette (colorsel, TRUE);
-
-		gtk_window_present_with_time(GTK_WINDOW(dialog), gtk_get_current_event_time());
-		response = gtk_dialog_run (GTK_DIALOG (dialog));
-
-		if (response == GTK_RESPONSE_OK) {
-			GdkColor gc;
-			GdColor color;
-			
-			gtk_color_selection_get_current_color (colorsel, &gc);
-			color=gd_color_get_from_rgb(gc.red>>8, gc.green>>8, gc.blue>>8);
-			color_combo_select_custom(GTK_COMBO_BOX(combo), color);
-		} else {
-			gd_color_combo_set(GTK_COMBO_BOX(combo), prevcol);
-		}
-
-		gtk_widget_destroy (dialog);	
-
-	} else
-	if (i<16) {
-		GdColor c;
+				gtk_widget_destroy(dialog);
+			}
+			break;
 		
-		gtk_combo_box_get_active_iter(GTK_COMBO_BOX(combo), &iter);
-		gtk_tree_model_get(model, &iter, 0, &c, -1);
-		g_object_set_data(G_OBJECT(combo), GDASH_COLOR, GUINT_TO_POINTER(c));
-	}	
+		case COLOR_ACTION_NONE:
+			{
+				GdColor c;
+				
+				gtk_combo_box_get_active_iter(GTK_COMBO_BOX(combo), &iter);
+				gtk_tree_model_get(model, &iter, COL_COLOR_CODE, &c, -1);
+				g_object_set_data(G_OBJECT(combo), GDASH_COLOR, GUINT_TO_POINTER(c));
+			}
+			break;
+	}
 }
-
 /* A GtkTreeViewRowSeparatorFunc that demonstrates how rows can be
  * rendered as separators. This particular function does nothing 
  * useful and just turns the fourth row into a separator.
  */
-static gboolean color_button_is_separator (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
+static gboolean
+is_separator (GtkTreeModel *model, GtkTreeIter  *iter, gpointer data)
 {
-	GtkTreePath *path;
-	gboolean result;
+  GtkTreePath *path;
+  gboolean result;
 
-	path = gtk_tree_model_get_path (model, iter);
-	result = gtk_tree_path_get_indices (path)[0] == 16;
-	gtk_tree_path_free (path);
+  path=gtk_tree_model_get_path(model, iter);
+  result=!gtk_tree_path_compare(path, selected_color_path);
+  gtk_tree_path_free (path);
 
-	return result;
+  return result;
 }
-
-
 /* combo box creator. */
 GtkWidget *
-gd_color_combo_new (const GdColor color)
+gd_color_combo_new(const GdColor color)
 {
 	/* this is the base of the cave editor element combo box.
 	    categories are autodetected by their integer values being >O_MAX */
 	GtkTreeStore *store;
 	GtkWidget *combo;
 	GtkCellRenderer *renderer;
-    GtkTreeIter iter;
+    GtkTreeIter iter, parent;
     int i;
 
 	/* tree store for colors. every combo has its own, as the custom color can be different. */
-    store = gtk_tree_store_new (3, G_TYPE_UINT, G_TYPE_STRING, GDK_TYPE_PIXBUF);
+    store=gtk_tree_store_new(4, G_TYPE_INT, G_TYPE_UINT, G_TYPE_STRING, GDK_TYPE_PIXBUF);
+    
+    /* add 16 c64 colors */
+    gtk_tree_store_append(store, &parent, NULL);
+    gtk_tree_store_set(store, &parent, COL_COLOR_CODE, 0, COL_COLOR_NAME, _("C64 Colors"), COL_COLOR_PIXBUF, NULL, -1);
     for (i = 0; i<16; i++) {
         GdkPixbuf *pixbuf;
 
         pixbuf=color_pixbuf(gd_c64_color(i));
-        gtk_tree_store_append (store, &iter, NULL);
-        gtk_tree_store_set (store, &iter, 0, gd_c64_color(i), 1, _(gd_color_get_visible_name(gd_c64_color(i))), 2, pixbuf, -1);
+        gtk_tree_store_append(store, &iter, &parent);
+        gtk_tree_store_set(store, &iter, COL_COLOR_ACTION, COLOR_ACTION_NONE, COL_COLOR_CODE, gd_c64_color(i), COL_COLOR_NAME, _(gd_color_get_visible_name(gd_c64_color(i))), COL_COLOR_PIXBUF, pixbuf, -1);
         g_object_unref (pixbuf);
     }
-    gtk_tree_store_append (store, &iter, NULL);	/* will be the separator */
-    gtk_tree_store_append (store, &iter, NULL);
-    gtk_tree_store_set (store, &iter, 0, 0, 1, _("Other"), 2, NULL, -1);
-
-	combo = gtk_combo_box_new_with_model (GTK_TREE_MODEL (store));
-    gtk_combo_box_set_row_separator_func (GTK_COMBO_BOX (combo), color_button_is_separator, NULL, NULL);
+    gtk_tree_store_append(store, &iter, NULL);
+	if (!selected_color_path)    
+		selected_color_path=gtk_tree_model_get_path(GTK_TREE_MODEL(store), &iter);
+    gtk_tree_store_append(store, &iter, NULL);
+    gtk_tree_store_set(store, &iter, COL_COLOR_ACTION, COLOR_ACTION_SELECT_ATARI, COL_COLOR_CODE, 0, COL_COLOR_NAME, _("Atari color..."), COL_COLOR_PIXBUF, NULL, -1);
+    gtk_tree_store_append(store, &iter, NULL);
+    gtk_tree_store_set(store, &iter, COL_COLOR_ACTION, COLOR_ACTION_SELECT_DTV, COL_COLOR_CODE, 0, COL_COLOR_NAME, _("C64DTV color..."), COL_COLOR_PIXBUF, NULL, -1);
+    gtk_tree_store_append(store, &iter, NULL);
+    gtk_tree_store_set(store, &iter, COL_COLOR_ACTION, COLOR_ACTION_SELECT_RGB, COL_COLOR_CODE, 0, COL_COLOR_NAME, _("RGB color..."), COL_COLOR_PIXBUF, NULL, -1);
+    
+	combo=gtk_combo_box_new_with_model(GTK_TREE_MODEL(store));
 	/* first column, object image */
-	renderer = gtk_cell_renderer_pixbuf_new ();
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, FALSE);
-	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "pixbuf", 2, NULL);
-
+	renderer=gtk_cell_renderer_pixbuf_new ();
+	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT (combo), renderer, FALSE);
+	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "pixbuf", COL_COLOR_PIXBUF, NULL);
+	gtk_cell_layout_set_cell_data_func (GTK_CELL_LAYOUT (combo), renderer, set_sensitive, NULL, NULL);
 	/* second column, object name */
 	renderer = gtk_cell_renderer_text_new ();
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, TRUE);
-	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "text", 1, NULL);
+	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT (combo), renderer, TRUE);
+	gtk_cell_layout_set_cell_data_func (GTK_CELL_LAYOUT (combo), renderer, set_sensitive, NULL, NULL);
+	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "text", COL_COLOR_NAME, NULL);
+	gtk_combo_box_set_row_separator_func(GTK_COMBO_BOX(combo), is_separator, NULL, NULL);
 
-	g_signal_connect(G_OBJECT(combo), "changed", G_CALLBACK(color_combo_changed), NULL);
 	gd_color_combo_set(GTK_COMBO_BOX(combo), color);
+	g_signal_connect(G_OBJECT(combo), "changed", G_CALLBACK(color_combo_changed), NULL);
 
 	return combo;
 }
@@ -203,7 +309,13 @@ gd_color_combo_new (const GdColor color)
 GdColor
 gd_color_combo_get_color(GtkWidget *widget)
 {
-	return GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(widget), GDASH_COLOR));
+	GtkTreeModel *model=gtk_combo_box_get_model(GTK_COMBO_BOX(widget));
+	GtkTreeIter iter;
+	GdColor color;
+
+	gtk_combo_box_get_active_iter(GTK_COMBO_BOX(widget), &iter);
+	gtk_tree_model_get(model, &iter, COL_COLOR_CODE, &color, -1);
+	return color;
 }
 
 #undef GDASH_COLOR
@@ -247,8 +359,8 @@ button_drawing_area_expose_event (const GtkWidget * widget, const GdkEventExpose
 	
 	if (cell)
 		gdk_draw_drawable (widget->window, widget->style->black_gc, cell, 0, 0, 2, 2, gd_cell_size_editor, gd_cell_size_editor);
-	gdk_draw_rectangle (widget->window, widget->style->black_gc, FALSE, 0, 0, gd_cell_size_editor+3, gd_cell_size_editor+3);
-	gdk_draw_rectangle (widget->window, widget->style->black_gc, FALSE, 1, 1, gd_cell_size_editor+1, gd_cell_size_editor+1);
+//	gdk_draw_rectangle (widget->window, widget->style->black_gc, FALSE, 0, 0, gd_cell_size_editor+3, gd_cell_size_editor+3);
+//	gdk_draw_rectangle (widget->window, widget->style->black_gc, FALSE, 1, 1, gd_cell_size_editor+1, gd_cell_size_editor+1);
 	return TRUE;
 }
 
@@ -294,7 +406,7 @@ redraw_timeout (gpointer data)
 
 
 void
-gd_element_button_set (GtkWidget *button, const GdElement element)
+gd_element_button_set(GtkWidget *button, const GdElement element)
 {
 	GtkWidget *image;
 
@@ -401,10 +513,11 @@ element_button_clicked_func(GtkWidget *button, gboolean stay_open)
 	GList *areas=NULL;
 	GtkWidget *dialog, *expander, *table, *table2, *align, *vbox;
 	int into_second=0;
+	GdkColor c;
 	
+	/* if the dialog is already open, only show it. */
 	dialog=(GtkWidget *)(g_object_get_data(G_OBJECT(button), GDASH_DIALOG));
 	if (dialog) {
-		/* if the dialog is already open, only show it. */
 		gtk_window_present(GTK_WINDOW(dialog));
 
 		return;
@@ -428,26 +541,33 @@ element_button_clicked_func(GtkWidget *button, gboolean stay_open)
 	gtk_container_add(GTK_CONTAINER(align), gtk_label_new(_("Normal elements")));
 	gtk_box_pack_start_defaults(GTK_BOX(vbox), align);
 	
+	
     table=gtk_table_new(0, 0, TRUE);
     gtk_container_set_border_width(GTK_CONTAINER(table), 6);
     gtk_box_pack_start_defaults(GTK_BOX(vbox), table);
-    
+
     expander=gtk_expander_new(_("For effects"));
     table2=gtk_table_new(0, 0, TRUE);
     gtk_container_set_border_width(GTK_CONTAINER(table2), 6);
     gtk_container_add(GTK_CONTAINER(expander), table2);
     gtk_box_pack_start_defaults(GTK_BOX(vbox), expander);
 
+	/* color for background around elements. */
+	/* gdkcolors are 16bit, we should *256, but instead *200 so a bit darker. */
+	c.red=gd_color_get_r(gd_current_background_color())*200;
+	c.green=gd_color_get_g(gd_current_background_color())*200;
+	c.blue=gd_color_get_b(gd_current_background_color())*200;
     /* create drawing areas */
     for (i=0; i<G_N_ELEMENTS(elements); i++) {
     	GtkWidget *da;
     	
 		da=gtk_drawing_area_new();
+		gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &c);
 		areas=g_list_prepend(areas, da);	/* put in list for animation timeout, that one will request redraw on them */
 		gtk_widget_add_events(da, GDK_BUTTON_PRESS_MASK|GDK_LEAVE_NOTIFY_MASK|GDK_ENTER_NOTIFY_MASK);
         g_object_set_data(G_OBJECT(da), GDASH_ELEMENT, GINT_TO_POINTER(elements[i]));
         g_object_set_data(G_OBJECT(da), GDASH_BUTTON, button);	/* button to update on click */
-		gtk_widget_set_size_request(da, gd_cell_size_editor+4, gd_cell_size_editor+4);
+		gtk_widget_set_size_request(da, gd_cell_size_editor+4, gd_cell_size_editor+4);	/* 2px border around them */
         gtk_widget_set_tooltip_text(da, _(gd_elements[elements[i]].name));
 		g_signal_connect(G_OBJECT(da), "expose-event", G_CALLBACK(button_drawing_area_expose_event), GINT_TO_POINTER(elements[i]));
 		g_signal_connect(G_OBJECT(da), "leave-notify-event", G_CALLBACK(button_drawing_area_crossing_event), NULL);
@@ -567,16 +687,16 @@ GtkWidget *
 gd_element_button_new(GdElement initial_element, gboolean stays_open, const char *special_title)
 {
 	GtkWidget *button;
-
+	
 	button=gtk_button_new();
 	g_signal_connect(G_OBJECT(button), "destroy", (GCallback) element_button_destroyed, NULL);
-	/* minimum width 128pix */
+	/* minimum width 128px */
 	gtk_widget_set_size_request(button, 128, -1);
 	if (stays_open)
 		g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(element_button_clicked_stay_open), NULL);
 	else
 		g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(element_button_clicked_modal), NULL);
-
+	
 	/* set the associated string which will be the title of the element box window opened */
 	gd_element_button_set_dialog_title(button, special_title);
 
@@ -638,21 +758,21 @@ gd_direction_combo_new(const GdDirection initial)
 		store=gtk_list_store_new (NUM_DIR_COLS, GDK_TYPE_PIXBUF, G_TYPE_STRING);
 
 		for (i=0; i<G_N_ELEMENTS(shown_dirs); i++) {
-			gtk_list_store_append (store, &iter);
+			gtk_list_store_append(store, &iter);
 			pixbuf=gtk_widget_render_icon(cellview, dir_icons[i], GTK_ICON_SIZE_MENU, NULL);
-			gtk_list_store_set (store, &iter, DIR_PIXBUF_COL, pixbuf, DIR_TEXT_COL, _(gd_direction_get_visible_name(shown_dirs[i])), -1);
+			gtk_list_store_set(store, &iter, DIR_PIXBUF_COL, pixbuf, DIR_TEXT_COL, _(gd_direction_get_visible_name(shown_dirs[i])), -1);
 		}
 
 		gtk_widget_destroy(cellview);
 	}
 
 	/* create combo box and renderer for icon and text */
-	combo=gtk_combo_box_new_with_model (GTK_TREE_MODEL(store));
+	combo=gtk_combo_box_new_with_model(GTK_TREE_MODEL(store));
     renderer=gtk_cell_renderer_pixbuf_new ();
-    gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, FALSE);
+    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT (combo), renderer, FALSE);
     gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "pixbuf", DIR_PIXBUF_COL, NULL);
     renderer=gtk_cell_renderer_text_new ();
-    gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, FALSE);
+    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT (combo), renderer, FALSE);
     gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "text", DIR_TEXT_COL, NULL);
 
 	/* set to initial value */
@@ -691,7 +811,7 @@ gd_scheduling_combo_new(const GdScheduling initial)
 	combo=gtk_combo_box_new_text();
 
 	for (i=0; i<GD_SCHEDULING_MAX; i++)
-		gtk_combo_box_append_text(GTK_COMBO_BOX(combo), _(gd_scheduling_name[i]));
+		gtk_combo_box_append_text(GTK_COMBO_BOX(combo), _(gd_scheduling_get_visible_name((GdScheduling) i)));
 
 	gtk_combo_box_set_active(GTK_COMBO_BOX(combo), initial);
 	

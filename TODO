@@ -1,66 +1,87 @@
 DONE
 ----- 
-All drawing objects should wraparound, at least when lineshifted borders are activated.
-bd2 scheduling now correct for c64, atari
-german translation capital nouns
-c64 szineket egysegbe foglalni (a c64 grafika importnal)
-new imported games
-	*) boulder dash 1-2-3 plus  - TO BE TESTED
-- Atari colors.
-2x scroll for lcd
-50hz scroll (sdash only)
-gravity switch can be activated at cave start
-- Default timing values reflect a real-world setting to begin with. For example, default cave timing (ms) might be 180, 160, 140, 120, 120. There might be other things that occur to you.
-new cave dialog asks if intermission and sets size
+enhanced timing for both sdash and gdash
+I noted a wrong explanatation concerning the scheduling tyres.
+Another thing: In cave properties can you move the tab "Notes" to the most right?
+invisible outbox do not like; csak grafikailag.
+The 3x nearest scaler looks distorted in sdash, ie. the top row and leftmost column of each element have 4 pixels and the bottom row and rightmost column have only 2. This issue is sdash only.
+And better handling for unknown color names would be very nice too.
+small bugfixes
+random atari colors, also for new caves (selectable)
+warning message for cave size change
+fine scroll mentes
+cave colors dialog escape
+I see you read Atari## colors from BDCFF files now. That's nice. If we could select them in the color picker as well, that would be perfect.
+random atari colors
+kolor szelekcio idejere kikapcsolni
+theme váltás után (de ugyanaz a szín) nem töltötte be újra a szarokat!
+a randomcolor nem mindig allitja at valahogy a gdash_colort?
+scroll speed for 50hz
+cave seed max 1<<30
+crazy dream copy object import
+copy&paste objects
+c64dtv colors: look like the same as atari colors. BUT SHOW ME AT LEAST ONE GAME WHICH USES IT
+brc amoeba probability import
+random rgb colors
+slower explosion tags now affect all. i know this is not the same as the original, but seemed much nicer.
+sdashban ez könnyű, bónús lífé felirat
+html-be notes
+paletted colors in sdash - tesztelni, állítgatni?
+preferred colors helyett - gdash title screenről választott?
+gdashnál egy infó gomb?	- name	- author	- date	- difficulty *	- remark *	- notes *
+replay help
+bonus sound nem tűnt el lol
+Either way, though, I think that the player should always be notified they're playing an intermission from the start (even if it means not using the opening status bar at all) It's not like you need to keep track of your lives during an intermission anyway.
+reowrked gdash status bar
+- Pushing probability of 4 mistranslates to 50%. It should be 25%. 
+	- sdash replay save
+changed saving of "notes" - sorry if some lines are lost
 
-
-gtk+ dialog kijavitva
+REFUSED
+-------
+They should be chosen like with the Random button in gdash's color picker, which produces quite useful colors. Same for BDCFF files with no colors specified at all. 
 
 
 TO DO
 -----
-amoeba threshold
+sdl event kezelés
+
+copy&paste elengedés után movera vált,
+
+brc slime permeability
+if (random(slime*4)<4) and (tab[x,y+2]=0) then
+      Begin tab[x,y]:=0;col[x,y+2]:=col[x,y];tab[x,y+2]:=27;mat[x,y+2]:=9;Voice4:=2;end;
+- Time bonus of -100 really seems odd.
+
+- teszt
+- replay checksumon gondolkozni
+	- átlalános cave checksum az elemek bdcff karaktere alapján?	
+
+replay folyamatos lejátszás? - egymás után nyomja őket
+
+amoeba threshold - belül %-ban tárolódik,
+de az editor átállítja?
+
+
+gtk verzióba		{TypeBoolean, N_("Even lines vertical scroll"), N_("Even lines vertical scroll"), &gd_even_line_pal_emu_vertical_scroll, FALSE},
+
 
 bdcff beolvasás miért hash table?
   size és hasonló szarok miatt
-  de tobb értéket is kéne tárolni
-  "multimap"
-  dynstring beolvasást jobban beépíteni - mindenhol gstring?
+  de tobb értéket is kéne tárolni esetleg, a hash table ezt akadályozza
 
-1stB, CrLi uses 4 stages for ghost explosion, clock birth, steelwall birth, bomb explosion and boulder birth each. The first is for delay state purposes and has the same graphics assigned as the 2nd stage. The 3rd and 4th are for the following frames with the other two explosion graphics. That makes those explosions last for 3 frames actually.
-I noticed that GDash uses 4 different graphics for those and they also last 4 frames.
-Same with the bomb, once armed, it lasts 6 frames until it explodes while it is 7 in GDash.
-
-jatek/palya inditasanal latszodjanak dolgok?
-  - nev
-  - description
-  - remark?
-  - notes?
-	Either way, though, I think that the player should always be notified they're playing an intermission from the start (even if it means not using the opening status bar at all) It's not like you need to keep track of your lives during an intermission anyway.
-	- sdashban ez könnyű, bónús lífé felirat
+dynstring beolvasást jobban beépíteni - mindenhol gstring?
 
 As there is an Amoeba 2 now, I think it would be nice to be able to set a different color for that then Amoeba 1!
 
 sound:
 	amoeba2
 	creature change dir
-	option to choose between C64 and Atari sound sets. - Sound themes
-
-bottom border for plck caves	There is one key routine at 5dce in every PLCK based game, except for DLP1.55:
-	.C:5dce   A9 07      LDA #$07
-	.C:5dd0   A0 27      LDY #$27
-	.C:5dd2   99 98 0B   STA $0B98,Y
-	.C:5dd5   88         DEY
-	.C:5dd6   10 FA      BPL $5DD2
-	.C:5dd8   60         RTS
+	themes
 
 design tips?
 
 surprise element
-
-loading imported caves with the default struct?
-
-apply the current cave timing settings to all the caves at once
 
 Scheduling:	different settings for clck, 1stb?
 	
@@ -70,11 +91,7 @@ extensive commenting
 
 cow not perfect
 
-record and playback of games
-
 option "More than 1 bomb" in the cave settings
-
-copy&paste objects?
 
 compat:
 	*) magicwall breakscan; De Luxe Caves 1 Cave L, De Luxe Caves 2 Cave A, Deluxe Caves 3 Cave A 

@@ -32,6 +32,7 @@ typedef enum _object_enum {
 	MAZE_UNICURSAL,		/* unicursal maze */
 	MAZE_BRAID,			/* braid maze */
 	RANDOM_FILL,		/* random fill */
+	COPY_PASTE,			/* copy & paste with optional mirror and flip */
 } GdObjectType;
 
 typedef enum _gd_object_levels {
@@ -53,8 +54,11 @@ typedef struct _object {
 	int x2, y2;				/* second coordinate */
 	int dx, dy;				/* distance of elements for raster or join */
 	GdElement element, fill_element;		/* element type */
+
 	gint32 seed[5];			/* for maze and random fill */
 	int horiz;				/* for maze */
+	
+	gboolean mirror, flip;	/* for copy */
 
 	gboolean c64_random;	/* random fill objects: use c64 random generator */	
 	GdElement random_fill[4];
@@ -72,6 +76,8 @@ typedef struct _objdesc {
 	char *first_button, *second_button;
 	char *horiz;
 	char *c64_random;
+	char *mirror;
+	char *flip;
 } GdObjectDescription;
 
 extern GdObjectDescription gd_object_description[];

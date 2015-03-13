@@ -8,11 +8,7 @@ Version=0.5
 Name=Engine tests
 Description=Caves which test some element
 Lives=4 9
-Notes=caveset
-Notes=  data
-Notes=bla
-Notes=bla.
-Notes=
+Notes=caveset\n  data\nbla\nbla.\n
 Levels=5
 
 [cave]
@@ -23,22 +19,6 @@ Levels=5
 Name=Voodoo
 Intermission=false
 Size=40 22 0 0 39 21
-Notes=Notes for the cave 'Voodoo'.
-Notes=
-Notes=		/* dynamic string: split to lines */
-Notes=		if (prop_desc[i].type==GD_TYPE_DYNSTRING) {
-Notes=			char *text=G_STRUCT_MEMBER(char *, str, prop_desc[i].offset);
-Notes=			char **lines;
-Notes=			int j;
-Notes=
-Notes=			if (!text || g_str_equal(text, ""))
-Notes=				continue;
-Notes=			lines=g_strsplit_set(text, "\n", -1);
-Notes=			for (j=0; lines[j]!=NULL; j++)
-Notes=				g_ptr_array_add(out, g_strdup_printf("%s=%s", prop_desc[i].identifier, lines[j]));
-Notes=			g_strfreev(lines);
-Notes=		}
-Notes=
 Colors=Black Black Orange Brown Gray3 Gray3 Yellow
 DiamondsRequired=15 15 15 15 15
 DiamondValue=0 0
@@ -63,6 +43,7 @@ AcidProperties=DIRT 0.1000
 EnemyDirectionProperties.changeathatching=true
 BorderProperties.lineshift=true
 ShortExplosions=false
+Notes=Notes for the cave 'Voodoo'.\n\n\t\t/* dynamic string: split to lines */\n\t\tif (prop_desc[i].type==GD_TYPE_DYNSTRING) {\n\t\t\tchar *text=G_STRUCT_MEMBER(char *, str, prop_desc[i].offset);\n\t\t\tchar **lines;\n\t\t\tint j;\n\n\t\t\tif (!text || g_str_equal(text, \"\"))\n\t\t\t\tcontinue;\n\t\t\tlines=g_strsplit_set(text, \"\\n\", -1);\n\t\t\tfor (j=0; lines[j]!=NULL; j++)\n\t\t\t\tg_ptr_array_add(out, g_strdup_printf(\"%s=%s\", prop_desc[i].identifier, lines[j]));\n\t\t\tg_strfreev(lines);\n\t\t}\n
 
 [objects]
 Point=3 4 INBOX
@@ -230,7 +211,10 @@ Line=7 9 10 9 DIRT
 
 [cave]
 [highscore]
+1566 Czirkos Zoltan
+1561 Czirkos Zoltan
 1392 Czirkos Zoltan
+1291 Czirkos Zoltan
 [/highscore]
 Name=Amoeba and bonus
 Intermission=false
@@ -264,7 +248,7 @@ ShortExplosions=false
 [objects]
 FillRect=4 2 8 6 BOULDER AMOEBA
 Point=19 5 INBOX
-FillRect=30 2 34 6 DIAMOND
+FillRect=28 2 34 6 DIAMOND
 Point=8 0 OUTBOX
 FillRect=12 2 16 6 BOULDER AMOEBA2
 Line=19 8 28 8 MAGICWALL
@@ -466,6 +450,9 @@ Point=10 10 WALLSLOPEDDOWNLEFT
 Point=10 9 WALLSLOPEDUPLEFT
 Point=11 9 WALLSLOPEDUPRIGHT
 Rectangle=9 8 12 11 SPACE
+CopyPaste=9 8 12 11 22 7 nomirror noflip
+CopyPaste=9 8 12 11 22 11 mirror flip
+CopyPaste=22 7 25 14 33 5 nomirror noflip
 [/objects]
 [/cave]
 

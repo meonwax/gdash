@@ -375,17 +375,17 @@ static int try_plck()
 			/* go through all caves and add no1v5.3e compatible flags */
 			for (j=0; j<i; j++) {
 				/* flags used previously on c64; gdash also knows them */
-				out[0x0002+0x0200*j+0x1e5]=0x20;
-				out[0x0002+0x0200*j+0x1e6]=0x90;
-				out[0x0002+0x0200*j+0x1e7]=0x46;
+				out[12+0x0200*j+0x1e5]=0x20;
+				out[12+0x0200*j+0x1e6]=0x90;
+				out[12+0x0200*j+0x1e7]=0x46;
 
 				/* set detected stuff for cave */
-				out[0x0002+0x0200*j+0x1ea]=b_stone_to;
-				out[0x0002+0x0200*j+0x1eb]=f_diamond_to;
-				out[0x0002+0x0200*j+0x1ec]=explosion_to;
-				out[0x0002+0x0200*j+0x1ed]=dirt_pointer;
-				out[0x0002+0x0200*j+0x1ee]=growing_pointer;
-				out[0x0002+0x0200*j+0x1ef]=200;	/* FIXME AMOEBA THRESHOLD */
+				out[12+0x0200*j+0x1ea]=b_stone_to;
+				out[12+0x0200*j+0x1eb]=f_diamond_to;
+				out[12+0x0200*j+0x1ec]=explosion_to;
+				out[12+0x0200*j+0x1ed]=dirt_pointer;
+				out[12+0x0200*j+0x1ee]=growing_pointer;
+				out[12+0x0200*j+0x1ef]=200;	/* FIXME AMOEBA THRESHOLD */
 			}
 		}
 		/* null out effects we could handle */
@@ -401,7 +401,7 @@ static int try_plck()
 		/* and check if there are others we cannot fit into a "standard" cawe */
 		for (j=0; j<numbers; j++)
 			if (diffs[j]) {
-				printf("*** Don't know how to handle effect for element number %x\n", j);
+				printf("*** Don't know how to handle effect for element number %x, default %x, this one %x\n", j, default_effect[j], memory[0x3b00+j]);
 			}
 	}
 	return 1;

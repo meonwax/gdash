@@ -210,3 +210,45 @@ gd_wrap_text(const char *orig, int width)
 }
 
 
+/* return current date in 2008-12-04 format */
+const char *
+gd_get_current_date()
+{
+	GDate *dat;
+	static char dats[128];
+	
+	dat=g_date_new();
+	g_date_set_time_t(dat, time(NULL));
+	g_date_strftime(dats, sizeof(dats), "%Y-%m-%d", dat);
+	g_date_free(dat);
+	
+	return dats;
+}
+
+/* return current date in 2008-12-04 12:34 format */
+const char *
+gd_get_current_date_time()
+{
+	GDate *dat;
+	static char dats[128];
+	
+	dat=g_date_new();
+	g_date_set_time_t(dat, time(NULL));
+	g_date_strftime(dats, sizeof(dats), "%Y-%m-%d %H:%I", dat);
+	g_date_free(dat);
+	
+	return dats;
+}
+
+int
+gd_clamp(int val, int min, int max)
+{
+	g_assert(min<=max);
+	
+	if (val<min)
+		return min;
+	if (val>max)
+		return max;
+	return val;
+}
+

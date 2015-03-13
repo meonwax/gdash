@@ -235,7 +235,7 @@ GdPropertyDefault gd_defaults_bd1[] = {
 	{CAVE_OFFSET(intermission_rewardlife), FALSE}, 
 	{CAVE_OFFSET(magic_wall_stops_amoeba), TRUE}, 
 	{CAVE_OFFSET(magic_timer_wait_for_hatching), FALSE}, 
-	{CAVE_OFFSET(pushing_stone_prob), 125000},
+	{CAVE_OFFSET(pushing_stone_prob), 250000},
 	{CAVE_OFFSET(pushing_stone_prob_sweet), 1000000},
 	{CAVE_OFFSET(active_is_first_found), FALSE}, 
 	{CAVE_OFFSET(short_explosions), TRUE}, 
@@ -268,7 +268,7 @@ GdPropertyDefault gd_defaults_bd2[] = {
 	{CAVE_OFFSET(intermission_rewardlife), FALSE},
 	{CAVE_OFFSET(magic_wall_stops_amoeba), FALSE},	/* marek roth bd inside faq 3.0 */
 	{CAVE_OFFSET(magic_timer_wait_for_hatching), FALSE},
-	{CAVE_OFFSET(pushing_stone_prob), 125000},
+	{CAVE_OFFSET(pushing_stone_prob), 250000},
 	{CAVE_OFFSET(pushing_stone_prob_sweet), 1000000},
 	{CAVE_OFFSET(active_is_first_found), FALSE},
 	{CAVE_OFFSET(short_explosions), TRUE},
@@ -301,7 +301,7 @@ GdPropertyDefault gd_defaults_plck[] = {
 	{CAVE_OFFSET(intermission_rewardlife), FALSE},
 	{CAVE_OFFSET(magic_wall_stops_amoeba), FALSE},
 	{CAVE_OFFSET(magic_timer_wait_for_hatching), FALSE},
-	{CAVE_OFFSET(pushing_stone_prob), 125000},
+	{CAVE_OFFSET(pushing_stone_prob), 250000},
 	{CAVE_OFFSET(pushing_stone_prob_sweet), 1000000},
 	{CAVE_OFFSET(active_is_first_found), FALSE},
 	{CAVE_OFFSET(short_explosions), TRUE},
@@ -328,7 +328,7 @@ GdPropertyDefault gd_defaults_1stb[] = {
 	{CAVE_OFFSET(intermission_instantlife), FALSE},
 	{CAVE_OFFSET(intermission_rewardlife), TRUE},
 	{CAVE_OFFSET(magic_timer_wait_for_hatching), TRUE},
-	{CAVE_OFFSET(pushing_stone_prob), 125000},
+	{CAVE_OFFSET(pushing_stone_prob), 250000},
 	{CAVE_OFFSET(pushing_stone_prob_sweet), 1000000},
 	{CAVE_OFFSET(active_is_first_found), TRUE},
 	{CAVE_OFFSET(short_explosions), FALSE},
@@ -358,7 +358,7 @@ GdPropertyDefault gd_defaults_crdr_7[] = {
 	{CAVE_OFFSET(intermission_instantlife), FALSE},
 	{CAVE_OFFSET(intermission_rewardlife), TRUE},
 	{CAVE_OFFSET(magic_timer_wait_for_hatching), TRUE},
-	{CAVE_OFFSET(pushing_stone_prob), 125000},
+	{CAVE_OFFSET(pushing_stone_prob), 250000},
 	{CAVE_OFFSET(pushing_stone_prob_sweet), 1000000},
 	{CAVE_OFFSET(active_is_first_found), TRUE},
 	{CAVE_OFFSET(short_explosions), FALSE},
@@ -390,7 +390,7 @@ GdPropertyDefault gd_defaults_crli[] = {
 	{CAVE_OFFSET(intermission_instantlife), FALSE},
 	{CAVE_OFFSET(intermission_rewardlife), TRUE},
 	{CAVE_OFFSET(magic_timer_wait_for_hatching), TRUE},
-	{CAVE_OFFSET(pushing_stone_prob), 125000},
+	{CAVE_OFFSET(pushing_stone_prob), 250000},
 	{CAVE_OFFSET(pushing_stone_prob_sweet), 1000000},
 	{CAVE_OFFSET(active_is_first_found), TRUE},
 	{CAVE_OFFSET(short_explosions), FALSE},
@@ -1245,6 +1245,7 @@ cave_copy_from_dlb (Cave *cave, const guint8 *data, int remaining_bytes)
 	pos=13;	/* those 13 bytes were the cave values above */
 	cavepos=0;
 	byte=0;					/* just to get rid of compiler warning */
+	separator=0;			/* just to get rid of compiler warning */
 	/* employ a state machine. */
 	state=START;
 	while (cavepos<400 && pos<remaining_bytes) {
@@ -1560,14 +1561,10 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 	cave->acid_spread_ratio=data[0x38]/255.0;
 	cave->acid_eats_this=crazydream_import_table[data[0x39]];
 	switch(data[0x3a]&3) {
-		case 0:
-			cave->gravity=MV_UP; break;
-		case 1:
-			cave->gravity=MV_DOWN; break;
-		case 2:
-			cave->gravity=MV_LEFT; break;
-		case 3:
-			cave->gravity=MV_RIGHT; break;
+		case 0: cave->gravity=MV_UP; break;
+		case 1: cave->gravity=MV_DOWN; break;
+		case 2: cave->gravity=MV_LEFT; break;
+		case 3:	cave->gravity=MV_RIGHT; break;
 	}
 	cave->snap_element=((data[0x3a]&4)!=0)?O_EXPLODE_1:O_SPACE;
 	/* we do not know the values for these, so do not import */
@@ -1662,11 +1659,17 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 				index+=5;
 				break;
 			case 7: /* paste */
-				gd_flatten_cave(cave, 0);	/* flatten cave, so a map is available. flatten at level 1 - level is not important */
-				for (ny=0; ny<ch; ny++)
-					for (nx=0; nx<cw; nx++)
-						cave->map[data[index+2]+ny][data[index+1]+nx]=cave->map[cy1+ny][cx1+nx];
-				object.type=NONE;
+				object.type=COPY_PASTE;
+				object.x1=cx1;
+				object.y1=cy1;
+				object.x2=cx1+cw-1;			/* original stored width and height, we store the coordinates of the source area */
+				object.y2=cy1+ch-1;
+				object.dx=data[index+1];	/* new pos */
+				object.dy=data[index+2];
+				object.flip=FALSE;
+				object.mirror=FALSE;
+				if (data[index+1]>=cave->w || data[index+2]>=cave->h || data[index+1]+cw>cave->w || data[index+2]+ch>cave->h)
+					g_warning("invalid paste coordinates %d,%d at byte %d", data[index+1], data[index+2], index);
 				index+=3;
 				break;
 			case 11: /* raster */

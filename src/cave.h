@@ -363,11 +363,13 @@ typedef enum _element_property {
 	P_EXPLODES_TO_STONES = 1<<10,		/* explodes to rocks if hit by a rock */
 	P_EXPLODES_AS_NITRO = 1<<11,		/* explodes as nitro pack */
 	P_EXPLODES=P_EXPLODES_TO_SPACE|P_EXPLODES_TO_DIAMONDS|P_EXPLODES_TO_STONES|P_EXPLODES_AS_NITRO,	/* explodes to something if hit */
+	P_EXPLOSION_FIRST_STAGE = 1<<12,			/* set for first stage of every explosion. helps slower/faster explosions changing */
 
-	P_NON_EXPLODABLE = 1<<12,		/* selfexplaining */
-	P_CCW = 1<<13,					/* this creature has a default counterclockwise rotation (for example, o_fire_1) */
-	P_CAN_BE_HAMMERED = 1<<14,		/* can be broken by pneumatic hammer */
-	P_VISUAL_EFFECT = 1<<15,		/* if the element can use a visual effect. used to check consistency of the code */
+	P_NON_EXPLODABLE = 1<<13,		/* selfexplaining */
+	P_CCW = 1<<14,					/* this creature has a default counterclockwise rotation (for example, o_fire_1) */
+	P_CAN_BE_HAMMERED = 1<<15,		/* can be broken by pneumatic hammer */
+	P_VISUAL_EFFECT = 1<<16,		/* if the element can use a visual effect. used to check consistency of the code */
+	P_PLAYER = 1<<17,						/* easier to find out if it is a player element */
 } GdElementProperties;
 
 
@@ -527,21 +529,25 @@ typedef struct _highscore {
 	int score;
 } GdHighScore;
 
-enum _gd_demo_bits {
-	GD_DEMO_MOVEMENT_SHIFT=0,
-	GD_DEMO_MOVEMENT_MASK=0x0f,
-	GD_DEMO_FIRE_SHIFT=4,
-	GD_DEMO_FIRE_MASK=0x10,
-	GD_DEMO_SUICIDE_SHIFT=5,
-	GD_DEMO_SUICIDE_MASK=0x20,	
-};
+/* maximum seed value for the cave random generator. should be smaller than a signed int. */
+#define GD_CAVE_SEED_MAX (1<<30)
 
-typedef struct _gd_cave_demo {
-	int level;	/* demo for level n */
+typedef struct _gd_cave_replay {
+	int level;	/* replay for level n */
 	guint32 seed;	/* seed the cave is to be rendered with */
-	guint8 movements[4096];	/* movements. lower 4 bits: direction, bit 5: fire, bit 6: suicide. delimited with 0xff. */
-	int movements_num;	/* number of movements so far */
-} GdCaveDemo;
+	gboolean saved;	/* also store it in the saved bdcff */
+
+	GdString player_name;	/* who played this */
+	GdString date;			/* when played */
+	GdString comment;		/* some comments from the player */
+	
+	int score;				/* score collected */
+	int duration;			/* number of seconds played */
+	gboolean success;		/* successful playing of cave? */
+	
+	GByteArray *movements;
+	int current_playing_pos;
+} GdReplay;
 
 typedef enum _gd_scheduling {
 	GD_SCHEDULING_MILLISECONDS,
@@ -585,6 +591,7 @@ typedef struct _cave {
 
 	GdElement **map;			/* pointer to data for map, non-null if has a map */
 	GList *objects;
+	GList *replays;
 	
 	gboolean intermission;		/* is this cave an intermission? */
 	gboolean intermission_instantlife;	/* one life extra, if the intermission is reached */
@@ -738,7 +745,7 @@ typedef struct _cave {
 	gboolean gate_open;			/* self-explaining */
 	guint32 render_seed;		/* the seed value, which was used to render the cave, is saved here. will be used by record&playback */
 	GRand *random;				/* random number generator of rendered cave */
-	int rendered;				/* if not null, rendered at level x */
+	int rendered;				/* if not zero, rendered at level x */
 	int timing_factor;			/* number of "milliseconds" in each second :) 1000 for ntsc, 1200 for pal. */
 	gpointer **objects_order;	/* two-dimensional map of cave; each cell is a pointer to the drawing object, which created this element. NULL if map or random. */
 	int **hammered_reappear;	/* integer map of cave; if non-zero, a brick wall will appear there */
@@ -809,10 +816,6 @@ typedef struct _cave {
 /* also no1 and bd2 cave data import helpers; line direction coordinates */
 extern const int gd_dx[], gd_dy[];
 
-/* names of schedulings */
-extern const char* gd_scheduling_name[];
-extern const char* gd_scheduling_filename[];	/* identifiers in bdcff */
-
 extern GdElement gd_char_to_element[];
 
 void gd_create_char_to_element_table();
@@ -851,13 +854,20 @@ void gd_cave_set_gdash_defaults(Cave *cave);
 void gd_cave_set_defaults_from_array(Cave* cave, GdPropertyDefault *defaults);
 void gd_cave_correct_visible_size(Cave *cave);
 void gd_cave_auto_shrink(Cave *cave);
-void gd_cave_easy(Cave *cave);
-void gd_cave_set_random_colors(Cave *cave);
+
+void gd_cave_set_random_c64_colors(Cave *cave);
+void gd_cave_set_random_c64dtv_colors(Cave *cave);
+void gd_cave_set_random_atari_colors(Cave *cave);
+void gd_cave_set_random_colors(Cave *cave, GdColorType type);
+
 void gd_cave_setup_for_game(Cave *cave);
 void gd_cave_count_diamonds(Cave *cave);
+
+/* c64 random generator support for cave fill */
 unsigned int gd_c64_random(GdC64RandomGenerator *rand);
 unsigned int gd_cave_c64_random(Cave *);
 void gd_c64_random_set_seed(GdC64RandomGenerator *rand, int seed1, int seed2);
+void gd_cave_c64_random_set_seed(Cave *cave, int seed1, int seed2);
 
 /* support */
 gpointer gd_cave_map_new_for_cave(const Cave *cave, const int cell_size);
@@ -866,14 +876,8 @@ gpointer gd_cave_map_dup_size(const Cave * cave, const gpointer map, const int c
 #define gd_cave_map_dup(CAVE, MAP) ((gpointer)gd_cave_map_dup_size((CAVE), (gpointer *)(CAVE)->MAP, sizeof((CAVE)->MAP[0][0])))
 void gd_cave_map_free(gpointer map);
 
-void gd_cave_store_rc (Cave * cave, int x, int y, const GdElement element, const void* order);
-static inline GdElement
-gd_cave_get_rc (const Cave *cave, const int x, const int y)
-{
-	g_assert(x >= 0 && x < cave->w && y >= 0 && y < cave->h);	/* check bounds */
-
-	return cave->map[y][x];
-}
+void gd_cave_store_rc(Cave * cave, int x, int y, const GdElement element, const void* order);
+GdElement gd_cave_get_rc (const Cave *cave, int x, int y);
 
 /* direction */
 const char *gd_direction_get_visible_name(GdDirection dir);
@@ -881,13 +885,13 @@ const char *gd_direction_get_filename(GdDirection dir);
 GdDirection gd_direction_from_string(const char *str);
 
 /* scheduling */
+const char *gd_scheduling_get_visible_name(GdScheduling sched);
 const char *gd_scheduling_get_filename(GdScheduling sched);
 GdScheduling gd_scheduling_from_string(const char *str);
 
 /* game playing helpers */
 #define GD_REDRAW (1<<10)
-void gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, gboolean paused, gboolean increment_animcycle);
-gboolean gd_cave_scroll(int width, int visible, int center, gboolean exact, int start, int to, int *current, int *desired, int *speed, int divisor);
+void gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, gboolean yellowish_color, int animcycle, gboolean hate_invisible_outbox);
 
 /* function to copy a GdString */
 static inline int
@@ -896,8 +900,16 @@ gd_strcpy(GdString dest, const GdString src)
 	return g_strlcpy(dest, src, sizeof(GdString));
 }
 
-int gd_cave_time_show(Cave *cave, int internal_time);
+int gd_cave_time_show(const Cave *cave, int internal_time);
 
+GdReplay *gd_replay_new();
+GdReplay *gd_replay_new_from_replay(GdReplay *orig);
+void gd_replay_free(GdReplay *replay);
+void gd_replay_store_next(GdReplay *replay, GdDirection player_move, gboolean player_fire, gboolean suicide);
+gboolean gd_replay_get_next_movement(GdReplay *replay, GdDirection *player_move, gboolean *player_fire, gboolean *suicide);
+void gd_replay_rewind(GdReplay *replay);
+
+char *gd_replay_movements_to_bdcff(GdReplay *replay);
 
 #endif							/* _CAVE_H */
 

@@ -444,7 +444,7 @@ gd_export_cave_list_to_crli_cavepack(GList *caveset, int level, const char *file
    window: show progress bar in a small dialog, transient for this window, if not NULL
 */
 void
-gd_save_html (char *htmlname, GtkWidget *window)
+gd_save_html(char *htmlname, GtkWidget *window)
 {
 	char *pngbasename;		/* used as a base for img src= tags */
 	char *pngoutbasename;	/* used as a base name for png output files */
@@ -488,6 +488,10 @@ gd_save_html (char *htmlname, GtkWidget *window)
 		g_string_append_printf (contents, _("Description: %s<BR>\n"), gd_caveset_data->description);
 	if (!g_str_equal(gd_caveset_data->www, ""))
 		g_string_append_printf (contents, _("WWW: %s<BR>\n"), gd_caveset_data->www);
+	if (!g_str_equal(gd_caveset_data->remark, ""))
+		g_string_append_printf (contents, _("Remark: %s<BR>\n"), gd_caveset_data->remark);
+	if (!g_str_equal(gd_caveset_data->notes->str, ""))
+		g_string_append_printf (contents, _("Notes:<BR>%s<BR>\n"), gd_caveset_data->notes->str);
 
 	g_string_append_printf (contents, "<HR>\n");
 
@@ -544,6 +548,19 @@ gd_save_html (char *htmlname, GtkWidget *window)
 			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Author"), cave->author);
 		if (!g_str_equal(cave->description, ""))
 			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Description"), cave->description);
+		if (!g_str_equal(cave->remark, ""))
+			g_string_append_printf (contents, _("<TR><TD>%s</TD><TD>%s</TD></TR>\n"), _("Remark"), cave->remark);
+		if (!g_str_equal(cave->notes->str, "")) {
+			/* we must split the notes into lines, and join them with html <br> */
+			char **spl;
+			char *join;
+			
+			spl=g_strsplit_set(cave->notes->str, "\n", -1);
+			join=g_strjoinv("<br>\n", spl);
+			g_strfreev(spl);
+			g_string_append_printf (contents, _("<TR><TD>%s</TD><TD>%s</TD></TR>\n"), _("Notes"), join);
+			g_free(join);
+		}
 		g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Type"), cave->intermission ? _("Intermission") : _("Normal cave"));
 		g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Selectable as start"), cave->selectable ? _("Yes") : _("No"));
 		g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%d</TD></TR>\n", _("Diamonds needed"), cave->diamonds_needed);

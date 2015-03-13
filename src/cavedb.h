@@ -25,6 +25,7 @@ extern GdElements gd_elements[];
 
 
 extern const GdStructDescriptor gd_cave_properties[];
+extern const GdStructDescriptor gd_replay_properties[];
 
 extern GdPropertyDefault gd_cave_defaults_gdash[];
 

@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: gdash 20081109\n"
+"Project-Id-Version: gdash 20081214\n"
 "Report-Msgid-Bugs-To: cirix@fw.hu\n"
-"POT-Creation-Date: 2008-11-10 12:05+0100\n"
+"POT-Creation-Date: 2008-12-13 22:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,103 +26,119 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 
-#: src/bdcff.c:260
+#: src/bdcff.c:393
 #, c-format
 msgid "invalid parameter \"%s\" for attribute %s"
 msgstr ""
 
-#: src/bdcff.c:657
+#: src/bdcff.c:865
 msgid "Only one-character map codes are currently supported!"
 msgstr ""
 
-#: src/bdcff.c:804
+#: src/bdcff.c:998
 msgid "Invalid BDCFF: [game] section has a map"
 msgstr ""
 
-#: src/bdcff.c:806
+#: src/bdcff.c:1000
 msgid "Invalid BDCFF: [game] section has drawing objects defined"
 msgstr ""
 
-#: src/colors.c:31
+#: src/colors.c:32
 msgid "Black"
 msgstr ""
 
-#: src/colors.c:31
+#: src/colors.c:32
 msgid "White"
 msgstr ""
 
-#: src/colors.c:31
+#: src/colors.c:32
 msgid "Red"
 msgstr ""
 
-#: src/colors.c:31
+#: src/colors.c:32
 msgid "Cyan"
 msgstr ""
 
-#: src/colors.c:31
+#: src/colors.c:32
 msgid "Purple"
 msgstr ""
 
-#: src/colors.c:31
+#: src/colors.c:32
 msgid "Green"
 msgstr ""
 
-#: src/colors.c:31
+#: src/colors.c:32
 msgid "Blue"
 msgstr ""
 
-#: src/colors.c:31
+#: src/colors.c:32
 msgid "Yellow"
 msgstr ""
 
-#: src/colors.c:32
+#: src/colors.c:33
 msgid "Orange"
 msgstr ""
 
-#: src/colors.c:32
+#: src/colors.c:33
 msgid "Brown"
 msgstr ""
 
-#: src/colors.c:32
+#: src/colors.c:33
 msgid "Light red"
 msgstr ""
 
-#: src/colors.c:32
+#: src/colors.c:33
 msgid "Dark gray"
 msgstr ""
 
-#: src/colors.c:32
+#: src/colors.c:33
 msgid "Gray"
 msgstr ""
 
-#: src/colors.c:32
+#: src/colors.c:33
 msgid "Light green"
 msgstr ""
 
-#: src/colors.c:32
+#: src/colors.c:33
 msgid "Light blue"
 msgstr ""
 
-#: src/colors.c:32
+#: src/colors.c:33
 msgid "Light gray"
 msgstr ""
 
-#: src/c64import.c:2181 src/c64import.c:2227 src/c64import.c:2315
+#: src/colors.c:99
+msgid "RGB colors"
+msgstr ""
+
+#: src/colors.c:100
+msgid "C64 colors"
+msgstr ""
+
+#: src/colors.c:101
+msgid "C64DTV colors"
+msgstr ""
+
+#: src/colors.c:102
+msgid "Atari colors"
+msgstr ""
+
+#: src/c64import.c:2184 src/c64import.c:2230 src/c64import.c:2318
 #, c-format
 msgid "Intermission %d"
 msgstr ""
 
-#: src/c64import.c:2183 src/c64import.c:2229 src/c64import.c:2320
+#: src/c64import.c:2186 src/c64import.c:2232 src/c64import.c:2323
 #, c-format
 msgid "Cave %c"
 msgstr ""
 
-#: src/c64import.c:2313
+#: src/c64import.c:2316
 #, c-format
 msgid "Intermission %02d"
 msgstr ""
 
-#: src/c64import.c:2318
+#: src/c64import.c:2321
 #, c-format
 msgid "Cave %02d"
 msgstr ""
@@ -168,11 +184,11 @@ msgstr ""
 msgid "Milliseconds"
 msgstr ""
 
-#: src/cave.c:331 src/editor.c:660 src/editorexport.c:548
+#: src/cave.c:350 src/editor.c:663 src/editorexport.c:565
 msgid "Yes"
 msgstr ""
 
-#: src/cave.c:331 src/editor.c:660 src/editorexport.c:548
+#: src/cave.c:350 src/editor.c:663 src/editorexport.c:565
 msgid "No"
 msgstr ""
 
@@ -228,7 +244,7 @@ msgstr ""
 msgid "Non-sloped brick wall"
 msgstr ""
 
-#: src/cavedb.c:45 src/cavedb.c:473
+#: src/cavedb.c:45 src/cavedb.c:470
 msgid "Magic wall"
 msgstr ""
 
@@ -280,7 +296,7 @@ msgstr ""
 msgid "Eatable brick wall"
 msgstr ""
 
-#: src/cavedb.c:58 src/cavedb.c:468
+#: src/cavedb.c:58 src/cavedb.c:465
 msgid "Stone"
 msgstr ""
 
@@ -296,7 +312,7 @@ msgstr ""
 msgid "Mega stone, falling"
 msgstr ""
 
-#: src/cavedb.c:62 src/cavedb.c:467
+#: src/cavedb.c:62 src/cavedb.c:464
 msgid "Diamond"
 msgstr ""
 
@@ -320,7 +336,7 @@ msgstr ""
 msgid "Expanding wall, vertical"
 msgstr ""
 
-#: src/cavedb.c:68 src/cavedb.c:433 src/cavedb.c:470
+#: src/cavedb.c:68 src/cavedb.c:430 src/cavedb.c:467
 msgid "Expanding wall"
 msgstr ""
 
@@ -336,11 +352,11 @@ msgstr ""
 msgid "Biter switch"
 msgstr ""
 
-#: src/cavedb.c:72 src/cavedb.c:418 src/cavedb.c:475
+#: src/cavedb.c:72 src/cavedb.c:415 src/cavedb.c:472
 msgid "Acid"
 msgstr ""
 
-#: src/cavedb.c:73 src/cavedb.c:471
+#: src/cavedb.c:73 src/cavedb.c:468
 msgid "Falling wall"
 msgstr ""
 
@@ -376,7 +392,7 @@ msgstr ""
 msgid "Trapped diamond"
 msgstr ""
 
-#: src/cavedb.c:82 src/cavedb.c:357
+#: src/cavedb.c:82 src/cavedb.c:354
 msgid "Clock"
 msgstr ""
 
@@ -416,7 +432,7 @@ msgstr ""
 msgid "Gravity switch"
 msgstr ""
 
-#: src/cavedb.c:93 src/cavedb.c:352 src/cavedb.c:479
+#: src/cavedb.c:93 src/cavedb.c:349 src/cavedb.c:476
 msgid "Pneumatic hammer"
 msgstr ""
 
@@ -428,7 +444,7 @@ msgstr ""
 msgid "Skeleton"
 msgstr ""
 
-#: src/cavedb.c:96 src/cavedb.c:414 src/cavedb.c:478
+#: src/cavedb.c:96 src/cavedb.c:411 src/cavedb.c:475
 msgid "Water"
 msgstr ""
 
@@ -556,15 +572,15 @@ msgstr ""
 msgid "Walled key 3"
 msgstr ""
 
-#: src/cavedb.c:129 src/cavedb.c:367 src/cavedb.c:371 src/cavedb.c:472
+#: src/cavedb.c:129 src/cavedb.c:364 src/cavedb.c:368 src/cavedb.c:469
 msgid "Amoeba"
 msgstr ""
 
-#: src/cavedb.c:130 src/cavedb.c:378
+#: src/cavedb.c:130 src/cavedb.c:375
 msgid "Amoeba 2"
 msgstr ""
 
-#: src/cavedb.c:131 src/cavedb.c:348
+#: src/cavedb.c:131 src/cavedb.c:345
 msgid "Sweet"
 msgstr ""
 
@@ -572,11 +588,11 @@ msgstr ""
 msgid "Voodoo doll"
 msgstr ""
 
-#: src/cavedb.c:133 src/cavedb.c:400 src/cavedb.c:474
+#: src/cavedb.c:133 src/cavedb.c:397 src/cavedb.c:471
 msgid "Slime"
 msgstr ""
 
-#: src/cavedb.c:134 src/cavedb.c:429 src/cavedb.c:477
+#: src/cavedb.c:134 src/cavedb.c:426 src/cavedb.c:474
 msgid "Bladder"
 msgstr ""
 
@@ -732,7 +748,7 @@ msgstr ""
 msgid "Player birth (3)"
 msgstr ""
 
-#: src/cavedb.c:175 src/cavedb.c:341
+#: src/cavedb.c:175 src/cavedb.c:338
 msgid "Player"
 msgstr ""
 
@@ -780,7 +796,7 @@ msgstr ""
 msgid "Ticking bomb (7)"
 msgstr ""
 
-#: src/cavedb.c:189 src/cavedb.c:469
+#: src/cavedb.c:189 src/cavedb.c:466
 msgid "Nitro pack"
 msgstr ""
 
@@ -956,7 +972,7 @@ msgstr ""
 msgid "Cave data"
 msgstr ""
 
-#: src/cavedb.c:278 src/caveset.c:56 src/gtkui.c:869
+#: src/cavedb.c:278 src/caveset.c:56 src/gtkmain.c:1431 src/gtkui.c:877
 msgid "Name"
 msgstr ""
 
@@ -964,7 +980,7 @@ msgstr ""
 msgid "Name of game"
 msgstr ""
 
-#: src/cavedb.c:279 src/caveset.c:57 src/editorexport.c:546
+#: src/cavedb.c:279 src/caveset.c:57 src/editorexport.c:550
 msgid "Description"
 msgstr ""
 
@@ -972,7 +988,7 @@ msgstr ""
 msgid "Some words about the game"
 msgstr ""
 
-#: src/cavedb.c:280 src/caveset.c:58 src/editorexport.c:544
+#: src/cavedb.c:280 src/caveset.c:58 src/editorexport.c:548
 msgid "Author"
 msgstr ""
 
@@ -980,7 +996,7 @@ msgstr ""
 msgid "Name of author"
 msgstr ""
 
-#: src/cavedb.c:281 src/caveset.c:59
+#: src/cavedb.c:281 src/caveset.c:59 src/gtkmain.c:1435
 msgid "Date"
 msgstr ""
 
@@ -996,7 +1012,7 @@ msgstr ""
 msgid "Web page or e-mail address"
 msgstr ""
 
-#: src/cavedb.c:283 src/cavedb.c:310 src/caveset.c:61
+#: src/cavedb.c:283 src/cavedb.c:307 src/caveset.c:61
 msgid "Difficulty"
 msgstr ""
 
@@ -1004,7 +1020,7 @@ msgstr ""
 msgid "Difficulty (informative)"
 msgstr ""
 
-#: src/cavedb.c:284 src/caveset.c:62
+#: src/cavedb.c:284 src/caveset.c:62 src/editorexport.c:552
 msgid "Remark"
 msgstr ""
 
@@ -1012,7 +1028,7 @@ msgstr ""
 msgid "Remark (informative)"
 msgstr ""
 
-#: src/cavedb.c:286 src/editorexport.c:548
+#: src/cavedb.c:286 src/editorexport.c:565
 msgid "Selectable as start"
 msgstr ""
 
@@ -1020,7 +1036,7 @@ msgstr ""
 msgid "This sets whether the game can be started at this cave."
 msgstr ""
 
-#: src/cavedb.c:287 src/editorexport.c:547
+#: src/cavedb.c:287 src/editorexport.c:564 src/gtkmain.c:1533
 msgid "Intermission"
 msgstr ""
 
@@ -1164,461 +1180,452 @@ msgstr ""
 msgid "Font used during the game. Not used by GDash."
 msgstr ""
 
-#: src/cavedb.c:307 src/caveset.c:68
-msgid "Notes"
-msgstr ""
-
-#: src/cavedb.c:307
-msgid "Long description of the cave."
-msgstr ""
-
-#: src/cavedb.c:311
+#: src/cavedb.c:308
 msgid "Diamonds"
 msgstr ""
 
-#: src/cavedb.c:312 src/editorexport.c:549
+#: src/cavedb.c:309 src/editorexport.c:566
 msgid "Diamonds needed"
 msgstr ""
 
-#: src/cavedb.c:312
+#: src/cavedb.c:309
 msgid ""
 "Here zero means automatically count diamonds before level start. If "
 "negative, the value is subtracted from that. This is useful for totally "
 "random caves."
 msgstr ""
 
-#: src/cavedb.c:313
+#: src/cavedb.c:310
 msgid "Score for diamonds"
 msgstr ""
 
-#: src/cavedb.c:313
+#: src/cavedb.c:310
 msgid "Number of points per diamond collected, before opening the exit."
 msgstr ""
 
-#: src/cavedb.c:314
+#: src/cavedb.c:311
 msgid "Score for extra diamonds"
 msgstr ""
 
-#: src/cavedb.c:314
+#: src/cavedb.c:311
 msgid "Number of points per diamond collected, after opening the exit."
 msgstr ""
 
-#: src/cavedb.c:315
+#: src/cavedb.c:312
 msgid "Time"
 msgstr ""
 
-#: src/cavedb.c:316 src/editorexport.c:552
+#: src/cavedb.c:313 src/editorexport.c:569
 msgid "Time (s)"
 msgstr ""
 
-#: src/cavedb.c:316
+#: src/cavedb.c:313
 msgid "Time available to solve cave, in seconds."
 msgstr ""
 
-#: src/cavedb.c:317
+#: src/cavedb.c:314
 msgid "Maximum time (s)"
 msgstr ""
 
-#: src/cavedb.c:317
+#: src/cavedb.c:314
 msgid ""
 "If you reach this time by collecting too many clocks, the timer will "
 "overflow."
 msgstr ""
 
-#: src/cavedb.c:318
+#: src/cavedb.c:315
 msgid "Score for time"
 msgstr ""
 
-#: src/cavedb.c:318
+#: src/cavedb.c:315
 msgid "Points for each seconds remaining, when the player exits the level."
 msgstr ""
 
-#: src/cavedb.c:319
+#: src/cavedb.c:316
 msgid "Scheduling type"
 msgstr ""
 
-#: src/cavedb.c:319
+#: src/cavedb.c:316
 msgid ""
 "This flag sets whether the game uses an emulation of the original timing "
 "(c64-style), or a more modern milliseconds-based timing. The original game "
 "used a delay (empty loop) based timing of caves; this is selected by setting "
-"this to BD1, BD2, Construction Kit or Crazy Dream 7. (BD1 intermissions are "
-"faster than normal caves - that is the only difference between BD1 and BD2 "
-"scheduling.)"
+"this to BD1, BD2, Construction Kit or Crazy Dream 7. This is a compatibility "
+"setting only; milliseconds-based timing is recommended for every new cave."
 msgstr ""
 
-#: src/cavedb.c:320
+#: src/cavedb.c:317
 msgid "PAL timing"
 msgstr ""
 
-#: src/cavedb.c:320
+#: src/cavedb.c:317
 msgid ""
 "On the PAL version of the C64 computer, the timer was actually slower than "
 "normal seconds. This flag is used to compensate for this. Most original "
 "games are authored for the PAL version."
 msgstr ""
 
-#: src/cavedb.c:322
+#: src/cavedb.c:319
 msgid "   Delay (c64-style)"
 msgstr ""
 
-#: src/cavedb.c:322
+#: src/cavedb.c:319
 msgid ""
 "The length of the delay loop between game frames. Used when milliseconds-"
 "based timing is inactive, ie. C64 scheduling is on."
 msgstr ""
 
-#: src/cavedb.c:323
+#: src/cavedb.c:320
 msgid "   Hatching time (seconds)"
 msgstr ""
 
-#: src/cavedb.c:323
+#: src/cavedb.c:320
 msgid ""
 "This value sets how much the cave will move until the player enters the "
 "cave. This is used for the C64-like schedulings."
 msgstr ""
 
-#: src/cavedb.c:324
+#: src/cavedb.c:321
 msgid "   Speed (ms)"
 msgstr ""
 
-#: src/cavedb.c:324
+#: src/cavedb.c:321
 msgid ""
 "Number of milliseconds between game frames. Used when milliseconds-based "
 "timing is active, ie. C64 scheduling is off."
 msgstr ""
 
-#: src/cavedb.c:325
+#: src/cavedb.c:322
 msgid "   Hatching delay (frames)"
 msgstr ""
 
-#: src/cavedb.c:325
+#: src/cavedb.c:322
 msgid ""
 "This value sets how much the cave will move until the player enters the "
 "cave. This is used for the milliseconds-based scheduling."
 msgstr ""
 
-#: src/cavedb.c:328
+#: src/cavedb.c:325
 msgid "Random seed value"
 msgstr ""
 
-#: src/cavedb.c:328 src/editor.c:1485
+#: src/cavedb.c:325 src/editor.c:1522
 msgid ""
 "Random seed value controls the predictable random number generator, which "
 "fills the cave initially. If set to -1, cave is totally random every time it "
 "is played."
 msgstr ""
 
-#: src/cavedb.c:343
+#: src/cavedb.c:340
 msgid "Player movements"
 msgstr ""
 
-#: src/cavedb.c:344
+#: src/cavedb.c:341
 msgid "Diagonal movements"
 msgstr ""
 
-#: src/cavedb.c:344
+#: src/cavedb.c:341
 msgid "Controls if the player can move diagonally."
 msgstr ""
 
-#: src/cavedb.c:345
+#: src/cavedb.c:342
 msgid "Uppermost player active"
 msgstr ""
 
-#: src/cavedb.c:345
+#: src/cavedb.c:342
 msgid ""
 "In 1stB, cave is scrolled to the uppermost and leftmost player found, "
 "whereas in the original game to the last one. Chasing stones also follow the "
 "active player."
 msgstr ""
 
-#: src/cavedb.c:346
+#: src/cavedb.c:343
 msgid "Snap element"
 msgstr ""
 
-#: src/cavedb.c:346
+#: src/cavedb.c:343
 msgid ""
 "Snapping (pressing fire while moving) usually creates space, but it can "
 "create any other element."
 msgstr ""
 
-#: src/cavedb.c:347 src/cavedb.c:349
+#: src/cavedb.c:344 src/cavedb.c:346
 msgid "Probability of pushing (%)"
 msgstr ""
 
-#: src/cavedb.c:347
+#: src/cavedb.c:344
 msgid ""
 "Chance of player managing to push a stone, every game cycle he tries. This "
 "is the normal probability."
 msgstr ""
 
-#: src/cavedb.c:349
+#: src/cavedb.c:346
 msgid ""
 "Chance of player managing to push a stone, every game cycle he tries. This "
 "is used after eating sweet."
 msgstr ""
 
-#: src/cavedb.c:350
+#: src/cavedb.c:347
 msgid "Mega stones pushable"
 msgstr ""
 
-#: src/cavedb.c:350
+#: src/cavedb.c:347
 msgid "If it is true, mega stones can be pushed after eating sweet."
 msgstr ""
 
-#: src/cavedb.c:353
+#: src/cavedb.c:350
 msgid "Time for hammer (frames)"
 msgstr ""
 
-#: src/cavedb.c:353
+#: src/cavedb.c:350
 msgid ""
 "This is the number of game frames, a pneumatic hammer is required to break a "
 "wall."
 msgstr ""
 
-#: src/cavedb.c:354
+#: src/cavedb.c:351
 msgid "Hammered walls reappear"
 msgstr ""
 
-#: src/cavedb.c:354
+#: src/cavedb.c:351
 msgid ""
 "If this is set to true, walls broken with a pneumatic hammer will reappear "
 "later."
 msgstr ""
 
-#: src/cavedb.c:355
+#: src/cavedb.c:352
 msgid "   Timer for reappear (frames)"
 msgstr ""
 
-#: src/cavedb.c:355
+#: src/cavedb.c:352
 msgid ""
 "This sets the number of game frames, after hammered walls reappear, when the "
 "above setting is true."
 msgstr ""
 
-#: src/cavedb.c:358
+#: src/cavedb.c:355
 msgid "Time bonus (s)"
 msgstr ""
 
-#: src/cavedb.c:358
+#: src/cavedb.c:355
 msgid "Bonus time when a clock is collected."
 msgstr ""
 
-#: src/cavedb.c:360
+#: src/cavedb.c:357
 msgid "Voodoo Doll"
 msgstr ""
 
-#: src/cavedb.c:361
+#: src/cavedb.c:358
 msgid "Can collect diamonds"
 msgstr ""
 
-#: src/cavedb.c:361
+#: src/cavedb.c:358
 msgid "Controls if a voodoo doll can collect diamonds for the player."
 msgstr ""
 
-#: src/cavedb.c:362
+#: src/cavedb.c:359
 msgid "Can be destroyed by explosion"
 msgstr ""
 
-#: src/cavedb.c:362
+#: src/cavedb.c:359
 msgid ""
 "Controls if the voodoo can be destroyed by an explosion nearby. If not, it "
 "is converted to a gravestone, and you get a time penalty."
 msgstr ""
 
-#: src/cavedb.c:363
+#: src/cavedb.c:360
 msgid "Dies if hit by a stone"
 msgstr ""
 
-#: src/cavedb.c:363
+#: src/cavedb.c:360
 msgid ""
 "Controls if the voodoo doll dies if it is hit by a stone. Then the player "
 "gets a time penalty."
 msgstr ""
 
-#: src/cavedb.c:364
+#: src/cavedb.c:361
 msgid "Time penalty (s)"
 msgstr ""
 
-#: src/cavedb.c:364
+#: src/cavedb.c:361
 msgid "Penalty time when the voodoo is destroyed by a stone."
 msgstr ""
 
-#: src/cavedb.c:368 src/cavedb.c:397
+#: src/cavedb.c:365 src/cavedb.c:394
 msgid "Timer waits for hatching"
 msgstr ""
 
-#: src/cavedb.c:368
+#: src/cavedb.c:365
 msgid ""
 "This determines if the amoeba timer starts before the player appearing. "
 "Amoeba can always be activated before that; but if this is set to true, the "
 "timer will not start."
 msgstr ""
 
-#: src/cavedb.c:369
+#: src/cavedb.c:366
 msgid "Timer started immediately"
 msgstr ""
 
-#: src/cavedb.c:369
+#: src/cavedb.c:366
 msgid ""
 "If this flag is enabled, the amoeba slow growth timer will start at the "
 "beginning of the cave, regardless of the amoeba being let free or not."
 msgstr ""
 
-#: src/cavedb.c:372 src/cavedb.c:379
+#: src/cavedb.c:369 src/cavedb.c:376
 msgid "Threshold (cells)"
 msgstr ""
 
-#: src/cavedb.c:372 src/cavedb.c:379
+#: src/cavedb.c:369 src/cavedb.c:376
 msgid ""
 "If the amoeba grows more than this fraction of the cave, it is considered "
 "too big."
 msgstr ""
 
-#: src/cavedb.c:373 src/cavedb.c:380
+#: src/cavedb.c:370 src/cavedb.c:377
 msgid "Slow growth time (s)"
 msgstr ""
 
-#: src/cavedb.c:373 src/cavedb.c:380
+#: src/cavedb.c:370 src/cavedb.c:377
 msgid "After this time, amoeba will grow very quickly."
 msgstr ""
 
-#: src/cavedb.c:374 src/cavedb.c:381
+#: src/cavedb.c:371 src/cavedb.c:378
 msgid "Growth ratio, slow (%)"
 msgstr ""
 
-#: src/cavedb.c:374 src/cavedb.c:381
+#: src/cavedb.c:371 src/cavedb.c:378
 msgid "This sets the speed at which a slow amoeba grows."
 msgstr ""
 
-#: src/cavedb.c:375 src/cavedb.c:382
+#: src/cavedb.c:372 src/cavedb.c:379
 msgid "Growth ratio, fast (%)"
 msgstr ""
 
-#: src/cavedb.c:375 src/cavedb.c:382
+#: src/cavedb.c:372 src/cavedb.c:379
 msgid "This sets the speed at which a fast amoeba grows."
 msgstr ""
 
-#: src/cavedb.c:376 src/cavedb.c:385
+#: src/cavedb.c:373 src/cavedb.c:382
 msgid "If too big, converts to"
 msgstr ""
 
-#: src/cavedb.c:376 src/cavedb.c:385
+#: src/cavedb.c:373 src/cavedb.c:382
 msgid "Controls which element an overgrown amoeba converts to."
 msgstr ""
 
-#: src/cavedb.c:377 src/cavedb.c:386
+#: src/cavedb.c:374 src/cavedb.c:383
 msgid "If enclosed, converts to"
 msgstr ""
 
-#: src/cavedb.c:377 src/cavedb.c:386
+#: src/cavedb.c:374 src/cavedb.c:383
 msgid "Controls which element an enclosed amoeba converts to."
 msgstr ""
 
-#: src/cavedb.c:383
+#: src/cavedb.c:380
 msgid "Explodes by amoeba"
 msgstr ""
 
-#: src/cavedb.c:383
+#: src/cavedb.c:380
 msgid ""
 "If this setting is enabled, an amoeba 2 will explode if it is touched by a "
 "normal amoeba."
 msgstr ""
 
-#: src/cavedb.c:384
+#: src/cavedb.c:381
 msgid "   Explodes to"
 msgstr ""
 
-#: src/cavedb.c:384
+#: src/cavedb.c:381
 msgid ""
 "An amoeba 2 explodes to this element, when touched by the original amoeba."
 msgstr ""
 
-#: src/cavedb.c:387
+#: src/cavedb.c:384
 msgid "Looks like"
 msgstr ""
 
-#: src/cavedb.c:387
+#: src/cavedb.c:384
 msgid ""
 "Amoeba 2 can look like any other element. Tip: it can also look like a "
 "normal amoeba. Or it can look like slime, and then you have two different "
-"coloured amoebas!"
+"colored amoebas!"
 msgstr ""
 
-#: src/cavedb.c:390
+#: src/cavedb.c:387
 msgid "Active elements"
 msgstr ""
 
-#: src/cavedb.c:392
+#: src/cavedb.c:389
 msgid "Magic Wall"
 msgstr ""
 
-#: src/cavedb.c:393
+#: src/cavedb.c:390
 msgid "Milling time (s)"
 msgstr ""
 
-#: src/cavedb.c:393
+#: src/cavedb.c:390
 msgid "Magic wall will stop after this time, and it cannot be activated again."
 msgstr ""
 
-#: src/cavedb.c:394
+#: src/cavedb.c:391
 msgid "Converts diamond to"
 msgstr ""
 
-#: src/cavedb.c:394
+#: src/cavedb.c:391
 msgid ""
 "As a special effect, magic walls can convert diamonds to any other element."
 msgstr ""
 
-#: src/cavedb.c:395
+#: src/cavedb.c:392
 msgid "Converts stone to"
 msgstr ""
 
-#: src/cavedb.c:395
+#: src/cavedb.c:392
 msgid ""
 "As a special effect, magic walls can convert stones to any other element."
 msgstr ""
 
-#: src/cavedb.c:396
+#: src/cavedb.c:393
 msgid "Stops amoeba"
 msgstr ""
 
-#: src/cavedb.c:396
+#: src/cavedb.c:393
 msgid "When the magic wall is activated, it can convert amoeba into diamonds."
 msgstr ""
 
-#: src/cavedb.c:397
+#: src/cavedb.c:394
 msgid ""
 "This determines if the magic wall timer starts before the player appearing. "
 "Magic can always be activated before that; but if this is set to true, the "
 "timer will not start."
 msgstr ""
 
-#: src/cavedb.c:401
+#: src/cavedb.c:398
 msgid "Predictable"
 msgstr ""
 
-#: src/cavedb.c:401
+#: src/cavedb.c:398
 msgid ""
 "Controls if the predictable random generator is used for slime. It is "
 "required for compatibility with some older caves."
 msgstr ""
 
-#: src/cavedb.c:403
+#: src/cavedb.c:400
 msgid "Permeability (unpredictable, %)"
 msgstr ""
 
-#: src/cavedb.c:403
+#: src/cavedb.c:400
 msgid ""
 "This controls the rate at which elements go through the slime. Higher values "
 "represent higher probability of passing. This one is for unpredictable slime."
 msgstr ""
 
-#: src/cavedb.c:404
+#: src/cavedb.c:401
 msgid "Permeability (predictable, bits)"
 msgstr ""
 
-#: src/cavedb.c:404
+#: src/cavedb.c:401
 msgid ""
 "This controls the rate at which elements go through the slime. This one is "
 "for predictable slime, and the value is used for a bitwise AND function. The "
@@ -1626,352 +1633,352 @@ msgid ""
 "255."
 msgstr ""
 
-#: src/cavedb.c:405
+#: src/cavedb.c:402
 msgid "Random seed (predictable)"
 msgstr ""
 
-#: src/cavedb.c:405
+#: src/cavedb.c:402
 msgid ""
 "The random number seed for predictable slime. Use -1 to leave on its "
 "default. Not recommended to change. Does not affect unpredictable slime."
 msgstr ""
 
-#: src/cavedb.c:406 src/cavedb.c:408
+#: src/cavedb.c:403 src/cavedb.c:405
 msgid "Eats this..."
 msgstr ""
 
-#: src/cavedb.c:406 src/cavedb.c:407 src/cavedb.c:408 src/cavedb.c:409
+#: src/cavedb.c:403 src/cavedb.c:404 src/cavedb.c:405 src/cavedb.c:406
 msgid ""
 "Slime can let other elements than stone and diamond go through. It always "
 "lets a waiting or a chasing stone pass, though."
 msgstr ""
 
-#: src/cavedb.c:407 src/cavedb.c:409
+#: src/cavedb.c:404 src/cavedb.c:406
 msgid "  ... and converts to"
 msgstr ""
 
-#: src/cavedb.c:412
+#: src/cavedb.c:409
 msgid "More elements"
 msgstr ""
 
-#: src/cavedb.c:415
+#: src/cavedb.c:412
 msgid "Does not flow downwards"
 msgstr ""
 
-#: src/cavedb.c:415
+#: src/cavedb.c:412
 msgid ""
 "In CrDr, the water element had the odd property that it did not flow "
 "downwards, only in other directions. This flag emulates this behaviour."
 msgstr ""
 
-#: src/cavedb.c:419
+#: src/cavedb.c:416
 msgid "Eats this element"
 msgstr ""
 
-#: src/cavedb.c:419
+#: src/cavedb.c:416
 msgid ""
 "The element which acid eats. If it cannot find any, it simply disappears."
 msgstr ""
 
-#: src/cavedb.c:420
+#: src/cavedb.c:417
 msgid "Spread ratio (%)"
 msgstr ""
 
-#: src/cavedb.c:420
+#: src/cavedb.c:417
 msgid ""
 "The probability at which an acid will explode and eat neighbouring elements."
 msgstr ""
 
-#: src/cavedb.c:421
+#: src/cavedb.c:418
 msgid "Leaves this behind"
 msgstr ""
 
-#: src/cavedb.c:421
+#: src/cavedb.c:418
 msgid ""
 "If acid converts to an explosion puff on spreading or any other element."
 msgstr ""
 
-#: src/cavedb.c:424 src/cavedb.c:476 src/help.c:69
+#: src/cavedb.c:421 src/cavedb.c:473 src/help.c:69
 msgid "Biter"
 msgstr ""
 
-#: src/cavedb.c:425
+#: src/cavedb.c:422
 msgid "Delay (frame)"
 msgstr ""
 
-#: src/cavedb.c:425
+#: src/cavedb.c:422
 msgid "Number of frames biters wait between movements."
 msgstr ""
 
-#: src/cavedb.c:426
+#: src/cavedb.c:423
 msgid "Eats this"
 msgstr ""
 
-#: src/cavedb.c:426
+#: src/cavedb.c:423
 msgid "Biters eat this element. (They always eat dirt.)"
 msgstr ""
 
-#: src/cavedb.c:430
+#: src/cavedb.c:427
 msgid "Converts to clock by touching"
 msgstr ""
 
-#: src/cavedb.c:434
+#: src/cavedb.c:431
 msgid "Direction changed"
 msgstr ""
 
-#: src/cavedb.c:434
+#: src/cavedb.c:431
 msgid ""
 "If this option is enabled, the direction of growing for the horizontal and "
 "vertical expanding wall is switched."
 msgstr ""
 
-#: src/cavedb.c:437
+#: src/cavedb.c:434
 msgid "Effects"
 msgstr ""
 
-#: src/cavedb.c:439
+#: src/cavedb.c:436
 msgid "Creature effects"
 msgstr ""
 
-#: src/cavedb.c:440
+#: src/cavedb.c:437
 msgid "Start backwards"
 msgstr ""
 
-#: src/cavedb.c:441
+#: src/cavedb.c:438
 msgid "Automatically turn (s)"
 msgstr ""
 
-#: src/cavedb.c:441
+#: src/cavedb.c:438
 msgid ""
 "If this is greater than zero, creatures will automatically change direction "
 "in every x seconds."
 msgstr ""
 
-#: src/cavedb.c:442
+#: src/cavedb.c:439
 msgid "Automatically turn on start"
 msgstr ""
 
-#: src/cavedb.c:442
+#: src/cavedb.c:439
 msgid ""
 "If this is set to true, creatures also turn at the start signal. If false, "
 "the first change in direction occurs only later."
 msgstr ""
 
-#: src/cavedb.c:444
+#: src/cavedb.c:441
 msgid "Cave effects"
 msgstr ""
 
-#: src/cavedb.c:445
+#: src/cavedb.c:442
 msgid "Explosions convert to"
 msgstr ""
 
-#: src/cavedb.c:445
+#: src/cavedb.c:442
 msgid "This element appears in places where an explosion happens."
 msgstr ""
 
-#: src/cavedb.c:446
+#: src/cavedb.c:443
 msgid "Diamond births convert to"
 msgstr ""
 
-#: src/cavedb.c:447
+#: src/cavedb.c:444
 msgid "Bombs explode to"
 msgstr ""
 
-#: src/cavedb.c:448
+#: src/cavedb.c:445
 msgid "Nitro packs explode to"
 msgstr ""
 
-#: src/cavedb.c:449
+#: src/cavedb.c:446
 msgid "Falling stones convert to"
 msgstr ""
 
-#: src/cavedb.c:449
+#: src/cavedb.c:446
 msgid "When a stone begins falling, it converts to this element."
 msgstr ""
 
-#: src/cavedb.c:450
+#: src/cavedb.c:447
 msgid "Bouncing stones convert to"
 msgstr ""
 
-#: src/cavedb.c:450
+#: src/cavedb.c:447
 msgid "When a stone stops falling and rolling, it converts to this element."
 msgstr ""
 
-#: src/cavedb.c:451
+#: src/cavedb.c:448
 msgid "Falling diamonds convert to"
 msgstr ""
 
-#: src/cavedb.c:451
+#: src/cavedb.c:448
 msgid "When a diamond begins falling, it converts to this element."
 msgstr ""
 
-#: src/cavedb.c:452
+#: src/cavedb.c:449
 msgid "Bouncing diamonds convert to"
 msgstr ""
 
-#: src/cavedb.c:452
+#: src/cavedb.c:449
 msgid "When a diamond stops falling and rolling, it converts to this element."
 msgstr ""
 
-#: src/cavedb.c:454
+#: src/cavedb.c:451
 msgid "Visual effects"
 msgstr ""
 
-#: src/cavedb.c:455
+#: src/cavedb.c:452
 msgid "Expanding wall looks like"
 msgstr ""
 
-#: src/cavedb.c:456
+#: src/cavedb.c:453
 msgid "Dirt looks like"
 msgstr ""
 
-#: src/cavedb.c:458
+#: src/cavedb.c:455
 msgid "Gravitation effects"
 msgstr ""
 
-#: src/cavedb.c:459
+#: src/cavedb.c:456
 msgid "Direction"
 msgstr ""
 
-#: src/cavedb.c:459
+#: src/cavedb.c:456
 msgid "The direction where stones and diamonds fall."
 msgstr ""
 
-#: src/cavedb.c:460
+#: src/cavedb.c:457
 msgid "Switch active at start"
 msgstr ""
 
-#: src/cavedb.c:460
+#: src/cavedb.c:457
 msgid ""
 "If set to true, the gravitation switch will be already activated, when the "
 "cave is started, as if a pot has already been collected."
 msgstr ""
 
-#: src/cavedb.c:461
+#: src/cavedb.c:458
 msgid "Skeletons needed for pot"
 msgstr ""
 
-#: src/cavedb.c:461
+#: src/cavedb.c:458
 msgid "The number of skeletons to be collected to be able to use a pot."
 msgstr ""
 
-#: src/cavedb.c:462
+#: src/cavedb.c:459
 msgid "Gravitation switch delay"
 msgstr ""
 
-#: src/cavedb.c:462
+#: src/cavedb.c:459
 msgid ""
 "The gravitation changes after a while using the gravitation switch. This "
 "option sets the number of seconds to wait."
 msgstr ""
 
-#: src/cavedb.c:465 src/gtkui.c:562
+#: src/cavedb.c:462 src/gtkui.c:563
 msgid "Sound"
 msgstr ""
 
-#: src/cavedb.c:466
+#: src/cavedb.c:463
 msgid "Sound for elements"
 msgstr ""
 
-#: src/cavedb.c:467
+#: src/cavedb.c:464
 msgid "If true, falling diamonds will have sound."
 msgstr ""
 
-#: src/cavedb.c:468
+#: src/cavedb.c:465
 msgid "If true, falling and pushed stones will have sound."
 msgstr ""
 
-#: src/cavedb.c:469
+#: src/cavedb.c:466
 msgid "If true, falling and pushed nitro packs will have sound."
 msgstr ""
 
-#: src/cavedb.c:470
+#: src/cavedb.c:467
 msgid "If true, expanding wall will have sound."
 msgstr ""
 
-#: src/cavedb.c:471
+#: src/cavedb.c:468
 msgid "If true, falling wall will have sound."
 msgstr ""
 
-#: src/cavedb.c:472
+#: src/cavedb.c:469
 msgid "Controls if the living amoeba has sound or not."
 msgstr ""
 
-#: src/cavedb.c:473
+#: src/cavedb.c:470
 msgid "If true, the activated magic wall will have sound."
 msgstr ""
 
-#: src/cavedb.c:474
+#: src/cavedb.c:471
 msgid "If true, the elements passing slime will have sound."
 msgstr ""
 
-#: src/cavedb.c:475
+#: src/cavedb.c:472
 msgid "If true, the acid spreading will have sound."
 msgstr ""
 
-#: src/cavedb.c:476
+#: src/cavedb.c:473
 msgid "Biters eating something or pushing a stone will have sound."
 msgstr ""
 
-#: src/cavedb.c:477
+#: src/cavedb.c:474
 msgid "Bladders moving and being pushed can have sound."
 msgstr ""
 
-#: src/cavedb.c:478
+#: src/cavedb.c:475
 msgid "If true, the cave containing water will have sound."
 msgstr ""
 
-#: src/cavedb.c:479
+#: src/cavedb.c:476
 msgid "If true, using the pneumatic hammer will have sound."
 msgstr ""
 
-#: src/cavedb.c:480
+#: src/cavedb.c:477
 msgid "Bladder spender"
 msgstr ""
 
-#: src/cavedb.c:480
+#: src/cavedb.c:477
 msgid "If true, the bladder spender will make sound, when the bladder appears."
 msgstr ""
 
-#: src/cavedb.c:481
+#: src/cavedb.c:478
 msgid "Bladder convert"
 msgstr ""
 
-#: src/cavedb.c:481
+#: src/cavedb.c:478
 msgid "If true, the bladder converting to a clock will make sound."
 msgstr ""
 
-#: src/cavedb.c:482
+#: src/cavedb.c:479
 msgid "Event sounds"
 msgstr ""
 
-#: src/cavedb.c:483
+#: src/cavedb.c:480
 msgid "Gravity change"
 msgstr ""
 
-#: src/cavedb.c:483
+#: src/cavedb.c:480
 msgid "If true, the gravity changing will make sound."
 msgstr ""
 
-#: src/cavedb.c:487 src/cavedb.c:488
+#: src/cavedb.c:484 src/cavedb.c:485
 msgid "Compatibility"
 msgstr ""
 
-#: src/cavedb.c:489
+#: src/cavedb.c:486
 msgid "Line shifting border"
 msgstr ""
 
-#: src/cavedb.c:489
+#: src/cavedb.c:486
 msgid ""
 "If this is set to true, the player exiting on either side will appear one "
 "row lower or upper on the other side."
 msgstr ""
 
-#: src/cavedb.c:490
+#: src/cavedb.c:487
 msgid "Objects wrap around"
 msgstr ""
 
-#: src/cavedb.c:490
+#: src/cavedb.c:487
 msgid ""
 "If true, object will wrap around the cave borders as well, ie. if you drag a "
 "line to the left, part of it will appear on the right hand side of the cave. "
@@ -1981,41 +1988,53 @@ msgid ""
 "or the bottom boundary will have no effect at all."
 msgstr ""
 
-#: src/cavedb.c:491
+#: src/cavedb.c:488
 msgid "Scan first and last row"
 msgstr ""
 
-#: src/cavedb.c:491
+#: src/cavedb.c:488
 msgid "Elements move on first and last row, too."
 msgstr ""
 
-#: src/cavedb.c:492
+#: src/cavedb.c:489
 msgid "Short explosions"
 msgstr ""
 
-#: src/cavedb.c:492
+#: src/cavedb.c:489
 msgid ""
 "In 1stB, explosions were longer, took five cave frames to complete, as "
 "opposed to four in the original."
 msgstr ""
 
-#: src/cavedb.c:493
+#: src/cavedb.c:490
 msgid "Skeletons worth diamonds"
 msgstr ""
 
-#: src/cavedb.c:493
+#: src/cavedb.c:490
 msgid "The number of diamonds each skeleton is worth."
 msgstr ""
 
-#: src/cavedb.c:494
+#: src/cavedb.c:491
 msgid "Gravity change affects everything"
 msgstr ""
 
-#: src/cavedb.c:494
+#: src/cavedb.c:491
 msgid ""
 "If this is enabled, changing the gravity will also affect bladders (moving "
 "and pushing), bladder spenders, falling walls and waiting stones. Otherwise, "
 "those elements behave as gravity was always pointing downwards."
+msgstr ""
+
+#: src/cavedb.c:494 src/caveset.c:68 src/editorexport.c:561
+msgid "Notes"
+msgstr ""
+
+#: src/cavedb.c:494
+msgid "Long description of the cave."
+msgstr ""
+
+#: src/cavedb.c:511
+msgid "Replay"
 msgstr ""
 
 #. TRANSLATORS: some languages (for example, german) do not have lowercase nouns.
@@ -2029,11 +2048,11 @@ msgstr ""
 #. Set the translated string to "lowercase-element-names-yes", if your language
 #. allows writing nouns with lowercase initials. Set it to "lowercase-element-names-no",
 #. if not: for example, german. Do not translate the string, but set the behavior!
-#: src/cavedb.c:723
+#: src/cavedb.c:750
 msgid "lowercase-element-names-yes"
 msgstr ""
 
-#: src/caveobject.c:29 src/help.c:136
+#: src/caveobject.c:29 src/help.c:140
 msgid "Point"
 msgstr ""
 
@@ -2051,14 +2070,14 @@ msgstr ""
 msgid "Draw"
 msgstr ""
 
-#: src/caveobject.c:30 src/help.c:138
+#: src/caveobject.c:30 src/help.c:142
 msgid "Line"
 msgstr ""
 
 #: src/caveobject.c:30 src/caveobject.c:31 src/caveobject.c:32
 #: src/caveobject.c:33 src/caveobject.c:35 src/caveobject.c:36
 #: src/caveobject.c:37 src/caveobject.c:38 src/caveobject.c:39
-#: src/caveobject.c:40
+#: src/caveobject.c:40 src/caveobject.c:41
 msgid "Starting coordinates"
 msgstr ""
 
@@ -2068,11 +2087,11 @@ msgstr ""
 msgid "Ending coordinates"
 msgstr ""
 
-#: src/caveobject.c:31 src/help.c:139
+#: src/caveobject.c:31 src/help.c:143
 msgid "Outline"
 msgstr ""
 
-#: src/caveobject.c:32 src/help.c:140
+#: src/caveobject.c:32 src/help.c:144
 msgid "Rectangle"
 msgstr ""
 
@@ -2088,7 +2107,7 @@ msgstr ""
 msgid "Fill"
 msgstr ""
 
-#: src/caveobject.c:33 src/help.c:141
+#: src/caveobject.c:33 src/help.c:145
 msgid "Raster"
 msgstr ""
 
@@ -2096,7 +2115,7 @@ msgstr ""
 msgid "Distance"
 msgstr ""
 
-#: src/caveobject.c:34 src/help.c:142
+#: src/caveobject.c:34 src/help.c:146
 msgid "Join"
 msgstr ""
 
@@ -2120,7 +2139,7 @@ msgstr ""
 msgid "Replace"
 msgstr ""
 
-#: src/caveobject.c:36 src/help.c:143
+#: src/caveobject.c:36 src/help.c:147
 msgid "Fill to border"
 msgstr ""
 
@@ -2128,7 +2147,7 @@ msgstr ""
 msgid "Border"
 msgstr ""
 
-#: src/caveobject.c:37 src/help.c:147
+#: src/caveobject.c:37 src/help.c:151
 msgid "Maze"
 msgstr ""
 
@@ -2137,7 +2156,7 @@ msgid "Wall and path"
 msgstr ""
 
 #: src/caveobject.c:37 src/caveobject.c:38 src/caveobject.c:39
-#: src/caveobject.c:40 src/editor.c:1488
+#: src/caveobject.c:40 src/editor.c:1525
 #, c-format
 msgid "Random seed %d"
 msgstr ""
@@ -2162,11 +2181,11 @@ msgstr ""
 msgid "Horizontal (%)"
 msgstr ""
 
-#: src/caveobject.c:38 src/help.c:148
+#: src/caveobject.c:38 src/help.c:152
 msgid "Unicursal maze"
 msgstr ""
 
-#: src/caveobject.c:39 src/help.c:149
+#: src/caveobject.c:39 src/help.c:153
 msgid "Braid maze"
 msgstr ""
 
@@ -2190,64 +2209,89 @@ msgstr ""
 msgid "C64 random numbers"
 msgstr ""
 
-#: src/caveobject.c:307
+#: src/caveobject.c:41 src/help.c:155
+msgid "Copy and paste"
+msgstr ""
+
+#: src/caveobject.c:41
+msgid "Width and height"
+msgstr ""
+
+#: src/caveobject.c:41
+msgid "Paste coordinates"
+msgstr ""
+
+#: src/caveobject.c:41
+msgid "Mirror"
+msgstr ""
+
+#: src/caveobject.c:41
+msgid "Flip"
+msgstr ""
+
+#: src/caveobject.c:342
 #, c-format
 msgid "Point of <b>%s</b> at %d,%d"
 msgstr ""
 
-#: src/caveobject.c:310
+#: src/caveobject.c:345
 #, c-format
 msgid "Line from %d,%d to %d,%d of <b>%s</b>"
 msgstr ""
 
-#: src/caveobject.c:313
+#: src/caveobject.c:348
 #, c-format
 msgid "Rectangle from %d,%d to %d,%d of <b>%s</b>"
 msgstr ""
 
-#: src/caveobject.c:316
+#: src/caveobject.c:351
 #, c-format
 msgid "Rectangle from %d,%d to %d,%d of <b>%s</b>, filled with <b>%s</b>"
 msgstr ""
 
-#: src/caveobject.c:319
+#: src/caveobject.c:354
 #, c-format
 msgid "Raster from %d,%d to %d,%d of <b>%s</b>, distance %+d,%+d"
 msgstr ""
 
-#: src/caveobject.c:322
+#: src/caveobject.c:357
 #, c-format
 msgid "Join <b>%s</b> to every <b>%s</b>, distance %+d,%+d"
 msgstr ""
 
-#: src/caveobject.c:325
+#: src/caveobject.c:360
 #, c-format
 msgid "Floodfill from %d,%d of <b>%s</b>, border <b>%s</b>"
 msgstr ""
 
-#: src/caveobject.c:328
+#: src/caveobject.c:363
 #, c-format
 msgid "Floodfill from %d,%d of <b>%s</b>, replacing <b>%s</b>"
 msgstr ""
 
-#: src/caveobject.c:331
+#: src/caveobject.c:366
 #, c-format
 msgid "Maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"
 msgstr ""
 
-#: src/caveobject.c:334
+#: src/caveobject.c:369
 #, c-format
 msgid "Unicursal maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"
 msgstr ""
 
-#: src/caveobject.c:337
+#: src/caveobject.c:372
 #, c-format
 msgid "Braid maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"
 msgstr ""
 
-#: src/caveobject.c:340
+#: src/caveobject.c:375
 #, c-format
 msgid "Random fill from %d,%d to %d,%d, replacing %s"
+msgstr ""
+
+#: src/caveobject.c:378
+#, c-format
+msgid "Copy from %d,%d-%d,%d, paste to %d, %d"
 msgstr ""
 
 #: src/caveset.c:55
@@ -2394,251 +2438,276 @@ msgstr ""
 msgid "Draw random elements"
 msgstr ""
 
-#: src/editor.c:117
+#: src/editor.c:115
+msgid "_Copy and Paste"
+msgstr ""
+
+#: src/editor.c:115
+msgid "Copy and paste area"
+msgstr ""
+
+#: src/editor.c:118
 msgid "F_reehand"
 msgstr ""
 
-#: src/editor.c:117
+#: src/editor.c:118
 msgid "Draw freely"
 msgstr ""
 
-#: src/editor.c:118
-msgid "Set _visible part"
+#: src/editor.c:119
+msgid "Set _visible region"
 msgstr ""
 
-#: src/editor.c:118
-msgid "Select visible part of cave during play"
+#: src/editor.c:119
+msgid "Select visible region of cave during play"
 msgstr ""
 
-#: src/editor.c:290
+#: src/editor.c:292
 #, c-format
 msgid "%d objects selected"
 msgstr ""
 
-#: src/editor.c:457 src/editor.c:462
+#: src/editor.c:459 src/editor.c:464
 #, c-format
 msgid "GDash Cave Editor - %s"
 msgstr ""
 
-#: src/editor.c:631
+#: src/editor.c:634
 #, c-format
 msgid "Level %d"
 msgstr ""
 
-#: src/editor.c:722
+#: src/editor.c:725
 #, c-format
 msgid ""
 "%s\n"
 "Default value: %s"
 msgstr ""
 
-#: src/editor.c:722 src/editor.c:724
+#: src/editor.c:725 src/editor.c:727
 msgid "empty"
 msgstr ""
 
-#: src/editor.c:724
+#: src/editor.c:727
 #, c-format
 msgid "Default value: %s"
 msgstr ""
 
-#: src/editor.c:733
+#: src/editor.c:736
 msgid "Set to default value"
 msgstr ""
 
-#: src/editor.c:762
+#: src/editor.c:765
 #, c-format
 msgid ""
 "Value of tag '%s'. This tag is not known to GDash. Clear the text field to "
 "remove it."
 msgstr ""
 
-#: src/editor.c:868
+#: src/editor.c:875
 msgid "Cave Properties"
 msgstr ""
 
-#: src/editor.c:922
+#: src/editor.c:933
+msgid ""
+"You have changed the size of the cave. Please check the size of the visible "
+"region!"
+msgstr ""
+
+#: src/editor.c:934
+msgid ""
+"The visible area of the cave during the game can be smaller than the whole "
+"cave. If you resize the cave, the area to be shown cannot be guessed "
+"automatically. The tool to set this behavior is now selected, and shows the "
+"current visible area. Use drag and drop to change the position and size of "
+"the rectangle."
+msgstr ""
+
+#: src/editor.c:951
 msgid "Cave Set Properties"
 msgstr ""
 
-#: src/editor.c:1478
+#: src/editor.c:1515
 msgid "Level shown"
 msgstr ""
 
-#: src/editor.c:1500
+#: src/editor.c:1537
 msgid "Initial border"
 msgstr ""
 
-#: src/editor.c:1521
+#: src/editor.c:1558
 msgid "Initial fill"
 msgstr ""
 
-#: src/editor.c:1523
+#: src/editor.c:1560
 #, c-format
 msgid "Random fill %d"
 msgstr ""
 
-#: src/editor.c:1650
+#: src/editor.c:1687
 msgid "Object Properties"
 msgstr ""
 
-#: src/editor.c:1666 src/editorexport.c:547
+#: src/editor.c:1703 src/editorexport.c:564
 msgid "Type"
 msgstr ""
 
-#: src/editor.c:1674
+#: src/editor.c:1711
 msgid "Level currently shown"
 msgstr ""
 
-#: src/editor.c:1685
+#: src/editor.c:1722
 msgid "Enabled on levels"
 msgstr ""
 
-#: src/editor.c:1757
+#: src/editor.c:1794
 msgid ""
 "Random seed value controls the predictable random number generator. If set "
 "to -1, cave is totally random every time it is played."
 msgstr ""
 
-#: src/editor.c:1780
+#: src/editor.c:1831
 msgid "The object should be visible on at least one level."
 msgstr ""
 
-#: src/editor.c:1780
+#: src/editor.c:1831
 msgid "Enabled this object on all levels."
 msgstr ""
 
-#: src/editor.c:2424
+#: src/editor.c:2509
 msgid "Cave Name"
 msgstr ""
 
-#: src/editor.c:2510
+#: src/editor.c:2595
 #, c-format
 msgid "<b>%s</b>, %s, %dx%d, time %d:%02d, diamonds %d"
 msgstr ""
 
-#: src/editor.c:2510
+#: src/editor.c:2595
 msgid "selectable"
 msgstr ""
 
-#: src/editor.c:2510
+#: src/editor.c:2595
 msgid "not selectable"
 msgstr ""
 
-#: src/editor.c:2731
+#: src/editor.c:2816
 msgid "Cave Initial Random Fill"
 msgstr ""
 
-#: src/editor.c:2768
+#: src/editor.c:2853
 msgid "Save Cave as PNG Image"
 msgstr ""
 
-#: src/editor.c:2775
+#: src/editor.c:2860
 msgid "PNG files"
 msgstr ""
 
-#: src/editor.c:2851
+#: src/editor.c:2936
 msgid "Cave Overview"
 msgstr ""
 
-#: src/editor.c:2852
+#: src/editor.c:2937
 msgid "Save as _PNG"
 msgstr ""
 
-#: src/editor.c:2979
+#: src/editor.c:3095
 msgid "Cave Colors"
 msgstr ""
 
-#: src/editor.c:2983
-msgid "_Random"
+#: src/editor.c:3128
+msgid "Set random..."
 msgstr ""
 
-#: src/editor.c:3050
+#: src/editor.c:3135
+msgid ""
+"<i>Hint: As the palette can be changed for C64 and Atari colors, it is not "
+"recommended to use different types together (for example, RGB color for "
+"background, Atari color for Slime.)</i>"
+msgstr ""
+
+#: src/editor.c:3182
 msgid "Do you really want to delete cave(s)?"
 msgstr ""
 
-#: src/editor.c:3050
+#: src/editor.c:3182
 msgid "This operation cannot be undone."
 msgstr ""
 
-#: src/editor.c:3223
+#: src/editor.c:3355
 msgid ""
 "At least one object would have been totally hidden (not visible on any of "
 "the levels)."
 msgstr ""
 
-#: src/editor.c:3223
+#: src/editor.c:3355
 msgid "Enabled those objects on the current level."
 msgstr ""
 
-#: src/editor.c:3414
+#: src/editor.c:3546
 msgid "Do you really want to clear cave objects?"
 msgstr ""
 
-#: src/editor.c:3435
+#: src/editor.c:3567
 msgid "Do you really want to remove cave map?"
 msgstr ""
 
-#: src/editor.c:3435
+#: src/editor.c:3567
 msgid "This operation destroys all cave objects."
 msgstr ""
 
-#: src/editor.c:3456
+#: src/editor.c:3588
 msgid "This cave has no objects."
 msgstr ""
 
-#: src/editor.c:3460
+#: src/editor.c:3592
 msgid "Do you really want to flatten cave?"
 msgstr ""
 
-#: src/editor.c:3460
+#: src/editor.c:3592
 msgid ""
 "This operation merges all cave objects currently seen in a single map. "
 "Further objects may later be added, but the ones already seen will behave "
 "like the random fill elements; they will not be editable."
 msgstr ""
 
-#: src/editor.c:3593
+#: src/editor.c:3725
 msgid "Save Cave Set in HTML"
 msgstr ""
 
-#: src/editor.c:3601
+#: src/editor.c:3733
 msgid "HTML files"
 msgstr ""
 
-#: src/editor.c:3637
+#: src/editor.c:3769
 msgid "Export Cave as CrLi Cave File"
 msgstr ""
 
-#: src/editor.c:3676
+#: src/editor.c:3808
 msgid "Export Cave as CrLi Cave Pack"
 msgstr ""
 
-#: src/editor.c:3715
-#, c-format
-msgid "Testing %s"
-msgstr ""
-
-#: src/editor.c:3799
+#: src/editor.c:3919
 msgid "Create New Cave"
 msgstr ""
 
-#: src/editor.c:3810 src/gtkmain.c:882
+#: src/editor.c:3930 src/gtkmain.c:987
 msgid "Name:"
 msgstr ""
 
-#: src/editor.c:3816
+#: src/editor.c:3936
 msgid "New cave"
 msgstr ""
 
-#: src/editor.c:3820
+#: src/editor.c:3940
 msgid "Description:"
 msgstr ""
 
-#: src/editor.c:3829
+#: src/editor.c:3949
 msgid "Intermission:"
 msgstr ""
 
-#: src/editor.c:3831
+#: src/editor.c:3951
 msgid ""
 "Intermission caves are usually small and fast caves, which are not required "
 "to be solved. The player will not lose a life if he is not successful. The "
@@ -2647,11 +2716,11 @@ msgid ""
 "intermissions."
 msgstr ""
 
-#: src/editor.c:3962
+#: src/editor.c:4079
 msgid "Do you really want to remove unknown cave tags?"
 msgstr ""
 
-#: src/editor.c:3962
+#: src/editor.c:4079
 msgid ""
 "This operation removes all unknown tags associated with all caves. Unknown "
 "tags might come from another BDCFF-compatible game or an older version of "
@@ -2659,436 +2728,436 @@ msgid ""
 "you use this caveset in this application, they are of no use."
 msgstr ""
 
-#: src/editor.c:4079 src/editor.c:4090
+#: src/editor.c:4196 src/editor.c:4207
 #, c-format
 msgid "%s Element"
 msgstr ""
 
-#: src/editor.c:4083 src/editor.c:4100
+#: src/editor.c:4200 src/editor.c:4217
 msgid "Draw Element"
 msgstr ""
 
-#: src/editor.c:4094 src/editor.c:4104
+#: src/editor.c:4211 src/editor.c:4221
 msgid "Fill Element"
 msgstr ""
 
-#: src/editor.c:4253 src/gtkmain.c:1143
+#: src/editor.c:4370 src/gtkmain.c:1649
 msgid "_File"
 msgstr ""
 
-#: src/editor.c:4254
+#: src/editor.c:4371
 msgid "_Cave"
 msgstr ""
 
-#: src/editor.c:4255
+#: src/editor.c:4372
 msgid "_Edit"
 msgstr ""
 
-#: src/editor.c:4256
+#: src/editor.c:4373
 msgid "_View"
 msgstr ""
 
-#: src/editor.c:4257
+#: src/editor.c:4374
 msgid "_Tools"
 msgstr ""
 
-#: src/editor.c:4258 src/gtkmain.c:1145
+#: src/editor.c:4375 src/gtkmain.c:1651
 msgid "_Help"
 msgstr ""
 
-#: src/editor.c:4259
+#: src/editor.c:4376
 msgid "Close cave editor"
 msgstr ""
 
-#: src/editor.c:4260
+#: src/editor.c:4377
 msgid "New _cave"
 msgstr ""
 
-#: src/editor.c:4260
+#: src/editor.c:4377
 msgid "Create new cave"
 msgstr ""
 
-#: src/editor.c:4262
+#: src/editor.c:4379
 msgid "Save cave set to file"
 msgstr ""
 
-#: src/editor.c:4263
+#: src/editor.c:4380
 msgid "Save cave set as new file"
 msgstr ""
 
-#: src/editor.c:4264
+#: src/editor.c:4381
 msgid "Load cave set from file"
 msgstr ""
 
-#: src/editor.c:4265 src/gtkmain.c:1159
+#: src/editor.c:4382 src/gtkmain.c:1666
 msgid "O_pen shipped"
 msgstr ""
 
-#: src/editor.c:4265
+#: src/editor.c:4382
 msgid "Load shipped cave set from file"
 msgstr ""
 
-#: src/editor.c:4266 src/gtkmain.c:1162
+#: src/editor.c:4383 src/gtkmain.c:1669
 msgid "Hi_ghscores"
 msgstr ""
 
-#: src/editor.c:4267
+#: src/editor.c:4384
 msgid "Select all items"
 msgstr ""
 
-#: src/editor.c:4268
+#: src/editor.c:4385
 msgid "Cave set _properties"
 msgstr ""
 
-#: src/editor.c:4268
+#: src/editor.c:4385
 msgid "Set properties of cave set"
 msgstr ""
 
-#: src/editor.c:4273
+#: src/editor.c:4390
 msgid "_Edit cave"
 msgstr ""
 
-#: src/editor.c:4273
+#: src/editor.c:4390
 msgid "Edit selected cave"
 msgstr ""
 
-#: src/editor.c:4274
+#: src/editor.c:4391
 msgid "_Rename cave"
 msgstr ""
 
-#: src/editor.c:4274
+#: src/editor.c:4391
 msgid "Rename selected cave"
 msgstr ""
 
-#: src/editor.c:4275
+#: src/editor.c:4392
 msgid "Make cave _selectable"
 msgstr ""
 
-#: src/editor.c:4275
+#: src/editor.c:4392
 msgid "Make the cave selectable as game start"
 msgstr ""
 
-#: src/editor.c:4276
+#: src/editor.c:4393
 msgid "Make cave _unselectable"
 msgstr ""
 
-#: src/editor.c:4276
+#: src/editor.c:4393
 msgid "Make the cave unselectable as game start"
 msgstr ""
 
-#: src/editor.c:4281
+#: src/editor.c:4398
 msgid "_New cave set"
 msgstr ""
 
-#: src/editor.c:4281
+#: src/editor.c:4398
 msgid "Create new cave set with no caves"
 msgstr ""
 
-#: src/editor.c:4282
+#: src/editor.c:4399
 msgid "Save _HTML gallery"
 msgstr ""
 
-#: src/editor.c:4282
+#: src/editor.c:4399
 msgid "Save game in a HTML gallery"
 msgstr ""
 
-#: src/editor.c:4283
+#: src/editor.c:4400
 msgid "Export _CrLi cave pack"
 msgstr ""
 
-#: src/editor.c:4284
+#: src/editor.c:4401
 msgid "_Make caves selectable"
 msgstr ""
 
-#: src/editor.c:4285
+#: src/editor.c:4402
 msgid "All _caves"
 msgstr ""
 
-#: src/editor.c:4285
+#: src/editor.c:4402
 msgid "Make all caves selectable as game start"
 msgstr ""
 
-#: src/editor.c:4286
+#: src/editor.c:4403
 msgid "All _but intermissions"
 msgstr ""
 
-#: src/editor.c:4286
+#: src/editor.c:4403
 msgid "Make all caves but intermissions selectable as game start"
 msgstr ""
 
-#: src/editor.c:4287
+#: src/editor.c:4404
 msgid "All _after intermissions"
 msgstr ""
 
-#: src/editor.c:4287
+#: src/editor.c:4404
 msgid "Make all caves after intermissions selectable as game start"
 msgstr ""
 
-#: src/editor.c:4288
+#: src/editor.c:4405
 msgid "Remove all unknown tags"
 msgstr ""
 
-#: src/editor.c:4288
+#: src/editor.c:4405
 msgid "Removes all unknown tags found in the BDCFF file"
 msgstr ""
 
-#: src/editor.c:4293
+#: src/editor.c:4410
 msgid "_Export as CrLi cave file"
 msgstr ""
 
-#: src/editor.c:4294
+#: src/editor.c:4411
 msgid "Open cave selector"
 msgstr ""
 
-#: src/editor.c:4295
+#: src/editor.c:4412
 msgid "_Next cave"
 msgstr ""
 
-#: src/editor.c:4295
+#: src/editor.c:4412
 msgid "Next cave"
 msgstr ""
 
-#: src/editor.c:4296
+#: src/editor.c:4413
 msgid "_Previous cave"
 msgstr ""
 
-#: src/editor.c:4296
+#: src/editor.c:4413
 msgid "Previous cave"
 msgstr ""
 
-#: src/editor.c:4297
+#: src/editor.c:4414
 msgid "_Test"
 msgstr ""
 
-#: src/editor.c:4297 src/help.c:194
+#: src/editor.c:4414 src/help.c:198
 msgid "Test cave"
 msgstr ""
 
-#: src/editor.c:4298
+#: src/editor.c:4415
 msgid "Ca_ve properties"
 msgstr ""
 
-#: src/editor.c:4298
+#: src/editor.c:4415
 msgid "Cave settings"
 msgstr ""
 
-#: src/editor.c:4299
+#: src/editor.c:4416
 msgid "Set engine defaults"
 msgstr ""
 
-#: src/editor.c:4300
+#: src/editor.c:4417
 msgid "Cave co_lors"
 msgstr ""
 
-#: src/editor.c:4300
+#: src/editor.c:4417
 msgid "Select cave colors"
 msgstr ""
 
-#: src/editor.c:4301
+#: src/editor.c:4418
 msgid "Remove objects"
 msgstr ""
 
-#: src/editor.c:4301
+#: src/editor.c:4418
 msgid "Clear cave objects"
 msgstr ""
 
-#: src/editor.c:4302
+#: src/editor.c:4419
 msgid "Convert to map"
 msgstr ""
 
-#: src/editor.c:4302
+#: src/editor.c:4419
 msgid "Flatten cave to a single cave map without objects"
 msgstr ""
 
-#: src/editor.c:4303
+#: src/editor.c:4420
 msgid "O_verview"
 msgstr ""
 
-#: src/editor.c:4303
+#: src/editor.c:4420
 msgid "Full screen overview of cave"
 msgstr ""
 
-#: src/editor.c:4304
+#: src/editor.c:4421
 msgid "O_verview (simple)"
 msgstr ""
 
-#: src/editor.c:4304
+#: src/editor.c:4421
 msgid "Full screen overview of cave almost as in game"
 msgstr ""
 
-#: src/editor.c:4305
+#: src/editor.c:4422
 msgid "_Auto shrink"
 msgstr ""
 
-#: src/editor.c:4305
-msgid "Automatically set the visible part of the cave"
+#: src/editor.c:4422
+msgid "Automatically set the visible region of the cave"
 msgstr ""
 
-#: src/editor.c:4310
+#: src/editor.c:4427
 msgid "To _bottom"
 msgstr ""
 
-#: src/editor.c:4310
+#: src/editor.c:4427
 msgid "Push object to bottom"
 msgstr ""
 
-#: src/editor.c:4311
+#: src/editor.c:4428
 msgid "To t_op"
 msgstr ""
 
-#: src/editor.c:4311
+#: src/editor.c:4428
 msgid "Bring object to top"
 msgstr ""
 
-#: src/editor.c:4312
+#: src/editor.c:4429
 msgid "Show on this level"
 msgstr ""
 
-#: src/editor.c:4312
+#: src/editor.c:4429
 msgid "Enable object on currently visible level"
 msgstr ""
 
-#: src/editor.c:4313
+#: src/editor.c:4430
 msgid "Hide on this level"
 msgstr ""
 
-#: src/editor.c:4313
+#: src/editor.c:4430
 msgid "Disable object on currently visible level"
 msgstr ""
 
-#: src/editor.c:4314
+#: src/editor.c:4431
 msgid "Only on this level"
 msgstr ""
 
-#: src/editor.c:4314
+#: src/editor.c:4431
 msgid "Enable object only on the currently visible level"
 msgstr ""
 
-#: src/editor.c:4315
+#: src/editor.c:4432
 msgid "Show on all levels"
 msgstr ""
 
-#: src/editor.c:4315
+#: src/editor.c:4432
 msgid "Enable object on all levels"
 msgstr ""
 
-#: src/editor.c:4319
+#: src/editor.c:4436
 msgid "Ob_ject properties"
 msgstr ""
 
-#: src/editor.c:4319
+#: src/editor.c:4436
 msgid "Set object properties"
 msgstr ""
 
-#: src/editor.c:4324
+#: src/editor.c:4441
 msgid "Map"
 msgstr ""
 
-#: src/editor.c:4325
+#: src/editor.c:4442
 msgid "Shift _left"
 msgstr ""
 
-#: src/editor.c:4326
+#: src/editor.c:4443
 msgid "Shift _right"
 msgstr ""
 
-#: src/editor.c:4327
+#: src/editor.c:4444
 msgid "Shift _up"
 msgstr ""
 
-#: src/editor.c:4328
+#: src/editor.c:4445
 msgid "Shift _down"
 msgstr ""
 
-#: src/editor.c:4329
+#: src/editor.c:4446
 msgid "Remove m_ap"
 msgstr ""
 
-#: src/editor.c:4329
+#: src/editor.c:4446
 msgid "Remove cave map, if it has one"
 msgstr ""
 
-#: src/editor.c:4334
+#: src/editor.c:4451
 msgid "Setup cave _random fill"
 msgstr ""
 
-#: src/editor.c:4334
+#: src/editor.c:4451
 msgid "Setup initial fill random elements for the cave"
 msgstr ""
 
-#: src/editor.c:4339
+#: src/editor.c:4456
 msgid "Cut to clipboard"
 msgstr ""
 
-#: src/editor.c:4340
+#: src/editor.c:4457
 msgid "Copy to clipboard"
 msgstr ""
 
-#: src/editor.c:4341
+#: src/editor.c:4458
 msgid "Delete"
 msgstr ""
 
-#: src/editor.c:4346
+#: src/editor.c:4463
 msgid "Paste object from clipboard"
 msgstr ""
 
-#: src/editor.c:4351
+#: src/editor.c:4468
 msgid "Undo last action"
 msgstr ""
 
-#: src/editor.c:4356
+#: src/editor.c:4473
 msgid "Redo last action"
 msgstr ""
 
-#: src/editor.c:4364
+#: src/editor.c:4481
 msgid "_Animated view"
 msgstr ""
 
-#: src/editor.c:4364
+#: src/editor.c:4481
 msgid "Animated view"
 msgstr ""
 
-#: src/editor.c:4365
+#: src/editor.c:4482
 msgid "_Colored objects"
 msgstr ""
 
-#: src/editor.c:4365
-msgid "Cave objects are coloured"
+#: src/editor.c:4482
+msgid "Cave objects are colored"
 msgstr ""
 
-#: src/editor.c:4366
+#: src/editor.c:4483
 msgid "_Object list"
 msgstr ""
 
-#: src/editor.c:4366
+#: src/editor.c:4483
 msgid "Object list sidebar"
 msgstr ""
 
-#: src/editor.c:4367
+#: src/editor.c:4484
 msgid "_Show variables in test"
 msgstr ""
 
-#: src/editor.c:4367
+#: src/editor.c:4484
 msgid "Show a label during tests with some cave parameters"
 msgstr ""
 
-#: src/editor.c:4696
+#: src/editor.c:4815
 msgid "Level shown:"
 msgstr ""
 
-#: src/editor.c:4700
+#: src/editor.c:4819
 msgid ""
 "Element used to draw points, lines, and rectangles. You can use middle-click "
 "to pick one from the cave."
 msgstr ""
 
-#: src/editor.c:4705
+#: src/editor.c:4824
 msgid ""
 "Element used to fill rectangles, and second element of joins. You can use "
 "Ctrl + middle-click to pick one from the cave."
 msgstr ""
 
-#: src/editor.c:4742
+#: src/editor.c:4861
 msgid "_Objects"
 msgstr ""
 
@@ -3116,323 +3185,434 @@ msgstr ""
 msgid "WWW: %s<BR>\n"
 msgstr ""
 
-#: src/editorexport.c:547
+#: src/editorexport.c:492
+#, c-format
+msgid "Remark: %s<BR>\n"
+msgstr ""
+
+#: src/editorexport.c:494
+#, c-format
+msgid "Notes:<BR>%s<BR>\n"
+msgstr ""
+
+#: src/editorexport.c:552 src/editorexport.c:561
+#, c-format
+msgid "<TR><TD>%s</TD><TD>%s</TD></TR>\n"
+msgstr ""
+
+#: src/editorexport.c:564 src/gtkmain.c:1533
 msgid "Normal cave"
 msgstr ""
 
-#: src/editorexport.c:550
+#: src/editorexport.c:567
 msgid "Diamond value"
 msgstr ""
 
-#: src/editorexport.c:551
+#: src/editorexport.c:568
 msgid "Extra diamond value"
 msgstr ""
 
-#: src/editorexport.c:554
+#: src/editorexport.c:571
 msgid "Amoeba threshold and time (s)"
 msgstr ""
 
-#: src/editorexport.c:556
+#: src/editorexport.c:573
 msgid "Magic wall milling time (s)"
 msgstr ""
 
-#: src/editorwidgets.c:102
+#: src/editorwidgets.c:135
 msgid "Select Color"
 msgstr ""
 
-#: src/editorwidgets.c:183
-msgid "Other"
+#: src/editorwidgets.c:178
+msgid "Select Atari Color"
 msgstr ""
 
-#: src/editorwidgets.c:428
+#: src/editorwidgets.c:182
+msgid "Select C64 DTV Color"
+msgstr ""
+
+#: src/editorwidgets.c:271
+msgid "C64 Colors"
+msgstr ""
+
+#: src/editorwidgets.c:284
+msgid "Atari color..."
+msgstr ""
+
+#: src/editorwidgets.c:286
+msgid "C64DTV color..."
+msgstr ""
+
+#: src/editorwidgets.c:288
+msgid "RGB color..."
+msgstr ""
+
+#: src/editorwidgets.c:541
 msgid "Normal elements"
 msgstr ""
 
-#: src/editorwidgets.c:435
+#: src/editorwidgets.c:549
 msgid "For effects"
 msgstr ""
 
-#: src/editorwidgets.c:532
+#: src/editorwidgets.c:652
 msgid "Elements"
 msgstr ""
 
-#: src/gameplay.c:166
-#, c-format
-msgid "Snapshot of %s"
-msgstr ""
-
-#: src/gtkmain.c:146
+#: src/gtkmain.c:155
 #, c-format
 msgid "You have %d points, and achieved a highscore."
 msgstr ""
 
-#: src/gtkmain.c:147 src/gtkmain.c:161
+#: src/gtkmain.c:156 src/gtkmain.c:170
 msgid "Game over!"
 msgstr ""
 
-#: src/gtkmain.c:160
+#: src/gtkmain.c:169
 #, c-format
 msgid "You have %d points."
 msgstr ""
 
-#: src/gtkmain.c:425
+#: src/gtkmain.c:529
 #, c-format
 msgid "Time: <b>%02d:%02d</b>"
 msgstr ""
 
-#: src/gtkmain.c:427
+#: src/gtkmain.c:531
 #, c-format
 msgid "Time: <b>%03d</b>"
 msgstr ""
 
-#: src/gtkmain.c:430
-#, c-format
-msgid "Score: <b>%d</b>"
-msgstr ""
-
-#: src/gtkmain.c:433
-#, c-format
-msgid "Value: <b>%d</b>"
-msgstr ""
-
-#: src/gtkmain.c:437
-#, c-format
-msgid "Diamonds: <b>%d</b>"
-msgstr ""
-
-#: src/gtkmain.c:440
-msgid "Diamonds: <b>???</b>"
-msgstr ""
-
-#: src/gtkmain.c:444
-#, c-format
-msgid "Skeletons: <b>%d</b>"
-msgstr ""
-
-#: src/gtkmain.c:447
-#, c-format
-msgid "Key 1: <b>%d</b>"
-msgstr ""
-
-#: src/gtkmain.c:448
-#, c-format
-msgid "Key 2: <b>%d</b>"
-msgstr ""
-
-#: src/gtkmain.c:449
-#, c-format
-msgid "Key 3: <b>%d</b>"
-msgstr ""
-
-#: src/gtkmain.c:452
-#, c-format
-msgid "Gravity changes: <b>%d</b>"
-msgstr ""
-
-#: src/gtkmain.c:456
+#: src/gtkmain.c:537
 #, c-format
 msgid "Lives: <b>%d</b>"
 msgstr ""
 
-#: src/gtkmain.c:561
+#: src/gtkmain.c:539
+msgid "<b>Bonus life</b>"
+msgstr ""
+
+#: src/gtkmain.c:542
+msgid "Continuing from <b>snapshot</b>"
+msgstr ""
+
+#: src/gtkmain.c:545
+msgid "<b>Testing</b> cave"
+msgstr ""
+
+#: src/gtkmain.c:548
+msgid "Playing <b>replay</b>"
+msgstr ""
+
+#: src/gtkmain.c:551
+msgid "Continuing <b>replay</b>"
+msgstr ""
+
+#: src/gtkmain.c:555
+#, c-format
+msgid "Score: <b>%d</b>"
+msgstr ""
+
+#: src/gtkmain.c:558
+#, c-format
+msgid "Diamond value: <b>%d</b>"
+msgstr ""
+
+#: src/gtkmain.c:562
+#, c-format
+msgid "Diamonds: <b>%d</b>"
+msgstr ""
+
+#: src/gtkmain.c:565
+msgid "Diamonds: <b>???</b>"
+msgstr ""
+
+#: src/gtkmain.c:569
+#, c-format
+msgid "Skeletons: <b>%d</b>"
+msgstr ""
+
+#: src/gtkmain.c:572
+#, c-format
+msgid "Key 1: <b>%d</b>"
+msgstr ""
+
+#: src/gtkmain.c:573
+#, c-format
+msgid "Key 2: <b>%d</b>"
+msgstr ""
+
+#: src/gtkmain.c:574
+#, c-format
+msgid "Key 3: <b>%d</b>"
+msgstr ""
+
+#: src/gtkmain.c:577
+#, c-format
+msgid "Gravity change: <b>%d</b>"
+msgstr ""
+
+#: src/gtkmain.c:682
 #, c-format
 msgid "<b>%s</b>, level %d"
 msgstr ""
 
-#: src/gtkmain.c:864
+#: src/gtkmain.c:972
 msgid "There are no caves in this cave set!"
 msgstr ""
 
-#: src/gtkmain.c:871
+#: src/gtkmain.c:976
 msgid "Select cave to play"
 msgstr ""
 
-#: src/gtkmain.c:893
+#: src/gtkmain.c:998
 msgid "Cave:"
 msgstr ""
 
-#: src/gtkmain.c:913
+#: src/gtkmain.c:1019
 msgid "Level:"
 msgstr ""
 
-#: src/gtkmain.c:924
+#: src/gtkmain.c:1030
 msgid "Preview"
 msgstr ""
 
-#: src/gtkmain.c:1105
+#: src/gtkmain.c:1222
 msgid "Cannot load file from network link."
 msgstr ""
 
-#: src/gtkmain.c:1124
+#: src/gtkmain.c:1241
 msgid "Loaded caveset from file:"
 msgstr ""
 
-#: src/gtkmain.c:1142
+#: src/gtkmain.c:1381 src/help.c:102
+msgid "Replays"
+msgstr ""
+
+#: src/gtkmain.c:1392
+msgid ""
+"<i>Hint: When watching a replay, you can use the usual movement keys (left, "
+"right...) to stop the replay and immediately continue the playing of the "
+"cave yourself.</i>"
+msgstr ""
+
+#: src/gtkmain.c:1442 src/gtkui.c:882
+msgid "Score"
+msgstr ""
+
+#: src/gtkmain.c:1447
+msgid "Comment"
+msgstr ""
+
+#: src/gtkmain.c:1454
+msgid "Saved"
+msgstr ""
+
+#: src/gtkmain.c:1495 src/gtkmain.c:1538
+msgid "Description: "
+msgstr ""
+
+#: src/gtkmain.c:1500 src/gtkmain.c:1543
+msgid "Author: "
+msgstr ""
+
+#: src/gtkmain.c:1505 src/gtkmain.c:1548
+msgid "Date: "
+msgstr ""
+
+#: src/gtkmain.c:1510
+msgid "Diffuculty: "
+msgstr ""
+
+#: src/gtkmain.c:1515 src/gtkmain.c:1558
+msgid "Remark: "
+msgstr ""
+
+#: src/gtkmain.c:1520 src/gtkmain.c:1563
+msgid "Notes:\n"
+msgstr ""
+
+#: src/gtkmain.c:1532
+msgid "Type: "
+msgstr ""
+
+#: src/gtkmain.c:1553
+msgid "Difficulty: "
+msgstr ""
+
+#: src/gtkmain.c:1583
+msgid "Caveset information"
+msgstr ""
+
+#: src/gtkmain.c:1648
 msgid "_Play"
 msgstr ""
 
-#: src/gtkmain.c:1144
+#: src/gtkmain.c:1650
 msgid "_Settings"
 msgstr ""
 
-#: src/gtkmain.c:1148
+#: src/gtkmain.c:1654
 msgid "_Error console"
 msgstr ""
 
-#: src/gtkmain.c:1154
+#: src/gtkmain.c:1656
+msgid "Caveset _information"
+msgstr ""
+
+#: src/gtkmain.c:1656
+msgid "Show information about the and its caves"
+msgstr ""
+
+#: src/gtkmain.c:1661
 msgid "_New game"
 msgstr ""
 
-#: src/gtkmain.c:1154
+#: src/gtkmain.c:1661
 msgid "Start new game"
 msgstr ""
 
-#: src/gtkmain.c:1155
+#: src/gtkmain.c:1662
 msgid "Cave _editor"
 msgstr ""
 
-#: src/gtkmain.c:1157
+#: src/gtkmain.c:1664
 msgid "Load _internal game"
 msgstr ""
 
-#: src/gtkmain.c:1158
+#: src/gtkmain.c:1665
 msgid "Open _recent"
 msgstr ""
 
-#: src/gtkmain.c:1166
+#: src/gtkmain.c:1670
+msgid "Show _replays"
+msgstr ""
+
+#: src/gtkmain.c:1674
 msgid "_Take snapshot"
 msgstr ""
 
-#: src/gtkmain.c:1167
+#: src/gtkmain.c:1675
 msgid "Re_start level"
 msgstr ""
 
-#: src/gtkmain.c:1167
+#: src/gtkmain.c:1675
 msgid "Restart current level"
 msgstr ""
 
-#: src/gtkmain.c:1168
+#: src/gtkmain.c:1676
 msgid "_End game"
 msgstr ""
 
-#: src/gtkmain.c:1168
+#: src/gtkmain.c:1676
 msgid "End current game"
 msgstr ""
 
-#: src/gtkmain.c:1172
+#: src/gtkmain.c:1680
 msgid "_Revert to snapshot"
 msgstr ""
 
-#: src/gtkmain.c:1176
+#: src/gtkmain.c:1684
 msgid "Pause game"
 msgstr ""
 
-#: src/gtkmain.c:1177
+#: src/gtkmain.c:1685
 msgid "Fullscreen mode during play"
 msgstr ""
 
-#: src/gtkmain.c:1178
+#: src/gtkmain.c:1686
 msgid "Fast for_ward"
 msgstr ""
 
-#: src/gtkmain.c:1178
-msgid "Fast forward (5x speed)"
+#: src/gtkmain.c:1686
+msgid "Fast forward"
 msgstr ""
 
-#: src/gtkmain.c:1376
+#: src/gtkmain.c:1898
 msgid "Start editor"
 msgstr ""
 
-#: src/gtkmain.c:1377
+#: src/gtkmain.c:1899
 msgid "Save caveset in a HTML gallery"
 msgstr ""
 
-#: src/gtkmain.c:1378
+#: src/gtkmain.c:1900
 msgid ""
 "Save cave C, level L in a PNG image. If no cave selected, uses a random one"
 msgstr ""
 
-#: src/gtkmain.c:1379
+#: src/gtkmain.c:1901
 msgid "Set PNG image size. Default is 128x96, set to 0x0 for unscaled"
 msgstr ""
 
-#: src/gtkmain.c:1380
+#: src/gtkmain.c:1902
 msgid "Save caveset in a BDCFF file"
 msgstr ""
 
-#: src/gtkmain.c:1381
+#: src/gtkmain.c:1903
 msgid "Batch mode: quit after specified tasks"
 msgstr ""
 
-#: src/gtkmain.c:1432 src/sdlmain.c:736
+#: src/gtkmain.c:1954 src/sdlmain.c:1042
 #, c-format
 msgid "Errors during loading caveset from file '%s'"
 msgstr ""
 
-#: src/gtkmain.c:1437 src/sdlmain.c:741
+#: src/gtkmain.c:1959 src/sdlmain.c:1049
 #, c-format
 msgid "%d: no such internal caveset"
 msgstr ""
 
-#: src/gtkmain.c:1466 src/sdlmain.c:751
+#: src/gtkmain.c:1988 src/sdlmain.c:1059
 msgid "Invalid cave or level number!\n"
 msgstr ""
 
-#: src/gtkmain.c:1479
+#: src/gtkmain.c:2001
 #, c-format
 msgid "Invalid image size: %s"
 msgstr ""
 
-#: src/gtkui.c:283
+#: src/gtkui.c:284
 msgid "Default"
 msgstr ""
 
-#: src/gtkui.c:372
+#: src/gtkui.c:373
 msgid "All image files"
 msgstr ""
 
-#: src/gtkui.c:417
+#: src/gtkui.c:418
 msgid "Add Theme from Image File"
 msgstr ""
 
-#: src/gtkui.c:463
+#: src/gtkui.c:464
 msgid "The selected image cannot be used as a GDash theme."
-msgstr ""
-
-#: src/gtkui.c:490
-#, c-format
-msgid "Do you really want to remove theme '%s'?"
 msgstr ""
 
 #: src/gtkui.c:491
 #, c-format
+msgid "Do you really want to remove theme '%s'?"
+msgstr ""
+
+#: src/gtkui.c:492
+#, c-format
 msgid "The image file of the theme is '%s'."
 msgstr ""
 
-#: src/gtkui.c:503
+#: src/gtkui.c:504
 msgid "Cannot delete the image file."
 msgstr ""
 
-#: src/gtkui.c:551
+#: src/gtkui.c:552
 msgid "<b>Language</b> (requires restart)"
 msgstr ""
 
-#: src/gtkui.c:552
+#: src/gtkui.c:553
 msgid "The language of the application. Requires restart!"
 msgstr ""
 
-#: src/gtkui.c:553
+#: src/gtkui.c:554
 msgid "<b>Cave options</b>"
-msgstr ""
-
-#: src/gtkui.c:554
-msgid "Ease levels"
-msgstr ""
-
-#: src/gtkui.c:554
-msgid ""
-"Make caves easier to play. Only one diamonds to collect, more time "
-"available, no expanding walls... This might render some caves unplayable!"
 msgstr ""
 
 #: src/gtkui.c:555
@@ -3484,175 +3664,214 @@ msgid "Show times in minutes and seconds, instead of seconds only."
 msgstr ""
 
 #: src/gtkui.c:561
-msgid "<b>Sound options</b> (require restart)"
+msgid "No invisible outbox"
+msgstr ""
+
+#: src/gtkui.c:561
+msgid "Show invisible outboxes as visible (blinking) ones.!"
 msgstr ""
 
 #: src/gtkui.c:562
+msgid "<b>Sound options</b> (require restart)"
+msgstr ""
+
+#: src/gtkui.c:563
 msgid "Play sounds. Enabling this setting requires a restart!"
 msgstr ""
 
-#: src/gtkui.c:563
+#: src/gtkui.c:564
 msgid "Classic sounds only"
 msgstr ""
 
-#: src/gtkui.c:563
+#: src/gtkui.c:564
 msgid "Play only classic sounds taken from the original game."
 msgstr ""
 
-#: src/gtkui.c:564
+#: src/gtkui.c:565
 msgid "16-bit mixing"
 msgstr ""
 
-#: src/gtkui.c:564
+#: src/gtkui.c:565
 msgid ""
 "Use 16-bit mixing of sounds. Try changing this setting if sound is clicky. "
 "Changing this setting requires a restart!"
 msgstr ""
 
-#: src/gtkui.c:565
+#: src/gtkui.c:566
 msgid "44kHz mixing"
 msgstr ""
 
-#: src/gtkui.c:565
+#: src/gtkui.c:566
 msgid ""
 "Use 44kHz mixing of sounds. Try changing this setting if sound is clicky. "
 "Changing this setting requires a restart!"
 msgstr ""
 
-#: src/gtkui.c:568
+#: src/gtkui.c:569
 msgid "<b>Display options</b>"
 msgstr ""
 
-#: src/gtkui.c:569
-msgid "Random colours"
+#: src/gtkui.c:570
+msgid "Random colors"
 msgstr ""
 
-#: src/gtkui.c:569
-msgid "Use randomly selected colours for C64 graphics."
-msgstr ""
-
-#: src/gtkui.c:574
-msgid "PAL emulation for game"
-msgstr ""
-
-#: src/gtkui.c:574 src/gtkui.c:575
-msgid "Use PAL emulated graphics, ie. lines are striped."
+#: src/gtkui.c:570
+msgid "Use randomly selected colors for C64 graphics."
 msgstr ""
 
 #: src/gtkui.c:575
+msgid "PAL emulation for game"
+msgstr ""
+
+#: src/gtkui.c:575 src/gtkui.c:576
+msgid "Use PAL emulated graphics, ie. lines are striped."
+msgstr ""
+
+#: src/gtkui.c:576
 msgid "PAL emulation for editor"
 msgstr ""
 
-#: src/gtkui.c:576
-msgid "PAL scanline shade (%)"
-msgstr ""
-
-#: src/gtkui.c:576
-msgid "Darker rows for PAL emulation."
-msgstr ""
-
-#: src/gtkui.c:577
-msgid "<b>C64 palette</b>"
+#: src/gtkui.c:578
+msgid "Fine scroll"
 msgstr ""
 
 #: src/gtkui.c:578
-msgid ""
-"The colour palette for games imported from C64 files. Also affects BDCFF "
-"games, which have C64 colors!"
+msgid "Fine scroll - 50 frames per second."
 msgstr ""
 
 #: src/gtkui.c:579
-msgid "<b>Atari palette</b>"
+msgid "PAL scanline shade (%)"
+msgstr ""
+
+#: src/gtkui.c:579
+msgid "Darker rows for PAL emulation."
 msgstr ""
 
 #: src/gtkui.c:580
-msgid "The colour palette for imported Atari games."
+msgid "<b>C64 palette</b>"
 msgstr ""
 
-#: src/gtkui.c:592
+#: src/gtkui.c:581
+msgid "The color palette for games imported from C64 files."
+msgstr ""
+
+#: src/gtkui.c:582
+msgid "<b>C64 DTV palette</b>"
+msgstr ""
+
+#: src/gtkui.c:583
+msgid "The color palette for imported C64 DTV games."
+msgstr ""
+
+#: src/gtkui.c:584
+msgid "<b>Atari palette</b>"
+msgstr ""
+
+#: src/gtkui.c:585
+msgid "The color palette for imported Atari games."
+msgstr ""
+
+#: src/gtkui.c:586
+msgid "<b>Preferred palette</b>"
+msgstr ""
+
+#: src/gtkui.c:587
+msgid "New caves and random colored caves use this palette."
+msgstr ""
+
+#: src/gtkui.c:599
 msgid "GDash Preferences"
 msgstr ""
 
-#: src/gtkui.c:597
+#: src/gtkui.c:604
 msgid "_Remove theme"
 msgstr ""
 
-#: src/gtkui.c:602
+#: src/gtkui.c:609
 msgid "_Add theme"
 msgstr ""
 
-#: src/gtkui.c:678
+#: src/gtkui.c:686
 msgid ""
 "This is the list of available themes. Use the Add Theme button to install a "
 "new one."
 msgstr ""
 
-#: src/gtkui.c:699
+#: src/gtkui.c:707
 msgid "<b>Theme</b>"
 msgstr ""
 
-#: src/gtkui.c:859 src/help.c:189
+#: src/gtkui.c:867 src/help.c:193
 msgid "Highscores"
 msgstr ""
 
-#: src/gtkui.c:865
+#: src/gtkui.c:873
 msgid "Rank"
 msgstr ""
 
-#: src/gtkui.c:874
-msgid "Score"
+#: src/gtkui.c:1010
+#, c-format
+msgid "Cave set \"%s\" is edited. Discard changes?"
 msgstr ""
 
-#: src/gtkui.c:997
-msgid "Cave set is edited. Discard changes?"
+#: src/gtkui.c:1011
+msgid "If you discard the caveset, all changes and new replays will be lost."
 msgstr ""
 
-#: src/gtkui.c:1002
+#: src/gtkui.c:1015
 msgid "_Discard"
 msgstr ""
 
-#: src/gtkui.c:1021
+#: src/gtkui.c:1034
 #, c-format
 msgid "The file (%s) already exists, and will be overwritten."
 msgstr ""
 
-#: src/gtkui.c:1022
+#: src/gtkui.c:1035
 msgid "The file already exists. Do you want to overwrite it?"
 msgstr ""
 
-#: src/gtkui.c:1090
+#: src/gtkui.c:1103
 msgid "Save File As"
 msgstr ""
 
-#: src/gtkui.c:1094
+#: src/gtkui.c:1107
 msgid "BDCFF cave sets (*.bd)"
 msgstr ""
 
-#: src/gtkui.c:1099
+#: src/gtkui.c:1112 src/gtkui.c:1167
 msgid "All files (*)"
 msgstr ""
 
-#: src/gtkui.c:1189
+#: src/gtkui.c:1158
+msgid "Save Replays As"
+msgstr ""
+
+#: src/gtkui.c:1162
+msgid "BDCFF replays (*.bdr)"
+msgstr ""
+
+#: src/gtkui.c:1257
 msgid "Open File"
 msgstr ""
 
-#: src/gtkui.c:1191
+#: src/gtkui.c:1259
 msgid "Load _highscores from BDCFF file"
 msgstr ""
 
-#: src/gtkui.c:1198
+#: src/gtkui.c:1266
 msgid "GDash cave sets"
 msgstr ""
 
-#: src/gtkui.c:1248
+#: src/gtkui.c:1316
 msgid "Loaded game:"
 msgstr ""
 
-#: src/gtkui.c:1322
+#: src/gtkui.c:1392
 msgid "GDash Errors"
 msgstr ""
 
-#: src/gtkui.c:1392
+#: src/gtkui.c:1462
 msgid "_Show all"
 msgstr ""
 
@@ -3708,7 +3927,7 @@ msgstr ""
 
 #: src/help.c:51
 msgid ""
-"This is also dirt, but has a different colour. In any other sense, it is "
+"This is also dirt, but has a different color. In any other sense, it is "
 "identical to the above one."
 msgstr ""
 
@@ -3920,8 +4139,8 @@ msgstr ""
 
 #: src/help.c:84
 msgid ""
-"There are three types of keys, which open three different coloured doors. "
-"You can collect more from these; and for every door, always one key is used."
+"There are three types of keys, which open three different colored doors. You "
+"can collect more from these; and for every door, always one key is used."
 msgstr ""
 
 #: src/help.c:85
@@ -3929,7 +4148,7 @@ msgid "Doors"
 msgstr ""
 
 #: src/help.c:85
-msgid "This is a door which can only be opened by the key of the same colour."
+msgid "This is a door which can only be opened by the key of the same color."
 msgstr ""
 
 #: src/help.c:86
@@ -4033,19 +4252,45 @@ msgid ""
 msgstr ""
 
 #: src/help.c:102
+msgid ""
+"Every time you play a game, GDash records all your movements. These "
+"recordings can be viewed later, and can be saved with the caveset. To check "
+"them out, click on Show replays in the Play menu."
+msgstr ""
+
+#: src/help.c:103
+msgid ""
+"If you were very lucky in a cave, or something interesting happened, you do "
+"not have to be worry, as all played caves are recorded. In the Replays "
+"window, you can select some of them to be saved with the caveset. You can "
+"also add comments to selected movies. The replays are stored no matter if "
+"the cave was solved or not, so you can even send the recording of your "
+"unsuccessful missions for others to discuss."
+msgstr ""
+
+#: src/help.c:104
+msgid ""
+"During the replay of the cave, you can gain control of the replay if you use "
+"the usual cursor keys (left, up, etc.) to move. From that point, you can "
+"continue playing the cave as if it was a snapshot. You can answer your 'what "
+"would have happened if...' questions. Or see if you can do better than the "
+"original player!"
+msgstr ""
+
+#: src/help.c:106
 msgid "Themes"
 msgstr ""
 
-#: src/help.c:102
+#: src/help.c:106
 msgid ""
 "The game also supports themes. You can use the installed png file as a "
 "template. Cells can have any arbitrary size, not necessarily 16x16 pixels. "
 "However, they must be squares, and the image must have an alpha channel. If "
-"the image has only a small number of colours (fully saturated red for "
-"foreground colour 1, fully saturated green for amoeba...), the game will use "
-"original C64 colours, different ones for every cave. Whether the png file is "
-"interpreted as a true colour image or one with C64 colours, depends on the "
-"colour values used, and is autodetected. An image file with only #000000, "
+"the image has only a small number of colors (fully saturated red for "
+"foreground color 1, fully saturated green for amoeba...), the game will use "
+"original C64 colors, different ones for every cave. Whether the png file is "
+"interpreted as a true color image or one with C64 colors, depends on the "
+"color values used, and is autodetected. An image file with only #000000, "
 "#00FF00 and the like is taken as a C64 theme.\n"
 "For C64 themes, the meaning of colors are these:\n"
 "- Transparent: you should use it everywhere where there is no drawing.\n"
@@ -4060,11 +4305,11 @@ msgid ""
 "- White 0xffffff: for the editor; will the color of arrows.\n"
 msgstr ""
 
-#: src/help.c:117
+#: src/help.c:121
 msgid "Some words of warning"
 msgstr ""
 
-#: src/help.c:118
+#: src/help.c:122
 msgid ""
 "- Importing may not be complete and correct for all games and engines. There "
 "may be some unplayable caves, as older games had no precise timing.\n"
@@ -4076,17 +4321,17 @@ msgid ""
 "option in the editor menu to get rid of older or unknown options.\n"
 msgstr ""
 
-#: src/help.c:131
+#: src/help.c:135
 msgid ""
 "This editor lets you create your own levels and cave sets. It can operate in "
 "two modes, a game editor mode, and a cave edit mode.\n"
 msgstr ""
 
-#: src/help.c:132
+#: src/help.c:136
 msgid "Game editor"
 msgstr ""
 
-#: src/help.c:132
+#: src/help.c:136
 msgid ""
 "In this one, you are presented with an overview of your game. You can click "
 "on any cave to select it. Then you can select File|Edit Cave to view or "
@@ -4096,19 +4341,19 @@ msgid ""
 "File|New Cave."
 msgstr ""
 
-#: src/help.c:133
+#: src/help.c:137
 msgid "Cave editor"
 msgstr ""
 
-#: src/help.c:133
+#: src/help.c:137
 msgid "In this mode, you can edit a cave."
 msgstr ""
 
-#: src/help.c:134
+#: src/help.c:138
 msgid "How a cave is generated"
 msgstr ""
 
-#: src/help.c:134
+#: src/help.c:138
 msgid ""
 "A cave is built up of different objects. First, it is filled with random "
 "elements, of which there can be five. The probabilities of each can be set. "
@@ -4116,52 +4361,52 @@ msgid ""
 "the ability to import different file formats, used by other games.)"
 msgstr ""
 
-#: src/help.c:135
+#: src/help.c:139
 msgid ""
 "After this step, series of cave objects are rendered over the random data, "
 "which can be of various types: points, lines, rectangles and so. These are "
 "the following:"
 msgstr ""
 
-#: src/help.c:136
+#: src/help.c:140
 msgid "This is a single element. Click anywhere on the cave map to create one."
 msgstr ""
 
-#: src/help.c:137
+#: src/help.c:141
 msgid "Freehand"
 msgstr ""
 
-#: src/help.c:137
+#: src/help.c:141
 msgid ""
 "This is a freehand editing tool, which places many points as you click and "
 "drag the mouse. Use it wisely; lines and other drawing elements are more "
 "simple and the resulting cave is easier to edit."
 msgstr ""
 
-#: src/help.c:138
+#: src/help.c:142
 msgid ""
 "Click on the map to select the start point, then drag the mouse and finally "
 "release the button, to set the end point."
 msgstr ""
 
-#: src/help.c:139
+#: src/help.c:143
 msgid ""
 "Click on the map and then drag the mouse, to define the two corners of the "
 "rectangle."
 msgstr ""
 
-#: src/help.c:140
+#: src/help.c:144
 msgid "Similar to the above, but this is filled with a second element."
 msgstr ""
 
-#: src/help.c:141
+#: src/help.c:145
 msgid ""
 "This one is like a filled rectangle, but the horizontal and vertical "
 "distance of the elements can be changed. Use the object properties dialog to "
 "set the distances after creating the raster."
 msgstr ""
 
-#: src/help.c:142
+#: src/help.c:146
 msgid ""
 "This one is tricky. A join object scans the map, from top to bottom, "
 "searching for a specific element. If it finds one, it draws the second "
@@ -4176,7 +4421,7 @@ msgid ""
 "cave parts."
 msgstr ""
 
-#: src/help.c:143
+#: src/help.c:147
 msgid ""
 "This tool places a flood fill object. The object will fill an area of any "
 "shape in the cave with a specific element. The border of the area is set by "
@@ -4186,11 +4431,11 @@ msgid ""
 "otherwise it might fill the whole cave for different random seed values."
 msgstr ""
 
-#: src/help.c:144
+#: src/help.c:148
 msgid "Fill by replacement"
 msgstr ""
 
-#: src/help.c:144
+#: src/help.c:148
 msgid ""
 "This tool places another kind of fill object. This one will replace an "
 "element with another one; the area in which this replacement takes place "
@@ -4200,7 +4445,7 @@ msgid ""
 "place the object."
 msgstr ""
 
-#: src/help.c:147
+#: src/help.c:151
 msgid ""
 "You can use random generated mazes in cave designs. The walls and paths of "
 "the maze can be made from any freely chosen element. Also you can select 'No "
@@ -4210,19 +4455,19 @@ msgid ""
 "played. If the seed value is -1, the maze is always different."
 msgstr ""
 
-#: src/help.c:148
+#: src/help.c:152
 msgid "The unicursal maze is a long and curvy path."
 msgstr ""
 
-#: src/help.c:149
+#: src/help.c:153
 msgid "The maze like that in PacMan: there are no dead ends."
 msgstr ""
 
-#: src/help.c:150
+#: src/help.c:154
 msgid "Random Fill"
 msgstr ""
 
-#: src/help.c:150
+#: src/help.c:154
 msgid ""
 "This tool can be used to fill a part of a cave with random elements. It is "
 "similar to the random cave setup. At most five elements can be specified. "
@@ -4235,7 +4480,18 @@ msgid ""
 "so the cave will be different every time you play."
 msgstr ""
 
-#: src/help.c:151
+#: src/help.c:155
+msgid ""
+"This tool is simple: copies a rectangular part of the cave, and pastes it "
+"into a new location. The source and destination area may overlap. To select "
+"the area to be copied, use the copy and paste tool and then click and drag "
+"the mouse. The paste object immediately appears at the same location; the "
+"move tool can be used to move it to its final place. The contents of the "
+"rectangle can also be mirrored horizontally or flipped vertically: open the "
+"object properties window to set this behavior."
+msgstr ""
+
+#: src/help.c:156
 msgid ""
 "To select an element, you can middle-click any time on the cave map to pick "
 "one you already use. Use Ctrl together with middle-click to pick a fill "
@@ -4243,22 +4499,22 @@ msgid ""
 "cave."
 msgstr ""
 
-#: src/help.c:152
+#: src/help.c:157
 msgid "Managing cave objects"
 msgstr ""
 
-#: src/help.c:152
+#: src/help.c:157
 msgid "Use this tool to modify already existing cave objects."
 msgstr ""
 
-#: src/help.c:153
+#: src/help.c:158
 msgid ""
 "By looking at the cave, you can see that every object is drawn with a slight "
-"yellowish colour to distinguish them from random data. Click on any object "
-"to select it."
+"yellowish color to distinguish them from random data. Click on any object to "
+"select it."
 msgstr ""
 
-#: src/help.c:155
+#: src/help.c:160
 msgid ""
 "A selected object can be repositioned with the mouse by clicking and "
 "dragging. You can resize lines and rectangles by moving them by their end "
@@ -4268,13 +4524,13 @@ msgid ""
 "to edit. "
 msgstr ""
 
-#: src/help.c:158
+#: src/help.c:163
 msgid ""
 "By double-clicking on an object, or selecting object properties from the "
 "menu, a dialog pops up, which shows its parameters that you can modify."
 msgstr ""
 
-#: src/help.c:159
+#: src/help.c:164
 msgid ""
 "The order these objects are drawn also affects the cave. To reorder them, "
 "you can click on the To top and To bottom menu items. The object list on the "
@@ -4282,11 +4538,11 @@ msgid ""
 "You can also delete them, or use the standard cut, copy and paste operations."
 msgstr ""
 
-#: src/help.c:160
+#: src/help.c:165
 msgid "Cave properties"
 msgstr ""
 
-#: src/help.c:160
+#: src/help.c:165
 msgid ""
 "To view cave properties, select Edit|Cave properties from the menu. A dialog "
 "will pop up with many different options. Those are not explained here; most "
@@ -4294,13 +4550,13 @@ msgid ""
 "them with your mouse."
 msgstr ""
 
-#: src/help.c:161
+#: src/help.c:166
 msgid ""
 "If you want to restart editing, all cave objects can be deleted at once. A "
 "cave map can also be deleted by selecting Remove map from the menu."
 msgstr ""
 
-#: src/help.c:163
+#: src/help.c:168
 msgid ""
 "Cave objects can be merged into a single map. If you designed a new cave, "
 "this has no particular use; but for editing an imported, map-based cave, it "
@@ -4309,11 +4565,11 @@ msgid ""
 "application, which does not support BDCFF cave objects.)"
 msgstr ""
 
-#: src/help.c:164
+#: src/help.c:169
 msgid "More on random cave data"
 msgstr ""
 
-#: src/help.c:165
+#: src/help.c:170
 msgid ""
 "The elements which fill the cave initially are not really random. They are "
 "generated using a predictable random number generator, which can come up "
@@ -4327,7 +4583,7 @@ msgid ""
 "the top right corner of the editor window."
 msgstr ""
 
-#: src/help.c:173
+#: src/help.c:178
 msgid ""
 "A cave can be made totally random, by entering -1 in the random seed entry. "
 "Remember that you cannot test every cave that is generated this way, and "
@@ -4336,46 +4592,46 @@ msgid ""
 "game they are counted, and the number you specify is subtracted."
 msgstr ""
 
-#: src/help.c:177
+#: src/help.c:182
 msgid ""
 "The Edit menu contains a random elements setup tool, which can be used to "
 "setup the random number generator for the cave. It is able to edit all five "
 "levels, and updates the cave at every change."
 msgstr ""
 
-#: src/help.c:179
-msgid "Visible size of a cave"
+#: src/help.c:184
+msgid "Visible region of a cave"
 msgstr ""
 
-#: src/help.c:180
+#: src/help.c:185
 msgid ""
-"Every cave can have a rectangular area, which may be smaller then the cave "
+"Every cave can have a rectangular area, which may be smaller than the cave "
 "itself, and will be visible during the game. Cave elements outside this "
 "visible area, for example stones or creatures, also move. You can also use "
 "the Auto shrink tool to set this size automatically by checking steel walls "
 "and inbox/outbox elements."
 msgstr ""
 
-#: src/help.c:184
+#: src/help.c:189
 msgid "Shift cave map"
 msgstr ""
 
-#: src/help.c:185
+#: src/help.c:190
 msgid ""
 "If the cave is map-based, you can use the shift tools to move the map. This "
 "might be useful if you want to enlarge it and otherwise there would be no "
-"place to do this. Remember to check the visible size of the cave after "
+"place to do this. Remember to check the visible region of the cave after "
 "shifting it in any direction! For object-based caves, you can select all "
-"object at once and move them together!"
+"object at once and move them together."
 msgstr ""
 
-#: src/help.c:189
+#: src/help.c:193
 msgid ""
 "The editor can also be used to delete highscore files of a game or any of "
 "the caves."
 msgstr ""
 
-#: src/help.c:190
+#: src/help.c:194
 msgid ""
 "GDash uses two mechanisms to store highscores: it can save them in a "
 "separate file (this is done automatically), and it can also save them in the "
@@ -4384,26 +4640,26 @@ msgid ""
 "file or the one saved automatically in the configuration directory of GDash."
 msgstr ""
 
-#: src/help.c:194
+#: src/help.c:198
 msgid "If you are finished with drawing, use this button to test the cave."
 msgstr ""
 
-#: src/help.c:195
+#: src/help.c:199
 msgid "Loading and saving"
 msgstr ""
 
-#: src/help.c:195
+#: src/help.c:199
 msgid ""
 "To save your work, use the File|Save button from the main window. You can "
 "save games in a BDCFF file, which is a text format used widely on the "
 "Internet."
 msgstr ""
 
-#: src/help.c:196
+#: src/help.c:200
 msgid "HTML Galleries"
 msgstr ""
 
-#: src/help.c:196
+#: src/help.c:200
 msgid ""
 "This program is able to save cave sets in a HTML gallery, which you can put "
 "on a web server, so other ones can preview them online. To do this, select "
@@ -4411,11 +4667,11 @@ msgid ""
 "files will be put in the same directory and with a similar name."
 msgstr ""
 
-#: src/help.c:199
+#: src/help.c:203
 msgid "Converting to a cavepack"
 msgstr ""
 
-#: src/help.c:199
+#: src/help.c:203
 msgid ""
 "You can convert your individual caves or the complete caveset to a cavepack, "
 "which is a file format readable by the Crazy Light Construction Kit, written "
@@ -4431,7 +4687,7 @@ msgid ""
 "these applications."
 msgstr ""
 
-#: src/help.c:245
+#: src/help.c:249
 msgid "GDash Help"
 msgstr ""
 
@@ -4467,26 +4723,26 @@ msgstr ""
 msgid "System default"
 msgstr ""
 
-#: src/settings.c:434
+#: src/settings.c:446
 msgid "Select cave number C"
 msgstr ""
 
-#: src/settings.c:435
+#: src/settings.c:447
 msgid "Select level number L"
 msgstr ""
 
-#: src/settings.c:436
+#: src/settings.c:448
 msgid "Load internal caveset number I"
 msgstr ""
 
-#: src/settings.c:437
+#: src/settings.c:449
 msgid "Show license and quit"
 msgstr ""
 
-#: src/settings.c:438
+#: src/settings.c:450
 msgid "Cave names"
 msgstr ""
 
-#: src/settings.c:443
+#: src/settings.c:455
 msgid "[FILE NAME]"
 msgstr ""

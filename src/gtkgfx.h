@@ -35,7 +35,8 @@ void gd_loadcells_default();
 gboolean gd_loadcells_file(const char *filename);
 
 /* set scaling */
-void gd_select_pixbuf_colors (GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5);
+void gd_select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5);
+GdColor gd_current_background_color();
 
 GdkPixmap *gd_game_pixmap(int index);
 GdkPixmap *gd_editor_pixmap(int index);

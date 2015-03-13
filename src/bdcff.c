@@ -20,6 +20,7 @@
 #include <errno.h>
 #include <string.h>
 #include "caveset.h"
+#include "caveengine.h"
 #include "cave.h"
 #include "cavedb.h"
 #include "caveobject.h"
@@ -31,7 +32,78 @@
 /* these are used for bdcff loading, storing the sizes of caves */
 static int cavesize[6], intermissionsize[6];
 
-gboolean
+
+
+static gboolean
+replay_store_from_bdcff(GdReplay *replay, const char *str)
+{
+	GdDirection dir;
+	gboolean up, down, left, right;
+	gboolean fire, suicide;
+	const char *num=NULL;
+	int count, i;
+	
+	fire=suicide=up=down=left=right=FALSE;
+	for (i=0; str[i]!=0; i++)
+		switch(str[i]) {
+			case 'U':
+				fire=TRUE;
+			case 'u':
+				up=TRUE;
+				break;
+
+			case 'D':
+				fire=TRUE;
+			case 'd':
+				down=TRUE;
+				break;
+
+			case 'L':
+				fire=TRUE;
+			case 'l':
+				left=TRUE;
+				break;
+
+			case 'R':
+				fire=TRUE;
+			case 'r':
+				right=TRUE;
+				break;
+
+			case 'F':
+				fire=TRUE;
+				break;
+			case 'k':
+				suicide=TRUE;
+				break;
+				
+			case '.':
+				/* do nothing, as all other movements are false */
+				break;
+				
+			case 'c':
+			case 'C':
+				/* bdcff 'combined' flags. do nothing. */
+				break;
+				
+			default:
+				if (g_ascii_isdigit(str[i])) {
+					if (!num)
+						num=str+i;
+				}
+		}
+	dir=gd_direction_from_keypress(up, down, left, right);
+	count=1;
+	if (num)
+		sscanf(num, "%d", &count);
+	for (i=0; i<count; i++)
+		gd_replay_store_next(replay, dir, fire, suicide);
+		
+	return TRUE;
+}
+
+
+static gboolean
 attrib_is_valid_for_cave(const char *attrib)
 {
 	int i;
@@ -55,7 +127,7 @@ attrib_is_valid_for_cave(const char *attrib)
 	return FALSE;
 }
 
-gboolean
+static gboolean
 attrib_is_valid_for_caveset(const char *attrib)
 {
 	int i;
@@ -70,7 +142,7 @@ attrib_is_valid_for_caveset(const char *attrib)
 
 
 
-gboolean
+static gboolean
 struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const char *attrib, const char *param, int ratio)
 {
 	char **params;
@@ -107,6 +179,17 @@ struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const cha
 				was_string=TRUE;	/* remember this to skip checking the number of parameters at the end of the function */
 				continue;
 			}
+			
+			if (prop_desc[i].type==GD_TYPE_LONGSTRING) {
+				GString *str=*(GString **)value;
+				char *compressed;
+				
+				compressed=g_strcompress(param);
+				g_string_assign(str, compressed);
+				g_free(compressed);
+				was_string=TRUE;	/* remember this to skip checking the number of parameters at the end of the function */
+				continue;
+			}
 
 			/* not a string, so use scanf calls */
 			/* ALSO, if no more parameters to process, exit loop */
@@ -116,7 +199,6 @@ struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const cha
 
 				switch (prop_desc[i].type) {
 				case GD_TYPE_LONGSTRING:
-					/* handled outside */
 				case GD_TYPE_STRING:
 					/* handled above */
 				case GD_TAB:
@@ -212,6 +294,57 @@ struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const cha
  * BDCFF LOADING
  *
  */
+ 
+static gboolean
+replay_store_more_from_bdcff(GdReplay *replay, const char *param)
+{
+	char **split;
+	int i;
+	gboolean result=TRUE;
+	
+	split=g_strsplit_set(param, " ", -1);
+	for (i=0; split[i]!=0; i++)
+		result=result && replay_store_from_bdcff(replay, split[i]);
+	g_strfreev(split);
+	
+	return result;
+}
+
+/* report all remaining tags; called after the above function. */
+static void
+replay_report_unknown_tags_func(const char *attrib, const char *param, gpointer data)
+{
+	g_warning("unknown replay tag '%s'", attrib);
+}
+
+/* a GHashTable foreach func.
+   keys are attribs; values are params;
+   the user data is the cave the hash table belongs to. */
+static gboolean
+replay_process_tags_func(const char *attrib, const char *param, GdReplay *replay)
+{
+	gboolean identifier_found=FALSE;
+	
+	/* movements */
+	if (g_ascii_strcasecmp(attrib, "Movements")==0) {
+		identifier_found=TRUE;
+		replay_store_more_from_bdcff(replay, param);
+	} else
+		/* any other tag */
+		identifier_found=struct_set_property(replay, gd_replay_properties, attrib, param, 0);	/* 0: for ratio types; not used */
+	
+	/* a ghrfunc should return true if the identifier is to be removed */
+	return identifier_found;
+}
+
+
+/*  */
+static void
+replay_process_tags(GdReplay *replay, GHashTable *tags)
+{
+	/* process all tags */
+	g_hash_table_foreach_remove(tags, (GHRFunc) replay_process_tags_func, replay);
+}
 
 /* a GHashTable foreach func.
    keys are attribs; values are params;
@@ -278,11 +411,12 @@ cave_process_tags_func(const char *attrib, const char *param, Cave *cave)
 	if (g_ascii_strcasecmp(attrib, "Colors")==0) {
 		/* Colors=[border background] foreground1 foreground2 foreground3 [amoeba slime] */
 		identifier_found=TRUE;
+		gboolean ok=TRUE;
 		
 		if (paramcount==3) {
 			/* only color1,2,3 */
-			cave->colorb=GD_C64_BLACK;	/* border */
-			cave->color0=GD_C64_BLACK;	/* background */
+			cave->colorb=gd_c64_color(0);	/* border - black */
+			cave->color0=gd_c64_color(0);	/* background - black */
 			cave->color1=gd_color_get_from_string(params[0]);
 			cave->color2=gd_color_get_from_string(params[1]);
 			cave->color3=gd_color_get_from_string(params[2]);
@@ -310,7 +444,16 @@ cave_process_tags_func(const char *attrib, const char *param, Cave *cave)
 			cave->color5=gd_color_get_from_string(params[6]);	/* slime */
 		} else {
 			g_warning("invalid number of color strings: %s", param);
-			gd_cave_set_random_colors(cave);	/* just create some random */
+			ok=FALSE;
+		}
+
+		/* now check and maybe make up some new. */
+		if (!ok || gd_color_is_unknown(cave->colorb) || gd_color_is_unknown(cave->color0)
+			|| gd_color_is_unknown(cave->color1) || gd_color_is_unknown(cave->color2)
+			|| gd_color_is_unknown(cave->color3) || gd_color_is_unknown(cave->color4)
+			|| gd_color_is_unknown(cave->color5)) {
+			g_warning("created a new C64 color scheme.");
+			gd_cave_set_random_c64_colors(cave);	/* just create some random */
 		}
 	}
 	else
@@ -325,12 +468,14 @@ cave_process_tags_func(const char *attrib, const char *param, Cave *cave)
 
 /* report all remaining tags; called after the above function. */
 static void
-cave_report_tags_func(char *attrib, char *param, gpointer data)
+cave_report_and_copy_unknown_tags_func(char *attrib, char *param, gpointer data)
 {
 	Cave *cave=(Cave *)data;
-	g_warning("Unknown tag '%s'", attrib);
+	
+	g_warning("unknown tag '%s'", attrib);
 	g_hash_table_insert(cave->tags, g_strdup(attrib), g_strdup(param));
 }
+
 
 /* having read all strings belonging to the cave, process it. */
 static void
@@ -467,14 +612,16 @@ gd_caveset_load_from_bdcff(const char *contents)
 	char **lines;
 	int lineno;
 	Cave *cave;
+	gboolean reading_replay=FALSE;
 	gboolean reading_map=FALSE;
 	gboolean reading_mapcodes=FALSE;
 	gboolean reading_highscore=FALSE;
 	gboolean reading_objects=FALSE;
+	gboolean reading_bdcff_demo=FALSE;
 	GdString version_read="0.32";	/* assume version to be 0.32, also when the file does not specify it explicitly */
 	GList *mapstrings=NULL;
 	int linenum;
-	GHashTable *tags;
+	GHashTable *tags, *replay_tags;
 	GdObjectLevels levels=GD_OBJECT_LEVEL_ALL;
 	Cave *default_cave;
 
@@ -485,6 +632,7 @@ gd_caveset_load_from_bdcff(const char *contents)
 	gd_create_char_to_element_table();
 	
 	tags=g_hash_table_new_full(gd_str_case_hash, gd_str_case_equal, g_free, g_free);
+	replay_tags=g_hash_table_new_full(gd_str_case_hash, gd_str_case_equal, g_free, g_free);
 
 	/* split into lines */
 	lines=g_strsplit_set (contents, "\n", 0);
@@ -528,7 +676,7 @@ gd_caveset_load_from_bdcff(const char *contents)
 				g_list_free(mapstrings);
 				mapstrings=NULL;
 				if (g_hash_table_size(tags)!=0)
-					g_hash_table_foreach(tags, (GHFunc) cave_report_tags_func, cave);
+					g_hash_table_foreach(tags, (GHFunc) cave_report_and_copy_unknown_tags_func, cave);
 				g_hash_table_remove_all(tags);
 				/* set this to point the pseudo-cave which holds default values */
 				cave=default_cave;
@@ -562,6 +710,45 @@ gd_caveset_load_from_bdcff(const char *contents)
 			else if (g_ascii_strcasecmp(line, "[/objects]")==0) {
 				reading_objects=FALSE;
 			}
+			else if (g_ascii_strcasecmp(line, "[demo]")==0) {
+				GdReplay *replay;
+
+				reading_bdcff_demo=TRUE;
+				
+				if (cave!=default_cave) {
+					replay=gd_replay_new();
+					replay->saved=TRUE;
+					replay->success=TRUE;	/* we think that it is a successful demo */
+					cave->replays=g_list_append(cave->replays, replay);
+					gd_strcpy(replay->player_name, "???");	/* name not saved */
+				} else
+					g_warning("[demo] section must be in [cave] section!");
+			}
+			else if (g_ascii_strcasecmp(line, "[/demo]")==0) {
+				reading_bdcff_demo=FALSE;
+			}
+			else if (g_ascii_strcasecmp(line, "[replay]")==0) {
+				reading_replay=TRUE;
+			}
+			else if (g_ascii_strcasecmp(line, "[/replay]")==0) {
+				GdReplay *replay;
+				
+				reading_replay=FALSE;
+				replay=gd_replay_new();
+				replay->saved=TRUE;	/* set "saved" flag, so this replay will be written when the caveset is saved again */
+				replay_process_tags(replay, replay_tags);
+				/* report any remaining unknown tags */
+				g_hash_table_foreach(replay_tags, (GHFunc) replay_report_unknown_tags_func, NULL);
+				g_hash_table_remove_all(replay_tags);
+				if (replay->movements->len!=0) {
+					cave->replays=g_list_append(cave->replays, replay);
+				} else {
+					g_warning("no movements in replay!");
+					gd_replay_free(replay);
+				}
+				
+			}
+			/* GOSH i hate bdcff */
 			else if (g_ascii_strncasecmp(line, "[level=", strlen("[level="))==0) {
 				int l[5];
 				int num;
@@ -601,6 +788,9 @@ gd_caveset_load_from_bdcff(const char *contents)
 			continue;
 		}
 
+
+
+
 		if (reading_map) {
 			/* just append to the mapstrings list. we will process it later */
 			mapstrings=g_list_append(mapstrings, line);
@@ -615,7 +805,7 @@ gd_caveset_load_from_bdcff(const char *contents)
 			int score;
 			
 			if (sscanf(line, "%d", &score)!=1 || strchr(line, ' ')==NULL) {	/* first word is the score */
-				g_warning ("highscore format incorrect");
+				g_warning("highscore format incorrect");
 			} else {
 				if (cave==default_cave)
 					/* if we are reading the [game], add highscore to that one. */
@@ -625,6 +815,20 @@ gd_caveset_load_from_bdcff(const char *contents)
 					/* if a cave, add highscore to that. */
 					gd_add_highscore(cave->highscore, strchr(line, ' ')+1, score);
 			}
+			continue;
+		}
+		
+		/* read bdcff-style [demo], similar to a complete replay but cannot store like anything */
+		if (reading_bdcff_demo) {
+			GdReplay *replay;
+			GList *iter;
+			
+			if (cave==default_cave)			/* demo must be in [cave] section. we already showed an error message for this. */
+				continue;
+			iter=g_list_last(cave->replays);
+			g_assert(iter!=NULL);
+			replay=(GdReplay *)iter->data;
+			replay_store_more_from_bdcff(replay, line);
 			continue;
 		}
 		
@@ -650,7 +854,11 @@ gd_caveset_load_from_bdcff(const char *contents)
 			param=strchr(line, '=')+1;	/* param is after equal sign */
 			*strchr (line, '=')=0;	/* delete equal sign - line is therefore splitted */
 			
-			if (reading_mapcodes) {
+			/* own tag: not too much thinking :P */
+			if (reading_replay) {
+				g_hash_table_insert(replay_tags, g_strdup(attrib), g_strdup(param));
+			}
+			else if (reading_mapcodes) {
 				if (g_ascii_strcasecmp("Length", attrib)==0) {
 					/* we do not support map code width!=1 */
 					if (strcmp(param, "1")!=0)
@@ -704,20 +912,6 @@ gd_caveset_load_from_bdcff(const char *contents)
 						set_intermissionsize_defaults();
 						g_warning("invalid IntermissionSize tag: '%s'", line);
 					}
-			}
-			else
-			if (g_ascii_strcasecmp(attrib, "Notes")==0) {
-				if (cave!=default_cave) {
-					/* reading attributes of a cave */
-					if (cave->notes->len!=0)
-						g_string_append_c(cave->notes, '\n');
-					g_string_append(cave->notes, param);
-				} else {
-					/* reading attributes of a cave */
-					if (gd_caveset_data->notes->len!=0)
-						g_string_append_c(gd_caveset_data->notes, '\n');
-					g_string_append(gd_caveset_data->notes, param);
-				}
 			}
 			else
 			/* CHECK IF IT IS AN EFFECT */
@@ -808,6 +1002,7 @@ gd_caveset_load_from_bdcff(const char *contents)
 	/* cleanup */
 	g_strfreev (lines);
 	g_hash_table_destroy(tags);
+	g_hash_table_destroy(replay_tags);
 	gd_cave_free(default_cave);
 	gd_error_set_context(NULL);
 	
@@ -937,18 +1132,18 @@ save_properties(GPtrArray *out, gpointer str, gpointer str_def, const GdStructDe
 			continue;
 		}
 		
-		/* dynamic string: split to lines */
+		/* dynamic string: need to escape newlines */
 		if (prop_desc[i].type==GD_TYPE_LONGSTRING) {
 			GString *string=G_STRUCT_MEMBER(GString *, str, prop_desc[i].offset);
-			char **lines;
-			int j;
-			
-			if (string->len==0)
-				continue;
-			lines=g_strsplit_set(string->str, "\n", -1);
-			for (j=0; lines[j]!=NULL; j++)
-				g_ptr_array_add(out, g_strdup_printf("%s=%s", prop_desc[i].identifier, lines[j]));
-			g_strfreev(lines);
+
+			if (string->len>0) {
+				char *escaped;
+				
+				escaped=g_strescape(string->str, NULL);
+				g_ptr_array_add(out, g_strdup_printf("%s=%s", prop_desc[i].identifier, escaped));
+				g_free(escaped);
+			}
+			continue;
 		}
 
 		/* if identifier differs from the previous, write out the line collected, and start a new one */
@@ -1027,14 +1222,17 @@ save_properties(GPtrArray *out, gpointer str, gpointer str_def, const GdStructDe
 					should_write=TRUE;
 				break;
 			case GD_TYPE_SCHEDULING:
-				g_string_append_printf(line, "%s", gd_scheduling_filename[((GdScheduling *) value)[j]]);
+				g_string_append_printf(line, "%s", gd_scheduling_get_filename(((GdScheduling *) value)[j]));
 				if (((GdScheduling *) value)[j]!=((GdScheduling *) default_value)[j])
 					should_write=TRUE;
 				break;
 			case GD_TAB:
 			case GD_LABEL:
+				/* used by the editor ui */
+				break;
 			case GD_TYPE_STRING:
 			case GD_TYPE_LONGSTRING:
+				g_assert_not_reached();
 				break;
 			}
 		}
@@ -1069,10 +1267,32 @@ cave_properties_remove(GPtrArray *out, const char *prefix)
 	while (g_ptr_array_remove(out, NULL)) ;
 }
 
+static void
+save_replay_func(GdReplay *replay, GPtrArray *out)
+{
+	GdReplay *default_replay;
+	char *movements;
+	
+	/* if this replay is not to be saved, ignore it */
+	if (!replay->saved)
+		return;
+	
+	default_replay=gd_replay_new();
+	g_ptr_array_add(out, g_strdup(""));
+	g_ptr_array_add(out, g_strdup("[replay]"));
+	save_properties(out, replay, default_replay, gd_replay_properties, 0);	/* 0 = cave w*h, not used */
+	movements=gd_replay_movements_to_bdcff(replay);
+	g_ptr_array_add(out, g_strdup_printf("Movements=%s", movements));
+	g_free(movements);
+	g_ptr_array_add(out, g_strdup("[/replay]"));
+	gd_replay_free(default_replay);
+}
+
+
 /* output properties of a structure to a file. */
 /* g_list_foreach func, so "out" is the last parameter! */
 static void
-caveset_save_cave_func (Cave *cave, GPtrArray *out)
+caveset_save_cave_func(Cave *cave, GPtrArray *out)
 {
 	Cave *default_cave;
 	GString *line;	/* used for various purposes */
@@ -1181,6 +1401,10 @@ caveset_save_cave_func (Cave *cave, GPtrArray *out)
 		}
 		g_ptr_array_add(out, g_strdup("[/objects]"));
 	}
+
+	/* save replays */
+	g_list_foreach(cave->replays, (GFunc) save_replay_func, out);
+
 	g_ptr_array_add(out, g_strdup("[/cave]"));
 
 	g_string_free (line, TRUE);
@@ -1189,7 +1413,7 @@ caveset_save_cave_func (Cave *cave, GPtrArray *out)
 /* save cave in bdcff format. */
 /* "out" will be added g_strdupped lines of bdcff description. */
 void
-gd_caveset_save_to_bdcff(GPtrArray *out)
+gd_caveset_save_to_bdcff(GPtrArray *out, gboolean caves_with_replay_only)
 {
 	int i;
 	GList *iter;
@@ -1265,12 +1489,17 @@ gd_caveset_save_to_bdcff(GPtrArray *out)
 	g_ptr_array_add(out, g_strdup("Levels=5"));
 	
 	/* for all caves */
-	g_list_foreach (gd_caveset, (GFunc) caveset_save_cave_func, out);
+	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
+		Cave *cave=(Cave *) iter->data;
+
+		/* a) not only replays   OR  b) only replays and cave has replays */
+		if (!caves_with_replay_only || cave->replays!=NULL)
+			caveset_save_cave_func(cave, out);
+	}
 	g_ptr_array_add(out, g_strdup("[/game]"));
 	g_ptr_array_add(out, g_strdup("[/BDCFF]"));
 
 	/* saved to ptrarray */
 	return;
 }
-
 

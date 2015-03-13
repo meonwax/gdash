@@ -47,10 +47,18 @@ static gboolean using_png_gfx;
 
 void gd_create_pixbuf_for_builtin_gfx()
 {
+	/* just to set some default - this will also be the color of the builtin gfx in the preferences window */
+	gd_select_pixbuf_colors(0x000000, 0x5555aa, 0xc68e71, 0xffffff, 0xffffff, 0xffffff);
 	gd_pixbuf_for_builtin=gdk_pixbuf_copy(cells_pb[ABS(gd_elements[O_PLAYER].image_game)]);
 }
 
 
+
+GdColor
+gd_current_background_color()
+{
+	return color0;
+}
 
 
 /* somewhat optimized implementation of the Scale2x algorithm. */
@@ -562,7 +570,7 @@ c64_gfx_data_from_pixbuf(GdkPixbuf *pixbuf)
 
 
 gboolean
-gd_loadcells_file (const char *filename)
+gd_loadcells_file(const char *filename)
 {
 	GdkPixbuf *cells_pixbuf;
 	GError *error=NULL;
@@ -597,6 +605,7 @@ gd_loadcells_file (const char *filename)
 		using_png_gfx=TRUE;
 	}
 	g_object_unref(cells_pixbuf);
+	color0=GD_COLOR_INVALID;	/* so that pixbufs will be recreated */
 
 	return TRUE;
 }
@@ -607,8 +616,7 @@ gd_loadcells_default()
 	g_free(c64_custom_gfx);
 	c64_custom_gfx=NULL;
 	using_png_gfx=FALSE;
-	/* just to set some default - this will also be the color of the builtin gfx in the preferences window */
-	gd_select_pixbuf_colors(0x000000, 0x5555aa, 0xc68e71, 0xffffff, 0xffffff, 0xffffff);
+	color0=GD_COLOR_INVALID;	/* so that pixbufs will be recreated */
 }
 
 /* wrapper */

@@ -93,7 +93,7 @@ enum {
 
 #define FREEHAND -1
 #define MOVE -2
-#define VISIBLE_SIZE -3
+#define VISIBLE_REGION -3
 
 /* edit tools; check variable "action". this is declared here, as it stores the names of cave drawing objects */
 static GtkRadioActionEntry action_objects[]={
@@ -112,15 +112,17 @@ static GtkRadioActionEntry action_objects[]={
 	{"UnicursalMaze", GD_ICON_EDITOR_MAZE_UNI, N_("U_nicursal maze"), NULL, N_("Draw unicursal maze"), MAZE_UNICURSAL},
 	{"BraidMaze", GD_ICON_EDITOR_MAZE_BRAID, N_("Bra_id maze"), NULL, N_("Draw braid maze"), MAZE_BRAID},
 	{"RandomFill", GD_ICON_RANDOM_FILL, N_("R_andom fill"), NULL, N_("Draw random elements"), RANDOM_FILL},
+	{"CopyPaste", GTK_STOCK_COPY, N_("_Copy and Paste"), "" /* not null or it would use ctrl+c hotkey */, N_("Copy and paste area"), COPY_PASTE},
 	/* end of real cave objects */
 	
 	{"Freehand", GD_ICON_EDITOR_FREEHAND, N_("F_reehand"), "F3", N_("Draw freely"), FREEHAND},
-	{"Visible", GTK_STOCK_ZOOM_FIT, N_("Set _visible part"), NULL, N_("Select visible part of cave during play"), VISIBLE_SIZE},
+	{"Visible", GTK_STOCK_ZOOM_FIT, N_("Set _visible region"), NULL, N_("Select visible region of cave during play"), VISIBLE_REGION},
 };
 
 
 /* forward function declarations */
-static void select_cave_for_edit (Cave *);
+static void select_cave_for_edit(Cave *);
+static void select_tool(int tool);
 
 
 
@@ -321,7 +323,7 @@ object_tree_view_button_press_event(GtkWidget *widget, GdkEventButton *event, gp
 
 
 static void
-help_cb (GtkWidget *widget, gpointer data)
+help_cb(GtkWidget *widget, gpointer data)
 {
 	gd_show_editor_help (editor_window);
 }
@@ -564,7 +566,7 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 	notebook=gtk_notebook_new();
 	gtk_notebook_set_scrollable(GTK_NOTEBOOK(notebook), TRUE);
 	gtk_notebook_popup_enable(GTK_NOTEBOOK(notebook));
-	gtk_box_pack_start_defaults (GTK_BOX (GTK_DIALOG (dialog)->vbox), notebook);
+	gtk_box_pack_start_defaults(GTK_BOX (GTK_DIALOG (dialog)->vbox), notebook);
 
 	/* create the entry widgets */
 	for (i=0; prop_desc[i].identifier!=NULL; i++) {
@@ -582,7 +584,7 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 			/* create a table which will be the widget inside */
 			table=gtk_table_new(1, 1, FALSE);
 			gtk_container_set_border_width (GTK_CONTAINER (table), 6);
-			gtk_table_set_row_spacings (GTK_TABLE(table), 4);
+			gtk_table_set_row_spacings (GTK_TABLE(table), 3);
 			/* put the widget in an alignment */
 			gtk_container_add (GTK_CONTAINER (align), table);
 			/* and to the notebook */
@@ -603,6 +605,7 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 			if (G_STRUCT_MEMBER(GString *, str, prop_desc[i].offset)->len!=0)
 				gtk_text_buffer_insert_at_cursor(textbuffer, G_STRUCT_MEMBER(GString *, str, prop_desc[i].offset)->str, -1);
 
+			/* a text view in its scroll windows, so it can be any large */
 			scroll=gtk_scrolled_window_new(NULL, NULL);
 			gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 			gtk_container_add(GTK_CONTAINER(scroll), view);
@@ -707,7 +710,7 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 				value=((GdScheduling *) value)+j;
 				defpoint=((GdScheduling *) defpoint) + j;
 				widget=gd_scheduling_combo_new(*(GdScheduling *) value);
-				defval=g_strdup_printf("%s", _(gd_scheduling_name[*(GdScheduling *)defpoint]));
+				defval=g_strdup_printf("%s", _(gd_scheduling_get_visible_name(*(GdScheduling *)defpoint)));
 				break;
 			}
 			/* put widget into list so values can be extracted later */
@@ -858,19 +861,26 @@ cave_properties(Cave *cave, gboolean show_cancel)
 	int old_w, old_h;
 	int i;
 	gboolean edited;
+	gboolean size_changed, full_visible;
 	
 	/* remember old size, as the cave map might have to be resized */
 	old_w=cave->w;
 	old_h=cave->h;
+
+	/* check if full cave visible */
+	full_visible=(cave->x1==0 && cave->y1==0 && cave->x2==old_w-1 && cave->y2==old_h-1);
 		
 	def_val=gd_cave_new();
 	undo_save();
 	edited=edit_properties(_("Cave Properties"), cave, def_val, gd_cave_properties, cave->tags, show_cancel);
 	gd_cave_free(def_val);
+	
+	size_changed=(cave->w!=old_w || cave->h!=old_h);
 
-	if (edited) {
+	/* if the size changes, we have work to do. */
+	if (edited && size_changed) {
 		/* if cave has a map, resize it also */
-		if (cave->map && (old_w!=cave->w || old_h!=cave->h)) {
+		if (cave->map) {
 			/* create new map, with the new sizes */
 			GdElement **new_map=gd_cave_map_new(cave, GdElement);
 			int minx=MIN(old_w, cave->w);
@@ -889,6 +899,12 @@ cave_properties(Cave *cave, gboolean show_cancel)
 			gd_cave_map_free(cave->map);
 			cave->map=new_map;
 		}
+		
+		/* if originally the full cave was visible, we set the visible area to the full cave, here again. */
+		if (full_visible) {
+			cave->x2=cave->w-1;
+			cave->y2=cave->h-1;
+		}
 
 		/* do some validation */
 		gd_cave_correct_visible_size(cave);
@@ -899,14 +915,27 @@ cave_properties(Cave *cave, gboolean show_cancel)
 				int j;
 				
 				for (j=0; j<gd_cave_properties[i].count; j++)
-					if (value[j] >= cave->w*cave->h)
+					if (value[j]>=cave->w*cave->h)
 						value[j]=cave->w*cave->h;
 			}
-
+	}
+	
+	if (edited) {
 		/* redraw, recreate, re-everything */
-		select_cave_for_edit (cave);
-		
+		select_cave_for_edit(cave);
 		gd_caveset_edited=TRUE;
+	}
+
+	/* if the size of the cave changed, inform the user that he should check the visible region. */
+	/* also, automatically select the tool. */	
+	if (size_changed && !full_visible) {
+		select_tool(VISIBLE_REGION);
+		gd_warningmessage(_("You have changed the size of the cave. Please check the size of the visible region!"),
+			_("The visible area of the cave during the game can be smaller than the whole cave. If you resize "
+			  "the cave, the area to be shown cannot be guessed automatically. The tool to set this behavior is "
+			  "now selected, and shows the current visible area. Use drag and drop to change the position and "
+			  "size of the rectangle."));
+		
 	}
 }
 
@@ -967,12 +996,19 @@ render_cave()
 	for (iter=edited_cave->objects, i=0; iter; iter=g_list_next (iter), i++) {
 		GdObject *object=iter->data;
 		GtkTreeIter treeiter;
-		GdkPixbuf *fillelement;
+		GdkPixbuf *element, *fillelement;
 		gchar *text;
 		const char *levels_stock;
 
 		text=gd_get_object_coordinates_text (object);
-		switch(object->type) {
+		switch (object->type) {	/* for ELEMENT */
+			case COPY_PASTE:
+				element=NULL; break;
+			default:
+				element=gd_get_element_pixbuf_with_border(object->element); break;
+		}
+
+		switch (object->type) {	/* for FILL ELEMENT */
 			case FILLED_RECTANGLE:
 			case JOIN:
 			case FLOODFILL_BORDER:
@@ -980,7 +1016,7 @@ render_cave()
 			case MAZE:
 			case MAZE_UNICURSAL:
 			case MAZE_BRAID:
-				fillelement=gd_get_element_pixbuf_with_border (object->fill_element);
+				fillelement=gd_get_element_pixbuf_with_border(object->fill_element);
 				break;
 			default:
 				fillelement=NULL;
@@ -998,7 +1034,7 @@ render_cave()
 				levels_stock=GD_ICON_OBJECT_NOT_ON_CURRENT;
 
 		/* use atomic insert with values */
-		gtk_list_store_insert_with_values (object_list, &treeiter, i, INDEX_COLUMN, i, LEVELS_PIXBUF_COLUMN, levels_stock, TYPE_PIXBUF_COLUMN, action_objects[object->type].stock_id, ELEMENT_PIXBUF_COLUMN, gd_get_element_pixbuf_with_border (object->element), FILL_PIXBUF_COLUMN, fillelement, TEXT_COLUMN, text, POINTER_COLUMN, object, -1);
+		gtk_list_store_insert_with_values (object_list, &treeiter, i, INDEX_COLUMN, i, LEVELS_PIXBUF_COLUMN, levels_stock, TYPE_PIXBUF_COLUMN, action_objects[object->type].stock_id, ELEMENT_PIXBUF_COLUMN, element, FILL_PIXBUF_COLUMN, fillelement, TEXT_COLUMN, text, POINTER_COLUMN, object, -1);
 
 		/* also do selection as now we have the iter in hand */
 		if (g_list_index(selected, object)!=-1)
@@ -1143,8 +1179,8 @@ drawcave_int (const gpointer data)
 				draw=-draw + animcycle;
 
 			/* object coloring */
-			if (action==VISIBLE_SIZE) {
-				/* if showing visible size, different color applies for: */
+			if (action==VISIBLE_REGION) {
+				/* if showing visible region, different color applies for: */
 				if (x>=rendered_cave->x1 && x<=rendered_cave->x2 && y>=rendered_cave->y1 && y<=rendered_cave->y2)
 					draw+=NUM_OF_CELLS;
 				if (x==rendered_cave->x1 || x==rendered_cave->x2 || y==rendered_cave->y1 || y==rendered_cave->y2)
@@ -1173,7 +1209,7 @@ drawcave_int (const gpointer data)
 
 				/* only draw if inside bounds */
 				if (x>=0 && x<rendered_cave->w && y>=0 && y<rendered_cave->h) {
-					gdk_draw_rectangle (drawing_area->window, drawing_area->style->white_gc, FALSE, x*gd_cell_size_editor, y*gd_cell_size_editor, gd_cell_size_editor - 1, gd_cell_size_editor - 1);
+					gdk_draw_rectangle(drawing_area->window, drawing_area->style->white_gc, FALSE, x*gd_cell_size_editor, y*gd_cell_size_editor, gd_cell_size_editor - 1, gd_cell_size_editor - 1);
 					gdk_draw_line (drawing_area->window, drawing_area->style->white_gc, x*gd_cell_size_editor, y*gd_cell_size_editor, (x+1)*gd_cell_size_editor-1, (y+1)*gd_cell_size_editor-1);
 					gdk_draw_line (drawing_area->window, drawing_area->style->white_gc, x*gd_cell_size_editor, (y+1)*gd_cell_size_editor-1, (x+1)*gd_cell_size_editor-1, y*gd_cell_size_editor);
 					gfx_buffer[object->y1][object->x1]=-1;
@@ -1184,7 +1220,7 @@ drawcave_int (const gpointer data)
 
 	if (mouse_x>=0 && mouse_y>=0) {
 		/* this is the cell the mouse is over */
-		gdk_draw_rectangle (drawing_area->window, drawing_area->style->white_gc, FALSE, mouse_x*gd_cell_size_editor, mouse_y*gd_cell_size_editor, gd_cell_size_editor-1, gd_cell_size_editor-1);
+		gdk_draw_rectangle(drawing_area->window, drawing_area->style->white_gc, FALSE, mouse_x*gd_cell_size_editor, mouse_y*gd_cell_size_editor, gd_cell_size_editor-1, gd_cell_size_editor-1);
 		/* always redraw this cell the next frame - the easiest way to always get rid of the rectangle when the mouse is moved */
 		gfx_buffer[mouse_y][mouse_x]=-1;
 	}
@@ -1284,6 +1320,7 @@ element_button_new_with_update(GdElement *value)
 	
 	button=gd_element_button_new(*value, FALSE, NULL);
 	g_object_set_data(G_OBJECT(button), GDASH_DATA_POINTER, value);
+	/* this "clicked" will be called after the button's own, internal clicked signal */
 	g_signal_connect(button, "clicked", G_CALLBACK(elementbutton_changed), NULL);
 
 	return button;
@@ -1438,7 +1475,7 @@ random_setup_fill_color_expose(GtkWidget *widget, GdkEventExpose *event, gpointe
 
 		style=gtk_widget_get_style (widget);
 
-		gdk_draw_rectangle (widget->window, style->bg_gc[GTK_STATE_NORMAL], TRUE, event->area.x, event->area.y, event->area.width, event->area.height);
+		gdk_draw_rectangle(widget->window, style->bg_gc[GTK_STATE_NORMAL], TRUE, event->area.x, event->area.y, event->area.width, event->area.height);
 	}
 
 	return TRUE;
@@ -1635,7 +1672,7 @@ check_button_new_level_enable(GdObjectLevels *levels, int level)
 #undef GDASH_DATA_POINTER
 
 static void
-object_properties (GdObject *object)
+object_properties(GdObject *object)
 {
 	GtkWidget *dialog, *table, *hbox, *scale;
 	int i=0;
@@ -1766,6 +1803,20 @@ object_properties (GdObject *object)
 		i++;
 	}
 
+	/* mirror */
+	if (gd_object_description[object->type].mirror!=NULL) {
+		gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_(gd_object_description[object->type].mirror)), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
+		gtk_table_attach_defaults(GTK_TABLE(table), check_button_new_with_update(&object->mirror), 1, 3, i, i+1);
+		i++;
+	}
+
+	/* flip */
+	if (gd_object_description[object->type].flip!=NULL) {
+		gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_(gd_object_description[object->type].flip)), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
+		gtk_table_attach_defaults(GTK_TABLE(table), check_button_new_with_update(&object->flip), 1, 3, i, i+1);
+		i++;
+	}
+
 	if (object->type==RANDOM_FILL)
 		/* pborder (first) and pseed (last) parameter are not needed here */
 		random_setup_widgets_to_table(GTK_TABLE(table), i, NULL, &object->fill_element, object->random_fill, object->random_fill_probability, NULL);
@@ -1844,8 +1895,8 @@ button_press_event (GtkWidget *widget, const GdkEventButton * event, const gpoin
 	/* if double click, open element properties window.
 	 * if no element selected, open cave properties window.
 	 * (if mouse if over an element, the first click selected it.) */
-	/* do not allow this doubleclick for visible size mode as that one does not select objects */
-	if (event->type==GDK_2BUTTON_PRESS && action!=VISIBLE_SIZE) {
+	/* do not allow this doubleclick for visible region mode as that one does not select objects */
+	if (event->type==GDK_2BUTTON_PRESS && action!=VISIBLE_REGION) {
 		if (rendered_cave->objects_order[clicked_y][clicked_x])
 			object_properties (rendered_cave->objects_order[clicked_y][clicked_x]);
 		else
@@ -1902,7 +1953,7 @@ button_press_event (GtkWidget *widget, const GdkEventButton * event, const gpoin
 			}
 			break;
 			
-		case VISIBLE_SIZE:
+		case VISIBLE_REGION:
 			/* new click... prepare for undo! */
 			undo_move_flag=FALSE;
 			/* do nothing, the motion event will matter */
@@ -1920,10 +1971,11 @@ button_press_event (GtkWidget *widget, const GdkEventButton * event, const gpoin
 		case MAZE_UNICURSAL:
 		case MAZE_BRAID:
 		case RANDOM_FILL:
+		case COPY_PASTE:
 			/* CREATE A NEW OBJECT */
 			
 			/* ok not moving so drawing something new. */
-			new_object=g_new0 (GdObject, 1);
+			new_object=g_new0(GdObject, 1);
 			new_object->levels=GD_OBJECT_LEVEL_ALL;
 			new_object->type=action;	/* set type of object */
 			new_object->x1=clicked_x;
@@ -1942,29 +1994,44 @@ button_press_event (GtkWidget *widget, const GdkEventButton * event, const gpoin
 			if (new_object->type==FLOODFILL_REPLACE)
 				new_object->element=rendered_cave->map[clicked_y][clicked_x];
 			new_object->fill_element=gd_element_button_get(fillelement_button);
-
-			if (action==RASTER) {		/* for raster */
+			
+			switch (action) {
+				case RASTER:
 				new_object->dx=2;
 				new_object->dy=2;
-			}
-			else if (action==JOIN) {	/* for join */
+				break;
+				
+				case JOIN:
 				new_object->dx=0;
 				new_object->dy=0;
-			}
-			else if (action==MAZE || action==MAZE_UNICURSAL || action==MAZE_BRAID) {	/* for maze */
+				break;
+				
+				case MAZE:
+				case MAZE_UNICURSAL:
+				case MAZE_BRAID:
 				new_object->dx=1;
 				new_object->dy=1;
-			}
-			else if (action==RANDOM_FILL) {
-				int j;
+				break;
+				
+				case COPY_PASTE:
+				/* paste coordinates. */
+				new_object->dx=clicked_x;
+				new_object->dy=clicked_y;
+				break;
+				
+				case RANDOM_FILL:
+				{
+					int j;
 
-				new_object->element=O_NONE;				/* replace element */
-				new_object->random_fill[0]=gd_element_button_get(element_button);	/* first random element */
-				new_object->random_fill_probability[0]=32;
-				for (j=1; j<4; j++) {
-					new_object->random_fill[j]=O_DIRT;
-					new_object->random_fill_probability[j]=0;
+					new_object->element=O_NONE;				/* replace element */
+					new_object->random_fill[0]=gd_element_button_get(element_button);	/* first random element */
+					new_object->random_fill_probability[0]=32;
+					for (j=1; j<4; j++) {
+						new_object->random_fill[j]=O_DIRT;
+						new_object->random_fill_probability[j]=0;
+					}
 				}
+				break;
 			}
 
 			undo_save();
@@ -2047,9 +2114,9 @@ motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpoint
 	if (dx==0 && dy==0)
 		return TRUE;
 		
-	/* changing visible size is different; independent of cave objects. */	
-	if (action==VISIBLE_SIZE) {
-		/* save visible size flag only once */
+	/* changing visible region is different; independent of cave objects. */	
+	if (action==VISIBLE_REGION) {
+		/* save visible region flag only once */
 		if (undo_move_flag==FALSE) {
 			undo_save();
 			undo_move_flag=TRUE;
@@ -2199,6 +2266,8 @@ motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpoint
 					}
 					break;
 				case JOIN:
+				case COPY_PASTE:
+					/* for join, dx dy are displacement, for paste, dx dy are new positions. */
 					object->dx+=dx;
 					object->dy+=dy;
 					break;
@@ -2232,6 +2301,15 @@ motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpoint
 				object->y2=y;
 			}
 			break;
+		case COPY_PASTE:
+			/* dragging sets the second coordinate, but check paste coordinate */
+			if (object->x2!=x || object->y2!=y) {
+				object->x2=x;
+				object->y2=y;
+				object->dx=MIN(object->x1, object->x2);
+				object->dy=MIN(object->y1, object->y2);
+			}
+			break;
 		case JOIN:
 			/* dragging sets the distance of the new character placed. */
 			object->dx+=dx;
@@ -2253,15 +2331,22 @@ motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpoint
 		
 		for (iter=selected_objects; iter!=NULL; iter=iter->next) {
 			GdObject *object=iter->data;
-
-			object->x1+=dx;
-			object->y1+=dy;
-			object->x2+=dx;
-			object->y2+=dy;
-			if (object->type==JOIN) {
-				object->dx+=dx;
-				object->dy+=dy;
+			
+			switch (object->type) {
+				case COPY_PASTE:	/* dx dy are new coordinates */
+				case JOIN:	/* dx dy are displacement */
+					object->dx+=dx;
+					object->dy+=dy;
+					break;
+				
+				default:	/* lines, rectangles... */
+					object->x1+=dx;
+					object->y1+=dy;
+					object->x2+=dx;
+					object->y2+=dy;
+					break;
 			}
+
 		}
 	}
 
@@ -2440,7 +2525,7 @@ rename_cave_cb(GtkWidget *widget, gpointer data)
 }
 
 static void
-cave_make_selectable_cb (GtkWidget *widget, gpointer data)
+cave_make_selectable_cb(GtkWidget *widget, gpointer data)
 {
 	GList *list;
 	GtkTreeIter iter;
@@ -2464,7 +2549,7 @@ cave_make_selectable_cb (GtkWidget *widget, gpointer data)
 }
 
 static void
-cave_make_unselectable_cb (GtkWidget *widget, gpointer data)
+cave_make_unselectable_cb(GtkWidget *widget, gpointer data)
 {
 	GList *list;
 	GtkTreeIter iter;
@@ -2488,7 +2573,7 @@ cave_make_unselectable_cb (GtkWidget *widget, gpointer data)
 }
 
 static void
-icon_view_selection_changed_cb (GtkWidget *widget, gpointer data)
+icon_view_selection_changed_cb(GtkWidget *widget, gpointer data)
 {
 	GList *list;
 	GtkTreeModel *model;
@@ -2641,7 +2726,7 @@ select_cave_for_edit (Cave * cave)
 			drawing_area=gtk_drawing_area_new();
 			mouse_x=mouse_y=-1;
 			/* enable some events */
-			gtk_widget_set_events(drawing_area, GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_LEAVE_NOTIFY_MASK);
+			gtk_widget_add_events(drawing_area, GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_LEAVE_NOTIFY_MASK);
 			g_signal_connect(G_OBJECT (drawing_area), "destroy", G_CALLBACK(gtk_widget_destroyed), &drawing_area);
 			g_signal_connect(G_OBJECT (drawing_area), "button_press_event", G_CALLBACK(button_press_event), NULL);
 			g_signal_connect(G_OBJECT (drawing_area), "button_release_event", G_CALLBACK(button_release_event), NULL);
@@ -2718,7 +2803,7 @@ select_cave_for_edit (Cave * cave)
 
 /****************************************************/
 static void
-cave_random_setup_cb (GtkWidget *widget, gpointer data)
+cave_random_setup_cb(GtkWidget *widget, gpointer data)
 {
 	GtkWidget *dialog, *table;
 	int result;
@@ -2886,7 +2971,7 @@ cave_overview_simple_cb(GtkWidget *widget, gpointer data)
 /* automatically shrink cave
  */
 static void
-auto_shrink_cave_cb (GtkWidget *widget, gpointer data)
+auto_shrink_cave_cb(GtkWidget *widget, gpointer data)
 {
 	undo_save();
 	/* shrink the rendered cave, as it has all object and the like converted to a map. */
@@ -2897,8 +2982,8 @@ auto_shrink_cave_cb (GtkWidget *widget, gpointer data)
 	edited_cave->x2=rendered_cave->x2;
 	edited_cave->y2=rendered_cave->y2;
 	render_cave();
-	/* selecting visible size tool allows the user to see the result, maybe modify */
-	select_tool(VISIBLE_SIZE);
+	/* selecting visible region tool allows the user to see the result, maybe modify */
+	select_tool(VISIBLE_REGION);
 }
 
 
@@ -2915,7 +3000,7 @@ auto_shrink_cave_cb (GtkWidget *widget, gpointer data)
  */
 /* helper: update pixmaps and the like */
 static void
-color_changed ()
+color_changed()
 {
 	int x,y;
 	/* select new colors */
@@ -2934,26 +3019,46 @@ color_changed ()
 static gboolean colorchange_update_disabled;
 
 #define GDASH_PCOLOR "gdash-pcolor"
+/* when the user clicks the button and sets the color, we store the color to the cave,
+   and re-render cave with new colors.
+   
+   this behavior can be disabled, as when randomly changing all colors, nothing should
+   happen when we automatically update the buttons.
+ */
 static void
-colorbutton_changed (GtkWidget *widget, gpointer data)
+colorbutton_changed(GtkWidget *widget, gpointer data)
 {
-	GdColor* value=(GdColor *)g_object_get_data(G_OBJECT(widget), GDASH_PCOLOR);
-
-	g_assert(value!=NULL);
+	if (!colorchange_update_disabled) {
+		GdColor* value;
 		
-	*value=gd_color_combo_get_color(widget);	/* update cave data */
-	if (!colorchange_update_disabled)
+		value=(GdColor *)g_object_get_data(G_OBJECT(widget), GDASH_PCOLOR);
+		g_assert(value!=NULL);
+			
+		*value=gd_color_combo_get_color(widget);	/* update cave data */
 		color_changed();
+	}
 }
 
+/* when the random colors button is pressed, first we change the colors of the cave. */
+/* then we update the combo boxes one by one (they are in a glist *), but before that, */
+/* we disable their updating behaviour. otherwise they would re-render pixmaps one by one, */
+/* and they would also want to change the cave itself - the cave which already contains the */
+/* changed colors! */
 static void
-colorbutton_random_changed(GtkWidget *widget, gpointer data)
+cave_colors_random_combo_cb(GtkWidget *widget, gpointer data)
 {
 	GList *combos=(GList *)data;
 	GList *iter;
+	int new_index;
+	
+	new_index=gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
+	if (new_index==0)	/* 0 is the "set random..." text, so we do nothing */
+		return;
 
-	gd_cave_set_random_colors(edited_cave);	
-	color_changed();
+	/* create colors */
+	gd_cave_set_random_colors(edited_cave, (GdColorType) (new_index-1));	/* -1: 0 is "set random...", 1 is rgb... */
+
+	/* and update combo boxes from cave */
 	colorchange_update_disabled=TRUE;	/* this is needed, otherwise all combos would want to update the pixbufs, one by one */
 	for (iter=combos; iter!=NULL; iter=iter->next) {
 		GtkWidget *combo=(GtkWidget *)iter->data;
@@ -2964,35 +3069,44 @@ colorbutton_random_changed(GtkWidget *widget, gpointer data)
 		gd_color_combo_set(GTK_COMBO_BOX(combo), *value);
 	}
 	colorchange_update_disabled=FALSE;
+	color_changed();
+	
+	/* set back to "select random..." text */
+	gtk_combo_box_set_active(GTK_COMBO_BOX(widget), 0);
 }
 
 /* set cave colors with instant update */
 static void
-cave_colors_cb (GtkWidget *widget, gpointer data)
+cave_colors_cb(GtkWidget *widget, gpointer data)
 {
-	GtkWidget *dialog, *table=NULL, *button;
+	GtkWidget *dialog, *table=NULL, *label;
+	GtkWidget *random_combo;
 	GList *combos=NULL;
 	int i, row=0;
+	int result;
+	gboolean colored_objects_backup;
 	
 	undo_save();
+	
+	/* when editing colors, turn off the colored objects viewing for a while. */
+	colored_objects_backup=gd_colored_objects;
+	gd_colored_objects=FALSE;
 
 	dialog=gtk_dialog_new_with_buttons (_("Cave Colors"), GTK_WINDOW (editor_window), GTK_DIALOG_DESTROY_WITH_PARENT, NULL);
 	gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
-	gtk_dialog_set_has_separator (GTK_DIALOG (dialog), FALSE);
-	/* random button */
-	button=gtk_button_new_with_mnemonic(_("_Random"));
-	gtk_button_set_image(GTK_BUTTON(button), gtk_image_new_from_stock(GD_ICON_RANDOM_FILL, GTK_ICON_SIZE_BUTTON));
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->action_area), button, FALSE, FALSE, 0);
+	/* random combo */
+	random_combo=gtk_combo_box_new_text();
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->action_area), random_combo, FALSE, FALSE, 0);
 	/* close button */
-	gtk_dialog_add_button(GTK_DIALOG(dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_ACCEPT);
+	gtk_dialog_add_button(GTK_DIALOG(dialog), GTK_STOCK_OK, GTK_RESPONSE_ACCEPT);
 	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
 	
 	table=gtk_table_new(1, 1, FALSE);
-	gtk_container_set_border_width (GTK_CONTAINER (table), 6);
+	gtk_container_set_border_width(GTK_CONTAINER(table), 6);
 	gtk_table_set_row_spacings (GTK_TABLE(table), 6);
 	gtk_table_set_col_spacings (GTK_TABLE(table), 6);
 	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), table);
-
+	
 	/* search for color properties, and create label&combo for each */
 	for (i=0; gd_cave_properties[i].identifier!=NULL; i++)
 		if (gd_cave_properties[i].type==GD_TYPE_COLOR) {
@@ -3009,13 +3123,31 @@ cave_colors_cb (GtkWidget *widget, gpointer data)
 			gtk_table_attach(GTK_TABLE(table), combo, 1, 2, row, row+1, GTK_FILL|GTK_EXPAND, GTK_FILL|GTK_SHRINK, 0, 0);
 			row++;
 		}
-	g_signal_connect(button, "clicked", G_CALLBACK(colorbutton_random_changed), combos);
+	
+	/* a combo box which has a callback that sets random colors */
+	gtk_combo_box_append_text(GTK_COMBO_BOX(random_combo), _("Set random..."));	/* will be active=0 */
+	for (i=0; gd_color_get_palette_types_names()[i]!=NULL; i++)
+		gtk_combo_box_append_text(GTK_COMBO_BOX(random_combo), _(gd_color_get_palette_types_names()[i]));
+	gtk_combo_box_set_active(GTK_COMBO_BOX(random_combo), 0);
+	g_signal_connect(random_combo, "changed", G_CALLBACK(cave_colors_random_combo_cb), combos);
+
+	/* hint label */
+	label=gd_label_new_printf_centered(_("<i>Hint: As the palette can be changed for C64 and Atari colors, "
+	"it is not recommended to use different types together (for example, RGB color for background, Atari color for Slime.)</i>"));
+	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+	gtk_table_attach(GTK_TABLE(table), label, 0, 2, row, row+1, GTK_FILL|GTK_EXPAND, GTK_FILL|GTK_SHRINK, 0, 0);
 	
 	gtk_widget_show_all(dialog);
 	colorchange_update_disabled=FALSE;
-	gtk_dialog_run(GTK_DIALOG(dialog));
+	result=gtk_dialog_run(GTK_DIALOG(dialog));
 	g_list_free(combos);
 	gtk_widget_destroy(dialog);
+	/* if the new colors were not accepted by the user (escape pressed), we undo the changes. */
+	if (result!=GTK_RESPONSE_ACCEPT)
+		do_undo();
+
+	/* restore colored objects setting. */
+	gd_colored_objects=colored_objects_backup;
 }
 #undef GDASH_PCOLOR
 
@@ -3036,7 +3168,7 @@ cave_colors_cb (GtkWidget *widget, gpointer data)
 /* delete selected cave drawing element or cave.
 */
 static void
-delete_selected_cb (GtkWidget *widget, gpointer data)
+delete_selected_cb(GtkWidget *widget, gpointer data)
 {
 	/* deleting caves or cave object. */
 	if (edited_cave==NULL) {
@@ -3102,7 +3234,7 @@ delete_selected_cb (GtkWidget *widget, gpointer data)
 /* put selected drawing elements to bottom.
 */
 static void
-bottom_selected_cb (GtkWidget *widget, gpointer data)
+bottom_selected_cb(GtkWidget *widget, gpointer data)
 {
 	GList *iter;
 	
@@ -3123,7 +3255,7 @@ bottom_selected_cb (GtkWidget *widget, gpointer data)
 
 /* bring selected drawing element to top. */
 static void
-top_selected_cb (GtkWidget *widget, gpointer data)
+top_selected_cb(GtkWidget *widget, gpointer data)
 {
 	GList *iter;
 	
@@ -3142,7 +3274,7 @@ top_selected_cb (GtkWidget *widget, gpointer data)
 
 /* enable currently selected objects on the currently viewed level only. */
 static void
-show_object_this_level_only_cb (GtkWidget *widget, gpointer data)
+show_object_this_level_only_cb(GtkWidget *widget, gpointer data)
 {
 	GList *iter;
 	
@@ -3160,7 +3292,7 @@ show_object_this_level_only_cb (GtkWidget *widget, gpointer data)
 
 /* enable currently selected objects on all levels */
 static void
-show_object_all_levels_cb (GtkWidget *widget, gpointer data)
+show_object_all_levels_cb(GtkWidget *widget, gpointer data)
 {
 	GList *iter;
 	
@@ -3178,7 +3310,7 @@ show_object_all_levels_cb (GtkWidget *widget, gpointer data)
 
 /* enable currently selected objects on the currently viewed level only. */
 static void
-show_object_on_this_level_cb (GtkWidget *widget, gpointer data)
+show_object_on_this_level_cb(GtkWidget *widget, gpointer data)
 {
 	GList *iter;
 	
@@ -3196,7 +3328,7 @@ show_object_on_this_level_cb (GtkWidget *widget, gpointer data)
 
 /* enable currently selected objects on the currently viewed level only. */
 static void
-hide_object_on_this_level_cb (GtkWidget *widget, gpointer data)
+hide_object_on_this_level_cb(GtkWidget *widget, gpointer data)
 {
 	GList *iter;
 	int disappear;
@@ -3226,7 +3358,7 @@ hide_object_on_this_level_cb (GtkWidget *widget, gpointer data)
 /* copy selected object or caves to clipboard.
 */
 static void
-copy_selected_cb (GtkWidget *widget, gpointer data)
+copy_selected_cb(GtkWidget *widget, gpointer data)
 {
 	if (edited_cave==NULL) {
 		/* WE ARE NOW COPYING CAVES FROM A CAVESET */
@@ -3276,7 +3408,7 @@ copy_selected_cb (GtkWidget *widget, gpointer data)
 /* paste object or cave from clipboard
 */
 static void
-paste_clipboard_cb (GtkWidget *widget, gpointer data)
+paste_clipboard_cb(GtkWidget *widget, gpointer data)
 {
 	if (edited_cave==NULL) {
 		/* WE ARE IN THE CAVESET ICON VIEW */
@@ -3321,7 +3453,7 @@ paste_clipboard_cb (GtkWidget *widget, gpointer data)
 
 /* cut an object, or cave(s) from the caveset. */
 static void
-cut_selected_cb (GtkWidget *widget, gpointer data)
+cut_selected_cb(GtkWidget *widget, gpointer data)
 {
 	if (edited_cave==NULL) {
 		/* WE ARE NOW CUTTING CAVES FROM A CAVESET */
@@ -3393,7 +3525,7 @@ cut_selected_cb (GtkWidget *widget, gpointer data)
 }
 
 static void
-select_all_cb (GtkWidget *widget, gpointer data)
+select_all_cb(GtkWidget *widget, gpointer data)
 {
 	if (edited_cave==NULL)	/* in game editor */
 		gtk_icon_view_select_all(GTK_ICON_VIEW(iconview_cavelist));		/* SELECT ALL CAVES */
@@ -3403,7 +3535,7 @@ select_all_cb (GtkWidget *widget, gpointer data)
 
 /* delete all cave elements */
 static void
-clear_cave_elements_cb (GtkWidget *widget, gpointer data)
+clear_cave_elements_cb(GtkWidget *widget, gpointer data)
 {
 
 	g_return_if_fail (edited_cave!=NULL);
@@ -3425,7 +3557,7 @@ clear_cave_elements_cb (GtkWidget *widget, gpointer data)
 
 /* delete map from cave */
 static void
-remove_map_cb (GtkWidget *widget, gpointer data)
+remove_map_cb(GtkWidget *widget, gpointer data)
 {
 	gboolean response;
 
@@ -3446,7 +3578,7 @@ remove_map_cb (GtkWidget *widget, gpointer data)
 
 /* flatten cave -> pack everything in a map */
 static void
-flatten_cave_cb (GtkWidget *widget, gpointer data)
+flatten_cave_cb(GtkWidget *widget, gpointer data)
 {
 	gboolean response;
 
@@ -3577,7 +3709,7 @@ set_engine_default_cb(GtkWidget *widget, gpointer data)
 
 
 static void
-save_html_cb (GtkWidget *widget, gpointer data)
+save_html_cb(GtkWidget *widget, gpointer data)
 {
 	char *htmlname=NULL, *suggested_name;
 	/* if no filename given, */
@@ -3626,7 +3758,7 @@ save_html_cb (GtkWidget *widget, gpointer data)
 
 /* export cave to a crli editor format */
 static void
-export_cavefile_cb (GtkWidget *widget, gpointer data)
+export_cavefile_cb(GtkWidget *widget, gpointer data)
 {
 	char *outname=NULL;
 	/* if no filename given, */
@@ -3661,7 +3793,7 @@ export_cavefile_cb (GtkWidget *widget, gpointer data)
 
 /* export complete caveset to a crli cave pack */
 static void
-export_cavepack_cb (GtkWidget *widget, gpointer data)
+export_cavepack_cb(GtkWidget *widget, gpointer data)
 {
 	char *outname=NULL;
 	/* if no filename given, */
@@ -3704,24 +3836,16 @@ export_cavepack_cb (GtkWidget *widget, gpointer data)
 /* test selected level. main window is brought to focus.
 */
 static void
-play_level_cb (GtkWidget *widget, gpointer data)
+play_level_cb(GtkWidget *widget, gpointer data)
 {
-	Cave *playcave;
-
 	g_return_if_fail (edited_cave!=NULL);
-
-	/* make copy */
-	playcave=gd_cave_new_rendered (edited_cave, edit_level, g_random_int());
-	g_snprintf(playcave->name, sizeof(playcave->name), _("Testing %s"), edited_cave->name);
-	gd_cave_setup_for_game(playcave);
-	gd_main_start_level(playcave);	/* start the level as a snapshot */
-	gd_cave_free(playcave);	/* now the game module stores its own copy */
+	gd_main_new_game_test(edited_cave, edit_level);
 }
 
 
 
 static void
-object_properties_cb (GtkWidget *widget, gpointer data)
+object_properties_cb(GtkWidget *widget, gpointer data)
 {
 	object_properties(NULL);
 }
@@ -3730,14 +3854,14 @@ object_properties_cb (GtkWidget *widget, gpointer data)
 
 /* edit caveset properties */
 static void
-set_caveset_properties_cb (GtkWidget *widget, gpointer data)
+set_caveset_properties_cb(GtkWidget *widget, gpointer data)
 {
 	caveset_properties(TRUE);
 }
 
 
 static void
-cave_properties_cb (const GtkWidget *widget, const gpointer data)
+cave_properties_cb(const GtkWidget *widget, const gpointer data)
 {
 	cave_properties (edited_cave, TRUE);
 }
@@ -3752,14 +3876,14 @@ cave_properties_cb (const GtkWidget *widget, const gpointer data)
 
 /* go to cave selector */
 static void
-cave_selector_cb (GtkWidget *widget, gpointer data)
+cave_selector_cb(GtkWidget *widget, gpointer data)
 {
 	select_cave_for_edit(NULL);
 }
 
 /* view next cave */
 static void
-previous_cave_cb (GtkWidget *widget, gpointer data)
+previous_cave_cb(GtkWidget *widget, gpointer data)
 {
 	int i;
 	g_return_if_fail(edited_cave!=NULL);
@@ -3773,7 +3897,7 @@ previous_cave_cb (GtkWidget *widget, gpointer data)
 
 /* go to cave selector */
 static void
-next_cave_cb (GtkWidget *widget, gpointer data)
+next_cave_cb(GtkWidget *widget, gpointer data)
 {
 	int i;
 	g_return_if_fail(edited_cave!=NULL);
@@ -3787,14 +3911,10 @@ next_cave_cb (GtkWidget *widget, gpointer data)
 
 /* create new cave */
 static void
-new_cave_cb (GtkWidget *widget, gpointer data)
+new_cave_cb(GtkWidget *widget, gpointer data)
 {
 	Cave *newcave;
-	GDate *dat;
-	GdString dats;
 	GtkWidget *dialog, *entry_name, *entry_desc, *intermission_check, *table;
-
-
 
 	dialog=gtk_dialog_new_with_buttons(_("Create New Cave"), GTK_WINDOW(editor_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_NEW, GTK_RESPONSE_ACCEPT, NULL);
 	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
@@ -3807,29 +3927,29 @@ new_cave_cb (GtkWidget *widget, gpointer data)
 	gtk_table_set_col_spacings(GTK_TABLE(table), 6);
 
 	/* some properties - name */
-	gtk_table_attach_defaults (GTK_TABLE(table), gd_label_new_printf (_("Name:")), 0, 1, 0, 1);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf (_("Name:")), 0, 1, 0, 1);
 	entry_name=gtk_entry_new();
 	/* little inconsistency below: max length has unicode characters, while gdstring will have utf-8.
 	   however this does not make too much difference */
 	gtk_entry_set_max_length(GTK_ENTRY(entry_name), sizeof(GdString));
 	gtk_entry_set_activates_default(GTK_ENTRY(entry_name), TRUE);
 	gtk_entry_set_text(GTK_ENTRY(entry_name), _("New cave"));
-	gtk_table_attach_defaults (GTK_TABLE(table), entry_name, 1, 2, 0, 1);
+	gtk_table_attach_defaults(GTK_TABLE(table), entry_name, 1, 2, 0, 1);
 	
 	/* description */
-	gtk_table_attach_defaults (GTK_TABLE(table), gd_label_new_printf (_("Description:")), 0, 1, 1, 2);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf (_("Description:")), 0, 1, 1, 2);
 	entry_desc=gtk_entry_new();
 	/* little inconsistency below: max length has unicode characters, while gdstring will have utf-8.
 	   however this does not make too much difference */
 	gtk_entry_set_max_length(GTK_ENTRY(entry_desc), sizeof(GdString));
 	gtk_entry_set_activates_default(GTK_ENTRY(entry_desc), TRUE);
-	gtk_table_attach_defaults (GTK_TABLE(table), entry_desc, 1, 2, 1, 2);
+	gtk_table_attach_defaults(GTK_TABLE(table), entry_desc, 1, 2, 1, 2);
 
 	/* intermission */
-	gtk_table_attach_defaults (GTK_TABLE(table), gd_label_new_printf (_("Intermission:")), 0, 1, 2, 3);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf (_("Intermission:")), 0, 1, 2, 3);
 	intermission_check=gtk_check_button_new();
 	gtk_widget_set_tooltip_text(intermission_check, _("Intermission caves are usually small and fast caves, which are not required to be solved. The player will not lose a life if he is not successful. The game always proceeds to the next cave. If you set this check box, the size of the cave will also be set to 20x12, as that is the standard size for intermissions."));
-	gtk_table_attach_defaults (GTK_TABLE(table), intermission_check, 1, 2, 2, 3);
+	gtk_table_attach_defaults(GTK_TABLE(table), intermission_check, 1, 2, 2, 3);
 
 	gtk_widget_show_all(dialog);
 	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
@@ -3837,22 +3957,19 @@ new_cave_cb (GtkWidget *widget, gpointer data)
 		newcave=gd_cave_new();
 		
 		/* set some defaults */
-		gd_cave_set_random_colors(newcave);
+		gd_cave_set_random_colors(newcave, gd_preferred_palette);
 		gd_strcpy(newcave->name, gtk_entry_get_text(GTK_ENTRY(entry_name)));
 		gd_strcpy(newcave->description, gtk_entry_get_text(GTK_ENTRY(entry_desc)));
 		gd_strcpy(newcave->author, g_get_real_name());
 		newcave->intermission=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(intermission_check));
+		/* if the user says that he creates an intermission, it is immediately resized */
 		if (newcave->intermission) {
 			newcave->w=20;
 			newcave->h=12;
-			newcave->x2=19;
-			newcave->y2=11;
+			gd_cave_correct_visible_size(newcave);
 		}
-		dat=g_date_new();
-		g_date_set_time_t(dat, time(NULL));
-		g_date_strftime(dats, sizeof(dats), "%Y-%m-%d", dat);
-		g_date_free(dat);
-		gd_strcpy(newcave->date, dats);
+		gd_strcpy(newcave->date, gd_get_current_date());
+		/* default speeds - sensible defaults, as in bd2. */
 		newcave->level_speed[0]=180;
 		newcave->level_speed[1]=160;
 		newcave->level_speed[2]=140;
@@ -3874,7 +3991,7 @@ new_cave_cb (GtkWidget *widget, gpointer data)
  * after any operation, activate caveset editor again
  */
 static void
-open_caveset_cb (GtkWidget *widget, gpointer data)
+open_caveset_cb(GtkWidget *widget, gpointer data)
 {
 	/* destroy icon view so it does not interfere */
 	if (iconview_cavelist)
@@ -3886,7 +4003,7 @@ open_caveset_cb (GtkWidget *widget, gpointer data)
 }
 
 static void
-open_installed_caveset_cb (GtkWidget *widget, gpointer data)
+open_installed_caveset_cb(GtkWidget *widget, gpointer data)
 {
 	/* destroy icon view so it does not interfere */
 	if (iconview_cavelist)
@@ -3898,7 +4015,7 @@ open_installed_caveset_cb (GtkWidget *widget, gpointer data)
 }
 
 static void
-save_caveset_as_cb (GtkWidget *widget, gpointer data)
+save_caveset_as_cb(GtkWidget *widget, gpointer data)
 {
 	Cave *edited;
 	
@@ -3911,7 +4028,7 @@ save_caveset_as_cb (GtkWidget *widget, gpointer data)
 }
 
 static void
-save_caveset_cb (GtkWidget *widget, gpointer data)
+save_caveset_cb(GtkWidget *widget, gpointer data)
 {
 	Cave *edited;
 	
@@ -3924,7 +4041,7 @@ save_caveset_cb (GtkWidget *widget, gpointer data)
 }
 
 static void
-new_caveset_cb (GtkWidget *widget, gpointer data)
+new_caveset_cb(GtkWidget *widget, gpointer data)
 {
 	GDate *date;
 	
@@ -3949,7 +4066,7 @@ new_caveset_cb (GtkWidget *widget, gpointer data)
 
 
 static void
-remove_all_unknown_tags_cb (GtkWidget *widget, gpointer data)
+remove_all_unknown_tags_cb(GtkWidget *widget, gpointer data)
 {
 	Cave *edited;
 	gboolean response;
@@ -4052,7 +4169,7 @@ selectable_all_after_intermissions_cb(GtkWidget *widget, gpointer data)
 
 /* level shown in editor */
 static void
-level_scale_changed_cb (GtkWidget *widget, gpointer data)
+level_scale_changed_cb(GtkWidget *widget, gpointer data)
 {
 	edit_level=gtk_range_get_value (GTK_RANGE (widget))-1;
 	render_cave();				/* re-render cave */
@@ -4060,7 +4177,7 @@ level_scale_changed_cb (GtkWidget *widget, gpointer data)
 
 /* edit tool selected */
 static void
-action_objects_cb (GtkWidget *widget, gpointer data)
+action_objects_cb(GtkWidget *widget, gpointer data)
 {
 	action=gtk_radio_action_get_current_value (GTK_RADIO_ACTION (widget));
 	
@@ -4106,19 +4223,19 @@ action_objects_cb (GtkWidget *widget, gpointer data)
 }
 
 static void
-toggle_game_view_cb (GtkWidget *widget, gpointer data)
+toggle_game_view_cb(GtkWidget *widget, gpointer data)
 {
 	gd_game_view=gtk_toggle_action_get_active (GTK_TOGGLE_ACTION (widget));
 }
 
 static void
-toggle_colored_objects_cb (GtkWidget *widget, gpointer data)
+toggle_colored_objects_cb(GtkWidget *widget, gpointer data)
 {
 	gd_colored_objects=gtk_toggle_action_get_active (GTK_TOGGLE_ACTION (widget));
 }
 
 static void
-toggle_object_list_cb (GtkWidget *widget, gpointer data)
+toggle_object_list_cb(GtkWidget *widget, gpointer data)
 {
 	gd_show_object_list=gtk_toggle_action_get_active (GTK_TOGGLE_ACTION (widget));
 	if (gd_show_object_list && edited_cave)
@@ -4128,14 +4245,14 @@ toggle_object_list_cb (GtkWidget *widget, gpointer data)
 }
 
 static void
-toggle_test_label_cb (GtkWidget *widget, gpointer data)
+toggle_test_label_cb(GtkWidget *widget, gpointer data)
 {
 	gd_show_test_label=gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(widget));
 }
 
 
 static void
-close_editor_cb (GtkWidget *widget, gpointer data)
+close_editor_cb(GtkWidget *widget, gpointer data)
 {
 	gtk_widget_destroy(editor_window);
 }
@@ -4302,7 +4419,7 @@ gd_open_cave_editor()
 		{"FlattenCave", NULL, N_("Convert to map"), NULL, N_("Flatten cave to a single cave map without objects"), G_CALLBACK(flatten_cave_cb)},
 		{"Overview", GTK_STOCK_ZOOM_FIT, N_("O_verview"), NULL, N_("Full screen overview of cave"), G_CALLBACK(cave_overview_cb)},
 		{"OverviewSimple", GTK_STOCK_ZOOM_FIT, N_("O_verview (simple)"), NULL, N_("Full screen overview of cave almost as in game"), G_CALLBACK(cave_overview_simple_cb)},
-		{"AutoShrink", NULL, N_("_Auto shrink"), NULL, N_("Automatically set the visible part of the cave"), G_CALLBACK(auto_shrink_cave_cb)},
+		{"AutoShrink", NULL, N_("_Auto shrink"), NULL, N_("Automatically set the visible region of the cave"), G_CALLBACK(auto_shrink_cave_cb)},
 	};
 
 	/* action entries which relate to a selected cave element (line, rectangle...) */
@@ -4362,7 +4479,7 @@ gd_open_cave_editor()
 	/* toggle buttons: nonstatic as they use values from settings */
 	const GtkToggleActionEntry action_entries_toggle[]={
 		{"SimpleView", NULL, N_("_Animated view"), NULL, N_("Animated view"), G_CALLBACK(toggle_game_view_cb), gd_game_view},
-		{"ColoredObjects", NULL, N_("_Colored objects"), NULL, N_("Cave objects are coloured"), G_CALLBACK(toggle_colored_objects_cb), gd_colored_objects},
+		{"ColoredObjects", NULL, N_("_Colored objects"), NULL, N_("Cave objects are colored"), G_CALLBACK(toggle_colored_objects_cb), gd_colored_objects},
 		{"ShowObjectList", GTK_STOCK_INDEX, N_("_Object list"), "F9", N_("Object list sidebar"), G_CALLBACK(toggle_object_list_cb), gd_show_object_list},
 		{"ShowTestLabel", GTK_STOCK_INDEX, N_("_Show variables in test"), NULL, N_("Show a label during tests with some cave parameters"), G_CALLBACK(toggle_test_label_cb), gd_show_test_label}
 	};
@@ -4505,6 +4622,7 @@ gd_open_cave_editor()
 				"<menuitem action='Maze'/>"
 				"<menuitem action='UnicursalMaze'/>"
 				"<menuitem action='BraidMaze'/>"
+				"<menuitem action='CopyPaste'/>"
 				"<separator/>"
 				"<menuitem action='Visible'/>"
 				"<menuitem action='AutoShrink'/>"
@@ -4547,6 +4665,7 @@ gd_open_cave_editor()
 			"<toolitem action='Maze'/>"
 			"<toolitem action='UnicursalMaze'/>"
 			"<toolitem action='BraidMaze'/>"
+			"<toolitem action='CopyPaste'/>"
 			"<separator/>"
 			"<toolitem action='Test'/>"
 		"</toolbar>"
@@ -4692,26 +4811,26 @@ gd_open_cave_editor()
 	gtk_scale_set_digits (GTK_SCALE (level_scale), 0);
 	gtk_scale_set_value_pos (GTK_SCALE (level_scale), GTK_POS_LEFT);
 	g_signal_connect (G_OBJECT (level_scale), "value-changed", G_CALLBACK(level_scale_changed_cb), NULL);
-	gtk_box_pack_end_defaults (GTK_BOX (hbox_combo), level_scale);
+	gtk_box_pack_end_defaults(GTK_BOX (hbox_combo), level_scale);
 	gtk_box_pack_end (GTK_BOX (hbox_combo), gtk_label_new(_("Level shown:")), FALSE, FALSE, 0);
 
 	gtk_box_pack_start (GTK_BOX (hbox_combo), label_first_element=gtk_label_new(NULL), FALSE, FALSE, 0);
 	element_button=gd_element_button_new(O_DIRT, TRUE, NULL);	/* combo box of object, default element dirt (not really important what it is) */
 	gtk_widget_set_tooltip_text(element_button, _("Element used to draw points, lines, and rectangles. You can use middle-click to pick one from the cave."));
-	gtk_box_pack_start_defaults (GTK_BOX (hbox_combo), element_button);
+	gtk_box_pack_start_defaults(GTK_BOX (hbox_combo), element_button);
 
 	gtk_box_pack_start (GTK_BOX (hbox_combo), label_second_element=gtk_label_new(NULL), FALSE, FALSE, 0);
 	fillelement_button=gd_element_button_new(O_SPACE, TRUE, NULL);	/* combo box, default element space (not really important what it is) */
 	gtk_widget_set_tooltip_text (fillelement_button, _("Element used to fill rectangles, and second element of joins. You can use Ctrl + middle-click to pick one from the cave."));
-	gtk_box_pack_start_defaults (GTK_BOX (hbox_combo), fillelement_button);
+	gtk_box_pack_start_defaults(GTK_BOX (hbox_combo), fillelement_button);
 	
 	/* hbox for drawing area and object list */
 	hbox=gtk_hbox_new(FALSE, 6);
-	gtk_box_pack_start_defaults (GTK_BOX (vbox), hbox);
+	gtk_box_pack_start_defaults(GTK_BOX (vbox), hbox);
 
 	/* scroll window for drawing area and icon view ****************************************/
 	scroll_window=gtk_scrolled_window_new(NULL, NULL);
-	gtk_box_pack_start_defaults (GTK_BOX (hbox), scroll_window);
+	gtk_box_pack_start_defaults(GTK_BOX (hbox), scroll_window);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
 	/* object list ***************************************/

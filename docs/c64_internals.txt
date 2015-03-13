@@ -392,7 +392,7 @@ paint_line_quit:
 
 code bytes
 ----------
-disassembly from: marek roth tutorial.
+disassembly from: marek roth crazy light tutorial game.
 for each element, code byte at 6a70+n and 6af0+n, hi and lo byte.
 for example, chasing stone at (6a70+72) and (6af0+72) -> 5710.
 (same in crazy dream: a800 and a900)
@@ -1718,4 +1718,128 @@ bladder-481f
 .C:4396   4C 00 3B   JMP $3B00
 .C:4399   8A         TXA
 .C:439a   60         RTS
+	
+
+
+
+
+player
+------
+from frust dash:
+
+sub_7555:				; CODE XREF: sub_75A9
+		LDA	#0
+		STA	$B7
+		LDA	($32),Y
+		BNE	loc_7565
+		INC	$B7
+		LDA	#$35
+		STA	VARIABLES +$08
+		RTS	
+; ---------------------------------------------------------------------------
+
+loc_7565:				; CODE XREF: sub_7555+6
+		CMP	#1
+		BNE	loc_7571
+		INC	$B7
+		LDA	#-$5B
+		STA	VARIABLES +$08
+		RTS	
+; ---------------------------------------------------------------------------
+
+loc_7571:				; CODE XREF: sub_7555+12
+		CMP	#$14									; IS IT A DIAMOND?
+		BNE	loc_7578
+		JMP	loc_7529
+; ---------------------------------------------------------------------------
+
+loc_7578:				; CODE XREF: sub_7555+1E
+		CMP	#5										; IS IT AN OPEN EXIT?
+		BNE	loc_7586
+		LDA	#2
+		STA	$97
+		LDA	#1
+		STA	$9F
+		INC	$B7
+
+loc_7586:				; CODE XREF: sub_7555+25
+		CMP	#$10									; IS IT A STONE?
+		BNE	locret_75A8
+		CPY	#$28
+		BNE	loc_7599								; jump if not pushing left
+		LDY	#$27
+		LDA	($32),Y
+		BNE	loc_7597								; jump if not space left to the boulder
+		JSR	sub_7543								; move stone
+
+loc_7597:				; CODE XREF: sub_7555+3D
+		LDY	#$28
+
+loc_7599:				; CODE XREF: sub_7555+37
+		CPY	#$2A
+		BNE	locret_75A8								; jump if not pushing right
+		LDY	#$2B
+		LDA	($32),Y
+		BNE	loc_75A6
+		JSR	sub_7543
+
+loc_75A6:				; CODE XREF: sub_7555+4C
+		LDY	#$2A
+
+locret_75A8:				; CODE XREF: sub_7555+33 sub_7555+46
+		RTS	
+; End of function sub_7555
+
+
+
+
+move stone
+----------
+
+
+sub_7543:				; CODE XREF: sub_7555+3F sub_7555+4E
+		JSR	random								; random number
+		AND	#3									; &3  -> 0..3
+		BNE	locret_7554							; if nonzero (3 of 4 cases), return
+		INC	$B7
+		JSR	sub_71EE
+		LDA	#$11
+		JSR	set_object
+
+locret_7554:				; CODE XREF: sub_7543+5
+		RTS	
+; End of function sub_7543
+
+
+
+
+
+same code in crazy light tutorial prg:
+.C:5123   C9 10      CMP #$10				; boulder?
+.C:5125   D0 20      BNE $5147				; jump to other checking if not
+.C:5127   C0 28      CPY #$28
+.C:5129   D0 0C      BNE $5137				; jump if not pushing left
+.C:512b   A0 27      LDY #$27				; what is at 2*left?
+.C:512d   B1 6D      LDA ($6D),Y
+.C:512f   D0 03      BNE $5134				; jump if not space.
+.C:5131   20 EF 3D   JSR $3DEF				; try to push if space!
+.C:5134   A0 28      LDY #$28
+.C:5136   60         RTS
+.C:5137   C0 2A      CPY #$2A
+.C:5139   D0 0B      BNE $5146				; jump if not pushing right
+.C:513b   A0 2B      LDY #$2B				; what is at 2*right?
+.C:513d   B1 6D      LDA ($6D),Y
+.C:513f   D0 03      BNE $5144				; jump if not space.
+.C:5141   20 EF 3D   JSR $3DEF				; try to push if space!
+.C:5144   A0 2A      LDY #$2A
+.C:5146   60         RTS
+
+3d3f:
+.C:3def   20 00 25   JSR $2500				; same as in frustidash
+.C:3df2   29 03      AND #$03
+.C:3df4   D0 F5      BNE $3DEB
+.C:3df6   E6 AF      INC $AF
+.C:3df8   A9 11      LDA #$11
+.C:3dfa   20 69 43   JSR $4369
+.C:3dfd   4C C1 41   JMP $41C1
 

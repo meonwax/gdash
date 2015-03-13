@@ -48,7 +48,7 @@ N_("To play the game, press the New Game button. You can select which level you 
 		{NULL, NULL, O_PLAYER, N_("This is the player. He can move through space and dirt. He can pick up diamonds and push stones, but he should avoid flies.")},
 		{NULL, NULL, O_SPACE, N_("Stones and diamonds fall down in space, creatures can freely move here.")},
 		{NULL, NULL, O_DIRT, N_("You can move through dirt leaving empty space behind. Amoeba eats it.")},
-		{NULL, NULL, O_DIRT2, N_("This is also dirt, but has a different colour. In any other sense, it is identical to the above one.")},
+		{NULL, NULL, O_DIRT2, N_("This is also dirt, but has a different color. In any other sense, it is identical to the above one.")},
 		{NULL, NULL, O_DIAMOND, N_("The main object of the game is to collect required number of diamonds.")},
 		{NULL, NULL, O_STONE, N_("Stones can be pushed by the player, and he can drop them on flies to make an explosion.")},
 		{NULL, NULL, O_MEGA_STONE, N_("Like ordinary stones, but these are so heavy, that you cannot push them.")},
@@ -81,8 +81,8 @@ N_("To play the game, press the New Game button. You can select which level you 
 "also be able to push chasing stones.")},
 		{NULL, NULL, O_TRAPPED_DIAMOND, N_("This is an indestructible door with a diamond.")},
 		{NULL, NULL, O_DIAMOND_KEY, N_("If you get this key, all doors will convert into diamonds you can collect.")},
-		{NULL, N_("Keys"), O_KEY_1, N_("There are three types of keys, which open three different coloured doors. You can collect more from these; and for every door, always one key is used.")},
-		{NULL, N_("Doors"), O_DOOR_1, N_("This is a door which can only be opened by the key of the same colour.")},
+		{NULL, N_("Keys"), O_KEY_1, N_("There are three types of keys, which open three different colored doors. You can collect more from these; and for every door, always one key is used.")},
+		{NULL, N_("Doors"), O_DOOR_1, N_("This is a door which can only be opened by the key of the same color.")},
 		{NULL, NULL, O_BOX, N_("Sometimes you have to block a passage, for example to protect a voodoo. This is when a box like this comes handy. You can push it in every direction using the Ctrl key.")},
 		{NULL, NULL, O_PNEUMATIC_HAMMER, N_("Sometimes diamonds or keys are buried in brick walls. You can use a pneumatic hammer to break these walls, or simple brick walls which contain nothing. Stand on something, and press fire and left or right to use the hammer on a wall which is near the player, next to the element you stand on.")},
 		{NULL, NULL, O_CLOCK, N_("Collect this to get extra time.")},
@@ -99,9 +99,13 @@ N_("To play the game, press the New Game button. You can select which level you 
 		{NULL, N_("Strange elements"), O_DIRT_GLUED, N_("Some caves contain strange elements, for example, diamonds which cannot be collected, a player that cannot move... Don't be surprised!")},
 		{NULL, NULL, O_NONE, NULL},
 		{GD_ICON_SNAPSHOT, N_("Snapshots"), O_NONE, N_("You can experiment with levels by saving and reloading snapshots. However, if you are playing a reloaded cave, you will not get score or extra lives.")},
-		{GTK_STOCK_SELECT_COLOR, N_("Themes"), O_NONE, N_("The game also supports themes. You can use the installed png file as a template. Cells can have any arbitrary size, not necessarily 16x16 pixels. However, they must be squares, and the image must have an alpha channel. If the image has only a small number of colours (fully saturated red for foreground colour 1, fully "
-		"saturated green for amoeba...), the game will use original C64 colours, different ones for every cave. Whether the png file is interpreted as a true colour "
-		"image or one with C64 colours, depends on the colour values used, and is autodetected. An image file with only #000000, #00FF00 and the like is taken as "
+		{GD_ICON_REPLAY, N_("Replays"), O_NONE, N_("Every time you play a game, GDash records all your movements. These recordings can be viewed later, and can be saved with the caveset. To check them out, click on Show replays in the Play menu.")},
+		{NULL, NULL, O_NONE, N_("If you were very lucky in a cave, or something interesting happened, you do not have to be worry, as all played caves are recorded. In the Replays window, you can select some of them to be saved with the caveset. You can also add comments to selected movies. The replays are stored no matter if the cave was solved or not, so you can even send the recording of your unsuccessful missions for others to discuss.")},
+		{NULL, NULL,O_NONE, N_("During the replay of the cave, you can gain control of the replay if you use the usual cursor keys (left, up, etc.) to move. From that point, you can continue playing the cave as if it was a snapshot. You can answer your 'what would have happened if...' questions. Or see if you can do better than the original player!")},
+		{NULL, NULL, O_NONE, NULL},
+		{GTK_STOCK_SELECT_COLOR, N_("Themes"), O_NONE, N_("The game also supports themes. You can use the installed png file as a template. Cells can have any arbitrary size, not necessarily 16x16 pixels. However, they must be squares, and the image must have an alpha channel. If the image has only a small number of colors (fully saturated red for foreground color 1, fully "
+		"saturated green for amoeba...), the game will use original C64 colors, different ones for every cave. Whether the png file is interpreted as a true color "
+		"image or one with C64 colors, depends on the color values used, and is autodetected. An image file with only #000000, #00FF00 and the like is taken as "
 		"a C64 theme.\n"
 		"For C64 themes, the meaning of colors are these:\n"
 		"- Transparent: you should use it everywhere where there is no drawing.\n"
@@ -148,9 +152,10 @@ static const struct helpdata editorhelp[] = {
 	{GD_ICON_EDITOR_MAZE_UNI, N_("Unicursal maze"), O_NONE, N_("The unicursal maze is a long and curvy path.")},
 	{GD_ICON_EDITOR_MAZE_BRAID, N_("Braid maze"), O_NONE, N_("The maze like that in PacMan: there are no dead ends.")},
 	{GD_ICON_RANDOM_FILL, N_("Random Fill"), O_NONE, N_("This tool can be used to fill a part of a cave with random elements. It is similar to the random cave setup. At most five elements can be specified. You can also set a replace element; in that case, only that one will be changed to the randomly chosen ones. This can be used to fill the paths of a maze or the border of the cave with random elements. If you are statisfied with the size and position of the randomly filled area after placing, click the 'Object Properties' button to setup its elements. The random seed values can be specified independently for each level. You can also set them to -1, so the cave will be different every time you play.")},
+	{GTK_STOCK_COPY, N_("Copy and paste"), O_NONE, N_("This tool is simple: copies a rectangular part of the cave, and pastes it into a new location. The source and destination area may overlap. To select the area to be copied, use the copy and paste tool and then click and drag the mouse. The paste object immediately appears at the same location; the move tool can be used to move it to its final place. The contents of the rectangle can also be mirrored horizontally or flipped vertically: open the object properties window to set this behavior.")},
 	{GTK_STOCK_SELECT_COLOR, NULL, O_NONE, N_("To select an element, you can middle-click any time on the cave map to pick one you already use. Use Ctrl together with middle-click to pick a fill element. With Shift and middle-click you can pick an object type from the cave.")},
 	{GD_ICON_EDITOR_MOVE, N_("Managing cave objects"), O_NONE, N_("Use this tool to modify already existing cave objects.")},
-	{NULL, NULL, O_NONE, N_("By looking at the cave, you can see that every object is drawn with a slight yellowish colour to distinguish them from random data. Click on any object to select it.")},
+	{NULL, NULL, O_NONE, N_("By looking at the cave, you can see that every object is drawn with a slight yellowish color to distinguish them from random data. Click on any object to select it.")},
 	{NULL, NULL, O_NONE,
 		N_("A selected object can be repositioned with the mouse by clicking and dragging. You can resize lines and rectangles by moving them by "
 		"their end points or corners. Dragging any other part of these objects moves the whole thing. For joins, you can set "
@@ -176,16 +181,15 @@ static const struct helpdata editorhelp[] = {
 	{NULL, NULL, O_NONE, N_(
 	   "The Edit menu contains a random elements setup tool, which can be used to setup the random number generator for the cave. "
 	   "It is able to edit all five levels, and updates the cave at every change.")},
-	{GTK_STOCK_ZOOM_FIT, N_("Visible size of a cave"), O_NONE,
-		N_("Every cave can have a rectangular area, which may be smaller then the cave itself, and will be visible during the game. "
+	{GTK_STOCK_ZOOM_FIT, N_("Visible region of a cave"), O_NONE,
+		N_("Every cave can have a rectangular area, which may be smaller than the cave itself, and will be visible during the game. "
 		"Cave elements outside this visible area, for example stones or creatures, also move. "
 		"You can also use the Auto shrink tool to set this size automatically by checking "
 		"steel walls and inbox/outbox elements.")},
 	{GTK_STOCK_GO_FORWARD, N_("Shift cave map"), O_NONE,
 		N_("If the cave is map-based, you can use the shift tools to move the map. This might be useful if you want to enlarge it "
-		"and otherwise there would be no place to do this. Remember to check the visible size of the cave after shifting it in any "
-		"direction! For object-based caves, you can select all object at once and move them "
-		"together!")},
+		"and otherwise there would be no place to do this. Remember to check the visible region of the cave after shifting it in any "
+		"direction! For object-based caves, you can select all object at once and move them together.")},
 	{GD_ICON_AWARD, N_("Highscores"), O_NONE, N_("The editor can also be used to delete highscore files of a game or any of the caves.")},
 	{NULL, NULL, O_NONE, N_("GDash uses two mechanisms to store "
 		"highscores: it can save them in a separate file (this is done automatically), and it can also save them in the BDCFF file. Separate files are always "

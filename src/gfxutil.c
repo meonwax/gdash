@@ -21,7 +21,6 @@
 #include "gfxutil.h"
 
 /* pal emulation for 32-bit rgba images. */
-/* same applies to x coordinates. */
 
 /* used:
 	y=0.299r+0.587g+0.114b
@@ -424,4 +423,5 @@ gd_scale3x(guint8 *srcpix, int width, int height, int srcpitch, guint8 *dstpix, 
 		}
 	}
 }
+
 

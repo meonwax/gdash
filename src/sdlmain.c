@@ -35,10 +35,14 @@
 /* for main menu */
 typedef enum _state {
 	M_NONE,
-	M_QUIT,
+	M_QUIT,	/* quit immediately */
+	M_EXIT, /* normal quit */
 	M_ABOUT,
 	M_LICENSE,
 	M_PLAY,
+	M_SAVE,
+	M_SAVE_AS_NEW,
+	M_REPLAYS,
 	M_OPTIONS,
 	M_INSTALL_THEME,
 	M_HIGHSCORE,
@@ -53,12 +57,15 @@ static int levelnum;
 
 static char *username;
 
+static char *caveset_filename=NULL;
+static char *last_folder=NULL;
+
 
 
 
 
 static void
-showheader_new()
+clear_header()
 {
 	SDL_Rect r;
 	
@@ -75,82 +82,105 @@ showheader_uncover()
 	int cavename_y;
 	int len;
 	char *str;
+	gboolean first_line;
 
-	showheader_new();
-	/* show name of game */
-	if (gd_show_name_of_game) {		/* if showing the name of the cave... */
-		len=g_utf8_strlen(gd_caveset_data->name, -1);
-		if (gd_screen->w/gd_font_width()/2>=len)	/* if have place for double-width font */
-			gd_blittext(gd_screen, -1, statusbar_y1, GD_C64_WHITE, gd_caveset_data->name);
-		else
-			gd_blittext_n(gd_screen, -1, statusbar_y1, GD_C64_WHITE, gd_caveset_data->name);
+	clear_header();
+	first_line=FALSE;	/* will be set to TRUE, if we draw in the next few code lines. so the y coordinate of the second status line can be decided. */
+
+	/* if playing an intermission, tell the user! */
+	if (gd_gameplay.type==GD_GAMETYPE_REPLAY) {
+		gd_blittext(gd_screen, -1, statusbar_y1, GD_GDASH_YELLOW, "PLAYING REPLAY");
+		first_line=TRUE;
 	}
-	
-	/* y coordinates of "name of cave" depend on whether name of game is displayed or not */
-	if (gd_show_name_of_game)
-		cavename_y=statusbar_y2;	/* show cave name in the second line */
-	else		/* otherwise, cave name in the middle. */
-		cavename_y=statusbar_mid;
+	else {
+		if (gd_gameplay.cave->intermission) {
+			gd_blittext(gd_screen, -1, statusbar_y1, GD_GDASH_YELLOW, "ONE LIFE EXTRA");
+			first_line=TRUE;
+		}
+		else
+			/* if not an intermission, we may show the name of the game (caveset) */
+			if (gd_show_name_of_game) {		/* if showing the name of the cave... */
+				len=g_utf8_strlen(gd_caveset_data->name, -1);
+				if (gd_screen->w/gd_font_width()/2>=len)	/* if have place for double-width font */
+					gd_blittext(gd_screen, -1, statusbar_y1, GD_GDASH_YELLOW, gd_caveset_data->name);
+				else
+					gd_blittext_n(gd_screen, -1, statusbar_y1, GD_GDASH_YELLOW, gd_caveset_data->name);
+				first_line=TRUE;
+			}
+	}
 
+	cavename_y=first_line?statusbar_y2:statusbar_mid;
 	/* "xy players, cave ab/3" */
-	str=g_strdup_printf("%d%c, %s/%d", gd_gameplay.player_lives, GD_PLAYER_CHAR, gd_gameplay.cave->name, gd_gameplay.cave->rendered);
+	if (gd_gameplay.type==GD_GAMETYPE_NORMAL)
+		str=g_strdup_printf("%d%c, %s/%d", gd_gameplay.player_lives, GD_PLAYER_CHAR, gd_gameplay.cave->name, gd_gameplay.cave->rendered);
+	else
+		/* if not a normal game, do not show number of remaining lives */
+		str=g_strdup_printf("%s/%d", gd_gameplay.cave->name, gd_gameplay.cave->rendered);
 	len=g_utf8_strlen(str, -1);
 	if (gd_screen->w/gd_font_width()/2>=len)	/* if have place for double-width font */
-		gd_blittext(gd_screen, -1, cavename_y, GD_C64_WHITE, str);
+		gd_blittext(gd_screen, -1, cavename_y, GD_GDASH_WHITE, str);
 	else
-		gd_blittext_n(gd_screen, -1, cavename_y, GD_C64_WHITE, str);
+		gd_blittext_n(gd_screen, -1, cavename_y, GD_GDASH_WHITE, str);
 	g_free(str);
 }
 
 static void
 showheader_pause()
 {
-	showheader_new();
-	gd_blittext(gd_screen, -1, statusbar_mid, GD_C64_WHITE, "SPACEBAR TO RESUME");
-}
-
-static void
-showheader_timeout()
-{
-	showheader_new();
-	gd_blittext(gd_screen, -1, statusbar_mid, GD_C64_WHITE, "OUT OF TIME");
+	clear_header();
+	gd_blittext(gd_screen, -1, statusbar_mid, GD_GDASH_WHITE, "SPACEBAR TO RESUME");
 }
 
 static void
 showheader_gameover()
 {
-	showheader_new();
-	gd_blittext(gd_screen, -1, statusbar_mid, GD_C64_WHITE, "G A M E   O V E R");
+	clear_header();
+	gd_blittext(gd_screen, -1, statusbar_mid, GD_GDASH_WHITE, "G A M E   O V E R");
 }
 
 static void
-showheader_game()
+showheader_game(int timeout_since)
 {
-	int x;
+	int x, y;
+	gboolean first_line;
+	first_line=FALSE;	/* will be set to TRUE, if we draw in the next few code lines. so the y coordinate of the second status line can be decided. */
 
-	SDL_Rect r;
-	
-	r.x=0;
-	r.y=0;
-	r.w=gd_screen->w;
-	r.h=statusbar_height;
-	SDL_FillRect(gd_screen, &r, SDL_MapRGB(gd_screen->format, 0, 0, 0));
+	clear_header();
+
+	/* if playing an intermission, tell the user! */
+	if (gd_gameplay.type==GD_GAMETYPE_REPLAY) {
+		gd_blittext(gd_screen, -1, statusbar_y1, GD_GDASH_YELLOW, "PLAYING REPLAY");
+		first_line=TRUE;
+	}
+
+	/* y position of status bar */
+	y=first_line?statusbar_y2:statusbar_mid;
+
+	if (gd_gameplay.cave->player_state==GD_PL_TIMEOUT && timeout_since/25%4==0) {
+		clear_header();
+		gd_blittext(gd_screen, -1, y, GD_GDASH_WHITE, "OUT OF TIME");
+		return;
+	}
+	if (gd_gameplay.cave->player_state==GD_PL_NOT_YET) {
+		showheader_uncover();
+		return;
+	}
 
 	if (gd_keystate[SDLK_LSHIFT] || gd_keystate[SDLK_RSHIFT]) {
 		/* ALTERNATIVE STATUS BAR BY PRESSING SHIFT */
 		x=14*gd_scale;
 		
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%c%02d", GD_PLAYER_CHAR, gd_gameplay.player_lives);
+		x=gd_blittext_printf(gd_screen, x, y, GD_GDASH_WHITE, "%c%02d", GD_PLAYER_CHAR, gd_gameplay.player_lives);
 		x+=24*gd_scale;
 		/* color numbers are not the same as key numbers! c3->k1, c2->k2, c1->k3 */
 		/* this is how it was implemented in crdr7. */
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, gd_gameplay.cave->color3, "%c%02d", GD_KEY_CHAR, gd_gameplay.cave->key1);
+		x=gd_blittext_printf(gd_screen, x, y, gd_gameplay.cave->color3, "%c%02d", GD_KEY_CHAR, gd_gameplay.cave->key1);
 		x+=10*gd_scale;
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, gd_gameplay.cave->color2, "%c%02d", GD_KEY_CHAR, gd_gameplay.cave->key2);
+		x=gd_blittext_printf(gd_screen, x, y, gd_gameplay.cave->color2, "%c%02d", GD_KEY_CHAR, gd_gameplay.cave->key2);
 		x+=10*gd_scale;
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, gd_gameplay.cave->color1, "%c%02d", GD_KEY_CHAR, gd_gameplay.cave->key3);
+		x=gd_blittext_printf(gd_screen, x, y, gd_gameplay.cave->color1, "%c%02d", GD_KEY_CHAR, gd_gameplay.cave->key3);
 		x+=24*gd_scale;
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%02d", gd_cave_time_show(gd_gameplay.cave, gd_gameplay.cave->gravity_will_change));
+		x=gd_blittext_printf(gd_screen, x, y, GD_GDASH_WHITE, "%02d", gd_cave_time_show(gd_gameplay.cave, gd_gameplay.cave->gravity_will_change));
 	} else {
 		/* NORMAL STATUS BAR */
 		x=0;
@@ -163,26 +193,26 @@ showheader_game()
 
 		if (gd_keystate[SDLK_f]) {
 			/* fast forward mode - show "FAST" */
-			x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_YELLOW, "%cFAST%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
+			x=gd_blittext_printf(gd_screen, x, y, GD_GDASH_YELLOW, "%cFAST%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
 		} else {
 			/* normal speed mode - show diamonds needed and value */
 			if (gd_gameplay.cave->diamonds_needed>gd_gameplay.cave->diamonds_collected) {
 				if (gd_gameplay.cave->diamonds_needed>0)
-					x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_RED, "%03d", gd_gameplay.cave->diamonds_needed);
+					x=gd_blittext_printf(gd_screen, x, y, GD_GDASH_RED, "%03d", gd_gameplay.cave->diamonds_needed);
 				else
 					/* did not already count diamonds needed */
-					x=gd_blittext(gd_screen, x, statusbar_mid, GD_C64_RED, "???");
+					x=gd_blittext(gd_screen, x, y, GD_GDASH_RED, "???");
 			}
 			else
-				x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, " %c%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
-			x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%c%02d", GD_DIAMOND_CHAR, gd_gameplay.cave->diamond_value);
+				x=gd_blittext_printf(gd_screen, x, y, GD_GDASH_WHITE, " %c%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
+			x=gd_blittext_printf(gd_screen, x, y, GD_GDASH_WHITE, "%c%02d", GD_DIAMOND_CHAR, gd_gameplay.cave->diamond_value);
 		}
 		x+=10*gd_scale;
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_GREEN, "%03d", gd_gameplay.cave->diamonds_collected);
+		x=gd_blittext_printf(gd_screen, x, y, GD_GDASH_GREEN, "%03d", gd_gameplay.cave->diamonds_collected);
 		x+=10*gd_scale;
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%03d", time_secs);
+		x=gd_blittext_printf(gd_screen, x, y, GD_GDASH_WHITE, "%03d", time_secs);
 		x+=10*gd_scale;
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%06d", gd_gameplay.player_score);
+		x=gd_blittext_printf(gd_screen, x, y, GD_GDASH_WHITE, "%06d", gd_gameplay.player_score);
 	}
 }
 
@@ -191,7 +221,7 @@ game_help()
 {
 	const char* strings_menu[]={
 		"CURSOR", "MOVE",
-		"CTRL", "FIRE",
+		"CTRL", "FIRE (SNAP)",
 		"F2", "SUICIDE",
 		"F", "FASH FORWARD (HOLD)",
 		"SHIFT", "STATUS BAR (HOLD)",
@@ -208,220 +238,193 @@ game_help()
 }
 
 
+
+
+
+
+/* if normal scrolling is active, will install a 25hz (40ms) timer. */
+/* if fine scrolling, install a 50hz (20ms) timer. */
+#define FINE_SCROLL_INTERVAL 20
+#define NORMAL_SCROLL_INTERVAL 40
+/* timer will send an sdl event, and tell the function to  a) scroll  b) move cave, draw, ... and scroll */
+#define ONLY_SCROLL 1
+#define DRAW_AND_SCROLL 2
+
+/* this function might be called at a 1/40ms rate or 1/20ms rate. */
+/* detect this, and act accordingly. */
+/* 40ms is a normal draw and scroll. */
+/* if 20ms, one of the "interrupts" is a draw and scroll, the other is for scrolling only (fine scrolling). */
+static Uint32
+timer_callback(Uint32 interval, void *param)
+{
+	SDL_Event ev;
+	static gboolean toggle=FALSE;	/* actual value does not matter */
+	
+	ev.type=SDL_USEREVENT;
+	/* detect which timer is installed. */
+	switch (interval) {
+		case FINE_SCROLL_INTERVAL:
+			toggle=!toggle;
+			if (toggle)
+				ev.user.code=DRAW_AND_SCROLL;
+			else
+				ev.user.code=ONLY_SCROLL;
+			break;
+		case NORMAL_SCROLL_INTERVAL:
+			ev.user.code=DRAW_AND_SCROLL;
+			break;
+		default:
+			g_assert_not_reached();	/* should not call other functions, but... */
+			break;
+	}
+	SDL_PushEvent(&ev);
+	
+	return interval;
+}
+
+
+
 /* the game itself */
 static void
-play_game(int start_cave, int start_level)
+play_game_func()
 {
 	gboolean exit_game;
-	gboolean iterate;
 	gboolean show_highscore;
-	guint32 last_iterate, last_draw;
-	guint32 paused_since=0, outoftime_since=0;
-	char *name;
-
-	name=gd_input_string("ENTER YOUR NAME", username);
-	if (!name)
-		return;
-	g_free(username);
-	username=name;
-	
-	gd_music_stop();
-	
-	gd_new_game(username, start_cave, start_level);
+	int statusbar_since=0;	/* count number of frames from when the outoftime or paused event happened. */
+	gboolean paused;
+	SDL_TimerID tim;
+	SDL_Event event;
+	gboolean restart, suicide;	/* for sdl key_downs */
 
 	exit_game=FALSE;
 	show_highscore=FALSE;
-	while (!exit_game) {
-		gboolean success;
-		gboolean caveloop;
-		gboolean suicide;
-		gboolean paused;
+	paused=FALSE;
+	
+	/* install the sdl timer which will generate events to control the speed of the game and drawing */
+	tim=SDL_AddTimer(gd_fine_scroll?FINE_SCROLL_INTERVAL:NORMAL_SCROLL_INTERVAL, timer_callback, NULL);
+
+	suicide=FALSE;	/* detected suicide and restart level keys */
+	restart=FALSE;		
+	while (!exit_game && SDL_WaitEvent(&event)) {
+		GdGameState state;
+		GdDirection player_move;
 		
-		success=gd_game_start_level(NULL);
-		/* if refused to start, exit this loop */
-		if (!success)
-			break;
-
-		gd_select_pixbuf_colors(gd_gameplay.cave->color0, gd_gameplay.cave->color1, gd_gameplay.cave->color2, gd_gameplay.cave->color3, gd_gameplay.cave->color4, gd_gameplay.cave->color5);
-		gd_scroll_to_origin();
-		SDL_FillRect(gd_screen, NULL, SDL_MapRGB(gd_screen->format, 0, 0, 0));	/* fill whole gd_screen with black */
-
-		last_draw=SDL_GetTicks()-40;	/* -40 ensures that drawing starts immediately */
-		last_iterate=SDL_GetTicks();	/* to avoid compiler warning */
-		caveloop=TRUE;
-		iterate=FALSE;
-		suicide=FALSE;
-		paused=FALSE;
-		showheader_uncover();
-		while (caveloop) {
-			SDL_Event event;
-			int wait;
-			int speed_div;
+		switch(event.type) {
+			case SDL_QUIT:	/* application closed by window manager */
+				gd_quit=TRUE;
+				exit_game=TRUE;
+				break;
 			
-			/* this is to implement fast forward */
-			speed_div=1;
-			if (gd_keystate[SDLK_f])
-				speed_div=5;
-
-			while (SDL_PollEvent(&event)) {
-				switch(event.type) {
-					case SDL_QUIT:	/* application closed by window manager */
-						gd_quit=TRUE;
-						exit_game=TRUE;
-						caveloop=FALSE;
+			case SDL_KEYDOWN:
+				switch(event.key.keysym.sym) {
+					case SDLK_ESCAPE:
+						restart=TRUE;
 						break;
-					
-					case SDL_KEYDOWN:
-						switch(event.key.keysym.sym) {
-							case SDLK_F1:
-								exit_game=TRUE;
-								caveloop=FALSE;
-								break;
-							case SDLK_q:
-								if (gd_keystate[SDLK_LCTRL]||gd_keystate[SDLK_RCTRL]) {
-									gd_quit=TRUE;
-									exit_game=TRUE;
-									caveloop=FALSE;
-								}
-								break;
-							case SDLK_SPACE:
-								paused=!paused;
-								paused_since=SDL_GetTicks();
-								break;
-							case SDLK_F2:
-								suicide=TRUE;
-								break;
-							case SDLK_h:
-								wait=SDL_GetTicks();	/* remember time */
-								gd_no_sound();
-								game_help();
-								wait=SDL_GetTicks()-wait;
-								last_iterate+=wait;
-								last_draw+=wait;
-								break;
-							default:
-								break;
+					case SDLK_F1:
+						exit_game=TRUE;
+						break;
+					case SDLK_q:
+						if (gd_keystate[SDLK_LCTRL]||gd_keystate[SDLK_RCTRL]) {
+							gd_quit=TRUE;
+							exit_game=TRUE;
 						}
 						break;
-						
+					case SDLK_SPACE:
+						paused=!paused;
+						if (paused) {
+							statusbar_since=0;		/* count frames "paused" */
+							gd_no_sound();		/* if paused, no sound. */
+						}
+						break;
+					case SDLK_F2:
+						suicide=TRUE;
+						break;
+					case SDLK_h:
+						gd_no_sound();	/* switch off sounds when showing help. */
+						game_help();
+						/* no need to turn on sounds; next cave iteration will restore them. */
+						/* also, do not worry about 25hz user events, as the help function will simply drop them. */
+						break;
+					default:
+						break;
 				}
-			}
+				break;
 			
-			/* CAVE ITERATE ********************************************************************* */
-			while (iterate && SDL_GetTicks()>=last_iterate+gd_gameplay.cave->speed/speed_div) {
-				if (!paused && !gd_gameplay.out_of_window) {
-					GdPlayerState pl;
-					GdDirection player_move;
-					
-					/* returns true if cave is finished. if false, we will continue */
+			case SDL_USEREVENT:
+				if (event.user.code==DRAW_AND_SCROLL) {
+					/* get movement */
 					player_move=gd_direction_from_keypress(gd_up(), gd_down(), gd_left(), gd_right());
-					pl=gd_gameplay.cave->player_state;
+					state=gd_game_main_int(player_move, gd_fire(), suicide, restart, !paused && !gd_gameplay.out_of_window, FALSE, gd_keystate[SDLK_f]);
+					if (paused) {
+						if (statusbar_since/25%4==0)
+							showheader_pause();
+						else
+							showheader_game(statusbar_since);
+					}
 
-					iterate=!gd_game_iterate_cave(player_move, gd_fire(), suicide, gd_keystate[SDLK_ESCAPE]);
+					/* state of game, returned by gd_game_main_int */
+					switch (state) {
+						case GD_GAME_INVALID_STATE:
+							g_assert_not_reached();
+							break;
+							
+						case GD_GAME_CAVE_LOADED:
+							gd_select_pixbuf_colors(gd_gameplay.cave->color0, gd_gameplay.cave->color1, gd_gameplay.cave->color2, gd_gameplay.cave->color3, gd_gameplay.cave->color4, gd_gameplay.cave->color5);
+							gd_scroll_to_origin();
+							SDL_FillRect(gd_screen, NULL, SDL_MapRGB(gd_screen->format, 0, 0, 0));	/* fill whole gd_screen with black */
+							showheader_uncover();
+							suicide=FALSE;	/* clear detected keypresses, so we do not "remember" them from previous cave runs */
+							restart=FALSE;		
+							break;
 
-					if (pl!=GD_PL_TIMEOUT && gd_gameplay.cave->player_state==GD_PL_TIMEOUT)
-						/* cave did timeout at this moment */
-						outoftime_since=SDL_GetTicks();
-				}
-				
-				if (paused)
-					gd_no_sound();
-				
-				/* set this to false here. */
-				/* this is to prevent holding the suicide key for longer than cave->speed killing many players. */
-				suicide=FALSE;
+						case GD_GAME_NOTHING:
+							/* normally continue. */
+							break;
 
-				/* add n*cave_speed to the last_iterate, until we see that no iteration needs to be done. */
-				/* this is to handle the timer such a way that we do not try to "catch up" our lost "interrupts". */
-				while (SDL_GetTicks()>=last_iterate+gd_gameplay.cave->speed/speed_div)
-					last_iterate+=gd_gameplay.cave->speed/speed_div;
-			}
-			
-			/* CAVE DRAWING, BONUS POINTS, ... ********************************************************************* */
-			/* drawing/scrolling at 50fps, 1000ms/50fps=20ms */
-			if (SDL_GetTicks()>=last_draw+20) {
-				static gboolean toggle;
-				GdGameState state;
-				
-				toggle=!toggle;
-				
-				if (toggle) {
-					state=gd_game_main_int();
-					switch(state) {
-						case GD_GAME_NOTHING:						/* nothing to do */
+						case GD_GAME_LABELS_CHANGED:
+							showheader_game(statusbar_since);
+							suicide=FALSE;	/* clear detected keypresses, as cave was iterated and they were processed */
+							restart=FALSE;		
 							break;
-						case GD_GAME_BONUS_SCORE:
+
+						case GD_GAME_TIMEOUT_NOW:
+							statusbar_since=0;
+							showheader_game(statusbar_since);	/* also update the status bar here. */
+							suicide=FALSE;	/* clear detected keypresses, as cave was iterated and they were processed */
+							restart=FALSE;		
 							break;
-						case GD_GAME_COVER_START:
+						
+						case GD_GAME_NO_MORE_LIVES:
+							showheader_gameover();
 							break;
+
 						case GD_GAME_STOP:
-							/* game finished, add highscore */
-							exit_game=TRUE;
-							caveloop=FALSE;
+							exit_game=TRUE;	/* game stopped, this could be a replay or a snapshot */ 
 							break;
-						case GD_GAME_START_ITERATE:
-							iterate=TRUE;	/* start cave movements */
-							last_iterate=SDL_GetTicks();	/* remember moment we started the cave */
-							break;
-						case GD_GAME_NEXT_LEVEL:
-							caveloop=FALSE;
-							break;
+
 						case GD_GAME_GAME_OVER:
-							show_highscore=TRUE;
-							caveloop=FALSE;
+							exit_game=TRUE;
+							show_highscore=TRUE;	/* normal game stopped, may jump to highscore later. */
 							break;
 					}
 
-					/* draw status bar */
-					if (gd_gameplay.player_lives==0)
-						showheader_gameover();
-					else
-					switch(gd_gameplay.cave->player_state) {
-						case GD_PL_TIMEOUT:
-							if ((SDL_GetTicks()-outoftime_since)/1000%4==0)
-								showheader_timeout();
-							else
-								showheader_game();
-							break;
-						case GD_PL_LIVING:
-						case GD_PL_DIED:
-							if (paused && (SDL_GetTicks()-paused_since)/1000%4==0)
-								showheader_pause();
-							else
-								showheader_game();
-							break;
-							
-						case GD_PL_NOT_YET:
-							if (paused && (SDL_GetTicks()-paused_since)/1000%4==0)
-								showheader_pause();
-							else
-								showheader_uncover();
-							break;
-							
-						case GD_PL_EXITED:
-							showheader_game();
-							break;
-					}
+					statusbar_since++;
+				}	/* if draw_and_scroll */
+
+				/* for the sdl version, it seems nicer if we first scroll, and then draw. */
+				/* scrolling for the sdl version will merely invalidate the whole gfx buffer. */
+				/* if drawcave was before scrolling, it would draw, scroll would invalidate, and then it should be drawn again */
+				/* only do the drawing if the cave already exists. */
+				if (gd_gameplay.cave) {
+					gd_gameplay.out_of_window=gd_scroll(gd_gameplay.cave, gd_gameplay.cave->player_state==GD_PL_NOT_YET);	/* do the scrolling. scroll exactly, if player is not yet alive */
+					gd_drawcave(gd_screen, gd_gameplay.cave, gd_gameplay.gfx_buffer);	/* draw the cave. */
 				}
-
-				/* draw cave to gd_screen */
-				/* if fine scrolling, always call this; as it scrolls, too */
-				/* if no fine scrolling, call this for every 2*20ms=40ms */
-				if (gd_fine_scroll || toggle)
-					gd_drawcave(gd_screen, gd_gameplay.cave, gd_gameplay.gfx_buffer, !toggle);
-				
-				/* add n*20ms to the last_draw, until we see that no drawing needs to be done. */
-				/* this is to handle the timer such a way that we do not try to "catch up" our lost "interrupts". */
-				while (SDL_GetTicks()>=last_draw+20)
-					last_draw+=20;
+				SDL_Flip(gd_screen);	/* can always be called, as it keeps track of dirty regions of the screen */
+				break;
 			}
-
-			SDL_Flip(gd_screen);
-			
-			SDL_Delay(20);
-		}
 	}
-	gd_stop_game();
+	SDL_RemoveTimer(tim);
+	gd_no_sound();	/* we stop sounds. gd_stop_game would do it, but we need the game struct for highscore */
 
 	/* (if stopped because of a quit event, do not bother highscore at all) */
 	if (!gd_quit && show_highscore && gd_is_highscore(gd_caveset_data->highscore, gd_gameplay.player_score)) {
@@ -434,6 +437,40 @@ play_game(int start_cave, int start_level)
 	else {
 		/* no high score */
 	}
+}
+
+
+static void
+play_game(int start_cave, int start_level)
+{
+	char *name;
+
+	/* ask name of player. */
+	name=gd_input_string("ENTER YOUR NAME", username);
+	if (!name)
+		return;
+	g_free(username);
+	username=name;
+	
+	gd_music_stop();
+	
+	gd_new_game(username, start_cave, start_level);
+	play_game_func();
+	gd_stop_game();
+}
+
+static void
+play_replay(Cave *cave, GdReplay *replay)
+{
+	gd_music_stop();
+	
+	gd_new_game_replay(cave, replay);
+	play_game_func();
+	gd_stop_game();
+	/* wait for keys, as for example escape may be pressed at this time */
+	gd_wait_for_key_releases();
+	
+	gd_music_play_random();
 }
 
 static int
@@ -472,6 +509,173 @@ next_selectable_cave(int cavenum)
 	return cavenum;
 }
 
+
+
+
+
+
+/*
+ *   SDASH REPLAYS MENU
+ */
+
+static void
+replays_menu()
+{
+	gboolean finished;
+	/* an item stores a cave (to see its name) or a cave+replay */
+	typedef struct _item {
+		Cave *cave;
+		GdReplay *replay;
+	} Item;
+	int n, page;
+	int current;
+	const int lines_per_page=gd_screen->h/gd_line_height()-5;
+	GList *citer;
+	GPtrArray *items=NULL;
+	Cave *cave;
+	Item i;
+	
+	items=g_ptr_array_new();
+	/* for all caves */
+	for (citer=gd_caveset; citer!=NULL; citer=citer->next) {
+		GList *riter;
+		
+		cave=citer->data;
+		/* if cave has replays... */
+		if (cave->replays!=NULL) {
+			/* add cave data */
+			i.cave=cave;
+			i.replay=NULL;
+			g_ptr_array_add(items, g_memdup(&i, sizeof(i)));
+			
+			/* add replays, too */
+			for (riter=cave->replays; riter!=NULL; riter=riter->next) {
+				i.replay=(GdReplay *)riter->data;
+				g_ptr_array_add(items, g_memdup(&i, sizeof(i)));
+			}
+		}
+	}
+	
+	gd_backup_and_dark_screen();
+	gd_status_line("CRSR:MOVE  FIRE:PLAY  S:SAVED  ESC:EXIT");
+	
+	current=0;
+	finished=FALSE;
+	while (!finished && !gd_quit) {
+		page=current/lines_per_page;	/* show 18 lines per page */
+		
+		/* show lines */
+		gd_clear_line(gd_screen, 0);	/* for empty top row */
+		for (n=0; n<lines_per_page; n++) {	/* for empty caves&replays rows */
+			int y=(n+2)*gd_line_height();
+			
+			gd_clear_line(gd_screen, y);
+		}
+
+		gd_title_line("GDASH REPLAYS, PAGE %d/%d", page+1, items->len/lines_per_page+1);
+		for (n=0; n<lines_per_page && page*lines_per_page+n<items->len; n++) {
+			int pos=page*lines_per_page+n;
+			GdColor col_cave=current==pos?GD_GDASH_YELLOW:GD_GDASH_LIGHTBLUE;	/* selected=yellow, otherwise blue */
+			GdColor col=current==pos?GD_GDASH_YELLOW:GD_GDASH_GRAY3;	/* selected=yellow, otherwise blue */
+			Item *i;
+			int x, y;
+			
+			i=(Item *) g_ptr_array_index(items, pos);
+
+			x=0;
+			y=(n+2)*gd_line_height();
+			
+			if (!i->replay) {
+				/* no replay pointer: this is a cave, so write its name. */
+				x=gd_blittext_n(gd_screen, x, y, col_cave, i->cave->name);
+			} else {
+				const char *comm;
+				int c;
+				char buffer[100];
+				
+				/* successful or not */
+				x=gd_blittext_printf_n(gd_screen, x, y, i->replay->success?GD_GDASH_GREEN:GD_GDASH_RED, " %c ", GD_BALL_CHAR);
+
+				/* player name */
+				g_utf8_strncpy(buffer, i->replay->player_name, 15);	/* name: maximum 15 characters */
+				x=gd_blittext_n(gd_screen, x, y, col, buffer);
+				/* put 16-length spaces */
+				for (c=g_utf8_strlen(buffer, -1); c<16; c++)
+					x=gd_blittext_n(gd_screen, x, y, col, " ");
+
+				/* write comment */
+				if (!g_str_equal(i->replay->comment, ""))
+					comm=i->replay->comment;
+				else
+				/* or date */
+				if (!g_str_equal(i->replay->date, ""))
+					comm=i->replay->date;
+				else
+				/* or nothing */
+					comm="-";
+				g_utf8_strncpy(buffer, comm, 19);	/* comment or data: maximum 20 characters */
+				x=gd_blittext_n(gd_screen, x, y, col, comm);
+				/* put 20-length spaces */
+				for (c=g_utf8_strlen(buffer, -1); c<19; c++)
+					x=gd_blittext_n(gd_screen, x, y, col, " ");
+
+				/* saved - check box */				
+				x=gd_blittext_printf_n(gd_screen, x, y, col, " %c", i->replay->saved?GD_CHECKED_BOX_CHAR:GD_UNCHECKED_BOX_CHAR);
+			}
+		}
+		SDL_Flip(gd_screen);	/* draw to usere's screen */
+
+		/* we don't leave text on the screen after us. */
+		/* so next iteration will have a nice empty screen to draw on :) */
+		for (n=0; n<lines_per_page; n++)
+			gd_clear_line(gd_screen, (n+2)*gd_font_height());
+
+		SDL_Delay(160);
+		
+		/* do events; keys will be processed below */
+		gd_process_pending_events();
+
+		/* cursor movement */
+		if (gd_up())
+			current=gd_clamp(current-1, 0, items->len-1);
+		if (gd_down())
+			current=gd_clamp(current+1, 0, items->len-1);
+		if (gd_keystate[SDLK_s]) {
+			Item *i=(Item *)g_ptr_array_index(items, current);
+			
+			if (i->replay) {
+				i->replay->saved=!i->replay->saved;
+				gd_caveset_edited=TRUE;
+			}
+		}
+		if (gd_fire() || gd_keystate[SDLK_RETURN] || gd_keystate[SDLK_SPACE]) {
+			Item *i=(Item *)g_ptr_array_index(items, current);
+			
+			if (i->replay) {
+				gd_backup_and_black_screen();
+				play_replay(i->cave, i->replay);
+				gd_restore_screen();
+			}
+		}
+		if (gd_keystate[SDLK_ESCAPE])
+			finished=TRUE;
+		if (gd_keystate[SDLK_PAGEUP])
+			current=gd_clamp(current-lines_per_page, 0, items->len-1);
+		if (gd_keystate[SDLK_PAGEDOWN])
+			current=gd_clamp(current+lines_per_page, 0, items->len-1);
+	}
+	
+	/* set the theme. other variables are already set by the above code. */
+	/* forget list of themes */
+	g_ptr_array_foreach(items, (GFunc) g_free, NULL);
+	g_ptr_array_free(items, TRUE);
+	
+	gd_restore_screen();
+}
+
+
+
+
 static State
 main_menu()
 {
@@ -493,15 +697,17 @@ main_menu()
 	/* start playing after creating title animation above */
 	gd_music_play_random();
 
-	y=gd_screen->h-3*gd_line_height();
-	x=gd_blittext_n(gd_screen, 0, y, GD_C64_WHITE, "GAME: ");
-	x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, gd_caveset_data->name);
+	y=gd_screen->h-3*gd_line_height()-gd_line_height()/4;	/* three lines and a bit more */
+	x=gd_blittext_n(gd_screen, 0, y, GD_GDASH_WHITE, "GAME: ");
+	x=gd_blittext_n(gd_screen, x, y, GD_GDASH_YELLOW, gd_caveset_data->name);
+	if (gd_caveset_edited)	/* if edited (new replays), draw a sign */
+		x=gd_blittext_n(gd_screen, x, y, GD_GDASH_RED, " *");
 
-	gd_status_line("CRSR: SELECT   RETURN: PLAY   H: HELP");
+	gd_status_line("CRSR: SELECT   SPACE: PLAY   F1: HELP");
 	
 	if (gd_has_new_error())
 		/* show error flag */
-		gd_blittext_n(gd_screen, gd_screen->w-gd_font_width(), gd_screen->h-gd_font_height(), GD_C64_RED, "E");
+		gd_blittext_n(gd_screen, gd_screen->w-gd_font_width(), gd_screen->h-gd_font_height(), GD_GDASH_RED, "E");
 
 	s=M_NONE;
 	cavenum=gd_caveset_last_selected;
@@ -510,13 +716,13 @@ main_menu()
 	while(!gd_quit && s==M_NONE) {
 		SDL_Event event;
 		static int i=0;	/* used to slow down cave selection */
-		int y=gd_screen->h-2*gd_line_height();
+		int y=gd_screen->h-2*gd_line_height()-gd_line_height()/4;	/* two lines and a bit more */
 
 		gd_clear_line(gd_screen, y);
-		x=gd_blittext_n(gd_screen, 0, y, GD_C64_WHITE, "CAVE: ");
-		x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, gd_return_nth_cave(cavenum)->name);
-		x=gd_blittext_n(gd_screen, x, y, GD_C64_WHITE, "/");
-		x=gd_blittext_printf_n(gd_screen, x, y, GD_C64_YELLOW, "%d", levelnum+1);
+		x=gd_blittext_n(gd_screen, 0, y, GD_GDASH_WHITE, "CAVE: ");
+		x=gd_blittext_n(gd_screen, x, y, GD_GDASH_YELLOW, gd_return_nth_cave(cavenum)->name);
+		x=gd_blittext_n(gd_screen, x, y, GD_GDASH_WHITE, "/");
+		x=gd_blittext_printf_n(gd_screen, x, y, GD_GDASH_YELLOW, "%d", levelnum+1);
 
 		/* play animation */		
 		animcycle=(animcycle+1)%count;
@@ -535,7 +741,7 @@ main_menu()
 				case SDL_KEYDOWN:
 					switch(event.key.keysym.sym) {
 						case SDLK_ESCAPE:	/* escape: quit app */
-							s=M_QUIT;
+							s=M_EXIT;
 							break;
 							
 						case SDLK_RETURN:	/* enter: start playing */
@@ -546,10 +752,22 @@ main_menu()
 							s=M_LOAD;
 							break;
 
+						case SDLK_s:	/* save file */
+							s=M_SAVE;
+							break;
+
+						case SDLK_n:	/* save file with new filename */
+							s=M_SAVE_AS_NEW;
+							break;
+
 						case SDLK_c:
 							s=M_LOAD_FROM_INSTALLED;
 							break;
-							
+						
+						case SDLK_r:
+							s=M_REPLAYS;
+							break;
+
 						case SDLK_a:
 							s=M_ABOUT;
 							break;
@@ -570,12 +788,11 @@ main_menu()
 							s=M_ERRORS;
 							break;
 							
-						case SDLK_s:	/* h: highscore */
+						case SDLK_h:	/* h: highscore */
 							s=M_HIGHSCORE;
 							break;
 						
-						case SDLK_h:
-						case SDLK_F1:
+						case SDLK_F1:	/* f1: help */
 							s=M_HELP;
 							break;
 							
@@ -619,6 +836,8 @@ main_menu()
 
 		SDL_Delay(40);	/* 25 fps - we need exactly this for the animation */
 	}
+
+	gd_wait_for_key_releases();
 	
 	/* forget animation */
 	for (x=0; x<count; x++)
@@ -634,10 +853,13 @@ main_help()
 	const char* strings_menu[]={
 		"CURSOR", "SELECT CAVE&LEVEL",
 		"SPACE, RETURN", "PLAY GAME",
-		"S", "SHOW HALL OF FAME",
+		"H", "SHOW HALL OF FAME",
+		"R", "SHOW REPLAYS",
 		"", "",
 		"L", "LOAD CAVESET",
 		"C", "LOAD FROM INSTALLED CAVES",
+		"S", "SAVE CAVESET",
+		"N", "SAVE AS NEW FILE",
 		"", "",
 		"O", "OPTIONS",
 		"T", "INSTALL THEME",
@@ -653,26 +875,46 @@ main_help()
 }
 
 
+static void
+caveset_file_operation_successful(const char *filename)
+{
+	/* if it is a bd file, remember new filename */
+	if (g_str_has_suffix(filename, ".bd")) {
+		char *stored;
+
+		/* first make copy, then free and set pointer. we might be called with filename=caveset_filename */
+		stored=g_strdup(filename);
+		g_free(caveset_filename);
+		caveset_filename=stored;
+	} else {
+		g_free(caveset_filename);
+		caveset_filename=NULL;
+	}
+}
 
 static void
 load_file(const char *directory)
 {
-	static char *last_directory=NULL;
 	char *filename;
 	char *filter;
 	
-	if (!last_directory)
-		last_directory=g_strdup(g_get_home_dir());
+	/* if the caveset is edited, ask the user if to save. */
+	/* if does not want to discard, get out here */
+	if (!gd_discard_changes())
+		return;
 	
+	if (!last_folder)
+		last_folder=g_strdup(g_get_home_dir());
+		
 	filter=g_strjoinv(";", gd_caveset_extensions);
-	filename=gd_select_file("SELECT CAVESET TO LOAD", directory?directory:last_directory, filter);
+	filename=gd_select_file("SELECT CAVESET TO LOAD", directory?directory:last_folder, filter, FALSE);
 	g_free(filter);
 
 	/* if file selected */	
 	if (filename) {
 		/* remember last directory */
-		g_free(last_directory);
-		last_directory=g_path_get_dirname(filename);
+		g_free(last_folder);
+		last_folder=g_path_get_dirname(filename);
 
 		gd_save_highscore(gd_user_config_dir);
 		
@@ -685,6 +927,70 @@ load_file(const char *directory)
 		g_free(filename);
 	} 
 }
+
+
+/* save caveset to specified directory, and pop up error message if failed */
+static void
+caveset_save(const gchar *filename)
+{
+	gboolean saved;
+
+	saved=gd_caveset_save(filename, FALSE);
+	if (!saved)
+		gd_error_console();
+	else
+		caveset_file_operation_successful(filename);
+}
+
+static void
+save_file_as(const char *directory)
+{
+	char *filename;
+	char *filter;
+	
+	if (!last_folder)
+		last_folder=g_strdup(g_get_home_dir());
+	
+	filter=g_strjoinv(";", gd_caveset_extensions);
+	filename=gd_select_file("SAVE CAVESET AS", directory?directory:last_folder, filter, TRUE);
+	g_free(filter);
+	
+	/* file exists? ask if to overwrite */
+	if (filename && g_file_test(filename, G_FILE_TEST_EXISTS)) {
+		gboolean result, answer;
+		
+		answer=gd_ask_yes_no("File exists. Overwrite?", "No", "Yes", &result);
+		
+		/* if did not answer or answered no, forget filename. we do not overwrite */
+		if (!result || !answer) {
+			g_free(filename);
+			filename=NULL;
+		}
+	}
+
+	/* if file selected */	
+	if (filename) {
+		/* remember last directory */
+		g_free(last_folder);
+		last_folder=g_path_get_dirname(filename);
+		
+		caveset_save(filename);
+
+	} 
+	g_free(filename);
+}
+
+static void
+save_file()
+{
+	if (!caveset_filename)
+		/* if no filename remembered, rather start the save_as function, which asks for one. */
+		save_file_as(NULL);
+	else
+		/* if given, save. */
+		caveset_save(caveset_filename);
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -726,14 +1032,16 @@ int main(int argc, char *argv[])
 
 	gd_clear_error_flag();
 
-	gd_gameplay.wait_before_game_over=TRUE;
+	gd_wait_before_game_over=TRUE;
 	
 	/* LOAD A CAVESET FROM A FILE, OR AN INTERNAL ONE */
 	/* if remaining arguments, they are filenames */
 	if (gd_param_cavenames && gd_param_cavenames[0]) {
 		/* load caveset, "ignore" errors. */
-		if (!gd_caveset_load_from_file (gd_param_cavenames[0], gd_user_config_dir))
+		if (!gd_caveset_load_from_file (gd_param_cavenames[0], gd_user_config_dir)) {
 			g_critical (_("Errors during loading caveset from file '%s'"), gd_param_cavenames[0]);
+		} else
+			caveset_file_operation_successful(gd_param_cavenames[0]);
 	}
 	else if (gd_param_internal) {
 		/* if specified an internal caveset */
@@ -772,7 +1080,7 @@ int main(int argc, char *argv[])
 		
 		for (y=0; y<16; y++) {
 			int bg;
-			GdColor c=gd_c64_colors[y].rgb;
+			GdColor c=GD_GDASH_colors[y].rgb;
 			SDL_Rect r;
 			
 			bg=SDL_MapRGB(image->format, (c>>16)&0xff, (c>>8)&0xff, c&0xff);
@@ -783,7 +1091,7 @@ int main(int argc, char *argv[])
 			SDL_FillRect(image, &r, bg);
 			
 			for (x=0; x<16; x++) {
-				gd_blittext_n(image, x*24+4, y*24+4, gd_c64_colors[x].rgb, "A");
+				gd_blittext_n(image, x*24+4, y*24+4, GD_GDASH_colors[x].rgb, "A");
 			}
 				
 		}
@@ -810,13 +1118,42 @@ int main(int argc, char *argv[])
 		switch(s) {
 			case M_NONE:
 				break;
-				
+			
+			/* PLAYING */
 			case M_PLAY:
+				/* get selected cave&level, then play */
 				gd_caveset_last_selected=cavenum;
 				gd_caveset_last_selected_level=levelnum;
 				play_game(cavenum, levelnum);	
 				break;
+
+			case M_REPLAYS:
+				replays_menu();
+				break;
 				
+			case M_HIGHSCORE:
+				gd_show_highscore(NULL, 0);
+				break;
+			
+
+			/* FILES */				
+			case M_LOAD:
+				load_file(NULL);
+				break;
+			
+			case M_SAVE:
+				save_file(NULL);
+				break;
+			
+			case M_SAVE_AS_NEW:
+				save_file_as(NULL);
+				break;
+			
+			case M_LOAD_FROM_INSTALLED:
+				load_file(gd_system_caves_dir);
+				break;
+
+			/* INFO */
 			case M_ABOUT:
 				gd_about();
 				break;
@@ -825,14 +1162,11 @@ int main(int argc, char *argv[])
 				gd_show_license();
 				break;
 
-			case M_LOAD:
-				load_file(NULL);
-				break;
-			
-			case M_LOAD_FROM_INSTALLED:
-				load_file(gd_system_caves_dir);
+			case M_HELP:
+				main_help();
 				break;
 				
+			/* SETUP */
 			case M_INSTALL_THEME:
 				gd_install_theme();
 				break;
@@ -840,20 +1174,20 @@ int main(int argc, char *argv[])
 			case M_OPTIONS:
 				gd_settings_menu();
 				break;
-				
-			case M_HIGHSCORE:
-				gd_show_highscore(NULL, 0);
-				break;
-			
-			case M_HELP:
-				main_help();
-				break;
-				
+
 			case M_ERRORS:
 				gd_error_console();
 				break;
 				
+			/* EXIT */				
+			case M_EXIT:
+				/* normal quit; ask about saving if necessary. */
+				if (gd_discard_changes())
+					gd_quit=TRUE;
+				break;
+				
 			case M_QUIT:
+				/* quit immediately */
 				gd_quit=TRUE;
 				break;
 		};

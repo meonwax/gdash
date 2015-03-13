@@ -58,7 +58,7 @@ gd_cave_set_seconds_sound(Cave *cave)
 
 
 static inline GdElement*
-getp (const Cave *cave, const int x, const int y)
+getp(const Cave *cave, const int x, const int y)
 {
 	return cave->getp(cave, x, y);
 }
@@ -67,7 +67,7 @@ getp (const Cave *cave, const int x, const int y)
    perfect (non-lineshifting) GET function. returns a pointer to a selected cave element by its coordinates.
  */
 static inline GdElement*
-getp_perfect (const Cave *cave, const int x, const int y)
+getp_perfect(const Cave *cave, const int x, const int y)
 {
 	/* (x+n) mod n: this wors also for x>=n and -n+1<x<0 */
 	return &(cave->map[(y+cave->h)%cave->h][(x+cave->w)%cave->w]);
@@ -79,7 +79,7 @@ getp_perfect (const Cave *cave, const int x, const int y)
   the player entering one side will appear one row above or below on the other.
 */
 static inline GdElement*
-getp_shift (const Cave *cave, int x, int y)
+getp_shift(const Cave *cave, int x, int y)
 {
 	if (x>=cave->w) {
 		y++;
@@ -115,14 +115,14 @@ get_dir(const Cave *cave, const int x, const int y, const GdDirection dir)
 static inline gboolean
 explodes_to_space(const Cave *cave, const int x, const int y)
 {
-	return gd_elements[get(cave, x,y)&O_MASK].properties&P_EXPLODES_TO_SPACE;
+	return (gd_elements[get(cave, x,y)&O_MASK].properties&P_EXPLODES_TO_SPACE)!=0;
 }
 
 /* returns true if the element is explodable and explodes to diamond, for example a butterfly */
 static inline gboolean
 explodes_to_diamonds (const Cave *cave, const int x, const int y)
 {
-	return gd_elements[get(cave, x,y)&O_MASK].properties&P_EXPLODES_TO_DIAMONDS;
+	return (gd_elements[get(cave, x,y)&O_MASK].properties&P_EXPLODES_TO_DIAMONDS)!=0;
 }
 
 /* returns true if the element is explodable and explodes to stones, for example the stonefly */
@@ -213,10 +213,25 @@ rotates_ccw (const Cave *cave, const int x, const int y)
 	return (gd_elements[get(cave, x,y)&O_MASK].properties&P_CCW)!=0;
 }
 
+/* returns true if the element is a counter-clockwise creature */
+static inline gboolean
+is_player(const Cave *cave, const int x, const int y)
+{
+	return (gd_elements[get(cave, x,y)&O_MASK].properties&P_PLAYER)!=0;
+}
+
 static inline gboolean
 can_be_hammered_dir(const Cave *cave, const int x, const int y, const GdDirection dir)
 {
 	return (gd_elements[get_dir(cave, x, y, dir)&O_MASK].properties&P_CAN_BE_HAMMERED)!=0;
+}
+
+
+/* returns true if the element is explodable and explodes to space, for example the player */
+static inline gboolean
+is_first_stage_of_explosion(const Cave *cave, const int x, const int y)
+{
+	return (gd_elements[get(cave, x,y)&O_MASK].properties&P_EXPLOSION_FIRST_STAGE)!=0;
 }
 
 
@@ -937,7 +952,8 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 	
 	/* suicide only kills the active player */
 	/* player_x, player_y was set by the previous iterate routine, or the cave setup. */
-	if (suicide && cave->player_state==GD_PL_LIVING)
+	/* we must check if there is a player or not - he may have exploded or something like that */
+	if (suicide && cave->player_state==GD_PL_LIVING && is_player(cave, cave->player_x, cave->player_y))
 		store(cave, cave->player_x, cave->player_y, O_EXPLODE_1);
 
 	/* check for walls reappearing */
@@ -2206,6 +2222,17 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 
 	/* POSTPROCESSING */
 
+	/* another scan-like routine: */
+	/* short explosions (for example, in bd1) started with explode_2. */
+	/* internally we use explode_1; and change it to explode_2 if needed. */	
+	if (cave->short_explosions)
+		for (y=0; y<cave->h; y++)
+			for (x=0; x<cave->w; x++)
+				if (is_first_stage_of_explosion(cave, x, y)) {
+					next(cave, x, y);
+					store(cave, x, y, get(cave, x, y)&~SCANNED);
+				}
+
 	/* finally: forget "scanned" flags for objects. */
 	/* also, check for time penalties. */
 	/* these is something like an effect table, but we do not really use one. */
@@ -2219,18 +2246,6 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 			}
 		}
 
-	/* another scan-like routine: */
-	/* short explosions (for example, in bd1) started with explode_2. */
-	/* internally we use explode_1; and change it to explode_2 if needed. */	
-	if (cave->short_explosions) {
-		for (y=0; y<cave->h; y++)
-			for (x=0; x<cave->w; x++) 
-				if (get(cave, x, y)==O_EXPLODE_1)
-					store(cave, x, y, O_EXPLODE_2);
-				else
-				if (get(cave, x, y)==O_PRE_DIA_1)
-					store(cave, x, y, O_PRE_DIA_2);
-	}
 
 	/* this loop finds the coordinates of the player. needed for scrolling and chasing stone.*/
 	/* but we only do this, if a living player was found. if not yet, the setup routine coordinates are used */
@@ -2239,7 +2254,7 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 			/* to be 1stb compatible, we do everything backwards. */
 			for (y=cave->h-1; y>=0; y--)
 				for (x=cave->w-1; x>=0; x--)
-					if (get(cave, x, y)==O_PLAYER || get(cave, x, y)==O_PLAYER_BOMB || get(cave, x, y)==O_PLAYER_STIRRING) {
+					if (is_player(cave, x, y)) {
 						/* here we remember the coordinates. */
 						cave->player_x=x;
 						cave->player_y=y;
@@ -2250,7 +2265,7 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 			/* as in the original: look for the last one */
 			for (y=0; y<cave->h; y++)
 				for (x=0; x<cave->w; x++)
-					if (get(cave, x, y)==O_PLAYER || get(cave, x, y)==O_PLAYER_BOMB || get(cave, x, y)==O_PLAYER_STIRRING) {
+					if (is_player(cave, x, y)) {
 						/* here we remember the coordinates. */
 						cave->player_x=x;
 						cave->player_y=y;

@@ -31,31 +31,33 @@
 const int gd_dx[]={ 0, 0, 1, 1, 1, 0, -1, -1, -1, 0, 2, 2, 2, 0, -2, -2, -2 };
 const int gd_dy[]={ 0, -1, -1, 0, 1, 1, 1, 0, -1, -2, -2, 0, 2, 2, 2, 0, -2 };
 /* TRANSLATORS: None here means "no direction to move"; when there is no gravity while stirring the pot. */
-const char* gd_direction_name[]={ N_("None"), N_("Up"), N_("Up+right"), N_("Right"), N_("Down+right"), N_("Down"), N_("Down+left"), N_("Left"), N_("Up+left") };
-const char* gd_direction_filename[]={ NULL, "up", "upright", "right", "downright", "down", "downleft", "left", "upleft" };
-const char* gd_scheduling_name[]={ N_("Milliseconds"), "BD1", "BD2", "Construction Kit", "Crazy Dream 7", "Atari BD1", "Atari BD2/Construction Kit" };
-const char* gd_scheduling_filename[]={ "ms", "bd1", "bd2", "plck", "crdr7", "bd1atari", "bd2ckatari" };
+static const char* direction_name[]={ N_("None"), N_("Up"), N_("Up+right"), N_("Right"), N_("Down+right"), N_("Down"), N_("Down+left"), N_("Left"), N_("Up+left") };
+static const char* direction_filename[]={ "none", "up", "upright", "right", "downright", "down", "downleft", "left", "upleft" };
+static const char* scheduling_name[]={ N_("Milliseconds"), "BD1", "BD2", "Construction Kit", "Crazy Dream 7", "Atari BD1", "Atari BD2/Construction Kit" };
+static const char* scheduling_filename[]={ "ms", "bd1", "bd2", "plck", "crdr7", "bd1atari", "bd2ckatari" };
 
 static GHashTable *name_to_element;
 GdElement gd_char_to_element[256];
 
+/* color of flashing the screen, gate opening to exit */
 const GdColor gd_flash_color=0xFFFFC0;
+/* selected object in editor */
 const GdColor gd_select_color=0x8080FF;
 
 
-
+/* direction to string and vice versa */
 const char *
 gd_direction_get_visible_name(GdDirection dir)
 {
-	g_assert(dir>0 && dir<G_N_ELEMENTS(gd_direction_name));
-	return gd_direction_name[dir];
+	g_assert(dir>=0 && dir<G_N_ELEMENTS(direction_name));
+	return direction_name[dir];
 }
 
 const char *
 gd_direction_get_filename(GdDirection dir)
 {
-	g_assert(dir>0 && dir<G_N_ELEMENTS(gd_direction_name));
-	return gd_direction_filename[dir];
+	g_assert(dir>=0 && dir<G_N_ELEMENTS(direction_filename));
+	return direction_filename[dir];
 }
 
 GdDirection
@@ -64,8 +66,8 @@ gd_direction_from_string(const char *str)
 	int i;
 
 	g_assert(str!=NULL);
-	for (i=1; i<G_N_ELEMENTS(gd_direction_filename); i++)
-		if (g_ascii_strcasecmp(str, gd_direction_filename[i])==0)
+	for (i=1; i<G_N_ELEMENTS(direction_filename); i++)
+		if (g_ascii_strcasecmp(str, direction_filename[i])==0)
 			return (GdDirection) i;
 
 	g_warning("invalid direction name '%s', defaulting to down", str);
@@ -73,11 +75,21 @@ gd_direction_from_string(const char *str)
 }
 
 
+
+
+/* scheduling name to string and vice versa */
 const char *
 gd_scheduling_get_filename(GdScheduling sched)
 {
-	g_assert(sched>0 && sched<G_N_ELEMENTS(gd_scheduling_filename));
-	return gd_scheduling_filename[sched];
+	g_assert(sched>=0 && sched<G_N_ELEMENTS(scheduling_filename));
+	return scheduling_filename[sched];
+}
+
+const char *
+gd_scheduling_get_visible_name(GdScheduling sched)
+{
+	g_assert(sched>=0 && sched<G_N_ELEMENTS(scheduling_name));
+	return scheduling_name[sched];
 }
 
 GdScheduling
@@ -86,13 +98,15 @@ gd_scheduling_from_string(const char *str)
 	int i;
 
 	g_assert(str!=NULL);
-	for (i=0; i<G_N_ELEMENTS(gd_scheduling_filename); i++)
-		if (g_ascii_strcasecmp(str, gd_scheduling_filename[i])==0)
+	for (i=0; i<G_N_ELEMENTS(scheduling_filename); i++)
+		if (g_ascii_strcasecmp(str, scheduling_filename[i])==0)
 			return (GdScheduling) i;
 
 	g_warning("invalid scheduling name '%s', defaulting to plck", str);
 	return GD_SCHEDULING_PLCK;
 }
+
+
 
 
 /* creates the character->element conversion table; using
@@ -145,8 +159,8 @@ gd_cave_init()
 
 	g_assert(MV_MAX==G_N_ELEMENTS(gd_dx));
 	g_assert(MV_MAX==G_N_ELEMENTS(gd_dy));
-	g_assert(GD_SCHEDULING_MAX==G_N_ELEMENTS(gd_scheduling_filename));
-	g_assert(GD_SCHEDULING_MAX==G_N_ELEMENTS(gd_scheduling_name));
+	g_assert(GD_SCHEDULING_MAX==G_N_ELEMENTS(scheduling_filename));
+	g_assert(GD_SCHEDULING_MAX==G_N_ELEMENTS(scheduling_name));
 
 	/* put names to a hash table */
 	/* this is a helper for file read operations */
@@ -214,7 +228,12 @@ gd_get_element_from_string (const char *string)
 
 
 
-
+/*
+   fill a given struct with default properties.
+   "str" is the struct (data),
+   "properties" describes the structure and its pointers,
+   "defaults" are the pieces of data which will be copied to str.
+ */
 void
 gd_struct_set_defaults_from_array(gpointer str, const GdStructDescriptor *properties, GdPropertyDefault *defaults)
 {
@@ -338,10 +357,10 @@ gd_struct_explain_defaults_in_string(const GdStructDescriptor *properties, GdPro
 				g_string_append_printf(defs, "%s", gd_get_color_name(gd_c64_color(defaults[i].defval)));
 				break;
 			case GD_TYPE_DIRECTION:
-				g_string_append_printf(defs, "%s", gd_direction_name[defaults[i].defval]);
+				g_string_append_printf(defs, "%s", direction_name[defaults[i].defval]);
 				break;
 			case GD_TYPE_SCHEDULING:
-				g_string_append_printf(defs, "%s", gd_scheduling_name[(GdScheduling) defaults[i].defval]);
+				g_string_append_printf(defs, "%s", scheduling_name[(GdScheduling) defaults[i].defval]);
 				break;
 			}
 
@@ -354,6 +373,11 @@ gd_struct_explain_defaults_in_string(const GdStructDescriptor *properties, GdPro
 #endif
 
 
+
+
+
+
+
 void
 gd_cave_set_defaults_from_array(Cave* cave, GdPropertyDefault *defaults)
 {
@@ -363,6 +387,7 @@ gd_cave_set_defaults_from_array(Cave* cave, GdPropertyDefault *defaults)
 
 /*
 	load default values from description array
+	these are default for gdash and bdcff.
 */
 void
 gd_cave_set_gdash_defaults(Cave* cave)
@@ -371,12 +396,15 @@ gd_cave_set_gdash_defaults(Cave* cave)
 
 	gd_cave_set_defaults_from_array(cave, gd_cave_defaults_gdash);
 
-	/* these did not fit into that */
+	/* these did not fit into the descriptor array */
 	for (i=0; i<5; i++) {
 		cave->level_rand[i]=i;
 		cave->level_timevalue[i]=i+1;
 	}
 }
+
+
+
 
 
 
@@ -545,7 +573,7 @@ gd_cave_map_new_for_cave(const Cave *cave, const int cell_size)
 	if map is null, this also returns null.
 */
 gpointer
-gd_cave_map_dup_size (const Cave *cave, const gpointer map, const int cell_size)
+gd_cave_map_dup_size(const Cave *cave, const gpointer map, const int cell_size)
 {
 	gpointer *rows;
 	gpointer *maplines=(gpointer *)map;
@@ -575,11 +603,17 @@ gd_cave_map_free(gpointer map)
 	g_free(map);
 }
 
+
+
+
+
+
+
 /*
 	frees memory associated to cave
 */
 void
-gd_cave_free (Cave *cave)
+gd_cave_free(Cave *cave)
 {
 	int i;
 	
@@ -589,9 +623,10 @@ gd_cave_free (Cave *cave)
 	if (cave->tags)
 		g_hash_table_destroy(cave->tags);
 
-	if (cave->random)
+	if (cave->random)	/* random generator is a GRand * */
 		g_rand_free(cave->random);
 
+	/* free GStrings */
 	for (i=0; gd_cave_properties[i].identifier!=NULL; i++)
 		if (gd_cave_properties[i].type==GD_TYPE_LONGSTRING)
 			g_string_free(G_STRUCT_MEMBER(GString *, cave, gd_cave_properties[i].offset), TRUE);
@@ -603,8 +638,11 @@ gd_cave_free (Cave *cave)
 	/* hammered walls to reappear data */
 	gd_cave_map_free(cave->hammered_reappear);
 	/* free objects */
-	g_list_foreach (cave->objects, (GFunc) g_free, NULL);
+	g_list_foreach(cave->objects, (GFunc) g_free, NULL);
 	g_list_free (cave->objects);
+	/* free replays */
+	g_list_foreach(cave->replays, (GFunc) gd_replay_free, NULL);
+	g_list_free(cave->replays);
 
 	/* freeing main pointer */
 	g_free (cave);
@@ -632,7 +670,7 @@ gd_cave_copy(Cave *dest, const Cave *src)
 	dest->map=gd_cave_map_dup (src, map);
 	dest->hammered_reappear=gd_cave_map_dup(src, hammered_reappear);
 
-	/* for strings */
+	/* for longstrings */
 	for (i=0; gd_cave_properties[i].identifier!=NULL; i++)
 		if (gd_cave_properties[i].type==GD_TYPE_LONGSTRING)
 			G_STRUCT_MEMBER(GString *, dest, gd_cave_properties[i].offset)=g_string_new(G_STRUCT_MEMBER(GString *, src, gd_cave_properties[i].offset)->str);
@@ -648,6 +686,15 @@ gd_cave_copy(Cave *dest, const Cave *src)
 		for (iter=src->objects; iter!=NULL; iter=iter->next)		/* do a deep copy */
 			dest->objects=g_list_append(dest->objects, g_memdup (iter->data, sizeof (GdObject)));
 	}
+	
+	/* copy replays */
+	if (src->replays) {
+		GList *iter;
+		
+		dest->replays=NULL;
+		for (iter=src->replays; iter!=NULL; iter=iter->next)		/* do a deep copy */
+			dest->replays=g_list_append(dest->replays, gd_replay_new_from_replay(iter->data));
+	}
 
 	/* copy random number generator */
 	if (src->random)
@@ -656,7 +703,7 @@ gd_cave_copy(Cave *dest, const Cave *src)
 
 /* create new cave, which is a copy of the cave given. */
 Cave *
-gd_cave_new_from_cave (const Cave *orig)
+gd_cave_new_from_cave(const Cave *orig)
 {
 	Cave *cave;
 
@@ -670,11 +717,17 @@ gd_cave_new_from_cave (const Cave *orig)
 /*
 	Put an object to the specified position.
 	Performs range checking.
+	If wraparound objects are selected, wraps around x coordinates, with or without lineshift.
+	(The y coordinate is not wrapped, as it did not work like that on the c64)
 	order is a pointer to the GdObject describing this object. Thus the editor can identify which cell was created by which object.
 */
 void
-gd_cave_store_rc (Cave *cave, int x, int y, const GdElement element, const void* order)
+gd_cave_store_rc(Cave *cave, int x, int y, const GdElement element, const void* order)
 {
+	/* if we do not need to draw, exit now */
+	if (element==O_NONE)
+		return;
+
 	/* check bounds */
 	if (cave->wraparound_objects) {
 		if (cave->lineshift) {
@@ -703,11 +756,44 @@ gd_cave_store_rc (Cave *cave, int x, int y, const GdElement element, const void*
 		}
 	}
 	
-	/* if the above wraparound code fixed the coordinates, this will always be true. (except for the element!=O_NONE) */
-	if (x>=0 && x<cave->w && y>=0 && y<cave->h && element!=O_NONE) {
+	/* if the above wraparound code fixed the coordinates, this will always be true. */
+	/* but see the above comment for lineshifting y coordinate */
+	if (x>=0 && x<cave->w && y>=0 && y<cave->h) {
 		cave->map[y][x]=element;
 		cave->objects_order[y][x]=(void *)order;
 	}
+}
+
+GdElement
+gd_cave_get_rc(const Cave *cave, int x, int y)
+{
+	/* always fix coordinates as if cave was wraparound. */
+	
+	/* fix x coordinate */
+	if (cave->lineshift) {
+		/* fit x coordinate within range, with correcting y at the same time */
+		while (x<0) {
+			x+=cave->w;	/* out of bounds on the left... */
+			y--;		/* previous row */
+		}
+		while (x>=cave->w) {
+			x-=cave->w;
+			y++;
+		}
+	} else {
+		/* non lineshifting: changing x does not change y coordinate. */
+		while (x<0)
+			x+=cave->w;
+		while (x>=cave->w)
+			x-=cave->w;
+	}
+	/* after that, fix y coordinate */
+	while (y<0)
+		y+=cave->h;
+	while (y>=cave->h)
+		y-=cave->h;
+
+	return cave->map[y][x];
 }
 
 
@@ -746,7 +832,7 @@ gd_c64_random(GdC64RandomGenerator *rand)
 	Also by the predictable slime.
 */
 unsigned int
-gd_cave_c64_random (Cave *cave)
+gd_cave_c64_random(Cave *cave)
 {
 	return gd_c64_random(&cave->c64_rand);
 }
@@ -756,6 +842,12 @@ gd_c64_random_set_seed(GdC64RandomGenerator *rand, int seed1, int seed2)
 {
 	rand->rand_seed_1=seed1;
 	rand->rand_seed_2=seed2;
+}
+
+void
+gd_cave_c64_random_set_seed(Cave *cave, int seed1, int seed2)
+{
+	gd_c64_random_set_seed(&cave->c64_rand, seed1, seed2);
 }
 
 
@@ -769,26 +861,174 @@ gd_c64_random_set_seed(GdC64RandomGenerator *rand, int seed1, int seed2)
 /*
   select random colors for a given cave.
   this function will select colors so that they should look somewhat nice; for example
-  brick walls won't be the darkest colour, for example.
+  brick walls won't be the darkest color, for example.
 */
+static inline void
+swap(int *i1, int *i2)
+{
+	int t=*i1;
+	*i1=*i2;
+	*i2=t;
+}
+
 void
-gd_cave_set_random_colors(Cave *cave)
+gd_cave_set_random_c64_colors(Cave *cave)
 {
 	const int bright_colors[]={1, 3, 7};
 	const int dark_colors[]={2, 6, 8, 9, 11};
 
+	/* always black */
+	cave->colorb=gd_c64_color(0);
 	cave->color0=gd_c64_color(0);
+	/* choose some bright color for brick */
 	cave->color3=gd_c64_color(bright_colors[g_random_int_range(0, G_N_ELEMENTS(bright_colors))]);
+	/* choose a dark color for dirt, but should not be == color of brick */
 	do {
 		cave->color1=gd_c64_color(dark_colors[g_random_int_range(0, G_N_ELEMENTS(dark_colors))]);
-	} while (cave->color1==cave->color3);
+	} while (cave->color1==cave->color3);	/* so it is not the same as color 1 */
+	/* choose any but black for steel wall, but should not be == brick or dirt */
 	do {
+		/* between 1 and 15 - do not use black for this. */
 		cave->color2=gd_c64_color(g_random_int_range(1, 16));
-	} while (cave->color1==cave->color2 || cave->color2==cave->color3);
+	} while (cave->color1==cave->color2 || cave->color2==cave->color3);	/* so colors are not the same */
+	/* copy amoeba and slime color */
 	cave->color4=cave->color3;
 	cave->color5=cave->color1;
 }
 
+static void
+cave_set_random_indexed_colors(Cave *cave, GdColor (*color_indexer_func) (int, int))
+{
+	int hue=g_random_int_range(0, 15);
+	int hue_spread=g_random_int_range(1, 6);	/* 1..5 */
+	/* we only use 0..6, as saturation 15 is too bright (almost always white) */
+	/* also, saturation 0..1..2 is too dark. the color0=black is there for dark. */
+	int bri_spread=6-hue_spread;	/* so this is also 1..5. when hue spread is low, brightness spread is high */
+	int bri1=8, bri2=8-bri_spread, bri3=8+bri_spread;
+	/* there are 15 valid choices for hue, so we do a %15 */
+	int col1=hue, col2=(hue+hue_spread+15)%15, col3=(hue-hue_spread+15)%15;
+	
+	/* this makes up a random color, and selects a color triad by hue+5 and hue+10. */
+	/* also creates a random saturation. */
+	/* color of brick is 8+sat, so it is always a bright color. */
+	/* another two are 8-sat and 8. */
+	/* order of colors is also changed randomly. */
+	
+	if (g_random_boolean())
+		swap(&bri1, &bri2);
+	/* we do not touch bri3 (8+sat), as it should be a bright color */
+	if (g_random_boolean())
+		swap(&col1, &col2);
+	if (g_random_boolean())
+		swap(&col2, &col3);
+	if (g_random_boolean())
+		swap(&col1, &col3);
+	
+	cave->colorb=color_indexer_func(0, 0);
+	cave->color0=color_indexer_func(0, 0);
+	cave->color1=color_indexer_func(col1+1, bri1);
+	cave->color2=color_indexer_func(col2+1, bri2);
+	cave->color3=color_indexer_func(col3+1, bri3);
+	/* amoeba and slime are different */
+	cave->color4=color_indexer_func(g_random_int_range(11, 13), g_random_int_range(6, 12));	/* some green thing */
+	cave->color5=color_indexer_func(g_random_int_range(7, 10), g_random_int_range(0, 6));	/* some blueish thing */
+}
+
+void
+gd_cave_set_random_atari_colors(Cave *cave)
+{
+	cave_set_random_indexed_colors(cave, gd_atari_color_huesat);
+}
+
+void
+gd_cave_set_random_c64dtv_colors(Cave *cave)
+{
+	cave_set_random_indexed_colors(cave, gd_c64dtv_color_huesat);
+}
+
+static inline void
+swapd(double *i1, double *i2)
+{
+	double t=*i1;
+	*i1=*i2;
+	*i2=t;
+}
+
+void
+gd_cave_set_random_rgb_colors(Cave *cave)
+{
+	double hue=g_random_double();	/* any hue allowed */
+	double hue_spread=g_random_double_range(1.0/30.0, 1.0/3.0);	/* hue spread is min. 12 degrees, max 120 degrees (1/3) */
+	double h1=hue, h2=hue+hue_spread, h3=hue+2*hue_spread;
+	double v1, v2, v3;
+	double s1, s2, s3;
+	
+	if (g_random_boolean()) {
+		/* when hue spread is low, brightness(saturation) spread is high */
+		/* this formula gives a number (x) between 0.1 and 0.4, which will be 0.5-x and 0.5+x, so the range is 0.1->0.9 */
+		double spread=0.1+0.3*(1-hue_spread/(1.0/3.0));
+		v1=0.7;				/* brightness is same for all colors - a not too bright one */
+		v2=0.7;
+		v3=0.7;
+		s1=0.5;				/* saturation is different */
+		s2=0.5-spread;
+		s3=0.5+spread;
+	} else {	
+		/* when hue spread is low, brightness(saturation) spread is high */
+		/* this formula gives a number (x) between 0 and 0.2, which will be 0.5+x and 0.5+2x, so the range is 0.5->0.9 */
+		double spread=0.2*(1-hue_spread/(1.0/3.0));
+		v1=0.5;				/* brightness is different */
+		v2=0.5+spread;
+		v3=0.5+2*spread;
+		s1=0.8;				/* saturation is same - a not fully saturated one */
+		s2=0.8;
+		s3=0.8;
+	}
+	/* randomly change values, but do not touch v3, as cave->color3 should be a bright color */
+	if (g_random_boolean())	swapd(&v1, &v2);
+	/* randomly change hues and saturations */
+	if (g_random_boolean())	swapd(&h1, &h2);
+	if (g_random_boolean())	swapd(&h2, &h3);
+	if (g_random_boolean())	swapd(&h1, &h3);
+	if (g_random_boolean())	swapd(&s1, &s2);
+	if (g_random_boolean())	swapd(&s2, &s3);
+	if (g_random_boolean())	swapd(&s1, &s3);
+	
+	h1=h1*360.0;
+	h2=h2*360.0;
+	h3=h3*360.0;
+	
+	cave->colorb=gd_color_get_from_hsv(0,0,0);
+	cave->color0=gd_color_get_from_hsv(0,0,0);		/* black for background */
+	cave->color1=gd_color_get_from_hsv(h1,s1,v1);	/* dirt */
+	cave->color2=gd_color_get_from_hsv(h2,s2,v2);	/* steel */
+	cave->color3=gd_color_get_from_hsv(h3,s3,v3);	/* brick */
+	cave->color4=gd_color_get_from_hsv(g_random_int_range(100, 140),s2,v2);	/* green(120+-20) with the saturation and brightness of brick */
+	cave->color5=gd_color_get_from_hsv(g_random_int_range(220, 260),s1,v1);	/* blue(240+-20) with saturation and brightness of dirt */
+}
+
+
+void
+gd_cave_set_random_colors(Cave *cave, GdColorType type)
+{
+	switch (type) {
+		case GD_COLOR_TYPE_RGB:
+			gd_cave_set_random_rgb_colors(cave);
+			break;
+		case GD_COLOR_TYPE_C64:
+			gd_cave_set_random_c64_colors(cave);
+			break;
+		case GD_COLOR_TYPE_C64DTV:
+			gd_cave_set_random_c64dtv_colors(cave);
+			break;
+		case GD_COLOR_TYPE_ATARI:
+			gd_cave_set_random_atari_colors(cave);
+			break;			
+			
+		default:
+			g_assert_not_reached();
+	}
+}
 
 
 
@@ -799,7 +1039,7 @@ gd_cave_set_random_colors(Cave *cave)
 	after this, ew and eh will contain the effective width and height.
  */
 void
-gd_cave_auto_shrink (Cave *cave)
+gd_cave_auto_shrink(Cave *cave)
 {
 
 	int x, y;
@@ -958,44 +1198,6 @@ gd_cave_correct_visible_size(Cave *cave)
 
 
 
-/* create an easy level.
-	for now,
-		invisible outbox -> outbox,
-		clear expanding wall;
-		only one diamond needed.
-		time min 600s.
-	*/
-
-void
-gd_cave_easy (Cave *cave)
-{
-	int x, y;
-
-	g_assert(cave->map!=NULL);
-
-	for (x=0; x<cave->w; x++)
-		for (y=0; y<cave->h; y++)
-			switch (gd_cave_get_rc(cave, x, y)) {
-			case O_PRE_INVIS_OUTBOX:
-				cave->map[y][x]=O_PRE_OUTBOX;
-				break;
-			case O_INVIS_OUTBOX:
-				cave->map[x][x]=O_OUTBOX;
-				break;
-			case O_H_EXPANDING_WALL:
-			case O_V_EXPANDING_WALL:
-			case O_EXPANDING_WALL:
-				cave->map[y][x]=O_BRICK;
-				break;
-			default:
-				break;
-			}
-	if (cave->diamonds_needed>0)
-		cave->diamonds_needed=1;
-	if (cave->time < 600)
-		cave->time=600;
-}
-
 /*
 	bd1 and similar engines had animation bits in cave data, to set which elements to animate (firefly, butterfly, amoeba).
 	animating an element also caused some delay each frame; according to my measurements, around 2.6 ms/element.
@@ -1109,30 +1311,35 @@ gd_cave_count_diamonds(Cave *cave)
 
 
 
-/* this one only updates the visible area! */
+/* takes a cave and a gfx buffer, and fills the buffer with cell indexes.
+   the indexes might change if bonus life flash is active (small lines in "SPACE" cells),
+   for the paused state (which is used in gdash but not in sdash) - yellowish color.
+   also one can select if the next animation cycle is requested or not.
+   XXX this might be changed to the "int animcycle" itself, might be better
+   
+   if a cell is changed, it is flagged with GD_REDRAW; the flag can be cleared by the caller.
+ */
 void
-gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, gboolean paused, gboolean increment_animcycle)
+gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, gboolean yellowish_color, int animcycle, gboolean hate_invisible_outbox)
 {
 	static int player_blinking=0;
 	static int player_tapping=0;
-	static int animcycle=0;
 	int elemdrawing[O_MAX];
 	int x, y, draw;
 
 	g_assert(cave!=NULL);
 	g_assert(cave->map!=NULL);
 	g_assert(gfx_buffer!=NULL);
+	g_assert(animcycle>=0 && animcycle<=7);
 
-	if (increment_animcycle)
-		animcycle=(animcycle+1) & 7;
 	if (cave->last_direction) {	/* he is moving, so stop blinking and tapping. */
 		player_blinking=0;
 		player_tapping=0;
 	}
 	else {						/* he is idle, so animations can be done. */
-		if (animcycle == 0) {	/* blinking and tapping is started at the beginning of animation sequences. */
-			player_blinking=g_random_int_range (0, 4) == 0;	/* 1/4 chance of blinking, every sequence. */
-			if (g_random_int_range (0, 16) == 0)	/* 1/16 chance of starting or stopping tapping. */
+		if (animcycle==0) {	/* blinking and tapping is started at the beginning of animation sequences. */
+			player_blinking=g_random_int_range(0, 4)==0;	/* 1/4 chance of blinking, every sequence. */
+			if (g_random_int_range(0, 16)==0)	/* 1/16 chance of starting or stopping tapping. */
 				player_tapping=!player_tapping;
 		}
 	}
@@ -1174,13 +1381,19 @@ gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, 
 		elemdrawing[O_PLAYER_BOMB]=draw;
 	elemdrawing[O_INBOX]=gd_elements[cave->inbox_flash_toggle ? O_OUTBOX_OPEN : O_OUTBOX_CLOSED].image_game;
 	elemdrawing[O_OUTBOX]=gd_elements[cave->inbox_flash_toggle ? O_OUTBOX_OPEN : O_OUTBOX_CLOSED].image_game;
-	elemdrawing[O_BITER_SWITCH]=gd_elements[O_BITER_SWITCH].image_game+cave->biter_delay_frame;	/* XXX hack, not fit into gd_elements */
+	elemdrawing[O_BITER_SWITCH]=gd_elements[O_BITER_SWITCH].image_game+cave->biter_delay_frame;	/* hack, not fit into gd_elements */
 	/* visual effects */
 	elemdrawing[O_DIRT]=elemdrawing[cave->dirt_looks_like];
 	elemdrawing[O_EXPANDING_WALL]=elemdrawing[cave->expanding_wall_looks_like];
 	elemdrawing[O_V_EXPANDING_WALL]=elemdrawing[cave->expanding_wall_looks_like];
 	elemdrawing[O_H_EXPANDING_WALL]=elemdrawing[cave->expanding_wall_looks_like];
 	elemdrawing[O_AMOEBA_2]=elemdrawing[cave->amoeba_2_looks_like];
+
+	/* change only graphically */
+	if (hate_invisible_outbox) {
+		elemdrawing[O_PRE_INVIS_OUTBOX]=elemdrawing[O_PRE_OUTBOX];
+		elemdrawing[O_INVIS_OUTBOX]=elemdrawing[O_OUTBOX];
+	}
 
 	for (y=cave->y1; y<=cave->y2; y++) {
 		for (x=cave->x1; x<=cave->x2; x++) {
@@ -1196,7 +1409,7 @@ gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, 
 			if (draw<0)
 				draw=-draw+animcycle;
 			/* flash */
-			if (cave->gate_open_flash || paused)
+			if (cave->gate_open_flash || yellowish_color)
 				draw+=NUM_OF_CELLS;
 
 			/* set to buffer, with caching */
@@ -1206,75 +1419,6 @@ gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, 
 	}
 }
 
-/*
-	width: width of playfield.
-	visible: visible part. (remember: player_x-x1!)
-
-	center: the coordinates to scroll to.
-	exact: scroll exactly
-	start: start scrolling
-	to: scroll to, if started
-	current
-
-	desired: the function stores its data here
-	speed: the function stores its data here
-*/
-gboolean
-gd_cave_scroll(int width, int visible, int center, gboolean exact, int start, int to, int *current, int *desired, int *speed, int divisor)
-{
-	int i;
-	gboolean changed;
-
-	changed=FALSE;
-
-	/* HORIZONTAL */
-	/* hystheresis function.
-	 * when scrolling left, always go a bit less left than player being at the middle.
-	 * when scrolling right, always go a bit less to the right. */
-	if (width<visible) {
-		*speed=0;
-		*desired=0;
-		if (*current!=0) {
-			*current=0;
-			changed=TRUE;
-		}
-
-		return changed;
-	}
-
-	if (exact)
-		*desired=center;
-	else {
-		if (*current+start<center)
-			*desired=center-to;
-		if (*current-start>center)
-			*desired=center+to;
-	}
-	*desired=CLAMP(*desired, 0, width-visible);
-
-	/* adaptive scrolling speed.
-	 * gets faster with distance.
-	 * minimum speed is 1, to allow scrolling precisely to the desired positions (important at borders).
-	 */
-	if (*speed<ABS(*desired-*current)/divisor+1)
-		(*speed)++;
-	if (*speed>ABS(*desired-*current)/divisor+1)
-		(*speed)--;
-	if (*current < *desired) {
-		for (i=0; i < *speed; i++)
-			if (*current < *desired)
-				(*current)++;
-		changed=TRUE;
-	}
-	if (*current > *desired) {
-		for (i=0; i < *speed; i++)
-			if (*current > *desired)
-				(*current)--;
-		changed=TRUE;
-	}
-	
-	return changed;
-}
 
 
 
@@ -1282,10 +1426,177 @@ gd_cave_scroll(int width, int visible, int center, gboolean exact, int start, in
 /* cave time is rounded _UP_ to seconds. so at the exact moment when it changes from
    2sec remaining to 1sec remaining, the player has exactly one second. when it changes
    to zero, it is the exact moment of timeout. */
-/* internal time is milliseconds. */
+/* internal time is milliseconds (or 1200 milliseconds for pal timing). */
 int
-gd_cave_time_show(Cave *cave, int internal_time)
+gd_cave_time_show(const Cave *cave, int internal_time)
 {
 	return (internal_time+cave->timing_factor-1)/cave->timing_factor;
 }
+
+
+
+
+
+
+
+
+
+
+GdReplay *
+gd_replay_new()
+{
+	GdReplay *rep;
+	
+	rep=g_new0(GdReplay, 1);
+	rep->movements=g_byte_array_new();
+	return rep;
+}
+
+GdReplay *
+gd_replay_new_from_replay(GdReplay *orig)
+{
+	GdReplay *rep;
+	
+	rep=g_memdup(orig, sizeof(GdReplay));
+	rep->movements=g_byte_array_new();
+	g_byte_array_append(rep->movements, orig->movements->data, orig->movements->len);
+
+	return rep;
+}
+
+void
+gd_replay_free(GdReplay *replay)
+{
+	g_byte_array_free(replay->movements, TRUE);
+	g_free(replay);
+}
+
+enum {
+	REPLAY_MOVE_MASK=0x0f,
+	REPLAY_FIRE_MASK=0x10,
+	REPLAY_SUICIDE_MASK=0x20,
+};
+
+/* store movement in a replay */
+void
+gd_replay_store_next(GdReplay *replay, GdDirection player_move, gboolean player_fire, gboolean suicide)
+{
+	guint8 data[1];
+	
+	g_assert(player_move==(player_move & REPLAY_MOVE_MASK));
+	data[0]=(player_move)|(player_fire?REPLAY_FIRE_MASK:0)|(suicide?REPLAY_SUICIDE_MASK:0);
+	
+	g_byte_array_append(replay->movements, data, 1);
+}
+
+/* get next available movement from a replay; store variables to player_move, player_fire, suicide */
+/* return true if successful */
+gboolean
+gd_replay_get_next_movement(GdReplay *replay, GdDirection *player_move, gboolean *player_fire, gboolean *suicide)
+{
+	guint8 data;
+	
+	/* if no more available movements */
+	if (replay->current_playing_pos>=replay->movements->len)
+		return FALSE;
+	
+	data=replay->movements->data[replay->current_playing_pos++];
+	*suicide=(data&REPLAY_SUICIDE_MASK)!=0;
+	*player_fire=(data&REPLAY_FIRE_MASK)!=0;
+	*player_move=(data&REPLAY_MOVE_MASK);
+
+	return TRUE;
+}
+
+void gd_replay_rewind(GdReplay *replay)
+{
+	replay->current_playing_pos=0;
+}
+
+
+#define REPLAY_BDCFF_UP "u"
+#define REPLAY_BDCFF_UP_RIGHT "ur"
+#define REPLAY_BDCFF_RIGHT "r"
+#define REPLAY_BDCFF_DOWN_RIGHT "dr"
+#define REPLAY_BDCFF_DOWN "d"
+#define REPLAY_BDCFF_DOWN_LEFT "dl"
+#define REPLAY_BDCFF_LEFT "l"
+#define REPLAY_BDCFF_UP_LEFT "ul"
+/* when not moving */
+#define REPLAY_BDCFF_STILL "."
+/* when the fire is pressed */
+#define REPLAY_BDCFF_FIRE "F"
+#define REPLAY_BDCFF_SUICIDE "k"
+
+static char *
+direction_to_bdcff(GdDirection mov)
+{
+	switch (mov) {
+		/* not moving */
+		case MV_STILL: return REPLAY_BDCFF_STILL;
+		/* directions */
+		case MV_UP: return REPLAY_BDCFF_UP;
+		case MV_UP_RIGHT: return REPLAY_BDCFF_UP_RIGHT;
+		case MV_RIGHT: return REPLAY_BDCFF_RIGHT;
+		case MV_DOWN_RIGHT: return REPLAY_BDCFF_DOWN_RIGHT;
+		case MV_DOWN: return REPLAY_BDCFF_DOWN;
+		case MV_DOWN_LEFT: return REPLAY_BDCFF_DOWN_LEFT;
+		case MV_LEFT: return REPLAY_BDCFF_LEFT;
+		case MV_UP_LEFT: return REPLAY_BDCFF_UP_LEFT;
+		default:
+			g_assert_not_reached();	/* programmer error */
+			return REPLAY_BDCFF_STILL;
+	}
+}
+
+/* same as above; pressing fire will be a capital letter. */
+static char *
+direction_fire_to_bdcff(GdDirection dir, gboolean fire)
+{
+	static char mov[10];
+	
+	strcpy(mov, direction_to_bdcff(dir));
+	if (fire) {
+		int i;
+		
+		for (i=0; mov[i]!=0; i++)
+			mov[i]=g_ascii_toupper(mov[i]);
+	}
+	
+	return mov;
+}
+
+char *
+gd_replay_movements_to_bdcff(GdReplay *replay)
+{
+	int pos;
+	GString *str;
+	
+	str=g_string_new(NULL);
+	
+	for (pos=0; pos<replay->movements->len; pos++) {
+		int num=1;
+		guint8 data;
+
+		/* if this is not the first movement, append a space. */		
+		if (str->len!=0)
+			g_string_append_c(str, ' ');
+		
+		/* if same byte appears, count number of occurrences - something like an rle compression. */
+		/* be sure not to cross the array boundaries */
+		while (pos<replay->movements->len-1 && replay->movements->data[pos]==replay->movements->data[pos+1]) {
+			pos++;
+			num++;
+		}
+		data=replay->movements->data[pos];
+		if (data & REPLAY_SUICIDE_MASK)
+			g_string_append(str, REPLAY_BDCFF_SUICIDE);
+		g_string_append(str, direction_fire_to_bdcff(data & REPLAY_MOVE_MASK, data & REPLAY_FIRE_MASK));
+		if (num!=1)
+			g_string_append_printf(str, "%d", num);
+	}
+	
+	return g_string_free(str, FALSE);
+}
+
 

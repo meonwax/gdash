@@ -21,6 +21,7 @@
 #include "settings.h"
 
 #include "ataripal.h"
+#include "dtvpal.h"
 
 static char *c64_color_names[]={
 	"Black", "White", "Red", "Cyan", "Purple", "Green", "Blue", "Yellow",
@@ -93,6 +94,20 @@ static const char *c64_palettes_names[]={
 	NULL
 };
 
+/* indexes in this array must match GdColorType */
+static const char *palette_types_names[]={
+	N_("RGB colors"),
+	N_("C64 colors"),
+	N_("C64DTV colors"),
+	N_("Atari colors"),
+	NULL
+};
+
+
+const char ** gd_color_get_palette_types_names()
+{
+	return palette_types_names;
+}
 
 
 const char ** gd_color_get_c64_palette_names()
@@ -100,11 +115,15 @@ const char ** gd_color_get_c64_palette_names()
 	return c64_palettes_names;
 }
 
+const char ** gd_color_get_c64dtv_palette_names()
+{
+	return c64dtv_palettes_names;
+}
+
 const char ** gd_color_get_atari_palette_names()
 {
 	return atari_palettes_names;
 }
-
 
 /* return c64 color with index. */
 GdColor
@@ -112,7 +131,7 @@ gd_c64_color(int index)
 {
 	g_assert(index>=0 && index<=15);
 
-	return (1<<24)+index;
+	return (GD_COLOR_TYPE_C64<<24)+index;
 }
 
 /* return atari color with index. */
@@ -121,7 +140,38 @@ gd_atari_color(int index)
 {
 	g_assert(index>=0 && index<=255);
 
-	return (2<<24)+index;
+	return (GD_COLOR_TYPE_ATARI<<24)+index;
+}
+
+GdColor gd_atari_color_huesat(int hue, int sat)
+{
+	g_assert(hue>=0 && hue<=15);
+	g_assert(sat>=0 && sat<=15);
+	return gd_atari_color(16*hue+sat);
+}
+
+/* return atari color with index. */
+GdColor
+gd_c64dtv_color(int index)
+{
+	g_assert(index>=0 && index<=255);
+
+	return (GD_COLOR_TYPE_C64DTV<<24)+index;
+}
+
+GdColor
+gd_c64dtv_color_huesat(int hue, int sat)
+{
+	g_assert(hue>=0 && hue<=15);
+	g_assert(sat>=0 && sat<=15);
+	return gd_c64dtv_color(16*hue+sat);
+}
+
+/* return "unknown color" */
+static GdColor
+unknown_color()
+{
+	return (GD_COLOR_TYPE_UNKNOWN<<24);
 }
 
 /* convert color to rgbcolor; using the current palette. */
@@ -130,26 +180,35 @@ gd_color_get_rgb(GdColor color)
 {
 	int index;
 	const guint8 *atari_pal;
+	const guint8 *c64dtv_pal;
 	const GdColor *c64_pal;
 	
-	/* silently switch to default, if invalid value */
-	if (gd_c64_palette<0 || gd_c64_palette>=G_N_ELEMENTS(c64_palette_pointers)-1)
-		gd_c64_palette=0;
-	c64_pal=c64_palette_pointers[gd_c64_palette];
-	if (gd_atari_palette<0 || gd_atari_palette>=G_N_ELEMENTS(atari_palettes_pointers)-1)
-		gd_atari_palette=0;
-	atari_pal=atari_palettes_pointers[gd_atari_palette];
-
 	switch (color>>24) {
-		case 0:
+		case GD_COLOR_TYPE_RGB:
 			/* is already rgb */
 			return color;
-		case 1:
+
+		case GD_COLOR_TYPE_C64:
+			if (gd_c64_palette<0 || gd_c64_palette>=G_N_ELEMENTS(c64_palette_pointers)-1)
+				gd_c64_palette=0;	/* silently switch to default, if invalid value */
+			c64_pal=c64_palette_pointers[gd_c64_palette];
 			index=color&0x0f;
 			return c64_pal[index];
-		case 2:
+
+		case GD_COLOR_TYPE_C64DTV:
+			if (gd_c64dtv_palette<0 || gd_c64dtv_palette>=G_N_ELEMENTS(c64dtv_palettes_pointers)-1)
+				gd_c64dtv_palette=0;
+			c64dtv_pal=c64dtv_palettes_pointers[gd_c64dtv_palette];
+			index=color&0xff;
+			return gd_color_get_from_rgb(c64dtv_pal[index*3], c64dtv_pal[index*3+1], c64dtv_pal[index*3+2]);
+
+		case GD_COLOR_TYPE_ATARI:
+			if (gd_atari_palette<0 || gd_atari_palette>=G_N_ELEMENTS(atari_palettes_pointers)-1)
+				gd_atari_palette=0;
+			atari_pal=atari_palettes_pointers[gd_atari_palette];
 			index=color&0xff;
 			return gd_color_get_from_rgb(atari_pal[index*3], atari_pal[index*3+1], atari_pal[index*3+2]);
+
 		default:
 			g_assert_not_reached();
 	}
@@ -177,7 +236,38 @@ gd_color_get_b(GdColor color)
 GdColor
 gd_color_get_from_rgb(int r, int g, int b)
 {
-	return (r<<16)+(g<<8)+b;
+	return (GD_COLOR_TYPE_RGB<<24)+(r<<16)+(g<<8)+b;
+}
+
+/* make up GdColor from h,s,v values. */
+/* h=0..360, s=0..1, v=0..1 */
+GdColor
+gd_color_get_from_hsv(double h, double s, double v)
+{
+	int hi=(int)(h/60)%6;
+	double f=h/60-(int)(h/60);	/* fractional part */
+	double p=v*(1-s);
+	double q=v*(1-f*s);
+	double t=v*(1-(1-f)*s);
+	
+	v*=255;
+	p*=255;
+	q*=255;
+	t*=255;
+	
+//	g_print("%g %g %g %g\n", v, p, q, t);
+	
+	switch(hi) {
+		case 0: return gd_color_get_from_rgb(v, t, p);
+		case 1: return gd_color_get_from_rgb(q, v, p);
+		case 2: return gd_color_get_from_rgb(p, v, t);
+		case 3: return gd_color_get_from_rgb(p, q, v);
+		case 4: return gd_color_get_from_rgb(t, p, v);
+		case 5: return gd_color_get_from_rgb(v, p, q);
+	}
+	/* no way we reach this */
+	g_assert_not_reached();
+	return gd_color_get_from_rgb(0,0,0);
 }
 
 
@@ -197,9 +287,19 @@ gd_color_get_from_string(const char *color)
 		
 		if (sscanf(b, "%02x", &c)==1)
 			return gd_atari_color(c);
-		c=g_random_int_range(0, 256);
-		g_warning("Unknown Atari color: %s, using randomly chosen %02x\n", color, c);
-		return gd_c64_color(c);
+		g_warning("Unknown Atari color: %s", color);
+		return unknown_color();
+	}
+
+	/* we do not use sscanf(color, "c64dtv..." as may be lowercase */
+	if (g_ascii_strncasecmp(color, "C64DTV", strlen("C64DTV"))==0) {
+		const char *b=color+strlen("C64DTV");
+		int c;
+		
+		if (sscanf(b, "%02x", &c)==1)
+			return gd_c64dtv_color(c);
+		g_warning("Unknown C64DTV color: %s", color);
+		return unknown_color();
 	}
 
 	/* may or may not have a # */
@@ -207,8 +307,8 @@ gd_color_get_from_string(const char *color)
 		color++;
 	if (sscanf(color, "%02x%02x%02x", &r, &g, &b)!=3) {
 		i=g_random_int_range(0, 16);
-		g_warning("Unkonwn color %s, using randomly chosen %s\n", color, c64_color_names[i]);
-		return gd_c64_color(i);
+		g_warning("Unkonwn color %s", color);
+		return unknown_color();
 	}
 
 	return gd_color_get_from_rgb(r, g, b);
@@ -226,6 +326,11 @@ gd_color_get_string(GdColor color)
 	
 	if (gd_color_is_atari(color)) {
 		sprintf(text, "Atari%02x", color&0xff);
+		return text;
+	}
+
+	if (gd_color_is_dtv(color)) {
+		sprintf(text, "C64DTV%02x", color&0xff);
 		return text;
 	}
 
@@ -247,21 +352,48 @@ gd_color_get_visible_name(GdColor color)
 		sprintf(text, "Atari #%02x", color&0xff);
 		return text;
 	}
-
-	sprintf(text, "#%02x%02x%02x", (color>>16)&255, (color>>8)&255, color&255);
-	return text;
+	
+	if (gd_color_is_dtv(color)) {
+		sprintf(text, "C64DTV #%02x", color&0xff);
+		return text;
+	}
+	
+	if (gd_color_is_rgb(color)) {
+		sprintf(text, "RGB #%02x%02x%02x", (color>>16)&255, (color>>8)&255, color&255);
+		return text;
+	}
+	
+	g_assert_not_reached();
 }
 
 gboolean
 gd_color_is_c64(GdColor color)
 {
-	return (color>>24)==1;
+	return (color>>24)==GD_COLOR_TYPE_C64;
 }
 
 gboolean
 gd_color_is_atari(GdColor color)
 {
-	return (color>>24)==2;
+	return (color>>24)==GD_COLOR_TYPE_ATARI;
+}
+
+gboolean
+gd_color_is_dtv(GdColor color)
+{
+	return (color>>24)==GD_COLOR_TYPE_C64DTV;
+}
+
+gboolean
+gd_color_is_rgb(GdColor color)
+{
+	return (color>>24)==GD_COLOR_TYPE_RGB;
+}
+
+gboolean
+gd_color_is_unknown(GdColor color)
+{
+	return (color>>24)==GD_COLOR_TYPE_UNKNOWN;
 }
 
 /* get c64 color index from color; terminate app if not a c64 color. */
@@ -281,5 +413,49 @@ gd_color_get_c64_index_try(GdColor color)
 	g_warning("Non-C64 color: %s", gd_color_get_string(color));
 
 	return g_random_int_range(0, 16);
+}
+
+
+int
+gd_gdash_color_from_current_palette(int c)
+{
+#if 0
+	GdColor colors_for_rgb[]={	/* the c64 frodo */
+		0x000000, 0xFFFFFF, 0xCC0000, 0x00FFCC, 0xFF00FF, 0x00CC00, 0x0000CC, 0xFFFF00,
+		0xFF8800, 0x884400, 0xFF8888, 0x444444, 0x888888, 0x88FF88, 0x8888FF, 0xCCCCCC,
+	};
+	int colors_for_atari[]={	/* hand-selected */
+		0x00, 0x0f, 0x34, 0x98, 0x46, 0xc6, 0x62, 0xef,
+		0xfa, 0x13, 0x3a, 0x03, 0x07, 0xcc, 0x7d, 0x0b, 
+	};
+	int colors_for_dtv[]={	/* hand-selected */
+		0x00, 0x0f, 0x34, 0xaf, 0x58, 0xe8, 0x93, 0x1f,
+		0x18, 0x13, 0x3d, 0x03, 0x07, 0xed, 0x8d, 0x0b, 
+	};
+	g_assert(c>=0 && c<16);
+	
+	switch (gd_preferred_palette) {
+		case GD_COLOR_TYPE_RGB:		return colors_for_rgb[c];
+		case GD_COLOR_TYPE_C64:		return gd_c64_color(c);
+		case GD_COLOR_TYPE_C64DTV:	return gd_c64dtv_color(colors_for_dtv[c]);
+		case GD_COLOR_TYPE_ATARI:	return gd_atari_color(colors_for_atari[c]);
+		default:
+			g_assert_not_reached();
+	}
+	return colors_for_rgb[c];	/* to avoid compiler warning */
+#endif
+	/* these values are taken from the title screen, drawn by cws. */
+	/* so menus and everything else will look nice! */
+	/* the 16 colors that can be used are the same as on c64. */
+	/* "Black", "White", "Red", "Cyan", "Purple", "Green", "Blue", "Yellow", */
+	/* "Orange", "Brown", "LightRed", "Gray1", "Gray2", "LightGreen", "LightBlue", "Gray3", */
+	/* not in the png: cyan, purple. gray3 is darker in the png. */
+	GdColor gdash_colors[]={
+		0x000000, 0xffffff, 0xe33939, 0x55aaaa, 0xaa55aa, 0x71aa55, 0x0039ff, 0xffff55,
+		0xe37139, 0xaa7139, 0xe09080, 0x555555, 0x717171, 0xc6e38e, 0xaaaaff, 0x8e8e8e,
+	};
+	
+	g_assert(c>=0 && c<16);
+	return gdash_colors[c];
 }
 

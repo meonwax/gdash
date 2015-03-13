@@ -18,17 +18,29 @@
  
 #include <glib.h>
 
-/* color:
+typedef guint32 GdColor;
+
+/* color internal:
    XXRRGGBB;
    XX is 0 for RGB,
          1 for c64 colors (bb=index)
+         3 for c64dtv (bb=index)
          2 for atari colors (bb=index)
 */
 
-typedef guint32 GdColor;
+typedef enum _color_type {
+	GD_COLOR_TYPE_RGB=0,
+	GD_COLOR_TYPE_C64=1,
+	GD_COLOR_TYPE_C64DTV=2,
+	GD_COLOR_TYPE_ATARI=3,
+	GD_COLOR_TYPE_UNKNOWN	/* should be the last one */
+} GdColorType;
 
 const char ** gd_color_get_c64_palette_names();
 const char ** gd_color_get_atari_palette_names();
+const char ** gd_color_get_c64dtv_palette_names();
+
+const char ** gd_color_get_palette_types_names();
 
 /* i/o */
 const char* gd_color_get_string(GdColor color);
@@ -41,30 +53,44 @@ GdColor gd_color_get_rgb(GdColor color);
 
 GdColor gd_color_get_from_string(const char *color);
 GdColor gd_color_get_from_rgb(int r, int g, int b);
+GdColor gd_color_get_from_hsv(double h, double s, double v);
 
 GdColor gd_c64_color(int index);
 GdColor gd_atari_color(int index);
+GdColor gd_atari_color_huesat(int hue, int sat);
+GdColor gd_c64dtv_color(int index);
+GdColor gd_c64dtv_color_huesat(int hue, int sat);
+
 gboolean gd_color_is_c64(GdColor color);
 gboolean gd_color_is_atari(GdColor color);
+gboolean gd_color_is_dtv(GdColor color);
+gboolean gd_color_is_rgb(GdColor color);
+gboolean gd_color_is_unknown(GdColor color);
+
 int gd_color_get_c64_index(GdColor color);
 int gd_color_get_c64_index_try(GdColor color);
 
-#define GD_C64_BLACK (gd_c64_color(0))
-#define GD_C64_WHITE (gd_c64_color(1))
-#define GD_C64_RED (gd_c64_color(2))
-#define GD_C64_PURPLE (gd_c64_color(4))
-#define GD_C64_CYAN (gd_c64_color(3))
-#define GD_C64_GREEN (gd_c64_color(5))
-#define GD_C64_BLUE (gd_c64_color(6))
-#define GD_C64_YELLOW (gd_c64_color(7))
-#define GD_C64_ORANGE (gd_c64_color(8))
-#define GD_C64_BROWN (gd_c64_color(9))
-#define GD_C64_LIGHTRED (gd_c64_color(10))
-#define GD_C64_GRAY1 (gd_c64_color(11))
-#define GD_C64_GRAY2 (gd_c64_color(12))
-#define GD_C64_LIGHTGREEN (gd_c64_color(13))
-#define GD_C64_LIGHTBLUE (gd_c64_color(14))
-#define GD_C64_GRAY3 (gd_c64_color(15))
+int gd_gdash_color_from_current_palette(int c);
+
+#define GD_GDASH_BLACK (gd_gdash_color_from_current_palette(0))
+#define GD_GDASH_WHITE (gd_gdash_color_from_current_palette(1))
+#define GD_GDASH_RED (gd_gdash_color_from_current_palette(2))
+#define GD_GDASH_PURPLE (gd_gdash_color_from_current_palette(4))
+#define GD_GDASH_CYAN (gd_gdash_color_from_current_palette(3))
+#define GD_GDASH_GREEN (gd_gdash_color_from_current_palette(5))
+#define GD_GDASH_BLUE (gd_gdash_color_from_current_palette(6))
+#define GD_GDASH_YELLOW (gd_gdash_color_from_current_palette(7))
+#define GD_GDASH_ORANGE (gd_gdash_color_from_current_palette(8))
+#define GD_GDASH_BROWN (gd_gdash_color_from_current_palette(9))
+#define GD_GDASH_LIGHTRED (gd_gdash_color_from_current_palette(10))
+#define GD_GDASH_GRAY1 (gd_gdash_color_from_current_palette(11))
+#define GD_GDASH_GRAY2 (gd_gdash_color_from_current_palette(12))
+#define GD_GDASH_LIGHTGREEN (gd_gdash_color_from_current_palette(13))
+#define GD_GDASH_LIGHTBLUE (gd_gdash_color_from_current_palette(14))
+#define GD_GDASH_GRAY3 (gd_gdash_color_from_current_palette(15))
+
+#define GD_COLOR_INVALID (0xFFFFFFFF)
+#define GD_COLOR_BLACK (gd_color_from_rgb(0,0,0))
 
 #endif
 

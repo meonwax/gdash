@@ -44,6 +44,7 @@
 #define GD_ICON_OBJECT_ON_ALL "icon-object-on-all"
 #define GD_ICON_OBJECT_NOT_ON_ALL "icon-object-not-on-all"
 #define GD_ICON_OBJECT_NOT_ON_CURRENT "icon-object-not-on-current"
+#define GD_ICON_REPLAY "icon-replay"
 
 void gd_create_stock_icons(void);
 

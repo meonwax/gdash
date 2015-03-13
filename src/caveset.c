@@ -43,7 +43,7 @@ int gd_caveset_last_selected_level;
 
 
 /* list of possible extensions which can be opened */
-char *gd_caveset_extensions[]={"*.gds", "*.bd", "*.brc", NULL};
+char *gd_caveset_extensions[]={"*.gds", "*.bd", "*.bdr", "*.brc", NULL};
 
 
 
@@ -560,22 +560,30 @@ brc_import(guint8 *data)
 			cave->extra_diamond_value=data[3*c+datapos];
 			/* brc amoeba: random(256)>=size specified in brc. */
 			/* prob: 1-(data/256) */
-			cave->amoeba_growth_prob=1-data[7*c+datapos]/256.0;
-			cave->amoeba_fast_growth_prob=1-data[8*c+datapos]/256.0;
+			if (data[7*c+datapos]==0)
+				g_warning("amoeba growth cannot be zero, error at byte %d", data[7*c+datapos]);
+			else
+				cave->amoeba_growth_prob=1.0/data[7*c+datapos];
+			if (data[8*c+datapos]==0)
+				g_warning("amoeba growth cannot be zero, error at byte %d", data[8*c+datapos]);
+			else
+				cave->amoeba_fast_growth_prob=1.0/data[8*c+datapos];
 			cave->slime_predictable=FALSE;
 			cave->slime_permeability=1-data[9*c+datapos]/256.0;
 			cave->acid_spread_ratio=1-data[10*c+datapos]/256.0;
-			cave->pushing_stone_prob=data[11*c+datapos]/8.0;
+			cave->pushing_stone_prob=1.0/data[11*c+datapos];
 			cave->magic_wall_stops_amoeba=data[12*c+datapos+1]!=0;
 			cave->intermission=cavenum>=16 || data[14*c+datapos+1]!=0;
 
 			/* colors */
 			colind=data[31*c+datapos]%G_N_ELEMENTS(brc_color_table);
+			cave->colorb=0x000000;	/* fixed rgb black */
+			cave->color0=0x000000;	/* fixed rgb black */
 			cave->color1=brc_color_table[colind];
 			cave->color2=brc_color_table_comp[colind];	/* complement */
 			cave->color3=0xffffff;	/* white for brick */
-			cave->color4=0xe5ad23;	/* amoeba */
-			cave->color5=0x8af713;	/* slime */
+			cave->color4=0xe5ad23;	/* fixed for amoeba */
+			cave->color5=0x8af713;	/* fixed for slime */
 
 			if (import_effect) {
 				cave->enclosed_amoeba_to=brc_effect(data[14*c+datapos+1]);
@@ -795,7 +803,7 @@ gd_caveset_load_from_internal (const int i, const char *configdir)
 
 
 gboolean
-gd_caveset_save(const char *filename)
+gd_caveset_save(const char *filename, gboolean caves_with_replay_only)
 {
 	GPtrArray *saved;
 	char *contents;
@@ -803,7 +811,7 @@ gd_caveset_save(const char *filename)
 	gboolean success;
 
 	saved=g_ptr_array_sized_new(500);
-	gd_caveset_save_to_bdcff(saved);
+	gd_caveset_save_to_bdcff(saved, caves_with_replay_only);
 	g_ptr_array_add(saved, NULL);	/* so it can be used for strjoinv */
 #ifdef G_OS_WIN32
 	contents=g_strjoinv("\r\n", (char **)saved->pdata);

@@ -59,7 +59,7 @@ const gchar **gd_caveset_get_internal_game_names();
 /* caveset load from file; configdir passed to look for .hsc file */
 gboolean gd_caveset_load_from_file(const char *filename, const char *configdir);
 /* caveset save to bdcff file */
-gboolean gd_caveset_save(const char *filename);
+gboolean gd_caveset_save(const char *filename, gboolean caves_with_replay_only);
 
 /* misc caveset functions */
 int gd_caveset_count(void);

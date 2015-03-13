@@ -172,13 +172,13 @@ GdElements gd_elements[] = {
 	{O_PRE_PL_1, N_("Player birth (1)"), 0, "GUYBIRTH1", 0, 32, 32, 32},
 	{O_PRE_PL_2, N_("Player birth (2)"), 0, "GUYBIRTH2", 0, 33, 33, 33},
 	{O_PRE_PL_3, N_("Player birth (3)"), 0, "GUYBIRTH3", 0, 34, 34, 34},
-	{O_PLAYER, N_("Player"), P_BLOWS_UP_FLIES | P_EXPLODES_TO_SPACE, "GUY", 0, 328, 328, 35, 32},	/* has ckdelay */
-	{O_PLAYER_BOMB, N_("Player with bomb"), P_BLOWS_UP_FLIES | P_EXPLODES_TO_SPACE, "GUYBOMB", 0, 42, 42, 42, 25},	/* has ckdelay */
-	{O_PLAYER_GLUED, N_("Glued player"), P_BLOWS_UP_FLIES | P_EXPLODES_TO_SPACE, "GUYGLUED", 0, 329, 329, 35},
-	{O_PLAYER_STIRRING, N_("Player stirring"), P_BLOWS_UP_FLIES | P_EXPLODES_TO_SPACE, "GUYSTIRRING", 0, 256, -256, -256},
+	{O_PLAYER, N_("Player"), P_BLOWS_UP_FLIES | P_EXPLODES_TO_SPACE | P_PLAYER, "GUY", 0, 328, 328, 35, 32},	/* has ckdelay */
+	{O_PLAYER_BOMB, N_("Player with bomb"), P_BLOWS_UP_FLIES | P_EXPLODES_TO_SPACE | P_PLAYER, "GUYBOMB", 0, 42, 42, 42, 25},	/* has ckdelay */
+	{O_PLAYER_GLUED, N_("Glued player"), P_BLOWS_UP_FLIES | P_EXPLODES_TO_SPACE, "GUYGLUED", 0, 329, 329, 35},	/* is not a real player! so active x, y will not find it. */
+	{O_PLAYER_STIRRING, N_("Player stirring"), P_BLOWS_UP_FLIES | P_EXPLODES_TO_SPACE | P_PLAYER, "GUYSTIRRING", 0, 256, -256, -256},
 
 	{O_BOMB, N_("Bomb"), 0, "BOMB", 0, 48, 48, 48},
-	{O_BOMB_TICK_1, N_("Ticking bomb (1)"), 0, "IGNITEDBOMB1", 0, 49, 49, 49},
+	{O_BOMB_TICK_1, N_("Ticking bomb (1)"), P_EXPLOSION_FIRST_STAGE, "IGNITEDBOMB1", 0, 49, 49, 49},
 	{O_BOMB_TICK_2, N_("Ticking bomb (2)"), 0, "IGNITEDBOMB2", 0, 50, 50, 50},
 	{O_BOMB_TICK_3, N_("Ticking bomb (3)"), 0, "IGNITEDBOMB3", 0, 51, 51, 51},
 	{O_BOMB_TICK_4, N_("Ticking bomb (4)"), 0, "IGNITEDBOMB4", 0, 52, 52, 52},
@@ -190,41 +190,41 @@ GdElements gd_elements[] = {
 	{O_NITRO_PACK_F, N_("Nitro pack, falling"), P_EXPLODES_AS_NITRO, "NITROf", 0, 304, 304, 288},
 	{O_NITRO_PACK_EXPLODE, N_("Nitro pack, triggered"), 0, "NITROtriggered", 0, 309, 309, 288},
 
-	{O_PRE_CLOCK_1, N_("Clock birth (1)"), 0, "CLOCKBIRTH1", 0, 28, 28, 28, 280},	/* has ckdelay */
+	{O_PRE_CLOCK_1, N_("Clock birth (1)"), P_EXPLOSION_FIRST_STAGE, "CLOCKBIRTH1", 0, 28, 28, 28, 280},	/* has ckdelay */
 	{O_PRE_CLOCK_2, N_("Clock birth (2)"), 0, "CLOCKBIRTH2", 0, 29, 29, 29, 280},	/* has ckdelay */
 	{O_PRE_CLOCK_3, N_("Clock birth (3)"), 0, "CLOCKBIRTH3", 0, 30, 30, 30, 280},	/* has ckdelay */
 	{O_PRE_CLOCK_4, N_("Clock birth (4)"), 0, "CLOCKBIRTH4", 0, 31, 31, 31, 280},	/* has ckdelay */
-	{O_PRE_DIA_1, N_("Diamond birth (1)"), 0, "DIAMONDBIRTH1", 0, 56, 56, 56, 280},	/* has ckdelay */
+	{O_PRE_DIA_1, N_("Diamond birth (1)"), P_EXPLOSION_FIRST_STAGE, "DIAMONDBIRTH1", 0, 56, 56, 56, 280},	/* has ckdelay */
 	{O_PRE_DIA_2, N_("Diamond birth (2)"), 0, "DIAMONDBIRTH2", 0, 57, 57, 57, 280},	/* has ckdelay */
 	{O_PRE_DIA_3, N_("Diamond birth (3)"), 0, "DIAMONDBIRTH3", 0, 58, 58, 58, 280},	/* has ckdelay */
 	{O_PRE_DIA_4, N_("Diamond birth (4)"), 0, "DIAMONDBIRTH4", 0, 59, 59, 59, 280},	/* has ckdelay */
 	{O_PRE_DIA_5, N_("Diamond birth (5)"), 0, "DIAMONDBIRTH5", 0, 60, 60, 60, 280},	/* has ckdelay */
-	{O_EXPLODE_1, N_("Explosion (1)"), 0, "EXPLOSION1", 0, 43, 43, 43, 280},	/* has ckdelay */
+	{O_EXPLODE_1, N_("Explosion (1)"), P_EXPLOSION_FIRST_STAGE, "EXPLOSION1", 0, 43, 43, 43, 280},	/* has ckdelay */
 	{O_EXPLODE_2, N_("Explosion (2)"), 0, "EXPLOSION2", 0, 44, 44, 44, 280},	/* has ckdelay */
 	{O_EXPLODE_3, N_("Explosion (3)"), 0, "EXPLOSION3", 0, 45, 45, 45, 280},	/* has ckdelay */
 	{O_EXPLODE_4, N_("Explosion (4)"), 0, "EXPLOSION4", 0, 46, 46, 46, 280},	/* has ckdelay */
 	{O_EXPLODE_5, N_("Explosion (5)"), 0, "EXPLOSION5", 0, 47, 47, 47, 280},	/* has ckdelay */
-	{O_PRE_STONE_1, N_("Stone birth (1)"), 0, "BOULDERBIRTH1", 0, 36, 36, 36, 280},	/* has ckdelay */
+	{O_PRE_STONE_1, N_("Stone birth (1)"), P_EXPLOSION_FIRST_STAGE, "BOULDERBIRTH1", 0, 36, 36, 36, 280},	/* has ckdelay */
 	{O_PRE_STONE_2, N_("Stone birth (2)"), 0, "BOULDERBIRTH2", 0, 37, 37, 37, 280},	/* has ckdelay */
 	{O_PRE_STONE_3, N_("Stone birth (3)"), 0, "BOULDERBIRTH3", 0, 38, 38, 38, 280},	/* has ckdelay */
 	{O_PRE_STONE_4, N_("Stone birth (4)"), 0, "BOULDERBIRTH4", 0, 39, 39, 39, 280},	/* has ckdelay */
-	{O_PRE_STEEL_1, N_("Steel birth (1)"), 0, "STEELWALLBIRTH1", 0, 24, 24, 24, 280},	/* has ckdelay */
+	{O_PRE_STEEL_1, N_("Steel birth (1)"), P_EXPLOSION_FIRST_STAGE, "STEELWALLBIRTH1", 0, 24, 24, 24, 280},	/* has ckdelay */
 	{O_PRE_STEEL_2, N_("Steel birth (2)"), 0, "STEELWALLBIRTH2", 0, 25, 25, 25, 280},	/* has ckdelay */
 	{O_PRE_STEEL_3, N_("Steel birth (3)"), 0, "STEELWALLBIRTH3", 0, 26, 26, 26, 280},	/* has ckdelay */
 	{O_PRE_STEEL_4, N_("Steel birth (4)"), 0, "STEELWALLBIRTH4", 0, 27, 27, 27, 280},	/* has ckdelay */
-	{O_GHOST_EXPL_1, N_("Ghost explosion (1)"), 0, "GHOSTEXPLOSION1", 0, 80, 80, 80, 280},	/* has ckdelay */
+	{O_GHOST_EXPL_1, N_("Ghost explosion (1)"), P_EXPLOSION_FIRST_STAGE, "GHOSTEXPLOSION1", 0, 80, 80, 80, 280},	/* has ckdelay */
 	{O_GHOST_EXPL_2, N_("Ghost explosion (2)"), 0, "GHOSTEXPLOSION2", 0, 81, 81, 81, 280},	/* has ckdelay */
 	{O_GHOST_EXPL_3, N_("Ghost explosion (3)"), 0, "GHOSTEXPLOSION3", 0, 82, 82, 82, 280},	/* has ckdelay */
 	{O_GHOST_EXPL_4, N_("Ghost explosion (4)"), 0, "GHOSTEXPLOSION4", 0, 83, 83, 83, 280},	/* has ckdelay */
-	{O_BOMB_EXPL_1, N_("Bomb explosion (1)"), 0, "BOMBEXPLOSION1", 0, 84, 84, 84, 280},	/* has ckdelay */
+	{O_BOMB_EXPL_1, N_("Bomb explosion (1)"), P_EXPLOSION_FIRST_STAGE, "BOMBEXPLOSION1", 0, 84, 84, 84, 280},	/* has ckdelay */
 	{O_BOMB_EXPL_2, N_("Bomb explosion (2)"), 0, "BOMBEXPLOSION2", 0, 85, 85, 85, 280},	/* has ckdelay */
 	{O_BOMB_EXPL_3, N_("Bomb explosion (3)"), 0, "BOMBEXPLOSION3", 0, 86, 86, 86, 280},	/* has ckdelay */
 	{O_BOMB_EXPL_4, N_("Bomb explosion (4)"), 0, "BOMBEXPLOSION4", 0, 87, 87, 87, 280},	/* has ckdelay */
-	{O_NITRO_EXPL_1, N_("Nitro pack explosion (1)"), 0, "NITROEXPLOSION1", 0, 84, 84, 84, 280},	/* has ckdelay */
+	{O_NITRO_EXPL_1, N_("Nitro pack explosion (1)"), P_EXPLOSION_FIRST_STAGE, "NITROEXPLOSION1", 0, 84, 84, 84, 280},	/* has ckdelay */
 	{O_NITRO_EXPL_2, N_("Nitro pack explosion (2)"), 0, "NITROEXPLOSION2", 0, 85, 85, 85, 280},	/* has ckdelay */
 	{O_NITRO_EXPL_3, N_("Nitro pack explosion (3)"), 0, "NITROEXPLOSION3", 0, 86, 86, 86, 280},	/* has ckdelay */
 	{O_NITRO_EXPL_4, N_("Nitro pack explosion (4)"), 0, "NITROEXPLOSION4", 0, 87, 87, 87, 280},	/* has ckdelay */
-	{O_AMOEBA_2_EXPL_1, N_("Amoeba 2 explosion (1)"), 0, "AMOEBA2EXPLOSION1", 0, 292, 292, 292, 280},	/* has ckdelay */
+	{O_AMOEBA_2_EXPL_1, N_("Amoeba 2 explosion (1)"), P_EXPLOSION_FIRST_STAGE, "AMOEBA2EXPLOSION1", 0, 292, 292, 292, 280},	/* has ckdelay */
 	{O_AMOEBA_2_EXPL_2, N_("Amoeba 2 explosion (2)"), 0, "AMOEBA2EXPLOSION2", 0, 293, 293, 293, 280},	/* has ckdelay */
 	{O_AMOEBA_2_EXPL_3, N_("Amoeba 2 explosion (3)"), 0, "AMOEBA2EXPLOSION3", 0, 294, 294, 294, 280},	/* has ckdelay */
 	{O_AMOEBA_2_EXPL_4, N_("Amoeba 2 explosion (4)"), 0, "AMOEBA2EXPLOSION4", 0, 295, 295, 295, 280},	/* has ckdelay */
@@ -303,9 +303,6 @@ gd_cave_properties[] = {
 	{"Charset", GD_TYPE_STRING, 0, N_("Character set"), G_STRUCT_OFFSET(Cave, charset), 1, N_("Theme used for displaying the game. Not used by GDash.")},
 	{"Fontset", GD_TYPE_STRING, 0, N_("Font set"), G_STRUCT_OFFSET(Cave, fontset), 1, N_("Font used during the game. Not used by GDash.")},
 
-	/* notes - a tab on its own */
-	{"Notes", GD_TYPE_LONGSTRING, 0, N_("Notes"), G_STRUCT_OFFSET(Cave, notes), 1, N_("Long description of the cave.")},
-
 	/* difficulty */
 	{"", GD_TAB, 0, N_("Difficulty")},
 	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("Diamonds")},
@@ -316,7 +313,7 @@ gd_cave_properties[] = {
 	{"CaveTime", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Time (s)"), CAVE_OFFSET(level_time[0]), 5, N_("Time available to solve cave, in seconds."), 1, 999},
 	{"CaveMaxTime", GD_TYPE_INT, 0, N_("Maximum time (s)"), CAVE_OFFSET(max_time), 1, N_("If you reach this time by collecting too many clocks, the timer will overflow."), 60, 999},
 	{"TimeValue", GD_TYPE_INT, 0, N_("Score for time"), CAVE_OFFSET(level_timevalue[0]), 5, N_("Points for each seconds remaining, when the player exits the level."), 0, 50},
-	{"CaveScheduling", GD_TYPE_SCHEDULING, GD_ALWAYS_SAVE, N_("Scheduling type"), CAVE_OFFSET(scheduling), 1, N_("This flag sets whether the game uses an emulation of the original timing (c64-style), or a more modern milliseconds-based timing. The original game used a delay (empty loop) based timing of caves; this is selected by setting this to BD1, BD2, Construction Kit or Crazy Dream 7. (BD1 intermissions are faster than normal caves - that is the only difference between BD1 and BD2 scheduling.)")},
+	{"CaveScheduling", GD_TYPE_SCHEDULING, GD_ALWAYS_SAVE, N_("Scheduling type"), CAVE_OFFSET(scheduling), 1, N_("This flag sets whether the game uses an emulation of the original timing (c64-style), or a more modern milliseconds-based timing. The original game used a delay (empty loop) based timing of caves; this is selected by setting this to BD1, BD2, Construction Kit or Crazy Dream 7. This is a compatibility setting only; milliseconds-based timing is recommended for every new cave.")},
 	{"PALTiming", GD_TYPE_BOOLEAN, 0, N_("PAL timing"), CAVE_OFFSET(pal_timing), 1, N_("On the PAL version of the C64 computer, the timer was "
 	"actually slower than normal seconds. This flag is used to compensate for this. Most original games are authored for the PAL version.")},
 	{"CaveDelay", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("   Delay (c64-style)"), CAVE_OFFSET(level_ckdelay[0]), 5, N_("The length of the delay loop between game frames. Used when milliseconds-based timing is inactive, ie. C64 scheduling is on."), 0, 32},
@@ -384,7 +381,7 @@ gd_cave_properties[] = {
 	{"AMOEBA2EXPLOSIONeffect", GD_TYPE_EFFECT, 0, N_("   Explodes to"), CAVE_OFFSET(amoeba_2_explodes_to), 1, N_("An amoeba 2 explodes to this element, when touched by the original amoeba.")},
 	{"AMOEBA2BOULDEReffect", GD_TYPE_EFFECT, 0, N_("If too big, converts to"), CAVE_OFFSET(too_big_amoeba_2_to), 1, N_("Controls which element an overgrown amoeba converts to.")},
 	{"AMOEBA2DIAMONDeffect", GD_TYPE_EFFECT, 0, N_("If enclosed, converts to"), CAVE_OFFSET(enclosed_amoeba_2_to), 1, N_("Controls which element an enclosed amoeba converts to.")},
-	{"AMOEBA2LOOKSLIKEeffect", GD_TYPE_EFFECT, 0, N_("Looks like"), CAVE_OFFSET(amoeba_2_looks_like), 1, N_("Amoeba 2 can look like any other element. Tip: it can also look like a normal amoeba. Or it can look like slime, and then you have two different coloured amoebas!")},
+	{"AMOEBA2LOOKSLIKEeffect", GD_TYPE_EFFECT, 0, N_("Looks like"), CAVE_OFFSET(amoeba_2_looks_like), 1, N_("Amoeba 2 can look like any other element. Tip: it can also look like a normal amoeba. Or it can look like slime, and then you have two different colored amoebas!")},
 
 	/* ACTIVE 1 */
 	{"", GD_TAB, 0, N_("Active elements")},
@@ -492,8 +489,38 @@ gd_cave_properties[] = {
 	{"ShortExplosions", GD_TYPE_BOOLEAN, 0, N_("Short explosions"), CAVE_OFFSET(short_explosions), 1, N_("In 1stB, explosions were longer, took five cave frames to complete, as opposed to four in the original.")},
 	{"SkeletonsWorthDiamonds", GD_TYPE_INT, 0, N_("Skeletons worth diamonds"), CAVE_OFFSET(skeletons_worth_diamonds), 1, N_("The number of diamonds each skeleton is worth."), 0, 10},
 	{"GravityAffectsAll", GD_TYPE_BOOLEAN, 0, N_("Gravity change affects everything"), CAVE_OFFSET(gravity_affects_all), 1, N_("If this is enabled, changing the gravity will also affect bladders (moving and pushing), bladder spenders, falling walls and waiting stones. Otherwise, those elements behave as gravity was always pointing downwards.")},
+
+	/* notes - a tab on its own */
+	{"Notes", GD_TYPE_LONGSTRING, 0, N_("Notes"), G_STRUCT_OFFSET(Cave, notes), 1, N_("Long description of the cave.")},
+
 	{NULL}
 };
+
+
+
+
+
+/* entries. */
+/* type given for each element;
+ * GD_TYPE_ELEMENT represents a combo box of gdash objects.
+ * GD_TAB&LABEL represents a notebook tab or a label.
+ * others are self-explanatory. */
+const GdStructDescriptor
+gd_replay_properties[] = {
+	/* default data */
+	{"", GD_TAB, 0, N_("Replay")},
+	{"Level", GD_TYPE_INT, 0, NULL, G_STRUCT_OFFSET(GdReplay, level), 1, NULL},
+	{"RandomSeed", GD_TYPE_INT, 0, NULL, G_STRUCT_OFFSET(GdReplay, seed), 1, NULL},
+//	{"Saved", GD_TYPE_BOOLEAN, 0, NULL, G_STRUCT_OFFSET(GdReplay, saved), 1, NULL},
+	{"Player", GD_TYPE_STRING, 0, NULL, G_STRUCT_OFFSET(GdReplay, player_name), 1, NULL},
+	{"Date", GD_TYPE_STRING, 0, NULL, G_STRUCT_OFFSET(GdReplay, date), 1, NULL},
+	{"Comment", GD_TYPE_STRING, 0, NULL, G_STRUCT_OFFSET(GdReplay, comment), 1, NULL},
+	{"Score", GD_TYPE_INT, 0, NULL, G_STRUCT_OFFSET(GdReplay, score), 1, NULL},
+	{"Duration", GD_TYPE_INT, 0, NULL, G_STRUCT_OFFSET(GdReplay, duration), 1, NULL},
+	{"Success", GD_TYPE_BOOLEAN, 0, NULL, G_STRUCT_OFFSET(GdReplay, success), 1, NULL},
+	{NULL}
+};
+
 
 
 GdPropertyDefault gd_cave_defaults_gdash[] = {
@@ -547,7 +574,7 @@ GdPropertyDefault gd_cave_defaults_gdash[] = {
 	{CAVE_OFFSET(diagonal_movements), FALSE},
 	{CAVE_OFFSET(active_is_first_found), TRUE},
 	{CAVE_OFFSET(snap_element), O_SPACE},
-	{CAVE_OFFSET(pushing_stone_prob), 125000},
+	{CAVE_OFFSET(pushing_stone_prob), 250000},
 	{CAVE_OFFSET(pushing_stone_prob_sweet), 1000000},
 	{CAVE_OFFSET(level_bonus_time), 30},
 	{CAVE_OFFSET(pneumatic_hammer_frame), 5},

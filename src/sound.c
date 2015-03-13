@@ -265,6 +265,9 @@ void
 gd_play_bonus_life_sound()
 {
 #ifdef GD_SOUND
+	if (!mixer_started || !gd_sdl_sound)
+		return;
+
 	play_sound(gd_sound_get_channel(GD_S_BONUS_LIFE), GD_S_BONUS_LIFE);
 #endif
 }

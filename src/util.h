@@ -54,5 +54,11 @@ const char *gd_find_file(const char *filename);
 /* wrap a text to specified width */
 char *gd_wrap_text(const char *orig, int width);
 
+/* return current date in 2008-12-04 format */
+const char *gd_get_current_date();
+/* return current date in 2008-12-04 12:34 format */
+const char *gd_get_current_date_time();
+/* clamp integer into range */
+int gd_clamp(int val, int min, int max);
 #endif
 

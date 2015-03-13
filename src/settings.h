@@ -16,6 +16,7 @@
 #ifndef _GD_SETTINGS_H
 #define _GD_SETTINGS_H
 #include <glib.h>
+#include "colors.h"
 
 typedef enum _scaling_type {
 	GD_SCALING_ORIGINAL,
@@ -53,8 +54,8 @@ extern int gd_editor_window_height;	/* window size */
 extern int gd_language;
 
 /* settings */
-extern gboolean gd_easy_play;
 extern gboolean gd_time_min_sec;
+extern gboolean gd_no_invisible_outbox;
 extern gboolean gd_all_caves_selectable;
 extern gboolean gd_import_as_all_caves_selectable;
 extern gboolean gd_mouse_play;
@@ -85,8 +86,9 @@ extern int gd_pal_emu_scanline_shade;		/* in percent */
 extern gboolean gd_even_line_pal_emu_vertical_scroll;
 extern gboolean gd_fine_scroll;
 extern int gd_c64_palette;
+extern int gd_c64dtv_palette;
 extern int gd_atari_palette;
-
+extern GdColorType gd_preferred_palette;
 
 /* gdash directories */
 extern char *gd_user_config_dir;
