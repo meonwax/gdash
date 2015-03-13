@@ -1,61 +1,28 @@
 DONE
 ----
-- native look on windows
-- In the index view if I select a cave with a "&" char in the name the status bar on the bottom shows it as "&amp;". So "Skulls & Bones" becomes "Skulls &amp; Bones". But only in the status bar, in the index window the name is correct.
-- Moreover can you tell me where to change the word "Höhle" to "Höhlen" for the status bar? It should be plural.
-- And another small thing: If I changed something in editor, get back to the game and want to quit the game a message appears if I want to save the changes. As I set german as language the message appears in german but the key for "Ja" (yes) is not "J" but "Y" ("N" is still "Nein" and "No" - so no difference). Shouldn't it be "J" for german systems?
-- editor file open ablak; cancel, de mégis bepróbálkozik
-- options ablaknál az sdl verzióban is legyen valami módon help/description az egyes opciókhoz! fine scrollinghoz beírni, hogy lehet nem lesz jobb tőle.
-- Don Pedro's BD7 Cave M is set to BD1 engine, when it needs to be set to BD2. Otherwise the amoeba is affected by the magic wall bug.
-- Magic wall break scan implemented so it affects amoeba. Buggy timing is not implemented, however.
-- Quitting on Q from menu. escape quittingnél kérdezzen rá? maradjon meg az escape.
-- rocket launcher help, rocket launcher - one rocket or infinite rockets / one rocket
-
 
 
 TO DO
 -----
-restart level (esc) nem csökkenti az életek számát
 
-utolsó elfogyott élet után tűzgomb, de nem mutatja a game over feliratot
+sdl stdout.txt fájlba írását megszüntetni
 
-screen::set_size valahogy átnevezni, reinit vagy bármi
+kicsit csúnya a címképernyő beállítója az editorban. a dialog hint adja a méretet, és kimegy koppanásig.
 
-a pixmapstorage-t egy külön headerbe tenni. aki örököl belőle, elég lenne csak azt includeolja
-
-most már a felesleges includeokat el kell tűntetni
-
-opengl stuff teszt
-
-opengl esetén ne legyen replay saver. vagy megoldani valahogy, full pixbufokkal az egészet? 
-speciális pixmap (= pixbuf) és speciális screen (= pixbuf), az lenne a legszebb.
-
-
-az ikon ne legyen két (három?!) helyre is bepastelve. talán a screen-be kéne menjen?
-
-
-pixbuffactory::gimme_a_screen  ?
-
-fire ant dash @ c64hq
-
-- Masters Boulder Dash Cave B, the inbox timing is out rendering the cave unsolvable (firefly 
-smash under both PAL and NTSC), a quick change of the hatch value from 2 to 3 for all leveels 
-sorts that out.
-
-two different particle effects for diamond: diamond fall, diamond collect
-
-snapshot when playing
-
-replay menünél legyen szép a lapozás (most néha címke marad alulra)
-
-gtk version settings - install theme button
-
-"show variables in test" stuff
-
-gtkapp.cpp - the timing & other routines should be in the gtkmainwindow class
+Just an idea: Now as the scrolling works THAT fine with OpenGL I 
+wonder if you can modernize the way scrolling works a little bit on 
+a trial basis. It the moment scrolling begins just at the moment the 
+player reaches a certain area. But scrolling beginns immediately at 
+full speed. What if scrolling would begin just a little bit slower, 
+gets faster (to regular speed) and slows down as soon as scrolling 
+is finished. So scrolling would be not that abrupt.
 
 settings.cpp - all settings to a static class
 all parameters to another static class - to know what's happening
+
+gd_drawcave_to_pixbuf egyszerűsítése cairóval?
+
+memóriakezelést most már automatizálni mindenhol
 
 NEW ELEMENTS
     fragile diamonds
@@ -65,63 +32,21 @@ NEW ELEMENTS
     - option "More than 1 bomb" in the cave settings
     - telescope arm
 
+import
+    *) fire ant dash @ c64hq
     
-compat
-    *) Rockford's revenge cave 9 scrolling
-    itt az a kérdés, melyik legyen az active player. az, akit először/utoljára megtalál a cave scan,
-    vagy az, akit először/utoljára megtalál ÉS tudott mozogni?
-    a születő rockford is számítson aktívnak!
-
 compat:
 	*) frustidash
 	*) magicwall breakscan; De Luxe Caves 1 Cave L, De Luxe Caves 2 Cave A ????, Deluxe Caves 3 Cave A
-    *) The second issue is not so important. In bd1-games, the magicwall stops the amoeba even if the 
-    amoeba is located above the magicwall. For the moment, I implemented it this way: When an 
-    element passes the magicwall I set all the following amoebas to the delayed state. This causes a 
-    conversion, if no amoeba was able to grow before the scan of this element. Of course, this is 
-    not how it works. Ok, I have to adjust my implementation. I remarked that the conversion takes 
-    place in the same scan, not in the next. So it's much easier to implement: When a stone drops 
-    into the magicwall, you only have to set the variable that indicates if the amoeba is "enclosed" 
-    and have to convert in this scan to "True". All the falling amoebas will be converted.
-    
-I do not know if this is possible at all but an adaptive frame rate corresponding with the 
-monitor refresh rate would be nice but I do not know if the influence on the game speed would be 
-negative.
-
-bdcff beolvasás miért hash table?
-  size és hasonló szarok miatt
-  de tobb értéket is kéne tárolni esetleg, a hash table ezt akadályozza
-  multimap nem oldja meg?
-  c++98 multimap insert: There are no guarantees on the relative order of equivalent elements.
-
-cave play statistics:   1   2   3   4   5
-        played
-        finished
-        best time
-        most diamonds
-        most score
-something missing in GDash - now you can immediately see which caves you've played, and which 
-ones you should try again, also, high score, best time, most collected diamonds. delete 
-highscore stuff from cave, caveset & bdcff
-
-editor cave statistics:
-    - size
-    - number of Boulders
-    - number of Diamonds
-    - number of dirt
-    - number of Fireflies
+    *) Rockford's revenge cave 9 scrolling
+        itt az a kérdés, melyik legyen az active player. az, akit először/utoljára megtalál a cave scan,
+        vagy az, akit először/utoljára megtalál ÉS tudott mozogni?
+        a születő rockford is számítson aktívnak!
+    *) cow movement not perfect
 
 
 - beolvasás/kiírás scanned bit
     - bdcff import/export
-
-- double <-> int
-
-- pályákat keresni
-
-- brc import explosion effect
-
-- settingst szétdobni
 
 replay hogy minden keypresst elmentsen?
 keypress->mov az iteratebe
@@ -131,10 +56,7 @@ Amoeba2 sound
 new slime sound
 replicator sound
 
-mi legyen a replay checksumokkal
+mi legyen a replay checksumokkal? helpben is van róla szó.
 
 design tips?
 
-cow movement not perfect
-
-pal emulation should be somehow the attribute of the screen object.

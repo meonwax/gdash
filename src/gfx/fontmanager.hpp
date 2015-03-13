@@ -1,31 +1,38 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
 
-#ifndef _GD_GFX_FONTS
-#define _GD_GFX_FONTS
+#ifndef FONTMANAGER_HPP_INCLUDED
+#define FONTMANAGER_HPP_INCLUDED
 
 #include <list>
 #include <glib.h>
 #include <string>
 #include <vector>
 
-#include "cave/helper/colors.hpp"
-#include "gfx/pixmap.hpp"
+#include "cave/colors.hpp"
+#include "gfx/pixmapstorage.hpp"
 
 class Pixbuf;
 class Pixmap;
@@ -43,11 +50,12 @@ class Screen;
 #define GD_CHECKED_BOX_CHAR char(7)
 
 #define GD_PLAYER_CHAR char(8)
-#define GD_DIAMOND_CHAR char(9)
+#define GD_TAB_CHAR char(9)         // cannot be used, as it is the tabulator
 #define GD_NEWLINE_CHAR char(10)    // this cannot be used as a separate character, as it is the newline char
 #define GD_SKELETON_CHAR char(11)
 #define GD_KEY_CHAR char(12)
 #define GD_FULL_BOX_CHAR char(13)
+#define GD_DIAMOND_CHAR char(14)
 
 
 #define GD_ACUTE_CHAR char(16)
@@ -84,8 +92,8 @@ private:
     /// The currently selected color
     GdColor current_color;
 
-    /// The pixbuf factory used to render the fonts.
-    PixbufFactory const &pixbuf_factory;
+    /// The Screen on which this FontManager is working.
+    Screen &screen;
 
     /// Rendered fonts are stored in a list for caching.
     typedef std::list<RenderedFont *> container;
@@ -109,7 +117,6 @@ private:
     RenderedFont *wide(const GdColor &c);
 
     /// @brief Draw a piece of text with wide or narrow font.
-    /// @param screen The screen or pixmap to draw on.
     /// @param x The x coordinate to start drawing at. If -1 is given,
     ///     the text will be centered on the screen.
     /// @param y The y coordinate to draw at.
@@ -119,7 +126,7 @@ private:
     /// @param widefont True for the wide font, false for the narrow one.
     /// @return The x coordinate at which the drawing was ended.
     ///     By this, more text can be written with successive blittext calls.
-    int blittext_internal(Screen &screen, int x, int y, char const *text, bool widefont);
+    int blittext_internal(int x, int y, char const *text, bool widefont);
 
     FontManager(const FontManager &);   // not implemented
     FontManager &operator=(const FontManager &); // not implemented
@@ -129,7 +136,7 @@ private:
 
 public:
     /// @brief Creates a font manager.
-    FontManager(const PixbufFactory &pixbuf_factory_, const std::string &theme_file);
+    FontManager(Screen &screen, const std::string &theme_file);
 
     /// @brief Destructor.
     virtual ~FontManager();
@@ -141,28 +148,28 @@ public:
 
     /// @brief Write text on the screen with the wide font.
     /// For more info, look at blittext_internal.
-    int blittext(Screen &screen, int x, int y, char const *text) {
-        return blittext_internal(screen, x, y, text, true);
+    int blittext(int x, int y, char const *text) {
+        return blittext_internal(x, y, text, true);
     }
 
     /// @brief Write text on the screen with the wide font.
     /// For more info, look at blittext_internal.
-    int blittext(Screen &screen, int x, int y, const GdColor &color, char const *text) {
+    int blittext(int x, int y, const GdColor &color, char const *text) {
         set_color(color);
-        return blittext_internal(screen, x, y, text, true);
+        return blittext_internal(x, y, text, true);
     }
 
     /// @brief Write text on the screen with the narrow font.
     /// For more info, look at blittext_internal.
-    int blittext_n(Screen &screen, int x, int y, char const *text) {
-        return blittext_internal(screen, x, y, text, false);
+    int blittext_n(int x, int y, char const *text) {
+        return blittext_internal(x, y, text, false);
     }
 
     /// @brief Write text on the screen with the narrow font.
     /// For more info, look at blittext_internal.
-    int blittext_n(Screen &screen, int x, int y, const GdColor &color, char const *text) {
+    int blittext_n(int x, int y, const GdColor &color, char const *text) {
         set_color(color);
-        return blittext_internal(screen, x, y, text, false);
+        return blittext_internal(x, y, text, false);
     }
 
     /// @brief Set font of the manager.
@@ -171,12 +178,9 @@ public:
 
     /// @brief Destroy cache.
     void clear();
-    
+
     /// @brief Implement PixmapStorage.
     virtual void release_pixmaps();
-
-    /// @brief Get scale factor for drawing. @todo Remove?
-    int get_pixmap_scale() const;
 
     /// @brief Get height of font in pixels.
     int get_font_height() const;

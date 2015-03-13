@@ -1,21 +1,28 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _GD_GAMEAPPLET
-#define _GD_GAMEAPPLET
+#ifndef GAMEACTIVITY_HPP_INCLUDED
+#define GAMEACTIVITY_HPP_INCLUDED
 
 #include "framework/app.hpp"
 #include "gfx/cellrenderer.hpp"
@@ -24,24 +31,36 @@
 class GameControl;
 class Command;
 
+/**
+ * This activity allows the user playing the game.
+ * It must be given a dinamically allocated GameControl object,
+ * and passes all keypresses and stuff to this object.
+ */
 class GameActivity: public Activity {
 public:
+    /** Constructor of the GameActiviyt.
+     * @param app The parent App.
+     * @param game A newly allocated GameControl object, which will be passed the keypresses. Will be
+     * automatically deleted on exit. */
     GameActivity(App *app, GameControl *game);
     ~GameActivity();
     virtual void shown_event();
     virtual void hidden_event();
-    virtual void redraw_event();
+    virtual void redraw_event(bool full) const;
     virtual void keypress_event(KeyCode keycode, int gfxlib_keycode);
     virtual void timer_event(int ms_elapsed);
 
-    /* if you change these, change the help strings in the cpp file as well */
+    /**
+     * Shortcut keys in the GameActivity.
+     * Public for the GTK+ frontend to emulate these keypresses.
+     * If you change these, change the help strings as well. */
     enum Keys {
         EndGameKey = App::F1,
         RandomColorKey = App::F2,
         TakeSnapshotKey = App::F3,
         RevertToSnapshotKey = App::F4,
         PauseKey = ' ',
-        RestartLevelKey = App::F12,
+        CaveVariablesKey = App::F8,
     };
 
 private:
@@ -49,7 +68,6 @@ private:
     CellRenderer cellrenderer;
     GameRenderer gamerenderer;
     bool exit_game, show_highscore, paused;
-    int time_ms;
 };
 
 #endif

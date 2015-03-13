@@ -1,67 +1,50 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef GFX_PIXBUFFACTORY_H
-#define GFX_PIXBUFFACTORY_H
+#ifndef PIXBUFFACTORY_HPP_INCLUDED
+#define PIXBUFFACTORY_HPP_INCLUDED
 
 #include "config.h"
 
 class Pixbuf;
-class Pixmap;
 class GdColor;
-
-extern const char *gd_scaling_name[];
-extern const int gd_scaling_scale[];
-
 
 /// Scaling types supported by the pixbuf engine
 enum GdScalingType {
-    GD_SCALING_ORIGINAL,    ///< no scaling
-    GD_SCALING_2X,          ///< 2x nearest scaling
-    GD_SCALING_2X_SCALE2X,    ///< 2x scaling with the scale2x filter
-    GD_SCALING_2X_HQ2X,     ///< 2x scaling with the hq2x filter
-    GD_SCALING_3X,          ///< 3x nearest scaling
-    GD_SCALING_3X_SCALE3X,    ///< 3x scaling with the scale3x filter
-    GD_SCALING_3X_HQ3X,       ///< 3x scaling with the hq2x filter
-    GD_SCALING_4X,          ///< 4x nearest scaling
-    GD_SCALING_4X_SCALE4X,    ///< 4x scaling (scale2x applied twice)
-    GD_SCALING_4X_HQ4X,        ///< 4x scaling with hq4x
+    GD_SCALING_NEAREST,    ///< nearest neighbor
+    GD_SCALING_SCALE2X,    ///< Scale2X algorithm by Andrea Mazzoleni
+    GD_SCALING_HQX,        ///< HQX algorithm by Maxim Stepin and Cameron Zemek
     GD_SCALING_MAX,
 };
+
+/// Names of scaling types supported.
+extern const char *gd_scaling_names[];
 
 
 /// @ingroup Graphics
 class PixbufFactory {
-protected:
-    GdScalingType scaling_type;
-    bool pal_emulation;
-
-    /// @brief Create a new pixbuf factory.
-    PixbufFactory(GdScalingType scaling_type_, bool pal_emulation_);
 public:
-    /// @brief Return the scale factor of the pixbuf->pixmap.
-    /// @return The scale factor, 1 is unscaled (original size)
-    int get_pixmap_scale() const;
-
-    /// @brief Set scaling type and pal emulation for factory.
-    void set_properties(GdScalingType scaling_type_, bool pal_emulation_);
-
-    /// @brief Returns true, if the factory uses pal emulation.
-    bool get_pal_emulation() {
-        return pal_emulation;
-    }
+    /// @brief Create a new pixbuf factory.
+    PixbufFactory() {}
 
     /// @brief Virtual destructor.
     virtual ~PixbufFactory() {}
@@ -70,18 +53,18 @@ public:
     /// @param w The width of the pixbuf.
     /// @param h The height of the pixbuf.
     /// @return A newly allocated pixbuf object. Free with delete.
-    virtual Pixbuf *create(int w, int h) const=0;
+    virtual Pixbuf *create(int w, int h) const = 0;
 
     /// @brief Create a new pixbuf, and load an image from memory.
     /// @param length The number of bytes of the image.
     /// @param data Pointer to the image in memory.
     /// @return A newly allocated pixbuf object. Free with delete.
-    virtual Pixbuf *create_from_inline(int length, unsigned char const *data) const=0;
+    virtual Pixbuf *create_from_inline(int length, unsigned char const *data) const = 0;
 
     /// @brief Create a new pixbuf, and load an image from a file.
     /// @param filename The name of the file to load.
     /// @return A newly allocated pixbuf object. Free with delete.
-    virtual Pixbuf *create_from_file(const char *filename) const=0;
+    virtual Pixbuf *create_from_file(const char *filename) const = 0;
 
     /// @brief Create a new pixbuf, and load an image file from memory, which is base64 encoded..
     /// @param base64 Base64 encoded image string, delimited with zero.
@@ -92,19 +75,19 @@ public:
     /// @param c Color
     /// @param a Alpha value; 0 will be invisible, 255 will totally cover. Default is 128, which looks nice, and is accelerated by SDL.
     /// @return The new pixbuf.
-    virtual Pixbuf *create_composite_color(const Pixbuf &src, const GdColor &c, unsigned char alpha=128) const=0;
+    virtual Pixbuf *create_composite_color(const Pixbuf &src, const GdColor &c, unsigned char alpha = 128) const = 0;
 
     /// @brief Create a pixbuf, which is a part of this one.
     /// Pixels will be shared!
-    virtual Pixbuf *create_subpixbuf(Pixbuf &src, int x, int y, int w, int h) const=0;
+    virtual Pixbuf *create_subpixbuf(Pixbuf &src, int x, int y, int w, int h) const = 0;
 
-    /// @brief Create a newly allocated pixmap.
-    /// @param pb The pixbuf to set the contents from.
-    /// @param format_alpha Preserve alpha channel.
-    /// @return A newly allocated pixmap object. Free with delete.
-    virtual Pixmap *create_pixmap_from_pixbuf(Pixbuf const &pb, bool format_alpha) const=0;
-
-    Pixbuf *create_scaled(const Pixbuf &src) const;
+    /// @brief Use the selected software scaled to create a new, enlarged pixbuf.
+    /// @param src The pixbuf to scale.
+    /// @param scaling_factor The factor of enlargement, 1x, 2x, 3x or 4x.
+    /// @param scaling_type The scaling algorithm.
+    /// @param pal_emulation Whether to add a PAL TV effect.
+    /// @return The scaled pixbuf, to be freed by the caller.
+    Pixbuf *create_scaled(const Pixbuf &src, int scaling_factor, GdScalingType scaling_type, bool pal_emulation) const;
 
     /// Names of rotations.
     enum Rotation {
@@ -115,7 +98,7 @@ public:
     };
 
     /// Creates a new, rotated pixbuf.
-    virtual Pixbuf *create_rotated(const Pixbuf &src, Rotation r) const=0;
+    virtual Pixbuf *create_rotated(const Pixbuf &src, Rotation r) const = 0;
 };
 
 #endif

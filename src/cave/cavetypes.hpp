@@ -1,21 +1,28 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _GD_CAVE_TYPES
-#define _GD_CAVE_TYPES
+#ifndef CAVETYPES_HPP_INCLUDED
+#define CAVETYPES_HPP_INCLUDED
 
 #include "config.h"
 
@@ -23,6 +30,7 @@
 
 
 /// This enum lists all types used in GDash cave classes.
+/// When adding a new type, check CaveStored::get_has_levels.
 enum GdType {
     GD_TYPE_STRING,          ///< A one-line string. A GdString will be used for that.
     GD_TYPE_LONGSTRING,      ///< Multi-line string. Internally also a GdString.
@@ -48,17 +56,17 @@ enum GdType {
 
 enum {
     /* these define the number of the cells in the png file */
-    NUM_OF_CELLS_X=8,
-    NUM_OF_CELLS_Y=48,
+    NUM_OF_CELLS_X = 8,
+    NUM_OF_CELLS_Y = 54,
     /* +80: placeholder for cells which are rendered by the game; for example diamond+arrow = falling diamond */
-    NUM_OF_CELLS=NUM_OF_CELLS_X*NUM_OF_CELLS_Y+80,
+    NUM_OF_CELLS = NUM_OF_CELLS_X * NUM_OF_CELLS_Y + 80,
 };
 
 /**
  * These are the "objects" (cells) in caves.
  *
  * Many of them have a "scanned" pair, which is required by the engine.
- */
+ */ 
 enum GdElementEnum {
     O_SPACE,
     O_DIRT,
@@ -302,7 +310,7 @@ enum GdElementEnum {
     O_PLAYER_ROCKET_LAUNCHER_scanned,
     O_PLAYER_GLUED,
     O_PLAYER_STIRRING,
-    
+
     O_ROCKET_LAUNCHER,
     O_ROCKET_1,
     O_ROCKET_1_scanned,
@@ -407,6 +415,8 @@ enum GdElementEnum {
     O_PLAYER_TAP,
     O_PLAYER_BLINK,
     O_PLAYER_TAP_BLINK,
+    O_PLAYER_PUSH_LEFT,
+    O_PLAYER_PUSH_RIGHT,
     O_CREATURE_SWITCH_ON,
     O_EXPANDING_WALL_SWITCH_HORIZ,
     O_EXPANDING_WALL_SWITCH_VERT,
@@ -430,6 +440,8 @@ enum GdElementEnum {
     O_GLUED,
     O_OUT,
     O_EXCLAMATION_MARK,
+    
+    O_MAX_INDEX,
 };
 
 
@@ -551,16 +563,29 @@ public:
     Coordinate() : x(0), y(0) {}
     /// Create a coordinate of (x,y).
     Coordinate(int x, int y) : x(x), y(y) {}
-    Coordinate &operator+=(Coordinate const &p);
-    Coordinate operator+(Coordinate const &rhs) const;
-    bool operator==(Coordinate const &rhs) const;
-    static void drag_rectangle(Coordinate &p1, Coordinate &p2, Coordinate current, Coordinate displacement);
+    /// Add a vector to a coordinate.
+    /// @param p The vector to add.
+    Coordinate &operator+=(Coordinate const &p) {
+        x += p.x;
+        y += p.y;
+        return *this;
+    }
+    /// Add two coordinates (vectors).
+    Coordinate operator+(Coordinate const &rhs) const {
+        return Coordinate(x + rhs.x, y + rhs.y);
+    }
+    /// Compare two coordinates for equality.
+    /// @return True, if they are the same.
+    bool operator==(Coordinate const &rhs) const {
+        return x == rhs.x && y == rhs.y;
+    }
+    static void drag_rectangle(Coordinate &p1, Coordinate &p2, Coordinate const &current, Coordinate const &displacement);
 };
 
 /// Class which helps cave map to BDCFF conversions.
 class CharToElementTable {
     // table to hold char->element; 0..127 ascii values
-    enum { ArraySize=128 };
+    enum { ArraySize = 128 };
     GdElementEnum table[ArraySize];
 public:
     CharToElementTable();
@@ -572,7 +597,7 @@ public:
 /// Initialize the GDash caves type system. Must be called at program start.
 void gd_cave_types_init();
 
-// These istream operators are needed by the bdcff reader.
+// These istream operators are needed by the bdcff reader to read some object types.
 std::istream &operator>>(std::istream &is, GdElementEnum &e);
 std::istream &operator>>(std::istream &is, Coordinate &p);
 
@@ -600,6 +625,8 @@ std::string visible_name(GdProbability const &p);
 const char *visible_name(GdSchedulingEnum sched);
 const char *visible_name(GdDirectionEnum dir);
 const char *visible_name(GdElementEnum elem);
+const char *visible_name_lowercase(GdElementEnum elem);
+std::string visible_name_no_attribute(GdElementEnum elem);
 const char *visible_name(GdEngineEnum eng);
 std::string visible_name(Coordinate const &p);
 

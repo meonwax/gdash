@@ -1,17 +1,24 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 /**
@@ -109,16 +116,16 @@
 #include <glib/gi18n.h>
 
 #include "framework/app.hpp"
+
 #include "framework/commands.hpp"
-#include "cave/helper/colors.hpp"
 #include "gfx/pixbuf.hpp"
 #include "gfx/fontmanager.hpp"
 #include "gfx/pixbuffactory.hpp"
 #include "gfx/screen.hpp"
-#include "framework/commands.hpp"
 #include "input/gameinputhandler.hpp"
 
 #include "misc/about.hpp"
+#include "misc/helptext.hpp"
 #include "sound/sound.hpp"
 #include "settings.hpp"
 
@@ -126,24 +133,51 @@
 #include "framework/askyesnoactivity.hpp"
 #include "framework/showtextactivity.hpp"
 #include "framework/inputtextactivity.hpp"
-#include "framework/volumeactivity.hpp"
 #include "framework/settingsactivity.hpp"
 #include "framework/messageactivity.hpp"
+#ifdef HAVE_SDL
+    #include "framework/volumeactivity.hpp"
+#endif
 
-#include "background.cpp"
+#include "gamebackground.cpp"
 
 std::string help_strings_to_string(char const **strings) {
     std::string s;
-    for (int n=0; strings[n] != NULL; n+=2)
-        s += SPrintf("%c%s  %c%s\n") % GD_COLOR_INDEX_YELLOW % strings[n] % GD_COLOR_INDEX_LIGHTBLUE % strings[n+1];
+    for (int n = 0; strings[n] != NULL; n += 2)
+        s += SPrintf("%c%s  %c%s\n") % GD_COLOR_INDEX_YELLOW % strings[n] % GD_COLOR_INDEX_LIGHTBLUE % strings[n + 1];
     return s;
 }
 
 
-App::App() {
-    pixbuf_factory = NULL;
+static std::string help_text_to_string(helpdata const help_text[]) {
+    std::string s = SPrintf("%c") % GD_COLOR_INDEX_LIGHTBLUE;
+    for (int i = 0; g_strcmp0(help_text[i].stock_id, HELP_LAST_LINE) != 0; ++i) {
+        GdElementEnum element = help_text[i].element;
+        if (element != O_NONE) {
+            // pixbuf missing here
+            if (help_text[i].heading == NULL) {
+                /* add element name only if no other text given */
+                s += SPrintf("%c%s%c\n") % GD_COLOR_INDEX_YELLOW % visible_name_no_attribute(element);
+            }
+        }
+        if (help_text[i].heading) {
+            /* some words in big letters */
+            s += SPrintf("%c%s%c\n") % GD_COLOR_INDEX_YELLOW % _(help_text[i].heading);
+        }
+        if (help_text[i].keyname)
+            s += SPrintf(" %c%s\t") % GD_COLOR_INDEX_YELLOW % _(help_text[i].keyname);
+        if (help_text[i].description)
+            s += SPrintf("%c%s\n") % GD_COLOR_INDEX_LIGHTBLUE % _(help_text[i].description);
+        s += "\n";
+    }
+    return s;
+}
+
+
+App::App(Screen &screenref)
+    : PixmapStorage(screenref),
+      screen(&screenref) {
     font_manager = NULL;
-    screen = NULL;
     gameinput = NULL;
     caveset = NULL;
     background_image = NULL;
@@ -156,8 +190,6 @@ App::~App() {
     release_pixmaps();
     delete gameinput;
     delete font_manager;
-    delete pixbuf_factory;
-    delete screen;
 }
 
 
@@ -188,21 +220,56 @@ void App::set_start_editor_command(SmartPtr<Command> command) {
 
 
 void App::clear_screen() {
+    /* create if needed */
     if (!background_image) {
-        Pixbuf *pixbuf = pixbuf_factory->create_from_inline(sizeof(background), background);
-        background_image = pixbuf_factory->create_pixmap_from_pixbuf(*pixbuf, false);
+        Pixbuf *pixbuf = screen->pixbuf_factory.create_from_inline(sizeof(gamebackground), gamebackground);
+        background_image = screen->create_scaled_pixmap_from_pixbuf(*pixbuf, false);
         delete pixbuf;
-        screen->register_pixmap_storage(this);
     }
-    screen->blit(*background_image, 0, 0);
+    /* tile */
+    for (int y = 0; y < screen->get_height(); y += background_image->get_height())
+        for (int x = 0; x < screen->get_width(); x += background_image->get_width())
+            screen->blit(*background_image, x, y);
 }
 
 
 void App::draw_window(int rx, int ry, int rw, int rh) {
-    int const size = pixbuf_factory->get_pixmap_scale();
-    screen->fill_rect(rx-2*size, ry-2*size, rw+4*size, rh+4*size, GdColor::from_rgb(64,64,64));
-    screen->fill_rect(rx-1*size, ry-1*size, rw+2*size, rh+2*size, GdColor::from_rgb(128,128,128));
-    screen->fill_rect(rx, ry, rw, rh, GdColor::from_rgb(0,0,0));
+    /* if we have a "redraw all", we cannot build on the fact that the
+     * background stayed. so rather clear the screen befure drawing a window */
+    if (screen->must_redraw_all_before_flip())
+        clear_screen();
+
+    int const size = screen->get_pixmap_scale();
+    screen->fill_rect(rx - 2 * size, ry - 2 * size, rw + 4 * size, rh + 4 * size, GdColor::from_rgb(64, 64, 64));
+    screen->fill_rect(rx - 1 * size, ry - 1 * size, rw + 2 * size, rh + 2 * size, GdColor::from_rgb(128, 128, 128));
+    screen->fill_rect(rx, ry, rw, rh, GdColor::from_rgb(0, 0, 0));
+}
+
+
+void App::draw_scrollbar(int min, int current, int max) {
+    /* positions in char heights */
+    const int upper = 3, lower = 3;
+    /* if nothing to scroll, return immediately. */
+    if (max <= min)
+        return;
+    set_color(GD_GDASH_GRAY2);
+    /* bar */
+    screen->fill_rect(screen->get_width() - font_manager->get_font_width_narrow(), 
+        upper * font_manager->get_font_height(),
+        font_manager->get_font_width_narrow(),
+        screen->get_height() - (upper+lower) * font_manager->get_font_height(),
+        GdColor::from_rgb(0, 0, 0));
+    /* up & down arrow */
+    blittext_n(screen->get_width() - font_manager->get_font_width_narrow(),
+                screen->get_height() - (lower+1) * font_manager->get_font_height(), CPrintf("%c") % GD_DOWN_CHAR);
+    blittext_n(screen->get_width() - font_manager->get_font_width_narrow(),
+                upper * font_manager->get_font_height(), CPrintf("%c") % GD_UP_CHAR);
+    /* slider */
+    double pos = current / double(max-min);
+    pos = pos * (screen->get_height() - font_manager->get_font_height() * (upper+lower+2) - font_manager->get_font_height());
+    pos = pos + font_manager->get_font_height() * (upper+1);
+    blittext_n(screen->get_width() - font_manager->get_font_width_narrow(),
+                pos, CPrintf("%c") % GD_FULL_BOX_CHAR);
 }
 
 
@@ -214,7 +281,6 @@ void App::select_file_and_do_command(const char *title, const char *start_dir, c
 void App::ask_yesorno_and_do_command(char const *question, const char *yes_answer, char const *no_answer, SmartPtr<Command> command_when_yes, SmartPtr<Command> command_when_no) {
     enqueue_command(new PushActivityCommand(this, new AskYesNoActivity(this, question, yes_answer, no_answer, command_when_yes, command_when_no)));
 }
-
 
 void App::show_text_and_do_command(char const *title_line, std::string const &text, SmartPtr<Command> command_after_exit) {
     enqueue_command(new PushActivityCommand(this, new ShowTextActivity(this, title_line, text, command_after_exit)));
@@ -229,12 +295,23 @@ void App::show_message(std::string const &primary, std::string const &secondary,
     enqueue_command(new PushActivityCommand(this, new MessageActivity(this, primary, secondary, command_after_exit)));
 }
 
+void App::show_help(helpdata const help_text[]) {
+    // TRANSLATORS: 'H' uppercase because of title capitalization in English.
+    show_text_and_do_command("GDash Help", help_text_to_string(help_text));
+}
+
 void App::show_about_info() {
     // TRANSLATORS: about dialog box categories.
     struct String {
         char const *title;
         char const *text;
-    } strings[] = { { "GDash", About::comments }, { _("Copyright"), About::copyright}, { _("Website"), About::website }, { NULL, NULL } };
+    } strings[] = {
+        { _("About GDash"), _(About::comments) },
+        { _("Copyright"), _(About::copyright) },
+        { _("License"), _(About::license) },
+        { _("Website"), _(About::website) },
+        { NULL, NULL }
+    };
     // TRANSLATORS: about dialog box categories.
     struct StringArray {
         char const *title;
@@ -257,8 +334,6 @@ void App::show_about_info() {
         }
         text += '\n';
     }
-    // TRANSLATORS: about dialog box categories.
-    text += SPrintf("%c%s\n%c%s") % GD_COLOR_INDEX_YELLOW % _("License") % GD_COLOR_INDEX_LIGHTBLUE % About::license;
 
     show_text_and_do_command(PACKAGE_NAME PACKAGE_VERSION, text);
 }
@@ -278,19 +353,19 @@ void App::set_color(const GdColor &color) {
 /** write something to the screen, with normal characters.
  * x=-1 -> center horizontally */
 int App::blittext_n(int x, int y, const char *text) {
-    return font_manager->blittext_n(*screen, x, y, text);
+    return font_manager->blittext_n(x, y, text);
 }
 
 
 /** set status line (the last line in the screen) to text */
 void App::status_line(const char *text) {
-    font_manager->blittext_n(*screen, -1, screen->get_height()-font_manager->get_font_height(), GD_GDASH_GRAY2, text);
+    font_manager->blittext_n(-1, screen->get_height() - font_manager->get_font_height(), GD_GDASH_GRAY2, text);
 }
 
 
 /** set title line (the first line in the screen) to text */
 void App::title_line(const char *text) {
-    font_manager->blittext_n(*screen, -1, 0, GD_GDASH_WHITE, text);
+    font_manager->blittext_n(-1, 0, GD_GDASH_WHITE, text);
 }
 
 
@@ -320,7 +395,7 @@ void App::keypress_event(Activity::KeyCode keycode, int gfxlib_keycode) {
             /* if we have sound, key f9 will push a volume activity.
              * that activity will receive the keypresses. */
 #ifdef HAVE_SDL
-            if (dynamic_cast<VolumeActivity *>(topmost_activity()) == NULL) {
+            if (gd_sound_enabled && dynamic_cast<VolumeActivity *>(topmost_activity()) == NULL) {
                 enqueue_command(new PushActivityCommand(this, new VolumeActivity(this)));
             }
 #endif // ifdef HAVE_SDL
@@ -343,9 +418,11 @@ void App::keypress_event(Activity::KeyCode keycode, int gfxlib_keycode) {
 }
 
 
-void App::redraw_event() {
-    if (topmost_activity()) {
-        topmost_activity()->redraw_event();
+void App::redraw_event(bool full) {
+    Activity *topmost = topmost_activity();
+    if (topmost != NULL) {
+        topmost->redraw_event(full);
+        topmost->redraw_queued = false;
         process_commands();
     }
 }
@@ -395,10 +472,11 @@ void App::push_activity(Activity *the_activity) {
     if (topmost_activity()) {
         topmost_activity()->hidden_event();
     }
+    /* push the new one to the top */
     running_activities.push(the_activity);
     the_activity->pushed_event();
     the_activity->shown_event();
-    the_activity->redraw_event();
+    redraw_event(true);
 }
 
 
@@ -409,9 +487,10 @@ void App::pop_activity() {
         delete running_activities.top();
         running_activities.pop();
         /* send a redraw to the topmost one */
-        if (!running_activities.empty()) {
-            running_activities.top()->shown_event();
-            running_activities.top()->redraw_event();
+        Activity *topmost = topmost_activity();
+        if (topmost != NULL) {
+            topmost->shown_event();
+            redraw_event(true);
         }
     }
 }
@@ -423,8 +502,16 @@ void App::pop_all_activities() {
 }
 
 
-Activity *App::topmost_activity() {
+Activity *App::topmost_activity() const {
     if (running_activities.empty())
         return NULL;
     return running_activities.top();
+}
+
+
+bool App::redraw_queued() const {
+    Activity *topmost = topmost_activity();
+    if (topmost == NULL)
+        return false;
+    return topmost->redraw_queued;
 }

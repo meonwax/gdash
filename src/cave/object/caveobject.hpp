@@ -1,20 +1,27 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef _GD_CAVEOBJECT
-#define _GD_CAVEOBJECT
+#ifndef CAVEOBJECT_HPP_INCLUDED
+#define CAVEOBJECT_HPP_INCLUDED
 
 #include "config.h"
 
@@ -61,20 +68,20 @@ public:
 
     /// Clone object - create a newly allocated, exact copy.
     /// This will be the virtual constructor. All derived objects must implement this.
-    virtual CaveObject *clone() const=0;
+    virtual CaveObject *clone() const = 0;
 
     /// Draw the object on a specified level, in the specified cave. All derived objects implement this.
     /// @param cave The mapped (for game) cave to draw on
-    virtual void draw(CaveRendered &cave) const=0;
+    virtual void draw(CaveRendered &cave) const = 0;
 
     /// Get BDCFF description of object. All derived objects must implement.
-    virtual std::string get_bdcff() const=0;
+    virtual std::string get_bdcff() const = 0;
 
     /// Create a new object, and load properties from an istream.
     /// As sometimes the object name in the bdcff file also stores information about
     /// an object (for example, AddBackwards, we must also pass the name.
     /// Implementations should return NULL, if a read error occurs.
-    virtual CaveObject *clone_from_bdcff(const std::string &name, std::istream &is) const=0;
+    virtual CaveObject *clone_from_bdcff(const std::string &name, std::istream &is) const = 0;
 
     /// Object factory.
     static CaveObject *create_from_bdcff(const std::string &str);
@@ -84,26 +91,26 @@ public:
     /// button is still pressed.
     /// @param current The coordinate clicked.
     /// @param displacement The movement vector after the last click.
-    virtual void create_drag(Coordinate current, Coordinate displacement)=0;
+    virtual void create_drag(Coordinate current, Coordinate displacement) = 0;
 
     /// This function is called when a single object is moved in the editor by drag&drop.
     /// @param current The coordinate clicked.
     /// @param displacement The movement vector after the last click.
-    virtual void move(Coordinate current, Coordinate displacement)=0;
+    virtual void move(Coordinate current, Coordinate displacement) = 0;
 
     /// This function is called when multiple objects are dragged in the editor.
     /// @param displacement The movement vector.
-    virtual void move(Coordinate displacement)=0;
+    virtual void move(Coordinate displacement) = 0;
 
     /// Get a short string which shows the coordinates of the object in the object list of the editor.
-    virtual std::string get_coordinates_text() const=0;
+    virtual std::string get_coordinates_text() const = 0;
 
     /// Get an element which is very characteristic of the object - to show in the object list.
     /// If there is none, this returns O_NONE (for example a copy&paste object).
-    virtual GdElementEnum get_characteristic_element() const=0;
+    virtual GdElementEnum get_characteristic_element() const = 0;
 
     /// Get a string which describes the object in one sentence. It is translated to the current language.
-    virtual std::string get_description_markup() const=0;
+    virtual std::string get_description_markup() const = 0;
 
 protected:
     /// Protected constructor for all derived classes.

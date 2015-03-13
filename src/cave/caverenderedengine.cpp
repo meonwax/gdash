@@ -1,28 +1,32 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
 
-#include <algorithm>
 #include <cmath>
-#include "cave/elementproperties.hpp"
 
 #include "cave/caverendered.hpp"
-#include "cave/helper/cavesound.hpp"
-#include "misc/util.hpp"
+#include "cave/elementproperties.hpp"
 #include "settings.hpp"
 
 
@@ -30,14 +34,14 @@
 // these arrays contain the rotated directions.
 // ccw eighth: counter-clockwise, 1/8 turn (45 degrees)
 // cw fourth: clockwise, 1/4 turn (90 degrees)
-static GdDirection const ccw_eighth[]= { MV_STILL, MV_UP_LEFT, MV_UP, MV_UP_RIGHT, MV_RIGHT, MV_DOWN_RIGHT, MV_DOWN, MV_DOWN_LEFT };
-static GdDirection const ccw_fourth[]= { MV_STILL, MV_LEFT, MV_UP_LEFT, MV_UP, MV_UP_RIGHT, MV_RIGHT, MV_DOWN_RIGHT, MV_DOWN, MV_DOWN_LEFT, MV_LEFT };
-static GdDirection const cw_eighth[]= { MV_STILL, MV_UP_RIGHT, MV_RIGHT, MV_DOWN_RIGHT, MV_DOWN, MV_DOWN_LEFT, MV_LEFT, MV_UP_LEFT, MV_UP };
-static GdDirection const cw_fourth[]= { MV_STILL, MV_RIGHT, MV_DOWN_RIGHT, MV_DOWN, MV_DOWN_LEFT, MV_LEFT, MV_UP_LEFT, MV_UP, MV_UP_RIGHT };
+static GdDirection const ccw_eighth[] = { MV_STILL, MV_UP_LEFT, MV_UP, MV_UP_RIGHT, MV_RIGHT, MV_DOWN_RIGHT, MV_DOWN, MV_DOWN_LEFT };
+static GdDirection const ccw_fourth[] = { MV_STILL, MV_LEFT, MV_UP_LEFT, MV_UP, MV_UP_RIGHT, MV_RIGHT, MV_DOWN_RIGHT, MV_DOWN, MV_DOWN_LEFT, MV_LEFT };
+static GdDirection const cw_eighth[] = { MV_STILL, MV_UP_RIGHT, MV_RIGHT, MV_DOWN_RIGHT, MV_DOWN, MV_DOWN_LEFT, MV_LEFT, MV_UP_LEFT, MV_UP };
+static GdDirection const cw_fourth[] = { MV_STILL, MV_RIGHT, MV_DOWN_RIGHT, MV_DOWN, MV_DOWN_LEFT, MV_LEFT, MV_UP_LEFT, MV_UP, MV_UP_RIGHT };
 // 180 degrees turn of a direction
-static GdDirection const opposite[]= { MV_STILL, MV_DOWN, MV_DOWN_LEFT, MV_LEFT, MV_UP_LEFT, MV_UP, MV_UP_RIGHT, MV_RIGHT, MV_DOWN_RIGHT };
+static GdDirection const opposite[] = { MV_STILL, MV_DOWN, MV_DOWN_LEFT, MV_LEFT, MV_UP_LEFT, MV_UP, MV_UP_RIGHT, MV_RIGHT, MV_DOWN_RIGHT };
 // doubling a direction (e.g. right=1,0   2x right=2,0
-static GdDirection const twice[]= { MV_STILL, MV_UP_2, MV_UP_RIGHT_2, MV_RIGHT_2, MV_DOWN_RIGHT_2, MV_DOWN_2, MV_DOWN_LEFT_2, MV_LEFT_2, MV_UP_LEFT_2 };
+static GdDirection const twice[] = { MV_STILL, MV_UP_2, MV_UP_RIGHT_2, MV_RIGHT_2, MV_DOWN_RIGHT_2, MV_DOWN_2, MV_DOWN_LEFT_2, MV_LEFT_2, MV_UP_LEFT_2 };
 
 
 void CaveRendered::add_particle_set(int x, int y, GdElementEnum particletype) {
@@ -51,60 +55,67 @@ void CaveRendered::add_particle_set(int x, int y, GdElementEnum particletype) {
     double gx = gd_dx[gravity], gy = gd_dy[gravity], agx = fabs(gx), agy = fabs(gy);
     switch (particletype) {
         case O_DIRT:
-            particles.push_back(ParticleSet(75, 0.1, 0.15, x+0.5, y+0.5, 0.5, 0.5, 0, 0, 1, 1, dirt_particle_color));
+            particles.push_back(ParticleSet(75, 0.1, 0.15, x + 0.5, y + 0.5, 0.5, 0.5, 0, 0, 1, 1, dirt_particle_color));
             break;
         case O_DIRT2:
-            particles.push_back(ParticleSet(75, 0.1, 0.15, x+0.5, y+0.5, 0.5, 0.5, 0, 0, 1, 1, dirt_2_particle_color));
+            particles.push_back(ParticleSet(75, 0.1, 0.15, x + 0.5, y + 0.5, 0.5, 0.5, 0, 0, 1, 1, dirt_2_particle_color));
             break;
-        case O_STONE:
+        case O_STONE_F:
             particles.push_back(ParticleSet(75, 0.1, 0.15,
-                                            x+0.5+0.5*gx, y+0.5+0.5*gy, 0.25+0.25*agy, 0.25+0.25*agx,
-                                            0.5*gx, 0.5*gy, 1+agy, 1+agx, stone_particle_color));
+                                            x + 0.5 + 0.5 * gx, y + 0.5 + 0.5 * gy, 0.25 + 0.25 * agy, 0.25 + 0.25 * agx,
+                                            0.5 * gx, 0.5 * gy, 1 + agy, 1 + agx, stone_particle_color));
             break;
-        case O_MEGA_STONE:
+        case O_MEGA_STONE_F:
             particles.push_back(ParticleSet(75, 0.1, 0.15,
-                                            x+0.5+0.5*gx, y+0.5+0.5*gy, 0.25+0.25*agy, 0.25+0.25*agx,
-                                            0.5*gx, 0.5*gy, 1+agy, 1+agx, mega_stone_particle_color));
+                                            x + 0.5 + 0.5 * gx, y + 0.5 + 0.5 * gy, 0.25 + 0.25 * agy, 0.25 + 0.25 * agx,
+                                            0.5 * gx, 0.5 * gy, 1 + agy, 1 + agx, mega_stone_particle_color));
+            break;
+        case O_DIAMOND_F:
+            /* falling diamond */
+            particles.push_back(ParticleSet(15, 0.03, 0.5,
+                                            x + 0.5 + 0.5 * gx, y + 0.5 + 0.5 * gy, 0.25, 0.25,
+                                            0, 0, 2, 2, diamond_particle_color));
             break;
         case O_DIAMOND:
-            particles.push_back(ParticleSet(20, 0.03, 0.5,
-                                            x+0.5, y+0.5, 0.25, 0.25,
+            /* collecting diamond */
+            particles.push_back(ParticleSet(8, 0.03, 0.5,
+                                            x + 0.5, y + 0.5, 0.25, 0.25,
                                             0, 0, 2, 2, diamond_particle_color));
             break;
         case O_EXPLODE_1:
             /* for explosions, the original place of the particles is a 2x2 cave cell area, but they
              * expand rapidly. */
-            particles.push_back(ParticleSet(300, 0.05, 0.5, x+0.5, y+0.5, 1.0, 1.0, 0, 0, 4, 4, explosion_particle_color));
+            particles.push_back(ParticleSet(300, 0.05, 0.5, x + 0.5, y + 0.5, 1.0, 1.0, 0, 0, 4, 4, explosion_particle_color));
             break;
         case O_PRE_DIA_1:
-            particles.push_back(ParticleSet(300, 0.05, 0.5, x+0.5, y+0.5, 1.0, 1.0, 0, 0, 4, 4, diamond_particle_color));
+            particles.push_back(ParticleSet(300, 0.05, 0.5, x + 0.5, y + 0.5, 1.0, 1.0, 0, 0, 4, 4, diamond_particle_color));
             break;
         case O_MAGIC_WALL:
             // a magic wall creates particles in every frame. so add only very few particles!
             // rather they should be bright like stars
-            particles.push_back(ParticleSet(3, 0.01, 0.75, x+0.5, y+0.5, 0.5, 0.5, 0, 0, 1+2*agx, 1+2*agy, magic_wall_particle_color));
+            particles.push_back(ParticleSet(3, 0.01, 0.75, x + 0.5, y + 0.5, 0.5, 0.5, 0, 0, 1 + 2 * agx, 1 + 2 * agy, magic_wall_particle_color));
             break;
         case O_EXPANDING_WALL:
-            particles.push_back(ParticleSet(75, 0.1, 0.15, x+0.5, y+0.5, 0.5, 0.5, 0, 0, 1, 1, expanding_wall_particle_color));
+            particles.push_back(ParticleSet(75, 0.1, 0.15, x + 0.5, y + 0.5, 0.5, 0.5, 0, 0, 1, 1, expanding_wall_particle_color));
             break;
         case O_EXPANDING_STEEL_WALL:
-            particles.push_back(ParticleSet(75, 0.1, 0.15, x+0.5, y+0.5, 0.5, 0.5, 0, 0, 1, 1, expanding_steel_wall_particle_color));
+            particles.push_back(ParticleSet(75, 0.1, 0.15, x + 0.5, y + 0.5, 0.5, 0.5, 0, 0, 1, 1, expanding_steel_wall_particle_color));
             break;
         case O_LAVA:
             // this should look like it's boiling
-            particles.push_back(ParticleSet(10, 0.01, 0.5, x+0.5, y+0.5, 0.5, 0.5, 0, 0, 2, 2, lava_particle_color));
+            particles.push_back(ParticleSet(10, 0.01, 0.5, x + 0.5, y + 0.5, 0.5, 0.5, 0, 0, 2, 2, lava_particle_color));
             break;
         case O_ROCKET_1:
-            particles.push_back(ParticleSet(100, 0.03, 0.25, x+0.9, y+0.5, 0.5, 0.2, -4, 0.2, 3, 0.2, explosion_particle_color));
+            particles.push_back(ParticleSet(100, 0.03, 0.25, x + 0.9, y + 0.5, 0.5, 0.2, -4, 0.2, 3, 0.2, explosion_particle_color));
             break;
         case O_ROCKET_2:
-            particles.push_back(ParticleSet(100, 0.03, 0.25, x+0.5, y+0.1, 0.2, 0.5, 0.2, 4, 0.2, 3, explosion_particle_color));
+            particles.push_back(ParticleSet(100, 0.03, 0.25, x + 0.5, y + 0.1, 0.2, 0.5, 0.2, 4, 0.2, 3, explosion_particle_color));
             break;
         case O_ROCKET_3:
-            particles.push_back(ParticleSet(100, 0.03, 0.25, x+0.1, y+0.5, 0.5, 0.2, 4, 0.2, 3, 0.2, explosion_particle_color));
+            particles.push_back(ParticleSet(100, 0.03, 0.25, x + 0.1, y + 0.5, 0.5, 0.2, 4, 0.2, 3, 0.2, explosion_particle_color));
             break;
         case O_ROCKET_4:
-            particles.push_back(ParticleSet(100, 0.03, 0.25, x+0.5, y+0.9, 0.2, 0.5, 0.2, -4, 0.2, 3, explosion_particle_color));
+            particles.push_back(ParticleSet(100, 0.03, 0.25, x + 0.5, y + 0.9, 0.2, 0.5, 0.2, -4, 0.2, 3, explosion_particle_color));
             break;
         default:
             break;
@@ -179,13 +190,13 @@ void CaveRendered::sound_play(GdSound sound, int x, int y) {
     SoundWithPos *s;
     switch (gd_sound_get_channel(sound)) {
         case 1:
-            s=&sound1;
+            s = &sound1;
             break;
         case 2:
-            s=&sound2;
+            s = &sound2;
             break;
         case 3:
-            s=&sound3;
+            s = &sound3;
             break;
         default:
             g_assert_not_reached();
@@ -202,11 +213,11 @@ void CaveRendered::sound_play(GdSound sound, int x, int y) {
         sound = GD_S_AMOEBA_MAGIC;
 
     /* sound coordinates relative to player */
-    int dx = x-player_x, dy = y-player_y;
+    int dx = x - player_x, dy = y - player_y;
     /* if higher precedence, or same precedence but closer than the previous one, play. */
     if (gd_sound_get_precedence(sound) >= gd_sound_get_precedence(s->sound)
             || (gd_sound_get_precedence(sound) == gd_sound_get_precedence(s->sound)
-                && (dx*dx + dy*dy) < (s->dx*s->dx + s->dy*s->dy))) {
+                && (dx * dx + dy * dy) < (s->dx * s->dx + s->dy * s->dy))) {
         *s = SoundWithPos(sound, dx, dy);
     }
 }
@@ -237,14 +248,14 @@ void CaveRendered::play_effect_of_element(GdElementEnum element, int x, int y, G
         case O_CHASING_STONE:
             sound_play(GD_S_STONE, x, y);
             if (particles)
-                add_particle_set(x, y, O_STONE);
+                add_particle_set(x, y, O_STONE_F);
             break;
 
         case O_MEGA_STONE:
         case O_MEGA_STONE_F:
             sound_play(GD_S_STONE, x, y);
             if (particles)
-                add_particle_set(x, y, O_MEGA_STONE);
+                add_particle_set(x, y, O_MEGA_STONE_F);
             break;
 
         case O_DIAMOND:
@@ -253,7 +264,7 @@ void CaveRendered::play_effect_of_element(GdElementEnum element, int x, int y, G
         case O_FLYING_DIAMOND_F:
             sound_play(GD_S_DIAMOND_RANDOM, x, y);
             if (particles)
-                add_particle_set(x, y, O_DIAMOND);
+                add_particle_set(x, y, O_DIAMOND_F);
             break;
 
         case O_NUT:
@@ -444,6 +455,10 @@ void CaveRendered::play_eat_particle_of_element(GdElementEnum element, int x, in
         case O_DIRT_LOOSE:
             add_particle_set(x, y, O_DIRT2);
             break;
+        case O_DIAMOND:
+        case O_FLYING_DIAMOND:
+            add_particle_set(x, y, O_DIAMOND);
+            break;
         case O_STEEL_EATABLE:
         case O_BRICK_EATABLE:
             break;
@@ -458,7 +473,7 @@ void CaveRendered::play_eat_particle_of_element(GdElementEnum element, int x, in
 void CaveRendered::set_seconds_sound() {
     /* this is an integer division, so 0 seconds can be 0.5 seconds... */
     /* also, when this reaches 8, the player still has 8.9999 seconds. so the sound is played at almost t=9s. */
-    switch (time/timing_factor) {
+    switch (time / timing_factor) {
         case 8:
             sound_play(GD_S_TIMEOUT_1, player_x, player_y);
             break;
@@ -497,22 +512,22 @@ inline GdElementEnum CaveRendered::get(int x, int y) const {
 
 /// Returns the element at (x,y)+dir.
 inline GdElementEnum CaveRendered::get(int x, int y, GdDirectionEnum dir) const {
-    return get(x+gd_dx[dir], y+gd_dy[dir]);
+    return get(x + gd_dx[dir], y + gd_dy[dir]);
 }
 
 /// Returns true, if element at (x,y)+dir explodes if hit by a stone (for example, a firefly).
 inline bool CaveRendered::explodes_by_hit(int x, int y, GdDirectionEnum dir) const {
-    return (gd_element_properties[get(x, y, dir)].flags&P_EXPLODES_BY_HIT)!=0;
+    return (gd_element_properties[get(x, y, dir)].flags & P_EXPLODES_BY_HIT) != 0;
 }
 
 /// returns true, if the element is not explodable (for example the steel wall).
 inline bool CaveRendered::non_explodable(int x, int y) const {
-    return (gd_element_properties[get(x,y)].flags&P_NON_EXPLODABLE)!=0;
+    return (gd_element_properties[get(x, y)].flags & P_NON_EXPLODABLE) != 0;
 }
 
 /// returns true, if the element at (x,y)+dir can be eaten by the amoeba (dirt, space)
 inline bool CaveRendered::amoeba_eats(int x, int y, GdDirectionEnum dir) const {
-    return (gd_element_properties[get(x, y, dir)].flags&P_AMOEBA_CONSUMES)!=0;
+    return (gd_element_properties[get(x, y, dir)].flags & P_AMOEBA_CONSUMES) != 0;
 }
 
 /// Returns true if the element is sloped, so stones and diamonds roll down on it.
@@ -526,13 +541,13 @@ inline bool CaveRendered::amoeba_eats(int x, int y, GdDirectionEnum dir) const {
 bool CaveRendered::sloped(int x, int y, GdDirectionEnum dir, GdDirectionEnum slop) const {
     switch (slop) {
         case MV_LEFT:
-            return (gd_element_properties[get(x, y, dir)].flags&P_SLOPED_LEFT)!=0;
+            return (gd_element_properties[get(x, y, dir)].flags & P_SLOPED_LEFT) != 0;
         case MV_RIGHT:
-            return (gd_element_properties[get(x, y, dir)].flags&P_SLOPED_RIGHT)!=0;
+            return (gd_element_properties[get(x, y, dir)].flags & P_SLOPED_RIGHT) != 0;
         case MV_UP:
-            return (gd_element_properties[get(x, y, dir)].flags&P_SLOPED_UP)!=0;
+            return (gd_element_properties[get(x, y, dir)].flags & P_SLOPED_UP) != 0;
         case MV_DOWN:
-            return (gd_element_properties[get(x, y, dir)].flags&P_SLOPED_DOWN)!=0;
+            return (gd_element_properties[get(x, y, dir)].flags & P_SLOPED_DOWN) != 0;
         default:
             break;
     }
@@ -542,47 +557,53 @@ bool CaveRendered::sloped(int x, int y, GdDirectionEnum dir, GdDirectionEnum slo
 
 /// returns true if the element is sloped for bladder movement (brick=yes, diamond=no, for example)
 inline bool CaveRendered::sloped_for_bladder(int x, int y, GdDirectionEnum dir) const {
-    return (gd_element_properties[get(x, y, dir)].flags&P_BLADDER_SLOPED)!=0;
+    return (gd_element_properties[get(x, y, dir)].flags & P_BLADDER_SLOPED) != 0;
 }
 
 /// returns true if the element at (x,y)+dir can blow up a fly by touching it.
 inline bool CaveRendered::blows_up_flies(int x, int y, GdDirectionEnum dir) const {
-    return (gd_element_properties[get(x, y, dir)].flags&P_BLOWS_UP_FLIES)!=0;
+    return (gd_element_properties[get(x, y, dir)].flags & P_BLOWS_UP_FLIES) != 0;
 }
 
 /// returns true if the element is a counter-clockwise creature
 inline bool CaveRendered::rotates_ccw(int x, int y) const {
-    return (gd_element_properties[get(x, y)].flags&P_CCW)!=0;
+    return (gd_element_properties[get(x, y)].flags & P_CCW) != 0;
 }
 
 /// returns true if the element is a player (normal player, player glued, player with bomb)
-inline bool CaveRendered::is_player(int x, int y) const {
-    return (gd_element_properties[get(x, y)].flags&P_PLAYER)!=0;
+bool CaveRendered::is_player(int x, int y) const {
+    return (gd_element_properties[get(x, y)].flags & P_PLAYER) != 0;
 }
 
 /// returns true if the element at (x,y)+dir is a player (normal player, player glued, player with bomb)
-inline bool CaveRendered::is_player(int x, int y, GdDirectionEnum dir) const {
-    return (gd_element_properties[get(x, y, dir)].flags&P_PLAYER)!=0;
+bool CaveRendered::is_player(int x, int y, GdDirectionEnum dir) const {
+    return (gd_element_properties[get(x, y, dir)].flags & P_PLAYER) != 0;
 }
 
 /// returns true if the element at (x,y)+dir can be hammered.
 inline bool CaveRendered::can_be_hammered(int x, int y, GdDirectionEnum dir) const {
-    return (gd_element_properties[get(x, y, dir)].flags&P_CAN_BE_HAMMERED)!=0;
+    return (gd_element_properties[get(x, y, dir)].flags & P_CAN_BE_HAMMERED) != 0;
+}
+
+/// Returns true if the element at (x,y)+dir can be pushed.
+/// @todo should be inlined.
+bool CaveRendered::can_be_pushed(int x, int y, GdDirectionEnum dir) const {
+    return (gd_element_properties[get(x, y, dir)].flags & P_CAN_BE_PUSHED) != 0;
 }
 
 /// returns true if the element at (x,y) is the first animation stage of an explosion
 inline bool CaveRendered::is_first_stage_of_explosion(int x, int y) const {
-    return (gd_element_properties[get(x, y)].flags&P_EXPLOSION_FIRST_STAGE)!=0;
+    return (gd_element_properties[get(x, y)].flags & P_EXPLOSION_FIRST_STAGE) != 0;
 }
 
 /// returns true if the element sits on and is moved by the conveyor belt
 inline bool CaveRendered::moved_by_conveyor_top(int x, int y, GdDirectionEnum dir) const {
-    return (gd_element_properties[get(x, y, dir)].flags&P_MOVED_BY_CONVEYOR_TOP)!=0;
+    return (gd_element_properties[get(x, y, dir)].flags & P_MOVED_BY_CONVEYOR_TOP) != 0;
 }
 
 /// returns true if the elements floats upwards, and is conveyed by the conveyor belt which is OVER it
 inline bool CaveRendered::moved_by_conveyor_bottom(int x, int y, GdDirectionEnum dir) const {
-    return (gd_element_properties[get(x, y, dir)].flags&P_MOVED_BY_CONVEYOR_BOTTOM)!=0;
+    return (gd_element_properties[get(x, y, dir)].flags & P_MOVED_BY_CONVEYOR_BOTTOM) != 0;
 }
 
 /// returns true if the element is a scanned one (needed by the engine)
@@ -592,7 +613,7 @@ inline bool CaveRendered::is_scanned(int x, int y) const {
 
 /// returns true if the element is a scanned one (needed by the engine)
 inline bool CaveRendered::is_scanned(int x, int y, GdDirectionEnum dir) const {
-    return is_scanned_element(get(x+gd_dx[dir], y+gd_dy[dir]));
+    return is_scanned_element(get(x + gd_dx[dir], y + gd_dy[dir]));
 }
 
 /// Returns true if neighboring element is "e", or equivalent to "e".
@@ -607,18 +628,18 @@ inline bool CaveRendered::is_scanned(int x, int y, GdDirectionEnum dir) const {
 /// @param e The element to compare (x,y)+dir to
 /// @return True, if they are equivalent
 bool CaveRendered::is_like_element(int x, int y, GdDirectionEnum dir, GdElementEnum e) const {
-    int examined=get(x, y, dir);
+    int examined = get(x, y, dir);
 
     /* if it is a dirt-like, change to dirt, so equality will evaluate to true */
     if (gd_element_properties[examined].flags & P_DIRT)
-        examined=O_DIRT;
+        examined = O_DIRT;
     if (gd_element_properties[e].flags & P_DIRT)
-        e=O_DIRT;
+        e = O_DIRT;
     /* if the element on the map is a lava, it should be like space */
-    if (examined==O_LAVA)
-        examined=O_SPACE;
+    if (examined == O_LAVA)
+        examined = O_SPACE;
     /* now they are "normalized", compare and return */
-    return e==examined;
+    return e == examined;
 }
 
 /// Returns true if the neighboring element (x,y)+dir is a dirt or lava.
@@ -635,7 +656,7 @@ bool CaveRendered::is_like_element(int x, int y, GdDirectionEnum dir, GdElementE
 /// The player_eat_element function will also behave for lava as it does for space.
 inline bool CaveRendered::is_like_space(int x, int y, GdDirectionEnum dir) const {
     int e = get(x, y, dir);
-    return e==O_SPACE || e==O_LAVA;
+    return e == O_SPACE || e == O_LAVA;
 }
 
 /// Returns true, if element at (x,y)+dir is like dirt.
@@ -644,7 +665,7 @@ inline bool CaveRendered::is_like_space(int x, int y, GdDirectionEnum dir) const
 /// (without exploding).
 /// Therefore 'if (map(x,y)==O_DIRT)' must not be used!
 inline bool CaveRendered::is_like_dirt(int x, int y, GdDirectionEnum dir) const {
-    return (gd_element_properties[get(x, y, dir)].flags&P_DIRT)!=0;
+    return (gd_element_properties[get(x, y, dir)].flags & P_DIRT) != 0;
 }
 
 
@@ -654,7 +675,7 @@ inline bool CaveRendered::is_like_dirt(int x, int y, GdDirectionEnum dir) const 
 /// The element given is changed to its "scanned" state, if there is such.
 inline void CaveRendered::store(int x, int y, GdElementEnum element, bool disable_particle) {
     GdElementEnum &cell = map(x, y);
-    if (cell==O_LAVA) {
+    if (cell == O_LAVA) {
         play_effect_of_element(O_LAVA, x, y);
         return;
     }
@@ -664,7 +685,7 @@ inline void CaveRendered::store(int x, int y, GdElementEnum element, bool disabl
 
 /// Store an element to (x,y)+dir.
 inline void CaveRendered::store(int x, int y, GdDirectionEnum dir, GdElementEnum element) {
-    store(x+gd_dx[dir], y+gd_dy[dir], element);
+    store(x + gd_dx[dir], y + gd_dy[dir], element);
 }
 
 /// Store the element to (x,y)+dir, and store a space to (x,y).
@@ -676,14 +697,14 @@ inline void CaveRendered::move(int x, int y, GdDirectionEnum dir, GdElementEnum 
 /// increment a cave element; can be used for elements which are one after the other, for example bladder1, bladder2, bladder3...
 /// @todo to be removed
 inline void CaveRendered::next(int x, int y) {
-    map(x, y) = GdElementEnum(map(x, y)+1);
+    map(x, y) = GdElementEnum(map(x, y) + 1);
 }
 
 /// Remove th scanned "bit" from an element.
 /// To be called only for scanned elements!!!
 inline void CaveRendered::unscan(int x, int y) {
     if (is_scanned(x, y))
-        map(x, y)=gd_element_properties[get(x, y)].pair;
+        map(x, y) = gd_element_properties[get(x, y)].pair;
 }
 
 
@@ -696,13 +717,13 @@ void CaveRendered::cell_explode(int x, int y, GdElementEnum explode_to) {
     if (non_explodable(x, y))
         return;
 
-    if (voodoo_any_hurt_kills_player && get(x, y)==O_VOODOO)
-        voodoo_touched=true;
+    if (voodoo_any_hurt_kills_player && get(x, y) == O_VOODOO)
+        voodoo_touched = true;
 
-    if (get(x, y)==O_VOODOO && !voodoo_disappear_in_explosion)
+    if (get(x, y) == O_VOODOO && !voodoo_disappear_in_explosion)
         /* voodoo turns into a time penalty */
         store(x, y, O_TIME_PENALTY);
-    else if (get(x, y)==O_NITRO_PACK || get(x, y)==O_NITRO_PACK_F)
+    else if (get(x, y) == O_NITRO_PACK || get(x, y) == O_NITRO_PACK_F)
         /* nitro pack inside an explosion - it is now triggered */
         store(x, y, O_NITRO_PACK_EXPLODE);
     else
@@ -713,22 +734,22 @@ void CaveRendered::cell_explode(int x, int y, GdElementEnum explode_to) {
 /// A creature at (x,y) explodes to a 3x3 square.
 void CaveRendered::creature_explode(int x, int y, GdElementEnum explode_to) {
     /* the processing of an explosion took pretty much time: processing 3x3=9 elements */
-    ckdelay_current+=1200;
+    ckdelay_current += 1200;
     sound_play(GD_S_EXPLOSION, x, y);
 
-    for (int yy=y-1; yy<=y+1; yy++)
-        for (int xx=x-1; xx<=x+1; xx++)
+    for (int yy = y - 1; yy <= y + 1; yy++)
+        for (int xx = x - 1; xx <= x + 1; xx++)
             cell_explode(xx, yy, explode_to);
 }
 
 /// A nitro pack at (x,y) explodes to a 3x3 square.
 void CaveRendered::nitro_explode(int x, int y) {
     /* the processing of an explosion took pretty much time: processing 3x3=9 elements */
-    ckdelay_current+=1200;
+    ckdelay_current += 1200;
     sound_play(GD_S_NITRO_EXPLOSION, x, y);
 
-    for (int yy=y-1; yy<=y+1; yy++)
-        for (int xx=x-1; xx<=x+1; xx++)
+    for (int yy = y - 1; yy <= y + 1; yy++)
+        for (int xx = x - 1; xx <= x + 1; xx++)
             cell_explode(xx, yy, O_NITRO_EXPL_1);
     /* the current cell is explicitly changed into a nitro expl, as cell_explode changes it to a triggered nitro pack */
     store(x, y, O_NITRO_EXPL_1);
@@ -737,15 +758,15 @@ void CaveRendered::nitro_explode(int x, int y) {
 /// A voodoo explodes, leaving a 3x3 steel and a time penalty behind.
 void CaveRendered::voodoo_explode(int x, int y) {
     if (voodoo_any_hurt_kills_player)
-        voodoo_touched=true;
+        voodoo_touched = true;
 
     /* the processing of an explosion took pretty much time: processing 3x3=9 elements */
-    ckdelay_current+=1000;
+    ckdelay_current += 1000;
     sound_play(GD_S_VOODOO_EXPLOSION, x, y);
 
     /* voodoo explodes to 3x3 steel */
-    for (int yy=y-1; yy<=y+1; yy++)
-        for (int xx=x-1; xx<=x+1; xx++)
+    for (int yy = y - 1; yy <= y + 1; yy++)
+        for (int xx = x - 1; xx <= x + 1; xx++)
             store(xx, yy, O_PRE_STEEL_1);
     /* middle is a time penalty (which will be turned into a gravestone) */
     store(x, y, O_TIME_PENALTY);
@@ -759,37 +780,37 @@ void CaveRendered::cell_explode_skip_voodoo(int x, int y, GdElementEnum expl) {
     if (non_explodable(x, y))
         return;
     /* bomb does not explode voodoo */
-    if (!voodoo_disappear_in_explosion && get(x, y)==O_VOODOO)
+    if (!voodoo_disappear_in_explosion && get(x, y) == O_VOODOO)
         return;
-    if (voodoo_any_hurt_kills_player && get(x, y)==O_VOODOO)
-        voodoo_touched=true;
+    if (voodoo_any_hurt_kills_player && get(x, y) == O_VOODOO)
+        voodoo_touched = true;
     store(x, y, expl);
 }
 
 /// An x shaped ghost explosion.
 void CaveRendered::ghost_explode(int x, int y) {
     /* the processing of an explosion took pretty much time: processing 5 elements */
-    ckdelay_current+=650;
+    ckdelay_current += 650;
     sound_play(GD_S_GHOST_EXPLOSION, x, y);
 
     cell_explode_skip_voodoo(x, y, O_GHOST_EXPL_1);
-    cell_explode_skip_voodoo(x-1, y-1, O_GHOST_EXPL_1);
-    cell_explode_skip_voodoo(x+1, y+1, O_GHOST_EXPL_1);
-    cell_explode_skip_voodoo(x-1, y+1, O_GHOST_EXPL_1);
-    cell_explode_skip_voodoo(x+1, y-1, O_GHOST_EXPL_1);
+    cell_explode_skip_voodoo(x - 1, y - 1, O_GHOST_EXPL_1);
+    cell_explode_skip_voodoo(x + 1, y + 1, O_GHOST_EXPL_1);
+    cell_explode_skip_voodoo(x - 1, y + 1, O_GHOST_EXPL_1);
+    cell_explode_skip_voodoo(x + 1, y - 1, O_GHOST_EXPL_1);
 }
 
 /// A + shaped bomb explosion.
 void CaveRendered::bomb_explode(int x, int y) {
     /* the processing of an explosion took pretty much time: processing 5 elements */
-    ckdelay_current+=650;
+    ckdelay_current += 650;
     sound_play(GD_S_BOMB_EXPLOSION, x, y);
 
     cell_explode_skip_voodoo(x, y, O_BOMB_EXPL_1);
-    cell_explode_skip_voodoo(x-1, y, O_BOMB_EXPL_1);
-    cell_explode_skip_voodoo(x+1, y, O_BOMB_EXPL_1);
-    cell_explode_skip_voodoo(x, y+1, O_BOMB_EXPL_1);
-    cell_explode_skip_voodoo(x, y-1, O_BOMB_EXPL_1);
+    cell_explode_skip_voodoo(x - 1, y, O_BOMB_EXPL_1);
+    cell_explode_skip_voodoo(x + 1, y, O_BOMB_EXPL_1);
+    cell_explode_skip_voodoo(x, y + 1, O_BOMB_EXPL_1);
+    cell_explode_skip_voodoo(x, y - 1, O_BOMB_EXPL_1);
 }
 
 /// Explode the thing at (x,y).
@@ -903,7 +924,7 @@ void CaveRendered::explode(int x, int y) {
 /// A simple wrapper for the explode(int x, int y) function without
 /// the dir parameter.
 void CaveRendered::explode(int x, int y, GdDirectionEnum dir) {
-    explode(x+gd_dx[dir], y+gd_dy[dir]);
+    explode(x + gd_dx[dir], y + gd_dy[dir]);
 }
 
 
@@ -924,79 +945,78 @@ GdElementEnum CaveRendered::player_eat_element(GdElementEnum element, int x, int
     GdElementEnum was_element = element;
     x += gd_dx[dir];
     y += gd_dy[dir];
-    
+
     switch (element) {
         case O_DIAMOND_KEY:
             diamond_key_collected = true;
             element = O_SPACE;
             break;
 
-        /* KEYS AND DOORS */
+            /* KEYS AND DOORS */
         case O_KEY_1:
-            key1++;
+            ++key1;
             element = O_SPACE;
             break;
         case O_KEY_2:
-            key2++;
+            ++key2;
             element = O_SPACE;
             break;
         case O_KEY_3:
-            key3++;
+            ++key3;
             element = O_SPACE;
             break;
         case O_DOOR_1:
-            if (key1==0)
+            if (key1 == 0)
                 element = O_NONE;
             else {
-                key1--;
+                --key1;
                 element = O_SPACE;
             }
             break;
         case O_DOOR_2:
-            if (key2==0)
+            if (key2 == 0)
                 element = O_NONE;
             else {
-                key2--;
+                --key2;
                 element = O_SPACE;
             }
             break;
         case O_DOOR_3:
-            if (key3==0)
+            if (key3 == 0)
                 element = O_NONE;
             else {
-                key3--;
+                --key3;
                 element = O_SPACE;
             }
             break;
-        /* SWITCHES */
+            /* SWITCHES */
         case O_CREATURE_SWITCH:     /* creatures change direction. */
             creatures_backwards = !creatures_backwards;
             break;
         case O_EXPANDING_WALL_SWITCH:       /* expanding wall change direction. */
-            expanding_wall_changed=!expanding_wall_changed;
+            expanding_wall_changed = !expanding_wall_changed;
             break;
         case O_BITER_SWITCH:        /* biter change delay */
             biter_delay_frame++;
-            if (biter_delay_frame==4)
-                biter_delay_frame=0;
+            if (biter_delay_frame == 4)
+                biter_delay_frame = 0;
             break;
         case O_REPLICATOR_SWITCH:   /* replicator on/off switch */
-            replicators_active=!replicators_active;
+            replicators_active = !replicators_active;
             break;
         case O_CONVEYOR_SWITCH: /* conveyor belts on/off */
-            conveyor_belts_active=!conveyor_belts_active;
+            conveyor_belts_active = !conveyor_belts_active;
             break;
         case O_CONVEYOR_DIR_SWITCH: /* conveyor belts switch direction */
-            conveyor_belts_direction_changed=!conveyor_belts_direction_changed;
+            conveyor_belts_direction_changed = !conveyor_belts_direction_changed;
             break;
         case O_GRAVITY_SWITCH:
-            if (gravity_switch_active && (dir==MV_LEFT || dir==MV_RIGHT || dir==MV_UP || dir==MV_DOWN)) {
+            if (gravity_switch_active && (dir == MV_LEFT || dir == MV_RIGHT || dir == MV_UP || dir == MV_DOWN)) {
                 sound_play(GD_S_SWITCH_GRAVITY, x, y);
-                gravity_will_change = gravity_change_time*timing_factor;
+                gravity_will_change = gravity_change_time * timing_factor;
                 gravity_next_direction = dir;
                 gravity_switch_active = false;
-            }
-            else
+            } else
                 element = O_NONE;
             break;
 
@@ -1020,45 +1040,45 @@ GdElementEnum CaveRendered::player_eat_element(GdElementEnum element, int x, int
             break;
 
         case O_SWEET:
-            sweet_eaten=true;
+            sweet_eaten = true;
             element = O_SPACE;
             break;
 
         case O_PNEUMATIC_HAMMER:
-            got_pneumatic_hammer=true;
+            got_pneumatic_hammer = true;
             element = O_SPACE;
             break;
 
         case O_CLOCK:
             /* bonus time */
-            time+=time_bonus*timing_factor;
-            if (time>max_time*timing_factor)
-                time-=max_time*timing_factor;
+            time += time_bonus * timing_factor;
+            if (time > max_time * timing_factor)
+                time -= max_time * timing_factor;
             /* no space, rather a dirt remains there... */
             element = O_DIRT;
             break;
 
         case O_DIAMOND:
         case O_FLYING_DIAMOND:
-            score+=diamond_value;
-            diamonds_collected++;
-            if (diamonds_needed==diamonds_collected) {
-                gate_open=true;
-                diamond_value=extra_diamond_value;  /* extra is worth more points. */
-                gate_open_flash=1;
+            score += diamond_value;
+            ++diamonds_collected;
+            if (diamonds_needed == diamonds_collected) {
+                gate_open = true;
+                diamond_value = extra_diamond_value; /* extra is worth more points. */
+                gate_open_flash = 1;
                 sound_play(GD_S_CRACK, x, y);
             }
             element = O_SPACE;
             break;
         case O_SKELETON:
-            skeletons_collected++;
-            for (int i=0; i<skeletons_worth_diamonds; i++)
+            ++skeletons_collected;
+            for (int i = 0; i < skeletons_worth_diamonds; i++)
                 player_eat_element(O_DIAMOND, x, y, MV_STILL);  /* as if player got a diamond */
             element = O_SPACE;
             break;
         case O_OUTBOX:
         case O_INVIS_OUTBOX:
-            player_state=GD_PL_EXITED;  /* player now exits the cave! */
+            player_state = GD_PL_EXITED;  /* player now exits the cave! */
             element = O_SPACE;
             break;
 
@@ -1067,7 +1087,7 @@ GdElementEnum CaveRendered::player_eat_element(GdElementEnum element, int x, int
             element = O_NONE;
             break;
     }
-    
+
     if (element != O_NONE) {
         play_eat_sound_of_element(was_element, x, y);
         play_eat_particle_of_element(was_element, x, y);
@@ -1088,26 +1108,26 @@ GdElementEnum CaveRendered::player_eat_element(GdElementEnum element, int x, int
    @return True, if the player is teleported, false, if no suitable teleporter found.
  */
 bool CaveRendered::do_teleporter(int px, int py, GdDirectionEnum player_move) {
-    int tx=px;
-    int ty=py;
-    bool teleported=false;
+    int tx = px;
+    int ty = py;
+    bool teleported = false;
     do {
         /* jump to next element; wrap around columns and rows. */
         tx++;
-        if (tx>=w) {
-            tx=0;
+        if (tx >= w) {
+            tx = 0;
             ty++;
-            if (ty>=h)
-                ty=0;
+            if (ty >= h)
+                ty = 0;
         }
         /* if we found a teleporter... */
-        if (get(tx, ty)==O_TELEPORTER && is_like_space(tx, ty, player_move)) {
+        if (get(tx, ty) == O_TELEPORTER && is_like_space(tx, ty, player_move)) {
             store(tx, ty, player_move, get(px, py));    /* new player appears near teleporter found */
             store(px, py, O_SPACE); /* current player disappears */
             sound_play(GD_S_TELEPORTER, tx, ty);
-            teleported=true;    /* success */
+            teleported = true;  /* success */
         }
-    } while (!teleported && (tx!=px || ty!=py)); /* loop until we get back to original coordinates */
+    } while (!teleported && (tx != px || ty != py)); /* loop until we get back to original coordinates */
     return teleported;
 }
 
@@ -1118,13 +1138,13 @@ bool CaveRendered::do_teleporter(int px, int py, GdDirectionEnum player_move) {
     @return  true if the push is possible.
 */
 bool CaveRendered::do_push(int x, int y, GdDirectionEnum player_move, bool player_fire) {
-    GdElementEnum what=get(x, y, player_move);
+    GdElementEnum what = get(x, y, player_move);
     GdDirection grav_compat;    /* gravity for falling wall, bladder, ... */
     if (gravity_affects_all)
-        grav_compat=gravity;
+        grav_compat = gravity;
     else
-        grav_compat=MV_DOWN;
-    bool result=false;
+        grav_compat = MV_DOWN;
+    bool result = false;
 
     /* do a switch on what element is being pushed to determine probability. */
     switch (what) {
@@ -1138,47 +1158,47 @@ bool CaveRendered::do_push(int x, int y, GdDirectionEnum player_move, bool playe
             /* pushing some kind of stone or nut*/
             /* directions possible: 90degrees cw or ccw to current gravity. */
             /* only push if player dir is orthogonal to gravity, ie. gravity down, pushing left&right possible */
-            if (player_move==ccw_fourth[gravity] || player_move==cw_fourth[gravity]) {
+            if (player_move == ccw_fourth[gravity] || player_move == cw_fourth[gravity]) {
                 int prob;
 
-                prob=0;
+                prob = 0;
                 /* different probabilities for different elements. */
                 /* remember that probabilities are 1/million, stored as integers! */
                 switch (what) {
                     case O_WAITING_STONE:
-                        prob=1000000; /* waiting stones are light, can always push */
+                        prob = 1000000; /* waiting stones are light, can always push */
                         break;
                     case O_CHASING_STONE:
                         if (sweet_eaten) /* chasing can be pushed if player is turbo */
-                            prob=1000000;   /* with p=1, always push */
+                            prob = 1000000; /* with p=1, always push */
                         break;
                     case O_MEGA_STONE:
                         if (mega_stones_pushable_with_sweet && sweet_eaten) /* mega may(!) be pushed if player is turbo */
-                            prob=1000000;   /* p=1, always push */
+                            prob = 1000000; /* p=1, always push */
                         break;
                     case O_STONE:
                     case O_NUT:
                     case O_FLYING_STONE:
                     case O_NITRO_PACK:
                         if (sweet_eaten)
-                            prob=pushing_stone_prob_sweet;  /* probability with sweet */
+                            prob = pushing_stone_prob_sweet; /* probability with sweet */
                         else
-                            prob=pushing_stone_prob;    /* probability without sweet. */
+                            prob = pushing_stone_prob;  /* probability without sweet. */
                         break;
                     default:
                         g_assert_not_reached();
                         break;
                 }
 
-                if (is_like_space(x, y, twice[player_move]) && random.rand_int_range(0, 1000000)<prob) {
+                if (is_like_space(x, y, twice[player_move]) && random.rand_int_range(0, 1000000) < prob) {
                     /* if decided that he is able to push, */
-                    play_effect_of_element(what, x+gd_dx[player_move], y+gd_dy[player_move]);
+                    play_effect_of_element(what, x + gd_dx[player_move], y + gd_dy[player_move]);
                     /* if pushed a stone, it "bounces". all other elements are simply pushed. */
-                    if (what==O_STONE)
+                    if (what == O_STONE)
                         store(x, y, twice[player_move], stone_bouncing_effect);
                     else
                         store(x, y, twice[player_move], what);
-                    result=true;
+                    result = true;
                 }
             }
             break;
@@ -1197,44 +1217,44 @@ bool CaveRendered::do_push(int x, int y, GdDirectionEnum player_move, bool playe
             /* there is no "delayed" state of a bladder, so we use store_dir_no_scanned! */
 
             /* first check: we cannot push a bladder "up" */
-            if (player_move!=opposite[grav_compat]) {
+            if (player_move != opposite[grav_compat]) {
                 /* pushing a bladder "down". p=player, o=bladder, 1, 2, 3=directions to check. */
                 /* player moving in the direction of gravity. */
                 /*  p   p  g  */
                 /* 2o3  |  |  */
                 /*  1   v  v  */
-                if (player_move==grav_compat) {
+                if (player_move == grav_compat) {
                     if (is_like_space(x, y, twice[player_move])) /* pushing bladder down */
-                        store(x, y, twice[player_move], O_BLADDER), result=true;
+                        store(x, y, twice[player_move], O_BLADDER), result = true;
                     else if (is_like_space(x, y, cw_eighth[grav_compat]))    /* if no space to push down, maybe left (down-left to player) */
                         /* left is "down, turned right (cw)" */
-                        store(x, y, cw_eighth[grav_compat], O_BLADDER), result=true;
+                        store(x, y, cw_eighth[grav_compat], O_BLADDER), result = true;
                     else if (is_like_space(x, y, ccw_eighth[grav_compat]))   /* if not, maybe right (down-right to player) */
-                        store(x, y, ccw_eighth[grav_compat], O_BLADDER), result=true;
+                        store(x, y, ccw_eighth[grav_compat], O_BLADDER), result = true;
                 }
                 /* pushing a bladder "left". p=player, o=bladder, 1, 2, 3=directions to check. */
                 /*  3        g */
                 /* 1op  <-p  | */
                 /*  2        v */
-                else if (player_move==cw_fourth[grav_compat]) {
+                else if (player_move == cw_fourth[grav_compat]) {
                     if (is_like_space(x, y, twice[cw_fourth[grav_compat]]))  /* pushing it left */
-                        store(x, y, twice[cw_fourth[grav_compat]], O_BLADDER), result=true;
+                        store(x, y, twice[cw_fourth[grav_compat]], O_BLADDER), result = true;
                     else if (is_like_space(x, y, cw_eighth[grav_compat]))    /* maybe down, and player will move left */
-                        store(x, y, cw_eighth[grav_compat], O_BLADDER), result=true;
+                        store(x, y, cw_eighth[grav_compat], O_BLADDER), result = true;
                     else if (is_like_space(x, y, cw_eighth[player_move]))    /* maybe up, and player will move left */
-                        store(x, y, cw_eighth[player_move], O_BLADDER), result=true;
+                        store(x, y, cw_eighth[player_move], O_BLADDER), result = true;
                 }
                 /* pushing a bladder "right". p=player, o=bladder, 1, 2, 3=directions to check. */
                 /*  3        g */
                 /* po1  p-<  | */
                 /*  2        v */
-                else if (player_move==ccw_fourth[grav_compat]) {
+                else if (player_move == ccw_fourth[grav_compat]) {
                     if (is_like_space(x, y, twice[player_move])) /* pushing it right */
-                        store(x, y, twice[player_move], O_BLADDER), result=true;
+                        store(x, y, twice[player_move], O_BLADDER), result = true;
                     else if (is_like_space(x, y, ccw_eighth[grav_compat]))   /* maybe down, and player will move right */
-                        store(x, y, ccw_eighth[grav_compat], O_BLADDER), result=true;
+                        store(x, y, ccw_eighth[grav_compat], O_BLADDER), result = true;
                     else if (is_like_space(x, y, ccw_eighth[player_move]))   /* maybe up, and player will move right */
-                        store(x, y, ccw_eighth[player_move], O_BLADDER), result=true;
+                        store(x, y, ccw_eighth[player_move], O_BLADDER), result = true;
                 }
 
                 if (result)
@@ -1255,7 +1275,7 @@ bool CaveRendered::do_push(int x, int y, GdDirectionEnum player_move, bool playe
                         if (is_like_space(x, y, twice[player_move])) {
                             /* yes, so push. */
                             store(x, y, twice[player_move], O_BOX);
-                            result=true;
+                            result = true;
                             sound_play(GD_S_BOX_PUSH, x, y);
                         }
                         break;
@@ -1276,9 +1296,9 @@ bool CaveRendered::do_push(int x, int y, GdDirectionEnum player_move, bool playe
 
 /// clear these to no sound; and they will be set during iteration.
 void CaveRendered::clear_sounds() {
-    sound1=SoundWithPos(GD_S_NONE, 0, 0);
-    sound2=SoundWithPos(GD_S_NONE, 0, 0);
-    sound3=SoundWithPos(GD_S_NONE, 0, 0);
+    sound1 = SoundWithPos(GD_S_NONE, 0, 0);
+    sound2 = SoundWithPos(GD_S_NONE, 0, 0);
+    sound3 = SoundWithPos(GD_S_NONE, 0, 0);
 }
 
 /// Try to make an element start falling.
@@ -1323,7 +1343,7 @@ void CaveRendered::do_start_fall(int x, int y, GdDirectionEnum falling_direction
 /// and return true. Otherwise return false.
 /// @return true if voodoo crushed.
 bool CaveRendered::do_fall_try_crush_voodoo(int x, int y, GdDirectionEnum fall_dir) {
-    if (get(x, y, fall_dir)==O_VOODOO && voodoo_dies_by_stone) {
+    if (get(x, y, fall_dir) == O_VOODOO && voodoo_dies_by_stone) {
         /* this is a 1stB-style vodo. explodes by stone, collects diamonds */
         explode(x, y, fall_dir);
         return true;
@@ -1335,7 +1355,7 @@ bool CaveRendered::do_fall_try_crush_voodoo(int x, int y, GdDirectionEnum fall_d
 /// check if the voodoo below it can eat it. If yes, the voodoo eats it.
 /// @return true if successful, false if voodoo does not eat the element.
 bool CaveRendered::do_fall_try_eat_voodoo(int x, int y, GdDirectionEnum fall_dir) {
-    if (get(x, y, fall_dir)==O_VOODOO && voodoo_collects_diamonds) {
+    if (get(x, y, fall_dir) == O_VOODOO && voodoo_collects_diamonds) {
         /* this is a 1stB-style voodoo. explodes by stone, collects diamonds */
         player_eat_element(O_DIAMOND, x, y, fall_dir);  /* as if player got diamond */
         store(x, y, O_SPACE);   /* diamond disappears */
@@ -1350,7 +1370,7 @@ bool CaveRendered::do_fall_try_eat_voodoo(int x, int y, GdDirectionEnum fall_dir
 /// @param bouncing The element which it is converted to, if it has cracked a nut.
 /// @return True, if nut is cracked.
 bool CaveRendered::do_fall_try_crack_nut(int x, int y, GdDirectionEnum fall_dir, GdElementEnum bouncing) {
-    if (get(x, y, fall_dir)==O_NUT || get(x, y, fall_dir)==O_NUT_F) {
+    if (get(x, y, fall_dir) == O_NUT || get(x, y, fall_dir) == O_NUT_F) {
         /* stones */
         store(x, y, bouncing);
         store(x, y, fall_dir, nut_turns_to_when_crushed);
@@ -1366,11 +1386,11 @@ bool CaveRendered::do_fall_try_crack_nut(int x, int y, GdDirectionEnum fall_dir,
 /// @param magic The element a magic wall turns it to.
 /// @return If The element is processed by the magic wall.
 bool CaveRendered::do_fall_try_magic(int x, int y, GdDirectionEnum fall_dir, GdElementEnum magic) {
-    if (get(x, y, fall_dir)==O_MAGIC_WALL) {
+    if (get(x, y, fall_dir) == O_MAGIC_WALL) {
         play_effect_of_element(O_DIAMOND, x, y, MV_STILL, false);   /* always play diamond sound, but with no particle effect */
-        if (magic_wall_state==GD_MW_DORMANT)
-            magic_wall_state=GD_MW_ACTIVE;
-        if (magic_wall_state==GD_MW_ACTIVE && is_like_space(x, y, twice[fall_dir])) {
+        if (magic_wall_state == GD_MW_DORMANT)
+            magic_wall_state = GD_MW_ACTIVE;
+        if (magic_wall_state == GD_MW_ACTIVE && is_like_space(x, y, twice[fall_dir])) {
             /* if magic wall active and place underneath, it turns element into anything the effect says to do. */
             store(x, y, twice[fall_dir], magic);
         }
@@ -1448,17 +1468,17 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
     bool start_signal;
     GdDirection grav_compat;    /* gravity for falling wall, bladder, ... */
     /* directions for o_something_1, 2, 3 and 4 (creatures) */
-    static GdDirection const creature_dir[]= { MV_LEFT, MV_UP, MV_RIGHT, MV_DOWN };
-    static GdDirection const creature_chdir[]= { MV_RIGHT, MV_DOWN, MV_LEFT, MV_UP };
+    static GdDirection const creature_dir[] = { MV_LEFT, MV_UP, MV_RIGHT, MV_DOWN };
+    static GdDirection const creature_chdir[] = { MV_RIGHT, MV_DOWN, MV_LEFT, MV_UP };
     int time_decrement_sec;
-    GdElement biter_try[]= { O_DIRT, biter_eat, O_SPACE, O_STONE }; /* biters eating elements preference, they try to go in this order */
+    GdElement biter_try[] = { O_DIRT, biter_eat, O_SPACE, O_STONE }; /* biters eating elements preference, they try to go in this order */
 
     clear_sounds();
 
     if (gravity_affects_all)
-        grav_compat=gravity;
+        grav_compat = gravity;
     else
-        grav_compat=MV_DOWN;
+        grav_compat = MV_DOWN;
 
     /* if diagonal movements not allowed, */
     /* horizontal movements have precedence. [BROADRIBB] */
@@ -1466,11 +1486,11 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
         switch (player_move) {
             case MV_UP_RIGHT:
             case MV_DOWN_RIGHT:
-                player_move=MV_RIGHT;
+                player_move = MV_RIGHT;
                 break;
             case MV_UP_LEFT:
             case MV_DOWN_LEFT:
-                player_move=MV_LEFT;
+                player_move = MV_LEFT;
                 break;
             default:
                 /* no correction needed */
@@ -1479,22 +1499,22 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
     }
 
     /* increment this. if the scan routine comes across player, clears it (sets to zero). */
-    if (player_seen_ago<100)
-        player_seen_ago++;
+    if (player_seen_ago < 100)
+        ++player_seen_ago;
 
-    if (pneumatic_hammer_active_delay>0)
-        pneumatic_hammer_active_delay--;
+    if (pneumatic_hammer_active_delay > 0)
+        --pneumatic_hammer_active_delay;
 
     /* inboxes and outboxes flash with the rhythm of the game, not the display.
      * also, a player can be born only from an open, not from a steel-wall-like inbox. */
-    inbox_flash_toggle=!inbox_flash_toggle;
-    inbox_toggle=inbox_flash_toggle;
+    inbox_flash_toggle = !inbox_flash_toggle;
+    inbox_toggle = inbox_flash_toggle;
 
-    if (gate_open_flash>0)
-        gate_open_flash--;
+    if (gate_open_flash > 0)
+        --gate_open_flash;
 
     /* score collected this frame */
-    score=0;
+    score = 0;
 
     /* to implement buggy bd1 amoeba+magic wall behaviour */
     convert_amoeba_this_frame = false;
@@ -1502,19 +1522,19 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
     /* suicide only kills the active player */
     /* player_x, player_y was set by the previous iterate routine, or the cave setup. */
     /* we must check if there is a player or not - he may have exploded or something like that */
-    if (suicide && player_state==GD_PL_LIVING && is_player(player_x, player_y))
+    if (suicide && player_state == GD_PL_LIVING && is_player(player_x, player_y))
         store(player_x, player_y, O_EXPLODE_1);
 
     /* check for walls reappearing */
     if (hammered_walls_reappear) {
-        for (int y=0; y<h; y++)
-            for (int x=0; x<w; x++) {
+        for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++) {
                 /* timer for the cell > 0? */
-                if (hammered_reappear(x, y)>0) {
+                if (hammered_reappear(x, y) > 0) {
                     /* decrease timer */
                     hammered_reappear(x, y)--;
                     /* check if it became zero */
-                    if (hammered_reappear(x, y)==0) {
+                    if (hammered_reappear(x, y) == 0) {
                         store(x, y, O_BRICK);
                         sound_play(GD_S_WALL_REAPPEAR, x, y);
                     }
@@ -1523,24 +1543,24 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
     }
 
     /* variables to check during the scan */
-    amoeba_found_enclosed=true;     /* will be set to false if any of the amoeba is found free. */
-    amoeba_2_found_enclosed=true;
-    amoeba_count=0;
-    amoeba_2_count=0;
-    ckdelay_current=0;
-    time_decrement_sec=0;
+    amoeba_found_enclosed = true;   /* will be set to false if any of the amoeba is found free. */
+    amoeba_2_found_enclosed = true;
+    amoeba_count = 0;
+    amoeba_2_count = 0;
+    ckdelay_current = 0;
+    time_decrement_sec = 0;
 
     /* check whether to scan the first and last line */
     if (border_scan_first_and_last) {
-        ymin=0;
-        ymax=h-1;
+        ymin = 0;
+        ymax = h - 1;
     } else {
-        ymin=1;
-        ymax=h-2;
+        ymin = 1;
+        ymax = h - 2;
     }
     /* the cave scan routine */
-    for (int y=ymin; y<=ymax; y++)
-        for (int x=0; x<w; x++) {
+    for (int y = ymin; y <= ymax; y++)
+        for (int x = 0; x < w; x++) {
             /* if we find a scanned element, change it to the normal one, and that's all. */
             /* this is required, for example for chasing stones, which have moved, always passing slime! */
             if (is_scanned(x, y)) {
@@ -1549,7 +1569,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
             }
 
             /* add the ckdelay correction value for every element seen. */
-            ckdelay_current+=gd_element_properties[get(x, y)].ckdelay;
+            ckdelay_current += gd_element_properties[get(x, y)].ckdelay;
 
             switch (get(x, y)) {
                     /*
@@ -1560,38 +1580,38 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                         explode(x, y);
                         break;
                     }
-                    player_seen_ago=0;
+                    player_seen_ago = 0;
                     /* bd4 intermission caves have many players. so if one of them has exited,
                      * do not change the flag anymore. so this if () is needed */
-                    if (player_state!=GD_PL_EXITED)
-                        player_state=GD_PL_LIVING;
+                    if (player_state != GD_PL_EXITED)
+                        player_state = GD_PL_LIVING;
 
                     /* check for pneumatic hammer things */
                     /* 1) press fire, 2) have pneumatic hammer 4) space on left or right for hammer 5) stand on something */
                     if (player_fire && got_pneumatic_hammer && is_like_space(x, y, player_move)
                             && !is_like_space(x, y, MV_DOWN)) {
-                        if (player_move==MV_LEFT && can_be_hammered(x, y, MV_DOWN_LEFT)) {
-                            pneumatic_hammer_active_delay=pneumatic_hammer_frame;
+                        if (player_move == MV_LEFT && can_be_hammered(x, y, MV_DOWN_LEFT)) {
+                            pneumatic_hammer_active_delay = pneumatic_hammer_frame;
                             store(x, y, MV_LEFT, O_PNEUMATIC_ACTIVE_LEFT);
                             store(x, y, O_PLAYER_PNEUMATIC_LEFT);
                             break;  /* finished. */
                         }
-                        if (player_move==MV_RIGHT && can_be_hammered(x, y, MV_DOWN_RIGHT)) {
-                            pneumatic_hammer_active_delay=pneumatic_hammer_frame;
+                        if (player_move == MV_RIGHT && can_be_hammered(x, y, MV_DOWN_RIGHT)) {
+                            pneumatic_hammer_active_delay = pneumatic_hammer_frame;
                             store(x, y, MV_RIGHT, O_PNEUMATIC_ACTIVE_RIGHT);
                             store(x, y, O_PLAYER_PNEUMATIC_RIGHT);
                             break;  /* finished. */
                         }
                     }
 
-                    if (player_move!=MV_STILL) {
+                    if (player_move != MV_STILL) {
                         /* only do every check if he is not moving */
                         GdElementEnum what = get(x, y, player_move);
                         GdElementEnum remains = O_NONE; /* o_none in this variable will mean that there is no change. */
                         bool push;
 
                         /* if we are 'eating' a teleporter, and the function returns true (teleporting worked), break here */
-                        if (what==O_TELEPORTER && do_teleporter(x, y, player_move))
+                        if (what == O_TELEPORTER && do_teleporter(x, y, player_move))
                             break;
 
                         /* try to push element; if successful, break  */
@@ -1624,10 +1644,10 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
 
                                 case O_POT:
                                     /* we do not change the "remains" and "what" variables, so that part of the code will be ineffective */
-                                    if (!player_fire && !gravity_switch_active && skeletons_collected>=skeletons_needed_for_pot) {
+                                    if (!player_fire && !gravity_switch_active && skeletons_collected >= skeletons_needed_for_pot) {
                                         skeletons_collected -= skeletons_needed_for_pot;
                                         move(x, y, player_move, O_PLAYER_STIRRING);
-                                        gravity_disabled=true;
+                                        gravity_disabled = true;
                                     }
                                     break;
 
@@ -1641,7 +1661,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                         if (remains != O_NONE) {
                             /* if snapping anything and we have snapping explosions set. but these is not true for pushing. */
                             if (remains == O_SPACE && player_fire && !push)
-                                remains=snap_element;
+                                remains = snap_element;
                             if (remains != O_SPACE || player_fire)
                                 /* if any other element than space, player cannot move. also if pressing fire, will not move. */
                                 store(x, y, player_move, remains);
@@ -1659,14 +1679,14 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                         explode(x, y);
                         break;
                     }
-                    player_seen_ago=0;
+                    player_seen_ago = 0;
                     /* bd4 intermission caves have many players. so if one of them has exited,
                      * do not change the flag anymore. so this if () is needed */
-                    if (player_state!=GD_PL_EXITED)
-                        player_state=GD_PL_LIVING;
+                    if (player_state != GD_PL_EXITED)
+                        player_state = GD_PL_LIVING;
 
-                    if (player_move!=MV_STILL) {    /* if the player does not move, nothing to do */
-                        GdElementEnum what=get(x, y, player_move);
+                    if (player_move != MV_STILL) {  /* if the player does not move, nothing to do */
+                        GdElementEnum what = get(x, y, player_move);
                         GdElementEnum remains = O_NONE;
 
                         if (player_fire) {
@@ -1682,14 +1702,14 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
 
                         /* pushing and collecting */
                         /* if we are 'eating' a teleporter, and the function returns true (teleporting worked), break here */
-                        if (what==O_TELEPORTER && do_teleporter(x, y, player_move))
+                        if (what == O_TELEPORTER && do_teleporter(x, y, player_move))
                             break;
 
                         if (do_push(x, y, player_move, false))  /* player fire is false... */
-                            remains=O_SPACE;
+                            remains = O_SPACE;
                         else {
                             /* get element. if cannot get, player_eat_element will return the same */
-                            remains=player_eat_element(what, x, y, player_move);
+                            remains = player_eat_element(what, x, y, player_move);
                         }
 
                         /* if something changed, OR there is space, move. */
@@ -1706,11 +1726,11 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                         explode(x, y);
                         break;
                     }
-                    player_seen_ago=0;
+                    player_seen_ago = 0;
                     /* bd4 intermission caves have many players. so if one of them has exited,
                      * do not change the flag anymore. so this if () is needed */
-                    if (player_state!=GD_PL_EXITED)
-                        player_state=GD_PL_LIVING;
+                    if (player_state != GD_PL_EXITED)
+                        player_state = GD_PL_LIVING;
 
                     /* firing a rocket? */
                     if (player_move != MV_STILL) {    /* if the player does not move, nothing to do */
@@ -1754,14 +1774,14 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
 
                         /* pushing and collecting */
                         /* if we are 'eating' a teleporter, and the function returns true (teleporting worked), break here */
-                        if (what==O_TELEPORTER && do_teleporter(x, y, player_move))
+                        if (what == O_TELEPORTER && do_teleporter(x, y, player_move))
                             break;
 
                         if (do_push(x, y, player_move, false))  /* player fire is false... */
-                            remains=O_SPACE;
+                            remains = O_SPACE;
                         else {
                             /* get element. if cannot get, player_eat_element will return the same */
-                            remains=player_eat_element(what, x, y, player_move);
+                            remains = player_eat_element(what, x, y, player_move);
                         }
 
                         /* if something changed, OR there is space, move. */
@@ -1778,16 +1798,16 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                         break;
                     }
                     sound_play(GD_S_STIRRING, x, y); /* stirring sound */
-                    player_seen_ago=0;
+                    player_seen_ago = 0;
                     /* bd4 intermission caves have many players. so if one of them has exited,
                      * do not change the flag anymore. so this if () is needed */
                     if (player_state != GD_PL_EXITED)
                         player_state = GD_PL_LIVING;
                     if (player_fire) {
                         /* player "exits" stirring the pot by pressing fire */
-                        gravity_disabled=false;
+                        gravity_disabled = false;
                         store(x, y, O_PLAYER);
-                        gravity_switch_active=true;
+                        gravity_switch_active = true;
                     }
                     break;
 
@@ -1799,33 +1819,33 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                         explode(x, y);
                         break;
                     }
-                    player_seen_ago=0;
-                    if (player_state!=GD_PL_EXITED)
-                        player_state=GD_PL_LIVING;
-                    if (pneumatic_hammer_active_delay==0)   /* if hammering time is up, becomes a normal player again. */
+                    player_seen_ago = 0;
+                    if (player_state != GD_PL_EXITED)
+                        player_state = GD_PL_LIVING;
+                    if (pneumatic_hammer_active_delay == 0) /* if hammering time is up, becomes a normal player again. */
                         store(x, y, O_PLAYER);
                     break;
 
                     /* the active pneumatic hammer itself */
                 case O_PNEUMATIC_ACTIVE_RIGHT:
                 case O_PNEUMATIC_ACTIVE_LEFT:
-                    if (pneumatic_hammer_active_delay>0)
+                    if (pneumatic_hammer_active_delay > 0)
                         sound_play(GD_S_PNEUMATIC_HAMMER, x, y);
-                    if (pneumatic_hammer_active_delay==0) {
+                    if (pneumatic_hammer_active_delay == 0) {
                         GdElementEnum new_elem;
 
                         store(x, y, O_SPACE);   /* pneumatic hammer element disappears */
                         /* which is the new element which appears after that one is hammered? */
-                        new_elem=gd_element_get_hammered(get(x, y, MV_DOWN));
+                        new_elem = gd_element_get_hammered(get(x, y, MV_DOWN));
                         /* if there is a new element, display it */
                         /* O_NONE might be returned, for example if the element being hammered explodes during hammering (by a nearby explosion) */
-                        if (new_elem!=O_NONE) {
+                        if (new_elem != O_NONE) {
                             store(x, y, MV_DOWN, new_elem);
 
                             /* and if walls reappear, remember it in array */
                             /* y+1 is down */
                             if (hammered_walls_reappear)
-                                hammered_reappear(x, (y+1)%h)=hammered_wall_reappear_frame;
+                                hammered_reappear(x, (y + 1) % h) = hammered_wall_reappear_frame;
                         }
                     }
                     break;
@@ -1918,7 +1938,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
 
                 case O_FLYING_STONE_F:  /* falling stone */
                     if (!gravity_disabled) {
-                        GdDirectionEnum fall_dir=opposite[gravity];
+                        GdDirectionEnum fall_dir = opposite[gravity];
 
                         if (do_fall_try_crush_voodoo(x, y, fall_dir)) break;
                         if (do_fall_try_crack_nut(x, y, fall_dir, O_FLYING_STONE)) break;
@@ -1930,7 +1950,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
 
                 case O_FLYING_DIAMOND_F:    /* falling diamond */
                     if (!gravity_disabled) {
-                        GdDirectionEnum fall_dir=opposite[gravity];
+                        GdDirectionEnum fall_dir = opposite[gravity];
 
                         if (do_fall_try_eat_voodoo(x, y, fall_dir)) break;
                         if (do_fall_try_magic(x, y, fall_dir, magic_flying_diamond_to)) break;
@@ -1983,33 +2003,33 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                     else {
                         /* THIS IS THE CREATURE MOVE thing copied. */
                         GdDirection const *creature_move;
-                        bool ccw=rotates_ccw(x, y); /* check if default is counterclockwise */
+                        bool ccw = rotates_ccw(x, y); /* check if default is counterclockwise */
                         GdElementEnum base; /* base element number (which is like O_***_1) */
                         int dir, dirn, dirp;    /* direction */
 
-                        base=O_COW_1;
+                        base = O_COW_1;
 
-                        dir=get(x, y)-base; /* facing where */
-                        creature_move=creatures_backwards? creature_chdir:creature_dir;
+                        dir = get(x, y) - base; /* facing where */
+                        creature_move = creatures_backwards ? creature_chdir : creature_dir;
 
                         /* now change direction if backwards */
                         if (creatures_backwards)
-                            ccw=!ccw;
+                            ccw = !ccw;
 
                         if (ccw) {
-                            dirn=(dir+3)&3; /* fast turn */
-                            dirp=(dir+1)&3; /* slow turn */
+                            dirn = (dir + 3) & 3; /* fast turn */
+                            dirp = (dir + 1) & 3; /* slow turn */
                         } else {
-                            dirn=(dir+1)&3; /* fast turn */
-                            dirp=(dir+3)&3; /* slow turn */
+                            dirn = (dir + 1) & 3; /* fast turn */
+                            dirp = (dir + 3) & 3; /* slow turn */
                         }
 
                         if (is_like_space(x, y, creature_move[dirn]))
-                            move(x, y, creature_move[dirn], (GdElementEnum)(base+dirn));    /* turn and move to preferred dir */
+                            move(x, y, creature_move[dirn], (GdElementEnum)(base + dirn));  /* turn and move to preferred dir */
                         else if (is_like_space(x, y, creature_move[dir]))
-                            move(x, y, creature_move[dir], (GdElementEnum)(base+dir));  /* go on */
+                            move(x, y, creature_move[dir], (GdElementEnum)(base + dir)); /* go on */
                         else
-                            store(x, y, GdElementEnum(base+dirp));  /* turn in place if nothing else possible */
+                            store(x, y, GdElementEnum(base + dirp)); /* turn in place if nothing else possible */
                     }
                     break;
                     /* enclosed cows wait some time before turning to a skeleton */
@@ -2052,8 +2072,8 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                 case O_STONEFLY_3:
                 case O_STONEFLY_4:
                     /* check if touches a voodoo */
-                    if (get(x, y, MV_LEFT)==O_VOODOO || get(x, y, MV_RIGHT)==O_VOODOO || get(x, y, MV_UP)==O_VOODOO || get(x, y, MV_DOWN)==O_VOODOO)
-                        voodoo_touched=true;
+                    if (get(x, y, MV_LEFT) == O_VOODOO || get(x, y, MV_RIGHT) == O_VOODOO || get(x, y, MV_UP) == O_VOODOO || get(x, y, MV_DOWN) == O_VOODOO)
+                        voodoo_touched = true;
                     /* check if touches something bad and should explode (includes voodoo by the flags) */
                     if (blows_up_flies(x, y, MV_DOWN) || blows_up_flies(x, y, MV_UP)
                             || blows_up_flies(x, y, MV_LEFT) || blows_up_flies(x, y, MV_RIGHT))
@@ -2061,44 +2081,44 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                     /* otherwise move */
                     else {
                         GdDirection const *creature_move;
-                        bool ccw=rotates_ccw(x, y); /* check if default is counterclockwise */
+                        bool ccw = rotates_ccw(x, y); /* check if default is counterclockwise */
                         GdElementEnum base;         /* base element number (which is like O_***_1) */
                         int dir, dirn, dirp;        /* direction */
 
-                        if (get(x, y)>=O_FIREFLY_1 && get(x, y)<=O_FIREFLY_4)
-                            base=O_FIREFLY_1;
-                        else if (get(x, y)>=O_BUTTER_1 && get(x, y)<=O_BUTTER_4)
-                            base=O_BUTTER_1;
-                        else if (get(x, y)>=O_STONEFLY_1 && get(x, y)<=O_STONEFLY_4)
-                            base=O_STONEFLY_1;
-                        else if (get(x, y)>=O_ALT_FIREFLY_1 && get(x, y)<=O_ALT_FIREFLY_4)
-                            base=O_ALT_FIREFLY_1;
-                        else if (get(x, y)>=O_ALT_BUTTER_1 && get(x, y)<=O_ALT_BUTTER_4)
-                            base=O_ALT_BUTTER_1;
+                        if (get(x, y) >= O_FIREFLY_1 && get(x, y) <= O_FIREFLY_4)
+                            base = O_FIREFLY_1;
+                        else if (get(x, y) >= O_BUTTER_1 && get(x, y) <= O_BUTTER_4)
+                            base = O_BUTTER_1;
+                        else if (get(x, y) >= O_STONEFLY_1 && get(x, y) <= O_STONEFLY_4)
+                            base = O_STONEFLY_1;
+                        else if (get(x, y) >= O_ALT_FIREFLY_1 && get(x, y) <= O_ALT_FIREFLY_4)
+                            base = O_ALT_FIREFLY_1;
+                        else if (get(x, y) >= O_ALT_BUTTER_1 && get(x, y) <= O_ALT_BUTTER_4)
+                            base = O_ALT_BUTTER_1;
                         else
                             g_assert_not_reached();
 
-                        dir=get(x, y)-base; /* facing where */
-                        creature_move=creatures_backwards? creature_chdir:creature_dir;
+                        dir = get(x, y) - base; /* facing where */
+                        creature_move = creatures_backwards ? creature_chdir : creature_dir;
 
                         /* now change direction if backwards */
                         if (creatures_backwards)
-                            ccw=!ccw;
+                            ccw = !ccw;
 
                         if (ccw) {
-                            dirn=(dir+3)&3; /* fast turn */
-                            dirp=(dir+1)&3; /* slow turn */
+                            dirn = (dir + 3) & 3; /* fast turn */
+                            dirp = (dir + 1) & 3; /* slow turn */
                         } else {
-                            dirn=(dir+1)&3; /* fast turn */
-                            dirp=(dir+3)&3; /* slow turn */
+                            dirn = (dir + 1) & 3; /* fast turn */
+                            dirp = (dir + 3) & 3; /* slow turn */
                         }
 
                         if (is_like_space(x, y, creature_move[dirn]))
-                            move(x, y, creature_move[dirn], (GdElementEnum)(base+dirn));    /* turn and move to preferred dir */
+                            move(x, y, creature_move[dirn], (GdElementEnum)(base + dirn));  /* turn and move to preferred dir */
                         else if (is_like_space(x, y, creature_move[dir]))
-                            move(x, y, creature_move[dir], (GdElementEnum)(base+dir));  /* go on */
+                            move(x, y, creature_move[dir], (GdElementEnum)(base + dir)); /* go on */
                         else
-                            store(x, y, GdElementEnum(base+dirp));  /* turn in place if nothing else possible */
+                            store(x, y, GdElementEnum(base + dirp)); /* turn in place if nothing else possible */
                     }
                     break;
 
@@ -2118,74 +2138,74 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                     break;
 
                 case O_CHASING_STONE: {
-                    int px=player_x_mem[0];
-                    int py=player_y_mem[0];
-                    bool horizontal=random.rand_boolean();
-                    bool dont_move=false;
-                    int i=3;
+                    int px = player_x_mem[0];
+                    int py = player_y_mem[0];
+                    bool horizontal = random.rand_boolean();
+                    bool dont_move = false;
+                    int i = 3;
 
                     /* try to move... */
                     while (1) {
                         if (horizontal) {   /*********************************/
                             /* check for a horizontal movement */
-                            if (px==x) {
+                            if (px == x) {
                                 /* if coordinates are the same */
-                                i-=1;
-                                horizontal=!horizontal;
-                                if (i==2)
+                                i -= 1;
+                                horizontal = !horizontal;
+                                if (i == 2)
                                     continue;
                             } else {
-                                if (px>x && is_like_space(x, y, MV_RIGHT)) {
+                                if (px > x && is_like_space(x, y, MV_RIGHT)) {
                                     move(x, y, MV_RIGHT, O_CHASING_STONE);
-                                    dont_move=true;
+                                    dont_move = true;
                                     break;
-                                } else if (px<x && is_like_space(x, y, MV_LEFT)) {
+                                } else if (px < x && is_like_space(x, y, MV_LEFT)) {
                                     move(x, y, MV_LEFT, O_CHASING_STONE);
-                                    dont_move=true;
+                                    dont_move = true;
                                     break;
                                 } else {
-                                    i-=2;
-                                    if (i==1) {
-                                        horizontal=!horizontal;
+                                    i -= 2;
+                                    if (i == 1) {
+                                        horizontal = !horizontal;
                                         continue;
                                     }
                                 }
                             }
                         } else {    /********************************/
                             /* check for a vertical movement */
-                            if (py==y) {
+                            if (py == y) {
                                 /* if coordinates are the same */
-                                i-=1;
-                                horizontal=!horizontal;
-                                if (i==2)
+                                i -= 1;
+                                horizontal = !horizontal;
+                                if (i == 2)
                                     continue;
                             } else {
-                                if (py>y && is_like_space(x, y, MV_DOWN)) {
+                                if (py > y && is_like_space(x, y, MV_DOWN)) {
                                     move(x, y, MV_DOWN, O_CHASING_STONE);
-                                    dont_move=true;
+                                    dont_move = true;
                                     break;
-                                } else if (py<y && is_like_space(x, y, MV_UP)) {
+                                } else if (py < y && is_like_space(x, y, MV_UP)) {
                                     move(x, y, MV_UP, O_CHASING_STONE);
-                                    dont_move=true;
+                                    dont_move = true;
                                     break;
                                 } else {
-                                    i-=2;
-                                    if (i==1) {
-                                        horizontal=!horizontal;
+                                    i -= 2;
+                                    if (i == 1) {
+                                        horizontal = !horizontal;
                                         continue;
                                     }
                                 }
                             }
                         }
-                        if (i!=0)
-                            dont_move=true;
+                        if (i != 0)
+                            dont_move = true;
                         break;
                     }
 
                     /* if we should move in both directions, but can not move in any, stop. */
                     if (!dont_move) {
                         if (horizontal) {   /* check for horizontal */
-                            if (x>=px) {
+                            if (x >= px) {
                                 if (is_like_space(x, y, MV_UP) && is_like_space(x, y, MV_UP_LEFT))
                                     move(x, y, MV_UP, O_CHASING_STONE);
                                 else if (is_like_space(x, y, MV_DOWN) && is_like_space(x, y, MV_DOWN_LEFT))
@@ -2197,7 +2217,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                                     move(x, y, MV_DOWN, O_CHASING_STONE);
                             }
                         } else {    /* check for vertical */
-                            if (y>=py) {
+                            if (y >= py) {
                                 if (is_like_space(x, y, MV_LEFT) && is_like_space(x, y, MV_UP_LEFT))
                                     move(x, y, MV_LEFT, O_CHASING_STONE);
                                 else if (is_like_space(x, y, MV_RIGHT) && is_like_space(x, y, MV_UP_RIGHT))
@@ -2214,7 +2234,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                 break;
 
                 case O_REPLICATOR:
-                    if (replicators_wait_frame==0 && replicators_active && !gravity_disabled) {
+                    if (replicators_wait_frame == 0 && replicators_active && !gravity_disabled) {
                         /* only replicate, if space is under it. */
                         /* do not replicate players! */
                         /* also obeys gravity settings. */
@@ -2230,49 +2250,49 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                 case O_BITER_2:
                 case O_BITER_3:
                 case O_BITER_4:
-                    if (biters_wait_frame==0) {
+                    if (biters_wait_frame == 0) {
                         static GdDirectionEnum biter_move[] = { MV_UP, MV_RIGHT, MV_DOWN, MV_LEFT };
-                        int dir=get(x, y)-O_BITER_1;    /* direction, last two bits 0..3 */
-                        int dirn=(dir+3)&3;
-                        int dirp=(dir+1)&3;
-                        GdElementEnum made_sound_of=O_NONE;
+                        int dir = get(x, y) - O_BITER_1; /* direction, last two bits 0..3 */
+                        int dirn = (dir + 3) & 3;
+                        int dirp = (dir + 1) & 3;
+                        GdElementEnum made_sound_of = O_NONE;
 
                         unsigned int i;
-                        for (i=0; i<G_N_ELEMENTS(biter_try); i++) {
+                        for (i = 0; i < G_N_ELEMENTS(biter_try); i++) {
                             if (is_like_element(x, y, biter_move[dir], biter_try[i])) {
                                 GdDirectionEnum mdir = biter_move[dir];
-                                play_eat_particle_of_element(get(x, y, mdir), x+gd_dx[mdir], y+gd_dy[mdir]);
-                                move(x, y, mdir, GdElementEnum(O_BITER_1+dir));
-                                if (biter_try[i]!=O_SPACE)
-                                    made_sound_of=O_BITER_1;    /* sound of a biter eating */
+                                play_eat_particle_of_element(get(x, y, mdir), x + gd_dx[mdir], y + gd_dy[mdir]);
+                                move(x, y, mdir, GdElementEnum(O_BITER_1 + dir));
+                                if (biter_try[i] != O_SPACE)
+                                    made_sound_of = O_BITER_1;  /* sound of a biter eating */
                                 break;
                             } else if (is_like_element(x, y, biter_move[dirn], biter_try[i])) {
                                 GdDirectionEnum mdir = biter_move[dirn];
-                                play_eat_particle_of_element(get(x, y, mdir), x+gd_dx[mdir], y+gd_dy[mdir]);
-                                move(x, y, mdir, GdElementEnum(O_BITER_1+dirn));
-                                if (biter_try[i]!=O_SPACE)
-                                    made_sound_of=O_BITER_1;    /* sound of a biter eating */
+                                play_eat_particle_of_element(get(x, y, mdir), x + gd_dx[mdir], y + gd_dy[mdir]);
+                                move(x, y, mdir, GdElementEnum(O_BITER_1 + dirn));
+                                if (biter_try[i] != O_SPACE)
+                                    made_sound_of = O_BITER_1;  /* sound of a biter eating */
                                 break;
                             } else if (is_like_element(x, y, biter_move[dirp], biter_try[i])) {
                                 GdDirectionEnum mdir = biter_move[dirp];
-                                play_eat_particle_of_element(get(x, y, mdir), x+gd_dx[mdir], y+gd_dy[mdir]);
-                                move(x, y, mdir, GdElementEnum(O_BITER_1+dirp));
-                                if (biter_try[i]!=O_SPACE)
-                                    made_sound_of=O_BITER_1;    /* sound of a biter eating */
+                                play_eat_particle_of_element(get(x, y, mdir), x + gd_dx[mdir], y + gd_dy[mdir]);
+                                move(x, y, mdir, GdElementEnum(O_BITER_1 + dirp));
+                                if (biter_try[i] != O_SPACE)
+                                    made_sound_of = O_BITER_1;  /* sound of a biter eating */
                                 break;
                             }
                         }
-                        if (i==G_N_ELEMENTS(biter_try)) {
+                        if (i == G_N_ELEMENTS(biter_try)) {
                             /* i=number of elements in array: could not move, so just turn */
-                            store(x, y, GdElementEnum(O_BITER_1+dirp));
-                        } else if (biter_try[i]==O_STONE) {
+                            store(x, y, GdElementEnum(O_BITER_1 + dirp));
+                        } else if (biter_try[i] == O_STONE) {
                             /* if there was a stone there, where we moved... do not eat stones, just throw them back */
                             store(x, y, O_STONE);
-                            made_sound_of=O_STONE;
+                            made_sound_of = O_STONE;
                         }
 
                         /* if biter did move, we had sound. play it. */
-                        if (made_sound_of!=O_NONE)
+                        if (made_sound_of != O_NONE)
                             play_effect_of_element(made_sound_of, x, y);
                     }
                     break;
@@ -2282,8 +2302,8 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                 case O_DRAGONFLY_3:
                 case O_DRAGONFLY_4:
                     /* check if touches a voodoo */
-                    if (get(x, y, MV_LEFT)==O_VOODOO || get(x, y, MV_RIGHT)==O_VOODOO || get(x, y, MV_UP)==O_VOODOO || get(x, y, MV_DOWN)==O_VOODOO)
-                        voodoo_touched=true;
+                    if (get(x, y, MV_LEFT) == O_VOODOO || get(x, y, MV_RIGHT) == O_VOODOO || get(x, y, MV_UP) == O_VOODOO || get(x, y, MV_DOWN) == O_VOODOO)
+                        voodoo_touched = true;
                     /* check if touches something bad and should explode (includes voodoo by the flags) */
                     if (blows_up_flies(x, y, MV_DOWN) || blows_up_flies(x, y, MV_UP)
                             || blows_up_flies(x, y, MV_LEFT) || blows_up_flies(x, y, MV_RIGHT))
@@ -2291,28 +2311,28 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                     /* otherwise move */
                     else {
                         GdDirection const *creature_move;
-                        bool ccw=rotates_ccw(x, y); /* check if default is counterclockwise */
-                        GdElementEnum base=O_DRAGONFLY_1;   /* base element number (which is like O_***_1) */
+                        bool ccw = rotates_ccw(x, y); /* check if default is counterclockwise */
+                        GdElementEnum base = O_DRAGONFLY_1; /* base element number (which is like O_***_1) */
                         int dir, dirn;  /* direction */
 
-                        dir=get(x, y)-base; /* facing where */
-                        creature_move=creatures_backwards? creature_chdir:creature_dir;
+                        dir = get(x, y) - base; /* facing where */
+                        creature_move = creatures_backwards ? creature_chdir : creature_dir;
 
                         /* now change direction if backwards */
                         if (creatures_backwards)
-                            ccw=!ccw;
+                            ccw = !ccw;
 
                         if (ccw)
-                            dirn=(dir+3)&3; /* fast turn */
+                            dirn = (dir + 3) & 3; /* fast turn */
                         else
-                            dirn=(dir+1)&3; /* fast turn */
+                            dirn = (dir + 1) & 3; /* fast turn */
 
                         /* if can move forward, does so. */
                         if (is_like_space(x, y, creature_move[dir]))
-                            move(x, y, creature_move[dir], GdElementEnum(base+dir));
+                            move(x, y, creature_move[dir], GdElementEnum(base + dir));
                         else
                             /* otherwise turns 90 degrees in place. */
-                            store(x, y, GdElementEnum(base+dirn));
+                            store(x, y, GdElementEnum(base + dirn));
                     }
                     break;
 
@@ -2339,7 +2359,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                     } else {
                         /* is space over the bladder? */
                         if (is_like_space(x, y, opposite[grav_compat])) {
-                            if (get(x, y)==O_BLADDER_8) {
+                            if (get(x, y) == O_BLADDER_8) {
                                 /* if it is a bladder 8, really move up */
                                 move(x, y, opposite[grav_compat], O_BLADDER_1);
                                 play_effect_of_element(O_BLADDER, x, y);
@@ -2353,7 +2373,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                                         && is_like_space(x, y, ccw_fourth[opposite[grav_compat]])
                                         && is_like_space(x, y, ccw_eighth[opposite[grav_compat]])) {
                                     /* rolling up, to left */
-                                    if (get(x, y)==O_BLADDER_8) {
+                                    if (get(x, y) == O_BLADDER_8) {
                                         /* if it is a bladder 8, really roll */
                                         move(x, y, ccw_fourth[opposite[grav_compat]], O_BLADDER_8);
                                         play_effect_of_element(O_BLADDER, x, y);
@@ -2364,7 +2384,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                                            && is_like_space(x, y, cw_fourth[opposite[grav_compat]])
                                            && is_like_space(x, y, cw_eighth[opposite[grav_compat]])) {
                                     /* rolling up, to left */
-                                    if (get(x, y)==O_BLADDER_8) {
+                                    if (get(x, y) == O_BLADDER_8) {
                                         /* if it is a bladder 8, really roll */
                                         move(x, y, cw_fourth[opposite[grav_compat]], O_BLADDER_8);
                                         play_effect_of_element(O_BLADDER, x, y);
@@ -2387,11 +2407,11 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                         int i;
 
                         /* the ghost is given four possibilities to move. */
-                        for (i=0; i<4; i++) {
-                            static GdDirectionEnum dirs[]= {MV_UP, MV_DOWN, MV_LEFT, MV_RIGHT};
+                        for (i = 0; i < 4; i++) {
+                            static GdDirectionEnum dirs[] = {MV_UP, MV_DOWN, MV_LEFT, MV_RIGHT};
                             GdDirectionEnum random_dir;
 
-                            random_dir=dirs[random.rand_int_range(0, G_N_ELEMENTS(dirs))];
+                            random_dir = dirs[random.rand_int_range(0, G_N_ELEMENTS(dirs))];
                             if (is_like_space(x, y, random_dir)) {
                                 move(x, y, random_dir, O_GHOST);
                                 break;  /* ghost did move -> exit loop */
@@ -2406,7 +2426,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                      */
 
                 case O_AMOEBA:
-                    if (hatched && amoeba_state==GD_AM_AWAKE)
+                    if (hatched && amoeba_state == GD_AM_AWAKE)
                         play_effect_of_element(O_AMOEBA, x, y);
                     /* emulating BD1 amoeba+magic wall bug */
                     if (convert_amoeba_this_frame && amoeba_found_enclosed) {
@@ -2428,13 +2448,13 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                                 /* if still found enclosed, check all four directions, if this one is able to grow. */
                                 if (amoeba_eats(x, y, MV_UP) || amoeba_eats(x, y, MV_DOWN)
                                         || amoeba_eats(x, y, MV_LEFT) || amoeba_eats(x, y, MV_RIGHT)) {
-                                    amoeba_found_enclosed=false;    /* not enclosed. this is a local (per scan) flag! */
-                                    amoeba_state=GD_AM_AWAKE;
+                                    amoeba_found_enclosed = false;  /* not enclosed. this is a local (per scan) flag! */
+                                    amoeba_state = GD_AM_AWAKE;
                                 }
 
                             /* if alive, check in which dir to grow (or not) */
-                            if (amoeba_state==GD_AM_AWAKE) {
-                                if (random.rand_int_range(0, 1000000)<amoeba_growth_prob) {
+                            if (amoeba_state == GD_AM_AWAKE) {
+                                if (random.rand_int_range(0, 1000000) < amoeba_growth_prob) {
                                     switch (random.rand_int_range(0, 4)) {  /* decided to grow, choose a random direction. */
                                         case 0: /* let this be up. numbers indifferent. */
                                             if (amoeba_eats(x, y, MV_UP))
@@ -2460,7 +2480,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                     break;
 
                 case O_AMOEBA_2:
-                    if (hatched && amoeba_2_state==GD_AM_AWAKE)
+                    if (hatched && amoeba_2_state == GD_AM_AWAKE)
                         play_effect_of_element(O_AMOEBA, x, y);
                     amoeba_2_count++;
                     /* check if it is touching an amoeba, and explosion is enabled */
@@ -2482,12 +2502,12 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                                 if (amoeba_2_found_enclosed)
                                     if (amoeba_eats(x, y, MV_UP) || amoeba_eats(x, y, MV_DOWN)
                                             || amoeba_eats(x, y, MV_LEFT) || amoeba_eats(x, y, MV_RIGHT)) {
-                                        amoeba_2_found_enclosed=false;  /* not enclosed. this is a local (per scan) flag! */
-                                        amoeba_2_state=GD_AM_AWAKE;
+                                        amoeba_2_found_enclosed = false; /* not enclosed. this is a local (per scan) flag! */
+                                        amoeba_2_state = GD_AM_AWAKE;
                                     }
 
-                                if (amoeba_2_state==GD_AM_AWAKE)    /* if it is alive, decide if it attempts to grow */
-                                    if (random.rand_int_range(0, 1000000)<amoeba_2_growth_prob) {
+                                if (amoeba_2_state == GD_AM_AWAKE)  /* if it is alive, decide if it attempts to grow */
+                                    if (random.rand_int_range(0, 1000000) < amoeba_2_growth_prob) {
                                         switch (random.rand_int_range(0, 4)) {  /* decided to grow, choose a random direction. */
                                             case 0: /* let this be up. numbers indifferent. */
                                                 if (amoeba_eats(x, y, MV_UP))
@@ -2513,7 +2533,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
 
                 case O_ACID:
                     /* choose randomly, if it spreads */
-                    if (random.rand_int_range(0, 1000000)<=acid_spread_ratio) {
+                    if (random.rand_int_range(0, 1000000) <= acid_spread_ratio) {
                         /* the current one explodes */
                         store(x, y, acid_turns_to);
                         /* and if neighbours are eaten, put acid there. */
@@ -2556,8 +2576,8 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                 case O_H_EXPANDING_STEEL_WALL:
                 case O_V_EXPANDING_STEEL_WALL:
                     /* checks first if direction is changed. */
-                    if (((get(x, y)==O_H_EXPANDING_WALL || get(x, y)==O_H_EXPANDING_STEEL_WALL) && !expanding_wall_changed)
-                            || ((get(x, y)==O_V_EXPANDING_WALL || get(x, y)==O_V_EXPANDING_STEEL_WALL) && expanding_wall_changed)) {
+                    if (((get(x, y) == O_H_EXPANDING_WALL || get(x, y) == O_H_EXPANDING_STEEL_WALL) && !expanding_wall_changed)
+                            || ((get(x, y) == O_V_EXPANDING_WALL || get(x, y) == O_V_EXPANDING_STEEL_WALL) && expanding_wall_changed)) {
                         if (is_like_space(x, y, MV_LEFT)) {
                             store(x, y, MV_LEFT, get(x, y));
                             play_effect_of_element(get(x, y), x, y, MV_LEFT);
@@ -2604,29 +2624,29 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                      *    for predictable, a random number is generated, whether or not it is even possible that the stone
                      *    will be able to pass.
                      */
-                    if (slime_predictable? ((c64_rand.random()&slime_permeability_c64)==0) : random.rand_int_range(0, 1000000)<slime_permeability) {
-                        GdDirectionEnum grav=gravity;
-                        GdDirectionEnum oppos=opposite[gravity];
+                    if (slime_predictable ? ((c64_rand.random()&slime_permeability_c64) == 0) : random.rand_int_range(0, 1000000) < slime_permeability) {
+                        GdDirectionEnum grav = gravity;
+                        GdDirectionEnum oppos = opposite[gravity];
 
                         /* space under the slime? elements may pass from top to bottom then. */
                         if (is_like_space(x, y, grav)) {
-                            if (get(x, y, oppos)==slime_eats_1) {
+                            if (get(x, y, oppos) == slime_eats_1) {
                                 store(x, y, grav, slime_converts_1);    /* output a falling xy under */
                                 store(x, y, oppos, O_SPACE);
                                 play_effect_of_element(O_SLIME, x, y);
-                            } else if (get(x, y, oppos)==slime_eats_2) {
+                            } else if (get(x, y, oppos) == slime_eats_2) {
                                 store(x, y, grav, slime_converts_2);
                                 store(x, y, oppos, O_SPACE);
                                 play_effect_of_element(O_SLIME, x, y);
-                            } else if (get(x, y, oppos)==slime_eats_3) {
+                            } else if (get(x, y, oppos) == slime_eats_3) {
                                 store(x, y, grav, slime_converts_3);
                                 store(x, y, oppos, O_SPACE);
                                 play_effect_of_element(O_SLIME, x, y);
-                            } else if (get(x, y, oppos)==O_WAITING_STONE) { /* waiting stones pass without awakening */
+                            } else if (get(x, y, oppos) == O_WAITING_STONE) { /* waiting stones pass without awakening */
                                 store(x, y, grav, O_WAITING_STONE);
                                 store(x, y, oppos, O_SPACE);
                                 play_effect_of_element(O_SLIME, x, y);
-                            } else if (get(x, y, oppos)==O_CHASING_STONE) { /* chasing stones pass */
+                            } else if (get(x, y, oppos) == O_CHASING_STONE) { /* chasing stones pass */
                                 store(x, y, grav, O_CHASING_STONE);
                                 store(x, y, oppos, O_SPACE);
                                 play_effect_of_element(O_SLIME, x, y);
@@ -2634,15 +2654,15 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                         } else
                             /* or space over the slime? elements may pass from bottom to up then. */
                             if (is_like_space(x, y, oppos)) {
-                                if (get(x, y, grav)==O_BLADDER) {                   /* bladders move UP the slime */
+                                if (get(x, y, grav) == O_BLADDER) {                 /* bladders move UP the slime */
                                     store(x, y, grav, O_SPACE);
                                     store(x, y, oppos, O_BLADDER_1);
                                     play_effect_of_element(O_SLIME, x, y);
-                                } else if (get(x, y, grav)==O_FLYING_STONE) {
+                                } else if (get(x, y, grav) == O_FLYING_STONE) {
                                     store(x, y, grav, O_SPACE);
                                     store(x, y, oppos, O_FLYING_STONE_F);
                                     play_effect_of_element(O_SLIME, x, y);
-                                } else if (get(x, y, grav)==O_FLYING_DIAMOND) {
+                                } else if (get(x, y, grav) == O_FLYING_DIAMOND) {
                                     store(x, y, grav, O_SPACE);
                                     store(x, y, oppos, O_FLYING_DIAMOND_F);
                                     play_effect_of_element(O_SLIME, x, y);
@@ -2655,13 +2675,13 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                     if (is_like_space(x, y, grav_compat)) {
                         /* try falling if space under. */
                         int yy;
-                        for (yy=y+1; yy<y+h; yy++)
+                        for (yy = y + 1; yy < y + h; yy++)
                             /* yy<y+h is to check everything OVER the wall - since caves wrap around !! */
                             if (!is_like_space(x, yy))
                                 /* stop cycle when other than space */
                                 break;
                         /* if scanning stopped by a player... start falling! */
-                        if (get(x, yy)==O_PLAYER || get(x, yy)==O_PLAYER_GLUED || get(x, yy)==O_PLAYER_BOMB) {
+                        if (get(x, yy) == O_PLAYER || get(x, yy) == O_PLAYER_GLUED || get(x, yy) == O_PLAYER_BOMB) {
                             move(x, y, grav_compat, O_FALLING_WALL_F);
                             /* no sound when the falling wall starts falling! */
                         }
@@ -2694,25 +2714,25 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                         bool left;
 
                         /* decide direction */
-                        left=get(x, y)!=O_CONVEYOR_RIGHT;
+                        left = get(x, y) != O_CONVEYOR_RIGHT;
                         if (conveyor_belts_direction_changed)
-                            left=!left;
-                        dir=left?ccw_eighth:cw_eighth;
+                            left = !left;
+                        dir = left ? ccw_eighth : cw_eighth;
 
                         /* CHECK IF IT CONVEYS THE ELEMENT ABOVE IT */
                         /* if gravity is normal, and the conveyor belt has something ABOVE which can be moved
                             OR
                            the gravity is up, so anything that should float now goes DOWN and touches the conveyor */
-                        if ((gravity==MV_DOWN && moved_by_conveyor_top(x, y, MV_UP))
-                                || (gravity==MV_UP && moved_by_conveyor_bottom(x, y, MV_UP))) {
+                        if ((gravity == MV_DOWN && moved_by_conveyor_top(x, y, MV_UP))
+                                || (gravity == MV_UP && moved_by_conveyor_bottom(x, y, MV_UP))) {
                             if (is_like_space(x, y, dir[MV_UP])) {
                                 store(x, y, dir[MV_UP], get(x, y, MV_UP));  /* move */
                                 store(x, y, MV_UP, O_SPACE);    /* and place a space. */
                             }
                         }
                         /* CHECK IF IT CONVEYS THE ELEMENT BELOW IT */
-                        if ((gravity==MV_UP && moved_by_conveyor_top(x, y, MV_DOWN))
-                                || (gravity==MV_DOWN && moved_by_conveyor_bottom(x, y, MV_DOWN))) {
+                        if ((gravity == MV_UP && moved_by_conveyor_top(x, y, MV_DOWN))
+                                || (gravity == MV_DOWN && moved_by_conveyor_bottom(x, y, MV_DOWN))) {
                             if (is_like_space(x, y, dir[MV_DOWN])) {
                                 store(x, y, dir[MV_DOWN], get(x, y, MV_DOWN));  /* move */
                                 store(x, y, MV_DOWN, O_SPACE);  /* and clear. */
@@ -2720,37 +2740,33 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                         }
                     }
                     break;
-                
+
                 case O_ROCKET_1:
                     if (is_like_space(x, y, MV_RIGHT)) {
                         move(x, y, MV_RIGHT, O_ROCKET_1);
                         add_particle_set(x, y, O_ROCKET_1);
-                    }
-                    else
+                    } else
                         explode(x, y);
                     break;
                 case O_ROCKET_2:
                     if (is_like_space(x, y, MV_UP)) {
                         move(x, y, MV_UP, O_ROCKET_2);
                         add_particle_set(x, y, O_ROCKET_2);
-                    }
-                    else
+                    } else
                         explode(x, y);
                     break;
                 case O_ROCKET_3:
                     if (is_like_space(x, y, MV_LEFT)) {
                         move(x, y, MV_LEFT, O_ROCKET_3);
                         add_particle_set(x, y, O_ROCKET_3);
-                    }
-                    else
+                    } else
                         explode(x, y);
                     break;
                 case O_ROCKET_4:
                     if (is_like_space(x, y, MV_DOWN)) {
                         move(x, y, MV_DOWN, O_ROCKET_4);
                         add_particle_set(x, y, O_ROCKET_4);
-                    }
-                    else
+                    } else
                         explode(x, y);
                     break;
 
@@ -2784,7 +2800,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                     break;
 
                 case O_GHOST_EXPL_4: {
-                    static GdElementEnum ghost_explode[]= {
+                    static GdElementEnum ghost_explode[] = {
                         O_SPACE, O_SPACE, O_DIRT, O_DIRT, O_CLOCK, O_CLOCK, O_PRE_OUTBOX,
                         O_BOMB, O_BOMB, O_PLAYER, O_GHOST, O_BLADDER, O_DIAMOND, O_SWEET,
                         O_WAITING_STONE, O_BITER_1
@@ -2820,7 +2836,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                     player_seen_ago = 0;
                     if (hatched && !inbox_toggle)   /* if it is time of birth */
                         store(x, y, O_PRE_PL_1);
-                    inbox_toggle=!inbox_toggle;
+                    inbox_toggle = !inbox_toggle;
                     break;
                 case O_PRE_PL_1:
                     player_seen_ago = 0;
@@ -2907,7 +2923,7 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
                 case O_MAGIC_WALL:
                     /* the magic wall effects are handled by the elements which fall
                      * onto the wall. here only the sound is handled. */
-                    if (magic_wall_state==GD_MW_ACTIVE) {
+                    if (magic_wall_state == GD_MW_ACTIVE) {
                         play_effect_of_element(O_MAGIC_WALL, x, y);
                     }
                     break;
@@ -2934,12 +2950,12 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
     /* forget "scanned" flags for objects. */
     /* also, check for time penalties. */
     /* these is something like an effect table, but we do not really use one. */
-    for (int y=0; y<h; y++)
-        for (int x=0; x<w; x++) {
+    for (int y = 0; y < h; y++)
+        for (int x = 0; x < w; x++) {
             unscan(x, y);
-            if (get(x, y)==O_TIME_PENALTY) {
+            if (get(x, y) == O_TIME_PENALTY) {
                 store(x, y, O_GRAVESTONE);
-                time_decrement_sec+=time_penalty;   /* there is time penalty for destroying the voodoo */
+                time_decrement_sec += time_penalty; /* there is time penalty for destroying the voodoo */
             }
         }
 
@@ -2947,8 +2963,8 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
     /* short explosions (for example, in bd1) started with explode_2. */
     /* internally we use explode_1; and change it to explode_2 if needed. */
     if (short_explosions)
-        for (int y=0; y<h; y++)
-            for (int x=0; x<w; x++)
+        for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
                 if (is_first_stage_of_explosion(x, y)) {
                     next(x, y); /* select next frame of explosion */
                     unscan(x, y); /* forget scanned flag immediately */
@@ -2956,34 +2972,34 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
 
     /* this loop finds the coordinates of the player. needed for scrolling and chasing stone.*/
     /* but we only do this, if a living player was found. otherwise "stay" at current coordinates. */
-    if (player_state==GD_PL_LIVING) {
+    if (player_state == GD_PL_LIVING) {
         if (active_is_first_found) {
             /* to be 1stb compatible, we do everything backwards. */
-            for (int y=h-1; y>=0; y--)
-                for (int x=w-1; x>=0; x--)
+            for (int y = h - 1; y >= 0; y--)
+                for (int x = w - 1; x >= 0; x--)
                     if (is_player(x, y)) {
                         /* here we remember the coordinates. */
-                        player_x=x;
-                        player_y=y;
+                        player_x = x;
+                        player_y = y;
                     }
         } else {
             /* as in the original: look for the last one */
-            for (int y=0; y<h; y++)
-                for (int x=0; x<w; x++)
+            for (int y = 0; y < h; y++)
+                for (int x = 0; x < w; x++)
                     if (is_player(x, y)) {
                         /* here we remember the coordinates. */
-                        player_x=x;
-                        player_y=y;
+                        player_x = x;
+                        player_y = y;
                     }
         }
     }
     /* record coordinates of player for chasing stone */
-    for (unsigned i=0; i<PlayerMemSize-1; i++) {
-        player_x_mem[i]=player_x_mem[i+1];
-        player_y_mem[i]=player_y_mem[i+1];
+    for (unsigned i = 0; i < PlayerMemSize - 1; i++) {
+        player_x_mem[i] = player_x_mem[i + 1];
+        player_y_mem[i] = player_y_mem[i + 1];
     }
-    player_x_mem[PlayerMemSize-1]=player_x;
-    player_y_mem[PlayerMemSize-1]=player_y;
+    player_x_mem[PlayerMemSize - 1] = player_x;
+    player_y_mem[PlayerMemSize - 1] = player_y;
 
     /* SCHEDULING */
 
@@ -3001,40 +3017,40 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
         case GD_SCHEDULING_BD1:
             if (!intermission)
                 /* non-intermissions */
-                speed=(88+3.66*ckdelay+(ckdelay_current+ckdelay_extra_for_animation)/1000);
+                speed = (88 + 3.66 * ckdelay + (ckdelay_current + ckdelay_extra_for_animation) / 1000);
             else
                 /* intermissions were quicker, as only lines 1-12 were processed by the engine. */
-                speed=(60+3.66*ckdelay+(ckdelay_current+ckdelay_extra_for_animation)/1000);
+                speed = (60 + 3.66 * ckdelay + (ckdelay_current + ckdelay_extra_for_animation) / 1000);
             break;
 
         case GD_SCHEDULING_BD1_ATARI:
             /* about 20ms/frame faster than c64 version */
             if (!intermission)
-                speed=(74+3.2*ckdelay+(ckdelay_current)/1000);          /* non-intermissions */
+                speed = (74 + 3.2 * ckdelay + (ckdelay_current) / 1000); /* non-intermissions */
             else
-                speed=(65+2.88*ckdelay+(ckdelay_current)/1000);     /* for intermissions */
+                speed = (65 + 2.88 * ckdelay + (ckdelay_current) / 1000); /* for intermissions */
             break;
 
         case GD_SCHEDULING_BD2:
             /* 60 is a guess. */
-            speed=std::max(60+(ckdelay_current+ckdelay_extra_for_animation)/1000, ckdelay*20);
+            speed = std::max(60 + (ckdelay_current + ckdelay_extra_for_animation) / 1000, ckdelay * 20);
             break;
 
         case GD_SCHEDULING_PLCK:
             /* 65 is totally empty cave in construction kit, with delay=0) */
-            speed=std::max(65+ckdelay_current/1000, ckdelay*20);
+            speed = std::max(65 + ckdelay_current / 1000, ckdelay * 20);
             break;
 
         case GD_SCHEDULING_BD2_PLCK_ATARI:
             /* a really fast engine; timing works like c64 plck. */
             /* 40 ms was measured in the construction kit, with delay=0 */
-            speed=std::max(40+ckdelay_current/1000, ckdelay*20);
+            speed = std::max(40 + ckdelay_current / 1000, ckdelay * 20);
             break;
 
         case GD_SCHEDULING_CRDR:
             if (hammered_walls_reappear)        /* this made the engine very slow. */
-                ckdelay_current+=60000;
-            speed=std::max(130+ckdelay_current/1000, ckdelay*20);
+                ckdelay_current += 60000;
+            speed = std::max(130 + ckdelay_current / 1000, ckdelay * 20);
             break;
 
         case GD_SCHEDULING_MAX:
@@ -3046,60 +3062,61 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
     /* CAVE VARIABLES */
 
     /* PLAYER */
-    if ((player_state==GD_PL_LIVING && player_seen_ago>15) || kill_player)  /* check if player is alive. */
-        player_state=GD_PL_DIED;
+    if ((player_state == GD_PL_LIVING && player_seen_ago > 15) || kill_player) /* check if player is alive. */
+        player_state = GD_PL_DIED;
     if (voodoo_touched) /* check if any voodoo exploded, and kill players the next scan if that happended. */
-        kill_player=true;
+        kill_player = true;
 
     /* AMOEBA */
-    if (amoeba_state==GD_AM_AWAKE) {
+    if (amoeba_state == GD_AM_AWAKE) {
         /* check flags after evaluating. */
-        if (amoeba_count>=amoeba_max_count)
-            amoeba_state=GD_AM_TOO_BIG;
+        if (amoeba_count >= amoeba_max_count)
+            amoeba_state = GD_AM_TOO_BIG;
         if (amoeba_found_enclosed)
-            amoeba_state=GD_AM_ENCLOSED;
+            amoeba_state = GD_AM_ENCLOSED;
     }
     /* amoeba can also be turned into diamond by magic wall */
-    if (magic_wall_stops_amoeba && magic_wall_state==GD_MW_ACTIVE)
-        amoeba_state=GD_AM_ENCLOSED;
+    if (magic_wall_stops_amoeba && magic_wall_state == GD_MW_ACTIVE)
+        amoeba_state = GD_AM_ENCLOSED;
     /* AMOEBA 2 */
-    if (amoeba_2_state==GD_AM_AWAKE) {
+    if (amoeba_2_state == GD_AM_AWAKE) {
         /* check flags after evaluating. */
-        if (amoeba_2_count>=amoeba_2_max_count)
-            amoeba_2_state=GD_AM_TOO_BIG;
+        if (amoeba_2_count >= amoeba_2_max_count)
+            amoeba_2_state = GD_AM_TOO_BIG;
         if (amoeba_2_found_enclosed)
-            amoeba_2_state=GD_AM_ENCLOSED;
+            amoeba_2_state = GD_AM_ENCLOSED;
     }
     /* amoeba 2 can also be turned into diamond by magic wall */
-    if (magic_wall_stops_amoeba && magic_wall_state==GD_MW_ACTIVE)
-        amoeba_2_state=GD_AM_ENCLOSED;
+    if (magic_wall_stops_amoeba && magic_wall_state == GD_MW_ACTIVE)
+        amoeba_2_state = GD_AM_ENCLOSED;
 
 
     /* now check times. --------------------------- */
     /* decrement time if a voodoo was killed. */
-    time-=time_decrement_sec*timing_factor;
-    if (time<0)
-        time=0;
+    time -= time_decrement_sec * timing_factor;
+    if (time < 0)
+        time = 0;
 
     /* only decrement time when player is already born. */
     if (hatched) {
-        int secondsbefore, secondsafter;
-
-        secondsbefore=time/timing_factor;
-        time-=speed;
-        if (time<=0)
-            time=0;
-        secondsafter=time/timing_factor;
-        if (secondsbefore!=secondsafter)
+        int secondsbefore = time / timing_factor;
+        time -= speed;
+        if (time <= 0)
+            time = 0;
+        int secondsafter = time / timing_factor;
+        if (secondsbefore != secondsafter)
             set_seconds_sound();
+        
+        /* for statistics */
+        time_elapsed += speed;
     }
     /* a gravity switch was activated; seconds counting down */
-    if (gravity_will_change>0) {
-        gravity_will_change-=speed;
-        if (gravity_will_change<0)
-            gravity_will_change=0;
+    if (gravity_will_change > 0) {
+        gravity_will_change -= speed;
+        if (gravity_will_change < 0)
+            gravity_will_change = 0;
 
-        if (gravity_will_change==0) {
+        if (gravity_will_change == 0) {
             gravity = gravity_next_direction;
             if (gravity_change_sound)
                 sound_play(GD_S_GRAVITY_CHANGE, player_x, player_y);    /* takes precedence over amoeba and magic wall sound */
@@ -3107,76 +3124,76 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
     }
 
     /* creatures direction automatically change */
-    if (creatures_direction_will_change>0) {
-        creatures_direction_will_change-=speed;
-        if (creatures_direction_will_change<0)
-            creatures_direction_will_change=0;
+    if (creatures_direction_will_change > 0) {
+        creatures_direction_will_change -= speed;
+        if (creatures_direction_will_change < 0)
+            creatures_direction_will_change = 0;
 
-        if (creatures_direction_will_change==0) {
+        if (creatures_direction_will_change == 0) {
             if (creature_direction_auto_change_sound)
                 sound_play(GD_S_SWITCH_CREATURES, player_x, player_y);
-            creatures_backwards=!creatures_backwards;
-            creatures_direction_will_change=creatures_direction_auto_change_time*timing_factor;
+            creatures_backwards = !creatures_backwards;
+            creatures_direction_will_change = creatures_direction_auto_change_time * timing_factor;
         }
     }
 
     /* magic wall; if active&wait or not wait for hatching */
-    if (magic_wall_state==GD_MW_ACTIVE && (hatched || !magic_timer_wait_for_hatching)) {
-        magic_wall_time-=speed;
-        if (magic_wall_time<0)
-            magic_wall_time=0;
-        if (magic_wall_time==0)
-            magic_wall_state=GD_MW_EXPIRED;
+    if (magic_wall_state == GD_MW_ACTIVE && (hatched || !magic_timer_wait_for_hatching)) {
+        magic_wall_time -= speed;
+        if (magic_wall_time < 0)
+            magic_wall_time = 0;
+        if (magic_wall_time == 0)
+            magic_wall_state = GD_MW_EXPIRED;
     }
     /* we may wait for hatching, when starting amoeba */
-    if (amoeba_timer_started_immediately || (amoeba_state==GD_AM_AWAKE && (hatched || !amoeba_timer_wait_for_hatching))) {
-        amoeba_time-=speed;
-        if (amoeba_time<0)
-            amoeba_time=0;
-        if (amoeba_time==0)
-            amoeba_growth_prob=amoeba_fast_growth_prob;
+    if (amoeba_timer_started_immediately || (amoeba_state == GD_AM_AWAKE && (hatched || !amoeba_timer_wait_for_hatching))) {
+        amoeba_time -= speed;
+        if (amoeba_time < 0)
+            amoeba_time = 0;
+        if (amoeba_time == 0)
+            amoeba_growth_prob = amoeba_fast_growth_prob;
     }
     /* we may wait for hatching, when starting amoeba */
-    if (amoeba_timer_started_immediately || (amoeba_2_state==GD_AM_AWAKE && (hatched || !amoeba_timer_wait_for_hatching))) {
-        amoeba_2_time-=speed;
-        if (amoeba_2_time<0)
-            amoeba_2_time=0;
-        if (amoeba_2_time==0)
-            amoeba_2_growth_prob=amoeba_2_fast_growth_prob;
+    if (amoeba_timer_started_immediately || (amoeba_2_state == GD_AM_AWAKE && (hatched || !amoeba_timer_wait_for_hatching))) {
+        amoeba_2_time -= speed;
+        if (amoeba_2_time < 0)
+            amoeba_2_time = 0;
+        if (amoeba_2_time == 0)
+            amoeba_2_growth_prob = amoeba_2_fast_growth_prob;
     }
 
     /* check for player hatching. */
-    start_signal=false;
+    start_signal = false;
     /* if not the c64 scheduling, but the correct frametime is used, hatching delay should always be decremented. */
     /* otherwise, the if (millisecs...) condition below will set this. */
-    if (scheduling==GD_SCHEDULING_MILLISECONDS) {       /* NON-C64 scheduling */
-        if (hatching_delay_frame>0) {
-            hatching_delay_frame--; /* for milliseconds-based, non-c64 schedulings, hatching delay means frames. */
-            if (hatching_delay_frame==0)
-                start_signal=true;
+    if (scheduling == GD_SCHEDULING_MILLISECONDS) {     /* NON-C64 scheduling */
+        if (hatching_delay_frame > 0) {
+            --hatching_delay_frame; /* for milliseconds-based, non-c64 schedulings, hatching delay means frames. */
+            if (hatching_delay_frame == 0)
+                start_signal = true;
         }
     } else {                            /* C64 scheduling */
-        if (hatching_delay_time>0) {
-            hatching_delay_time-=speed; /* for c64 schedulings, hatching delay means milliseconds. */
-            if (hatching_delay_time<=0) {
-                hatching_delay_time=0;
-                start_signal=true;
+        if (hatching_delay_time > 0) {
+            hatching_delay_time -= speed; /* for c64 schedulings, hatching delay means milliseconds. */
+            if (hatching_delay_time <= 0) {
+                hatching_delay_time = 0;
+                start_signal = true;
             }
         }
     }
 
     /* if decremented hatching, and it became zero: */
     if (start_signal) {     /* THIS IS THE CAVE START SIGNAL */
-        hatched=true;   /* record that now the cave is in its normal state */
+        hatched = true; /* record that now the cave is in its normal state */
 
         count_diamonds();   /* if diamonds needed is below zero, we count the available diamonds now. */
 
         /* setup direction auto change */
         if (creatures_direction_auto_change_time) {
-            creatures_direction_will_change=creatures_direction_auto_change_time*timing_factor;
+            creatures_direction_will_change = creatures_direction_auto_change_time * timing_factor;
 
             if (creatures_direction_auto_change_on_start)
-                creatures_backwards=!creatures_backwards;
+                creatures_backwards = !creatures_backwards;
         }
 
         if (player_state == GD_PL_NOT_YET)
@@ -3186,36 +3203,36 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
     }
 
     /* for biters */
-    if (biters_wait_frame==0)
-        biters_wait_frame=biter_delay_frame;
+    if (biters_wait_frame == 0)
+        biters_wait_frame = biter_delay_frame;
     else
-        biters_wait_frame--;
+        --biters_wait_frame;
     /* replicators delay */
-    if (replicators_wait_frame==0)
-        replicators_wait_frame=replicator_delay_frame;
+    if (replicators_wait_frame == 0)
+        replicators_wait_frame = replicator_delay_frame;
     else
-        replicators_wait_frame--;
+        --replicators_wait_frame;
 
 
     /* LAST THOUGTS */
 
     /* check if cave failed by timeout */
-    if (player_state==GD_PL_LIVING && time==0) {
+    if (player_state != GD_PL_TIMEOUT && time == 0) {
+        player_state = GD_PL_TIMEOUT;
         clear_sounds();
-        player_state=GD_PL_TIMEOUT;
         sound_play(GD_S_TIMEOUT, player_x, player_y);
     }
 
     /* set these for drawing. */
-    last_direction=player_move;
+    last_direction = player_move;
     /* here we remember last movements for animation. this is needed here, as animation
        is in sync with the game, not the keyboard directly. (for example, after exiting
        the cave, the player was "running" in the original, till bonus points were counted
        for remaining time and so on. */
-    if (player_move==MV_LEFT || player_move==MV_UP_LEFT || player_move==MV_DOWN_LEFT)
-        last_horizontal_direction=MV_LEFT;
-    if (player_move==MV_RIGHT || player_move==MV_UP_RIGHT || player_move==MV_DOWN_RIGHT)
-        last_horizontal_direction=MV_RIGHT;
+    if (player_move == MV_LEFT || player_move == MV_UP_LEFT || player_move == MV_DOWN_LEFT)
+        last_horizontal_direction = MV_LEFT;
+    if (player_move == MV_RIGHT || player_move == MV_UP_RIGHT || player_move == MV_DOWN_RIGHT)
+        last_horizontal_direction = MV_RIGHT;
 
     // return direction of movement of player, which might be changed if no diagonal movements.
     return player_move;

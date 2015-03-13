@@ -1,21 +1,28 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _GD_REFLECTIVE
-#define _GD_REFLECTIVE
+#ifndef REFLECTIVE_HPP_INCLUDED
+#define REFLECTIVE_HPP_INCLUDED
 
 #include "config.h"
 
@@ -63,7 +70,7 @@ public:
     /** Return the data member pointed to by the prop.
      * @param o The reflective object.
      * @return The data member, the pointer for which will be stored in the derived object. */
-    virtual MEMBERTYPE &get(Reflective &o) const=0;
+    virtual MEMBERTYPE &get(Reflective &o) const = 0;
 protected:
     /// Create a new GetterForType.
     GetterForType(unsigned count);
@@ -159,13 +166,13 @@ std::auto_ptr<GetterBase> GetterBase::create_new(MEMBERTYPE(KLASS::*ptr)[COUNT])
  * Properties which can be used in a description of a reflective class data item.
  */
 enum ReflectivePropertyFlags {
-    GD_ALWAYS_SAVE=1<<0,
-    GD_DONT_SAVE=1<<1,
-    GD_DONT_SHOW_IN_EDITOR=1<<2,
-    GD_SHOW_LEVEL_LABEL=1<<3,
-    GD_COMPATIBILITY_SETTING=1<<4,
-    GD_BDCFF_RATIO_TO_CAVE_SIZE=1<<5,
-    GD_BD_PROBABILITY=1<<6,
+    GD_ALWAYS_SAVE = 1 << 0,
+    GD_DONT_SAVE = 1 << 1,
+    GD_DONT_SHOW_IN_EDITOR = 1 << 2,
+    GD_SHOW_LEVEL_LABEL = 1 << 3,
+    GD_COMPATIBILITY_SETTING = 1 << 4,
+    GD_BDCFF_RATIO_TO_CAVE_SIZE = 1 << 5,
+    GD_BD_PROBABILITY = 1 << 6,
 };
 
 /**
@@ -197,7 +204,7 @@ struct PropertyDescription {
  */
 class Reflective {
 public:
-    virtual PropertyDescription const *get_description_array() const=0;
+    virtual PropertyDescription const *get_description_array() const = 0;
     virtual ~Reflective() {}
     template <class MEMBERTYPE> MEMBERTYPE &get(std::auto_ptr<GetterBase> const &prop);
 };

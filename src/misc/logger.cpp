@@ -1,17 +1,24 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
@@ -21,6 +28,7 @@
 #include <iostream>
 #include <cassert>
 
+#include "settings.hpp"
 #include "misc/logger.hpp"
 
 std::vector<Logger *> Logger::loggers;
@@ -44,17 +52,17 @@ static char severity_char(ErrorMessage::Severity sev) {
 }
 
 static ErrorMessage::Severity severity_glog(int flag) {
-    if (flag&G_LOG_LEVEL_ERROR) return ErrorMessage::Error;
-    if (flag&G_LOG_LEVEL_CRITICAL) return ErrorMessage::Critical;
-    if (flag&G_LOG_LEVEL_WARNING) return ErrorMessage::Warning;
-    if (flag&G_LOG_LEVEL_MESSAGE) return ErrorMessage::Message;
-    if (flag&G_LOG_LEVEL_INFO) return ErrorMessage::Info;
-    if (flag&G_LOG_LEVEL_DEBUG) return ErrorMessage::Debug;
+    if (flag & G_LOG_LEVEL_ERROR) return ErrorMessage::Error;
+    if (flag & G_LOG_LEVEL_CRITICAL) return ErrorMessage::Critical;
+    if (flag & G_LOG_LEVEL_WARNING) return ErrorMessage::Warning;
+    if (flag & G_LOG_LEVEL_MESSAGE) return ErrorMessage::Message;
+    if (flag & G_LOG_LEVEL_INFO) return ErrorMessage::Info;
+    if (flag & G_LOG_LEVEL_DEBUG) return ErrorMessage::Debug;
     return ErrorMessage::Warning;
 }
 
 std::ostream &operator<<(std::ostream &os, const ErrorMessage &em) {
-    os<<severity_char(em.sev)<<':'<<em.message;
+    os << severity_char(em.sev) << ':' << em.message;
     return os;
 }
 
@@ -85,11 +93,11 @@ Logger::Logger(bool ignore_)
 /// Removes it from the static list of loggers.
 Logger::~Logger() {
     if (!read) {
-        std::cerr<<"Messages left in logger!"<<std::endl;
-        for (Container::const_iterator it=messages.begin(); it!=messages.end(); ++it)
-            std::cerr<<"  "<<*it<<std::endl;
+        std::cerr << "Messages left in logger!" << std::endl;
+        for (Container::const_iterator it = messages.begin(); it != messages.end(); ++it)
+            std::cerr << "  " << *it << std::endl;
     }
-    assert(loggers.back()==this);
+    assert(loggers.back() == this);
     loggers.pop_back();
     if (loggers.empty())
         g_log_set_default_handler(g_log_default_handler, NULL);
@@ -98,7 +106,7 @@ Logger::~Logger() {
 /// Clears the logger to empty. (No messages.)
 void Logger::clear() {
     messages.clear();
-    read=true;
+    read = true;
 }
 
 /// Returns if there are no error messages stored in the misc/logger.
@@ -108,7 +116,7 @@ bool Logger::empty() const {
 }
 
 void Logger::set_context(std::string const &new_context) {
-    context=new_context;
+    context = new_context;
 }
 
 std::string const &Logger::get_context() const {
@@ -125,13 +133,13 @@ Logger::Container const &Logger::get_messages() const {
 /// @return String of messages - each message on its own line.
 std::string Logger::get_messages_in_one_string() const {
     std::string s;
-    bool first=true;
-    for (ConstIterator it=messages.begin(); it!=messages.end(); ++it) {
+    bool first = true;
+    for (ConstIterator it = messages.begin(); it != messages.end(); ++it) {
         if (first) {
-            s+='\n';
-            first=false;
+            s += '\n';
+            first = false;
         }
-        s+=it->message;
+        s += it->message;
     }
 
     return s;
@@ -144,12 +152,12 @@ void Logger::log(ErrorMessage::Severity sev, std::string const &message) {
     if (ignore)
         return;
 
-    if (context=="")
+    if (context == "")
         messages.push_back(ErrorMessage(sev, message));
     else
-        messages.push_back(ErrorMessage(sev, context+": "+message));
-    std::cerr<<messages.back()<<std::endl;
-    read=false;
+        messages.push_back(ErrorMessage(sev, context + ": " + message));
+    std::cerr << messages.back() << std::endl;
+    read = false;
 }
 
 void log(ErrorMessage::Severity sev, std::string const &message) {
@@ -170,28 +178,29 @@ Logger &get_active_logger() {
 /**
  * @brief Convenience function to log a critical message.
  */
-void gd_critical(const gchar *message) {
+void gd_critical(const char *message) {
     log(ErrorMessage::Critical, message);
 }
 
 /**
  * @brief Convenience function to log a warning message.
  */
-void gd_warning(const gchar *message) {
+void gd_warning(const char *message) {
     log(ErrorMessage::Warning, message);
 }
 
 /**
  * @brief Convenience function to log a normal message.
  */
-void gd_message(const gchar *message) {
+void gd_message(const char *message) {
     log(ErrorMessage::Message, message);
 }
 
 /**
  * @brief Convenience function to log a debug message.
  */
-void gd_debug(const gchar *message) {
-    log(ErrorMessage::Debug, message);
+void gd_debug(const char *message) {
+    if (gd_param_debug)
+        log(ErrorMessage::Debug, message);
 }
 

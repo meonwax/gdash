@@ -1,17 +1,24 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
@@ -20,7 +27,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "cave/helper/colors.hpp"
+#include "cave/colors.hpp"
 #include "misc/printf.hpp"
 #include "misc/logger.hpp"
 
@@ -30,7 +37,7 @@ std::string gd_tostring_free(char *str) {
     std::string ret;
 
     if (str) {
-        ret=str;
+        ret = str;
         g_free(str);
     }
 
@@ -42,11 +49,11 @@ static std::string find_file_try_path(const char *path, const char *filename) {
     char *result;
 
     // create path
-    result=g_build_path(G_DIR_SEPARATOR_S, path, filename, NULL);
+    result = g_build_path(G_DIR_SEPARATOR_S, path, filename, NULL);
 
     // check if exists
     if (g_file_test(result, G_FILE_TEST_EXISTS))
-        ret=result;
+        ret = result;
     g_free(result);
 
     return ret;
@@ -55,9 +62,9 @@ static std::string find_file_try_path(const char *path, const char *filename) {
 
 /* tries to find a file in the gdash installation and returns a path */
 std::string gd_find_data_file(const std::string &filename, const std::vector<std::string>& dirs) {
-    for (unsigned i=0; i<dirs.size(); ++i) {
-        std::string result=find_file_try_path(dirs[i].c_str(), filename.c_str());
-        if (result!="")
+    for (unsigned i = 0; i < dirs.size(); ++i) {
+        std::string result = find_file_try_path(dirs[i].c_str(), filename.c_str());
+        if (result != "")
             return result;
     }
 
@@ -65,11 +72,11 @@ std::string gd_find_data_file(const std::string &filename, const std::vector<std
 }
 
 int gd_clamp(int val, int min, int max) {
-    g_assert(min<=max);
+    g_assert(min <= max);
 
-    if (val<min)
+    if (val < min)
         return min;
-    if (val>max)
+    if (val > max)
         return max;
     return val;
 }
@@ -78,7 +85,7 @@ int gd_clamp(int val, int min, int max) {
 std::string gd_get_current_date() {
     char dats[128];
 
-    GDate *dat=g_date_new();
+    GDate *dat = g_date_new();
     g_date_set_time_t(dat, time(NULL));
     g_date_strftime(dats, sizeof(dats), "%Y-%m-%d", dat);
     g_date_free(dat);
@@ -90,7 +97,7 @@ std::string gd_get_current_date() {
 std::string gd_get_current_date_time() {
     char dats[128];
 
-    GDate *dat=g_date_new();
+    GDate *dat = g_date_new();
     g_date_set_time_t(dat, time(0));
     g_date_strftime(dats, sizeof(dats), "%Y-%m-%d %H:%I", dat);
     g_date_free(dat);
@@ -100,56 +107,56 @@ std::string gd_get_current_date_time() {
 
 /* remove leading and trailing spaces from string */
 void gd_strchomp(std::string &s) {
-    while (s.length()>0 && s[0]==' ')
+    while (s.length() > 0 && s[0] == ' ')
         s.erase(0, 1);
-    while (s.length()>0 && s[s.length()-1]==' ')
-        s.erase(s.length()-1, 1);
+    while (s.length() > 0 && s[s.length() - 1] == ' ')
+        s.erase(s.length() - 1, 1);
 }
 
 int gd_str_ascii_casecmp(const std::string &s1, const std::string &s2) {
-    int s1len=s1.length();
-    int s2len=s2.length();
+    int s1len = s1.length();
+    int s2len = s2.length();
 
-    if (s1len==0 && s2len==0)
+    if (s1len == 0 && s2len == 0)
         return 0;
-    if (s1len==0 && s2len!=0)
+    if (s1len == 0 && s2len != 0)
         return -1;
-    if (s1len!=0 && s2len==0)
+    if (s1len != 0 && s2len == 0)
         return 1;
 
     /* compare characters */
-    int i=0;
-    while (i<s1len && i<s2len) {
-        int c1=s1[i];
-        if (c1>='A' && c1<='Z')
-            c1=c1-'A'+'a';    /* convert to lowercase, but only ascii characters */
+    int i = 0;
+    while (i < s1len && i < s2len) {
+        int c1 = s1[i];
+        if (c1 >= 'A' && c1 <= 'Z')
+            c1 = c1 - 'A' + 'a'; /* convert to lowercase, but only ascii characters */
 
-        int c2=s2[i];
-        if (c2>='A' && c2<='Z')
-            c2=c2-'A'+'a';
+        int c2 = s2[i];
+        if (c2 >= 'A' && c2 <= 'Z')
+            c2 = c2 - 'A' + 'a';
 
-        if (c1!=c2)
-            return (c1-c2);
+        if (c1 != c2)
+            return (c1 - c2);
         i++;
     }
     /* ... one of the strings (or both of them) are ended. */
-    if (s2len<s1len)    /* if s1 is longer, it is "larger". (s2 is the prefix of s1.) */
+    if (s2len < s1len)  /* if s1 is longer, it is "larger". (s2 is the prefix of s1.) */
         return -1;
-    if (s2len>s1len)    /* if s2 is longer, it is "larger". (s1 is the prefix of s2.) */
+    if (s2len > s1len)  /* if s2 is longer, it is "larger". (s1 is the prefix of s2.) */
         return 1;
     return 0;
 }
 
 bool gd_str_ascii_caseequal(const std::string &s1, const std::string &s2) {
-    return gd_str_ascii_casecmp(s1, s2)==0;
+    return gd_str_ascii_casecmp(s1, s2) == 0;
 }
 
 bool gd_str_equal(const char *a, const char *b) {
-    return strcmp(a,b)==0;
+    return strcmp(a, b) == 0;
 }
 
 bool gd_str_ascii_prefix(const std::string &str, const std::string &prefix) {
-    return gd_str_ascii_casecmp(str.substr(0, prefix.length()), prefix)==0;
+    return gd_str_ascii_casecmp(str.substr(0, prefix.length()), prefix) == 0;
 }
 
 

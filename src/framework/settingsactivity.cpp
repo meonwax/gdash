@@ -1,17 +1,24 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
@@ -21,19 +28,20 @@
 
 #include "framework/settingsactivity.hpp"
 #include "framework/commands.hpp"
-#include "input/gameinputhandler.hpp"
-#include "cave/helper/colors.hpp"
-#include "cave/gamerender.hpp"
-#include "gfx/pixbuffactory.hpp"
-#include "gfx/cellrenderer.hpp"
+#include "framework/app.hpp"
+#include "settings.hpp"
+#include "cave/colors.hpp"
 #include "gfx/screen.hpp"
 #include "gfx/fontmanager.hpp"
+#include "input/gameinputhandler.hpp"
+#include "gfx/cellrenderer.hpp"
 #include "misc/logger.hpp"
-#include "misc/printf.hpp"
 #include "misc/util.hpp"
-#include "settings.hpp"
-
+#include "misc/autogfreeptr.hpp"
 #include "framework/thememanager.hpp"
+#ifdef HAVE_SDL
+    #include "framework/shadermanager.hpp"
+#endif
 
 
 class SelectKeyActivity: public Activity {
@@ -43,7 +51,7 @@ public:
           title(title), action(action), pkeycode(pkeycode) {
     }
     virtual void keypress_event(KeyCode keycode, int gfxlib_keycode);
-    virtual void redraw_event();
+    virtual void redraw_event(bool full) const;
 
 private:
     std::string title, action;
@@ -57,19 +65,19 @@ void SelectKeyActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
 }
 
 
-void SelectKeyActivity::redraw_event() {
-    int height=6*app->font_manager->get_line_height();
-    int y1=(app->screen->get_height()-height)/2;    /* middle of the screen */
-    int cx=2*app->font_manager->get_font_width_narrow(), cy=y1, cw=app->screen->get_width()-2*cx, ch=height;
+void SelectKeyActivity::redraw_event(bool full) const {
+    int height = 6 * app->font_manager->get_line_height();
+    int y1 = (app->screen->get_height() - height) / 2; /* middle of the screen */
+    int cx = 2 * app->font_manager->get_font_width_narrow(), cy = y1, cw = app->screen->get_width() - 2 * cx, ch = height;
 
     app->draw_window(cx, cy, cw, ch);
     app->screen->set_clip_rect(cx, cy, cw, ch);
     app->set_color(GD_GDASH_WHITE);
-    app->blittext_n(-1, y1+app->font_manager->get_line_height(), title.c_str());
-    app->blittext_n(-1, y1+3*app->font_manager->get_line_height(), action.c_str());
+    app->blittext_n(-1, y1 + app->font_manager->get_line_height(), title.c_str());
+    app->blittext_n(-1, y1 + 3 * app->font_manager->get_line_height(), action.c_str());
     app->screen->remove_clip_rect();
 
-    app->screen->flip();
+    app->screen->drawing_finished();
 }
 
 
@@ -87,7 +95,7 @@ private:
     std::string &filename;
     virtual void execute() {
         Logger l;
-        if (CellRenderer::is_image_ok_for_theme(*app->pixbuf_factory, filename.c_str())) {
+        if (CellRenderer::is_image_ok_for_theme(app->screen->pixbuf_factory, filename.c_str())) {
             /* copy theme to user config directory */
             std::string new_name = filename_for_new_theme(filename.c_str());
             install_theme(filename.c_str(), new_name.c_str());
@@ -97,7 +105,7 @@ private:
         }
 
         if (!l.empty()) {
-            app->show_text_and_do_command(_("Cannot install theme!"), l.get_messages_in_one_string());
+            app->show_message(_("Cannot install theme!"), l.get_messages_in_one_string());
             l.clear();
         }
     }
@@ -105,7 +113,9 @@ private:
 
 
 void SettingsActivity::load_themes() {
-    load_themes_list(*app->pixbuf_factory, themes, themenum);
+    gd_settings_array_unprepare(settings, TypeTheme);
+    load_themes_list(app->screen->pixbuf_factory, themes, themenum);
+    gd_settings_array_prepare(settings, TypeTheme, themes, &themenum);
 }
 
 
@@ -115,19 +125,23 @@ SettingsActivity::SettingsActivity(App *app, Setting *settings_data)
     settings = settings_data;
     for (numsettings = 0; settings[numsettings].name != NULL; ++numsettings)
         ;
-    numpages = settings[numsettings-1].page + 1;    /* number of pages: take it from the last setting */
+    numpages = settings[numsettings - 1].page + 1;  /* number of pages: take it from the last setting */
 
     load_themes();
+#ifdef HAVE_SDL
+    load_shaders_list(shaders, shadernum);
+    gd_settings_array_prepare(settings, TypeShader, shaders, &shadernum);
+#endif
 
     /* check the settings, calculate sizes etc. */
     yd = app->font_manager->get_line_height();
     y1.resize(numpages);
     for (unsigned page = 0; page < numpages; page++) {
-        int num=0;
+        int num = 0;
         for (unsigned n = 0; n < numsettings; n++)
             if (settings[n].page == page)
                 num++;
-        y1[page] = (app->screen->get_height() - num*yd) / 2;
+        y1[page] = (app->screen->get_height() - num * yd) / 2;
     }
     current = 1;    /* 0th is presumably a page identifier */
     restart = false;
@@ -141,6 +155,11 @@ SettingsActivity::SettingsActivity(App *app, Setting *settings_data)
 
 SettingsActivity::~SettingsActivity() {
     gd_theme = themes[themenum];
+    gd_settings_array_unprepare(settings, TypeTheme);
+#ifdef HAVE_SDL
+    gd_shader = shaders[shadernum];
+    gd_settings_array_unprepare(settings, TypeShader);
+#endif
     if (restart)
         app->request_restart();
 }
@@ -150,21 +169,21 @@ void SettingsActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
     unsigned page = settings[current].page;
     switch (keycode) {
         case App::Up:
-            current = gd_clamp(current-1, 0, numsettings-1);
+            current = gd_clamp(current - 1, 0, numsettings - 1);
             while (current > 0 && settings[current].type == TypePage)
                 current--;
             break;
         case App::Down:
-            current = gd_clamp(current+1, 0, numsettings-1);
+            current = gd_clamp(current + 1, 0, numsettings - 1);
             break;
         case App::PageUp:
             if (page > 0)
-                while (settings[current].page==page)
+                while (settings[current].page == page)
                     current--;    /* decrement until previous page is found */
             break;
         case App::PageDown:
-            if (page < numpages-1)
-                while (settings[current].page==page)
+            if (page < numpages - 1)
+                while (settings[current].page == page)
                     current++;    /* increment until previous page is found */
             break;
 
@@ -174,22 +193,24 @@ void SettingsActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
                 case TypePage:
                     break;
                 case TypeBoolean:
-                    *(bool *)settings[current].var=false;
+                    *(bool *)settings[current].var = false;
+                    break;
+                case TypeInteger:
+                    *(int *)settings[current].var = gd_clamp(*(int *)settings[current].var - 1, settings[current].min, settings[current].max);
                     break;
                 case TypePercent:
-                    *(int *)settings[current].var=gd_clamp(*(int *)settings[current].var - 5, 0, 100);
+                    *(int *)settings[current].var = gd_clamp(*(int *)settings[current].var - 5, 0, 100);
                     break;
+                case TypeShader:
                 case TypeTheme:
-                    themenum=gd_clamp(themenum-1, 0, themes.size()-1);
-                    break;
                 case TypeStringv:
-                    *(int *)settings[current].var=gd_clamp(*(int *)settings[current].var-1, 0, g_strv_length((char **) settings[current].stringv)-1);
+                    *(int *)settings[current].var = gd_clamp(*(int *)settings[current].var - 1, 0, g_strv_length((char **) settings[current].stringv) - 1);
                     break;
                 case TypeKey:
                     break;
             }
             if (settings[current].restart)
-                restart=true;
+                restart = true;
             break;
 
         case App::Right:    /* key right */
@@ -197,22 +218,24 @@ void SettingsActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
                 case TypePage:
                     break;
                 case TypeBoolean:
-                    *(bool *)settings[current].var=true;
+                    *(bool *)settings[current].var = true;
+                    break;
+                case TypeInteger:
+                    *(int *)settings[current].var = gd_clamp(*(int *)settings[current].var + 1, settings[current].min, settings[current].max);
                     break;
                 case TypePercent:
-                    *(int *)settings[current].var=gd_clamp(*(int *)settings[current].var + 5, 0, 100);
+                    *(int *)settings[current].var = gd_clamp(*(int *)settings[current].var + 5, 0, 100);
                     break;
                 case TypeTheme:
-                    themenum=gd_clamp(themenum+1, 0, themes.size()-1);
-                    break;
                 case TypeStringv:
-                    *(int *)settings[current].var=gd_clamp(*(int *)settings[current].var+1, 0, g_strv_length((char **) settings[current].stringv)-1);
+                case TypeShader:
+                    *(int *)settings[current].var = gd_clamp(*(int *)settings[current].var + 1, 0, g_strv_length((char **) settings[current].stringv) - 1);
                     break;
                 case TypeKey:
                     break;
             }
             if (settings[current].restart)
-                restart=true;
+                restart = true;
             break;
 
         case ' ':
@@ -221,16 +244,19 @@ void SettingsActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
                 case TypePage:
                     break;
                 case TypeBoolean:
-                    *(bool *)settings[current].var=!*(bool *)settings[current].var;
+                    *(bool *)settings[current].var = !*(bool *)settings[current].var;
+                    break;
+                case TypeInteger:
+                    *(int *)settings[current].var = (*(int *)settings[current].var + 1 - settings[current].min)
+                        % (settings[current].max-settings[current].min+1) + settings[current].min;
                     break;
                 case TypePercent:
-                    *(int *)settings[current].var=gd_clamp(*(int *)settings[current].var + 5, 0, 100);
+                    *(int *)settings[current].var = gd_clamp(*(int *)settings[current].var + 5, 0, 100);
                     break;
+                case TypeShader:
                 case TypeTheme:
-                    themenum=(themenum+1)%themes.size();
-                    break;
                 case TypeStringv:
-                    *(int *)settings[current].var=(*(int *)settings[current].var+1)%g_strv_length((char **) settings[current].stringv);
+                    *(int *)settings[current].var = (*(int *)settings[current].var + 1) % g_strv_length((char **) settings[current].stringv);
                     break;
                 case TypeKey:
                     // TRANSLATORS: 35 chars max
@@ -238,7 +264,7 @@ void SettingsActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
                     break;
             }
             if (settings[current].restart)
-                restart=true;
+                restart = true;
             break;
 
         case 't':
@@ -246,12 +272,12 @@ void SettingsActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
             // TRANSLATORS: 40 chars max
             app->select_file_and_do_command(_("Select Image for Theme"), g_get_home_dir(), "*.bmp;*.png", false, "", new ThemeSelectedCommand(app, this));
             break;
-        
+
         case 'h':
         case 'H':
         case '?':
             if (settings[current].description)
-                app->show_message(settings[current].description);
+                app->show_message(_(settings[current].description));
             break;
 
         case App::Escape:    /* finished options menu */
@@ -261,20 +287,20 @@ void SettingsActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
 
     if (settings[current].type == TypePage)
         current++;
-    redraw_event();
+    queue_redraw();
 }
 
 
-void SettingsActivity::redraw_event() {
+void SettingsActivity::redraw_event(bool full) const {
     app->clear_screen();
-    // TRANSLATORS: 40 chars max
-    app->title_line(CPrintf(_("GDash Options, page %d/%d")) % (settings[current].page+1) % numpages);
-    // TRANSLATORS: 40 chars max. Change means to change the setting
+    // TRANSLATORS: 40 chars max (and it has title line capitalization in English)
+    app->title_line(CPrintf(_("GDash Options")));
+    // TRANSLATORS: 40 chars max. 'Change' means to change the setting in the options window
     app->status_line(_("Space: change   H: help   Esc: exit"));
     app->set_color(GD_GDASH_GRAY1);
     // TRANSLATORS: 40 chars max
     if (have_theme)
-        app->blittext_n(-1, app->screen->get_height() - 2*app->font_manager->get_line_height(), _("Press T to install a new theme."));
+        app->blittext_n(-1, app->screen->get_height() - 2 * app->font_manager->get_line_height(), _("Press T to install a new theme."));
 
     /* show settings */
     unsigned page = settings[current].page;
@@ -286,22 +312,16 @@ void SettingsActivity::redraw_event() {
                 case TypePage:
                     break;
                 case TypeBoolean:
-                    value = *(bool *)settings[n].var? _("yes") : _("no");
+                    value = *(bool *)settings[n].var ? _("yes") : _("no");
+                    break;
+                case TypeInteger:
+                    value = SPrintf("%d") % *(int *)settings[n].var;
                     break;
                 case TypePercent:
                     value = SPrintf("%d%%") % *(int *)settings[n].var;
                     break;
                 case TypeTheme:
-                    if (themenum==0)
-                        value = _("[Default]");
-                    else {
-                        char *thm = g_filename_display_basename(themes[themenum].c_str());
-                        if (strrchr(thm, '.'))    /* remove extension */
-                            *strrchr(thm, '.')='\0';
-                        value = thm;
-                        g_free(thm);
-                    }
-                    break;
+                case TypeShader:
                 case TypeStringv:
                     value = settings[n].stringv[*(int *)settings[n].var];
                     break;
@@ -310,16 +330,17 @@ void SettingsActivity::redraw_event() {
                     break;
             }
 
-            int y = y1[page]+linenum*yd;
+            int y = y1[page] + linenum * yd;
             if (settings[n].type != TypePage) {
-                int x = 4*app->font_manager->get_font_width_narrow();
-                app->blittext_n(x, y, CPrintf("%c%s  %c%s") % (current==n ? GD_COLOR_INDEX_YELLOW : GD_COLOR_INDEX_LIGHTBLUE) % settings[n].name % GD_COLOR_INDEX_GREEN % value);
+                int x = 4 * app->font_manager->get_font_width_narrow();
+                app->blittext_n(x, y, CPrintf("%c%s  %c%s") % (current == n ? GD_COLOR_INDEX_YELLOW : GD_COLOR_INDEX_LIGHTBLUE) % _(settings[n].name) % GD_COLOR_INDEX_GREEN % value);
             } else {
-                int x = 2*app->font_manager->get_font_width_narrow();
-                app->blittext_n(x, y, CPrintf("%c%s") % GD_COLOR_INDEX_WHITE % settings[n].name);
+                int x = 2 * app->font_manager->get_font_width_narrow();
+                app->blittext_n(x, y, CPrintf("%c%s") % GD_COLOR_INDEX_WHITE % _(settings[n].name));
             }
             linenum++;
         }
     }
-    app->screen->flip();
+    app->draw_scrollbar(0, current, numsettings-1);
+    app->screen->drawing_finished();
 }

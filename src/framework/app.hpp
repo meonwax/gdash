@@ -1,21 +1,28 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _GD_APP
-#define _GD_APP
+#ifndef APP_HPP_INCLUDED
+#define APP_HPP_INCLUDED
 
 #include "config.h"
 
@@ -26,8 +33,7 @@
 
 #include "misc/smartptr.hpp"
 #include "framework/activity.hpp"
-#include "gfx/screen.hpp"
-
+#include "gfx/pixmapstorage.hpp"
 
 class GdColor;
 class PixbufFactory;
@@ -40,6 +46,7 @@ class GameInputHandler;
 class App;
 class Activity;
 class Setting;
+struct helpdata;
 template <typename T> class Command1Param;
 
 
@@ -135,7 +142,7 @@ public:
      * corresponding pointer members. These will be deleted upon the destruction
      * of the app object. The app object might also be assigned a caveset, in case
      * the activities in it use it. */
-    App();
+    App(Screen &screenref);
     /** Destructor.
      * Deletes the screen, the gameinputhandler, the fontmanager and the pixbuffactory. */
     virtual ~App();
@@ -173,7 +180,9 @@ public:
     void status_line(const char *text);
     /** Draw a black window with a small frame. */
     void draw_window(int rx, int ry, int rw, int rh);
-    
+    /** Draw scrollbar. */
+    void draw_scrollbar(int min, int current, int max);
+
     /* customizable ui features */
     /** Create a file selection dialog, and when the user accepts
      * the selection, parametrize the command with the name of the file and execute it.
@@ -220,6 +229,9 @@ public:
      * @param secondary The message to show - second part, additional info.
      * @param command_after_exit A command to execute when the user acknowledged the text. May be omitted. */
     virtual void show_message(std::string const &primary, std::string const &secondary = "", SmartPtr<Command> command_after_exit = SmartPtr<Command>());
+    /** Show help text.
+     * @param help_text The strings of the help text. See the helpdata struct. */
+    virtual void show_help(helpdata const help_text[]);
 
 
     /* events */
@@ -236,7 +248,7 @@ public:
      */
     void keypress_event(Activity::KeyCode keycode, int gfxlib_keycode);
     /** See Activity::redraw_event(). */
-    void redraw_event();
+    void redraw_event(bool full);
     /** To be called when the user closes the window of the game. The quit_event_command
      * set via the set_quit_event_command() will be executed. */
     void quit_event();
@@ -264,10 +276,10 @@ public:
     void request_restart();
     /** An Activity may call this to trigger executing the editor Command. */
     void start_editor();
+    /** Return true if the topmost activity queued a redraw. */
+    bool redraw_queued() const;
 
     /* supporting objects */
-    /** The PixbufFactory to be used for drawing. Will be deleted by ~App. */
-    PixbufFactory *pixbuf_factory;
     /** The FontManager to be used for drawing texts. Will be deleted by ~App.
      * Should use the pixbuf_factory assigned to the App. */
     FontManager *font_manager;
@@ -284,7 +296,7 @@ private:
     /** The stack of the Activity objects handled. */
     std::stack<Activity *> running_activities;
     /** Returns the topmost activity, or NULL. */
-    Activity *topmost_activity();
+    Activity *topmost_activity() const;
     /** The commands to be executed after the processing of the events. */
     std::queue<SmartPtr<Command> > command_queue;
     /** The command to be executed when all activities have quit. */

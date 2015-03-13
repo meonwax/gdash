@@ -1,20 +1,27 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef _GD_ADOPTINGCONTAINER
-#define _GD_ADOPTINGCONTAINER
+#ifndef ADOPTINGCONTAINER_HPP_INCLUDED
+#define ADOPTINGCONTAINER_HPP_INCLUDED
 
 #include "config.h"
 
@@ -76,8 +83,8 @@ public:
 template <class T>
 template <class PRED>
 void AdoptingContainer<T>::remove_if(PRED p) {
-    typename _my_base::iterator bound=std::stable_partition(begin(), end(), p);
-    for (const_iterator it=begin(); it!=bound; ++it) {
+    typename _my_base::iterator bound = std::stable_partition(begin(), end(), p);
+    for (const_iterator it = begin(); it != bound; ++it) {
         delete(*it);
     }
     _my_base::erase(begin(), bound);
@@ -91,33 +98,33 @@ AdoptingContainer<T>::AdoptingContainer() {
 /// Copy constructor
 template <class T>
 AdoptingContainer<T>::AdoptingContainer(const AdoptingContainer<T>& orig) {
-    (*this)=orig;
+    (*this) = orig;
 }
 
 /// Assignment operator
 template <class T>
 AdoptingContainer<T>& AdoptingContainer<T>::operator=(const AdoptingContainer<T>& rhs) {
-    if (this==&rhs)
+    if (this == &rhs)
         return *this;
-    for (unsigned i=0; i<size(); ++i)
+    for (unsigned i = 0; i < size(); ++i)
         delete(*this)[i];
     this->resize(rhs.size());
-    for (unsigned i=0; i<size(); ++i)
-        (*this)[i]=rhs[i]->clone();
+    for (unsigned i = 0; i < size(); ++i)
+        (*this)[i] = rhs[i]->clone();
     return *this;
 }
 
 /// Destructor
 template <class T>
 AdoptingContainer<T>::~AdoptingContainer() {
-    for (unsigned i=0; i<size(); ++i)
+    for (unsigned i = 0; i < size(); ++i)
         delete(*this)[i];
 }
 
 /// Clear object from list.
 template <class T>
 void AdoptingContainer<T>::clear() {
-    for (unsigned i=0; i<size(); ++i)
+    for (unsigned i = 0; i < size(); ++i)
         delete _my_base::at(i);
     _my_base::clear();
 }

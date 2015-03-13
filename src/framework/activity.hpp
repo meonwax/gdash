@@ -1,21 +1,28 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef GD_ACTIVITY_H
-#define GD_ACTIVITY_H
+#ifndef ACTIVITY_HPP_INCLUDED
+#define ACTIVITY_HPP_INCLUDED
 
 #include "config.h"
 
@@ -50,12 +57,13 @@ public:
     typedef unsigned KeyCode;
     /** Construct an activity.
      * @param app The App, in which the activity will run. */
-    Activity(App *app) : app(app) {}
+    Activity(App *app) : app(app), redraw_queued(false) {}
     /** Virtual destructor.
      * Pure virtual, but implemented in the cpp file: a trick to make
      * this an abstract base class. */
     virtual ~Activity() = 0;
 
+private:
     /**
      * Inform the Activity object about time elapsing.
      * @param ms_elapsed The number of milliseconds elapsed. These are
@@ -81,10 +89,9 @@ public:
      * Called by the App to request the topmost Activity to redraw the screen.
      * The state of the Activity should not change, as it may be called any time.
      * When the Activity becomes the topmost one, this is called by the App
-     * automatically. Activities can call their own redraw_event() methods if
-     * they want.
+     * automatically. Activities should not call their own redraw_event() methods.
      */
-    virtual void redraw_event();
+    virtual void redraw_event(bool full) const = 0;
     /**
      * Called by the App when the Activity gets pushed into the stack of activities
      * of the App. The Activity can perform some post-initialization, it may even
@@ -106,8 +113,16 @@ public:
     virtual void hidden_event();
 
 protected:
+    friend class App;
     /** The owner app. Used for enqueueing Command objects, for example. */
     App *app;
+    /** There is something to draw. */
+    bool redraw_queued;
+    /** Event handlers can call this function to tell the App that a redraw should be done.
+     * Redraws are processed after all events and commands. */
+    void queue_redraw() {
+        redraw_queued = true;
+    }
 
 private:
     Activity(Activity const &);       ///< Not meant to be copied.

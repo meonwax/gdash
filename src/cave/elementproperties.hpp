@@ -1,21 +1,28 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _GD_ELEMENT_PROPERTIES_H
-#define _GD_ELEMENT_PROPERTIES_H
+#ifndef ELEMENTPROPERTIES_HPP_INCLUDED
+#define ELEMENTPROPERTIES_HPP_INCLUDED
 
 #include "config.h"
 
@@ -42,6 +49,7 @@ enum ElementPropertyEnum {
     E_P_NON_EXPLODABLE,         ///< selfexplaining
     E_P_CCW,                    ///< this creature has a default counterclockwise rotation (for example, o_fire_1)
     E_P_CAN_BE_HAMMERED,        ///< can be broken by pneumatic hammer
+    E_P_CAN_BE_PUSHED,          ///< can be pushed by player
     E_P_VISUAL_EFFECT,          ///< if the element can use a visual effect. used to check consistency of the code
     E_P_PLAYER,                 ///< easier to find out if it is a player element
     E_P_MOVED_BY_CONVEYOR_TOP,      ///< can be moved by conveyor belt
@@ -52,28 +60,29 @@ enum ElementPropertyEnum {
 /// Every property from ElementPropertyEnum should be listed here,
 /// with 1<<x. Also here it is possible to combine them.
 enum ElementPropertyBitMask {
-    P_SCANNED=1<<E_P_SCANNED,
-    P_SLOPED_LEFT=1<<E_P_SLOPED_LEFT,
-    P_SLOPED_RIGHT=1<<E_P_SLOPED_RIGHT,
-    P_SLOPED_UP=1<<E_P_SLOPED_UP,
-    P_SLOPED_DOWN=1<<E_P_SLOPED_DOWN,
-    P_SLOPED=P_SLOPED_LEFT|P_SLOPED_RIGHT|P_SLOPED_UP|P_SLOPED_DOWN,        ///< To say "any direction"
-    P_BLADDER_SLOPED=1<<E_P_BLADDER_SLOPED,
+    P_SCANNED = 1 << E_P_SCANNED,
+    P_SLOPED_LEFT = 1 << E_P_SLOPED_LEFT,
+    P_SLOPED_RIGHT = 1 << E_P_SLOPED_RIGHT,
+    P_SLOPED_UP = 1 << E_P_SLOPED_UP,
+    P_SLOPED_DOWN = 1 << E_P_SLOPED_DOWN,
+    P_SLOPED = P_SLOPED_LEFT | P_SLOPED_RIGHT | P_SLOPED_UP | P_SLOPED_DOWN, ///< To say "any direction"
+    P_BLADDER_SLOPED = 1 << E_P_BLADDER_SLOPED,
 
-    P_AMOEBA_CONSUMES=1<<E_P_AMOEBA_CONSUMES,
-    P_DIRT=1<<E_P_DIRT,
-    P_BLOWS_UP_FLIES=1<<E_P_BLOWS_UP_FLIES,
+    P_AMOEBA_CONSUMES = 1 << E_P_AMOEBA_CONSUMES,
+    P_DIRT = 1 << E_P_DIRT,
+    P_BLOWS_UP_FLIES = 1 << E_P_BLOWS_UP_FLIES,
 
-    P_EXPLODES_BY_HIT=1<<E_P_EXPLODES_BY_HIT,
-    P_EXPLOSION_FIRST_STAGE=1<<E_P_EXPLOSION_FIRST_STAGE,
+    P_EXPLODES_BY_HIT = 1 << E_P_EXPLODES_BY_HIT,
+    P_EXPLOSION_FIRST_STAGE = 1 << E_P_EXPLOSION_FIRST_STAGE,
 
-    P_NON_EXPLODABLE=1<<E_P_NON_EXPLODABLE,
-    P_CCW=1<<E_P_CCW,
-    P_CAN_BE_HAMMERED=1<<E_P_CAN_BE_HAMMERED,
-    P_VISUAL_EFFECT=1<<E_P_VISUAL_EFFECT,
-    P_PLAYER=1<<E_P_PLAYER,
-    P_MOVED_BY_CONVEYOR_TOP=1<<E_P_MOVED_BY_CONVEYOR_TOP,
-    P_MOVED_BY_CONVEYOR_BOTTOM=1<<E_P_MOVED_BY_CONVEYOR_BOTTOM,
+    P_NON_EXPLODABLE = 1 << E_P_NON_EXPLODABLE,
+    P_CCW = 1 << E_P_CCW,
+    P_CAN_BE_HAMMERED = 1 << E_P_CAN_BE_HAMMERED,
+    P_CAN_BE_PUSHED = 1 << E_P_CAN_BE_PUSHED,
+    P_VISUAL_EFFECT = 1 << E_P_VISUAL_EFFECT,
+    P_PLAYER = 1 << E_P_PLAYER,
+    P_MOVED_BY_CONVEYOR_TOP = 1 << E_P_MOVED_BY_CONVEYOR_TOP,
+    P_MOVED_BY_CONVEYOR_BOTTOM = 1 << E_P_MOVED_BY_CONVEYOR_BOTTOM,
 };
 
 /// Description of a single element.
@@ -103,13 +112,13 @@ extern GdElementPorperty gd_element_properties[];
 
 /// returns true, if the given element is scanned
 inline bool is_scanned_element(GdElementEnum e) {
-    return (gd_element_properties[e].flags&P_SCANNED) != 0;
+    return (gd_element_properties[e].flags & P_SCANNED) != 0;
 }
 
 
 /// This function converts an element to its scanned pair.
 inline GdElementEnum scanned_pair(GdElementEnum of_what) {
-    if (gd_element_properties[of_what].flags&P_SCANNED)  // already scanned?
+    if (gd_element_properties[of_what].flags & P_SCANNED) // already scanned?
         return of_what;
     return gd_element_properties[of_what].pair;
 }
@@ -117,7 +126,7 @@ inline GdElementEnum scanned_pair(GdElementEnum of_what) {
 
 /// This function converts an element to its scanned pair.
 inline GdElementEnum nonscanned_pair(GdElementEnum of_what) {
-    if (!(gd_element_properties[of_what].flags&P_SCANNED))  // already nonscanned?
+    if (!(gd_element_properties[of_what].flags & P_SCANNED)) // already nonscanned?
         return of_what;
     return gd_element_properties[of_what].pair;
 }

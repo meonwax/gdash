@@ -52,7 +52,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = $(am__EXEEXT_1)
+bin_PROGRAMS = gdash$(EXEEXT)
+@GTK_TRUE@am__append_1 = $(gtkheaders)
+@GTK_TRUE@am__append_2 = $(gtksources)
+@SDL_TRUE@am__append_3 = $(sdlheaders)
+@SDL_TRUE@am__append_4 = $(sdlsources)
 subdir = src
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -66,17 +70,64 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-@GTK_TRUE@am__EXEEXT_1 = gdash$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
+am__gdash_SOURCES_DIST = misc/printf.cpp cave/colors.cpp \
+	cave/cavetypes.cpp cave/elementproperties.cpp \
+	cave/helper/cavereplay.cpp cave/caverendered.cpp \
+	cave/particle.cpp cave/caverenderedengine.cpp \
+	cave/helper/caverandom.cpp cave/helper/cavesound.cpp \
+	cave/helper/cavehighscore.cpp cave/cavebase.cpp \
+	cave/cavestored.cpp cave/object/caveobject.cpp \
+	cave/object/caveobjectrectangular.cpp \
+	cave/object/caveobjectfill.cpp \
+	cave/object/caveobjectboundaryfill.cpp \
+	cave/object/caveobjectcopypaste.cpp \
+	cave/object/caveobjectfillrect.cpp \
+	cave/object/caveobjectfloodfill.cpp \
+	cave/object/caveobjectjoin.cpp cave/object/caveobjectline.cpp \
+	cave/object/caveobjectmaze.cpp cave/object/caveobjectpoint.cpp \
+	cave/object/caveobjectrandomfill.cpp \
+	cave/object/caveobjectraster.cpp \
+	cave/object/caveobjectrectangle.cpp cave/caveset.cpp \
+	fileops/bdcffhelper.cpp fileops/bdcffload.cpp \
+	fileops/bdcffsave.cpp fileops/c64import.cpp \
+	fileops/brcimport.cpp fileops/binaryimport.cpp \
+	fileops/loadfile.cpp fileops/highscore.cpp \
+	cave/gamecontrol.cpp settings.cpp misc/util.cpp \
+	misc/logger.cpp misc/about.cpp misc/helptext.cpp \
+	gfx/pixbuf.cpp gfx/screen.cpp gfx/pixbuffactory.cpp \
+	gfx/pixbufmanip.cpp gfx/pixbufmanip_hq2x.cpp \
+	gfx/pixbufmanip_hq3x.cpp gfx/pixbufmanip_hq4x.cpp \
+	gfx/cellrenderer.cpp gfx/fontmanager.cpp cave/gamerender.cpp \
+	cave/titleanimation.cpp framework/app.cpp \
+	framework/activity.cpp framework/titlescreenactivity.cpp \
+	framework/showtextactivity.cpp framework/messageactivity.cpp \
+	framework/gameactivity.cpp framework/selectfileactivity.cpp \
+	framework/inputtextactivity.cpp framework/askyesnoactivity.cpp \
+	framework/settingsactivity.cpp framework/thememanager.cpp \
+	framework/replaymenuactivity.cpp \
+	framework/replaysaveractivity.cpp framework/commands.cpp \
+	input/joystick.cpp input/gameinputhandler.cpp sound/sound.cpp \
+	mainwindow.cpp gtkmain.cpp gtk/gtkpixbuf.cpp \
+	gtk/gtkpixbuffactory.cpp gtk/gtkscreen.cpp gtk/gtkui.cpp \
+	gtk/gtkuisettings.cpp gtk/gtkgameinputhandler.cpp \
+	misc/helphtml.cpp editor/editorwidgets.cpp \
+	editor/editorautowidgets.cpp editor/editorcellrenderer.cpp \
+	editor/exporthtml.cpp editor/exportcrli.cpp editor/editor.cpp \
+	gtk/gtkapp.cpp gtk/gtkmainwindow.cpp \
+	framework/shadermanager.cpp framework/volumeactivity.cpp \
+	sdl/sdlpixbuf.cpp sdl/sdlabstractscreen.cpp sdl/sdlscreen.cpp \
+	sdl/sdlpixbuffactory.cpp sdl/ogl.cpp \
+	sdl/sdlgameinputhandler.cpp sdl/sdlmainwindow.cpp \
+	sdl/IMG_savepng.c
 am__objects_1 = gdash-printf.$(OBJEXT) gdash-colors.$(OBJEXT) \
 	gdash-cavetypes.$(OBJEXT) gdash-elementproperties.$(OBJEXT) \
-	gdash-cavemap.$(OBJEXT) gdash-cavereplay.$(OBJEXT) \
-	gdash-caverendered.$(OBJEXT) gdash-particle.$(OBJEXT) \
-	gdash-caverenderedengine.$(OBJEXT) gdash-caverandom.$(OBJEXT) \
-	gdash-cavesound.$(OBJEXT) gdash-cavehighscore.$(OBJEXT) \
-	gdash-cavebase.$(OBJEXT) gdash-cavestored.$(OBJEXT) \
-	gdash-caveobject.$(OBJEXT) \
+	gdash-cavereplay.$(OBJEXT) gdash-caverendered.$(OBJEXT) \
+	gdash-particle.$(OBJEXT) gdash-caverenderedengine.$(OBJEXT) \
+	gdash-caverandom.$(OBJEXT) gdash-cavesound.$(OBJEXT) \
+	gdash-cavehighscore.$(OBJEXT) gdash-cavebase.$(OBJEXT) \
+	gdash-cavestored.$(OBJEXT) gdash-caveobject.$(OBJEXT) \
 	gdash-caveobjectrectangular.$(OBJEXT) \
 	gdash-caveobjectfill.$(OBJEXT) \
 	gdash-caveobjectboundaryfill.$(OBJEXT) \
@@ -91,18 +142,18 @@ am__objects_1 = gdash-printf.$(OBJEXT) gdash-colors.$(OBJEXT) \
 	gdash-bdcffhelper.$(OBJEXT) gdash-bdcffload.$(OBJEXT) \
 	gdash-bdcffsave.$(OBJEXT) gdash-c64import.$(OBJEXT) \
 	gdash-brcimport.$(OBJEXT) gdash-binaryimport.$(OBJEXT) \
-	gdash-loadfile.$(OBJEXT) gdash-gamecontrol.$(OBJEXT) \
-	gdash-settings.$(OBJEXT) gdash-util.$(OBJEXT) \
-	gdash-logger.$(OBJEXT) gdash-about.$(OBJEXT) \
-	gdash-pixbuf.$(OBJEXT) gdash-pixmap.$(OBJEXT) \
-	gdash-screen.$(OBJEXT) gdash-pixbuffactory.$(OBJEXT) \
-	gdash-pixbufmanip.$(OBJEXT) gdash-pixbufmanip_hq2x.$(OBJEXT) \
+	gdash-loadfile.$(OBJEXT) gdash-highscore.$(OBJEXT) \
+	gdash-gamecontrol.$(OBJEXT) gdash-settings.$(OBJEXT) \
+	gdash-util.$(OBJEXT) gdash-logger.$(OBJEXT) \
+	gdash-about.$(OBJEXT) gdash-helptext.$(OBJEXT) \
+	gdash-pixbuf.$(OBJEXT) gdash-screen.$(OBJEXT) \
+	gdash-pixbuffactory.$(OBJEXT) gdash-pixbufmanip.$(OBJEXT) \
+	gdash-pixbufmanip_hq2x.$(OBJEXT) \
 	gdash-pixbufmanip_hq3x.$(OBJEXT) \
 	gdash-pixbufmanip_hq4x.$(OBJEXT) gdash-cellrenderer.$(OBJEXT) \
 	gdash-fontmanager.$(OBJEXT) gdash-gamerender.$(OBJEXT) \
 	gdash-titleanimation.$(OBJEXT) gdash-app.$(OBJEXT) \
-	gdash-activity.$(OBJEXT) gdash-volumeactivity.$(OBJEXT) \
-	gdash-titlescreenactivity.$(OBJEXT) \
+	gdash-activity.$(OBJEXT) gdash-titlescreenactivity.$(OBJEXT) \
 	gdash-showtextactivity.$(OBJEXT) \
 	gdash-messageactivity.$(OBJEXT) gdash-gameactivity.$(OBJEXT) \
 	gdash-selectfileactivity.$(OBJEXT) \
@@ -112,26 +163,29 @@ am__objects_1 = gdash-printf.$(OBJEXT) gdash-colors.$(OBJEXT) \
 	gdash-replaymenuactivity.$(OBJEXT) \
 	gdash-replaysaveractivity.$(OBJEXT) gdash-commands.$(OBJEXT) \
 	gdash-joystick.$(OBJEXT) gdash-gameinputhandler.$(OBJEXT) \
-	gdash-sound.$(OBJEXT)
-am__objects_2 = gdash-gtkpixbuf.$(OBJEXT) gdash-gtkpixmap.$(OBJEXT) \
+	gdash-sound.$(OBJEXT) gdash-mainwindow.$(OBJEXT) \
+	gdash-gtkmain.$(OBJEXT)
+am__objects_2 = gdash-gtkpixbuf.$(OBJEXT) \
 	gdash-gtkpixbuffactory.$(OBJEXT) gdash-gtkscreen.$(OBJEXT) \
 	gdash-gtkui.$(OBJEXT) gdash-gtkuisettings.$(OBJEXT) \
-	gdash-gtkgameinputhandler.$(OBJEXT) \
+	gdash-gtkgameinputhandler.$(OBJEXT) gdash-helphtml.$(OBJEXT) \
 	gdash-editorwidgets.$(OBJEXT) \
 	gdash-editorautowidgets.$(OBJEXT) \
 	gdash-editorcellrenderer.$(OBJEXT) gdash-exporthtml.$(OBJEXT) \
 	gdash-exportcrli.$(OBJEXT) gdash-editor.$(OBJEXT) \
-	gdash-help.$(OBJEXT) gdash-gtkapp.$(OBJEXT) \
-	gdash-gtkmainwindow.$(OBJEXT) gdash-sdlpixbuf.$(OBJEXT) \
-	gdash-sdlpixmap.$(OBJEXT) gdash-sdlabstractscreen.$(OBJEXT) \
-	gdash-sdlscreen.$(OBJEXT) gdash-sdlpixbuffactory.$(OBJEXT) \
-	gdash-ogl.$(OBJEXT) gdash-sdlgameinputhandler.$(OBJEXT) \
-	gdash-sdlmainwindow.$(OBJEXT) gdash-IMG_savepng.$(OBJEXT) \
-	gdash-sdlparticle.$(OBJEXT) gdash-gtkmain.$(OBJEXT)
-am_gdash_OBJECTS = $(am__objects_1) $(am__objects_2)
+	gdash-gtkapp.$(OBJEXT) gdash-gtkmainwindow.$(OBJEXT)
+@GTK_TRUE@am__objects_3 = $(am__objects_2)
+am__objects_4 = gdash-shadermanager.$(OBJEXT) \
+	gdash-volumeactivity.$(OBJEXT) gdash-sdlpixbuf.$(OBJEXT) \
+	gdash-sdlabstractscreen.$(OBJEXT) gdash-sdlscreen.$(OBJEXT) \
+	gdash-sdlpixbuffactory.$(OBJEXT) gdash-ogl.$(OBJEXT) \
+	gdash-sdlgameinputhandler.$(OBJEXT) \
+	gdash-sdlmainwindow.$(OBJEXT) gdash-IMG_savepng.$(OBJEXT)
+@SDL_TRUE@am__objects_5 = $(am__objects_4)
+am__objects_6 = $(am__objects_1) $(am__objects_3) $(am__objects_5)
+am_gdash_OBJECTS = $(am__objects_6)
 gdash_OBJECTS = $(am_gdash_OBJECTS)
-am__DEPENDENCIES_1 =
-gdash_DEPENDENCIES = $(am__DEPENDENCIES_1)
+gdash_DEPENDENCIES =
 gdash_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(gdash_LDFLAGS) \
 	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -169,7 +223,7 @@ AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(gdash_SOURCES)
-DIST_SOURCES = $(gdash_SOURCES)
+DIST_SOURCES = $(am__gdash_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -315,27 +369,22 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-INCLUDES = \
-	-I$(top_srcdir)/include
-
-@GTK_FALSE@GDASH = 
-
-# if gtk is enabled, build gdash.
-@GTK_TRUE@GDASH = gdash
+INCLUDES = -I$(top_srcdir)/include
 
 # base sources and headers:
 #   the gdash engine.
-base_headers = \
+baseheaders = \
 	misc/printf.hpp \
 	misc/smartptr.hpp \
+	misc/autogfreeptr.hpp \
 	cave/cavetypes.hpp \
 	cave/elementproperties.hpp \
 	cave/helper/namevaluepair.hpp \
 	cave/helper/reflective.hpp \
 	cave/helper/adoptingcontainer.hpp \
 	cave/helper/cavemap.hpp \
-	cave/helper/colors.hpp \
 	cave/helper/cavehighscore.hpp \
+	cave/colors.hpp \
 	cave/cavebase.hpp \
 	cave/cavestored.hpp \
 	cave/helper/caverandom.hpp \
@@ -365,13 +414,15 @@ base_headers = \
 	fileops/brcimport.hpp \
 	fileops/binaryimport.hpp \
 	fileops/loadfile.hpp \
+	fileops/highscore.hpp \
 	cave/gamecontrol.hpp \
 	settings.hpp \
 	misc/util.hpp \
 	misc/logger.hpp \
 	misc/about.hpp \
+	misc/helptext.hpp \
 	gfx/pixbuf.hpp \
-	gfx/pixmap.hpp \
+	gfx/pixmapstorage.hpp \
 	gfx/screen.hpp \
 	gfx/pixbuffactory.hpp \
 	gfx/pixbufmanip.hpp \
@@ -382,7 +433,6 @@ base_headers = \
 	cave/titleanimation.hpp \
 	framework/app.hpp \
 	framework/activity.hpp \
-	framework/volumeactivity.hpp \
 	framework/titlescreenactivity.hpp \
 	framework/showtextactivity.hpp \
 	framework/messageactivity.hpp \
@@ -399,12 +449,11 @@ base_headers = \
 	input/gameinputhandler.hpp \
 	sound/sound.hpp
 
-base_sources = \
+basesources = \
 	misc/printf.cpp \
-	cave/helper/colors.cpp \
+	cave/colors.cpp \
 	cave/cavetypes.cpp \
 	cave/elementproperties.cpp \
-	cave/helper/cavemap.cpp \
 	cave/helper/cavereplay.cpp \
 	cave/caverendered.cpp \
 	cave/particle.cpp \
@@ -436,13 +485,14 @@ base_sources = \
 	fileops/brcimport.cpp \
 	fileops/binaryimport.cpp \
 	fileops/loadfile.cpp \
+	fileops/highscore.cpp \
 	cave/gamecontrol.cpp \
 	settings.cpp \
 	misc/util.cpp \
 	misc/logger.cpp \
 	misc/about.cpp \
+	misc/helptext.cpp \
 	gfx/pixbuf.cpp \
-	gfx/pixmap.cpp \
 	gfx/screen.cpp \
 	gfx/pixbuffactory.cpp \
 	gfx/pixbufmanip.cpp \
@@ -455,7 +505,6 @@ base_sources = \
 	cave/titleanimation.cpp \
 	framework/app.cpp \
 	framework/activity.cpp \
-	framework/volumeactivity.cpp \
 	framework/titlescreenactivity.cpp \
 	framework/showtextactivity.cpp \
 	framework/messageactivity.cpp \
@@ -470,81 +519,86 @@ base_sources = \
 	framework/commands.cpp \
 	input/joystick.cpp \
 	input/gameinputhandler.cpp \
-	sound/sound.cpp
+	sound/sound.cpp \
+	mainwindow.cpp \
+	gtkmain.cpp
 
 
 # gtk sources and headers:
 #   the gdash gtk ui, with editor.
 gtksources = \
 	gtk/gtkpixbuf.cpp \
-	gtk/gtkpixmap.cpp \
 	gtk/gtkpixbuffactory.cpp \
 	gtk/gtkscreen.cpp \
 	gtk/gtkui.cpp \
 	gtk/gtkuisettings.cpp \
 	gtk/gtkgameinputhandler.cpp \
+	misc/helphtml.cpp \
 	editor/editorwidgets.cpp \
 	editor/editorautowidgets.cpp \
 	editor/editorcellrenderer.cpp \
 	editor/exporthtml.cpp \
 	editor/exportcrli.cpp \
 	editor/editor.cpp \
-	gtk/help.cpp \
 	gtk/gtkapp.cpp \
-	gtk/gtkmainwindow.cpp \
-	sdl/sdlpixbuf.cpp \
-	sdl/sdlpixmap.cpp \
-	sdl/sdlabstractscreen.cpp \
-	sdl/sdlscreen.cpp \
-	sdl/sdlpixbuffactory.cpp \
-	sdl/ogl.cpp \
-	sdl/sdlgameinputhandler.cpp \
-	sdl/sdlmainwindow.cpp \
-	sdl/IMG_savepng.c \
-	sdl/sdlparticle.cpp \
-	gtkmain.cpp
+	gtk/gtkmainwindow.cpp
 
 gtkheaders = \
 	gtk/gtkpixbuf.hpp \
-	gtk/gtkpixmap.hpp \
 	gtk/gtkpixbuffactory.hpp \
 	gtk/gtkscreen.hpp \
 	gtk/gtkui.hpp \
 	gtk/gtkuisettings.hpp \
 	gtk/gtkgameinputhandler.hpp \
+	misc/helphtml.hpp \
 	editor/editorwidgets.hpp \
 	editor/editorautowidgets.hpp \
 	editor/editorcellrenderer.hpp \
 	editor/exporthtml.hpp \
 	editor/exportcrli.hpp \
 	editor/editor.hpp \
-	gtk/help.hpp \
 	gtk/gtkapp.hpp \
 	gtk/gtkmainwindow.hpp \
+	mainwindow.hpp
+
+
+# sdl sources and headers:
+#   the sdl and the opengl engine.
+sdlsources = \
+	framework/shadermanager.cpp \
+	framework/volumeactivity.cpp \
+	sdl/sdlpixbuf.cpp \
+	sdl/sdlabstractscreen.cpp \
+	sdl/sdlscreen.cpp \
+	sdl/sdlpixbuffactory.cpp \
+	sdl/ogl.cpp \
+	sdl/sdlgameinputhandler.cpp \
+	sdl/sdlmainwindow.cpp \
+	sdl/IMG_savepng.c
+
+sdlheaders = \
+	framework/shadermanager.hpp \
+	framework/volumeactivity.hpp \
 	sdl/sdlpixbuf.hpp \
-	sdl/sdlpixmap.hpp \
 	sdl/sdlabstractscreen.hpp \
 	sdl/sdlscreen.hpp \
 	sdl/sdlpixbuffactory.hpp \
 	sdl/ogl.hpp \
 	sdl/sdlgameinputhandler.hpp \
 	sdl/sdlmainwindow.hpp \
-	sdl/sdlparticle.hpp \
 	sdl/IMG_savepng.h
 
 noinst_HEADERS = \
-	$(base_headers) \
-	$(gtkheaders)
+	$(baseheaders) \
+	$(gtkheaders) \
+	$(sdlheaders)
 
-gdash_CPPFLAGS = -g -Wall -DGDASH_GTK @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@ @GL_CFLAGS@ @LIBPNG_CFLAGS@
+programheaders = $(baseheaders) $(am__append_1) $(am__append_3)
+programsources = $(basesources) $(am__append_2) $(am__append_4)
+gdash_CPPFLAGS = -g -Wall @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@ @GL_CFLAGS@ @LIBPNG_CFLAGS@
 gdash_LDFLAGS = -g -Wall
-@SDL_TRUE@GDASH_LIBADD = -lSDL_mixer -lSDL_image
-gdash_LDADD = @GTK_LIBS@ @GLIB_LIBS@ @LIBINTL@ @SDL_LIBS@ @GL_LIBS@ @LIBPNG_LIBS@ $(GDASH_LIBADD)
-gdash_SOURCES = \
-	$(base_sources) \
-	$(gtksources) \
-	$(sound_sources)
-
+gdash_LDADD = @GTK_LIBS@ @GLIB_LIBS@ @LIBINTL@ @SDL_LIBS@ @GL_LIBS@ @LIBPNG_LIBS@
+gdash_SOURCES = $(programsources)
 all: all-am
 
 .SUFFIXES:
@@ -642,7 +696,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-c64import.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-cavebase.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-cavehighscore.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-cavemap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-caveobject.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-caveobjectboundaryfill.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-caveobjectcopypaste.Po@am__quote@
@@ -686,15 +739,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkmainwindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkpixbuf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkpixbuffactory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkpixmap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkscreen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkui.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkuisettings.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-help.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-helphtml.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-helptext.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-highscore.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-inputtextactivity.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-joystick.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-loadfile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-logger.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-mainwindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-messageactivity.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-ogl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-particle.Po@am__quote@
@@ -704,7 +759,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-pixbufmanip_hq2x.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-pixbufmanip_hq3x.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-pixbufmanip_hq4x.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-pixmap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-printf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-replaymenuactivity.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-replaysaveractivity.Po@am__quote@
@@ -712,14 +766,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlabstractscreen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlgameinputhandler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlmainwindow.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlparticle.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlpixbuf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlpixbuffactory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlpixmap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlscreen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-selectfileactivity.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-settings.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-settingsactivity.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-shadermanager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-showtextactivity.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sound.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-thememanager.Po@am__quote@
@@ -784,19 +837,19 @@ gdash-printf.obj: misc/printf.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-printf.obj `if test -f 'misc/printf.cpp'; then $(CYGPATH_W) 'misc/printf.cpp'; else $(CYGPATH_W) '$(srcdir)/misc/printf.cpp'; fi`
 
-gdash-colors.o: cave/helper/colors.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-colors.o -MD -MP -MF $(DEPDIR)/gdash-colors.Tpo -c -o gdash-colors.o `test -f 'cave/helper/colors.cpp' || echo '$(srcdir)/'`cave/helper/colors.cpp
+gdash-colors.o: cave/colors.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-colors.o -MD -MP -MF $(DEPDIR)/gdash-colors.Tpo -c -o gdash-colors.o `test -f 'cave/colors.cpp' || echo '$(srcdir)/'`cave/colors.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-colors.Tpo $(DEPDIR)/gdash-colors.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='cave/helper/colors.cpp' object='gdash-colors.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='cave/colors.cpp' object='gdash-colors.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-colors.o `test -f 'cave/helper/colors.cpp' || echo '$(srcdir)/'`cave/helper/colors.cpp
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-colors.o `test -f 'cave/colors.cpp' || echo '$(srcdir)/'`cave/colors.cpp
 
-gdash-colors.obj: cave/helper/colors.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-colors.obj -MD -MP -MF $(DEPDIR)/gdash-colors.Tpo -c -o gdash-colors.obj `if test -f 'cave/helper/colors.cpp'; then $(CYGPATH_W) 'cave/helper/colors.cpp'; else $(CYGPATH_W) '$(srcdir)/cave/helper/colors.cpp'; fi`
+gdash-colors.obj: cave/colors.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-colors.obj -MD -MP -MF $(DEPDIR)/gdash-colors.Tpo -c -o gdash-colors.obj `if test -f 'cave/colors.cpp'; then $(CYGPATH_W) 'cave/colors.cpp'; else $(CYGPATH_W) '$(srcdir)/cave/colors.cpp'; fi`
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-colors.Tpo $(DEPDIR)/gdash-colors.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='cave/helper/colors.cpp' object='gdash-colors.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='cave/colors.cpp' object='gdash-colors.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-colors.obj `if test -f 'cave/helper/colors.cpp'; then $(CYGPATH_W) 'cave/helper/colors.cpp'; else $(CYGPATH_W) '$(srcdir)/cave/helper/colors.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-colors.obj `if test -f 'cave/colors.cpp'; then $(CYGPATH_W) 'cave/colors.cpp'; else $(CYGPATH_W) '$(srcdir)/cave/colors.cpp'; fi`
 
 gdash-cavetypes.o: cave/cavetypes.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-cavetypes.o -MD -MP -MF $(DEPDIR)/gdash-cavetypes.Tpo -c -o gdash-cavetypes.o `test -f 'cave/cavetypes.cpp' || echo '$(srcdir)/'`cave/cavetypes.cpp
@@ -825,20 +878,6 @@ gdash-elementproperties.obj: cave/elementproperties.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='cave/elementproperties.cpp' object='gdash-elementproperties.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-elementproperties.obj `if test -f 'cave/elementproperties.cpp'; then $(CYGPATH_W) 'cave/elementproperties.cpp'; else $(CYGPATH_W) '$(srcdir)/cave/elementproperties.cpp'; fi`
-
-gdash-cavemap.o: cave/helper/cavemap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-cavemap.o -MD -MP -MF $(DEPDIR)/gdash-cavemap.Tpo -c -o gdash-cavemap.o `test -f 'cave/helper/cavemap.cpp' || echo '$(srcdir)/'`cave/helper/cavemap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-cavemap.Tpo $(DEPDIR)/gdash-cavemap.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='cave/helper/cavemap.cpp' object='gdash-cavemap.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-cavemap.o `test -f 'cave/helper/cavemap.cpp' || echo '$(srcdir)/'`cave/helper/cavemap.cpp
-
-gdash-cavemap.obj: cave/helper/cavemap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-cavemap.obj -MD -MP -MF $(DEPDIR)/gdash-cavemap.Tpo -c -o gdash-cavemap.obj `if test -f 'cave/helper/cavemap.cpp'; then $(CYGPATH_W) 'cave/helper/cavemap.cpp'; else $(CYGPATH_W) '$(srcdir)/cave/helper/cavemap.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-cavemap.Tpo $(DEPDIR)/gdash-cavemap.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='cave/helper/cavemap.cpp' object='gdash-cavemap.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-cavemap.obj `if test -f 'cave/helper/cavemap.cpp'; then $(CYGPATH_W) 'cave/helper/cavemap.cpp'; else $(CYGPATH_W) '$(srcdir)/cave/helper/cavemap.cpp'; fi`
 
 gdash-cavereplay.o: cave/helper/cavereplay.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-cavereplay.o -MD -MP -MF $(DEPDIR)/gdash-cavereplay.Tpo -c -o gdash-cavereplay.o `test -f 'cave/helper/cavereplay.cpp' || echo '$(srcdir)/'`cave/helper/cavereplay.cpp
@@ -1274,6 +1313,20 @@ gdash-loadfile.obj: fileops/loadfile.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-loadfile.obj `if test -f 'fileops/loadfile.cpp'; then $(CYGPATH_W) 'fileops/loadfile.cpp'; else $(CYGPATH_W) '$(srcdir)/fileops/loadfile.cpp'; fi`
 
+gdash-highscore.o: fileops/highscore.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-highscore.o -MD -MP -MF $(DEPDIR)/gdash-highscore.Tpo -c -o gdash-highscore.o `test -f 'fileops/highscore.cpp' || echo '$(srcdir)/'`fileops/highscore.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-highscore.Tpo $(DEPDIR)/gdash-highscore.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fileops/highscore.cpp' object='gdash-highscore.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-highscore.o `test -f 'fileops/highscore.cpp' || echo '$(srcdir)/'`fileops/highscore.cpp
+
+gdash-highscore.obj: fileops/highscore.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-highscore.obj -MD -MP -MF $(DEPDIR)/gdash-highscore.Tpo -c -o gdash-highscore.obj `if test -f 'fileops/highscore.cpp'; then $(CYGPATH_W) 'fileops/highscore.cpp'; else $(CYGPATH_W) '$(srcdir)/fileops/highscore.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-highscore.Tpo $(DEPDIR)/gdash-highscore.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fileops/highscore.cpp' object='gdash-highscore.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-highscore.obj `if test -f 'fileops/highscore.cpp'; then $(CYGPATH_W) 'fileops/highscore.cpp'; else $(CYGPATH_W) '$(srcdir)/fileops/highscore.cpp'; fi`
+
 gdash-gamecontrol.o: cave/gamecontrol.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gamecontrol.o -MD -MP -MF $(DEPDIR)/gdash-gamecontrol.Tpo -c -o gdash-gamecontrol.o `test -f 'cave/gamecontrol.cpp' || echo '$(srcdir)/'`cave/gamecontrol.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-gamecontrol.Tpo $(DEPDIR)/gdash-gamecontrol.Po
@@ -1344,6 +1397,20 @@ gdash-about.obj: misc/about.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-about.obj `if test -f 'misc/about.cpp'; then $(CYGPATH_W) 'misc/about.cpp'; else $(CYGPATH_W) '$(srcdir)/misc/about.cpp'; fi`
 
+gdash-helptext.o: misc/helptext.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-helptext.o -MD -MP -MF $(DEPDIR)/gdash-helptext.Tpo -c -o gdash-helptext.o `test -f 'misc/helptext.cpp' || echo '$(srcdir)/'`misc/helptext.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-helptext.Tpo $(DEPDIR)/gdash-helptext.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='misc/helptext.cpp' object='gdash-helptext.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-helptext.o `test -f 'misc/helptext.cpp' || echo '$(srcdir)/'`misc/helptext.cpp
+
+gdash-helptext.obj: misc/helptext.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-helptext.obj -MD -MP -MF $(DEPDIR)/gdash-helptext.Tpo -c -o gdash-helptext.obj `if test -f 'misc/helptext.cpp'; then $(CYGPATH_W) 'misc/helptext.cpp'; else $(CYGPATH_W) '$(srcdir)/misc/helptext.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-helptext.Tpo $(DEPDIR)/gdash-helptext.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='misc/helptext.cpp' object='gdash-helptext.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-helptext.obj `if test -f 'misc/helptext.cpp'; then $(CYGPATH_W) 'misc/helptext.cpp'; else $(CYGPATH_W) '$(srcdir)/misc/helptext.cpp'; fi`
+
 gdash-pixbuf.o: gfx/pixbuf.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-pixbuf.o -MD -MP -MF $(DEPDIR)/gdash-pixbuf.Tpo -c -o gdash-pixbuf.o `test -f 'gfx/pixbuf.cpp' || echo '$(srcdir)/'`gfx/pixbuf.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-pixbuf.Tpo $(DEPDIR)/gdash-pixbuf.Po
@@ -1357,20 +1424,6 @@ gdash-pixbuf.obj: gfx/pixbuf.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gfx/pixbuf.cpp' object='gdash-pixbuf.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-pixbuf.obj `if test -f 'gfx/pixbuf.cpp'; then $(CYGPATH_W) 'gfx/pixbuf.cpp'; else $(CYGPATH_W) '$(srcdir)/gfx/pixbuf.cpp'; fi`
-
-gdash-pixmap.o: gfx/pixmap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-pixmap.o -MD -MP -MF $(DEPDIR)/gdash-pixmap.Tpo -c -o gdash-pixmap.o `test -f 'gfx/pixmap.cpp' || echo '$(srcdir)/'`gfx/pixmap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-pixmap.Tpo $(DEPDIR)/gdash-pixmap.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gfx/pixmap.cpp' object='gdash-pixmap.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-pixmap.o `test -f 'gfx/pixmap.cpp' || echo '$(srcdir)/'`gfx/pixmap.cpp
-
-gdash-pixmap.obj: gfx/pixmap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-pixmap.obj -MD -MP -MF $(DEPDIR)/gdash-pixmap.Tpo -c -o gdash-pixmap.obj `if test -f 'gfx/pixmap.cpp'; then $(CYGPATH_W) 'gfx/pixmap.cpp'; else $(CYGPATH_W) '$(srcdir)/gfx/pixmap.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-pixmap.Tpo $(DEPDIR)/gdash-pixmap.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gfx/pixmap.cpp' object='gdash-pixmap.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-pixmap.obj `if test -f 'gfx/pixmap.cpp'; then $(CYGPATH_W) 'gfx/pixmap.cpp'; else $(CYGPATH_W) '$(srcdir)/gfx/pixmap.cpp'; fi`
 
 gdash-screen.o: gfx/screen.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-screen.o -MD -MP -MF $(DEPDIR)/gdash-screen.Tpo -c -o gdash-screen.o `test -f 'gfx/screen.cpp' || echo '$(srcdir)/'`gfx/screen.cpp
@@ -1539,20 +1592,6 @@ gdash-activity.obj: framework/activity.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='framework/activity.cpp' object='gdash-activity.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-activity.obj `if test -f 'framework/activity.cpp'; then $(CYGPATH_W) 'framework/activity.cpp'; else $(CYGPATH_W) '$(srcdir)/framework/activity.cpp'; fi`
-
-gdash-volumeactivity.o: framework/volumeactivity.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-volumeactivity.o -MD -MP -MF $(DEPDIR)/gdash-volumeactivity.Tpo -c -o gdash-volumeactivity.o `test -f 'framework/volumeactivity.cpp' || echo '$(srcdir)/'`framework/volumeactivity.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-volumeactivity.Tpo $(DEPDIR)/gdash-volumeactivity.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='framework/volumeactivity.cpp' object='gdash-volumeactivity.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-volumeactivity.o `test -f 'framework/volumeactivity.cpp' || echo '$(srcdir)/'`framework/volumeactivity.cpp
-
-gdash-volumeactivity.obj: framework/volumeactivity.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-volumeactivity.obj -MD -MP -MF $(DEPDIR)/gdash-volumeactivity.Tpo -c -o gdash-volumeactivity.obj `if test -f 'framework/volumeactivity.cpp'; then $(CYGPATH_W) 'framework/volumeactivity.cpp'; else $(CYGPATH_W) '$(srcdir)/framework/volumeactivity.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-volumeactivity.Tpo $(DEPDIR)/gdash-volumeactivity.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='framework/volumeactivity.cpp' object='gdash-volumeactivity.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-volumeactivity.obj `if test -f 'framework/volumeactivity.cpp'; then $(CYGPATH_W) 'framework/volumeactivity.cpp'; else $(CYGPATH_W) '$(srcdir)/framework/volumeactivity.cpp'; fi`
 
 gdash-titlescreenactivity.o: framework/titlescreenactivity.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-titlescreenactivity.o -MD -MP -MF $(DEPDIR)/gdash-titlescreenactivity.Tpo -c -o gdash-titlescreenactivity.o `test -f 'framework/titlescreenactivity.cpp' || echo '$(srcdir)/'`framework/titlescreenactivity.cpp
@@ -1764,6 +1803,34 @@ gdash-sound.obj: sound/sound.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-sound.obj `if test -f 'sound/sound.cpp'; then $(CYGPATH_W) 'sound/sound.cpp'; else $(CYGPATH_W) '$(srcdir)/sound/sound.cpp'; fi`
 
+gdash-mainwindow.o: mainwindow.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-mainwindow.o -MD -MP -MF $(DEPDIR)/gdash-mainwindow.Tpo -c -o gdash-mainwindow.o `test -f 'mainwindow.cpp' || echo '$(srcdir)/'`mainwindow.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-mainwindow.Tpo $(DEPDIR)/gdash-mainwindow.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mainwindow.cpp' object='gdash-mainwindow.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-mainwindow.o `test -f 'mainwindow.cpp' || echo '$(srcdir)/'`mainwindow.cpp
+
+gdash-mainwindow.obj: mainwindow.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-mainwindow.obj -MD -MP -MF $(DEPDIR)/gdash-mainwindow.Tpo -c -o gdash-mainwindow.obj `if test -f 'mainwindow.cpp'; then $(CYGPATH_W) 'mainwindow.cpp'; else $(CYGPATH_W) '$(srcdir)/mainwindow.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-mainwindow.Tpo $(DEPDIR)/gdash-mainwindow.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mainwindow.cpp' object='gdash-mainwindow.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-mainwindow.obj `if test -f 'mainwindow.cpp'; then $(CYGPATH_W) 'mainwindow.cpp'; else $(CYGPATH_W) '$(srcdir)/mainwindow.cpp'; fi`
+
+gdash-gtkmain.o: gtkmain.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gtkmain.o -MD -MP -MF $(DEPDIR)/gdash-gtkmain.Tpo -c -o gdash-gtkmain.o `test -f 'gtkmain.cpp' || echo '$(srcdir)/'`gtkmain.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-gtkmain.Tpo $(DEPDIR)/gdash-gtkmain.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gtkmain.cpp' object='gdash-gtkmain.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-gtkmain.o `test -f 'gtkmain.cpp' || echo '$(srcdir)/'`gtkmain.cpp
+
+gdash-gtkmain.obj: gtkmain.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gtkmain.obj -MD -MP -MF $(DEPDIR)/gdash-gtkmain.Tpo -c -o gdash-gtkmain.obj `if test -f 'gtkmain.cpp'; then $(CYGPATH_W) 'gtkmain.cpp'; else $(CYGPATH_W) '$(srcdir)/gtkmain.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-gtkmain.Tpo $(DEPDIR)/gdash-gtkmain.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gtkmain.cpp' object='gdash-gtkmain.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-gtkmain.obj `if test -f 'gtkmain.cpp'; then $(CYGPATH_W) 'gtkmain.cpp'; else $(CYGPATH_W) '$(srcdir)/gtkmain.cpp'; fi`
+
 gdash-gtkpixbuf.o: gtk/gtkpixbuf.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gtkpixbuf.o -MD -MP -MF $(DEPDIR)/gdash-gtkpixbuf.Tpo -c -o gdash-gtkpixbuf.o `test -f 'gtk/gtkpixbuf.cpp' || echo '$(srcdir)/'`gtk/gtkpixbuf.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-gtkpixbuf.Tpo $(DEPDIR)/gdash-gtkpixbuf.Po
@@ -1777,20 +1844,6 @@ gdash-gtkpixbuf.obj: gtk/gtkpixbuf.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gtk/gtkpixbuf.cpp' object='gdash-gtkpixbuf.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-gtkpixbuf.obj `if test -f 'gtk/gtkpixbuf.cpp'; then $(CYGPATH_W) 'gtk/gtkpixbuf.cpp'; else $(CYGPATH_W) '$(srcdir)/gtk/gtkpixbuf.cpp'; fi`
-
-gdash-gtkpixmap.o: gtk/gtkpixmap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gtkpixmap.o -MD -MP -MF $(DEPDIR)/gdash-gtkpixmap.Tpo -c -o gdash-gtkpixmap.o `test -f 'gtk/gtkpixmap.cpp' || echo '$(srcdir)/'`gtk/gtkpixmap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-gtkpixmap.Tpo $(DEPDIR)/gdash-gtkpixmap.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gtk/gtkpixmap.cpp' object='gdash-gtkpixmap.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-gtkpixmap.o `test -f 'gtk/gtkpixmap.cpp' || echo '$(srcdir)/'`gtk/gtkpixmap.cpp
-
-gdash-gtkpixmap.obj: gtk/gtkpixmap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gtkpixmap.obj -MD -MP -MF $(DEPDIR)/gdash-gtkpixmap.Tpo -c -o gdash-gtkpixmap.obj `if test -f 'gtk/gtkpixmap.cpp'; then $(CYGPATH_W) 'gtk/gtkpixmap.cpp'; else $(CYGPATH_W) '$(srcdir)/gtk/gtkpixmap.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-gtkpixmap.Tpo $(DEPDIR)/gdash-gtkpixmap.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gtk/gtkpixmap.cpp' object='gdash-gtkpixmap.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-gtkpixmap.obj `if test -f 'gtk/gtkpixmap.cpp'; then $(CYGPATH_W) 'gtk/gtkpixmap.cpp'; else $(CYGPATH_W) '$(srcdir)/gtk/gtkpixmap.cpp'; fi`
 
 gdash-gtkpixbuffactory.o: gtk/gtkpixbuffactory.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gtkpixbuffactory.o -MD -MP -MF $(DEPDIR)/gdash-gtkpixbuffactory.Tpo -c -o gdash-gtkpixbuffactory.o `test -f 'gtk/gtkpixbuffactory.cpp' || echo '$(srcdir)/'`gtk/gtkpixbuffactory.cpp
@@ -1861,6 +1914,20 @@ gdash-gtkgameinputhandler.obj: gtk/gtkgameinputhandler.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gtk/gtkgameinputhandler.cpp' object='gdash-gtkgameinputhandler.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-gtkgameinputhandler.obj `if test -f 'gtk/gtkgameinputhandler.cpp'; then $(CYGPATH_W) 'gtk/gtkgameinputhandler.cpp'; else $(CYGPATH_W) '$(srcdir)/gtk/gtkgameinputhandler.cpp'; fi`
+
+gdash-helphtml.o: misc/helphtml.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-helphtml.o -MD -MP -MF $(DEPDIR)/gdash-helphtml.Tpo -c -o gdash-helphtml.o `test -f 'misc/helphtml.cpp' || echo '$(srcdir)/'`misc/helphtml.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-helphtml.Tpo $(DEPDIR)/gdash-helphtml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='misc/helphtml.cpp' object='gdash-helphtml.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-helphtml.o `test -f 'misc/helphtml.cpp' || echo '$(srcdir)/'`misc/helphtml.cpp
+
+gdash-helphtml.obj: misc/helphtml.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-helphtml.obj -MD -MP -MF $(DEPDIR)/gdash-helphtml.Tpo -c -o gdash-helphtml.obj `if test -f 'misc/helphtml.cpp'; then $(CYGPATH_W) 'misc/helphtml.cpp'; else $(CYGPATH_W) '$(srcdir)/misc/helphtml.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-helphtml.Tpo $(DEPDIR)/gdash-helphtml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='misc/helphtml.cpp' object='gdash-helphtml.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-helphtml.obj `if test -f 'misc/helphtml.cpp'; then $(CYGPATH_W) 'misc/helphtml.cpp'; else $(CYGPATH_W) '$(srcdir)/misc/helphtml.cpp'; fi`
 
 gdash-editorwidgets.o: editor/editorwidgets.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-editorwidgets.o -MD -MP -MF $(DEPDIR)/gdash-editorwidgets.Tpo -c -o gdash-editorwidgets.o `test -f 'editor/editorwidgets.cpp' || echo '$(srcdir)/'`editor/editorwidgets.cpp
@@ -1946,20 +2013,6 @@ gdash-editor.obj: editor/editor.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-editor.obj `if test -f 'editor/editor.cpp'; then $(CYGPATH_W) 'editor/editor.cpp'; else $(CYGPATH_W) '$(srcdir)/editor/editor.cpp'; fi`
 
-gdash-help.o: gtk/help.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-help.o -MD -MP -MF $(DEPDIR)/gdash-help.Tpo -c -o gdash-help.o `test -f 'gtk/help.cpp' || echo '$(srcdir)/'`gtk/help.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-help.Tpo $(DEPDIR)/gdash-help.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gtk/help.cpp' object='gdash-help.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-help.o `test -f 'gtk/help.cpp' || echo '$(srcdir)/'`gtk/help.cpp
-
-gdash-help.obj: gtk/help.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-help.obj -MD -MP -MF $(DEPDIR)/gdash-help.Tpo -c -o gdash-help.obj `if test -f 'gtk/help.cpp'; then $(CYGPATH_W) 'gtk/help.cpp'; else $(CYGPATH_W) '$(srcdir)/gtk/help.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-help.Tpo $(DEPDIR)/gdash-help.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gtk/help.cpp' object='gdash-help.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-help.obj `if test -f 'gtk/help.cpp'; then $(CYGPATH_W) 'gtk/help.cpp'; else $(CYGPATH_W) '$(srcdir)/gtk/help.cpp'; fi`
-
 gdash-gtkapp.o: gtk/gtkapp.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gtkapp.o -MD -MP -MF $(DEPDIR)/gdash-gtkapp.Tpo -c -o gdash-gtkapp.o `test -f 'gtk/gtkapp.cpp' || echo '$(srcdir)/'`gtk/gtkapp.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-gtkapp.Tpo $(DEPDIR)/gdash-gtkapp.Po
@@ -1988,6 +2041,34 @@ gdash-gtkmainwindow.obj: gtk/gtkmainwindow.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-gtkmainwindow.obj `if test -f 'gtk/gtkmainwindow.cpp'; then $(CYGPATH_W) 'gtk/gtkmainwindow.cpp'; else $(CYGPATH_W) '$(srcdir)/gtk/gtkmainwindow.cpp'; fi`
 
+gdash-shadermanager.o: framework/shadermanager.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-shadermanager.o -MD -MP -MF $(DEPDIR)/gdash-shadermanager.Tpo -c -o gdash-shadermanager.o `test -f 'framework/shadermanager.cpp' || echo '$(srcdir)/'`framework/shadermanager.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-shadermanager.Tpo $(DEPDIR)/gdash-shadermanager.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='framework/shadermanager.cpp' object='gdash-shadermanager.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-shadermanager.o `test -f 'framework/shadermanager.cpp' || echo '$(srcdir)/'`framework/shadermanager.cpp
+
+gdash-shadermanager.obj: framework/shadermanager.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-shadermanager.obj -MD -MP -MF $(DEPDIR)/gdash-shadermanager.Tpo -c -o gdash-shadermanager.obj `if test -f 'framework/shadermanager.cpp'; then $(CYGPATH_W) 'framework/shadermanager.cpp'; else $(CYGPATH_W) '$(srcdir)/framework/shadermanager.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-shadermanager.Tpo $(DEPDIR)/gdash-shadermanager.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='framework/shadermanager.cpp' object='gdash-shadermanager.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-shadermanager.obj `if test -f 'framework/shadermanager.cpp'; then $(CYGPATH_W) 'framework/shadermanager.cpp'; else $(CYGPATH_W) '$(srcdir)/framework/shadermanager.cpp'; fi`
+
+gdash-volumeactivity.o: framework/volumeactivity.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-volumeactivity.o -MD -MP -MF $(DEPDIR)/gdash-volumeactivity.Tpo -c -o gdash-volumeactivity.o `test -f 'framework/volumeactivity.cpp' || echo '$(srcdir)/'`framework/volumeactivity.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-volumeactivity.Tpo $(DEPDIR)/gdash-volumeactivity.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='framework/volumeactivity.cpp' object='gdash-volumeactivity.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-volumeactivity.o `test -f 'framework/volumeactivity.cpp' || echo '$(srcdir)/'`framework/volumeactivity.cpp
+
+gdash-volumeactivity.obj: framework/volumeactivity.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-volumeactivity.obj -MD -MP -MF $(DEPDIR)/gdash-volumeactivity.Tpo -c -o gdash-volumeactivity.obj `if test -f 'framework/volumeactivity.cpp'; then $(CYGPATH_W) 'framework/volumeactivity.cpp'; else $(CYGPATH_W) '$(srcdir)/framework/volumeactivity.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-volumeactivity.Tpo $(DEPDIR)/gdash-volumeactivity.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='framework/volumeactivity.cpp' object='gdash-volumeactivity.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-volumeactivity.obj `if test -f 'framework/volumeactivity.cpp'; then $(CYGPATH_W) 'framework/volumeactivity.cpp'; else $(CYGPATH_W) '$(srcdir)/framework/volumeactivity.cpp'; fi`
+
 gdash-sdlpixbuf.o: sdl/sdlpixbuf.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-sdlpixbuf.o -MD -MP -MF $(DEPDIR)/gdash-sdlpixbuf.Tpo -c -o gdash-sdlpixbuf.o `test -f 'sdl/sdlpixbuf.cpp' || echo '$(srcdir)/'`sdl/sdlpixbuf.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-sdlpixbuf.Tpo $(DEPDIR)/gdash-sdlpixbuf.Po
@@ -2001,20 +2082,6 @@ gdash-sdlpixbuf.obj: sdl/sdlpixbuf.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/sdlpixbuf.cpp' object='gdash-sdlpixbuf.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-sdlpixbuf.obj `if test -f 'sdl/sdlpixbuf.cpp'; then $(CYGPATH_W) 'sdl/sdlpixbuf.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/sdlpixbuf.cpp'; fi`
-
-gdash-sdlpixmap.o: sdl/sdlpixmap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-sdlpixmap.o -MD -MP -MF $(DEPDIR)/gdash-sdlpixmap.Tpo -c -o gdash-sdlpixmap.o `test -f 'sdl/sdlpixmap.cpp' || echo '$(srcdir)/'`sdl/sdlpixmap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-sdlpixmap.Tpo $(DEPDIR)/gdash-sdlpixmap.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/sdlpixmap.cpp' object='gdash-sdlpixmap.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-sdlpixmap.o `test -f 'sdl/sdlpixmap.cpp' || echo '$(srcdir)/'`sdl/sdlpixmap.cpp
-
-gdash-sdlpixmap.obj: sdl/sdlpixmap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-sdlpixmap.obj -MD -MP -MF $(DEPDIR)/gdash-sdlpixmap.Tpo -c -o gdash-sdlpixmap.obj `if test -f 'sdl/sdlpixmap.cpp'; then $(CYGPATH_W) 'sdl/sdlpixmap.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/sdlpixmap.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-sdlpixmap.Tpo $(DEPDIR)/gdash-sdlpixmap.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/sdlpixmap.cpp' object='gdash-sdlpixmap.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-sdlpixmap.obj `if test -f 'sdl/sdlpixmap.cpp'; then $(CYGPATH_W) 'sdl/sdlpixmap.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/sdlpixmap.cpp'; fi`
 
 gdash-sdlabstractscreen.o: sdl/sdlabstractscreen.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-sdlabstractscreen.o -MD -MP -MF $(DEPDIR)/gdash-sdlabstractscreen.Tpo -c -o gdash-sdlabstractscreen.o `test -f 'sdl/sdlabstractscreen.cpp' || echo '$(srcdir)/'`sdl/sdlabstractscreen.cpp
@@ -2099,34 +2166,6 @@ gdash-sdlmainwindow.obj: sdl/sdlmainwindow.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/sdlmainwindow.cpp' object='gdash-sdlmainwindow.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-sdlmainwindow.obj `if test -f 'sdl/sdlmainwindow.cpp'; then $(CYGPATH_W) 'sdl/sdlmainwindow.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/sdlmainwindow.cpp'; fi`
-
-gdash-sdlparticle.o: sdl/sdlparticle.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-sdlparticle.o -MD -MP -MF $(DEPDIR)/gdash-sdlparticle.Tpo -c -o gdash-sdlparticle.o `test -f 'sdl/sdlparticle.cpp' || echo '$(srcdir)/'`sdl/sdlparticle.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-sdlparticle.Tpo $(DEPDIR)/gdash-sdlparticle.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/sdlparticle.cpp' object='gdash-sdlparticle.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-sdlparticle.o `test -f 'sdl/sdlparticle.cpp' || echo '$(srcdir)/'`sdl/sdlparticle.cpp
-
-gdash-sdlparticle.obj: sdl/sdlparticle.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-sdlparticle.obj -MD -MP -MF $(DEPDIR)/gdash-sdlparticle.Tpo -c -o gdash-sdlparticle.obj `if test -f 'sdl/sdlparticle.cpp'; then $(CYGPATH_W) 'sdl/sdlparticle.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/sdlparticle.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-sdlparticle.Tpo $(DEPDIR)/gdash-sdlparticle.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/sdlparticle.cpp' object='gdash-sdlparticle.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-sdlparticle.obj `if test -f 'sdl/sdlparticle.cpp'; then $(CYGPATH_W) 'sdl/sdlparticle.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/sdlparticle.cpp'; fi`
-
-gdash-gtkmain.o: gtkmain.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gtkmain.o -MD -MP -MF $(DEPDIR)/gdash-gtkmain.Tpo -c -o gdash-gtkmain.o `test -f 'gtkmain.cpp' || echo '$(srcdir)/'`gtkmain.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-gtkmain.Tpo $(DEPDIR)/gdash-gtkmain.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gtkmain.cpp' object='gdash-gtkmain.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-gtkmain.o `test -f 'gtkmain.cpp' || echo '$(srcdir)/'`gtkmain.cpp
-
-gdash-gtkmain.obj: gtkmain.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gtkmain.obj -MD -MP -MF $(DEPDIR)/gdash-gtkmain.Tpo -c -o gdash-gtkmain.obj `if test -f 'gtkmain.cpp'; then $(CYGPATH_W) 'gtkmain.cpp'; else $(CYGPATH_W) '$(srcdir)/gtkmain.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-gtkmain.Tpo $(DEPDIR)/gdash-gtkmain.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gtkmain.cpp' object='gdash-gtkmain.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-gtkmain.obj `if test -f 'gtkmain.cpp'; then $(CYGPATH_W) 'gtkmain.cpp'; else $(CYGPATH_W) '$(srcdir)/gtkmain.cpp'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

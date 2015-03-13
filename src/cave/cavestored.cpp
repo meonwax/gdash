@@ -1,17 +1,24 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
@@ -44,10 +51,10 @@ PropertyDescription const CaveStored::descriptor[] = {
     {"IntermissionProperties.rewardlife", GD_TYPE_BOOLEAN, 0, N_("   Reward life"), GetterBase::create_new(&CaveStored::intermission_rewardlife), N_("If true, an extra life is given to the player, when the intermission cave is successfully finished.")},
     {"Size", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Width"), GetterBase::create_new(&CaveStored::w), N_("Width of cave. The standard size for a cave is 40x22, and 20x12 for an intermission."), 12, 128},
     {"Size", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Height"), GetterBase::create_new(&CaveStored::h), N_("Height of cave. The standard size for a cave is 40x22, and 20x12 for an intermission."), 12, 128},
-    {"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, left"), GetterBase::create_new(&CaveStored::x1), N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
-    {"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, upper"), GetterBase::create_new(&CaveStored::y1), N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
-    {"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, right"), GetterBase::create_new(&CaveStored::x2), N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
-    {"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, lower"), GetterBase::create_new(&CaveStored::y2), N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
+    {"Size", GD_TYPE_INT, GD_ALWAYS_SAVE | GD_DONT_SHOW_IN_EDITOR, N_("Visible, left"), GetterBase::create_new(&CaveStored::x1), N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
+    {"Size", GD_TYPE_INT, GD_ALWAYS_SAVE | GD_DONT_SHOW_IN_EDITOR, N_("Visible, upper"), GetterBase::create_new(&CaveStored::y1), N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
+    {"Size", GD_TYPE_INT, GD_ALWAYS_SAVE | GD_DONT_SHOW_IN_EDITOR, N_("Visible, right"), GetterBase::create_new(&CaveStored::x2), N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
+    {"Size", GD_TYPE_INT, GD_ALWAYS_SAVE | GD_DONT_SHOW_IN_EDITOR, N_("Visible, lower"), GetterBase::create_new(&CaveStored::y2), N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
 
     {"Charset", GD_TYPE_STRING, 0, N_("Character set"), GetterBase::create_new(&CaveStored::charset), N_("Theme used for displaying the game. Informative, not used by GDash.")},
     {"Fontset", GD_TYPE_STRING, 0, N_("Font set"), GetterBase::create_new(&CaveStored::fontset), N_("Font used during the game. Informative, not used by GDash.")},
@@ -61,13 +68,13 @@ PropertyDescription const CaveStored::descriptor[] = {
     {"Remark", GD_TYPE_LONGSTRING, 0, 0, GetterBase::create_new(&CaveStored::remark), N_("Remark (informative). Can contain supplementary information about the design of the cave. It is not shown during the game, only when the user requests the cave info dialog, so can also contain spoilers and hints.")},
 
     // do not show them in editor, but save them in bdcff. they have a separate dialog box
-    {"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, 0, GetterBase::create_new(&CaveStored::colorb), 0},
-    {"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, 0, GetterBase::create_new(&CaveStored::color0), 0},
-    {"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, 0, GetterBase::create_new(&CaveStored::color1), 0},
-    {"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, 0, GetterBase::create_new(&CaveStored::color2), 0},
-    {"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, 0, GetterBase::create_new(&CaveStored::color3), 0},
-    {"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, 0, GetterBase::create_new(&CaveStored::color4), 0},
-    {"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, 0, GetterBase::create_new(&CaveStored::color5), 0},
+    {"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE | GD_DONT_SHOW_IN_EDITOR, 0, GetterBase::create_new(&CaveStored::colorb), 0},
+    {"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE | GD_DONT_SHOW_IN_EDITOR, 0, GetterBase::create_new(&CaveStored::color0), 0},
+    {"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE | GD_DONT_SHOW_IN_EDITOR, 0, GetterBase::create_new(&CaveStored::color1), 0},
+    {"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE | GD_DONT_SHOW_IN_EDITOR, 0, GetterBase::create_new(&CaveStored::color2), 0},
+    {"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE | GD_DONT_SHOW_IN_EDITOR, 0, GetterBase::create_new(&CaveStored::color3), 0},
+    {"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE | GD_DONT_SHOW_IN_EDITOR, 0, GetterBase::create_new(&CaveStored::color4), 0},
+    {"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE | GD_DONT_SHOW_IN_EDITOR, 0, GetterBase::create_new(&CaveStored::color5), 0},
 
     /* difficulty */
     {"", GD_TAB, 0, N_("Difficulty")},
@@ -116,7 +123,7 @@ PropertyDescription const CaveStored::descriptor[] = {
     /* rocket launcher */
     {"", GD_LABEL, 0, N_("Rocket launcher")},
     {"RocketLauncher.infinite", GD_TYPE_BOOLEAN, 0, N_("Infinite rockets"), GetterBase::create_new(&CaveStored::infinite_rockets), N_("If it is true, the player is able to launch an infinite number of rockets. Otherwise every rocket launcher contains only a single rocket.")},
-    
+
     /* pneumatic hammer */
     {"", GD_LABEL, 0, N_("Pneumatic hammer")},
     {"PneumaticHammer.frames", GD_TYPE_INT, 0, N_("Time for hammer (frames)"), GetterBase::create_new(&CaveStored::pneumatic_hammer_frame), N_("This is the number of game frames, a pneumatic hammer is required to break a wall."), 1, 100},
@@ -200,7 +207,7 @@ PropertyDescription const CaveStored::descriptor[] = {
     /* biter */
     {"", GD_LABEL, 0, N_("Biter")},
     {"BiterProperties", GD_TYPE_INT, 0, N_("Delay (frame)"), GetterBase::create_new(&CaveStored::biter_delay_frame), N_("Number of frames biters wait between movements."), 0, 3},
-    {"BiterProperties", GD_TYPE_ELEMENT, 0, N_("Eats this"), GetterBase::create_new(&CaveStored::biter_eat), N_("Biters eat this element. (They always eat dirt.)")},
+    {"BiterProperties", GD_TYPE_ELEMENT, 0, N_("Eats this"), GetterBase::create_new(&CaveStored::biter_eat), N_("Biters eat this element. They always eat dirt.")},
     /* bladder */
     {"", GD_LABEL, 0, N_("Bladder")},
     {"BladderProperties", GD_TYPE_ELEMENT, 0, N_("Converts to clock by touching"), GetterBase::create_new(&CaveStored::bladder_converts_by), NULL},
@@ -342,226 +349,291 @@ PropertyDescription const CaveStored::random_dialog[] = {
 };
 
 
+PropertyDescription const CaveStored::cave_statistics_data[] = {
+    // TRANSLATORS: short for "number of times played". 5 chars max!
+    {"StatPlayed", GD_TYPE_INT_LEVELS, 0, NC_("Statistics", "Play"), GetterBase::create_new(&CaveStored::stat_level_played), NULL},
+    // TRANSLATORS: short for "number of times played successfully". 5 chars max!
+    {"StatPlayedSuccessfully", GD_TYPE_INT_LEVELS, 0, NC_("Statistics", "Succ"), GetterBase::create_new(&CaveStored::stat_level_played_successfully), NULL},
+    // TRANSLATORS: short for "best time". 5 chars max!
+    {"StatBestTime", GD_TYPE_INT_LEVELS, 0, NC_("Statistics", "Time"), GetterBase::create_new(&CaveStored::stat_level_best_time), NULL},
+    // TRANSLATORS: short for "max diamonds collected". 5 chars max!
+    {"StatMostDiamonds", GD_TYPE_INT_LEVELS, 0, NC_("Statistics", "Diam"), GetterBase::create_new(&CaveStored::stat_level_most_diamonds), NULL},
+    // TRANSLATORS: short for "max score collected". 5 chars max!
+    {"StatHighestScore", GD_TYPE_INT_LEVELS, 0, NC_("Statistics", "Score"), GetterBase::create_new(&CaveStored::stat_level_highest_score), NULL},
+    {0}
+};
+
+
+
 void CaveStored::set_gdash_defaults() {
     /* default data */
-    selectable=true;
-    intermission=false;
-    intermission_instantlife=false;
-    intermission_rewardlife=true;
-    w=40;
-    h=22;
-    x1=0;
-    y1=0;
-    x2=39;
-    y2=21;
-    colorb=GdColor::from_c64(0);
-    color0=GdColor::from_c64(0);
-    color1=GdColor::from_c64(8);
-    color2=GdColor::from_c64(11);
-    color3=GdColor::from_c64(1);
-    color4=GdColor::from_c64(5);
-    color5=GdColor::from_c64(6);
+    selectable = true;
+    intermission = false;
+    intermission_instantlife = false;
+    intermission_rewardlife = true;
+    w = 40;
+    h = 22;
+    x1 = 0;
+    y1 = 0;
+    x2 = 39;
+    y2 = 21;
+    colorb = GdColor::from_c64(0);
+    color0 = GdColor::from_c64(0);
+    color1 = GdColor::from_c64(8);
+    color2 = GdColor::from_c64(11);
+    color3 = GdColor::from_c64(1);
+    color4 = GdColor::from_c64(5);
+    color5 = GdColor::from_c64(6);
 
     /* difficulty */
-    for (unsigned i=0; i<5; i++) {
-        level_diamonds[i]=10;
-        level_time[i]=999;
-        level_timevalue[i]=i+1;
-        level_ckdelay[i]=0;
-        level_hatching_delay_time[i]=2;
-        level_speed[i]=200;
-        level_hatching_delay_frame[i]=21;
-        level_rand[i]=i;
+    for (unsigned i = 0; i < 5; i++) {
+        level_diamonds[i] = 10;
+        level_time[i] = 999;
+        level_timevalue[i] = i + 1;
+        level_ckdelay[i] = 0;
+        level_hatching_delay_time[i] = 2;
+        level_speed[i] = 200;
+        level_hatching_delay_frame[i] = 21;
+        level_rand[i] = i;
     }
-    diamond_value=0;
-    extra_diamond_value=0;
-    max_time=999;
-    pal_timing=false;
-    scheduling=GD_SCHEDULING_MILLISECONDS;
+    diamond_value = 0;
+    extra_diamond_value = 0;
+    max_time = 999;
+    pal_timing = false;
+    scheduling = GD_SCHEDULING_MILLISECONDS;
 
     /* initial fill */
-    initial_border=O_STEEL;
-    initial_fill=O_DIRT;
-    random_fill_1=O_DIRT;
-    random_fill_probability_1=0;
-    random_fill_2=O_DIRT;
-    random_fill_probability_2=0;
-    random_fill_3=O_DIRT;
-    random_fill_probability_3=0;
-    random_fill_4=O_DIRT;
-    random_fill_probability_4=0;
+    initial_border = O_STEEL;
+    initial_fill = O_DIRT;
+    random_fill_1 = O_DIRT;
+    random_fill_probability_1 = 0;
+    random_fill_2 = O_DIRT;
+    random_fill_probability_2 = 0;
+    random_fill_3 = O_DIRT;
+    random_fill_probability_3 = 0;
+    random_fill_4 = O_DIRT;
+    random_fill_probability_4 = 0;
 
     /* PLAYER */
-    diagonal_movements=false;
-    active_is_first_found=true;
-    snap_element=O_SPACE;
-    pushing_stone_prob=250000;
-    pushing_stone_prob_sweet=1000000;
-    mega_stones_pushable_with_sweet=false;
-    pneumatic_hammer_frame=5;
-    hammered_walls_reappear=false;
-    hammered_wall_reappear_frame=100;
-    voodoo_collects_diamonds=false;
-    voodoo_disappear_in_explosion=true;
-    voodoo_dies_by_stone=false;
-    voodoo_any_hurt_kills_player=false;
-    for (unsigned i=0; i<5; i++) {
-        level_bonus_time[i]=30;
-        level_penalty_time[i]=30;
+    diagonal_movements = false;
+    active_is_first_found = true;
+    snap_element = O_SPACE;
+    pushing_stone_prob = 250000;
+    pushing_stone_prob_sweet = 1000000;
+    mega_stones_pushable_with_sweet = false;
+    pneumatic_hammer_frame = 5;
+    hammered_walls_reappear = false;
+    hammered_wall_reappear_frame = 100;
+    voodoo_collects_diamonds = false;
+    voodoo_disappear_in_explosion = true;
+    voodoo_dies_by_stone = false;
+    voodoo_any_hurt_kills_player = false;
+    for (unsigned i = 0; i < 5; i++) {
+        level_bonus_time[i] = 30;
+        level_penalty_time[i] = 30;
     }
 
     /* magic wall */
-    for (unsigned i=0; i<5; i++)
-        level_magic_wall_time[i]=999;
-    magic_diamond_to=O_STONE_F;
-    magic_stone_to=O_DIAMOND_F;
-    magic_mega_stone_to=O_NITRO_PACK_F;
-    magic_nitro_pack_to=O_MEGA_STONE_F;
-    magic_nut_to=O_NUT_F;
-    magic_flying_stone_to=O_FLYING_DIAMOND_F;
-    magic_flying_diamond_to=O_FLYING_STONE_F;
-    magic_wall_stops_amoeba=true;
-    magic_timer_wait_for_hatching=false;
+    for (unsigned i = 0; i < 5; i++)
+        level_magic_wall_time[i] = 999;
+    magic_diamond_to = O_STONE_F;
+    magic_stone_to = O_DIAMOND_F;
+    magic_mega_stone_to = O_NITRO_PACK_F;
+    magic_nitro_pack_to = O_MEGA_STONE_F;
+    magic_nut_to = O_NUT_F;
+    magic_flying_stone_to = O_FLYING_DIAMOND_F;
+    magic_flying_diamond_to = O_FLYING_STONE_F;
+    magic_wall_stops_amoeba = true;
+    magic_timer_wait_for_hatching = false;
 
     /* amoeba */
-    amoeba_timer_started_immediately=true;
-    amoeba_timer_wait_for_hatching=false;
-    for (unsigned i=0; i<5; i++) {
-        level_amoeba_threshold[i]=200;
-        level_amoeba_time[i]=999;
+    amoeba_timer_started_immediately = true;
+    amoeba_timer_wait_for_hatching = false;
+    for (unsigned i = 0; i < 5; i++) {
+        level_amoeba_threshold[i] = 200;
+        level_amoeba_time[i] = 999;
     }
-    amoeba_growth_prob=31250;
-    amoeba_fast_growth_prob=250000;
-    amoeba_timer_started_immediately=true;
-    amoeba_timer_wait_for_hatching=false;
-    amoeba_too_big_effect=O_STONE;
-    amoeba_enclosed_effect=O_DIAMOND;
+    amoeba_growth_prob = 31250;
+    amoeba_fast_growth_prob = 250000;
+    amoeba_timer_started_immediately = true;
+    amoeba_timer_wait_for_hatching = false;
+    amoeba_too_big_effect = O_STONE;
+    amoeba_enclosed_effect = O_DIAMOND;
 
     /* amoeba 2 */
-    for (unsigned i=0; i<5; i++) {
-        level_amoeba_2_threshold[i]=200;
-        level_amoeba_2_time[i]=999;
+    for (unsigned i = 0; i < 5; i++) {
+        level_amoeba_2_threshold[i] = 200;
+        level_amoeba_2_time[i] = 999;
     }
-    amoeba_2_growth_prob=31250;
-    amoeba_2_fast_growth_prob=250000;
-    amoeba_2_too_big_effect=O_STONE;
-    amoeba_2_enclosed_effect=O_DIAMOND;
-    amoeba_2_explodes_by_amoeba=true;
-    amoeba_2_looks_like=O_AMOEBA_2;
-    amoeba_2_explosion_effect=O_SPACE;
+    amoeba_2_growth_prob = 31250;
+    amoeba_2_fast_growth_prob = 250000;
+    amoeba_2_too_big_effect = O_STONE;
+    amoeba_2_enclosed_effect = O_DIAMOND;
+    amoeba_2_explodes_by_amoeba = true;
+    amoeba_2_looks_like = O_AMOEBA_2;
+    amoeba_2_explosion_effect = O_SPACE;
 
     /* water */
-    water_does_not_flow_down=false;
+    water_does_not_flow_down = false;
 
     /* nut */
-    nut_turns_to_when_crushed=O_NUT_CRACK_1;
+    nut_turns_to_when_crushed = O_NUT_CRACK_1;
 
     /* expanding */
-    expanding_wall_changed=false;
+    expanding_wall_changed = false;
 
     /* replicator */
-    replicator_delay_frame=4;
-    replicators_active=true;
+    replicator_delay_frame = 4;
+    replicators_active = true;
 
     /* conveyor belt */
-    conveyor_belts_active=true;
-    conveyor_belts_direction_changed=false;
+    conveyor_belts_active = true;
+    conveyor_belts_direction_changed = false;
 
     /* slime */
-    slime_predictable=true;
-    for (unsigned i=0; i<5; i++) {
-        level_slime_seed_c64[i]=-1;
-        level_slime_permeability_c64[i]=0;
-        level_slime_permeability[i]=1000000;
+    slime_predictable = true;
+    for (unsigned i = 0; i < 5; i++) {
+        level_slime_seed_c64[i] = -1;
+        level_slime_permeability_c64[i] = 0;
+        level_slime_permeability[i] = 1000000;
     }
-    slime_eats_1=O_DIAMOND;
-    slime_converts_1=O_DIAMOND_F;
-    slime_eats_2=O_STONE;
-    slime_converts_2=O_STONE_F;
-    slime_eats_3=O_NUT;
-    slime_converts_3=O_NUT_F;
+    slime_eats_1 = O_DIAMOND;
+    slime_converts_1 = O_DIAMOND_F;
+    slime_eats_2 = O_STONE;
+    slime_converts_2 = O_STONE_F;
+    slime_eats_3 = O_NUT;
+    slime_converts_3 = O_NUT_F;
 
     /* acid */
-    acid_eats_this=O_DIRT;
-    acid_spread_ratio=31250;
-    acid_turns_to=O_EXPLODE_3;
+    acid_eats_this = O_DIRT;
+    acid_spread_ratio = 31250;
+    acid_turns_to = O_EXPLODE_3;
 
     /* biter */
-    biter_delay_frame=0;
-    biter_eat=O_DIAMOND;
+    biter_delay_frame = 0;
+    biter_eat = O_DIAMOND;
 
     /* bladder */
-    bladder_converts_by=O_VOODOO;
+    bladder_converts_by = O_VOODOO;
 
     /* SOUND */
-    amoeba_sound=true;
-    magic_wall_sound=true;
-    slime_sound=true;
-    lava_sound=true;
-    replicator_sound=true;
-    acid_spread_sound=true;
-    biter_sound=true;
-    bladder_sound=true;
-    water_sound=true;
-    stone_sound=true;
-    nut_sound=true;
-    diamond_sound=true;
-    falling_wall_sound=true;
-    expanding_wall_sound=true;
-    nitro_sound=true;
-    pneumatic_hammer_sound=true;
-    bladder_spender_sound=true;
-    bladder_convert_sound=true;
-    gravity_change_sound=true;
-    creature_direction_auto_change_sound=true;
+    amoeba_sound = true;
+    magic_wall_sound = true;
+    slime_sound = true;
+    lava_sound = true;
+    replicator_sound = true;
+    acid_spread_sound = true;
+    biter_sound = true;
+    bladder_sound = true;
+    water_sound = true;
+    stone_sound = true;
+    nut_sound = true;
+    diamond_sound = true;
+    falling_wall_sound = true;
+    expanding_wall_sound = true;
+    nitro_sound = true;
+    pneumatic_hammer_sound = true;
+    bladder_spender_sound = true;
+    bladder_convert_sound = true;
+    gravity_change_sound = true;
+    creature_direction_auto_change_sound = true;
 
     /* creature effects */
-    creatures_backwards=false;
-    creatures_direction_auto_change_time=0;
-    creatures_direction_auto_change_on_start=false;
+    creatures_backwards = false;
+    creatures_direction_auto_change_time = 0;
+    creatures_direction_auto_change_on_start = false;
     /* cave effects */
-    explosion_effect=O_SPACE;
-    explosion_3_effect=O_EXPLODE_4;
-    diamond_birth_effect=O_DIAMOND;
-    bomb_explosion_effect=O_BRICK;
-    nitro_explosion_effect=O_SPACE;
-    firefly_explode_to=O_EXPLODE_1;
-    alt_firefly_explode_to=O_EXPLODE_1;
-    butterfly_explode_to=O_PRE_DIA_1;
-    alt_butterfly_explode_to=O_PRE_DIA_1;
-    stonefly_explode_to=O_PRE_STONE_1;
-    dragonfly_explode_to=O_EXPLODE_1;
+    explosion_effect = O_SPACE;
+    explosion_3_effect = O_EXPLODE_4;
+    diamond_birth_effect = O_DIAMOND;
+    bomb_explosion_effect = O_BRICK;
+    nitro_explosion_effect = O_SPACE;
+    firefly_explode_to = O_EXPLODE_1;
+    alt_firefly_explode_to = O_EXPLODE_1;
+    butterfly_explode_to = O_PRE_DIA_1;
+    alt_butterfly_explode_to = O_PRE_DIA_1;
+    stonefly_explode_to = O_PRE_STONE_1;
+    dragonfly_explode_to = O_EXPLODE_1;
 
-    stone_falling_effect=O_STONE_F;
-    stone_bouncing_effect=O_STONE;
-    diamond_falling_effect=O_DIAMOND_F;
-    diamond_bouncing_effect=O_DIAMOND;
+    stone_falling_effect = O_STONE_F;
+    stone_bouncing_effect = O_STONE;
+    diamond_falling_effect = O_DIAMOND_F;
+    diamond_bouncing_effect = O_DIAMOND;
     /* visual effects */
-    expanding_wall_looks_like=O_BRICK;
-    dirt_looks_like=O_DIRT;
+    expanding_wall_looks_like = O_BRICK;
+    dirt_looks_like = O_DIRT;
     /* gravity */
-    gravity=MV_DOWN;
-    gravity_switch_active=false;
-    skeletons_needed_for_pot=5;
-    gravity_change_time=10;
+    gravity = MV_DOWN;
+    gravity_switch_active = false;
+    skeletons_needed_for_pot = 5;
+    gravity_change_time = 10;
 
     /* COMPATIBILITY */
-    border_scan_first_and_last=true;
-    lineshift=false;
-    wraparound_objects=false;
-    short_explosions=true;
-    skeletons_worth_diamonds=0;
-    gravity_affects_all=true;
+    border_scan_first_and_last = true;
+    lineshift = false;
+    wraparound_objects = false;
+    short_explosions = true;
+    skeletons_worth_diamonds = 0;
+    gravity_affects_all = true;
 
-    level_speed[0]=180;
-    level_speed[1]=160;
-    level_speed[2]=140;
-    level_speed[3]=120;
-    level_speed[4]=120;
+    level_speed[0] = 180;
+    level_speed[1] = 160;
+    level_speed[2] = 140;
+    level_speed[3] = 120;
+    level_speed[4] = 120;
 };
 
 /// Creates a new CaveStored.
 /// Sets GDash defaults for all cave properties. GDash defaults are the same as BDCFF defaults.
 CaveStored::CaveStored() {
     set_gdash_defaults();
+}
+
+
+bool CaveStored::has_levels() {
+    PropertyDescription const *prop_desc = get_description_array();
+    
+    /* if we find any cave variable which has levels AND one of the levels
+     * is set to a different value, return "true" as yes we have levels */
+    for (unsigned i = 0; prop_desc[i].identifier != NULL; ++i) {
+        PropertyDescription const &prop = prop_desc[i];
+        switch (prop.type)  {
+            case GD_TYPE_BOOLEAN_LEVELS:
+                {
+                    GdBool *arr = this->get<GdBoolLevels>(prop.prop);
+                    for (unsigned j = 1; j < 5; ++j)
+                        if (arr[0] != arr[j])
+                            return true;
+                }
+                break;
+            case GD_TYPE_INT_LEVELS:
+                {
+                    GdInt *arr = this->get<GdIntLevels>(prop.prop);
+                    for (unsigned j = 1; j < 5; ++j)
+                        if (arr[0] != arr[j])
+                            return true;
+                }
+                break;
+            case GD_TYPE_PROBABILITY_LEVELS:
+                {
+                    GdProbability *arr = this->get<GdProbabilityLevels>(prop.prop);
+                    for (unsigned j = 1; j < 5; ++j)
+                        if (arr[0] != arr[j])
+                            return true;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    
+    /* now we check the objects. if any of them is neither seenonall nor invisible, it
+     * is visible on a specific level only, so return true */
+    for (CaveObjectStore::const_iterator it = objects.begin();  it != objects.end(); ++it) {
+        if (!(*it)->is_invisible() && !(*it)->is_seen_on_all())
+            return true;
+    }
+    
+    /* no difference - return false, we have no levels */
+    return false;
 }

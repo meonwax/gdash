@@ -1,39 +1,44 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
 
-#include <cstdlib>
-
-#include "misc/logger.hpp"
-#include "misc/util.hpp"
-#include "misc/printf.hpp"
+#include <memory>
 
 #include "gfx/cellrenderer.hpp"
+
+#include "misc/logger.hpp"
 #include "gfx/pixbuf.hpp"
-#include "gfx/pixmap.hpp"
 #include "gfx/pixbuffactory.hpp"
-#include "settings.hpp"
+#include "gfx/screen.hpp"
 
 
 /* data */
 #include "c64_gfx.cpp"
 
-CellRenderer::CellRenderer(PixbufFactory &pixbuf_factory_, const std::string &theme_file)
-    :   loaded(0),
+CellRenderer::CellRenderer(Screen &screen, const std::string &theme_file)
+    :   PixmapStorage(screen),
+        loaded(0),
         cells_all(0),
         is_c64_colored(false),
         cell_size(0),
@@ -45,7 +50,7 @@ CellRenderer::CellRenderer(PixbufFactory &pixbuf_factory_, const std::string &th
         color3(GD_GDASH_WHITE),
         color4(GD_GDASH_WHITE),
         color5(GD_GDASH_WHITE),
-        pixbuf_factory(pixbuf_factory_) {
+        screen(screen) {
     load_theme_file(theme_file);
 }
 
@@ -58,7 +63,7 @@ CellRenderer::~CellRenderer() {
 
 /** Remove colored Pixbufs and Pixmaps created. */
 void CellRenderer::remove_cached() {
-    for (unsigned i=0; i<G_N_ELEMENTS(cells_pixbufs); ++i) {
+    for (unsigned i = 0; i < G_N_ELEMENTS(cells_pixbufs); ++i) {
         delete cells_pixbufs[i];
         cells_pixbufs[i] = NULL;
     }
@@ -71,50 +76,48 @@ void CellRenderer::remove_cached() {
 
 
 void CellRenderer::release_pixmaps() {
-    for (unsigned i=0; i<G_N_ELEMENTS(cells); ++i) {
+    for (unsigned i = 0; i < G_N_ELEMENTS(cells); ++i) {
         delete cells[i];
-        cells[i]=0;
+        cells[i] = 0;
     }
 }
 
 
 
 Pixbuf &CellRenderer::cell_pixbuf(unsigned i) {
-    g_assert(i<G_N_ELEMENTS(cells_pixbufs));
+    g_assert(i < G_N_ELEMENTS(cells_pixbufs));
     if (cells_all == NULL)
         create_colorized_cells();
     g_assert(cells_all != NULL);
     if (cells_pixbufs[i] == NULL)
-        cells_pixbufs[i] = pixbuf_factory.create_subpixbuf(*cells_all, (i%NUM_OF_CELLS_X)*cell_size, (i/NUM_OF_CELLS_X)*cell_size, cell_size, cell_size);
+        cells_pixbufs[i] = screen.pixbuf_factory.create_subpixbuf(*cells_all, (i % NUM_OF_CELLS_X) * cell_size, (i / NUM_OF_CELLS_X) * cell_size, cell_size, cell_size);
     return *cells_pixbufs[i];
 }
 
 Pixmap &CellRenderer::cell(unsigned i) {
-    g_assert(i<G_N_ELEMENTS(cells));
-    if (cells[i]==0) {
-        int type=i/NUM_OF_CELLS;    // 0=normal, 1=colored1, 2=colored2
-        int index=i%NUM_OF_CELLS;
-        Pixbuf &pb=cell_pixbuf(index);      // this is to be rendered as a pixmap, but may be colored
+    g_assert(i < G_N_ELEMENTS(cells));
+    if (cells[i] == NULL) {
+        int type = i / NUM_OF_CELLS;  // 0=normal, 1=colored1, 2=colored2
+        int index = i % NUM_OF_CELLS;
+        Pixbuf &pb = cell_pixbuf(index);    // this is to be rendered as a pixmap, but may be colored
 
         switch (type) {
             case 0:
-                cells[i]=pixbuf_factory.create_pixmap_from_pixbuf(pb, false);
+                cells[i] = screen.create_scaled_pixmap_from_pixbuf(pb, false);
                 break;
             case 1: {
-                Pixbuf *colored=pixbuf_factory.create_composite_color(pb, gd_flash_color);
-                cells[i]=pixbuf_factory.create_pixmap_from_pixbuf(*colored, false);
-                delete colored;
+                std::auto_ptr<Pixbuf> colored(screen.pixbuf_factory.create_composite_color(pb, gd_flash_color));
+                cells[i] = screen.create_scaled_pixmap_from_pixbuf(*colored, false);
             }
             break;
-
             case 2: {
-                Pixbuf *colored=pixbuf_factory.create_composite_color(pb, gd_select_color);
-                cells[i]=pixbuf_factory.create_pixmap_from_pixbuf(*colored, false);
-                delete colored;
+                std::auto_ptr<Pixbuf> colored(screen.pixbuf_factory.create_composite_color(pb, gd_select_color));
+                cells[i] = screen.create_scaled_pixmap_from_pixbuf(*colored, false);
             }
             break;
             default:
                 g_assert_not_reached();
+                break;
         }
     }
     return *cells[i];
@@ -131,22 +134,15 @@ bool CellRenderer::is_pixbuf_ok_for_theme(const Pixbuf &surface) {
     if (surface.get_width() / NUM_OF_CELLS_X < 16) {
         gd_critical("The image should contain cells which are at least 16x16 pixels in size!");
     }
-    if (!surface.has_alpha()) {
-        gd_critical("Image should have an alpha channel!");
-        return false;
-    }
 
     return true;    /* passed checks */
 }
 
 bool CellRenderer::is_image_ok_for_theme(PixbufFactory &pixbuf_factory, const char *filename) {
     try {
-        Pixbuf *image=pixbuf_factory.create_from_file(filename);
-        /* if the image is loaded */
         SetLoggerContextForFunction scf(filename);
-        bool result=is_pixbuf_ok_for_theme(*image);
-        delete image;
-        return result;
+        std::auto_ptr<Pixbuf> image(pixbuf_factory.create_from_file(filename));
+        return is_pixbuf_ok_for_theme(*image);
     } catch (...) {
         return false;
     }
@@ -167,7 +163,7 @@ bool CellRenderer::loadcells_image(Pixbuf *image) {
     loaded = NULL;
 
     /* load new stuff */
-    cell_size = image->get_width()/NUM_OF_CELLS_X;
+    cell_size = image->get_width() / NUM_OF_CELLS_X;
     loaded = image;
 
     if (check_if_pixbuf_c64_png(*loaded)) {
@@ -190,7 +186,7 @@ bool CellRenderer::loadcells_file(const std::string &filename) {
     /* load cell graphics */
     /* load from file */
     try {
-        Pixbuf *image = pixbuf_factory.create_from_file(filename.c_str());
+        Pixbuf *image = screen.pixbuf_factory.create_from_file(filename.c_str());
         return loadcells_image(image);
     } catch (std::exception &e) {
         gd_critical(CPrintf("%s: unable to load image (%s)") % filename % e.what());
@@ -202,24 +198,21 @@ bool CellRenderer::loadcells_file(const std::string &filename) {
 /* if successful, ok. */
 /* if fails, or no theme specified, load the builtin */
 void CellRenderer::load_theme_file(const std::string &theme_file) {
-    if (theme_file!="" && loadcells_file(theme_file)) {
+    if (theme_file != "" && loadcells_file(theme_file)) {
         /* loaded from png file */
     } else {
-        Pixbuf *image = pixbuf_factory.create_from_inline(sizeof(c64_gfx), c64_gfx);
+        Pixbuf *image = screen.pixbuf_factory.create_from_inline(sizeof(c64_gfx), c64_gfx);
         loadcells_image(image);
     }
 }
 
 int CellRenderer::get_cell_size() {
-    return cell_size*pixbuf_factory.get_pixmap_scale();
+    return cell_size * screen.get_pixmap_scale();
 }
 
-bool CellRenderer::get_pal_emulation() const {
-    return pixbuf_factory.get_pal_emulation();
-}
 
 void CellRenderer::select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5) {
-    if (c0!=color0 || c1!=color1 || c2!=color2 || c3!=color3 || c4!=color4 || c5!=color5) {
+    if (c0 != color0 || c1 != color1 || c2 != color2 || c3 != color3 || c4 != color4 || c5 != color5) {
         /* if not the same colors as requested before */
         color0 = c0;
         color1 = c1;
@@ -263,18 +256,16 @@ c64_color_index(int h, int s, int v, int a) {
 
 /* returns true, if the given pixbuf seems to be a c64 imported image. */
 bool CellRenderer::check_if_pixbuf_c64_png(Pixbuf const &image) {
-    int wx=image.get_width()*4;       // 4 bytes/pixel
-    int h=image.get_height();
+    int wx = image.get_width() * 4;   // 4 bytes/pixel
+    int h = image.get_height();
 
-    image.lock();
     bool c64_png = true;
-    for (int y=0; y<h; y++) {
-        const unsigned char *p=(const unsigned char *) image.get_row(y);
-        for (int x=0; x<wx; x++)
-            if (p[x]!=0 && p[x]!=255)
-                c64_png=false;
+    for (int y = 0; y < h; y++) {
+        const unsigned char *p = (const unsigned char *) image.get_row(y);
+        for (int x = 0; x < wx; x++)
+            if (p[x] != 0 && p[x] != 255)
+                c64_png = false;
     }
-    image.unlock();
 
     return c64_png;
 }
@@ -298,7 +289,6 @@ bool CellRenderer::check_if_pixbuf_c64_png(Pixbuf const &image) {
  * This allows for modulating the cave colors in saturation and value. If the
  * loaded image contains a dark purple color instead of RGB(255;0;255) purple,
  * the cave color will also be darkened at that pixel and so on. */
-#include <iostream>
 void CellRenderer::create_colorized_cells() {
     g_assert(is_c64_colored);
     g_assert(loaded != NULL);
@@ -319,32 +309,32 @@ void CellRenderer::create_colorized_cells() {
     cols[8] = GdColor::from_hsv(0, 0, 0);    /* for the transparent */
 
     int w = loaded->get_width(), h = loaded->get_height();
-    cells_all = pixbuf_factory.create(w, h);
+    cells_all = screen.pixbuf_factory.create(w, h);
 
-    cells_all->lock();
-    loaded->lock();
-
-    for (int y=0; y<h; y++) {
+    for (int y = 0; y < h; y++) {
         const guint32 *p = loaded->get_row(y);
         guint32 *to = cells_all->get_row(y);
-        for (int x=0; x<w; x++) {
+        for (int x = 0; x < w; x++) {
             /* rgb values found in image */
             unsigned r = (p[x] & loaded->rmask) >> loaded->rshift;
             unsigned g = (p[x] & loaded->gmask) >> loaded->gshift;
             unsigned b = (p[x] & loaded->bmask) >> loaded->bshift;
             unsigned a = (p[x] & loaded->amask) >> loaded->ashift;
-
             GdColor in = GdColor::from_rgb(r, g, b).to_hsv();
+            unsigned h = in.get_h();
+            unsigned s = in.get_s();
+            unsigned v = in.get_v();
+
             /* the color code from the original image (essentially the hue) will select the color index */
-            unsigned index = c64_color_index(in.get_h(), in.get_s(), in.get_v(), a);
+            unsigned index = c64_color_index(h, s, v, a);
             GdColor newcol;
             if (index == 0 || index >= 6) {
                 /* for the background and the editor colors, no shading is used */
                 newcol = cols[index];
             } else {
                 /* otherwise the saturation and value from the original image will modify it */
-                unsigned s_multiplier = in.get_s();
-                unsigned v_multiplier = in.get_v();
+                unsigned s_multiplier = s;
+                unsigned v_multiplier = v;
                 newcol = GdColor::from_hsv(
                              cols[index].get_h(),
                              cols[index].get_s() * s_multiplier / 100,
@@ -360,7 +350,4 @@ void CellRenderer::create_colorized_cells() {
             to[x] = newcolword;
         }
     }
-
-    loaded->unlock();
-    cells_all->unlock();
 }

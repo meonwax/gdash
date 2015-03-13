@@ -311,14 +311,15 @@ ICONS = \
 	object_not_on_current.png \
 	replay.png \
 	keyboard.png \
-	image.png
+	image.png \
+	statistics.png
 
 TITLE = \
 	gdash_screen.png \
 	gdash_tile.png
 
-BACKGROUND = \
-	background.png
+GAMEBACKGROUND = \
+	gamebackground.png
 
 GDASH_ICON_32 = \
 	gdash_icon_32.png
@@ -326,20 +327,25 @@ GDASH_ICON_32 = \
 GDASH_ICON_48 = \
 	gdash_icon_48.png
 
+FOR_HTML = \
+	background.png \
+	style.css
+
 noinst_HEADERS = \
 	icons.cpp \
 	c64_gfx.cpp \
 	c64_font.cpp \
 	title.cpp \
-	background.cpp \
+	gamebackground.cpp \
 	gdash_icon_32.cpp \
 	gdash_icon_48.cpp \
 	levels.cpp \
 	ataripal.cpp \
-	dtvpal.cpp
+	dtvpal.cpp \
+	for_html.cpp
 
 pkgdata_DATA = boulder_rush.png c64_gfx.png c64_gfx_bd2.png
-EXTRA_DIST = $(ICONS) $(TITLE) $(BACKGROUND) \
+EXTRA_DIST = $(ICONS) $(TITLE) $(GAMEBACKGROUND) $(FOR_HTML) \
 	icons.list \
 	files2c.sh \
 	c64_font.png \
@@ -670,8 +676,8 @@ title.cpp: $(TITLE) file2c Makefile.am
 	sh ./files2c.sh $@ "" $(TITLE)
 
 # the empty string causes files2c.sh not to write the pointer arrays
-background.cpp: $(BACKGROUND) file2c Makefile.am
-	sh ./files2c.sh $@ "" $(BACKGROUND)
+gamebackground.cpp: $(GAMEBACKGROUND) file2c Makefile.am
+	sh ./files2c.sh $@ "" $(GAMEBACKGROUND)
 
 # the empty string causes files2c.sh not to write the pointer arrays
 gdash_icon_32.cpp: $(GDASH_ICON_32) file2c Makefile.am
@@ -688,6 +694,10 @@ c64_gfx.cpp: c64_gfx.png file2c Makefile.am
 # the empty string causes files2c.sh not to write the pointer arrays
 c64_font.cpp: c64_font.png file2c Makefile.am
 	sh ./files2c.sh $@ "" c64_font.png
+
+# the empty string causes files2c.sh not to write the pointer arrays
+for_html.cpp: $(FOR_HTML) file2c Makefile.am
+	sh ./files2c.sh $@ "" $(FOR_HTML)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

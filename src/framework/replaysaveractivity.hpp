@@ -1,35 +1,59 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef GD_REPLAYSAVERACTIVITY
-#define GD_REPLAYSAVERACTIVITY
+#ifndef REPLAYSAVERACTIVITY_HPP_INCLUDED
+#define REPLAYSAVERACTIVITY_HPP_INCLUDED
 
 
 /* the replay saver thing only works in the sdl version */
 #ifdef HAVE_SDL
 
-#include "framework/app.hpp"
-#include "gfx/cellrenderer.hpp"
+#include <SDL.h>
+
+#include "framework/activity.hpp"
 #include "sdl/sdlscreen.hpp"
 #include "sdl/sdlpixbuffactory.hpp"
-#include "cave/gamerender.hpp"
 #include "gfx/fontmanager.hpp"
+#include "gfx/cellrenderer.hpp"
+#include "cave/gamerender.hpp"
 
 class CaveStored;
 class CaveReplay;
 class GameControl;
+
+/** This is a special SDL screen, which is a bitmap in memory.
+ * During the replay, the drawing routine draws on this, and it can be saved to disk. */
+class SDLInmemoryScreen: public SDLAbstractScreen {
+public:
+    SDLInmemoryScreen(PixbufFactory &pixbuf_factory) : SDLAbstractScreen(pixbuf_factory) {}
+    virtual void set_title(char const *);
+    virtual void configure_size();
+    ~SDLInmemoryScreen();
+    virtual Pixmap *create_pixmap_from_pixbuf(Pixbuf const &pb, bool keep_alpha) const;
+
+    Pixbuf const *create_pixbuf_screenshot() const;
+    void save(char const *filename);
+};
+
 
 /**
  * This activity plays a replay, and saves every animation frame to
@@ -73,7 +97,7 @@ public:
     /** Destructor.
      * Has many things to do - write a WAV header, reinstall the normal mixer etc. */
     ~ReplaySaverActivity();
-    virtual void redraw_event();
+    virtual void redraw_event(bool full) const;
     /**
      * When the Activity is shown, it will install its own sound mixer. */
     virtual void shown_event();
@@ -114,25 +138,14 @@ private:
     /** SDL sound environment variable saved, to be restored after replay saving. */
     std::string saved_driver;
 
-    /** This is a special SDL screen, which is a bitmap in memory.
-     * During the replay, the drawing routine draws on this, and it can be saved to disk. */
-    class SDLInmemoryScreen: public SDLAbstractScreen {
-    public:
-        SDLInmemoryScreen() {}
-        virtual void set_title(char const *);
-        virtual void configure_size();
-        ~SDLInmemoryScreen();
-        void save(char const *filename);
-    };
-
     /** GameControl object which plays the replay. */
     GameControl *game;
     /** A PixbufFactory set to no scaling, no pal emulation. */
     SDLPixbufFactory pf;
-    /** A font manager, which uses the pf PixbufFactory. */
-    FontManager fm;
     /** A Screen, which is much like an image in memory, so it can be saved to PNG */
     SDLInmemoryScreen pm;
+    /** A font manager, which uses the pf PixbufFactory. */
+    FontManager fm;
     /** A CellRenderer needed by the GameControl object. */
     CellRenderer cellrenderer;
     /** A GameRenderer, which will draw the cave. */

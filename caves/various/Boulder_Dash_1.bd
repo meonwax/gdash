@@ -8,7 +8,8 @@ TitleScreenScroll=iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAABHNCSVQICAgIfA
 Levels=5
 
 [cave]
-Name=Cave A
+Name=Cave A: Intro
+Description=Pick up jewels and exit before time is up.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -41,7 +42,8 @@ Point=38 16 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave B
+Name=Cave B: Rooms
+Description=Pick up jewels, but you must move boulders to get all jewels.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -82,7 +84,8 @@ Point=18 20 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave C
+Name=Cave C: Maze
+Description= Pick up jewels. You must get every jewel to exit.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -112,7 +115,8 @@ Point=39 18 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave D
+Name=Cave D: Butterflies
+Description=Drop boulders on butterflies to create jewels.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -188,7 +192,8 @@ Point=18 10 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave E
+Name=Cave E: Guards
+Description=The jewels are there for grapping, but they are guarded by the deadly fireflies.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -243,7 +248,8 @@ Point=34 14 FIREFLYl
 [/cave]
 
 [cave]
-Name=Cave F
+Name=Cave F: Firefly dens
+Description=Each firefly is guarding a jewel.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -300,7 +306,8 @@ Point=38 18 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave G
+Name=Cave G: Amoeba
+Description=Surround the amoeba with boulders, so it can't grow anymore. Pick up jewels that are created when it suffocates.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -340,7 +347,8 @@ Point=39 5 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave H
+Name=Cave H: Enchanted Wall
+Description=Activate the enchanted wall and create as many jewels as you can.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -424,7 +432,8 @@ Point=18 2 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave I
+Name=Cave I: Greed
+Description=You have to get a lot of jewels here, lucky there are so many.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -461,7 +470,8 @@ Point=8 10 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave J
+Name=Cave J: Tracks
+Description=Get the jewels, avoid the fireflies.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -506,7 +516,8 @@ Line=4 14 4 17 DIAMOND
 [/cave]
 
 [cave]
-Name=Cave K
+Name=Cave K: Crowd
+Description=You must move a lot of boulders around in some tight spaces.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -552,7 +563,8 @@ Point=38 15 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave L
+Name=Cave L: Walls
+Description=You must blast hrough walls to get at some of the jewels. Drop a boulder on a firefly at the right time and place to do this.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -633,7 +645,8 @@ Point=18 5 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave M
+Name=Cave M: Apocalypse
+Description=Bring the butterflies and amoeba together and watch the jewels fly.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -668,7 +681,8 @@ Rectangle=5 19 34 20 DIRT
 [/cave]
 
 [cave]
-Name=Cave N
+Name=Cave N: Zigzag
+Description=Magically transform the butterflies into jewels, but don't waste any boulders and watch out the fireflies.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -709,7 +723,8 @@ Point=39 18 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave O
+Name=Cave O: Funnel
+Description=There is an enchanted wall at the bottom of the rock tunnel.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -744,7 +759,8 @@ Point=20 1 INBOX
 [/cave]
 
 [cave]
-Name=Cave P
+Name=Cave P: Enchanted boxes
+Description=The top of each square room is an enchanted wall, but you'll have to blast your way inside.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false

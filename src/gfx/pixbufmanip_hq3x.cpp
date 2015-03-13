@@ -113,37 +113,37 @@ void hq3x(Pixbuf const &src, Pixbuf &dst) {
     //   | w7 | w8 | w9 |
     //   +----+----+----+
 
-    int sw=src.get_width();
-    int sh=src.get_height();
-    int dpL=dst.get_pitch()/4;  /* 4 bytes/pixel */
+    int sw = src.get_width();
+    int sh = src.get_height();
+    int dpL = dst.get_pitch() / 4; /* 4 bytes/pixel */
 
-    for (int j=0; j<sh; j++) {
-        const guint32 *line=src.get_row(j);
+    for (int j = 0; j < sh; j++) {
+        const guint32 *line = src.get_row(j);
         const guint32 *prevline, *nextline;
-        if (j>0)      prevline = src.get_row(j-1);
-        else prevline = src.get_row(sh-1);
-        if (j<sh-1)   nextline = src.get_row(j+1);
+        if (j > 0)      prevline = src.get_row(j - 1);
+        else prevline = src.get_row(sh - 1);
+        if (j < sh - 1)   nextline = src.get_row(j + 1);
         else nextline = src.get_row(0);
 
-        for (int i=0; i<sw; i++) {
+        for (int i = 0; i < sw; i++) {
             w[2] = prevline[i];
             w[5] = line[i];
             w[8] = nextline[i];
 
-            if (i>0) {
-                w[1] = prevline[i-1];
-                w[4] = line[i-1];
-                w[7] = nextline[i-1];
+            if (i > 0) {
+                w[1] = prevline[i - 1];
+                w[4] = line[i - 1];
+                w[7] = nextline[i - 1];
             } else {
-                w[1] = prevline[sw-1];
-                w[4] = line[sw-1];
-                w[7] = nextline[sw-1];
+                w[1] = prevline[sw - 1];
+                w[4] = line[sw - 1];
+                w[7] = nextline[sw - 1];
             }
 
-            if (i<sw-1) {
-                w[3] = prevline[i+1];
-                w[6] = line[i+1];
-                w[9] = nextline[i+1];
+            if (i < sw - 1) {
+                w[3] = prevline[i + 1];
+                w[6] = line[i + 1];
+                w[9] = nextline[i + 1];
             } else {
                 w[3] = prevline[0];
                 w[6] = line[0];
@@ -155,8 +155,8 @@ void hq3x(Pixbuf const &src, Pixbuf &dst) {
 
             guint32 YUV1 = RGBtoYUV(w[5]);
 
-            for (int k=1; k<=9; k++) {
-                if (k==5) continue;
+            for (int k = 1; k <= 9; k++) {
+                if (k == 5) continue;
 
                 if (w[k] != w[5]) {
                     guint32 YUV2 = RGBtoYUV(w[k]);
@@ -168,7 +168,7 @@ void hq3x(Pixbuf const &src, Pixbuf &dst) {
                 flag <<= 1;
             }
 
-            guint32 *dp=dst.get_row(j*3)+i*3;
+            guint32 *dp = dst.get_row(j * 3) + i * 3;
 
             switch (pattern) {
                 case 0:

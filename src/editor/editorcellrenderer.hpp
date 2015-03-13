@@ -1,26 +1,34 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
+#ifndef EDITORCELLRENDERER_HPP_INCLUDED
+#define EDITORCELLRENDERER_HPP_INCLUDED
 
 #include "config.h"
 
 #include <gtk/gtk.h>
 
 #include "gfx/cellrenderer.hpp"
-#include "gtk/gtkpixmap.hpp"
-#include "gtk/gtkpixbuf.hpp"
 #include "gfx/pixbuffactory.hpp"
 
 class GTKPixbufFactory;
@@ -38,7 +46,7 @@ private:
     /** Small pixbufs for the editor. */
     GdkPixbuf *combo_pixbufs[NUM_OF_CELLS];
 
-    void add_arrow_to_cell(GdElementEnum dest, GdElementEnum src, GdElementEnum arrow, PixbufFactory::Rotation r=PixbufFactory::None);
+    void add_arrow_to_cell(GdElementEnum dest, GdElementEnum src, GdElementEnum arrow, PixbufFactory::Rotation r = PixbufFactory::None);
     void copy_cell(int dest, int src);
     void create_composite_cell_pixbuf(GdElementEnum dest, GdElementEnum src1, GdElementEnum src2);
     void draw_editor_pixbufs();
@@ -48,12 +56,12 @@ public:
     /**
      * @brief Constructor.
      *
-     * Loads a theme file (or "" for default theme); uses pixbuf_factory as a gfx engine.
-     * @param pixbuf_factory_ The gfx engine to use.
+     * Loads a theme file (or "" for default theme) to draw on the screen.
+     * @param screen The screen and graphics engine to use.
      * @param theme_name The theme name from the caveset "charset" field.
      * @param default_theme_file The name of the file to load a theme from, if the specified theme is not found. Can be the empty string, to load the built-in theme.
      */
-    EditorCellRenderer(GTKPixbufFactory &pixbuf_factory_, const std::string &theme_file);
+    EditorCellRenderer(Screen &screen, const std::string &theme_file);
     virtual void remove_cached();
     virtual void select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5);
 
@@ -63,14 +71,10 @@ public:
     }
 
     /** Convenience function which returns the GdkPixbuf* of a cell. */
-    GdkPixbuf *cell_gdk_pixbuf(unsigned i) {
-        return static_cast<GTKPixbuf &>(cell_pixbuf(i)).get_gdk_pixbuf();
-    }
+    GdkPixbuf *cell_gdk_pixbuf(unsigned i);
 
-    /** Convenience function which returns the GdkDrawable* (pixmap) of a cell. */
-    GdkDrawable *cell_gdk_drawable(unsigned i) {
-        return static_cast<GTKPixmap &>(cell(i)).get_drawable();
-    }
+    /** Convenience function which returns the scaled GdkPixbuf* of a cell. */
+    cairo_surface_t *cell_cairo_surface(unsigned i);
 
     /** @brief Returns a small picture of the element, for use in the editor.
      *  The picture will be GTK_ICON_SIZE_MENU, +1 pixel black border.
@@ -87,3 +91,5 @@ public:
 };
 
 GdkPixbuf *gd_drawcave_to_pixbuf(const CaveRendered *cave, EditorCellRenderer &cr, int width, int height, bool game_view, bool border);
+
+#endif

@@ -1,20 +1,27 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef _GD_SETTINGS
-#define _GD_SETTINGS
+#ifndef SETTINGS_HPP_INCLUDED
+#define SETTINGS_HPP_INCLUDED
 
 #include "config.h"
 
@@ -52,7 +59,6 @@ extern int gd_preferred_palette;
 extern bool gd_game_view;    /* show animated cells instead of arrows & ... */
 extern bool gd_colored_objects;    /* show objects with different color */
 extern bool gd_show_object_list;    /* show object list */
-extern bool gd_show_test_label;    /* show a label with some variables, for testing */
 extern int gd_editor_window_width;    /* window size */
 extern int gd_editor_window_height;    /* window size */
 extern bool gd_fast_uncover_in_test;
@@ -61,10 +67,13 @@ extern bool gd_fast_uncover_in_test;
 extern bool gd_show_preview;
 
 /* graphics */
+extern int gd_graphics_engine;
 extern bool gd_fullscreen;
-extern int gd_cell_scale_game;
+extern int gd_cell_scale_factor_game;
+extern int gd_cell_scale_type_game;
 extern bool gd_pal_emulation_game;
-extern int gd_cell_scale_editor;
+extern int gd_cell_scale_factor_editor;
+extern int gd_cell_scale_type_editor;
 extern bool gd_pal_emulation_editor;
 
 /* keyboard */
@@ -113,12 +122,27 @@ extern bool gd_sound_stereo;
 extern bool gd_classic_sound;
 extern int gd_sound_chunks_volume_percent;
 extern int gd_sound_music_volume_percent;
+
+extern std::string gd_shader;
+extern int shader_pal_radial_distortion;
+extern int shader_pal_chroma_to_luma_strength;
+extern int shader_pal_luma_to_chroma_strength;
+extern int shader_pal_scanline_shade_luma;
+extern int shader_pal_phosphor_shade;
+extern int shader_pal_random_scanline_displace;
+extern int shader_pal_random_y;
+extern int shader_pal_random_uv;
+extern int shader_pal_luma_x_blur;
+extern int shader_pal_chroma_x_blur;
+extern int shader_pal_chroma_y_blur;
 #endif    /* if gd_sound */
 
 
 /* command line parameters */
 extern int gd_param_license;
 extern char **gd_param_cavenames;
+extern gboolean gd_param_debug;
+extern gboolean gd_param_load_default_settings;
 
 /* gdash directories */
 extern const char *gd_user_config_dir;
@@ -126,7 +150,7 @@ extern const char *gd_system_data_dir;
 extern const char *gd_system_caves_dir;
 extern const char *gd_system_music_dir;
 
-extern std::vector<std::string> gd_sound_dirs, gd_themes_dirs, gd_fonts_dirs;
+extern std::vector<std::string> gd_sound_dirs, gd_themes_dirs, gd_fonts_dirs, gd_shaders_dirs;
 
 extern const char *gd_languages_names[];
 
@@ -149,7 +173,9 @@ GOptionContext *gd_option_context_new();
 enum SettingType {
     TypePage,
     TypeBoolean,
+    TypeInteger,
     TypeTheme,
+    TypeShader,
     TypePercent,
     TypeStringv,
     TypeKey,
@@ -162,10 +188,16 @@ public:
     bool restart;     // a setting which requires a restart
     const char **stringv;
     char const *description;
-    unsigned page;
+    int min, max;     // for integers
+    std::string *stringvar; // for the theme and the scaler
+
+    unsigned page;    // generated inside the game
 };
 
 Setting *gd_get_game_settings_array();
 Setting *gd_get_keyboard_settings_array(GameInputHandler *gih);
+void gd_settings_array_prepare(Setting *settings, SettingType which,
+                               std::vector<std::string> const & strings, int *var);
+void gd_settings_array_unprepare(Setting *settings, SettingType which);
 
 #endif

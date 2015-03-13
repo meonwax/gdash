@@ -1,26 +1,34 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
 
 #include <cstdlib>
-#include "cave/elementproperties.hpp"
+
 #include "cave/caverendered.hpp"
+#include "cave/elementproperties.hpp"
+#include "cave/helper/cavereplay.hpp"
 #include "cave/cavestored.hpp"
-#include "misc/printf.hpp"
 #include "misc/logger.hpp"
 
 /// Add extra ckdelay to cave by checking the existence some animated elements.
@@ -29,25 +37,25 @@
 void CaveRendered::set_ckdelay_extra_for_animation() {
     g_assert(!map.empty());
 
-    bool has_amoeba=false, has_firefly=false, has_butterfly=false;
+    bool has_amoeba = false, has_firefly = false, has_butterfly = false;
 
-    for (int y=0; y<height(); y++)
-        for (int x=0; x<width(); x++) {
+    for (int y = 0; y < height(); y++)
+        for (int x = 0; x < width(); x++) {
             switch (map(x, y)) {
                 case O_FIREFLY_1:
                 case O_FIREFLY_2:
                 case O_FIREFLY_3:
                 case O_FIREFLY_4:
-                    has_firefly=true;
+                    has_firefly = true;
                     break;
                 case O_BUTTER_1:
                 case O_BUTTER_2:
                 case O_BUTTER_3:
                 case O_BUTTER_4:
-                    has_butterfly=true;
+                    has_butterfly = true;
                     break;
                 case O_AMOEBA:
-                    has_amoeba=true;
+                    has_amoeba = true;
                     break;
                 default:
                     /* other animated elements are not important,
@@ -55,15 +63,15 @@ void CaveRendered::set_ckdelay_extra_for_animation() {
                     break;
             }
         }
-    ckdelay_extra_for_animation=0;
+    ckdelay_extra_for_animation = 0;
     if (has_amoeba)
-        ckdelay_extra_for_animation+=2600;
+        ckdelay_extra_for_animation += 2600;
     if (has_firefly)
-        ckdelay_extra_for_animation+=2600;
+        ckdelay_extra_for_animation += 2600;
     if (has_butterfly)
-        ckdelay_extra_for_animation+=2600;
+        ckdelay_extra_for_animation += 2600;
     if (has_amoeba)
-        ckdelay_extra_for_animation+=2600;
+        ckdelay_extra_for_animation += 2600;
 }
 
 /// Do some init - setup some cave variables before the game.
@@ -75,33 +83,33 @@ void CaveRendered::setup_for_game() {
     /* find the player which will be the one to scroll to at the beginning of the game (before the player's birth) */
     if (active_is_first_found) {
         /* uppermost player is active */
-        for (int y=height()-1; y>=0; y--)
-            for (int x=width()-1; x>=0; x--)
-                if (map(x,y)==O_INBOX) {
-                    player_x=x;
-                    player_y=y;
+        for (int y = height() - 1; y >= 0; y--)
+            for (int x = width() - 1; x >= 0; x--)
+                if (map(x, y) == O_INBOX) {
+                    player_x = x;
+                    player_y = y;
                 }
     } else {
         /* lowermost player is active */
-        for (int y=0; y<height(); y++)
-            for (int x=0; x<width(); x++)
-                if (map(x,y)==O_INBOX) {
-                    player_x=x;
-                    player_y=y;
+        for (int y = 0; y < height(); y++)
+            for (int x = 0; x < width(); x++)
+                if (map(x, y) == O_INBOX) {
+                    player_x = x;
+                    player_y = y;
                 }
     }
-    for (unsigned i=0; i<PlayerMemSize; ++i) {
-        player_x_mem[i]=player_x;
-        player_y_mem[i]=player_y;
+    for (unsigned i = 0; i < PlayerMemSize; ++i) {
+        player_x_mem[i] = player_x;
+        player_y_mem[i] = player_y;
     }
 
     /* select number of milliseconds (for pal and ntsc) */
-    timing_factor=pal_timing?1200:1000;
-    time*=timing_factor;
-    magic_wall_time*=timing_factor;
-    amoeba_time*=timing_factor;
-    amoeba_2_time*=timing_factor;
-    hatching_delay_time*=timing_factor;
+    timing_factor = pal_timing ? 1200 : 1000;
+    time *= timing_factor;
+    magic_wall_time *= timing_factor;
+    amoeba_time *= timing_factor;
+    amoeba_2_time *= timing_factor;
+    hatching_delay_time *= timing_factor;
 
     /* setup maps */
     objects_order.remove();  /* only needed by the editor */
@@ -109,9 +117,9 @@ void CaveRendered::setup_for_game() {
         hammered_reappear.set_size(w, h, 0);
     /* set cave get function; to implement perfect or lineshifting borders */
     if (lineshift)
-        map.set_wrap_type(CaveMapBase::LineShift);
+        map.set_wrap_type(CaveMapFuncs::LineShift);
     else
-        map.set_wrap_type(CaveMapBase::Perfect);
+        map.set_wrap_type(CaveMapFuncs::Perfect);
 }
 
 /// Count diamonds in a cave, and set diamonds_needed accordingly.
@@ -120,25 +128,25 @@ void CaveRendered::setup_for_game() {
 void CaveRendered::count_diamonds() {
     /* if automatically counting diamonds. if this was negative,
      * the sum will be this less than the number of all the diamonds in the cave */
-    if (diamonds_needed<=0) {
-        for (int y=0; y<height(); y++)
-            for (int x=0; x<width(); x++)
+    if (diamonds_needed <= 0) {
+        for (int y = 0; y < height(); y++)
+            for (int x = 0; x < width(); x++)
                 switch (map(x, y)) {
                     case O_DIAMOND:
                     case O_DIAMOND_F:
                     case O_FLYING_DIAMOND:
                     case O_FLYING_DIAMOND_F:
-                        diamonds_needed++;
+                        ++diamonds_needed;
                         break;
                     case O_SKELETON:
-                        diamonds_needed+=skeletons_worth_diamonds;
+                        diamonds_needed += skeletons_worth_diamonds;
                         break;
                     default:
                         break;
                 }
-        if (diamonds_needed<0)
+        if (diamonds_needed < 0)
             /* if still below zero, let this be 0, so gate will be open immediately */
-            diamonds_needed=0;
+            diamonds_needed = 0;
     }
 }
 
@@ -154,118 +162,122 @@ void CaveRendered::count_diamonds() {
 /// @param bonus_life_flash Set to true, if the player got a bonus life. The space element will change accordingly.
 /// @param animcycle Animation cycle - an integer between 0 and 7 to select animated frames.
 /// @param hate_invisible_outbox Show invisible outboxes as visible (blinking) ones.
-void CaveRendered::draw_indexes(CaveMap<int> &gfx_buffer, CaveMap<bool> const &covered, bool bonus_life_flash, int animcycle, bool hate_invisible_outbox) {
-    int elemdrawing[O_MAX];
+void CaveRendered::draw_indexes(CaveMapFast<int> &gfx_buffer, CaveMapFast<bool> const &covered, bool bonus_life_flash, int animcycle, bool hate_invisible_outbox) {
+    int elemdrawing[O_MAX_INDEX];
 
     g_assert(!map.empty());
-    g_assert(animcycle>=0);
-    g_assert(animcycle<=7);
+    g_assert(animcycle >= 0);
+    g_assert(animcycle <= 7);
 
-    if (last_direction) {   /* he is moving, so stop blinking and tapping. */
-        player_blinking=false;
-        player_tapping=false;
+    if (last_direction != MV_STILL) {   /* he is moving, so stop blinking and tapping. */
+        player_blinking = false;
+        player_tapping = false;
     } else {                    /* he is idle, so animations can be done. */
-        if (animcycle==0) { /* blinking and tapping is started at the beginning of animation sequences. */
-            player_blinking=g_random_int_range(0, 4)==0;    /* 1/4 chance of blinking, every sequence. */
-            if (g_random_int_range(0, 16)==0)   /* 1/16 chance of starting or stopping tapping. */
-                player_tapping=!player_tapping;
+        if (animcycle == 0) { /* blinking and tapping is started at the beginning of animation sequences. */
+            player_blinking = g_random_int_range(0, 4) == 0; /* 1/4 chance of blinking, every sequence. */
+            if (g_random_int_range(0, 16) == 0) /* 1/16 chance of starting or stopping tapping. */
+                player_tapping = !player_tapping;
         }
     }
 
-    for (int x=0; x<O_MAX; x++)
-        elemdrawing[x]=gd_element_properties[x].image_game;
+    for (int x = 0; x < O_MAX_INDEX; x++)
+        elemdrawing[x] = gd_element_properties[x].image_game;
     if (bonus_life_flash)
-        elemdrawing[O_SPACE]=gd_element_properties[O_FAKE_BONUS].image_game;
-    elemdrawing[O_MAGIC_WALL]=gd_element_properties[magic_wall_state==GD_MW_ACTIVE ? O_MAGIC_WALL : O_BRICK].image_game;
-    elemdrawing[O_CREATURE_SWITCH]=gd_element_properties[creatures_backwards ? O_CREATURE_SWITCH_ON : O_CREATURE_SWITCH].image_game;
-    elemdrawing[O_EXPANDING_WALL_SWITCH]=gd_element_properties[expanding_wall_changed ? O_EXPANDING_WALL_SWITCH_VERT : O_EXPANDING_WALL_SWITCH_HORIZ].image_game;
-    elemdrawing[O_GRAVITY_SWITCH]=gd_element_properties[gravity_switch_active?O_GRAVITY_SWITCH_ACTIVE:O_GRAVITY_SWITCH].image_game;
-    elemdrawing[O_REPLICATOR_SWITCH]=gd_element_properties[replicators_active?O_REPLICATOR_SWITCH_ON:O_REPLICATOR_SWITCH_OFF].image_game;
+        elemdrawing[O_SPACE] = gd_element_properties[O_FAKE_BONUS].image_game;
+    elemdrawing[O_MAGIC_WALL] = gd_element_properties[magic_wall_state == GD_MW_ACTIVE ? O_MAGIC_WALL : O_BRICK].image_game;
+    elemdrawing[O_CREATURE_SWITCH] = gd_element_properties[creatures_backwards ? O_CREATURE_SWITCH_ON : O_CREATURE_SWITCH].image_game;
+    elemdrawing[O_EXPANDING_WALL_SWITCH] = gd_element_properties[expanding_wall_changed ? O_EXPANDING_WALL_SWITCH_VERT : O_EXPANDING_WALL_SWITCH_HORIZ].image_game;
+    elemdrawing[O_GRAVITY_SWITCH] = gd_element_properties[gravity_switch_active ? O_GRAVITY_SWITCH_ACTIVE : O_GRAVITY_SWITCH].image_game;
+    elemdrawing[O_REPLICATOR_SWITCH] = gd_element_properties[replicators_active ? O_REPLICATOR_SWITCH_ON : O_REPLICATOR_SWITCH_OFF].image_game;
     if (!replicators_active)
         /* if the replicators are inactive, do not animate them. */
-        elemdrawing[O_REPLICATOR]=abs(elemdrawing[O_REPLICATOR]);
-    elemdrawing[O_CONVEYOR_SWITCH]=gd_element_properties[conveyor_belts_active?O_CONVEYOR_SWITCH_ON:O_CONVEYOR_SWITCH_OFF].image_game;
+        elemdrawing[O_REPLICATOR] = abs(elemdrawing[O_REPLICATOR]);
+    elemdrawing[O_CONVEYOR_SWITCH] = gd_element_properties[conveyor_belts_active ? O_CONVEYOR_SWITCH_ON : O_CONVEYOR_SWITCH_OFF].image_game;
     if (conveyor_belts_direction_changed) {
         /* if direction is changed, animation is changed. */
-        int temp;
+        int temp = elemdrawing[O_CONVEYOR_LEFT];
+        elemdrawing[O_CONVEYOR_LEFT] = elemdrawing[O_CONVEYOR_RIGHT];
+        elemdrawing[O_CONVEYOR_RIGHT] = temp;
 
-        temp=elemdrawing[O_CONVEYOR_LEFT];
-        elemdrawing[O_CONVEYOR_LEFT]=elemdrawing[O_CONVEYOR_RIGHT];
-        elemdrawing[O_CONVEYOR_RIGHT]=temp;
-
-        elemdrawing[O_CONVEYOR_DIR_SWITCH]=gd_element_properties[O_CONVEYOR_DIR_CHANGED].image_game;
+        elemdrawing[O_CONVEYOR_DIR_SWITCH] = gd_element_properties[O_CONVEYOR_DIR_CHANGED].image_game;
     } else
-        elemdrawing[O_CONVEYOR_DIR_SWITCH]=gd_element_properties[O_CONVEYOR_DIR_NORMAL].image_game;
+        elemdrawing[O_CONVEYOR_DIR_SWITCH] = gd_element_properties[O_CONVEYOR_DIR_NORMAL].image_game;
     if (!conveyor_belts_active) {
         /* if they are not running, do not animate them. */
-        elemdrawing[O_CONVEYOR_LEFT]=abs(elemdrawing[O_CONVEYOR_LEFT]);
-        elemdrawing[O_CONVEYOR_RIGHT]=abs(elemdrawing[O_CONVEYOR_RIGHT]);
+        elemdrawing[O_CONVEYOR_LEFT] = abs(elemdrawing[O_CONVEYOR_LEFT]);
+        elemdrawing[O_CONVEYOR_RIGHT] = abs(elemdrawing[O_CONVEYOR_RIGHT]);
     }
-    if (animcycle&2) {
-        elemdrawing[O_PNEUMATIC_ACTIVE_LEFT]+=2;    /* also a hack, like biter_switch */
-        elemdrawing[O_PNEUMATIC_ACTIVE_RIGHT]+=2;
-        elemdrawing[O_PLAYER_PNEUMATIC_LEFT]+=2;
-        elemdrawing[O_PLAYER_PNEUMATIC_RIGHT]+=2;
+    if (animcycle & 2) {
+        elemdrawing[O_PNEUMATIC_ACTIVE_LEFT] += 2;  /* also a hack, like biter_switch */
+        elemdrawing[O_PNEUMATIC_ACTIVE_RIGHT] += 2;
+        elemdrawing[O_PLAYER_PNEUMATIC_LEFT] += 2;
+        elemdrawing[O_PLAYER_PNEUMATIC_RIGHT] += 2;
     }
-
+    /* player */
     int draw;
-    if ((last_direction) == MV_STILL) { /* player is idle. */
+    if (last_direction == MV_STILL) { /* player is idle. */
         if (player_blinking && player_tapping)
-            draw=gd_element_properties[O_PLAYER_TAP_BLINK].image_game;
+            draw = gd_element_properties[O_PLAYER_TAP_BLINK].image_game;
         else if (player_blinking)
-            draw=gd_element_properties[O_PLAYER_BLINK].image_game;
+            draw = gd_element_properties[O_PLAYER_BLINK].image_game;
         else if (player_tapping)
-            draw=gd_element_properties[O_PLAYER_TAP].image_game;
+            draw = gd_element_properties[O_PLAYER_TAP].image_game;
         else
-            draw=gd_element_properties[O_PLAYER].image_game;
+            draw = gd_element_properties[O_PLAYER].image_game;
     } else if (last_horizontal_direction == MV_LEFT)
-        draw=gd_element_properties[O_PLAYER_LEFT].image_game;
-    else
-        /* of course this is MV_RIGHT. */
-        draw=gd_element_properties[O_PLAYER_RIGHT].image_game;
-    elemdrawing[O_PLAYER]=draw;
-    elemdrawing[O_PLAYER_GLUED]=draw;
+        draw = gd_element_properties[O_PLAYER_LEFT].image_game;
+    else /* mv_right */
+        draw = gd_element_properties[O_PLAYER_RIGHT].image_game;
+    elemdrawing[O_PLAYER] = draw;
+    elemdrawing[O_PLAYER_GLUED] = draw;
     /* player with bomb/rocketlauncher does not blink or tap - no graphics drawn for that.
      * running is drawn using w/o bomb/rocketlauncher cells */
-    if (last_direction!=MV_STILL) {
-        elemdrawing[O_PLAYER_BOMB]=draw;
-        elemdrawing[O_PLAYER_ROCKET_LAUNCHER]=draw;
+    if (last_direction != MV_STILL) {
+        elemdrawing[O_PLAYER_BOMB] = draw;
+        elemdrawing[O_PLAYER_ROCKET_LAUNCHER] = draw;
     }
-    elemdrawing[O_INBOX]=gd_element_properties[inbox_flash_toggle ? O_OUTBOX_OPEN : O_OUTBOX_CLOSED].image_game;
-    elemdrawing[O_OUTBOX]=gd_element_properties[inbox_flash_toggle ? O_OUTBOX_OPEN : O_OUTBOX_CLOSED].image_game;
-    elemdrawing[O_BITER_SWITCH]=gd_element_properties[O_BITER_SWITCH].image_game+biter_delay_frame;   /* hack, cannot do this with gd_element_properties */
+    elemdrawing[O_INBOX] = gd_element_properties[inbox_flash_toggle ? O_OUTBOX_OPEN : O_OUTBOX_CLOSED].image_game;
+    elemdrawing[O_OUTBOX] = gd_element_properties[inbox_flash_toggle ? O_OUTBOX_OPEN : O_OUTBOX_CLOSED].image_game;
+    elemdrawing[O_BITER_SWITCH] = gd_element_properties[O_BITER_SWITCH].image_game + biter_delay_frame; /* hack, cannot do this with gd_element_properties */
     /* visual effects */
-    elemdrawing[O_DIRT]=elemdrawing[dirt_looks_like];
-    elemdrawing[O_EXPANDING_WALL]=elemdrawing[expanding_wall_looks_like];
-    elemdrawing[O_V_EXPANDING_WALL]=elemdrawing[expanding_wall_looks_like];
-    elemdrawing[O_H_EXPANDING_WALL]=elemdrawing[expanding_wall_looks_like];
-    elemdrawing[O_AMOEBA_2]=elemdrawing[amoeba_2_looks_like];
+    elemdrawing[O_DIRT] = elemdrawing[dirt_looks_like];
+    elemdrawing[O_EXPANDING_WALL] = elemdrawing[expanding_wall_looks_like];
+    elemdrawing[O_V_EXPANDING_WALL] = elemdrawing[expanding_wall_looks_like];
+    elemdrawing[O_H_EXPANDING_WALL] = elemdrawing[expanding_wall_looks_like];
+    elemdrawing[O_AMOEBA_2] = elemdrawing[amoeba_2_looks_like];
 
     /* change only graphically */
     if (hate_invisible_outbox) {
-        elemdrawing[O_PRE_INVIS_OUTBOX]=elemdrawing[O_PRE_OUTBOX];
-        elemdrawing[O_INVIS_OUTBOX]=elemdrawing[O_OUTBOX];
+        elemdrawing[O_PRE_INVIS_OUTBOX] = elemdrawing[O_PRE_OUTBOX];
+        elemdrawing[O_INVIS_OUTBOX] = elemdrawing[O_OUTBOX];
     }
 
-    for (int y=y1; y<=y2; y++) {
-        for (int x=x1; x<=x2; x++) {
+    for (int y = y1; y <= y2; y++) {
+        for (int x = x1; x <= x2; x++) {
             int draw;
 
             if (covered(x, y))          /* if covered, real element is not important */
-                draw=gd_element_properties[O_COVERED].image_game;
+                draw = gd_element_properties[O_COVERED].image_game;
             else
-                draw=elemdrawing[map(x,y)];
+                draw = elemdrawing[map(x, y)];
+            if ((last_direction == MV_LEFT || last_direction == MV_RIGHT)
+                && is_player(x, y) && can_be_pushed(x, y, last_direction)) {
+                if (last_direction == MV_LEFT)
+                    draw = elemdrawing[O_PLAYER_PUSH_LEFT];
+                else
+                    draw = elemdrawing[O_PLAYER_PUSH_RIGHT];
+            }
 
             /* if negative, animated. */
-            if (draw<0)
-                draw=-draw+animcycle;
+            if (draw < 0)
+                draw = -draw + animcycle;
             /* flash */
             if (gate_open_flash)
-                draw+=NUM_OF_CELLS;
+                draw += NUM_OF_CELLS;
 
             /* set to buffer, with caching */
-            if (gfx_buffer(x,y)!=draw)
-                gfx_buffer(x,y)=draw | GD_REDRAW;
+            if (gfx_buffer(x, y) != draw)
+                gfx_buffer(x, y) = draw | GD_REDRAW;
         }
     }
 }
@@ -279,52 +291,52 @@ void CaveRendered::draw_indexes(CaveMap<int> &gfx_buffer, CaveMap<bool> const &c
 /// @param internal_time The internal time variable of the cave.
 /// @return The time value in seconds, which can be shown to the user.
 int CaveRendered::time_visible(int internal_time) const {
-    return (internal_time+timing_factor-1)/timing_factor;
+    return (internal_time + timing_factor - 1) / timing_factor;
 }
 
 /// Calculate adler checksum for a rendered cave; this can be used for more caves.
 void gd_cave_adler_checksum_more(const CaveRendered &cave, unsigned &a, unsigned &b) {
-    for (int y=0; y<cave.h; y++) {
-        for (int x=0; x<cave.w; x++) {
-            a+=gd_element_properties[cave.map(x,y)].character;
-            b+=a;
+    for (int y = 0; y < cave.h; y++) {
+        for (int x = 0; x < cave.w; x++) {
+            a += gd_element_properties[cave.map(x, y)].character;
+            b += a;
 
-            a%=65521;
-            b%=65521;
+            a %= 65521;
+            b %= 65521;
         }
     }
 }
 
 /// Calculate adler checksum for a single rendered cave
 unsigned gd_cave_adler_checksum(const CaveRendered &cave) {
-    unsigned a=1;
-    unsigned b=0;
+    unsigned a = 1;
+    unsigned b = 0;
 
     gd_cave_adler_checksum_more(cave, a, b);
-    return (b<<16)+a;
+    return (b << 16) + a;
 }
 
 int gd_cave_check_replays(CaveStored &cave, bool report, bool remove, bool repair) {
-    int wrong=0;
-    for (std::list<CaveReplay>::iterator it=cave.replays.begin(); it!=cave.replays.end(); ++it) {
-        CaveReplay &replay=*it;
+    int wrong = 0;
+    for (std::list<CaveReplay>::iterator it = cave.replays.begin(); it != cave.replays.end(); ++it) {
+        CaveReplay &replay = *it;
         GdInt checksum;
 
-        CaveRendered rendered(cave, replay.level-1, replay.seed);
-        checksum=gd_cave_adler_checksum(rendered);
+        CaveRendered rendered(cave, replay.level - 1, replay.seed);
+        checksum = gd_cave_adler_checksum(rendered);
 
-        replay.wrong_checksum=false;
+        replay.wrong_checksum = false;
         /* count wrong ones... the checksum might be changed later to "repair" */
-        if (replay.checksum!=0 && checksum!=replay.checksum)
+        if (replay.checksum != 0 && checksum != replay.checksum)
             wrong++;
 
-        if (replay.checksum==0 || repair) {
+        if (replay.checksum == 0 || repair) {
             /* if no checksum found, add one. or if repair requested, overwrite old one. */
-            replay.checksum=checksum;
+            replay.checksum = checksum;
         } else {
             /* if has a checksum, compare with this one. */
-            if (replay.checksum!=checksum) {
-                replay.wrong_checksum=true;
+            if (replay.checksum != checksum) {
+                replay.wrong_checksum = true;
 
                 if (report)
                     gd_warning(CPrintf("%s: replay played by %s at %s is invalid") % cave.name % replay.player_name % replay.date);
@@ -351,22 +363,22 @@ int gd_cave_check_replays(CaveStored &cave, bool report, bool remove, bool repai
 /// @param order Pointer to the object which draws this element, or 0 if none.
 void CaveRendered::store_rc(int x, int y, GdElementEnum element, CaveObject const *order) {
     /* if we do not need to draw, exit now */
-    if (element==O_NONE)
+    if (element == O_NONE)
         return;
 
     /* if objects wrap around (mainly in imported caves), correct the coordinates */
     if (wraparound_objects) {
         if (lineshift)
-            CaveMapBase::lineshift_wrap_coords_only_x(w, x, y);
+            CaveMapFuncs::lineshift_wrap_coords_only_x(w, x, y);
         else
-            CaveMapBase::perfect_wrap_coords(w, h, x, y);
+            CaveMapFuncs::perfect_wrap_coords(w, h, x, y);
     }
 
     /* if the above wraparound code fixed the coordinates, this will always be true. */
     /* but see the above comment for lineshifting y coordinate */
-    if (x>=0 && x<w && y>=0 && y<h) {
-        map(x, y)=element;
-        objects_order(x, y)=const_cast<CaveObject *>(order);
+    if (x >= 0 && x < w && y >= 0 && y < h) {
+        map(x, y) = element;
+        objects_order(x, y) = const_cast<CaveObject *>(order);
     }
 }
 
@@ -377,14 +389,14 @@ void CaveRendered::store_rc(int x, int y, GdElementEnum element, CaveObject cons
 /// Must write this in a way so it can be called many times for a single CaveRendered object!
 /// @param data The stored cave to read the map, objects and random values from
 void CaveRendered::create_map(CaveStored const &data, int level) {
-    rendered_on=level;
+    rendered_on = level;
     if (data.map.empty()) {
         /* if we have no map, fill with predictable random generator. */
         map.set_size(w, h);
 
         /* IF CAVE HAS NO MAP, USE THE RANDOM NUMBER GENERATOR */
         /* init c64 randomgenerator */
-        if (data.level_rand[level]<0)
+        if (data.level_rand[level] < 0)
             c64_rand.set_seed(random.rand_int_range(0, 256), random.rand_int_range(0, 256));
         else
             c64_rand.set_seed(data.level_rand[level]);
@@ -394,42 +406,42 @@ void CaveRendered::create_map(CaveStored const &data, int level) {
          * as c64 did. this way works the original random generator the right way.
          * also, do not fill last row, that is needed for the random seeds to be correct
          * after filling! predictable slime will use it. */
-        for (int y=1; y<h-1; y++) {
-            for (int x=0; x<w; x++) {
+        for (int y = 1; y < h - 1; y++) {
+            for (int x = 0; x < w; x++) {
                 int randm;
 
-                if (data.level_rand[level]<0)
-                    randm=random.rand_int_range(0, 256);    /* use the much better glib random generator */
+                if (data.level_rand[level] < 0)
+                    randm = random.rand_int_range(0, 256);  /* use the much better glib random generator */
                 else
-                    randm=c64_rand.random();    /* use c64 */
+                    randm = c64_rand.random();  /* use c64 */
 
                 /* select the element to draw the way it was done on c64 */
-                GdElement element=data.initial_fill;
-                if (randm<data.random_fill_probability_1)
-                    element=data.random_fill_1;
-                if (randm<data.random_fill_probability_2)
-                    element=data.random_fill_2;
-                if (randm<data.random_fill_probability_3)
-                    element=data.random_fill_3;
-                if (randm<data.random_fill_probability_4)
-                    element=data.random_fill_4;
+                GdElement element = data.initial_fill;
+                if (randm < data.random_fill_probability_1)
+                    element = data.random_fill_1;
+                if (randm < data.random_fill_probability_2)
+                    element = data.random_fill_2;
+                if (randm < data.random_fill_probability_3)
+                    element = data.random_fill_3;
+                if (randm < data.random_fill_probability_4)
+                    element = data.random_fill_4;
 
-                map(x, y)=element;
+                map(x, y) = element;
             }
         }
 
         /* draw initial border */
-        for (int y=0; y<h; y++) {
-            map(0, y)=data.initial_border;
-            map(w-1, y)=data.initial_border;
+        for (int y = 0; y < h; y++) {
+            map(0, y) = data.initial_border;
+            map(w - 1, y) = data.initial_border;
         }
-        for (int x=0; x<w; x++) {
-            map(x, 0)=data.initial_border;
-            map(x, h-1)=data.initial_border;
+        for (int x = 0; x < w; x++) {
+            map(x, 0) = data.initial_border;
+            map(x, h - 1) = data.initial_border;
         }
     } else {
         /* IF CAVE HAS A MAP, SIMPLY USE IT... no need to fill with random elements */
-        map=data.map;
+        map = data.map;
         /* initialize c64 predictable random for slime. the values were taken from afl bd, see docs/internals.txt */
         c64_rand.set_seed(0, 0x1e);
     }
@@ -437,12 +449,12 @@ void CaveRendered::create_map(CaveStored const &data, int level) {
     /* render cave objects above random data or map */
     /* first, set map wraparound type - this is for the get's to work correctly */
     if (lineshift)
-        map.set_wrap_type(CaveMapBase::LineShift);
+        map.set_wrap_type(CaveMapFuncs::LineShift);
     else
-        map.set_wrap_type(CaveMapBase::Perfect);
+        map.set_wrap_type(CaveMapFuncs::Perfect);
     /* then draw objects */
     objects_order.fill(0);
-    for (CaveObjectStore::const_iterator it=data.objects.begin(); it!=data.objects.end(); ++it) {
+    for (CaveObjectStore::const_iterator it = data.objects.begin(); it != data.objects.end(); ++it) {
         if ((*it)->seen_on[rendered_on])
             (*it)->draw(*this);
     }
@@ -460,26 +472,26 @@ CaveRendered::CaveRendered(CaveStored const &data, int level, int seed)
     amoeba_2_state(GD_AM_SLEEPING),
     magic_wall_state(GD_MW_DORMANT),
     player_state(GD_PL_NOT_YET) {
-    rendered_on=level;
+    rendered_on = level;
 
-    render_seed=seed;
+    render_seed = seed;
 
-    time=data.level_time[level];
-    timevalue=data.level_timevalue[level];
-    diamonds_needed=data.level_diamonds[level];
-    magic_wall_time=data.level_magic_wall_time[level];
-    slime_permeability=data.level_slime_permeability[level];
-    slime_permeability_c64=data.level_slime_permeability_c64[level];
-    time_bonus=data.level_bonus_time[level];
-    time_penalty=data.level_penalty_time[level];
-    amoeba_time=data.level_amoeba_time[level];
-    amoeba_max_count=data.level_amoeba_threshold[level];
-    amoeba_2_time=data.level_amoeba_2_time[level];
-    amoeba_2_max_count=data.level_amoeba_2_threshold[level];
-    hatching_delay_time=data.level_hatching_delay_time[level];
-    hatching_delay_frame=data.level_hatching_delay_frame[level];
-    speed=data.level_speed[level];
-    ckdelay=data.level_ckdelay[level];
+    time = data.level_time[level];
+    timevalue = data.level_timevalue[level];
+    diamonds_needed = data.level_diamonds[level];
+    magic_wall_time = data.level_magic_wall_time[level];
+    slime_permeability = data.level_slime_permeability[level];
+    slime_permeability_c64 = data.level_slime_permeability_c64[level];
+    time_bonus = data.level_bonus_time[level];
+    time_penalty = data.level_penalty_time[level];
+    amoeba_time = data.level_amoeba_time[level];
+    amoeba_max_count = data.level_amoeba_threshold[level];
+    amoeba_2_time = data.level_amoeba_2_time[level];
+    amoeba_2_max_count = data.level_amoeba_2_threshold[level];
+    hatching_delay_time = data.level_hatching_delay_time[level];
+    hatching_delay_frame = data.level_hatching_delay_frame[level];
+    speed = data.level_speed[level];
+    ckdelay = data.level_ckdelay[level];
 
     random.set_seed(render_seed);
     objects_order.resize(w, h);
@@ -487,13 +499,16 @@ CaveRendered::CaveRendered(CaveStored const &data, int level, int seed)
 
     /* if a specific slime seed is requested, change it now, after creating map data */
     /* if there is -1 in the c64 random seed, it means "leave the values those left here by the cave setup routine" */
-    if (data.level_slime_seed_c64[level]!=-1)
-        c64_rand.set_seed(data.level_slime_seed_c64[level]/256, data.level_slime_seed_c64[level]%256);
+    if (data.level_slime_seed_c64[level] != -1)
+        c64_rand.set_seed(data.level_slime_seed_c64[level] / 256, data.level_slime_seed_c64[level] % 256);
 
     /* check if we use c64 ckdelay or milliseconds for timing */
-    if (scheduling!=GD_SCHEDULING_MILLISECONDS)
-        /* delay loop based timing... set something for first iteration, then later it will be calculated */
-        speed=120;
+    /* if so set something for first iteration, then later it will be calculated */
+    if (scheduling != GD_SCHEDULING_MILLISECONDS)
+        speed = 120;
 
     gd_cave_correct_visible_size(*this);
+
+    last_direction = MV_STILL;
+    last_horizontal_direction = MV_STILL;
 }

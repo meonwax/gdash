@@ -214,8 +214,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 EXTRA_DIST = \
 	c64_internals.txt ckdelay.xls cd7_speeds.xls ckdelay.txt brc_format.txt \
-	cave_style.css background.png \
-	replay_to_avi.html style.css gdash.png avidemux_codec.png avidemux_fps.png
+	cave_style.css
 
 all: all-am
 
@@ -399,6 +398,22 @@ uninstall-am:
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-generic pdf pdf-am ps ps-am uninstall uninstall-am
 
+
+# To create the docs, GDash must be installed on the system,
+# so it can use the translations.
+
+.PHONY: Docs Doc-English.html Doc-Deutsch.html Doc-Magyar.html
+
+Docs: Doc-English.html Doc-Deutsch.html Doc-Magyar.html
+
+Doc-English.html: ../src/gdash
+	../src/gdash -q --save-docs 1
+
+Doc-Deutsch.html: ../src/gdash
+	../src/gdash -q --save-docs 2
+
+Doc-Magyar.html: ../src/gdash
+	../src/gdash -q --save-docs 3
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

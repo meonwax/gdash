@@ -4,35 +4,27 @@ localedir = $(datadir)/locale
 
 DEFS = -DLOCALEDIR=\"$(localedir)\" -DPKGDATADIR=\"$(pkgdatadir)\" @DEFS@
 
-INCLUDES = \
-	-I$(top_srcdir)/include
+INCLUDES = -I$(top_srcdir)/include
 
-# if gtk is enabled, build gdash.
-if GTK
-  GDASH=gdash
-else
-  GDASH=
-endif
-
-bin_PROGRAMS = $(GDASH)
-
+bin_PROGRAMS = gdash
 
 strip: $(bin_PROGRAMS)
 	strip $(bin_PROGRAMS)
 
 # base sources and headers:
 #   the gdash engine.
-base_headers = \
+baseheaders = \
 	misc/printf.hpp \
 	misc/smartptr.hpp \
+	misc/autogfreeptr.hpp \
 	cave/cavetypes.hpp \
 	cave/elementproperties.hpp \
 	cave/helper/namevaluepair.hpp \
 	cave/helper/reflective.hpp \
 	cave/helper/adoptingcontainer.hpp \
 	cave/helper/cavemap.hpp \
-	cave/helper/colors.hpp \
 	cave/helper/cavehighscore.hpp \
+	cave/colors.hpp \
 	cave/cavebase.hpp \
 	cave/cavestored.hpp \
 	cave/helper/caverandom.hpp \
@@ -62,13 +54,15 @@ base_headers = \
 	fileops/brcimport.hpp \
 	fileops/binaryimport.hpp \
 	fileops/loadfile.hpp \
+	fileops/highscore.hpp \
 	cave/gamecontrol.hpp \
 	settings.hpp \
 	misc/util.hpp \
 	misc/logger.hpp \
 	misc/about.hpp \
+	misc/helptext.hpp \
 	gfx/pixbuf.hpp \
-	gfx/pixmap.hpp \
+	gfx/pixmapstorage.hpp \
 	gfx/screen.hpp \
 	gfx/pixbuffactory.hpp \
 	gfx/pixbufmanip.hpp \
@@ -79,7 +73,6 @@ base_headers = \
 	cave/titleanimation.hpp \
 	framework/app.hpp \
 	framework/activity.hpp \
-	framework/volumeactivity.hpp \
 	framework/titlescreenactivity.hpp \
 	framework/showtextactivity.hpp \
 	framework/messageactivity.hpp \
@@ -96,12 +89,11 @@ base_headers = \
 	input/gameinputhandler.hpp \
 	sound/sound.hpp
 
-base_sources = \
+basesources = \
 	misc/printf.cpp \
-	cave/helper/colors.cpp \
+	cave/colors.cpp \
 	cave/cavetypes.cpp \
 	cave/elementproperties.cpp \
-	cave/helper/cavemap.cpp \
 	cave/helper/cavereplay.cpp \
 	cave/caverendered.cpp \
 	cave/particle.cpp \
@@ -133,13 +125,14 @@ base_sources = \
 	fileops/brcimport.cpp \
 	fileops/binaryimport.cpp \
 	fileops/loadfile.cpp \
+	fileops/highscore.cpp \
 	cave/gamecontrol.cpp \
 	settings.cpp \
 	misc/util.cpp \
 	misc/logger.cpp \
 	misc/about.cpp \
+	misc/helptext.cpp \
 	gfx/pixbuf.cpp \
-	gfx/pixmap.cpp \
 	gfx/screen.cpp \
 	gfx/pixbuffactory.cpp \
 	gfx/pixbufmanip.cpp \
@@ -152,7 +145,6 @@ base_sources = \
 	cave/titleanimation.cpp \
 	framework/app.cpp \
 	framework/activity.cpp \
-	framework/volumeactivity.cpp \
 	framework/titlescreenactivity.cpp \
 	framework/showtextactivity.cpp \
 	framework/messageactivity.cpp \
@@ -167,86 +159,97 @@ base_sources = \
 	framework/commands.cpp \
 	input/joystick.cpp \
 	input/gameinputhandler.cpp \
-	sound/sound.cpp
+	sound/sound.cpp \
+	mainwindow.cpp \
+	gtkmain.cpp
 
 # gtk sources and headers:
 #   the gdash gtk ui, with editor.
 gtksources = \
 	gtk/gtkpixbuf.cpp \
-	gtk/gtkpixmap.cpp \
 	gtk/gtkpixbuffactory.cpp \
 	gtk/gtkscreen.cpp \
 	gtk/gtkui.cpp \
 	gtk/gtkuisettings.cpp \
 	gtk/gtkgameinputhandler.cpp \
+	misc/helphtml.cpp \
 	editor/editorwidgets.cpp \
 	editor/editorautowidgets.cpp \
 	editor/editorcellrenderer.cpp \
 	editor/exporthtml.cpp \
 	editor/exportcrli.cpp \
 	editor/editor.cpp \
-	gtk/help.cpp \
 	gtk/gtkapp.cpp \
-	gtk/gtkmainwindow.cpp \
-	sdl/sdlpixbuf.cpp \
-	sdl/sdlpixmap.cpp \
-	sdl/sdlabstractscreen.cpp \
-	sdl/sdlscreen.cpp \
-	sdl/sdlpixbuffactory.cpp \
-	sdl/ogl.cpp \
-	sdl/sdlgameinputhandler.cpp \
-	sdl/sdlmainwindow.cpp \
-	sdl/IMG_savepng.c \
-	sdl/sdlparticle.cpp \
-	gtkmain.cpp
+	gtk/gtkmainwindow.cpp
 
 gtkheaders = \
 	gtk/gtkpixbuf.hpp \
-	gtk/gtkpixmap.hpp \
 	gtk/gtkpixbuffactory.hpp \
 	gtk/gtkscreen.hpp \
 	gtk/gtkui.hpp \
 	gtk/gtkuisettings.hpp \
 	gtk/gtkgameinputhandler.hpp \
+	misc/helphtml.hpp \
 	editor/editorwidgets.hpp \
 	editor/editorautowidgets.hpp \
 	editor/editorcellrenderer.hpp \
 	editor/exporthtml.hpp \
 	editor/exportcrli.hpp \
 	editor/editor.hpp \
-	gtk/help.hpp \
 	gtk/gtkapp.hpp \
 	gtk/gtkmainwindow.hpp \
+	mainwindow.hpp
+
+# sdl sources and headers:
+#   the sdl and the opengl engine.
+sdlsources = \
+	framework/shadermanager.cpp \
+	framework/volumeactivity.cpp \
+	sdl/sdlpixbuf.cpp \
+	sdl/sdlabstractscreen.cpp \
+	sdl/sdlscreen.cpp \
+	sdl/sdlpixbuffactory.cpp \
+	sdl/ogl.cpp \
+	sdl/sdlgameinputhandler.cpp \
+	sdl/sdlmainwindow.cpp \
+	sdl/IMG_savepng.c
+
+sdlheaders = \
+	framework/shadermanager.hpp \
+	framework/volumeactivity.hpp \
 	sdl/sdlpixbuf.hpp \
-	sdl/sdlpixmap.hpp \
 	sdl/sdlabstractscreen.hpp \
 	sdl/sdlscreen.hpp \
 	sdl/sdlpixbuffactory.hpp \
 	sdl/ogl.hpp \
 	sdl/sdlgameinputhandler.hpp \
 	sdl/sdlmainwindow.hpp \
-	sdl/sdlparticle.hpp \
 	sdl/IMG_savepng.h
 
 
 
-
 noinst_HEADERS = \
-	$(base_headers) \
-	$(gtkheaders)
+	$(baseheaders) \
+	$(gtkheaders) \
+	$(sdlheaders)
 
 
 
-
-
-
-gdash_CPPFLAGS = -g -Wall -DGDASH_GTK @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@ @GL_CFLAGS@ @LIBPNG_CFLAGS@
-gdash_LDFLAGS = -g -Wall
-if SDL
-    GDASH_LIBADD=-lSDL_mixer -lSDL_image
+programheaders=$(baseheaders)
+programsources=$(basesources)
+if GTK
+  programheaders+=$(gtkheaders)
+  programsources+=$(gtksources)
 endif
-gdash_LDADD = @GTK_LIBS@ @GLIB_LIBS@ @LIBINTL@ @SDL_LIBS@ @GL_LIBS@ @LIBPNG_LIBS@ $(GDASH_LIBADD)
-gdash_SOURCES = \
-	$(base_sources) \
-	$(gtksources) \
-	$(sound_sources)
+if SDL
+  programheaders+=$(sdlheaders)
+  programsources+=$(sdlsources)
+endif
+
+
+
+
+gdash_CPPFLAGS = -g -Wall @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@ @GL_CFLAGS@ @LIBPNG_CFLAGS@
+gdash_LDFLAGS = -g -Wall
+gdash_LDADD = @GTK_LIBS@ @GLIB_LIBS@ @LIBINTL@ @SDL_LIBS@ @GL_LIBS@ @LIBPNG_LIBS@
+gdash_SOURCES = $(programsources)

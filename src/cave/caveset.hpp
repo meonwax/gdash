@@ -1,27 +1,32 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef _GD_CAVESET
-#define _GD_CAVESET
+#ifndef CAVESET_HPP_INCLUDED
+#define CAVESET_HPP_INCLUDED
 
 #include "config.h"
 
-#include <stdexcept>
 #include "cave/cavetypes.hpp"
 #include "cave/helper/cavehighscore.hpp"
-#include "cave/caverendered.hpp"
 #include "cave/helper/reflective.hpp"
 #include "cave/helper/adoptingcontainer.hpp"
 #include "cave/cavestored.hpp"
@@ -60,25 +65,19 @@ public:
 
     AdoptingContainer<CaveStored> caves;
 
-    /* highscore in config directory */
-    void save_highscore(const char *directory) const;
-    bool load_highscore(const char *directory);
-
-    void save_to_file(const char *filename) throw(std::runtime_error);
+    void save_to_file(const char *filename);
     void set_name_from_filename(const char *filename);
 
-    bool has_replays();
+    bool has_replays() const;
     bool has_caves() const {
         return !caves.empty();
     }
+    bool has_levels() const;
     CaveStored &cave(unsigned i) const {
         return *(caves.at(i));
     }
     int cave_index(CaveStored const *cave) const;
     int first_selectable_cave_index() const;
-
-private:
-    const char *filename_for_cave_highscores(const char *directory) const;
     unsigned checksum() const;
 
 // for reflective

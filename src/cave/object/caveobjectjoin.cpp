@@ -1,17 +1,24 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
@@ -27,7 +34,7 @@
 #include "cave/elementproperties.hpp"
 
 std::string CaveJoin::get_bdcff() const {
-    return BdcffFormat(backwards?"AddBackward":"Add") << dist << search_element << put_element;
+    return BdcffFormat(backwards ? "AddBackward" : "Add") << dist << search_element << put_element;
 }
 
 CaveJoin *CaveJoin::clone_from_bdcff(const std::string &name, std::istream &is) const {
@@ -36,9 +43,13 @@ CaveJoin *CaveJoin::clone_from_bdcff(const std::string &name, std::istream &is) 
     if (!(is >> dist >> search >> replace))
         return NULL;
 
-    bool backwards=gd_str_ascii_caseequal(name, "AddBackward");
+    bool backwards = gd_str_ascii_caseequal(name, "AddBackward");
     return new CaveJoin(dist, search, replace, backwards);
 }
+
+CaveJoin *CaveJoin::clone() const {
+    return new CaveJoin(*this);
+};
 
 CaveJoin::CaveJoin(Coordinate _dist, GdElementEnum _search_element, GdElementEnum _put_element, bool _backward)
     :   CaveObject(GD_JOIN),
@@ -52,21 +63,21 @@ void CaveJoin::draw(CaveRendered &cave) const {
     /* find every object, and put fill_element next to it. relative coordinates dx,dy */
     if (!backwards) {
         /* from top to bottom */
-        for (int y=0; y<cave.h; y++)
-            for (int x=0; x<cave.w; x++)
-                if (cave.map(x, y)==search_element) {
+        for (int y = 0; y < cave.h; y++)
+            for (int x = 0; x < cave.w; x++)
+                if (cave.map(x, y) == search_element) {
                     /* these new coordinates should wrap around, too. that is needed by profi boulder caves. */
                     /* but they will be wrapped around by store_rc */
-                    cave.store_rc(x+dist.x, y+dist.y, put_element, this);
+                    cave.store_rc(x + dist.x, y + dist.y, put_element, this);
                 }
     } else {
         /* from bottom to top */
-        for (int y=cave.h-1; y>=0; --y)
-            for (int x=cave.w-1; x>=0; --x)
-                if (cave.map(x, y)==search_element) {
+        for (int y = cave.h - 1; y >= 0; --y)
+            for (int x = cave.w - 1; x >= 0; --x)
+                if (cave.map(x, y) == search_element) {
                     /* these new coordinates should wrap around, too. that is needed by profi boulder caves. */
                     /* but they will be wrapped around by store_rc */
-                    cave.store_rc(x+dist.x, y+dist.y, put_element, this);
+                    cave.store_rc(x + dist.x, y + dist.y, put_element, this);
                 }
     }
 }
@@ -98,23 +109,29 @@ std::string CaveJoin::get_coordinates_text() const {
 /// Here it could be made automatic, as it is more intuitive, and
 /// BDCFF can code backward searches as well.
 void CaveJoin::create_drag(Coordinate current, Coordinate displacement) {
-    dist+=displacement;
+    dist += displacement;
     /* when just created, guess backwards flag. */
-    if (dist.y>0 || (dist.y==0 && dist.x>0))
-        backwards=true;
+    if (dist.y > 0 || (dist.y == 0 && dist.x > 0))
+        backwards = true;
     else
-        backwards=false;
+        backwards = false;
 }
 
 void CaveJoin::move(Coordinate current, Coordinate displacement) {
-    dist+=displacement;
+    dist += displacement;
 }
 
 void CaveJoin::move(Coordinate displacement) {
-    dist+=displacement;
+    dist += displacement;
 }
 
 std::string CaveJoin::get_description_markup() const {
     return SPrintf(_("Join <b>%ms</b> to every <b>%ms</b>, distance %+d,%+d"))
-           % gd_element_properties[put_element].lowercase_name % gd_element_properties[search_element].lowercase_name % dist.x % dist.y;
+           % visible_name_lowercase(put_element)
+           % visible_name_lowercase(search_element) % dist.x % dist.y;
 }
+
+GdElementEnum CaveJoin::get_characteristic_element() const {
+    return put_element;
+}
+

@@ -1,29 +1,36 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
 
 #include <glib/gi18n.h>
 
-#include "misc/logger.hpp"
-#include "misc/printf.hpp"
 #include "framework/titlescreenactivity.hpp"
-#include "framework/gameactivity.hpp"
-#include "framework/inputtextactivity.hpp"
-#include "framework/settingsactivity.hpp"
+#include "framework/app.hpp"
+#include "misc/smartptr.hpp"
+
+#include "misc/logger.hpp"
+#include "misc/helptext.hpp"
 #include "framework/replaymenuactivity.hpp"
 #include "framework/commands.hpp"
 #include "input/gameinputhandler.hpp"
@@ -32,29 +39,25 @@
 #include "cave/titleanimation.hpp"
 #include "settings.hpp"
 #include "gfx/screen.hpp"
-#include "gfx/pixmap.hpp"
 #include "gfx/pixbuffactory.hpp"
 #include "gfx/fontmanager.hpp"
 #include "sound/sound.hpp"
-#include "misc/about.hpp"
-#include "cave/gamecontrol.hpp"
-#include "settings.hpp"
 
 
 TitleScreenActivity::TitleScreenActivity(App *app)
-  : Activity(app)
-  , scale(app->pixbuf_factory->get_pixmap_scale())
-  , image_centered_threshold(164*scale)
-  , frames(0), time_ms(0), animcycle(0)
-  , alternate_status(false) {
+    : Activity(app)
+    , PixmapStorage(*app->screen)
+    , scale(app->screen->get_pixmap_scale())
+    , image_centered_threshold(164 * scale)
+    , frames(0), time_ms(0), animcycle(0)
+    , which_status(0) {
+    caveset_has_levels = app->caveset->has_levels();
     cavenum = app->caveset->last_selected_cave;
     levelnum = app->caveset->last_selected_level;
-    app->screen->register_pixmap_storage(this);
 }
 
 
 TitleScreenActivity::~TitleScreenActivity() {
-    app->screen->unregister_pixmap_storage(this);
     clear_animation();
 }
 
@@ -64,9 +67,9 @@ void TitleScreenActivity::release_pixmaps() {
 }
 
 
-void TitleScreenActivity::render_animation() {
+void TitleScreenActivity::render_animation() const {
     if (animation.empty()) {
-        animation = get_title_animation_pixmap(app->caveset->title_screen, app->caveset->title_screen_scroll, false, *app->pixbuf_factory);
+        animation = get_title_animation_pixmap(app->caveset->title_screen, app->caveset->title_screen_scroll, false, *app->screen, app->screen->pixbuf_factory);
         /* this is required because the caveset might have changed since the last redraw, and
          * thus the title screen might have changed, and the new title screen might have fewer
          * frames than the original. */
@@ -76,42 +79,42 @@ void TitleScreenActivity::render_animation() {
 
 
 void TitleScreenActivity::clear_animation() {
-    for (unsigned x=0; x<animation.size(); x++)
+    for (unsigned x = 0; x < animation.size(); x++)
         delete animation[x];
     animation.clear();
 }
 
 
 void TitleScreenActivity::shown_event() {
-    int scale = app->pixbuf_factory->get_pixmap_scale();
-    app->screen->set_size(scale * 320, scale * 200);
+    int scale = app->screen->get_pixmap_scale();
+    app->screen->set_size(scale * 320, scale * 200, gd_fullscreen);
 
     /* render title screen animation in memory pixmap */
     render_animation();
 
     /* height of title screen, then decide which lines to show and where */
-    image_h=animation[0]->get_height();
-    int font_h=app->font_manager->get_font_height();
+    image_h = animation[0]->get_height();
+    int font_h = app->font_manager->get_font_height();
     /* less than 2 lines left - place for only one line of text. */
-    if (app->screen->get_height()-image_h < 2*font_h) {
-        y_gameline=-1;
-        y_caveline=image_h + (app->screen->get_height()-image_h-font_h)/2;    /* centered in the small place */
-        show_status=false;
-    } else if (app->screen->get_height()-image_h < 3*font_h) {
+    if (app->screen->get_height() - image_h < 2 * font_h) {
+        y_gameline = -1;
+        y_caveline = image_h + (app->screen->get_height() - image_h - font_h) / 2; /* centered in the small place */
+        show_status = false;
+    } else if (app->screen->get_height() - image_h < 3 * font_h) {
         /* more than 2, less than 3 - place for status bar. game name is not shown, as this will */
         /* only be true for a game with its own title screen, and i decided that in that case it */
         /* would make more sense. */
-        y_gameline=-1;
-        y_caveline=image_h + (app->screen->get_height()-image_h-font_h*2)/2;  /* centered there */
-        show_status=true;
+        y_gameline = -1;
+        y_caveline = image_h + (app->screen->get_height() - image_h - font_h * 2) / 2; /* centered there */
+        show_status = true;
     } else {
         /* more than 3, less than 4 - place for everything. */
-        y_gameline=image_h + (app->screen->get_height()-image_h-font_h-font_h*2)/2;   /* centered with cave name */
-        y_caveline=y_gameline+font_h;
+        y_gameline = image_h + (app->screen->get_height() - image_h - font_h - font_h * 2) / 2; /* centered with cave name */
+        y_caveline = y_gameline + font_h;
         /* if there is some place, move the cave line one pixel lower. */
-        if (y_caveline+2*font_h<app->screen->get_height())
-            y_caveline+=1*scale;
-        show_status=true;
+        if (y_caveline + 2 * font_h < app->screen->get_height())
+            y_caveline += 1 * scale;
+        show_status = true;
     }
 
     app->screen->set_title(CPrintf("GDash - %s") % app->caveset->name);
@@ -124,36 +127,50 @@ void TitleScreenActivity::hidden_event() {
 }
 
 
-void TitleScreenActivity::redraw_event() {
+void TitleScreenActivity::redraw_event(bool full) const {
     app->clear_screen();
-    
+
     // If the screen was resized, the animation might have disappeared
     render_animation();
 
-    if (y_gameline!=-1) {
+    if (y_gameline != -1) {
         // TRANSLATORS: Game here is like caveset, the loaded game from which the user will select the cave to play
         app->blittext_n(0, y_gameline, CPrintf("%c%s: %c%s %c%s") % GD_COLOR_INDEX_WHITE % _("Game") % GD_COLOR_INDEX_YELLOW % app->caveset->name % GD_COLOR_INDEX_RED % (app->caveset->edited ? "*" : ""));
     }
 
-    int dx=(app->screen->get_width()-animation[animcycle]->get_width())/2;    /* centered horizontally */
+    int dx = (app->screen->get_width() - animation[animcycle]->get_width()) / 2; /* centered horizontally */
     int dy;
-    if (animation[animcycle]->get_height()<image_centered_threshold)
-        dy=(image_centered_threshold - animation[animcycle]->get_height())/2; /* centered vertically */
+    if (animation[animcycle]->get_height() < image_centered_threshold)
+        dy = (image_centered_threshold - animation[animcycle]->get_height()) / 2; /* centered vertically */
     else
-        dy=0;   /* top of screen, as not too much space was left for info lines */
+        dy = 0; /* top of screen, as not too much space was left for info lines */
     app->screen->blit(*animation[animcycle], dx, dy);
 
     if (show_status) {
-        if (Joystick::have_joystick() && alternate_status) {
-            // TRANSLATORS: 40 chars max. Joy here is the joystick (that one can also select the cave)
-            app->status_line(_("Joy: select   Fire: play"));
-        } else {
-            // TRANSLATORS: 40 chars max. Select the game to play.
-            if (get_active_logger().empty()) {
-                app->status_line(_("Crsr: select   Space: play   H: help"));
-            } else {
-                app->status_line(_("Crsr: select   Space: play   X: errors"));
+        if (get_active_logger().empty()) {
+            switch (which_status) {
+                case 0:
+                    // TRANSLATORS: 40 chars max. Select the game to play.
+                    app->status_line(_("Crsr: select   Space: play   H: help"));
+                    break;
+                case 1:
+#ifdef HAVE_GTK
+                    /* the gtk version has an editor */
+                    // TRANSLATORS: 40 chars max.
+                    app->status_line(_("F: hall of fame  E: editor  R: replays"));
+#else
+                    /* the non-gtk version has no editor */
+                    // TRANSLATORS: 40 chars max.
+                    app->status_line(_("F: hall of fame    R: replays"));
+#endif
+                    break;
+                case 2:
+                    // TRANSLATORS: 40 chars max. Joy here is the joystick (that one can also select the cave)
+                    app->status_line(_("Joy: select   Fire: play"));
+                    break;
             }
+        } else {
+            app->status_line(_("Crsr: select   Space: play   X: errors"));
         }
     }
     /* selected cave */
@@ -161,16 +178,20 @@ void TitleScreenActivity::redraw_event() {
         app->blittext_n(0, y_caveline, CPrintf(_("%cNo caves.")) % GD_COLOR_INDEX_WHITE);
     } else {
         // TRANSLATORS: Cave is the name of the cave to play
-        app->blittext_n(0, y_caveline, CPrintf(_("%cCave: %c%s%c/%c%d")) % GD_COLOR_INDEX_WHITE % GD_COLOR_INDEX_YELLOW % app->caveset->cave(cavenum).name % GD_COLOR_INDEX_WHITE % GD_COLOR_INDEX_YELLOW % (levelnum+1));
+        if (caveset_has_levels) {
+            app->blittext_n(0, y_caveline, CPrintf(_("%cCave: %c%s%c/%c%d")) % GD_COLOR_INDEX_WHITE % GD_COLOR_INDEX_YELLOW % app->caveset->cave(cavenum).name % GD_COLOR_INDEX_WHITE % GD_COLOR_INDEX_YELLOW % (levelnum + 1));
+        } else {
+            app->blittext_n(0, y_caveline, CPrintf(_("%cCave: %c%s%c")) % GD_COLOR_INDEX_WHITE % GD_COLOR_INDEX_YELLOW % app->caveset->cave(cavenum).name);
+        }
     }
 
-    app->screen->flip();
+    app->screen->drawing_finished();
 }
 
 
 static int previous_selectable_cave(CaveSet &caveset, unsigned cavenum) {
-    unsigned cn=cavenum;
-    while (cn>0) {
+    unsigned cn = cavenum;
+    while (cn > 0) {
         cn--;
         if (gd_all_caves_selectable || caveset.cave(cn).selectable)
             return cn;
@@ -182,8 +203,8 @@ static int previous_selectable_cave(CaveSet &caveset, unsigned cavenum) {
 
 
 static int next_selectable_cave(CaveSet &caveset, unsigned cavenum) {
-    unsigned cn=cavenum;
-    while (cn+1<caveset.caves.size()) {
+    unsigned cn = cavenum;
+    while (cn + 1 < caveset.caves.size()) {
         cn++;
         if (gd_all_caves_selectable || caveset.cave(cn).selectable)
             return cn;
@@ -198,26 +219,28 @@ void TitleScreenActivity::timer_event(int ms_elapsed) {
     time_ms += ms_elapsed;
     if (time_ms >= 40) {
         time_ms -= 40;
-        animcycle=(animcycle+1)%animation.size();
+        animcycle = (animcycle + 1) % animation.size();
         frames++;
-        if (frames>100) {
-            frames=0;
-            alternate_status=!alternate_status;
+        if (frames > 100) {
+            frames = 0;
+            which_status += 1;
+            if (which_status > 2 || (!Joystick::have_joystick() && which_status == 2))
+                which_status = 0;
         }
 
         /* on every 5th timer event... */
         if (frames % 5 == 0) {
             /* joystick or keyboard up */
-            if (app->gameinput->up()) {
+            if (caveset_has_levels && app->gameinput->up()) {
                 levelnum++;
-                if (levelnum>4)
-                    levelnum=4;
+                if (levelnum > 4)
+                    levelnum = 4;
             }
             /* joystick or keyboard down */
-            if (app->gameinput->down()) {
+            if (caveset_has_levels && app->gameinput->down()) {
                 levelnum--;
-                if (levelnum<0)
-                    levelnum=0;
+                if (levelnum < 0)
+                    levelnum = 0;
             }
             /* joystick or keyboard left */
             if (app->gameinput->left())
@@ -236,59 +259,17 @@ void TitleScreenActivity::timer_event(int ms_elapsed) {
             }
         }
 
-        redraw_event();
+        queue_redraw();
     }
-}
-
-
-void show_errors(App *app, Logger &l) {
-    std::string text;
-
-    Logger::Container const &errors = l.get_messages();
-    for (Logger::Container::const_iterator it = errors.begin(); it != errors.end(); ++it) {
-        text += it->message;
-        text += "\n\n";
-    }
-    // TRANSLATORS: 40 chars max
-    app->show_text_and_do_command(_("GDASH ERROR CONSOLE"), text);
-    l.clear();
 }
 
 
 void TitleScreenActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
     switch (keycode) {
         case 'h':
-        case 'H': {
-            static char const *strings[]= {
-                // TRANSLATORS: cursor keys selected for playing, or joystick movement
-                _("Cursor, joy"), _("Select cave & level"),
-                // TRANSLATORS: users press space of game/joystick fire button to play
-                _("Space, Fire1"), _("Play the game"),
-                "", "",
-                // TRANSLATORS: string should be short (~20 chars)
-                "L, Tab (C)", _("Load (installed caves)"),
-                // TRANSLATORS: string should be short (~20 chars)
-                "S (N)", _("Save (Save as)"),
-                "I", _("Caveset info"),
-                "F", _("Hall of fame"),
-                "R", _("Replays"),
-                "", "",
-                "E", _("Editor"),
-                "", "",
-                "F9", _("Sound volume"),
-                // TRANSLATORS: string should be short (~20 chars)
-                "F11", _("Fullscreen on/off"),
-                "O", _("Options"),
-                "K", _("Keyboard options"),
-                "X", _("Error console"),
-                "A", _("About GDash"),
-                "", "",
-                "Escape, Q", _("Quit game"),
-                NULL
-            };
-            app->show_text_and_do_command(_("GDash Help"), help_strings_to_string(strings));
-        }
-        break;
+        case 'H':
+            app->show_help(titlehelp);
+            break;
         case 'a':
         case 'A':
             app->show_about_info();
@@ -316,7 +297,9 @@ void TitleScreenActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
             break;
         case 'e':
         case 'E':
+#ifdef HAVE_GTK
             app->start_editor();
+#endif
             break;
         case 'o':
         case 'O':
@@ -329,6 +312,10 @@ void TitleScreenActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
         case 'f':
         case 'F':
             app->enqueue_command(new ShowHighScoreCommand(app, NULL, -1));
+            break;
+        case 't':
+        case 'T':
+            app->enqueue_command(new ShowStatisticsCommand(app));
             break;
         case 'x':
         case 'X':
@@ -354,8 +341,9 @@ void TitleScreenActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
             if (app->caveset->edited)
                 app->quit_event();
             else
+                // TRANSLATORS: Game means the application here.
                 app->ask_yesorno_and_do_command(_("Quit game?"), _("yes"), _("no"), new PopAllActivitiesCommand(app),
-                    SmartPtr<Command>());
+                                                SmartPtr<Command>());
             break;
     }
 }

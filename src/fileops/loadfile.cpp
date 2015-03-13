@@ -1,17 +1,24 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "fileops/loadfile.hpp"
@@ -41,9 +48,9 @@ CaveSet create_from_buffer(const unsigned char *buffer, int length, char const *
             throw std::runtime_error(_("Error loading GDS file."));
         /* no serious error :) */
         CaveSet newcaves;
-        for (std::vector<CaveStored *>::iterator it=new_caveset.begin(); it!=new_caveset.end(); ++it)
+        for (std::vector<CaveStored *>::iterator it = new_caveset.begin(); it != new_caveset.end(); ++it)
             newcaves.caves.push_back_adopt(*it);
-        newcaves.last_selected_cave=newcaves.first_selectable_cave_index();
+        newcaves.last_selected_cave = newcaves.first_selectable_cave_index();
         newcaves.set_name_from_filename(filename);
         return newcaves;
     }
@@ -95,10 +102,10 @@ CaveSet create_from_buffer(const unsigned char *buffer, int length, char const *
  * @param filename The name of the file, which can be BDCFF or other binary formats.
  * @return The caveset loaded. If impossible to load, throws an exception.
  */
-CaveSet create_from_file(const char *filename) throw(std::runtime_error) {
+CaveSet load_caveset_from_file(const char *filename) {
     std::vector<unsigned char> contents = load_file_to_vector(filename);
     /* -1 because the loader adds a terminating zero */
-    return create_from_buffer(&contents[0], contents.size()-1, filename);
+    return create_from_buffer(&contents[0], contents.size() - 1, filename);
 }
 
 
@@ -117,10 +124,10 @@ std::vector<unsigned char> load_file_to_vector(char const *filename) {
     is.seekg(0, is.end);
     int filesize = is.tellg();
     is.seekg(0, is.beg);
-    if (filesize > (2 * 1<<20))
+    if (filesize > (2 * 1 << 20))
         throw std::runtime_error(_("File bigger than 2MiB, refusing to load."));
     /* read file. the vector will be one bytes bigger, so it can be added a terminating zero char. */
-    std::vector<unsigned char> contents(filesize+1);
+    std::vector<unsigned char> contents(filesize + 1);
     if (!is.read((char *) &contents[0], filesize))
         throw std::runtime_error(_("Unable to read file."));
     is.close();

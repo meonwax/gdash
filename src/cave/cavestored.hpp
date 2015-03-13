@@ -1,35 +1,39 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef _GD_CAVESTORED
-#define _GD_CAVESTORED
+#ifndef CAVESTORED_HPP_INCLUDED
+#define CAVESTORED_HPP_INCLUDED
 
 #include "config.h"
 
 #include <list>
+
 #include "cave/cavebase.hpp"
 #include "cave/helper/cavehighscore.hpp"
 #include "cave/helper/reflective.hpp"
 #include "cave/helper/cavereplay.hpp"
 #include "cave/object/caveobject.hpp"
 #include "cave/helper/adoptingcontainer.hpp"
-
-#define GD_TITLE_SCREEN_MAX_WIDTH 320
-#define GD_TITLE_SCREEN_MAX_HEIGHT 192
-#define GD_TITLE_SCROLL_MAX_WIDTH 320
-#define GD_TITLE_SCROLL_MAX_HEIGHT 32
+#include "cave/helper/cavemap.hpp"
 
 typedef AdoptingContainer<CaveObject> CaveObjectStore;
 
@@ -50,24 +54,42 @@ public:
         return new CaveStored(*this);
     }
 
+    enum {
+        GD_TITLE_SCREEN_MAX_WIDTH = 320,
+        GD_TITLE_SCREEN_MAX_HEIGHT = 192,
+        GD_TITLE_SCROLL_MAX_WIDTH = 320,
+        GD_TITLE_SCROLL_MAX_HEIGHT = 32
+    };
+
     /* reflective class function reimplementations */
+private:
+    static PropertyDescription const descriptor[];
+public:
     virtual PropertyDescription const *get_description_array() const {
         return descriptor;
     }
-private:
-    static PropertyDescription const descriptor[];
 
+    /* other reflective dialogs */
 public:
     static PropertyDescription const color_dialog[];
     static PropertyDescription const random_dialog[];
+    static PropertyDescription const cave_statistics_data[];
+
     // Player's data
     HighScoreTable highscore;                   ///< Highscore table
+    GdIntLevels stat_level_played;
+    GdIntLevels stat_level_played_successfully;
+    GdIntLevels stat_level_best_time;
+    GdIntLevels stat_level_most_diamonds;
+    GdIntLevels stat_level_highest_score;
     std::list<CaveReplay> replays;              ///< List of replays (demos) to this cave
 
     // Cave elements data - map + objects
-    CaveMap<GdElementEnum> map;                   ///< cave map
+    CaveMapClever<GdElementEnum> map;                   ///< cave map
     CaveObjectStore objects;                    ///< Stores cave drawing objects
 
+    /// Returns true, if it has different levels.
+    bool has_levels();
     void set_gdash_defaults();
 
     /// For convenience - add object to cave.
@@ -115,5 +137,6 @@ public:
 
     GdString unknown_tags;                  ///< stores read-but-not-understood strings from bdcff, so we can save them later.
 };
+
 
 #endif

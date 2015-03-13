@@ -7,7 +7,8 @@ TitleScreen=iVBORw0KGgoAAAANSUhEUgAAAUAAAACgCAIAAADywSLLAAAAA3NCSVQICAjb4U/gAAAg
 Levels=5
 
 [cave]
-Name=Cave A
+Name=Cave A: Intro
+Description=Get past the firefly dens, and blow your way into the chamber containing the enchanted wall.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -57,7 +58,8 @@ Point=5 18 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave B
+Name=Cave B: Silos
+Description=The silo areas contain amoebas which must be blocked off. Use the rocks at the top and two at either end to do so. Wait for the amoeba to suffocate and turn into jewels, then release the rocks that plug the bottom of the silos.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -101,7 +103,8 @@ Point=38 16 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave C
+Name=Cave C: Spirals
+Description=This is a straightforward contest (at least at the lower levels). Rockford must pick up almost all the jewels to exit. At higher levels, he must use coordination and strategy to avoid the fireflies.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -139,7 +142,8 @@ Point=18 10 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave D
+Name=Cave D: Breakthrough
+Description=Clear the area between amoeba and fireflies, then release squadrons of fireflies. I usually release the middle squadron, which flies up and around the amoeba. If amoeba is sufficiently breached, release top squadron. Make sure amoeba is breached sufficiently for you to go in and get all the jewels and get out. If a looping firefly is blocking the way out, wait for amoeba to destroy it.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -180,6 +184,7 @@ Point=1 10 OUTBOX
 
 [cave]
 Name=Intermission 1
+Description=This one turns out not to be solvable 100% of the time. The trick is to release fireflies so that the jewel falls to the bottom without getting blown up. It can then be picked up.
 Selectable=false
 Intermission=true
 IntermissionProperties.instantlife=true
@@ -215,7 +220,8 @@ Point=2 10 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave E
+Name=Cave E: Shower
+Description=This is a matter of dexterity, and ultimately pattern learning, because the shower of jewels and rocks is deterministic. An enchanted wall just below the slime takes care of objects that are out of play.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -251,7 +257,8 @@ Point=35 18 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave F
+Name=Cave F: Gauntlet
+Description=In the first phase, you must avoid the fireflies. This is a matter of learning the rhythm. Visually, I move Rockford just after a firefly has moved below him, and I pause him to the left of each "platform". In the second phase you clean out jewels. I get all the jewels in the lower half first. It is possible to get all jewels.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -294,7 +301,8 @@ Raster=6 7 1 3 1 6 FIREFLYr
 [/cave]
 
 [cave]
-Name=Cave G
+Name=Cave G: Jail
+Description=Since the exit is surrounded by walls, you must blast through, starting from the rightmost wall, by dropping conveniently placed rocks on fireflies.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -333,7 +341,8 @@ Point=12 11 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave H
+Name=Cave H: Ring around the rosy
+Description=The trick is to make the fireflies circulate around a much smaller lump of dirt, so that they bump each other out of the loop and can be led to the amoeba. The way I do it is to move Rockford right 3, then down 6, then right again, so as to cut the "island" down to an L-shape. Since the fireflies take a while to follow, I use the time to cut out several columns under the amoeba, which arriving fireflies will use from right to left, as the columns get clogged with jewels.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -371,6 +380,7 @@ Point=19 4 OUTBOX
 
 [cave]
 Name=Intermission 2
+Description=This is like Cave E of BD1. The trick is to come in from the right for the jewels in the first row and from the left for the second row. Wait until enemy has flown over the jewel, then rush in. Enemy will fly to where you were before and not bother you if you keep going.
 Selectable=false
 Intermission=true
 IntermissionProperties.instantlife=true
@@ -412,7 +422,8 @@ Point=18 10 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave I
+Name=Cave I: Fast tricks
+Description=The trick here is to move around the islands counter-clockwise, as do the fireflies. It is best to switch to a new island just after a firefly has passed, so you are chasing it, not vice versa. The firefly on the centre vertical island is a bit of a spoiler, so I usually kill him with the second jewel from the bottom.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -457,7 +468,8 @@ Point=38 13 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave J
+Name=Cave J: Mixed doubles
+Description=A special trick works best here, and would be a necessity at higher levels. Move left two rows below a rock pair, and then right one row below the same pair. The rocks will drop, but only the butterfly will come out, while the firefly loops. Moving down and then up under one of the fallen rocks, wait until the butterfly follows and then drop a rock. At higher levels, to ensure that butterflies follow, go left and follow the outside border counter-clockwise, then work on the lower right pair first.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -492,7 +504,8 @@ Point=30 15 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave K
+Name=Cave K: Snake
+Description=Since the fireflies fill up the path you make, you have to collect all the jewels, wihout recrossing your path.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -530,7 +543,8 @@ Point=35 18 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave L
+Name=Cave L: Gridlock
+Description=Try to get to the bottom, and clear out as much dirt from the bottom up until getting trapped in a room becomes unlikely.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -568,6 +582,7 @@ Point=37 6 OUTBOX
 
 [cave]
 Name=Intermission 3
+Description=Run to the bottom, wait until left most firefly has touched bottom, then cut out the bottom of the four left columns of dirt, run to the left wall, and up. It will be easy to avoid the four fireflies while you do the same manoeuvre to the next four (or just go for the jewels, if you've got the timing right).
 Selectable=false
 Intermission=true
 IntermissionProperties.instantlife=true
@@ -606,7 +621,8 @@ Point=18 5 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave M
+Name=Cave M: Combination
+Description=The exit is at the mid-lower left of the cave (you just need to get one jewel to get it flashing). Knock out dirt on the bottom two rows so that jewels line up horizontally. Work your way to the right of the screen in this manner, and then run all the way back along a solid row of jewels. In some levels you will sometimes need two partial rows of jewels by a column.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -643,7 +659,8 @@ Point=2 13 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave N
+Name=Cave N: Tree
+Description=There are 3 rows of 7 jewels. The top row is the most difficult, but the following strategy works well. Stand below a jewel until firefly traffic is sparse. Grab the jewel (by using the button) and then run under a rock, which will seal off your passage from the fireflies. In this way, the situation is kept under control, because you're never directly in the path of a firefly.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -681,7 +698,8 @@ Point=20 19 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave O
+Name=Cave O: Cocoons
+Description=This is four puzzles in one, and they can be attacked separately.\nFor the first, push the rock to where the butterfly makes the vertical leg of its cycle, and then drop the rock on it.\nFor the second, bore a hole in the dirt at the bottom of the cell, and then stand under the rock. The trick here is to keep the butterfly on a vertical path long enough to make the timing of the dropping rock less crucial.\nFor the third, drop the lower rock onto the wall. When you release the butterfly, this rock will be enough to lead the butterfly under the upper rock with which you can bomb it.\nFor the fourth, move counter-clockwise under the cage, release the butterfly, and drop the rock on him as he comes up the left hand-side of the resulting island.  Or, for more control, drop the rock on a ledge you create beside the double enchanted wall, and then wait for the butterfly to come around.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -734,7 +752,8 @@ Point=38 3 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave P
+Name=Cave P: Spelunking
+Description=The exit is in the centre of the cave. The exact solution is hard to describe, but the general strategy is to go down the sides to the bottom, and then to undermine as much as possible under the exit, until finally enough rubble comes down to allow you to get to the top and out the exit.
 Intermission=false
 IntermissionProperties.instantlife=true
 IntermissionProperties.rewardlife=false
@@ -767,6 +786,7 @@ Point=20 11 OUTBOX
 
 [cave]
 Name=Intermission 4
+Description=Put the rock right one space. Get the jewel (as in Intermission 2) and lead the firefly under the rock. When it explodes, the other fireflies are released and the exit becomes accessible.
 Selectable=false
 Intermission=true
 IntermissionProperties.instantlife=true

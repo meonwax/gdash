@@ -1,17 +1,24 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
@@ -20,32 +27,29 @@
 #include <glib/gi18n.h>
 
 #include "fileops/loadfile.hpp"
-#include "gtk/gtkpixbuffactory.hpp"
-#include "cave/cavestored.hpp"
+#include "fileops/highscore.hpp"
 #include "cave/caveset.hpp"
 #include "misc/logger.hpp"
-#include "misc/printf.hpp"
-#include "misc/util.hpp"
-#include "cave/elementproperties.hpp"
+#include "gtk/gtkpixbuf.hpp"
+#include "gtk/gtkpixbuffactory.hpp"
+#include "gtk/gtkscreen.hpp"
+#include "editor/editorcellrenderer.hpp"
 #include "settings.hpp"
-
 #include "gtk/gtkui.hpp"
-#include "gtk/gtkapp.hpp"
-#include "framework/commands.hpp"
+#include "misc/about.hpp"
+#include "misc/helptext.hpp"
 
 /* pixbufs of icons and the like */
 #include "icons.cpp"
-/* title image and icon */
-#include "gdash_icon_48.cpp"
 
-static char *last_folder=NULL;
+static char *last_folder = NULL;
 
 void gd_register_stock_icons() {
     /* a table of icon data (guint8*, static arrays included from icons.h) and stock id. */
     static struct {
         const guint8 *data;
         const char *stock_id;
-    } icons[]= {
+    } icons[] = {
         { cave_editor, GD_ICON_CAVE_EDITOR },
         { move, GD_ICON_EDITOR_MOVE },
         { add_join, GD_ICON_EDITOR_JOIN },
@@ -72,13 +76,14 @@ void gd_register_stock_icons() {
         { replay, GD_ICON_REPLAY },
         { keyboard, GD_ICON_KEYBOARD },
         { image, GD_ICON_IMAGE },
+        { statistics, GD_ICON_STATISTICS },
     };
 
-    GtkIconFactory *factory=gtk_icon_factory_new();
-    for (unsigned i=0; i<G_N_ELEMENTS(icons); ++i) {
+    GtkIconFactory *factory = gtk_icon_factory_new();
+    for (unsigned i = 0; i < G_N_ELEMENTS(icons); ++i) {
         /* 3rd param: copy pixels = false */
-        GdkPixbuf *pixbuf=gdk_pixbuf_new_from_inline(-1, icons[i].data, FALSE, NULL);
-        GtkIconSet *iconset=gtk_icon_set_new_from_pixbuf(pixbuf);
+        GdkPixbuf *pixbuf = gdk_pixbuf_new_from_inline(-1, icons[i].data, FALSE, NULL);
+        GtkIconSet *iconset = gtk_icon_set_new_from_pixbuf(pixbuf);
         g_object_unref(pixbuf);
         gtk_icon_factory_add(factory, icons[i].stock_id, iconset);
     }
@@ -88,9 +93,14 @@ void gd_register_stock_icons() {
 
 
 GdkPixbuf *gd_icon() {
-    GTKPixbuf pb(sizeof(gdash_icon_48), gdash_icon_48);
-    g_object_ref(pb.get_gdk_pixbuf());
-    return pb.get_gdk_pixbuf();
+    GInputStream *is = g_memory_input_stream_new_from_data(Screen::gdash_icon_48_png, Screen::gdash_icon_48_size, NULL);
+    GError *error = NULL;
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_stream(is, NULL, &error);
+    g_object_unref(is);
+    if (error != NULL) {
+        throw std::runtime_error("cannot open inlined icon");
+    }
+    return pixbuf;
 }
 
 
@@ -98,43 +108,43 @@ GdkPixbuf *gd_icon() {
 /* they have floating reference. */
 /* the list is to be freed by the caller. */
 static GList *image_load_filters() {
-    GSList *formats=gdk_pixbuf_get_formats();
+    GSList *formats = gdk_pixbuf_get_formats();
     GSList *iter;
     GtkFileFilter *all_filter;
-    GList *filters=NULL;    /* new list of filters */
+    GList *filters = NULL;  /* new list of filters */
 
-    all_filter=gtk_file_filter_new();
+    all_filter = gtk_file_filter_new();
     gtk_file_filter_set_name(all_filter, _("All image files"));
 
     /* iterate the list of formats given by gdk. create file filters for each. */
-    for (iter=formats; iter!=NULL; iter=iter->next) {
-        GdkPixbufFormat *frm=(GdkPixbufFormat *)iter->data;
+    for (iter = formats; iter != NULL; iter = iter->next) {
+        GdkPixbufFormat *frm = (GdkPixbufFormat *)iter->data;
 
         if (!gdk_pixbuf_format_is_disabled(frm)) {
             GtkFileFilter *filter;
             char **extensions;
             int i;
 
-            filter=gtk_file_filter_new();
+            filter = gtk_file_filter_new();
             gtk_file_filter_set_name(filter, gdk_pixbuf_format_get_description(frm));
-            extensions=gdk_pixbuf_format_get_extensions(frm);
-            for (i=0; extensions[i]!=NULL; i++) {
+            extensions = gdk_pixbuf_format_get_extensions(frm);
+            for (i = 0; extensions[i] != NULL; i++) {
                 char *pattern;
 
-                pattern=g_strdup_printf("*.%s", extensions[i]);
+                pattern = g_strdup_printf("*.%s", extensions[i]);
                 gtk_file_filter_add_pattern(filter, pattern);
                 gtk_file_filter_add_pattern(all_filter, pattern);
                 g_free(pattern);
             }
             g_strfreev(extensions);
 
-            filters=g_list_append(filters, filter);
+            filters = g_list_append(filters, filter);
         }
     }
     g_slist_free(formats);
 
     /* add "all image files" filter */
-    filters=g_list_prepend(filters, all_filter);
+    filters = g_list_prepend(filters, all_filter);
 
     return filters;
 }
@@ -148,20 +158,20 @@ char *gd_select_image_file(const char *title) {
     int result;
     char *filename;
 
-    dialog=gtk_file_chooser_dialog_new(title, guess_active_toplevel(), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+    dialog = gtk_file_chooser_dialog_new(title, guess_active_toplevel(), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT);
 
     /* obtain list of image filters, and add all to the window */
-    filters=image_load_filters();
-    for (iter=filters; iter!=NULL; iter=iter->next)
+    filters = image_load_filters();
+    for (iter = filters; iter != NULL; iter = iter->next)
         gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), GTK_FILE_FILTER(iter->data));
     g_list_free(filters);
 
-    result=gtk_dialog_run(GTK_DIALOG(dialog));
-    if (result==GTK_RESPONSE_ACCEPT)
-        filename=gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+    result = gtk_dialog_run(GTK_DIALOG(dialog));
+    if (result == GTK_RESPONSE_ACCEPT)
+        filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
     else
-        filename=NULL;
+        filename = NULL;
     gtk_widget_destroy(dialog);
 
     return filename;
@@ -172,26 +182,26 @@ char *gd_select_image_file(const char *title) {
  * Try to guess which window is active.
  */
 GtkWindow *guess_active_toplevel() {
-    GtkWidget *parent=NULL;
+    GtkWidget *parent = NULL;
 
     /* before doing anything, process updates, as windows may have been opened or closed right at the previous moment */
     gdk_window_process_all_updates();
 
     /* if we find a modal window, it is active. */
-    GList *toplevels=gtk_window_list_toplevels();
-    for (GList *iter=toplevels; iter!=NULL; iter=iter->next)
+    GList *toplevels = gtk_window_list_toplevels();
+    for (GList *iter = toplevels; iter != NULL; iter = iter->next)
         if (gtk_window_get_modal(GTK_WINDOW(iter->data)))
-            parent=(GtkWidget *)iter->data;
+            parent = (GtkWidget *)iter->data;
 
     /* if no modal window found, search for a focused toplevel */
     if (!parent)
-        for (GList *iter=toplevels; iter!=NULL; iter=iter->next)
+        for (GList *iter = toplevels; iter != NULL; iter = iter->next)
             if (gtk_window_has_toplevel_focus(GTK_WINDOW(iter->data)))
-                parent=(GtkWidget *)iter->data;
+                parent = (GtkWidget *)iter->data;
 
     /* if any of them is focused, just choose the last from the list as a fallback. */
     if (!parent && toplevels)
-        parent=(GtkWidget *) g_list_last(toplevels)->data;
+        parent = (GtkWidget *) g_list_last(toplevels)->data;
     g_list_free(toplevels);
 
     if (parent)
@@ -209,13 +219,13 @@ GtkWindow *guess_active_toplevel() {
  * @param secondary Secondary (small) text - may be null.
  */
 static void show_message(GtkMessageType type, const char *primary, const char *secondary) {
-    GtkWidget *dialog=gtk_message_dialog_new(guess_active_toplevel(),
-                      GtkDialogFlags(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
-                      type, GTK_BUTTONS_OK,
-                      "%s", primary);
+    GtkWidget *dialog = gtk_message_dialog_new(guess_active_toplevel(),
+                        GtkDialogFlags(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
+                        type, GTK_BUTTONS_OK,
+                        "%s", primary);
     gtk_window_set_title(GTK_WINDOW(dialog), "GDash");
     /* secondary message exists an is not empty string: */
-    if (secondary && secondary[0]!=0)
+    if (secondary && secondary[0] != 0)
         gtk_message_dialog_format_secondary_markup(GTK_MESSAGE_DIALOG(dialog), "%s", secondary);
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
@@ -244,23 +254,23 @@ void gd_infomessage(const char *primary, const char *secondary) {
  */
 bool gd_discard_changes(CaveSet const &caveset) {
     /* save highscore on every ocassion when the caveset is to be removed from memory */
-    caveset.save_highscore(gd_user_config_dir);
+    save_highscore(caveset, gd_user_config_dir);
 
     /* caveset is not edited, so pretend user confirmed */
     if (!caveset.edited)
         return TRUE;
 
-    GtkWidget *dialog=gtk_message_dialog_new(guess_active_toplevel(), GtkDialogFlags(0), GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, _("Caveset \"%s\" is edited or new replays are added. Discard changes?"), caveset.name.c_str());
+    GtkWidget *dialog = gtk_message_dialog_new(guess_active_toplevel(), GtkDialogFlags(0), GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, _("Caveset \"%s\" is edited or new replays are added. Discard changes?"), caveset.name.c_str());
     gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), _("If you discard the caveset, all changes and new replays will be lost."));
     gtk_dialog_add_button(GTK_DIALOG(dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
     /* create a discard button with a trash icon and Discard text */
-    GtkWidget *button=gtk_button_new_with_mnemonic(_("_Discard"));
+    GtkWidget *button = gtk_button_new_with_mnemonic(_("_Discard"));
     gtk_button_set_image(GTK_BUTTON(button), gtk_image_new_from_stock(GTK_STOCK_DELETE, GTK_ICON_SIZE_BUTTON));
     gtk_widget_show(button);
     gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_YES);
 
-    bool discard=gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_YES;
+    bool discard = gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES;
     gtk_widget_destroy(dialog);
 
     /* return button pressed */
@@ -297,23 +307,23 @@ static void caveset_save(const gchar *filename, CaveSet &caveset) {
  * @param caveset The caveset to save.
  */
 void gd_save_caveset_as(CaveSet &caveset) {
-    GtkWidget *dialog=gtk_file_chooser_dialog_new(_("Save File As"), guess_active_toplevel(), GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
+    GtkWidget *dialog = gtk_file_chooser_dialog_new(_("Save File As"), guess_active_toplevel(), GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT);
     gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), TRUE);
 
-    GtkFileFilter *filter=gtk_file_filter_new();
+    GtkFileFilter *filter = gtk_file_filter_new();
     gtk_file_filter_set_name(filter, _("BDCFF cave sets (*.bd)"));
     gtk_file_filter_add_pattern(filter, "*.bd");
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
 
-    filter=gtk_file_filter_new();
+    filter = gtk_file_filter_new();
     gtk_file_filter_set_name(filter, _("All files (*)"));
     gtk_file_filter_add_pattern(filter, "*");
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
 
     gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), CPrintf("%s.bd") % caveset.name);
 
-    char *filename=NULL;
+    char *filename = NULL;
     if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
         filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 
@@ -321,9 +331,9 @@ void gd_save_caveset_as(CaveSet &caveset) {
     if (filename != NULL) {
         /* if it has no .bd extension, add one */
         if (!g_str_has_suffix(filename, ".bd")) {
-            char *suffixed=g_strdup_printf("%s.bd", filename);
+            char *suffixed = g_strdup_printf("%s.bd", filename);
             g_free(filename);
-            filename=suffixed;
+            filename = suffixed;
         }
         caveset_save(filename, caveset);
     }
@@ -355,18 +365,18 @@ void gd_save_caveset(CaveSet &caveset) {
  * If it is edited and not saved, this function will do nothing.
  */
 void gd_open_caveset(const char *directory, CaveSet &caveset) {
-    char *filename=NULL;
+    char *filename = NULL;
 
     /* if caveset is edited, and user does not want to discard changes */
     if (!gd_discard_changes(caveset))
         return;
 
-    GtkWidget *dialog=gtk_file_chooser_dialog_new(_("Open File"), guess_active_toplevel(), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+    GtkWidget *dialog = gtk_file_chooser_dialog_new(_("Open File"), guess_active_toplevel(), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT);
 
-    GtkFileFilter *filter=gtk_file_filter_new();
+    GtkFileFilter *filter = gtk_file_filter_new();
     gtk_file_filter_set_name(filter, _("GDash cave sets"));
-    for (int i=0; gd_caveset_extensions[i]!=NULL; i++)
+    for (int i = 0; gd_caveset_extensions[i] != NULL; i++)
         gtk_file_filter_add_pattern(filter, gd_caveset_extensions[i]);
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
 
@@ -380,11 +390,11 @@ void gd_open_caveset(const char *directory, CaveSet &caveset) {
         /* otherwise user home */
         gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), g_get_home_dir());
 
-    int result=gtk_dialog_run(GTK_DIALOG(dialog));
-    if (result==GTK_RESPONSE_ACCEPT) {
+    int result = gtk_dialog_run(GTK_DIALOG(dialog));
+    if (result == GTK_RESPONSE_ACCEPT) {
         filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
         g_free(last_folder);
-        last_folder=gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(dialog));
+        last_folder = gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(dialog));
     }
 
     /* WINDOWS GTK+ 20080926 HACK */
@@ -404,7 +414,7 @@ void gd_open_caveset(const char *directory, CaveSet &caveset) {
     /* if got a filename, load the file */
     if (filename != NULL) {
         try {
-            caveset = create_from_file(filename);
+            caveset = load_caveset_from_file(filename);
         } catch (std::exception &e) {
             gd_errormessage(_("Error loading caveset."), e.what());
         }
@@ -419,25 +429,27 @@ void gd_open_caveset(const char *directory, CaveSet &caveset) {
  * @return The new GtkLabel.
  */
 GtkWidget *gd_label_new_centered(const char *markup) {
-    GtkWidget *lab=gtk_label_new(NULL);
-    gtk_misc_set_alignment(GTK_MISC(lab), 0, 0.5);
-    gtk_label_set_markup(GTK_LABEL(lab), markup);
-
-    return lab;
+    return gtk_widget_new(GTK_TYPE_LABEL, "label", markup, "use-markup", TRUE, "xalign", (double) 0.5, NULL);
 }
 
 
 /**
- * Convenience function to create a label with centered text.
+ * Convenience function to create a label with left aligned text.
  * @param markup The text to show (in pango markup format)
  * @return The new GtkLabel.
  */
 GtkWidget *gd_label_new_leftaligned(const char *markup) {
-    GtkWidget *lab=gtk_label_new(NULL);
-    gtk_misc_set_alignment(GTK_MISC(lab), 0, 0.5);
-    gtk_label_set_markup(GTK_LABEL(lab), markup);
+    return gtk_widget_new(GTK_TYPE_LABEL, "label", markup, "use-markup", TRUE, "xalign", (double) 0.0, NULL);
+}
 
-    return lab;
+
+/**
+ * Convenience function to create a label with right aligned text.
+ * @param markup The text to show (in pango markup format)
+ * @return The new GtkLabel.
+ */
+GtkWidget *gd_label_new_rightaligned(const char *markup) {
+    return gtk_widget_new(GTK_TYPE_LABEL, "label", markup, "use-markup", TRUE, "xalign", (double) 1.0, NULL);
 }
 
 
@@ -448,7 +460,7 @@ void gd_show_errors(Logger &l, const char *title, bool always_show) {
     GtkTextIter iter;
     GdkPixbuf *pixbuf_error, *pixbuf_warning, *pixbuf_info;
 
-    GtkWidget *dialog=gtk_dialog_new_with_buttons(title, guess_active_toplevel(), GTK_DIALOG_NO_SEPARATOR, GTK_STOCK_CLOSE, GTK_RESPONSE_OK, NULL);
+    GtkWidget *dialog = gtk_dialog_new_with_buttons(title, guess_active_toplevel(), GTK_DIALOG_NO_SEPARATOR, GTK_STOCK_CLOSE, GTK_RESPONSE_OK, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
     gtk_window_set_default_size(GTK_WINDOW(dialog), 512, 384);
     GtkWidget *sw = gtk_scrolled_window_new(NULL, NULL);
@@ -457,20 +469,20 @@ void gd_show_errors(Logger &l, const char *title, bool always_show) {
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
     /* get text and show it */
-    GtkTextBuffer *buffer=gtk_text_buffer_new(NULL);
-    GtkWidget *view=gtk_text_view_new_with_buffer(buffer);
+    GtkTextBuffer *buffer = gtk_text_buffer_new(NULL);
+    GtkWidget *view = gtk_text_view_new_with_buffer(buffer);
     gtk_container_add(GTK_CONTAINER(sw), view);
     g_object_unref(buffer);
 
-    pixbuf_error=gtk_widget_render_icon(view, GTK_STOCK_DIALOG_ERROR, GTK_ICON_SIZE_MENU, NULL);
-    pixbuf_warning=gtk_widget_render_icon(view, GTK_STOCK_DIALOG_WARNING, GTK_ICON_SIZE_MENU, NULL);
-    pixbuf_info=gtk_widget_render_icon(view, GTK_STOCK_DIALOG_INFO, GTK_ICON_SIZE_MENU, NULL);
-    Logger::Container const &messages=l.get_messages();
-    for (Logger::ConstIterator error=messages.begin(); error!=messages.end(); ++error) {
+    pixbuf_error = gtk_widget_render_icon(view, GTK_STOCK_DIALOG_ERROR, GTK_ICON_SIZE_MENU, NULL);
+    pixbuf_warning = gtk_widget_render_icon(view, GTK_STOCK_DIALOG_WARNING, GTK_ICON_SIZE_MENU, NULL);
+    pixbuf_info = gtk_widget_render_icon(view, GTK_STOCK_DIALOG_INFO, GTK_ICON_SIZE_MENU, NULL);
+    Logger::Container const &messages = l.get_messages();
+    for (Logger::ConstIterator error = messages.begin(); error != messages.end(); ++error) {
         gtk_text_buffer_get_iter_at_offset(buffer, &iter, -1);
-        if (error->sev<=ErrorMessage::Message)
+        if (error->sev <= ErrorMessage::Message)
             gtk_text_buffer_insert_pixbuf(buffer, &iter, pixbuf_info);
-        else if (error->sev<=ErrorMessage::Warning)
+        else if (error->sev <= ErrorMessage::Warning)
             gtk_text_buffer_insert_pixbuf(buffer, &iter, pixbuf_warning);
         else
             gtk_text_buffer_insert_pixbuf(buffer, &iter, pixbuf_error);
@@ -503,13 +515,13 @@ void gd_show_errors(Logger &l, const char *title, bool always_show) {
  * @return true, if the user answered yes, no otherwise.
  */
 bool gd_question_yesno(const char *primary, const char *secondary) {
-    GtkWidget *dialog=gtk_message_dialog_new(guess_active_toplevel(), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", primary);
+    GtkWidget *dialog = gtk_message_dialog_new(guess_active_toplevel(), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", primary);
     if (secondary && !g_str_equal(secondary, ""))
         gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "%s", secondary);
-    int response=gtk_dialog_run(GTK_DIALOG(dialog));
+    int response = gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
 
-    return response==GTK_RESPONSE_YES;
+    return response == GTK_RESPONSE_YES;
 }
 
 
@@ -522,12 +534,113 @@ void gd_dialog_add_hint(GtkDialog *dialog, const char *hint) {
     /* turn off separator, as it does not look nice with the hint */
     gtk_dialog_set_has_separator(dialog, FALSE);
 
-    GtkWidget *align=gtk_alignment_new(0.5, 0.5, 0, 0);
+    GtkWidget *align = gtk_alignment_new(0.5, 0.5, 0, 0);
     gtk_box_pack_end(GTK_BOX(GTK_DIALOG(dialog)->vbox), align, FALSE, TRUE, 0);
-    GtkWidget *hbox=gtk_hbox_new(FALSE, 6);
+    GtkWidget *hbox = gtk_hbox_new(FALSE, 6);
     gtk_container_add(GTK_CONTAINER(align), hbox);
-    GtkWidget *label=gd_label_new_centered(hint);
+    GtkWidget *label = gd_label_new_centered(hint);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_box_pack_start(GTK_BOX(hbox), gtk_image_new_from_stock(GTK_STOCK_DIALOG_INFO, GTK_ICON_SIZE_DIALOG), FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 0);
+}
+
+
+void gd_show_about_info() {
+    gtk_show_about_dialog(guess_active_toplevel(), "program-name", "GDash", "license", About::license, "wrap-license", TRUE, "copyright", About::copyright, "authors", About::authors, "version", PACKAGE_VERSION, "comments", _(About::comments), "translator-credits", _(About::translator_credits), "website", About::website, "artists", About::artists, "documenters", About::documenters, NULL);
+}
+
+
+
+
+
+
+/**
+ * Opens a dialog, containing help text.
+ * Waits for the user to close dialog.
+ *
+ * @param help_text The paragraphs of the help text.
+ * @param parent Parent widget of the dialog box.
+ */
+void show_help_window(const helpdata help_text[], GtkWidget *parent) {
+    GTKPixbufFactory pf;
+    GTKScreen screen(pf, NULL);
+    EditorCellRenderer cr(screen, gd_theme);
+
+    /* create text buffer */
+    GtkTextIter iter;
+    GtkTextBuffer *buffer = gtk_text_buffer_new(NULL);
+    gtk_text_buffer_get_iter_at_offset(buffer, &iter, 0);
+    gtk_text_buffer_create_tag(buffer, "name", "weight", PANGO_WEIGHT_BOLD, "scale", PANGO_SCALE_LARGE, NULL);
+    gtk_text_buffer_create_tag(buffer, "bold", "weight", PANGO_WEIGHT_BOLD, "scale", PANGO_SCALE_MEDIUM, NULL);
+    for (unsigned int i = 0; g_strcmp0(help_text[i].stock_id, HELP_LAST_LINE) != 0; ++i) {
+        if (help_text[i].stock_id) {
+            GdkPixbuf *pixbuf = gtk_widget_render_icon(parent, help_text[i].stock_id, GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
+            gtk_text_buffer_insert_pixbuf(buffer, &iter, pixbuf);
+            gtk_text_buffer_insert(buffer, &iter, " ", -1);
+            g_object_unref(pixbuf);
+        }
+
+        GdElementEnum element = help_text[i].element;
+        if (element != O_NONE) {
+            gtk_text_buffer_insert_pixbuf(buffer, &iter, cr.combo_pixbuf_simple(element));
+            gtk_text_buffer_insert(buffer, &iter, " ", -1);
+            if (help_text[i].heading == NULL) {
+                /* add element name only if no other text given */
+                gtk_text_buffer_insert_with_tags_by_name(buffer, &iter, visible_name_no_attribute(element).c_str(), -1, "name", NULL);
+                gtk_text_buffer_insert(buffer, &iter, "\n", -1);
+            }
+        }
+        /* some words in big letters */
+        if (help_text[i].heading) {
+            if (element == O_NONE && i != 0 && help_text[i].stock_id == NULL)
+                gtk_text_buffer_insert(buffer, &iter, "\n", -1);
+            gtk_text_buffer_insert_with_tags_by_name(buffer, &iter, _(help_text[i].heading), -1, "name", NULL);
+            gtk_text_buffer_insert(buffer, &iter, "\n", -1);
+        }
+        /* keyboard stuff in bold */
+        if (help_text[i].keyname) {
+            gtk_text_buffer_insert(buffer, &iter, "  ", -1);
+            gtk_text_buffer_insert_with_tags_by_name(buffer, &iter, _(help_text[i].keyname), -1, "bold", NULL);
+            gtk_text_buffer_insert(buffer, &iter, "\t", -1);
+        }
+        if (help_text[i].description) {
+            /* the long text */
+            gtk_text_buffer_insert(buffer, &iter, gettext(help_text[i].description), -1);
+            gtk_text_buffer_insert(buffer, &iter, "\n", -1);
+        }
+    }
+
+    // TRANSLATORS: Title text capitalization in English
+    GtkWidget *dialog = gtk_dialog_new_with_buttons(_("GDash Help"), GTK_WINDOW(parent), GTK_DIALOG_NO_SEPARATOR, GTK_STOCK_CLOSE, GTK_RESPONSE_OK, NULL);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+    gtk_window_set_default_size(GTK_WINDOW(dialog), 512, 384);
+    GtkWidget *sw = gtk_scrolled_window_new(NULL, NULL);
+    gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), sw);
+    gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(sw), GTK_SHADOW_IN);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
+    /* get text and show it */
+    GtkWidget *view = gtk_text_view_new_with_buffer(buffer);
+    g_object_unref(buffer);
+    gtk_container_add(GTK_CONTAINER(sw), view);
+
+    /* set some tags */
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(view), FALSE);
+    gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(view), FALSE);
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(view), GTK_WRAP_WORD);
+    gtk_text_view_set_pixels_above_lines(GTK_TEXT_VIEW(view), 3);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(view), 6);
+    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(view), 6);
+    PangoTabArray *tabarray = pango_tab_array_new_with_positions(5, FALSE,
+        PANGO_TAB_LEFT, 10 * 7 * PANGO_SCALE,
+        PANGO_TAB_LEFT, 20 * 7 * PANGO_SCALE,
+        PANGO_TAB_LEFT, 30 * 7 * PANGO_SCALE,
+        PANGO_TAB_LEFT, 40 * 7 * PANGO_SCALE,
+        PANGO_TAB_LEFT, 50 * 7 * PANGO_SCALE);
+    gtk_text_view_set_tabs(GTK_TEXT_VIEW(view), tabarray);
+    pango_tab_array_free(tabarray);
+
+    gtk_widget_show_all(dialog);
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
 }

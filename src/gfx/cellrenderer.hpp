@@ -1,33 +1,41 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
 
-#ifndef _GD_GFX_CELLS
-#define _GD_GFX_CELLS
+#ifndef CELLRENDERER_HPP_INCLUDED
+#define CELLRENDERER_HPP_INCLUDED
 
 #include <vector>
 
 #include "cave/cavetypes.hpp"
-#include "cave/helper/colors.hpp"
-#include "gfx/pixmap.hpp"
+#include "cave/colors.hpp"
+#include "gfx/pixmapstorage.hpp"
 
 class PixbufFactory;
 class Pixbuf;
 class Pixmap;
+class Screen;
 
 /// @ingroup Graphics
 /// @brief The class which is responsible for rendering the cave pixbufs.
@@ -54,7 +62,7 @@ protected:
     Pixbuf *cells_pixbufs[NUM_OF_CELLS];
 
     /// The cache to store the pixbufs already rendered.
-    Pixmap *cells[3*NUM_OF_CELLS];
+    Pixmap *cells[3 * NUM_OF_CELLS];
 
     /// If using c64 gfx, these store the current color theme.
     GdColor color0, color1, color2, color3, color4, color5;
@@ -68,12 +76,11 @@ protected:
     CellRenderer &operator=(const CellRenderer &);  // not implemented
 
 public:
-    /// The pixbuf factory which is used to create pixbufs and pixmaps.
-    /// Public, so can be used by other objects - why not.
-    PixbufFactory &pixbuf_factory;
+    /// The Screen for which the CellRenderer is drawing.
+    Screen &screen;
 
     /// Constructor. Loads a theme file (or nothing); uses pixbuf_factory as a gfx engine.
-    CellRenderer(PixbufFactory &pixbuf_factory_, const std::string &theme_file);
+    CellRenderer(Screen &screen, std::string const &theme_file);
 
     /// To implement PixbufStorage.
     virtual void release_pixmaps();
@@ -105,9 +112,6 @@ public:
     const GdColor &get_background_color() const {
         return color0;
     }
-
-    /// Returns true if the pixbuf factory used uses pal emulation.
-    bool get_pal_emulation() const;
 
     /// @brief Select a color theme, when using C64 graphics.
     /// If no c64 graphics is used, then this function does nothing.

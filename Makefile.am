@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = po include src caves docs sound music
+SUBDIRS = po include src caves docs sound music shaders
 
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -Im4
 
 
 desktopdir = $(datadir)/applications
@@ -13,6 +13,8 @@ icon_DATA = gdash.png
 
 gdash.nsi: gdash.nsi.in
 	sed s/GDASH-VERSION/$(PACKAGE_VERSION)/ <$^ >$@
+	echo do not forget to strip gdash.exe
+	echo do not forget to create documentation
 
 EXTRA_DIST = \
 	$(icon_DATA) $(desktop_DATA) \

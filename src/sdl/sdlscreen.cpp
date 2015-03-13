@@ -1,35 +1,58 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
 
 #include <stdexcept>
+#include <memory>
+#include <SDL_image.h>
 
 #include "sdl/sdlscreen.hpp"
 #include "sdl/sdlpixbuf.hpp"
+#include "gfx/pixbuffactory.hpp"
 
 #include "misc/logger.hpp"
 #include "settings.hpp"
 
-// title image
-#include "gdash_icon_32.cpp"
+
+SDLPixmap::~SDLPixmap() {
+    SDL_FreeSurface(surface);
+}
+
+
+int SDLPixmap::get_width() const {
+    return surface->w;
+}
+
+
+int SDLPixmap::get_height() const {
+    return surface->h;
+}
 
 
 
-SDLScreen::SDLScreen() {
+SDLScreen::SDLScreen(PixbufFactory &pixbuf_factory)
+    : SDLAbstractScreen(pixbuf_factory) {
     surface = NULL;
 }
 
@@ -50,21 +73,23 @@ void SDLScreen::configure_size() {
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
     SDL_EnableUNICODE(1);
     /* icon */
-    SDLPixbuf icon(sizeof(gdash_icon_32), gdash_icon_32);
-    SDL_WM_SetIcon(icon.get_surface(), NULL);
+    SDL_RWops *rwop = SDL_RWFromConstMem(Screen::gdash_icon_32_png, Screen::gdash_icon_32_size);
+    SDL_Surface *icon = IMG_Load_RW(rwop, 1);  // 1 = automatically closes rwop
+    SDL_WM_SetIcon(icon, NULL);
+    SDL_FreeSurface(icon);
     set_title("GDash");
 
     /* create screen */
-    Uint32 flags = SDL_ANYFORMAT | SDL_ASYNCBLIT;
-    surface = SDL_SetVideoMode(w, h, 32, flags | (gd_fullscreen?SDL_FULLSCREEN:0));
+    Uint32 flags = SDL_ANYFORMAT;
+    surface = SDL_SetVideoMode(w, h, 0, flags | (gd_fullscreen ? SDL_FULLSCREEN : 0));
     if (gd_fullscreen && !surface)
-        surface=SDL_SetVideoMode(w, h, 32, flags);        // try the same, without fullscreen
+        surface = SDL_SetVideoMode(w, h, 0, flags);        // try the same, without fullscreen
     if (!surface)
-        throw std::runtime_error("cannot initialize sdl video");
+        throw ScreenConfigureException("cannot initialize sdl video");
     /* do not show mouse cursor */
     SDL_ShowCursor(SDL_DISABLE);
     /* warp mouse pointer so cursor cannot be seen, if the above call did nothing for some reason */
-    SDL_WarpMouse(w-1, h-1);
+    SDL_WarpMouse(w - 1, h - 1);
 }
 
 
@@ -73,8 +98,12 @@ void SDLScreen::set_title(char const *title) {
 }
 
 
-bool SDLScreen::must_redraw_all_before_flip() {
-    return false;
+bool SDLScreen::must_redraw_all_before_flip() const {
+    if (surface == NULL)
+        return false;
+    /* if we have double buffering, all stuff must be redrawn before flips. */
+    /* unused currently, but could be used for directx */
+    return (surface->flags & SDL_DOUBLEBUF) != 0;
 }
 
 
@@ -83,3 +112,7 @@ void SDLScreen::flip() {
 }
 
 
+Pixmap *SDLScreen::create_pixmap_from_pixbuf(Pixbuf const &pb, bool keep_alpha) const {
+    SDLPixbuf const &sdlpb = static_cast<SDLPixbuf const &>(pb);
+    return new SDLPixmap(keep_alpha ? SDL_DisplayFormatAlpha(sdlpb.get_surface()) : SDL_DisplayFormat(sdlpb.get_surface()));
+}

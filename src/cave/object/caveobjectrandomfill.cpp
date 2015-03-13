@@ -1,17 +1,24 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
@@ -27,21 +34,21 @@
 #include "misc/util.hpp"
 
 std::string CaveRandomFill::get_bdcff() const {
-    const char *type=c64_random?"RandomFillC64":"RandomFill";
+    const char *type = c64_random ? "RandomFillC64" : "RandomFill";
     BdcffFormat f(type);
 
     f << p1 << p2;
     f << seed[0] << seed[1] << seed[2] << seed[3] << seed[4];
     f << initial_fill;
-    if (random_fill_probability_1!=0)
+    if (random_fill_probability_1 != 0)
         f << random_fill_1 << random_fill_probability_1;
-    if (random_fill_probability_2!=0)
+    if (random_fill_probability_2 != 0)
         f << random_fill_2 << random_fill_probability_2;
-    if (random_fill_probability_3!=0)
+    if (random_fill_probability_3 != 0)
         f << random_fill_3 << random_fill_probability_3;
-    if (random_fill_probability_4!=0)
+    if (random_fill_probability_4 != 0)
         f << random_fill_4 << random_fill_probability_4;
-    if (replace_only!=O_NONE)
+    if (replace_only != O_NONE)
         f << replace_only;
 
     return f;
@@ -51,35 +58,35 @@ CaveRandomFill *CaveRandomFill::clone_from_bdcff(const std::string &name, std::i
     Coordinate p1, p2;
     int seed[5];
     GdElementEnum initial_fill, replace_only;
-    GdElementEnum random_fill[4]= {O_DIRT, O_DIRT, O_DIRT, O_DIRT};
-    int random_prob[4]= {0,0,0,0};
+    GdElementEnum random_fill[4] = {O_DIRT, O_DIRT, O_DIRT, O_DIRT};
+    int random_prob[4] = {0, 0, 0, 0};
     int j;
     std::string s1, s2;
 
     if (!(is >> p1 >> p2 >> seed[0] >> seed[1] >> seed[2] >> seed[3] >> seed[4] >> initial_fill))
         return NULL;
-    j=0;
+    j = 0;
     /* now come fill element&probability pairs. read as we find two words */
-    while (j<4 && (is >> s1 >> s2)) {
+    while (j < 4 && (is >> s1 >> s2)) {
         std::istringstream is1(s1), is2(s2);
         // read two strings - they must be fill & prob
-        if (!(is1>>random_fill[j]))
+        if (!(is1 >> random_fill[j]))
             return NULL;
-        if (!(is2>>random_prob[j]))
+        if (!(is2 >> random_prob[j]))
             return NULL;
-        s1="";
-        s2="";
+        s1 = "";
+        s2 = "";
         j++;
     }
-    if (s1!="") {
+    if (s1 != "") {
         std::istringstream is(s1);
         // one string left - must be a replace only element
-        if (!(is>>replace_only))
+        if (!(is >> replace_only))
             return NULL;
     } else
-        replace_only=O_NONE;
+        replace_only = O_NONE;
 
-    CaveRandomFill *r=new CaveRandomFill(p1, p2);
+    CaveRandomFill *r = new CaveRandomFill(p1, p2);
     r->set_replace_only(replace_only);
     r->set_seed(seed[0], seed[1], seed[2], seed[3], seed[4]);
     r->set_random_fill(initial_fill, random_fill[0], random_fill[1], random_fill[2], random_fill[3]);
@@ -89,53 +96,58 @@ CaveRandomFill *CaveRandomFill::clone_from_bdcff(const std::string &name, std::i
 }
 
 
+CaveRandomFill *CaveRandomFill::clone() const {
+    return new CaveRandomFill(*this);
+}
+
+
 CaveRandomFill::CaveRandomFill(Coordinate _p1, Coordinate _p2)
     :   CaveRectangular(GD_RANDOM_FILL, _p1, _p2),
         replace_only(O_NONE),
         c64_random(false) {
-    initial_fill=O_SPACE;
-    random_fill_1=O_DIRT;
-    random_fill_probability_1=0;
-    random_fill_2=O_DIRT;
-    random_fill_probability_2=0;
-    random_fill_3=O_DIRT;
-    random_fill_probability_3=0;
-    random_fill_4=O_DIRT;
-    random_fill_probability_4=0;
-    for (int j=0; j<5; j++)
-        seed[j]=-1;
+    initial_fill = O_SPACE;
+    random_fill_1 = O_DIRT;
+    random_fill_probability_1 = 0;
+    random_fill_2 = O_DIRT;
+    random_fill_probability_2 = 0;
+    random_fill_3 = O_DIRT;
+    random_fill_probability_3 = 0;
+    random_fill_4 = O_DIRT;
+    random_fill_probability_4 = 0;
+    for (int j = 0; j < 5; j++)
+        seed[j] = -1;
 }
 
 void CaveRandomFill::set_random_fill(GdElementEnum initial, GdElementEnum e1, GdElementEnum e2, GdElementEnum e3, GdElementEnum e4) {
-    initial_fill=initial;
-    random_fill_1=e1;
-    random_fill_2=e2;
-    random_fill_3=e3;
-    random_fill_4=e4;
+    initial_fill = initial;
+    random_fill_1 = e1;
+    random_fill_2 = e2;
+    random_fill_3 = e3;
+    random_fill_4 = e4;
 }
 
 void CaveRandomFill::set_random_prob(int i1, int i2, int i3, int i4) {
-    random_fill_probability_1=i1;
-    random_fill_probability_2=i2;
-    random_fill_probability_3=i3;
-    random_fill_probability_4=i4;
+    random_fill_probability_1 = i1;
+    random_fill_probability_2 = i2;
+    random_fill_probability_3 = i3;
+    random_fill_probability_4 = i4;
 }
 
 void CaveRandomFill::set_seed(int s1, int s2, int s3, int s4, int s5) {
-    seed[0]=s1;
-    seed[1]=s2;
-    seed[2]=s3;
-    seed[3]=s4;
-    seed[4]=s5;
+    seed[0] = s1;
+    seed[1] = s2;
+    seed[2] = s3;
+    seed[3] = s4;
+    seed[4] = s5;
 }
 
 void CaveRandomFill::draw(CaveRendered &cave) const {
     /* -1 means that it should be different every time played. */
     guint32 s;
-    if (seed[cave.rendered_on]==-1)
-        s=cave.random.rand_int();
+    if (seed[cave.rendered_on] == -1)
+        s = cave.random.rand_int();
     else
-        s=seed[cave.rendered_on];
+        s = seed[cave.rendered_on];
 
     RandomGenerator rand;
     rand.set_seed(s);
@@ -144,34 +156,34 @@ void CaveRandomFill::draw(CaveRendered &cave) const {
     c64rand.set_seed(s);
 
     /* change coordinates if not in correct order */
-    int x1=p1.x;
-    int y1=p1.y;
-    int x2=p2.x;
-    int y2=p2.y;
-    if (y1>y2)
+    int x1 = p1.x;
+    int y1 = p1.y;
+    int x2 = p2.x;
+    int y2 = p2.y;
+    if (y1 > y2)
         std::swap(y1, y2);
-    if (x1>x2)
+    if (x1 > x2)
         std::swap(x1, x2);
 
-    for (int y=y1; y<=y2; y++)
-        for (int x=x1; x<=x2; x++) {
+    for (int y = y1; y <= y2; y++)
+        for (int x = x1; x <= x2; x++) {
             int randm;
 
             if (c64_random) /* use c64 random generator */
-                randm=c64rand.random();
+                randm = c64rand.random();
             else    /* use the much better glib random generator */
-                randm=rand.rand_int_range(0, 256);
+                randm = rand.rand_int_range(0, 256);
 
-            GdElementEnum element=initial_fill;
-            if (randm<random_fill_probability_1)
-                element=random_fill_1;
-            if (randm<random_fill_probability_2)
-                element=random_fill_2;
-            if (randm<random_fill_probability_3)
-                element=random_fill_3;
-            if (randm<random_fill_probability_4)
-                element=random_fill_4;
-            if (replace_only==O_NONE || cave.map(x, y)==replace_only)
+            GdElementEnum element = initial_fill;
+            if (randm < random_fill_probability_1)
+                element = random_fill_1;
+            if (randm < random_fill_probability_2)
+                element = random_fill_2;
+            if (randm < random_fill_probability_3)
+                element = random_fill_3;
+            if (randm < random_fill_probability_4)
+                element = random_fill_4;
+            if (replace_only == O_NONE || cave.map(x, y) == replace_only)
                 cave.store_rc(x, y, element, this);
         }
 }
@@ -202,10 +214,14 @@ PropertyDescription const *CaveRandomFill::get_description_array() const {
 }
 
 std::string CaveRandomFill::get_description_markup() const {
-    if (replace_only==O_NONE)
+    if (replace_only == O_NONE)
         return SPrintf(_("Random fill from %d,%d to %d,%d"))
                % p1.x % p1.y % p2.x % p2.y;
     else
         return SPrintf(_("Random fill from %d,%d to %d,%d, replacing %ms"))
-               % p1.x % p1.y % p2.x % p2.y % gd_element_properties[replace_only].lowercase_name;
+               % p1.x % p1.y % p2.x % p2.y % visible_name_lowercase(replace_only);
+}
+
+GdElementEnum CaveRandomFill::get_characteristic_element() const {
+    return O_NONE;
 }

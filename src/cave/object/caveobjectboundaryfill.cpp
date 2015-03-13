@@ -1,17 +1,24 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
@@ -20,7 +27,6 @@
 
 #include "fileops/bdcffhelper.hpp"
 #include "cave/caverendered.hpp"
-#include "misc/printf.hpp"
 #include "cave/elementproperties.hpp"
 
 #include "cave/object/caveobjectboundaryfill.hpp"
@@ -37,6 +43,10 @@ CaveBoundaryFill *CaveBoundaryFill::clone_from_bdcff(const std::string &name, st
         return NULL;
 
     return new CaveBoundaryFill(start, fill, boundary);
+}
+
+CaveBoundaryFill *CaveBoundaryFill::clone() const {
+    return new CaveBoundaryFill(*this);
 }
 
 /// Create a new boundary fill objects.
@@ -59,10 +69,10 @@ void CaveBoundaryFill::draw_proc(CaveRendered &cave, int x, int y) const {
     /* fill with border so we do not come back */
     cave.store_rc(x, y, border_element, this);
 
-    if (x>0 && cave.map(x-1, y)!=border_element) draw_proc(cave, x-1, y);
-    if (y>0 && cave.map(x, y-1)!=border_element) draw_proc(cave, x, y-1);
-    if (x<cave.w-1 && cave.map(x+1, y)!=border_element) draw_proc(cave, x+1, y);
-    if (y<cave.h-1 && cave.map(x, y+1)!=border_element) draw_proc(cave, x, y+1);
+    if (x > 0 && cave.map(x - 1, y) != border_element) draw_proc(cave, x - 1, y);
+    if (y > 0 && cave.map(x, y - 1) != border_element) draw_proc(cave, x, y - 1);
+    if (x < cave.w - 1 && cave.map(x + 1, y) != border_element) draw_proc(cave, x + 1, y);
+    if (y < cave.h - 1 && cave.map(x, y + 1) != border_element) draw_proc(cave, x, y + 1);
 }
 
 /// Draw the object.
@@ -73,7 +83,7 @@ void CaveBoundaryFill::draw_proc(CaveRendered &cave, int x, int y) const {
 /// @param level The level the cave is rendered on.
 void CaveBoundaryFill::draw(CaveRendered &cave) const {
     /* check bounds */
-    if (start.x<0 || start.y<0 || start.x>=cave.w || start.y>=cave.h)
+    if (start.x < 0 || start.y < 0 || start.x >= cave.w || start.y >= cave.h)
         return;
 
     /* this procedure fills the area with the border element. */
@@ -81,10 +91,10 @@ void CaveBoundaryFill::draw(CaveRendered &cave) const {
 
     /* after the fill, we change all filled cells to the fill_element. */
     /* we find those by looking at the object_order map, that was filled by draw_proc/store_rc */
-    for (int y=0; y<cave.h; y++)
-        for (int x=0; x<cave.w; x++)
-            if (cave.objects_order(x, y)==this)
-                cave.map(x, y)=fill_element;
+    for (int y = 0; y < cave.h; y++)
+        for (int x = 0; x < cave.w; x++)
+            if (cave.objects_order(x, y) == this)
+                cave.map(x, y) = fill_element;
 }
 
 PropertyDescription const CaveBoundaryFill::descriptor[] = {
@@ -102,5 +112,5 @@ PropertyDescription const *CaveBoundaryFill::get_description_array() const {
 
 std::string CaveBoundaryFill::get_description_markup() const {
     return SPrintf(_("Boundary fill from %d,%d of <b>%ms</b>, border <b>%ms</b>"))
-           % start.x % start.y % gd_element_properties[fill_element].lowercase_name % gd_element_properties[border_element].lowercase_name;
+           % start.x % start.y % visible_name_lowercase(fill_element) % visible_name_lowercase(border_element);
 }

@@ -1,17 +1,24 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
@@ -21,10 +28,10 @@
 #include "cave/helper/cavesound.hpp"
 
 enum GdSoundFlag {
-    GD_SP_LOOPED = 1<<0,    ///< sound must be played looped (for example, amoeba sound)
-    GD_SP_CLASSIC = 1<<1,   ///< this is a classic sound. non-classic sounds must have replacement or GD_S_NONE
-    GD_SP_FORCE = 1<<2,     ///< force restart - do not let sample play to the end, but do a restart if the same sample is requested.
-    GD_SP_FAKE = 1<<3,      ///< not a real sound, but a "macro" which will be changed to a real sound during playing.
+    GD_SP_LOOPED = 1 << 0,  ///< sound must be played looped (for example, amoeba sound)
+    GD_SP_CLASSIC = 1 << 1, ///< this is a classic sound. non-classic sounds must have replacement or GD_S_NONE
+    GD_SP_FORCE = 1 << 2,   ///< force restart - do not let sample play to the end, but do a restart if the same sample is requested.
+    GD_SP_FAKE = 1 << 3,    ///< not a real sound, but a "macro" which will be changed to a real sound during playing.
 };
 
 struct SoundProperty {
@@ -49,7 +56,7 @@ sound_flags[] = {
     { GD_S_FALLING_WALL, "falling_wall.ogg", 0, 1, 10, GD_S_STONE},
     { GD_S_EXPANDING_WALL, "expanding_wall.ogg", 0, 1, 10, GD_S_STONE},
     { GD_S_WALL_REAPPEAR, "wall_reappear.ogg", 0, 1, 9},
-    { GD_S_DIAMOND_RANDOM, NULL, GD_SP_CLASSIC|GD_SP_FAKE, 1, 10},
+    { GD_S_DIAMOND_RANDOM, NULL, GD_SP_CLASSIC | GD_SP_FAKE, 1, 10},
     { GD_S_DIAMOND_1, "diamond_1.ogg", GD_SP_CLASSIC, 1, 10},
     { GD_S_DIAMOND_2, "diamond_2.ogg", GD_SP_CLASSIC, 1, 10},
     { GD_S_DIAMOND_3, "diamond_3.ogg", GD_SP_CLASSIC, 1, 10},
@@ -94,13 +101,13 @@ sound_flags[] = {
     { GD_S_TIMEOUT_8, "timeout_8.ogg", GD_SP_CLASSIC, 2, 27},
     { GD_S_TIMEOUT_9, "timeout_9.ogg", GD_SP_CLASSIC, 2, 28},
     { GD_S_TIMEOUT, "timeout.ogg", GD_SP_FORCE, 2, 150, GD_S_NONE},
-    { GD_S_EXPLOSION, "explosion.ogg", GD_SP_CLASSIC|GD_SP_FORCE, 2, 100},
+    { GD_S_EXPLOSION, "explosion.ogg", GD_SP_CLASSIC | GD_SP_FORCE, 2, 100},
     { GD_S_BOMB_EXPLOSION, "bomb_explosion.ogg", GD_SP_FORCE, 2, 100, GD_S_EXPLOSION},
     { GD_S_GHOST_EXPLOSION, "ghost_explosion.ogg", GD_SP_FORCE, 2, 100, GD_S_EXPLOSION},
     { GD_S_VOODOO_EXPLOSION, "voodoo_explosion.ogg", GD_SP_FORCE, 2, 100, GD_S_EXPLOSION},
     { GD_S_NITRO_EXPLOSION, "nitro_explosion.ogg", GD_SP_FORCE, 2, 100, GD_S_EXPLOSION},
     { GD_S_BOMB_PLACE, "bomb_place.ogg", 0, 2, 10, GD_S_NONE},
-    { GD_S_FINISHED, "finished.ogg", GD_SP_CLASSIC|GD_SP_FORCE|GD_SP_LOOPED, 2, 15},    // precedence larger than normal, but smaller than timeout sounds
+    { GD_S_FINISHED, "finished.ogg", GD_SP_CLASSIC | GD_SP_FORCE | GD_SP_LOOPED, 2, 15}, // precedence larger than normal, but smaller than timeout sounds
     { GD_S_SWITCH_BITER, "switch_biter.ogg", 0, 2, 10, GD_S_NONE},
     { GD_S_SWITCH_CREATURES, "switch_creatures.ogg", 0, 2, 10, GD_S_NONE},
     { GD_S_SWITCH_GRAVITY, "switch_gravity.ogg", 0, 2, 10, GD_S_NONE},
@@ -109,11 +116,11 @@ sound_flags[] = {
     { GD_S_SWITCH_REPLICATOR, "switch_replicator.ogg", 0, 2, 10, GD_S_NONE},
 
     // channel 3 sounds.
-    { GD_S_AMOEBA, "amoeba.ogg", GD_SP_CLASSIC|GD_SP_LOOPED, 3, 30},
-    { GD_S_MAGIC_WALL, "magic_wall.ogg", GD_SP_CLASSIC|GD_SP_LOOPED, 3, 30},
-    { GD_S_AMOEBA_MAGIC, "amoeba_and_magic.ogg", GD_SP_CLASSIC|GD_SP_LOOPED, 3, 30},
-    { GD_S_COVER, "cover.ogg", GD_SP_CLASSIC|GD_SP_LOOPED, 3, 100},
-    { GD_S_PNEUMATIC_HAMMER, "pneumatic.ogg", GD_SP_CLASSIC|GD_SP_LOOPED, 3, 50},
+    { GD_S_AMOEBA, "amoeba.ogg", GD_SP_CLASSIC | GD_SP_LOOPED, 3, 30},
+    { GD_S_MAGIC_WALL, "magic_wall.ogg", GD_SP_CLASSIC | GD_SP_LOOPED, 3, 30},
+    { GD_S_AMOEBA_MAGIC, "amoeba_and_magic.ogg", GD_SP_CLASSIC | GD_SP_LOOPED, 3, 30},
+    { GD_S_COVER, "cover.ogg", GD_SP_CLASSIC | GD_SP_LOOPED, 3, 100},
+    { GD_S_PNEUMATIC_HAMMER, "pneumatic.ogg", GD_SP_CLASSIC | GD_SP_LOOPED, 3, 50},
     { GD_S_WATER, "water.ogg", GD_SP_LOOPED, 3, 20, GD_S_NONE},
     { GD_S_CRACK, "crack.ogg", GD_SP_CLASSIC, 3, 150},
     { GD_S_GRAVITY_CHANGE, "gravity_change.ogg", 0, 3, 60, GD_S_NONE},
@@ -139,22 +146,22 @@ const char *gd_sound_get_filename(GdSound sound) {
 
 /// Returns true, if the sound is looped.
 bool gd_sound_is_looped(GdSound sound) {
-    return (sound_flags[sound].flags&GD_SP_LOOPED)!=0;
+    return (sound_flags[sound].flags & GD_SP_LOOPED) != 0;
 }
 
 /// Returns true, if the sound is a "macro".
 bool gd_sound_is_fake(GdSound sound) {
-    return (sound_flags[sound].flags&GD_SP_FAKE)!=0;
+    return (sound_flags[sound].flags & GD_SP_FAKE) != 0;
 }
 
 /// Returns true, if the sound is a classic sound.
 bool gd_sound_is_classic(GdSound sound) {
-    return (sound_flags[sound].flags&GD_SP_CLASSIC)!=0;
+    return (sound_flags[sound].flags & GD_SP_CLASSIC) != 0;
 }
 
 /// Returns true, if the sound is always restarted, when playing "again".
 bool gd_sound_force_start(GdSound sound) {
-    return (sound_flags[sound].flags&GD_SP_FORCE)!=0;
+    return (sound_flags[sound].flags & GD_SP_FORCE) != 0;
 }
 
 /// Gives the classic equivalent of the sound.
@@ -183,19 +190,19 @@ static class _init {
 public:
     _init() {
         /* check if the number of sounds in the array matches. */
-        g_assert(G_N_ELEMENTS(sound_flags)==GD_S_MAX);
+        g_assert(G_N_ELEMENTS(sound_flags) == GD_S_MAX);
 
-        for (unsigned i=0; i<GD_S_MAX; i++) {
-            GdSound s=GdSound(i);
+        for (unsigned i = 0; i < GD_S_MAX; i++) {
+            GdSound s = GdSound(i);
             /* check index */
-            g_assert(sound_flags[i].sound==s);
+            g_assert(sound_flags[i].sound == s);
             if (!gd_sound_is_classic(s))
                 /* replacement for a non-classic sound must be classic */
                 g_assert(gd_sound_is_classic(gd_sound_classic_equivalent(s)));
-            if (s!=GD_S_NONE) {
+            if (s != GD_S_NONE) {
                 /* channel must be 1<=c<=4 for sound %d */
-                g_assert(gd_sound_get_channel(s)>=1);
-                g_assert(gd_sound_get_channel(s)<=4);
+                g_assert(gd_sound_get_channel(s) >= 1);
+                g_assert(gd_sound_get_channel(s) <= 4);
             }
         }
     }

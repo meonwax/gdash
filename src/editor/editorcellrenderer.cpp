@@ -1,41 +1,50 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
 
 #include <cstdlib>
 
-#include "cave/caverendered.hpp"
-#include "cave/elementproperties.hpp"
-#include "gtk/gtkpixmap.hpp"
-#include "gtk/gtkpixbuffactory.hpp"
 #include "editor/editorcellrenderer.hpp"
+#include "cave/elementproperties.hpp"
+#include "gtk/gtkpixbuf.hpp"
+#include "gtk/gtkscreen.hpp"
+#include "cave/caverendered.hpp"
+#include "gtk/gtkpixbuffactory.hpp"
 
-EditorCellRenderer::EditorCellRenderer(GTKPixbufFactory &pixbuf_factory_, const std::string &theme_file)
+
+EditorCellRenderer::EditorCellRenderer(Screen &screen, const std::string &theme_file)
     :
-    CellRenderer(pixbuf_factory_, theme_file),
+    CellRenderer(screen, theme_file),
     combo_pixbufs() {
     draw_editor_pixbufs();
 }
 
 void EditorCellRenderer::remove_cached() {
-    for (unsigned i=0; i<G_N_ELEMENTS(combo_pixbufs); ++i)
+    for (unsigned i = 0; i < G_N_ELEMENTS(combo_pixbufs); ++i)
         if (combo_pixbufs[i]) {
             g_object_unref(combo_pixbufs[i]);
-            combo_pixbufs[i]=NULL;
+            combo_pixbufs[i] = NULL;
         }
     CellRenderer::remove_cached();
 }
@@ -49,27 +58,27 @@ void EditorCellRenderer::remove_cached() {
 */
 void EditorCellRenderer::add_arrow_to_cell(GdElementEnum dest, GdElementEnum src, GdElementEnum arrow, PixbufFactory::Rotation r) {
     // if already drawn, return
-    if (cells_pixbufs[gd_element_properties[dest].image]!=NULL)
+    if (cells_pixbufs[gd_element_properties[dest].image] != NULL)
         return;
 
     /* editor image <- game image */
     copy_cell(gd_element_properties[dest].image, abs(gd_element_properties[src].image_game));
-    Pixbuf *arrow_pb = pixbuf_factory.create_rotated(cell_pixbuf(gd_element_properties[arrow].image), r);    /* arrow */
+    Pixbuf *arrow_pb = screen.pixbuf_factory.create_rotated(cell_pixbuf(gd_element_properties[arrow].image), r);    /* arrow */
     arrow_pb->blit(*cells_pixbufs[gd_element_properties[dest].image], 0, 0);
     delete arrow_pb;
 }
 
 void EditorCellRenderer::copy_cell(int dest, int src) {
-    g_assert(src<NUM_OF_CELLS);
-    g_assert(dest<NUM_OF_CELLS);
+    g_assert(src < NUM_OF_CELLS);
+    g_assert(dest < NUM_OF_CELLS);
 
     // if already created
-    if (cells_pixbufs[dest]!=NULL)
+    if (cells_pixbufs[dest] != NULL)
         return;
 
-    int pcs=cell_pixbuf(src).get_width();
-    Pixbuf *d=pixbuf_factory.create(pcs, pcs);
-    cells_pixbufs[dest]=d;
+    int pcs = cell_pixbuf(src).get_width();
+    Pixbuf *d = screen.pixbuf_factory.create(pcs, pcs);
+    cells_pixbufs[dest] = d;
     cell_pixbuf(src).copy(0, 0, pcs, pcs, *d, 0, 0);
 }
 
@@ -77,18 +86,18 @@ void EditorCellRenderer::copy_cell(int dest, int src) {
     composite two elements.
 */
 void EditorCellRenderer::create_composite_cell_pixbuf(GdElementEnum dest, GdElementEnum src1, GdElementEnum src2) {
-    int dimg=gd_element_properties[dest].image;
+    int dimg = gd_element_properties[dest].image;
 
-    g_assert(dimg<NUM_OF_CELLS);
-    if (cells_pixbufs[dimg]!=NULL)      // if already drawn
+    g_assert(dimg < NUM_OF_CELLS);
+    if (cells_pixbufs[dimg] != NULL)    // if already drawn
         return;
 
     // destination image=source1
     copy_cell(dimg, abs(gd_element_properties[src1].image_game));
     // composite source2 to destination
     // using gtk directly (this is not implemented in gdash pixbuf)
-    GdkPixbuf *srcpb=static_cast<GTKPixbuf &>(cell_pixbuf(abs(gd_element_properties[src2].image_game))).get_gdk_pixbuf();
-    GdkPixbuf *dstpb=static_cast<GTKPixbuf *>(cells_pixbufs[dimg])->get_gdk_pixbuf();
+    GdkPixbuf *srcpb = static_cast<GTKPixbuf &>(cell_pixbuf(abs(gd_element_properties[src2].image_game))).get_gdk_pixbuf();
+    GdkPixbuf *dstpb = static_cast<GTKPixbuf *>(cells_pixbufs[dimg])->get_gdk_pixbuf();
     gdk_pixbuf_composite(srcpb, dstpb, 0, 0, gdk_pixbuf_get_width(srcpb), gdk_pixbuf_get_height(srcpb), 0, 0, 1, 1, GDK_INTERP_NEAREST, 85);
 }
 
@@ -183,14 +192,14 @@ void EditorCellRenderer::draw_editor_pixbufs() {
     add_arrow_to_cell(O_WAITING_STONE, O_STONE, O_EXCLAMATION_MARK);
 
     /* blinking outbox: helps editor, drawing the cave is more simple */
-    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple)+0, gd_element_properties[O_OUTBOX_OPEN].image_game);
-    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple)+1, gd_element_properties[O_OUTBOX_OPEN].image_game);
-    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple)+2, gd_element_properties[O_OUTBOX_OPEN].image_game);
-    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple)+3, gd_element_properties[O_OUTBOX_OPEN].image_game);
-    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple)+4, gd_element_properties[O_OUTBOX_CLOSED].image_game);
-    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple)+5, gd_element_properties[O_OUTBOX_CLOSED].image_game);
-    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple)+6, gd_element_properties[O_OUTBOX_CLOSED].image_game);
-    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple)+7, gd_element_properties[O_OUTBOX_CLOSED].image_game);
+    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple) + 0, gd_element_properties[O_OUTBOX_OPEN].image_game);
+    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple) + 1, gd_element_properties[O_OUTBOX_OPEN].image_game);
+    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple) + 2, gd_element_properties[O_OUTBOX_OPEN].image_game);
+    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple) + 3, gd_element_properties[O_OUTBOX_OPEN].image_game);
+    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple) + 4, gd_element_properties[O_OUTBOX_CLOSED].image_game);
+    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple) + 5, gd_element_properties[O_OUTBOX_CLOSED].image_game);
+    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple) + 6, gd_element_properties[O_OUTBOX_CLOSED].image_game);
+    copy_cell(abs(gd_element_properties[O_PRE_OUTBOX].image_simple) + 7, gd_element_properties[O_OUTBOX_CLOSED].image_game);
 }
 
 void EditorCellRenderer::select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5) {
@@ -205,12 +214,12 @@ GdkPixbuf *EditorCellRenderer::get_element_pixbuf_with_border(int index) {
         /* scale pixbuf to that specified by gtk */
         int x, y;
         gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &x, &y);
-        GdkPixbuf *pixbuf=gdk_pixbuf_scale_simple(static_cast<GTKPixbuf &>(cell_pixbuf(index)).get_gdk_pixbuf(), x, y, GDK_INTERP_BILINEAR);
+        GdkPixbuf *pixbuf = gdk_pixbuf_scale_simple(static_cast<GTKPixbuf &>(cell_pixbuf(index)).get_gdk_pixbuf(), x, y, GDK_INTERP_BILINEAR);
         /* draw a little black border around image, makes the icons look much better */
-        GdkPixbuf *pixbuf_border=gdk_pixbuf_new(GDK_COLORSPACE_RGB, gdk_pixbuf_get_has_alpha(pixbuf), 8, x+2, y+2);
+        GdkPixbuf *pixbuf_border = gdk_pixbuf_new(GDK_COLORSPACE_RGB, gdk_pixbuf_get_has_alpha(pixbuf), 8, x + 2, y + 2);
         gdk_pixbuf_fill(pixbuf_border, 0x000000ff);    /* RGBA: opaque black */
         gdk_pixbuf_copy_area(pixbuf, 0, 0, x, y, pixbuf_border, 1, 1);
-        combo_pixbufs[index]=pixbuf_border;
+        combo_pixbufs[index] = pixbuf_border;
         g_object_unref(pixbuf);
     }
     return combo_pixbufs[index];
@@ -222,7 +231,7 @@ GdkPixbuf *EditorCellRenderer::get_element_pixbuf_with_border(int index) {
 */
 GdkPixbuf *EditorCellRenderer::combo_pixbuf(GdElementEnum element) {
     /* which pixbuf to show? */
-    int index=abs(gd_element_properties[element].image);
+    int index = abs(gd_element_properties[element].image);
     return get_element_pixbuf_with_border(index);
 }
 
@@ -232,7 +241,7 @@ GdkPixbuf *EditorCellRenderer::combo_pixbuf(GdElementEnum element) {
 */
 GdkPixbuf *EditorCellRenderer::combo_pixbuf_simple(GdElementEnum element) {
     /* which pixbuf to show? */
-    int index=abs(gd_element_properties[element].image_simple);
+    int index = abs(gd_element_properties[element].image_simple);
     return get_element_pixbuf_with_border(index);
 }
 
@@ -254,44 +263,44 @@ GdkPixbuf *EditorCellRenderer::combo_pixbuf_simple(GdElementEnum element) {
 GdkPixbuf *gd_drawcave_to_pixbuf(const CaveRendered *cave, EditorCellRenderer &cr, int width, int height, bool game_view, bool border) {
 
     int x1, y1, x2, y2;
-    int borderadd=border?4:0, borderpos=border?2:0;
+    int borderadd = border ? 4 : 0, borderpos = border ? 2 : 0;
 
     g_assert(!cave->map.empty());
     if (game_view) {
         /* if showing the visible part only */
-        x1=cave->x1;
-        y1=cave->y1;
-        x2=cave->x2;
-        y2=cave->y2;
+        x1 = cave->x1;
+        y1 = cave->y1;
+        x2 = cave->x2;
+        y2 = cave->y2;
     } else {
         /* showing entire cave - for example, overview in editor */
-        x1=0;
-        y1=0;
-        x2=cave->w-1;
-        y2=cave->h-1;
+        x1 = 0;
+        y1 = 0;
+        x2 = cave->w - 1;
+        y2 = cave->h - 1;
     }
 
     cr.select_pixbuf_colors(cave->color0, cave->color1, cave->color2, cave->color3, cave->color4, cave->color5);
 
     /* get size of one cell in the original pixbuf */
-    int cell_size=cr.get_cell_pixbuf_size();
+    int cell_size = cr.get_cell_pixbuf_size();
 
     /* add two pixels black border: +4 +4 for width and height */
-    GdkPixbuf *pixbuf=gdk_pixbuf_new(GDK_COLORSPACE_RGB, gdk_pixbuf_get_has_alpha(cr.cell_gdk_pixbuf(0)), 8, (x2-x1+1)*cell_size+borderadd, (y2-y1+1)*cell_size+borderadd);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, gdk_pixbuf_get_has_alpha(cr.cell_gdk_pixbuf(0)), 8, (x2 - x1 + 1) * cell_size + borderadd, (y2 - y1 + 1) * cell_size + borderadd);
     if (border)
         gdk_pixbuf_fill(pixbuf, 0x000000ff);    /* fill with opaque black, so border is black */
 
     /* take visible part into consideration */
-    for (int y=y1; y<=y2; y++)
-        for (int x=x1; x<=x2; x++) {
-            GdElementEnum element=cave->map(x,y);
+    for (int y = y1; y <= y2; y++)
+        for (int x = x1; x <= x2; x++) {
+            GdElementEnum element = cave->map(x, y);
             int draw;
 
             if (game_view) {
                 /* visual effects */
                 switch (element) {
                     case O_DIRT:
-                        element=cave->dirt_looks_like;
+                        element = cave->dirt_looks_like;
                         break;
                     case O_EXPANDING_WALL:
                     case O_H_EXPANDING_WALL:
@@ -299,11 +308,11 @@ GdkPixbuf *gd_drawcave_to_pixbuf(const CaveRendered *cave, EditorCellRenderer &c
                         /* only change the view, if it is not brick wall (the default value). */
                         /* so arrows remain - as well as they always remaing for the steel expanding wall,
                            which has no visual effect. */
-                        if (cave->expanding_wall_looks_like!=O_BRICK)
-                            element=cave->expanding_wall_looks_like;
+                        if (cave->expanding_wall_looks_like != O_BRICK)
+                            element = cave->expanding_wall_looks_like;
                         break;
                     case O_AMOEBA_2:
-                        element=cave->amoeba_2_looks_like;
+                        element = cave->amoeba_2_looks_like;
                         break;
                     default:
                         /* we check that this element has no visual effect. */
@@ -311,27 +320,36 @@ GdkPixbuf *gd_drawcave_to_pixbuf(const CaveRendered *cave, EditorCellRenderer &c
                         g_assert((gd_element_properties[element].flags & P_VISUAL_EFFECT) == 0);
                         break;
                 }
-                draw=abs(gd_element_properties[element].image_simple);                /* pixbuf like in the editor */
+                draw = abs(gd_element_properties[element].image_simple);              /* pixbuf like in the editor */
             } else
-                draw=gd_element_properties[element].image;                /* pixbuf like in the editor */
-            gdk_pixbuf_copy_area(cr.cell_gdk_pixbuf(draw), 0, 0, cell_size, cell_size, pixbuf, (x-x1)*cell_size+borderpos, (y-y1)*cell_size+borderpos);
+                draw = gd_element_properties[element].image;              /* pixbuf like in the editor */
+            gdk_pixbuf_copy_area(cr.cell_gdk_pixbuf(draw), 0, 0, cell_size, cell_size, pixbuf, (x - x1)*cell_size + borderpos, (y - y1)*cell_size + borderpos);
         }
 
     /* if requested size is 0, return unscaled */
-    if (width==0 || height==0)
+    if (width == 0 || height == 0)
         return pixbuf;
 
     /* decide which direction fits in rectangle */
     /* cells are squares... no need to know cell_size here */
     float scale;
     if ((float) gdk_pixbuf_get_width(pixbuf) / (float) gdk_pixbuf_get_height(pixbuf) >= (float) width / (float) height)
-        scale=width / ((float) gdk_pixbuf_get_width(pixbuf));
+        scale = width / ((float) gdk_pixbuf_get_width(pixbuf));
     else
-        scale=height / ((float) gdk_pixbuf_get_height(pixbuf));
+        scale = height / ((float) gdk_pixbuf_get_height(pixbuf));
 
     /* scale to specified size */
-    GdkPixbuf *scaled=gdk_pixbuf_scale_simple(pixbuf, gdk_pixbuf_get_width(pixbuf)*scale, gdk_pixbuf_get_height(pixbuf)*scale, GDK_INTERP_BILINEAR);
+    GdkPixbuf *scaled = gdk_pixbuf_scale_simple(pixbuf, gdk_pixbuf_get_width(pixbuf) * scale, gdk_pixbuf_get_height(pixbuf) * scale, GDK_INTERP_BILINEAR);
     g_object_unref(pixbuf);
 
     return scaled;
+}
+
+
+GdkPixbuf *EditorCellRenderer::cell_gdk_pixbuf(unsigned i) {
+    return static_cast<GTKPixbuf &>(cell_pixbuf(i)).get_gdk_pixbuf();
+}
+
+cairo_surface_t *EditorCellRenderer::cell_cairo_surface(unsigned i) {
+    return static_cast<GTKPixmap &>(cell(i)).get_cairo_surface();
 }

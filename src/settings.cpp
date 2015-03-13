@@ -1,17 +1,24 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
@@ -20,13 +27,17 @@
 #include <glib.h>
 #include <map>
 
-#include "settings.hpp"
 #include "misc/logger.hpp"
 #include "misc/printf.hpp"
+#include "misc/autogfreeptr.hpp"
+#include "cave/colors.hpp"
 #include "misc/util.hpp"
 #include "cave/gamerender.hpp"
 #include "gfx/pixbuffactory.hpp"
 #include "input/gameinputhandler.hpp"
+#include "mainwindow.hpp"
+
+#include "settings.hpp"
 
 #ifdef HAVE_SDL
 #include <SDL.h>
@@ -42,35 +53,35 @@
 
 /* possible languages. */
 /* they are not translated, so every language name is show in that language itself. */
-const char *gd_languages_names[]= {N_("System default"), "English", "Deutsch", "Magyar", NULL};
+const char *gd_languages_names[] = {N_("System default"), "English", "Deutsch", "Magyar", NULL};
 /* this should correspond to the above one. */
-static const char *languages_for_env[]= { NULL, "en", "de", "hu" };
+static const char *languages_for_env[] = { NULL, "en", "de", "hu" };
 
 #ifdef G_OS_WIN32
 /* locale names used in windows. */
-static const char *language_locale_default[]= { "", NULL, };
-static const char *language_locale_en[]= { "English", NULL, };
-static const char *language_locale_de[]= { "German", NULL, };
-static const char *language_locale_hu[]= { "Hungarian", NULL, };
+static const char *language_locale_default[] = { "", NULL, };
+static const char *language_locale_en[] = { "English", NULL, };
+static const char *language_locale_de[] = { "German", NULL, };
+static const char *language_locale_hu[] = { "Hungarian", NULL, };
 #else
 /* locale names used in unix. */
 /* anyone, a better solution for this? */
-static const char *language_locale_default[]=
-    { "", NULL, };
-static const char *language_locale_en[]=
-    { "en_US.UTF-8", "en_US.UTF8", "en_US.ISO8859-15", "en_US.ISO8859-1", "en_US.US-ASCII", "en_US", "en", NULL, };
-static const char *language_locale_de[]= {
+static const char *language_locale_default[] =
+{ "", NULL, };
+static const char *language_locale_en[] =
+{ "en_US.UTF-8", "en_US.UTF8", "en_US.ISO8859-15", "en_US.ISO8859-1", "en_US.US-ASCII", "en_US", "en", NULL, };
+static const char *language_locale_de[] = {
     "de_DE.UTF-8", "de_DE.UTF8", "de_DE.ISO8859-15", "de_DE.ISO8859-1", "de_DE",
     "de_AT.UTF-8", "de_AT.UTF8", "de_AT.ISO8859-15", "de_AT.ISO8859-1", "de_AT",
     "de_CH.UTF-8", "de_CH.UTF8", "de_CH.ISO8859-15", "de_CH.ISO8859-1", "de_CH",
     "de", NULL,
 };
-static const char *language_locale_hu[]=
-    { "hu_HU.UTF-8", "hu_HU.ISO8859-2", "hu_HU", "hu", NULL, };
+static const char *language_locale_hu[] =
+{ "hu_HU.UTF-8", "hu_HU.UTF8", "hu_HU.ISO8859-2", "hu_HU", "hu", NULL, };
 #endif    /* ifdef g_os_win32 else */
 
 /* put the locales to be tried in an array - same for windows and unix */
-static const char **language_locale[]= {
+static const char **language_locale[] = {
     language_locale_default,
     language_locale_en,
     language_locale_de,
@@ -86,84 +97,98 @@ static std::map<char const *, std::string *> settings_strings;
 /* universal settings */
 std::string gd_username;
 std::string gd_theme;
-bool gd_no_invisible_outbox=false;
-bool gd_all_caves_selectable=false;
-bool gd_import_as_all_caves_selectable=false;
-bool gd_use_bdcff_highscore=false;
-int gd_pal_emu_scanline_shade=80;
-bool gd_fine_scroll=false;
-bool gd_particle_effects=true;
-bool gd_show_story=true;
-bool gd_show_name_of_game=true;
-int gd_status_bar_colors=GD_STATUS_BAR_ORIGINAL;
+bool gd_no_invisible_outbox = false;
+bool gd_all_caves_selectable = false;
+bool gd_import_as_all_caves_selectable = false;
+bool gd_use_bdcff_highscore = false;
+int gd_pal_emu_scanline_shade = 80;
+bool gd_fine_scroll = true;
+bool gd_particle_effects = true;
+bool gd_show_story = true;
+bool gd_show_name_of_game = true;
+int gd_status_bar_colors = GD_STATUS_BAR_ORIGINAL;
 
 /* palette settings */
-int gd_c64_palette=0;
-int gd_c64dtv_palette=0;
-int gd_atari_palette=0;
-int gd_preferred_palette=GdColor::TypeRGB;
+int gd_c64_palette = 0;
+int gd_c64dtv_palette = 0;
+int gd_atari_palette = 0;
+int gd_preferred_palette = GdColor::TypeRGB;
 /* editor settings */
-bool gd_game_view=true;    /* show animated cells instead of arrows & ... */
-bool gd_colored_objects=true;    /* show objects with different color */
-bool gd_show_object_list=true;    /* show object list */
-bool gd_show_test_label=true;    /* show a label with some variables, for testing */
-int gd_editor_window_width=800;    /* window size */
-int gd_editor_window_height=520;    /* window size */
+bool gd_game_view = true;  /* show animated cells instead of arrows & ... */
+bool gd_colored_objects = true;  /* show objects with different color */
+bool gd_show_object_list = true;  /* show object list */
+int gd_editor_window_width = 800;  /* window size */
+int gd_editor_window_height = 520;  /* window size */
 bool gd_fast_uncover_in_test = true;
 
 /* preferences */
-int gd_language=0;
-bool gd_show_preview=true;
+int gd_language = 0;
+bool gd_show_preview = true;
 
 /* graphics */
+int gd_graphics_engine = 0; /* whichever is the first one supported */
 bool gd_fullscreen = false;
-int gd_cell_scale_game=GD_SCALING_2X;
-bool gd_pal_emulation_game=false;
-int gd_cell_scale_editor=GD_SCALING_ORIGINAL;
-bool gd_pal_emulation_editor=false;
+int gd_cell_scale_factor_game = 2;
+int gd_cell_scale_type_game = GD_SCALING_NEAREST;
+bool gd_pal_emulation_game = false;
+int gd_cell_scale_factor_editor = 1;
+int gd_cell_scale_type_editor = GD_SCALING_NEAREST;
+bool gd_pal_emulation_editor = false;
 
 /* html output option */
 /* CURRENTLY ONLY FROM THE COMMAND LINE */
-char *gd_html_stylesheet_filename=NULL;
-char *gd_html_favicon_filename=NULL;
+char *gd_html_stylesheet_filename = NULL;
+char *gd_html_favicon_filename = NULL;
 
 /* GTK keyboard settings */
 #ifdef HAVE_GTK    /* only if having gtk */
-int gd_gtk_key_left=GDK_Left;
-int gd_gtk_key_right=GDK_Right;
-int gd_gtk_key_up=GDK_Up;
-int gd_gtk_key_down=GDK_Down;
-int gd_gtk_key_fire_1=GDK_Control_L;
-int gd_gtk_key_fire_2=GDK_Control_R;
-int gd_gtk_key_suicide=GDK_s;
-int gd_gtk_key_fast_forward=GDK_f;
-int gd_gtk_key_status_bar=GDK_Shift_L;
-int gd_gtk_key_restart_level=GDK_Escape;
+int gd_gtk_key_left = GDK_Left;
+int gd_gtk_key_right = GDK_Right;
+int gd_gtk_key_up = GDK_Up;
+int gd_gtk_key_down = GDK_Down;
+int gd_gtk_key_fire_1 = GDK_Control_L;
+int gd_gtk_key_fire_2 = GDK_Control_R;
+int gd_gtk_key_suicide = GDK_s;
+int gd_gtk_key_fast_forward = GDK_f;
+int gd_gtk_key_status_bar = GDK_Shift_L;
+int gd_gtk_key_restart_level = GDK_Escape;
 #endif    /* only if having gtk */
 
 /* SDL settings */
 #ifdef HAVE_SDL
-int gd_sdl_key_left=SDLK_LEFT;
-int gd_sdl_key_right=SDLK_RIGHT;
-int gd_sdl_key_up=SDLK_UP;
-int gd_sdl_key_down=SDLK_DOWN;
-int gd_sdl_key_fire_1=SDLK_LCTRL;
-int gd_sdl_key_fire_2=SDLK_RCTRL;
-int gd_sdl_key_suicide=SDLK_s;
-int gd_sdl_key_fast_forward=SDLK_f;
-int gd_sdl_key_status_bar=SDLK_LSHIFT;
-int gd_sdl_key_restart_level=SDLK_ESCAPE;
+int gd_sdl_key_left = SDLK_LEFT;
+int gd_sdl_key_right = SDLK_RIGHT;
+int gd_sdl_key_up = SDLK_UP;
+int gd_sdl_key_down = SDLK_DOWN;
+int gd_sdl_key_fire_1 = SDLK_LCTRL;
+int gd_sdl_key_fire_2 = SDLK_RCTRL;
+int gd_sdl_key_suicide = SDLK_s;
+int gd_sdl_key_fast_forward = SDLK_f;
+int gd_sdl_key_status_bar = SDLK_LSHIFT;
+int gd_sdl_key_restart_level = SDLK_ESCAPE;
+std::string gd_shader;
+int shader_pal_radial_distortion = 10;
+int shader_pal_random_scanline_displace = 50;
+int shader_pal_luma_x_blur = 50;
+int shader_pal_chroma_x_blur = 75;
+int shader_pal_chroma_y_blur = 75;
+int shader_pal_chroma_to_luma_strength = 25;
+int shader_pal_luma_to_chroma_strength = 15;
+int shader_pal_random_y = 10;
+int shader_pal_random_uv = 10;
+int shader_pal_scanline_shade_luma = 90;
+int shader_pal_phosphor_shade = 85;
 #endif    /* use_sdl */
 
 /* sound settings */
 #ifdef HAVE_SDL
-bool gd_sound_enabled=true;
-bool gd_sound_16bit_mixing=true;
-bool gd_sound_44khz_mixing=true;
-bool gd_sound_stereo=true;
-bool gd_classic_sound=false;
-int gd_sound_chunks_volume_percent=50;
-int gd_sound_music_volume_percent=50;
+bool gd_sound_enabled = true;
+bool gd_sound_16bit_mixing = true;
+bool gd_sound_44khz_mixing = true;
+bool gd_sound_stereo = true;
+bool gd_classic_sound = false;
+int gd_sound_chunks_volume_percent = 50;
+int gd_sound_music_volume_percent = 50;
 #endif    /* if gd_sound */
 
 
@@ -173,11 +198,14 @@ const char *gd_system_data_dir;
 const char *gd_system_caves_dir;
 const char *gd_system_music_dir;
 
-std::vector<std::string> gd_sound_dirs, gd_themes_dirs, gd_fonts_dirs;
+std::vector<std::string> gd_sound_dirs, gd_themes_dirs, gd_fonts_dirs, gd_shaders_dirs;
 
 /* command line parameters */
-int gd_param_license=0;
-char **gd_param_cavenames=NULL;
+int gd_param_license = 0;
+char **gd_param_cavenames = NULL;
+gboolean gd_param_debug = FALSE;
+gboolean gd_param_load_default_settings = FALSE;
+
 
 
 static void set_page_numbers(Setting *settings) {
@@ -192,45 +220,67 @@ static void set_page_numbers(Setting *settings) {
 
 Setting *gd_get_game_settings_array() {
     static Setting settings_static[] = {
-        { TypePage, _("Game") },
-        { TypeStringv, _("Language"), &gd_language, false, gd_languages_names, _("The language of the application. Changing this setting requires a restart!") },
-        { TypeBoolean, _("All caves selectable"), &gd_all_caves_selectable, false, NULL, _("All caves and intermissions can be selected at game start.") },
-        { TypeBoolean, _("Import as all selectable"), &gd_import_as_all_caves_selectable, false, NULL, _("Original, C64 games are imported not with A, E, I, M caves selectable, but all caves (ABCD, EFGH... excluding intermissions). This does not affect BDCFF caves.") },
-        { TypeBoolean, _("Use BDCFF highscore"), &gd_use_bdcff_highscore, false, NULL, _("Use BDCFF highscores. GDash saves highscores in its own configuration directory and also in the *.bd files. However, it prefers loading them from the configuration directory; as the *.bd files might be read-only. You can enable this setting to let GDash load them from the *.bd files. This can be selected for a specific file in the file open dialog, too.") },
-        { TypeBoolean, _("Show story"), &gd_show_story, false, NULL, _("If the cave has a story, it will be shown when the cave is first started.") },
-        { TypeBoolean, _("Game name at uncover"), &gd_show_name_of_game, false, NULL, _("Show the name of the game when uncovering a cave.") },
-        { TypeBoolean, _("No invisible outbox"), &gd_no_invisible_outbox, false, NULL, _("Show invisible outboxes as visible (blinking) ones.") },
+        { TypePage, N_("Game") },
+        { TypeStringv, N_("Language"), &gd_language, false, gd_languages_names, N_("The language of the application. Changing this setting requires a restart!") },
+        { TypeBoolean, N_("All caves selectable"), &gd_all_caves_selectable, false, NULL, N_("All caves and intermissions can be selected at game start.") },
+        { TypeBoolean, N_("Import as all selectable"), &gd_import_as_all_caves_selectable, false, NULL, N_("Original, C64 games are imported not with A, E, I, M caves selectable, but all caves (ABCD, EFGH... excluding intermissions). This does not affect BDCFF caves.") },
+        { TypeBoolean, N_("Use BDCFF highscore"), &gd_use_bdcff_highscore, false, NULL, N_("Use BDCFF highscores. GDash saves highscores in its own configuration directory and also in the *.bd files. However, it prefers loading them from the configuration directory; as the *.bd files might be read-only. You can enable this setting to let GDash load them from the *.bd files.") },
+        { TypeBoolean, N_("Show story"), &gd_show_story, false, NULL, N_("If the cave has a story, it will be shown when the cave is first started.") },
+        { TypeBoolean, N_("Game name at uncover"), &gd_show_name_of_game, false, NULL, N_("Show the name of the game when uncovering a cave.") },
+        { TypeBoolean, N_("No invisible outbox"), &gd_no_invisible_outbox, false, NULL, N_("Show invisible outboxes as visible (blinking) ones.") },
 
-        { TypePage, _("Game graphics") },
-        { TypeTheme,   _("Theme"), NULL, false },
-        { TypeStringv, _("Scale"), &gd_cell_scale_game, true, gd_scaling_name, _("Scaling factor and method.") },
-        { TypeBoolean, _("PAL emulation"), &gd_pal_emulation_game, true, NULL, _("Use PAL emulated graphics, i.e. lines are striped, and colors are distorted like on a TV.") },
-        { TypePercent, _("  PAL scanline shade"), &gd_pal_emu_scanline_shade, true, NULL, _("Darker rows for PAL emulation.") },
-        { TypeBoolean, _("Particle effects"), &gd_particle_effects, false, NULL, _("Particle effects during play.") },
-        { TypeBoolean, _("Fine scrolling"), &gd_fine_scroll, false, NULL, _("50 frames per second scrolling. Depending on your hardware and operating system, this may make scrolling smoother, but on some systems, it actually makes it worse.") },
-        { TypeStringv, _("Status bar colors"), &gd_status_bar_colors, false, gd_status_bar_colors_get_names(), _("Preferred status bar color scheme. Only affects the colors, not the status bar layout.") },
-        { TypeStringv, _("  C64 palette"), &gd_c64_palette, false, GdColor::get_c64_palette_names(), _("The color palette for games imported from C64 files.") },
-        { TypeStringv, _("  C64DTV palette"), &gd_c64dtv_palette, false, GdColor::get_c64dtv_palette_names(), _("The color palette for imported C64 DTV games.") },
-        { TypeStringv, _("  Atari palette"), &gd_atari_palette, false, GdColor::get_atari_palette_names(), _("The color palette for imported Atari games.") },
-        { TypeStringv, _("  Preferred palette"), &gd_preferred_palette, false, GdColor::get_palette_types_names(), _("New caves and random colored caves use this palette.") },
+        { TypePage, N_("Theme and colors") },
+        { TypeTheme,   N_("Theme"), NULL, false, NULL, N_("Graphics theme used inside the game."), 0, 0, NULL },
+        { TypeStringv, N_("Status bar colors"), &gd_status_bar_colors, false, gd_status_bar_colors_get_names(), N_("Preferred status bar color scheme. Only affects the colors, not the status bar layout.") },
+        { TypeStringv, N_("  C64 palette"), &gd_c64_palette, false, GdColor::get_c64_palette_names(), N_("The color palette for games imported from C64 files.") },
+        { TypeStringv, N_("  C64DTV palette"), &gd_c64dtv_palette, false, GdColor::get_c64dtv_palette_names(), N_("The color palette for imported C64 DTV games.") },
+        { TypeStringv, N_("  Atari palette"), &gd_atari_palette, false, GdColor::get_atari_palette_names(), N_("The color palette for imported Atari games.") },
+        { TypeStringv, N_("  Preferred palette"), &gd_preferred_palette, false, GdColor::get_palette_types_names(), N_("New caves and random colored caves use this palette.") },
+
+        { TypePage, N_("Game graphics") },
+        // TRANSLATORS: here "engine" = "graphics engine"
+        { TypeStringv, N_("Engine"), &gd_graphics_engine, true, gd_graphics_engine_names, N_("Graphics engine which used for drawing.") },
+        { TypeInteger, N_("Scaling factor"), &gd_cell_scale_factor_game, true, NULL, N_("Scaling size."), 1, 4 },
+        { TypeStringv, N_("  Scaling type"), &gd_cell_scale_type_game, true, gd_scaling_names, N_("Software scaling method used. Only effective for the GTK+ and the SDL engines.") },
+        { TypeBoolean, N_("  Software PAL emu"), &gd_pal_emulation_game, true, NULL, N_("Use PAL emulated graphics, i.e. lines are striped, and colors are distorted like on a TV. Only effective for the GTK+ and the SDL engines.") },
+        { TypePercent, N_("  PAL scanline shade"), &gd_pal_emu_scanline_shade, true, NULL, N_("Darker rows for PAL emulation. Only effective for the GTK+ and the SDL engines.") },
+        { TypeBoolean, N_("Fine scrolling"), &gd_fine_scroll, true, NULL, N_("If fine scrolling is turned off, scrolling and cave animation is limited to a lower frame rate, and consumes much less CPU. On some hardware, it might actually look better than fine scrolling. Not all graphics engines support fine scrolling.") },
+        { TypeBoolean, N_("Particle effects"), &gd_particle_effects, true, NULL, N_("Particle effects during play. This requires a lot of CPU power.") },
+
+#ifdef HAVE_SDL
+        { TypePage, N_("OpenGL settings") },
+        { TypeShader,  N_("Shader"), NULL, true, NULL, N_("The shader which adds a graphical effect to the screen. Only effective if the OpenGL engine is used. If your video card is older, it might not support shaders. The GDash TV shader can be configured with the settings below."), 0, 0, &gd_shader },
+        { TypePercent, N_("Radial distortion"), &shader_pal_radial_distortion, false, NULL, N_("With radial distortion, the screen won't be flat, but it will look like as if it's projected on a sphere.") },
+        { TypePercent, N_("Random scanline displacement"), &shader_pal_random_scanline_displace, false, NULL, N_("Increasing this setting causes the the image to be unstable horizontally.") },
+        { TypePercent, N_("Luma X blur"), &shader_pal_luma_x_blur, false, NULL, N_("Horizontal blur of luminosity.") },
+        { TypePercent, N_("Chroma X blur"), &shader_pal_chroma_x_blur, false, NULL, N_("Slight horizontal blur of colors.") },
+        { TypePercent, N_("Chroma Y blur"), &shader_pal_chroma_y_blur, false, NULL, N_("Vertical blur of colors, to imitate a PAL TV signal.") },
+        { TypePercent, N_("Chroma to luma"), &shader_pal_chroma_to_luma_strength, false, NULL, N_("Sudden changes in colors can cause patterns to appear on the image.") },
+        { TypePercent, N_("Luma to chroma"), &shader_pal_luma_to_chroma_strength, false, NULL, N_("Sudden changes in luminosity can cause false colors to appear on the image.") },
+        { TypePercent, N_("Random Y"), &shader_pal_random_y, false, NULL, N_("Noise level of luminosity.") },
+        { TypePercent, N_("Random UV"), &shader_pal_random_uv, false, NULL, N_("Noise level of colors.") },
+        { TypePercent, N_("Scanline shade"), &shader_pal_scanline_shade_luma, false, NULL, N_("Darkened horizontal rows to emulate a TV screen.") },
+        { TypePercent, N_("Phosphor shade"), &shader_pal_phosphor_shade, false, NULL, N_("Red, green and blue subpixels of a TV screen can be emulated.") },
+#endif        
 
 #ifdef HAVE_GTK
-        { TypePage, _("Editor settings") },
-        { TypeStringv, _("Scale"), &gd_cell_scale_editor, true, gd_scaling_name, _("Scaling factor and method.") },
-        { TypeBoolean, _("PAL emulation"), &gd_pal_emulation_editor, true, NULL, _("Use PAL emulated graphics, i.e. lines are striped, and colors are distorted like on a TV.") },
-        { TypeBoolean, _("Animated view"), &gd_game_view, true, NULL, _("Show simplified view of cave in the editor.") },
-        { TypeBoolean, _("Colored objects"), &gd_colored_objects, true, NULL, _("Cave objects are colored, to make them different from random cave elements.") },
-        { TypeBoolean, _("Object list"), &gd_show_object_list, true, NULL, _("Show objects list sidebar in the editor.") },
-        { TypeBoolean, _("Fast uncover in test"), &gd_fast_uncover_in_test, false, NULL, _("Fast uncovering and covering of cave in editor cave test, to reduce waiting time.") },
+        { TypePage, N_("Editor settings") },
+        { TypeInteger, N_("Scaling factor"), &gd_cell_scale_factor_editor, true, NULL, N_("Scaling size."), 1, 4 },
+        { TypeStringv, N_("Scaling type"), &gd_cell_scale_type_editor, true, gd_scaling_names, N_("Scaling method.") },
+        { TypeBoolean, N_("PAL emulation"), &gd_pal_emulation_editor, true, NULL, N_("Use PAL emulated graphics, i.e. lines are striped, and colors are distorted like on a TV.") },
+        { TypeBoolean, N_("Animated view"), &gd_game_view, true, NULL, N_("Show simplified view of cave in the editor.") },
+        { TypeBoolean, N_("Colored objects"), &gd_colored_objects, true, NULL, N_("Cave objects are colored, to make them different from random cave elements.") },
+        { TypeBoolean, N_("Object list"), &gd_show_object_list, true, NULL, N_("Show objects list sidebar in the editor.") },
+        { TypeBoolean, N_("Fast uncover in test"), &gd_fast_uncover_in_test, false, NULL, N_("Fast uncovering and covering of cave in editor cave test, to reduce waiting time.") },
 #endif
 
 #ifdef HAVE_SDL
-        { TypePage, _("Sound") },
-        { TypeBoolean, _("Sound"), &gd_sound_enabled, true, NULL, _("Play sounds and music in the program.") },
-        { TypeBoolean, _("Classic sounds only"), &gd_classic_sound, true, NULL, _("Play only classic sounds taken from the original game.") },
-        { TypeBoolean, _("Stereo sounds"), &gd_sound_stereo, true, NULL, _("If you enable stereo sounds, you will hear the direction of sounds in the caves.") },
-        { TypeBoolean, _("16-bit mixing"), &gd_sound_16bit_mixing, true, NULL, _("Use 16-bit mixing of sounds. Try changing this setting if sound is clicky.") },
-        { TypeBoolean, _("44kHz mixing"), &gd_sound_44khz_mixing, true, NULL, _("Use 44kHz mixing of sounds. Try changing this setting if sound is clicky.") },
+        { TypePage, N_("Sound") },
+        { TypeBoolean, N_("Sound"), &gd_sound_enabled, true, NULL, N_("Play sounds and music in the program.") },
+        { TypeBoolean, N_("Classic sounds only"), &gd_classic_sound, true, NULL, N_("Play only classic sounds taken from the original game.") },
+        { TypeBoolean, N_("Stereo sounds"), &gd_sound_stereo, true, NULL, N_("If you enable stereo sounds, you will hear the direction of sounds in the caves.") },
+        { TypeBoolean, N_("16-bit mixing"), &gd_sound_16bit_mixing, true, NULL, N_("Use 16-bit mixing of sounds. Try changing this setting if sound is clicky.") },
+        { TypeBoolean, N_("44kHz mixing"), &gd_sound_44khz_mixing, true, NULL, N_("Use 44kHz mixing of sounds. Try changing this setting if sound is clicky.") },
 #endif
 
         /* end */
@@ -246,17 +296,17 @@ Setting *gd_get_game_settings_array() {
 
 Setting *gd_get_keyboard_settings_array(GameInputHandler *gih) {
     static Setting settings_static[] = {
-        { TypePage, _("Keyboard") },
-        { TypeKey,     _("Key left"), &gih->get_key_variable(GameInputHandler::KeyLeft), false },
-        { TypeKey,     _("Key right"), &gih->get_key_variable(GameInputHandler::KeyRight), false },
-        { TypeKey,     _("Key up"), &gih->get_key_variable(GameInputHandler::KeyUp), false },
-        { TypeKey,     _("Key down"), &gih->get_key_variable(GameInputHandler::KeyDown), false },
-        { TypeKey,     _("Key snap"), &gih->get_key_variable(GameInputHandler::KeyFire1), false },
-        { TypeKey,     _("Key snap (alt.)"), &gih->get_key_variable(GameInputHandler::KeyFire2), false },
-        { TypeKey,     _("Key suicide"), &gih->get_key_variable(GameInputHandler::KeySuicide), false },
-        { TypeKey,     _("Key fast forward"), &gih->get_key_variable(GameInputHandler::KeyFastForward), false },
-        { TypeKey,     _("Key status bar"), &gih->get_key_variable(GameInputHandler::KeyStatusBar), false },
-        { TypeKey,     _("Key restart level"), &gih->get_key_variable(GameInputHandler::KeyRestartLevel), false },
+        { TypePage, N_("Keyboard") },
+        { TypeKey,     N_("Key left"), &gih->get_key_variable(GameInputHandler::KeyLeft), false },
+        { TypeKey,     N_("Key right"), &gih->get_key_variable(GameInputHandler::KeyRight), false },
+        { TypeKey,     N_("Key up"), &gih->get_key_variable(GameInputHandler::KeyUp), false },
+        { TypeKey,     N_("Key down"), &gih->get_key_variable(GameInputHandler::KeyDown), false },
+        { TypeKey,     N_("Key snap"), &gih->get_key_variable(GameInputHandler::KeyFire1), false },
+        { TypeKey,     N_("Key snap (alt.)"), &gih->get_key_variable(GameInputHandler::KeyFire2), false },
+        { TypeKey,     N_("Key suicide"), &gih->get_key_variable(GameInputHandler::KeySuicide), false },
+        { TypeKey,     N_("Key fast forward"), &gih->get_key_variable(GameInputHandler::KeyFastForward), false },
+        { TypeKey,     N_("Key status bar"), &gih->get_key_variable(GameInputHandler::KeyStatusBar), false },
+        { TypeKey,     N_("Key restart level"), &gih->get_key_variable(GameInputHandler::KeyRestartLevel), false },
         /* end */
         { TypeBoolean, NULL },
     };
@@ -267,26 +317,62 @@ Setting *gd_get_keyboard_settings_array(GameInputHandler *gih) {
 }
 
 
+static char *displayname(char const *filename) {
+    if (g_str_equal(filename, "")) {
+        // TRANSLATORS: Default (builtin) theme, shader, etc.
+        return g_strdup(_("[Default]"));
+    }
+    char *disp = g_filename_display_basename(filename);
+    if (strrchr(disp, '.'))    /* remove extension */
+        *strrchr(disp, '.') = '\0';
+    return disp;
+}
+
+
+void gd_settings_array_prepare(Setting *settings, SettingType which,
+                               std::vector<std::string> const & strings, int *var) {
+    for (unsigned i = 0; settings[i].name != NULL; ++i) {
+        if (settings[i].type == which) {
+            settings[i].var = var;
+            char **stringv = g_new(char *, strings.size()+1);
+            for (unsigned j = 0; j != strings.size(); ++j)
+                stringv[j] = displayname(strings[j].c_str());
+            stringv[strings.size()] = NULL;
+            settings[i].stringv = (char const **) stringv;
+        }
+    }
+}
+
+
+void gd_settings_array_unprepare(Setting *settings, SettingType which) {
+    for (unsigned i = 0; settings[i].name != NULL; ++i) {
+        if (settings[i].type == which) {
+            settings[i].var = NULL;
+            g_strfreev((char **) settings[i].stringv);
+            settings[i].stringv = NULL;
+        }
+    }
+}
 
 
 /* gets boolean value from key file; returns def if not found or unreadable */
 static bool keyfile_get_bool_with_default(GKeyFile *keyfile, const char *group, const char *key, bool def) {
-    GError *error=NULL;
+    GError *error = NULL;
     gboolean result = g_key_file_get_boolean(keyfile, group, key, &error);
     if (!error)
         return result != FALSE;
-    gd_message(error->message);
+    gd_debug(error->message);
     g_error_free(error);
     return def;
 }
 
 /* gets integer value from key file; returns def if not found or unreadable */
 static int keyfile_get_integer_with_default(GKeyFile *keyfile, const char *group, const char *key, int def) {
-    GError *error=NULL;
-    int result=g_key_file_get_integer(keyfile, group, key, &error);
+    GError *error = NULL;
+    int result = g_key_file_get_integer(keyfile, group, key, &error);
     if (!error)
         return result;
-    gd_message(error->message);
+    gd_debug(error->message);
     g_error_free(error);
     return def;
 }
@@ -295,14 +381,14 @@ static std::string keyfile_get_string(GKeyFile *keyfile, const char *group, cons
     if (!g_key_file_has_key(keyfile, group, key, NULL))
         return "";
 
-    GError *error=NULL;
-    char *result=g_key_file_get_string(keyfile, group, key, &error);
+    GError *error = NULL;
+    char *result = g_key_file_get_string(keyfile, group, key, &error);
     if (result) {
         std::string ret(result);
         g_free(result);
         return ret;
     }
-    gd_message(error->message);
+    gd_debug(error->message);
     g_error_free(error);
     return "";
 }
@@ -330,7 +416,6 @@ void gd_settings_init() {
     settings_bools["game_view"] = &gd_game_view;
     settings_bools["colored_objects"] = &gd_colored_objects;
     settings_bools["show_object_list"] = &gd_show_object_list;
-    settings_bools["show_test_label"] = &gd_show_test_label;
     settings_bools["show_preview"] = &gd_show_preview;
     settings_bools["pal_emulation_game"] = &gd_pal_emulation_game;
     settings_bools["pal_emulation_editor"] = &gd_pal_emulation_editor;
@@ -338,9 +423,13 @@ void gd_settings_init() {
     settings_integers["editor_window_width"] = &gd_editor_window_width;
     settings_integers["editor_window_height"] = &gd_editor_window_height;
     settings_integers["language"] = &gd_language;
-    settings_integers["cell_scale_game"] = &gd_cell_scale_game;
-    settings_integers["cell_scale_editor"] = &gd_cell_scale_editor;
     settings_bools["fullscreen"] = &gd_fullscreen;
+    settings_integers["graphics_engine"] = &gd_graphics_engine;
+    settings_integers["cell_scale_factor_game"] = &gd_cell_scale_factor_game;
+    settings_integers["cell_scale_type_game"] = &gd_cell_scale_type_game;
+    settings_integers["cell_scale_factor_editor"] = &gd_cell_scale_factor_editor;
+    settings_integers["cell_scale_type_editor"] = &gd_cell_scale_type_editor;
+
 
 #ifdef HAVE_GTK
     settings_integers["gtk_key_left"] = &gd_gtk_key_left;
@@ -366,6 +455,19 @@ void gd_settings_init() {
     settings_integers["sdl_key_fast_forward"] = &gd_sdl_key_fast_forward;
     settings_integers["sdl_key_status_bar"] = &gd_sdl_key_status_bar;
     settings_integers["sdl_key_restart_level"] = &gd_sdl_key_restart_level;
+    settings_strings["shader"] = &gd_shader;
+
+    settings_integers["shader_pal_radial_distortion"] = &shader_pal_radial_distortion;
+    settings_integers["shader_pal_random_scanline_displace"] = &shader_pal_random_scanline_displace;
+    settings_integers["shader_pal_luma_x_blur"] = &shader_pal_luma_x_blur;
+    settings_integers["shader_pal_chroma_x_blur"] = &shader_pal_chroma_x_blur;
+    settings_integers["shader_pal_chroma_y_blur"] = &shader_pal_chroma_y_blur;
+    settings_integers["shader_pal_chroma_to_luma_strength"] = &shader_pal_chroma_to_luma_strength;
+    settings_integers["shader_pal_luma_to_chroma_strength"] = &shader_pal_luma_to_chroma_strength;
+    settings_integers["shader_pal_random_y"] = &shader_pal_random_y;
+    settings_integers["shader_pal_random_uv"] = &shader_pal_random_uv;
+    settings_integers["shader_pal_scanline_shade_luma"] = &shader_pal_scanline_shade_luma;
+    settings_integers["shader_pal_phosphor_shade"] = &shader_pal_phosphor_shade;
 #endif    /* use_sdl */
 
 #ifdef HAVE_SDL
@@ -396,18 +498,19 @@ static void add_dirs(std::vector<std::string>& dirs, const char *specific) {
 void gd_settings_init_dirs() {
 #ifdef G_OS_WIN32
     /* on win32, use the glib function. */
-    gd_system_data_dir=g_win32_get_package_installation_directory(NULL, NULL);
+    gd_system_data_dir = g_win32_get_package_installation_directory(NULL, NULL);
 #else
     /* on linux, this is a defined, built-in string, $perfix/share/locale */
-    gd_system_data_dir=PKGDATADIR;
+    gd_system_data_dir = PKGDATADIR;
 #endif
-    gd_system_caves_dir=g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "caves", NULL);
-    gd_system_music_dir=g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "music", NULL);
-    gd_user_config_dir=g_build_path(G_DIR_SEPARATOR_S, g_get_user_config_dir(), PACKAGE, NULL);
+    gd_system_caves_dir = g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "caves", NULL);
+    gd_system_music_dir = g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "music", NULL);
+    gd_user_config_dir = g_build_path(G_DIR_SEPARATOR_S, g_get_user_config_dir(), PACKAGE, NULL);
 
     add_dirs(gd_sound_dirs, "sound");
     add_dirs(gd_themes_dirs, "themes");
     add_dirs(gd_fonts_dirs, "fonts");
+    add_dirs(gd_shaders_dirs, "shaders");
 }
 
 /* set locale from the gdash setting variable. */
@@ -415,26 +518,27 @@ void gd_settings_init_dirs() {
 /* for sdl version, not really matters. */
 /* if no gtk, just set the system default locale. */
 void gd_settings_set_locale() {
-    if (gd_language<0 || gd_language>=int(G_N_ELEMENTS(language_locale)))
-        gd_language=0;    /* switch to default, if out of bounds. */
+    if (gd_language < 0 || gd_language >= int(G_N_ELEMENTS(language_locale)))
+        gd_language = 0;  /* switch to default, if out of bounds. */
 
     /* we set the language environment variable, as gtk and other stuff will use it. */
-    g_assert(G_N_ELEMENTS(language_locale)==G_N_ELEMENTS(languages_for_env));
+    g_assert(G_N_ELEMENTS(language_locale) == G_N_ELEMENTS(languages_for_env));
     if (languages_for_env[gd_language] != NULL) {
         g_setenv("LANG", languages_for_env[gd_language], TRUE);
         g_setenv("LANGUAGE", languages_for_env[gd_language], TRUE);
     }
 
     /* try to set the locale. */
-    int i=0;
-    char *result=NULL;
-    while (result==NULL && language_locale[gd_language][i]!=NULL) {
+    int i = 0;
+    char *result = NULL;
+    while (result == NULL && language_locale[gd_language][i] != NULL) {
         result = setlocale(LC_ALL, language_locale[gd_language][i]);
         i++;
     }
     if (result == NULL) {
-        /* failed to set */
-        gd_message(CPrintf("Failed to set language to '%s'. Switching to system default locale.") % gd_languages_names[gd_language]);
+        /* failed to set. switch to system default */
+        if (gd_language != 0)
+            gd_message(CPrintf("Failed to set language to '%s'. Switching to system default locale.") % gd_languages_names[gd_language]);
         setlocale(LC_ALL, "");
     }
 }
@@ -463,24 +567,23 @@ void gd_settings_init_translation() {
 
 /* load settings from .config/gdash/gdash.ini */
 void gd_load_settings() {
-    GError *error=NULL;
+    GError *error = NULL;
     gchar *data;
     gsize length;
 
-    char *filename=g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir, SETTINGS_INI_FILE, NULL);
+    AutoGFreePtr<char> filename(g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir, SETTINGS_INI_FILE, NULL));
     if (!g_file_get_contents(filename, &data, &length, &error)) {
         /* no ini file found */
         gd_debug(error->message);
         g_error_free(error);
         return;
     }
-    g_free(filename);
     /* if zero length file, also return */
-    if (length==0)
+    if (length == 0)
         return;
 
-    GKeyFile *ini=g_key_file_new();
-    gboolean success=g_key_file_load_from_data(ini, data, length, G_KEY_FILE_NONE, &error);
+    GKeyFile *ini = g_key_file_new();
+    gboolean success = g_key_file_load_from_data(ini, data, length, G_KEY_FILE_NONE, &error);
     g_free(data);
     if (!success) {
         gd_message(CPrintf("INI file contents error: %s") % error->message);
@@ -505,23 +608,23 @@ void gd_load_settings() {
         var = keyfile_get_string(ini, SETTINGS_GDASH_GROUP, key);
     }
 
-    /* check settings */
-    if (gd_cell_scale_game<0 || gd_cell_scale_game>=GD_SCALING_MAX)
-        gd_cell_scale_game=GD_SCALING_ORIGINAL;
-    if (gd_cell_scale_editor<0 || gd_cell_scale_editor>=GD_SCALING_MAX)
-        gd_cell_scale_editor=GD_SCALING_ORIGINAL;
-    if (gd_preferred_palette<0 || gd_preferred_palette>=int(GdColor::TypeInvalid))
-        gd_preferred_palette=GdColor::TypeRGB;
-    if (gd_status_bar_colors<0 || gd_status_bar_colors > int(GD_STATUS_BAR_MAX))
-        gd_status_bar_colors=GD_STATUS_BAR_ORIGINAL;
-
     g_key_file_free(ini);
+
+    /* check settings */
+    gd_cell_scale_factor_game = gd_clamp(gd_cell_scale_factor_game, 1, 4);
+    gd_cell_scale_factor_editor = gd_clamp(gd_cell_scale_factor_editor, 1, 4);
+    gd_cell_scale_type_game = gd_clamp(gd_cell_scale_type_game, 0, GD_SCALING_MAX-1);
+    gd_cell_scale_type_editor = gd_clamp(gd_cell_scale_type_editor, 0, GD_SCALING_MAX-1);
+    if (gd_preferred_palette < 0 || gd_preferred_palette >= int(GdColor::TypeInvalid))
+        gd_preferred_palette = GdColor::TypeRGB;
+    if (gd_status_bar_colors < 0 || gd_status_bar_colors > int(GD_STATUS_BAR_MAX))
+        gd_status_bar_colors = GD_STATUS_BAR_ORIGINAL;
 }
 
 
 /* save settings to .config/gdash.ini */
 void gd_save_settings() {
-    GKeyFile *ini=g_key_file_new();
+    GKeyFile *ini = g_key_file_new();
 
     /* save them */
     for (std::map<char const *, int *>::const_iterator it = settings_integers.begin(); it != settings_integers.end(); ++it) {
@@ -540,9 +643,9 @@ void gd_save_settings() {
         g_key_file_set_string(ini, SETTINGS_GDASH_GROUP, key, var.c_str());
     }
 
-    GError *error=NULL;
+    GError *error = NULL;
     /* convert to string and free */
-    gchar *data=g_key_file_to_data(ini, NULL, &error);
+    gchar *data = g_key_file_to_data(ini, NULL, &error);
     g_key_file_free(ini);
     if (error) {
         /* this is highly unlikely - why would g_key_file_to_data report error? docs do not mention. */
@@ -552,7 +655,7 @@ void gd_save_settings() {
         return;
     }
 
-    char *filename=g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir, SETTINGS_INI_FILE, NULL);
+    char *filename = g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir, SETTINGS_INI_FILE, NULL);
     g_mkdir_with_parents(gd_user_config_dir, 0700);
     g_file_set_contents(filename, data, -1, &error);
     g_free(filename);
@@ -567,12 +670,14 @@ void gd_save_settings() {
 }
 
 GOptionContext *gd_option_context_new() {
-    GOptionEntry const entries[]= {
+    GOptionEntry const entries[] = {
         {"license", 'L', 0, G_OPTION_ARG_NONE, &gd_param_license, N_("Show license and quit")},
+        {"debug", 'v', 0, G_OPTION_ARG_NONE, &gd_param_debug, N_("Show some debug messages")},
+        {"default-settings", 0, 0, G_OPTION_ARG_NONE, &gd_param_load_default_settings, N_("Load default settings")},
         {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &gd_param_cavenames, N_("Cave names")},
         {NULL}
     };
-    GOptionContext *context=g_option_context_new(_("[FILE NAME]"));
+    GOptionContext *context = g_option_context_new(_("[FILE NAME]"));
     g_option_context_set_help_enabled(context, TRUE);
     g_option_context_add_main_entries(context, entries, PACKAGE);    /* gdash parameters */
 

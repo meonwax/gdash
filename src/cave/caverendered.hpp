@@ -1,21 +1,28 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _GD_CAVE_RENDERED
-#define _GD_CAVE_RENDERED
+#ifndef CAVERENDERED_HPP_INCLUDED
+#define CAVERENDERED_HPP_INCLUDED
 
 #include "config.h"
 
@@ -25,9 +32,12 @@
 #include "cave/cavebase.hpp"
 #include "cave/helper/caverandom.hpp"
 #include "cave/helper/cavesound.hpp"
+#include "cave/helper/cavemap.hpp"
 #include "cave/particle.hpp"
 
-#define GD_REDRAW (1<<10)
+class CaveStored;
+class CaveObject;
+
 /// These are states of the magic wall.
 /// @todo ezt nem kéne plainolddatába rakni?
 enum MagicWallState {
@@ -53,8 +63,9 @@ enum AmoebaState {
     GD_AM_ENCLOSED,     ///< enclosed, will convert to diamonds
 };
 
-class CaveStored;
-class CaveObject;
+/// For signalling a cell to be redrawn in the graphics map.
+enum { GD_REDRAW = 1 << 10 };
+
 
 /// @ingroup Cave
 class CaveRendered : public CaveBase {
@@ -86,14 +97,15 @@ private:
     bool is_player(int x, int y) const;
     bool is_player(int x, int y, GdDirectionEnum dir) const;
     bool can_be_hammered(int x, int y, GdDirectionEnum dir) const;
+    bool can_be_pushed(int x, int y, GdDirectionEnum dir) const;
     bool is_first_stage_of_explosion(int x, int y) const;
     bool moved_by_conveyor_top(int x, int y, GdDirectionEnum dir) const;
     bool moved_by_conveyor_bottom(int x, int y, GdDirectionEnum dir) const;
     bool is_scanned(int x, int y) const;
     bool is_scanned(int x, int y, GdDirectionEnum dir) const;
     bool is_like_element(int x, int y, GdDirectionEnum dir, GdElementEnum e) const;
-    bool is_like_space(int x, int y, GdDirectionEnum dir=MV_STILL) const;
-    bool is_like_dirt(int x, int y, GdDirectionEnum dir=MV_STILL) const;
+    bool is_like_space(int x, int y, GdDirectionEnum dir = MV_STILL) const;
+    bool is_like_dirt(int x, int y, GdDirectionEnum dir = MV_STILL) const;
 
     GdElementEnum get(int x, int y) const;
     GdElementEnum get(int x, int y, GdDirectionEnum dir) const;
@@ -112,7 +124,7 @@ public:
     void set_ckdelay_extra_for_animation();
 
     /* game playing helpers */
-    void draw_indexes(CaveMap<int> &gfx_buffer, CaveMap<bool> const &covered, bool bonus_life_flash, int animcycle, bool hate_invisible_outbox);
+    void draw_indexes(CaveMapFast<int> &gfx_buffer, CaveMapFast<bool> const &covered, bool bonus_life_flash, int animcycle, bool hate_invisible_outbox);
     int time_visible(int internal_time) const;
     void set_seconds_sound();
     void sound_play(GdSound sound, int x, int y);
@@ -132,9 +144,9 @@ public:
     void do_fall_roll_or_stop(int x, int y, GdDirectionEnum fall_dir, GdElementEnum bouncing);
 
     // Cave maps
-    CaveMap<CaveObject *> objects_order;    ///< two-dimensional map of cave; each cell is a pointer to the drawing object, which created this element. NULL if map or random.
-    CaveMap<int> hammered_reappear;         ///< integer map of cave; if non-zero, a brick wall will appear there
-    CaveMap<GdElementEnum> map;             ///< cave map
+    CaveMapFast<CaveObject *> objects_order;    ///< two-dimensional map of cave; each cell is a pointer to the drawing object, which created this element. NULL if map or random.
+    CaveMapClever<int> hammered_reappear;         ///< integer map of cave; if non-zero, a brick wall will appear there
+    CaveMapClever<GdElementEnum> map;             ///< cave map
 
     // Variables for random number generation
     GdInt render_seed;                ///< the seed value, which was used to render the cave, is saved here. will be used by record&playback
@@ -154,6 +166,7 @@ public:
     GdInt time_bonus;                   ///< bonus time for clock collected.
     GdInt time_penalty;                 ///< Time penalty when voodoo destroyed.
     GdInt time;                         ///< milliseconds remaining to finish cave
+    GdInt time_elapsed;                 ///< Time elapsed (in milliseconds) since the start of the cave
     GdInt timevalue;                    ///< points for remaining seconds - for current level
     GdInt diamonds_needed;              ///< diamonds needed to open outbox
     GdInt diamonds_collected;           ///< diamonds collected
@@ -175,7 +188,7 @@ public:
     GdBool kill_player;                 ///< Voodoo died, or used pressed escape to restart level.
     GdBool sweet_eaten;                 ///< player ate sweet, he's strong. prob_sweet applies, and also able to push chasing stones
     GdInt player_x, player_y;           ///< Coordinates of player (for scrolling)
-    enum { PlayerMemSize=16 };
+    enum { PlayerMemSize = 16 };
     GdInt player_x_mem[PlayerMemSize], player_y_mem[PlayerMemSize];             ///< coordinates of player, for chasing stone
     GdInt key1, key2, key3;             ///< The player is holding this number of keys of each color
     GdBool diamond_key_collected;       ///< Key collected, so trapped diamonds convert to diamonds

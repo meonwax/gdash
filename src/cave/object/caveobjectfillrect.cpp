@@ -1,17 +1,24 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "config.h"
@@ -28,7 +35,7 @@
 std::string CaveFillRect::get_bdcff() const {
     BdcffFormat f("FillRect");
     f << p1 << p2 << border_element;
-    if (border_element!=fill_element)
+    if (border_element != fill_element)
         f << fill_element;
 
     return f;
@@ -36,18 +43,22 @@ std::string CaveFillRect::get_bdcff() const {
 
 CaveFillRect *CaveFillRect::clone_from_bdcff(const std::string &name, std::istream &is) const {
     Coordinate p1, p2;
-    std::string s;
     GdElementEnum element, element_fill;
     if (!(is >> p1 >> p2 >> element))
         return NULL;
+    std::string s;
     if (is >> s) {  /* optional paramter - yuck */
         std::istringstream is(s);
         is >> element_fill;
     } else
-        element_fill=element;
+        element_fill = element;
 
     return new CaveFillRect(p1, p2, element, element_fill);
 }
+
+CaveFillRect *CaveFillRect::clone() const {
+    return new CaveFillRect(*this);
+};
 
 /// Create filled rectangle cave object.
 CaveFillRect::CaveFillRect(Coordinate _p1, Coordinate _p2, GdElementEnum _element, GdElementEnum _fill_element)
@@ -58,18 +69,18 @@ CaveFillRect::CaveFillRect(Coordinate _p1, Coordinate _p2, GdElementEnum _elemen
 
 void CaveFillRect::draw(CaveRendered &cave) const {
     /* reorder coordinates if not drawing from northwest to southeast */
-    int x1=p1.x;
-    int y1=p1.y;
-    int x2=p2.x;
-    int y2=p2.y;
-    if (y1>y2)
+    int x1 = p1.x;
+    int y1 = p1.y;
+    int x2 = p2.x;
+    int y2 = p2.y;
+    if (y1 > y2)
         std::swap(y1, y2);
-    if (x1>x2)
+    if (x1 > x2)
         std::swap(x1, x2);
 
-    for (int y=y1; y<=y2; y++)
-        for (int x=x1; x<=x2; x++)
-            cave.store_rc(x, y, (y==y1 || y==y2 || x==x1 || x==x2) ? border_element : fill_element, this);
+    for (int y = y1; y <= y2; y++)
+        for (int x = x1; x <= x2; x++)
+            cave.store_rc(x, y, (y == y1 || y == y2 || x == x1 || x == x2) ? border_element : fill_element, this);
 }
 
 PropertyDescription const CaveFillRect::descriptor[] = {
@@ -88,5 +99,10 @@ PropertyDescription const *CaveFillRect::get_description_array() const {
 
 std::string CaveFillRect::get_description_markup() const {
     return SPrintf(_("Rectangle from %d,%d to %d,%d of <b>%ms</b>, filled with <b>%ms</b>"))
-           % p1.x % p1.y % p2.x % p2.y % gd_element_properties[border_element].lowercase_name % gd_element_properties[fill_element].lowercase_name;
+           % p1.x % p1.y % p2.x % p2.y
+           % visible_name_lowercase(border_element) % visible_name_lowercase(fill_element);
+}
+
+GdElementEnum CaveFillRect::get_characteristic_element() const {
+    return fill_element;
 }

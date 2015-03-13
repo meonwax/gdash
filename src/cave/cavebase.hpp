@@ -1,31 +1,37 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef _GD_CAVEBASE
-#define _GD_CAVEBASE
+#ifndef CAVEBASE_HPP_INCLUDED
+#define CAVEBASE_HPP_INCLUDED
 
 #include "config.h"
 
-#include "cave/helper/colors.hpp"
+#include "cave/colors.hpp"
 #include "cave/cavetypes.hpp"
-#include "cave/helper/cavemap.hpp"
 
 /// @defgroup Cave
 
 /// @ingroup Cave
-/// An abstract class for the caves.
+/// @brief An abstract class for the caves.
 /// This is the base class for CaveStored (used to store caves on the disk) and CaveRendered (used to play the game).
 /// The base class is used to make the CaveRendered(CaveStored&) constructor simple - no need to copy all properties
 /// one by one.
@@ -66,7 +72,7 @@ public:
     GdInt max_time;         ///< the maximum time in seconds. if above, it overflows
 
     GdInt w, h;             ///< Sizes of cave, width and height.
-    GdInt x1,y1,x2,y2;      ///< Visible part of the cave
+    GdInt x1, y1, x2, y2;   ///< Visible part of the cave
     GdColor colorb;         ///< border color
     GdColor color0, color1, color2, color3, color4, color5; ///< c64-style colors; 4 and 5 are amoeba and slime.
 
@@ -192,7 +198,7 @@ public:
     GdBool hammered_walls_reappear; ///< if true, hammered walls will reappear some time after hammering
     GdInt pneumatic_hammer_frame;   ///< number of frames it takes to hammer a wall
     GdInt hammered_wall_reappear_frame; ///< number of frames, after which a hammered wall will reappear
-    
+
     GdBool infinite_rockets;        ///< If true, the player which got a rocket launcher will be able to launch an infinite number of rockets
 };
 
@@ -207,10 +213,10 @@ void gd_cave_set_random_colors(CaveBase &cave, GdColor::Type type);
 
 /* arrays for movements */
 /* also no1 and bd2 cave data import helpers; line direction coordinates */
-//~ extern const int gd_dx[], gd_dy[];
 /* arrays for movements. also no1 and bd2 cave data import helpers; line direction coordinates */
-static const int gd_dx[]= { 0, 0, 1, 1, 1, 0, -1, -1, -1, 0, 2, 2, 2, 0, -2, -2, -2 };
-static const int gd_dy[]= { 0, -1, -1, 0, 1, 1, 1, 0, -1, -2, -2, 0, 2, 2, 2, 0, -2 };
+/* static arrays, because they are in the header. this way they can be "inlined" */
+static const int gd_dx[] = { 0, 0, 1, 1, 1, 0, -1, -1, -1, 0, 2, 2, 2, 0, -2, -2, -2 };
+static const int gd_dy[] = { 0, -1, -1, 0, 1, 1, 1, 0, -1, -2, -2, 0, 2, 2, 2, 0, -2 };
 
 GdDirectionEnum gd_direction_from_keypress(bool up, bool down, bool left, bool right);
 

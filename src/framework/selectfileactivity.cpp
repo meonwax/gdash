@@ -1,33 +1,38 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
+#include "framework/selectfileactivity.hpp"
+#include "cave/colors.hpp"
+#include "framework/app.hpp"
+#include <glib/gi18n.h>
+#include "framework/commands.hpp"
+#include "gfx/fontmanager.hpp"
 
 #include <glib.h>
 #include <glib/gstdio.h>
-#include <glib/gi18n.h>
-#include <string>
 #include <algorithm>
-
-#include "framework/selectfileactivity.hpp"
-#include "framework/commands.hpp"
-#include "cave/helper/colors.hpp"
-#include "gfx/fontmanager.hpp"
 #include "gfx/screen.hpp"
 #include "misc/util.hpp"
-#include "misc/printf.hpp"
-#include "misc/logger.hpp"
 
 // TODO utf8-filename charset audit
 
@@ -70,7 +75,7 @@ private:
 
 /* returns a string which contains the utf8 representation of the filename originally in system encoding */
 static std::string filename_to_utf8(const char *filename) {
-    GError *error=NULL;
+    GError *error = NULL;
     char *utf8 = g_filename_to_utf8(filename, -1,  NULL, NULL, &error);
     if (error) {
         g_error_free(error);
@@ -88,8 +93,8 @@ static bool filename_sort(std::string const &s1, std::string const &s2) {
         return true;
     if (s2.empty())
         return false;
-    bool const s1_dir = s1[s1.length()-1]==G_DIR_SEPARATOR;
-    bool const s2_dir = s2[s2.length()-1]==G_DIR_SEPARATOR;
+    bool const s1_dir = s1[s1.length() - 1] == G_DIR_SEPARATOR;
+    bool const s2_dir = s2[s2.length() - 1] == G_DIR_SEPARATOR;
     if (s1_dir && s2_dir)
         return s1 < s2;
     if (s1_dir)
@@ -107,9 +112,9 @@ SelectFileActivity::SelectFileActivity(App *app, const char *title, const char *
     title(title),
     for_save(for_save),
     defaultname(defaultname),
-    start_dir(start_dir?start_dir:"") {
+    start_dir(start_dir ? start_dir : "") {
     yd = app->font_manager->get_line_height();
-    names_per_page = app->screen->get_height()/yd-5;
+    names_per_page = app->screen->get_height() / yd - 5;
     if (glob == NULL || g_str_equal(glob, ""))
         glob = "*";
     globs = g_strsplit_set(glob, ";", -1);
@@ -121,7 +126,7 @@ SelectFileActivity::SelectFileActivity(App *app, const char *title, const char *
 
 
 void SelectFileActivity::pushed_event() {
-    if (start_dir!="")
+    if (start_dir != "")
         jump_to_directory(start_dir.c_str());
     else
         jump_to_directory(directory_of_process);
@@ -136,7 +141,7 @@ SelectFileActivity::~SelectFileActivity() {
 void SelectFileActivity::jump_to_directory(char const *jump_to) {
     GDir *dir;
     /* directory we are looking at, and then to the selected one (which may be relative path!) */
-    if (g_chdir(directory)==-1 || g_chdir(jump_to)==-1 || NULL == (dir = g_dir_open(".", 0, NULL))) {
+    if (g_chdir(directory) == -1 || g_chdir(jump_to) == -1 || NULL == (dir = g_dir_open(".", 0, NULL))) {
         g_chdir(directory_of_process);    /* step back to directory where we started */
         dir = g_dir_open(".", 0, NULL);
         if (!dir) {
@@ -157,21 +162,21 @@ void SelectFileActivity::jump_to_directory(char const *jump_to) {
 
     files.clear();
     char const *name;
-    while ((name = g_dir_read_name(dir))!=NULL) {
+    while ((name = g_dir_read_name(dir)) != NULL) {
 #ifdef G_OS_WIN32
         /* on windows, skip hidden files? */
 #else
         /* on unix, skip file names starting with a '.' - those are hidden files */
-        if (name[0]=='.')
+        if (name[0] == '.')
             continue;
 #endif
         if (g_file_test(name, G_FILE_TEST_IS_DIR))
             files.push_back(std::string(name) + G_DIR_SEPARATOR_S);    /* dirname/ or dirname\ */
         else {
             bool match = false;
-            for (int i=0; globs[i]!=NULL && !match; i++)
+            for (int i = 0; globs[i] != NULL && !match; i++)
                 if (g_pattern_match_simple(globs[i], name))
-                    match=true;
+                    match = true;
             if (match)
                 files.push_back(filename_to_utf8(name));
         }
@@ -181,10 +186,10 @@ void SelectFileActivity::jump_to_directory(char const *jump_to) {
     /* add "directory up" if we are NOT in a root directory */
 #ifdef G_OS_WIN32
     if (!g_str_has_suffix(directory, ":\\"))    /* root directory is "X:\" */
-        files.push_back(std::string("..")+G_DIR_SEPARATOR_S);    /* ..\ */
+        files.push_back(std::string("..") + G_DIR_SEPARATOR_S);  /* ..\ */
 #else
     if (!g_str_equal(directory, "/"))
-        files.push_back(std::string("..")+G_DIR_SEPARATOR_S);    /* ../ */
+        files.push_back(std::string("..") + G_DIR_SEPARATOR_S);  /* ../ */
 #endif
     /* sort the array */
     sort(files.begin(), files.end(), filename_sort);
@@ -193,7 +198,7 @@ void SelectFileActivity::jump_to_directory(char const *jump_to) {
     /* step back to directory where we started */
     g_chdir(directory_of_process);
 
-    redraw_event();
+    queue_redraw();
 }
 
 
@@ -257,28 +262,28 @@ void SelectFileActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
     switch (keycode) {
             /* movements */
         case App::PageUp:
-            sel = gd_clamp(sel - names_per_page, 0, files.size()-1);
-            redraw_event();
+            sel = gd_clamp(sel - names_per_page, 0, files.size() - 1);
+            queue_redraw();
             break;
         case App::PageDown:
-            sel = gd_clamp(sel + names_per_page, 0, files.size()-1);
-            redraw_event();
+            sel = gd_clamp(sel + names_per_page, 0, files.size() - 1);
+            queue_redraw();
             break;
         case App::Up:
-            sel = gd_clamp(sel-1, 0, files.size()-1);
-            redraw_event();
+            sel = gd_clamp(sel - 1, 0, files.size() - 1);
+            queue_redraw();
             break;
         case App::Down:
-            sel=gd_clamp(sel+1, 0, files.size()-1);
-            redraw_event();
+            sel = gd_clamp(sel + 1, 0, files.size() - 1);
+            queue_redraw();
             break;
         case App::Home:
             sel = 0;
-            redraw_event();
+            queue_redraw();
             break;
         case App::End:
-            sel = files.size()-1;
-            redraw_event();
+            sel = files.size() - 1;
+            queue_redraw();
             break;
         case App::Enter:
             process_enter();
@@ -310,13 +315,13 @@ void SelectFileActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
 }
 
 
-void SelectFileActivity::redraw_event() {
+void SelectFileActivity::redraw_event(bool full) const {
     app->clear_screen();
 
     /* show current directory */
     app->title_line(title.c_str());
     app->set_color(GD_GDASH_YELLOW);
-    app->blittext_n(-1, 1*yd, filename_to_utf8(directory).c_str());
+    app->blittext_n(-1, 1 * yd, filename_to_utf8(directory).c_str());
     if (for_save) {
         // TRANSLATORS: 40 chars max
         app->status_line(_("Crsr:select  N:new  J:jump  Esc:cancel"));   /* for saving, we allow the user to select a new filename. */
@@ -324,13 +329,16 @@ void SelectFileActivity::redraw_event() {
         // TRANSLATORS: 40 chars max
         app->status_line(_("Crsr: select   J: jump   Esc: cancel"));
     }
-    unsigned i, page = sel/names_per_page, cur;
-    for (i=0, cur=page*names_per_page; i<names_per_page; i++, cur++) {
-        if (cur<files.size()) {    /* may not be as much filenames as it would fit on the screen */
-            app->set_color((cur==unsigned(sel)) ? GD_GDASH_YELLOW : GD_GDASH_LIGHTBLUE);
-            app->blittext_n(app->font_manager->get_font_width_narrow(), (i+3)*yd, files[cur].c_str());
+    unsigned i, page = sel / names_per_page, cur;
+    for (i = 0, cur = page * names_per_page; i < names_per_page; i++, cur++) {
+        if (cur < files.size()) {  /* may not be as much filenames as it would fit on the screen */
+            app->set_color((cur == unsigned(sel)) ? GD_GDASH_YELLOW : GD_GDASH_LIGHTBLUE);
+            app->blittext_n(app->font_manager->get_font_width_narrow(), (i + 3)*yd, files[cur].c_str());
         }
     }
 
-    app->screen->flip();
+    if (files.size() > names_per_page)
+        app->draw_scrollbar(0, sel, files.size() - 1);
+
+    app->screen->drawing_finished();
 }

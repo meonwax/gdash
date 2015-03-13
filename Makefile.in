@@ -302,8 +302,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = po include src caves docs sound music
-ACLOCAL_AMFLAGS = -I m4
+SUBDIRS = po include src caves docs sound music shaders
+ACLOCAL_AMFLAGS = -Im4
 desktopdir = $(datadir)/applications
 desktop_DATA = gdash.desktop
 icondir = $(datadir)/pixmaps
@@ -864,6 +864,8 @@ uninstall-am: uninstall-desktopDATA uninstall-iconDATA
 
 gdash.nsi: gdash.nsi.in
 	sed s/GDASH-VERSION/$(PACKAGE_VERSION)/ <$^ >$@
+	echo do not forget to strip gdash.exe
+	echo do not forget to create documentation
 
 doxy:
 	doxygen doxygen.conf

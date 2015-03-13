@@ -1,25 +1,30 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include "framework/inputtextactivity.hpp"
-#include "framework/inputtextactivity.hpp"
+#include "framework/app.hpp"
 #include "gfx/fontmanager.hpp"
 #include "gfx/screen.hpp"
-#include "cave/helper/colors.hpp"
-#include "misc/printf.hpp"
 
 InputTextActivity::InputTextActivity(App *app, char const *title_line, const char *default_text, SmartPtr<Command1Param<std::string> > command_when_successful)
     :
@@ -36,26 +41,26 @@ InputTextActivity::~InputTextActivity() {
 }
 
 
-void InputTextActivity::redraw_event() {
-    int height=6*app->font_manager->get_line_height();
-    int y1=(app->screen->get_height()-height)/2;    /* middle of the screen */
-    int cx=2*app->font_manager->get_font_width_narrow(), cy=y1, cw=app->screen->get_width()-2*cx, ch=height;
+void InputTextActivity::redraw_event(bool full) const {
+    int height = 6 * app->font_manager->get_line_height();
+    int y1 = (app->screen->get_height() - height) / 2; /* middle of the screen */
+    int cx = 2 * app->font_manager->get_font_width_narrow(), cy = y1, cw = app->screen->get_width() - 2 * cx, ch = height;
 
     app->draw_window(cx, cy, cw, ch);
     app->screen->set_clip_rect(cx, cy, cw, ch);
-    int width=cw/app->font_manager->get_font_width_narrow();
+    int width = cw / app->font_manager->get_font_width_narrow();
 
     app->set_color(GD_GDASH_WHITE);
-    app->blittext_n(-1, y1+app->font_manager->get_line_height(), title.c_str());
+    app->blittext_n(-1, y1 + app->font_manager->get_line_height(), title.c_str());
     int len = g_utf8_strlen(text->str, -1);
     int x;
-    if (len<width-1)
-        x=-1; /* if fits on screen (+1 for cursor), centered */
+    if (len < width - 1)
+        x = -1; /* if fits on screen (+1 for cursor), centered */
     else
-        x=cx+cw-(len+1)*app->font_manager->get_font_width_narrow();    /* otherwise show end, +1 for cursor */
-    app->blittext_n(x, y1+3*app->font_manager->get_line_height(), CPrintf("%s%c") % text->str % (blink?'_':' '));
+        x = cx + cw - (len + 1) * app->font_manager->get_font_width_narrow(); /* otherwise show end, +1 for cursor */
+    app->blittext_n(x, y1 + 3 * app->font_manager->get_line_height(), CPrintf("%s%c") % text->str % (blink ? '_' : ' '));
     app->screen->remove_clip_rect();
-    app->screen->flip();
+    app->screen->drawing_finished();
 }
 
 
@@ -67,11 +72,11 @@ void InputTextActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
             app->enqueue_command(command_when_successful);
             break;
         case App::BackSpace:
-            if (text->len!=0) {
-                char *ptr=text->str+text->len;    /* string pointer + length: points to the terminating zero */
-                ptr=g_utf8_prev_char(ptr);    /* step back one utf8 character */
-                g_string_truncate(text, ptr-text->str);
-                redraw_event();
+            if (text->len != 0) {
+                char *ptr = text->str + text->len; /* string pointer + length: points to the terminating zero */
+                ptr = g_utf8_prev_char(ptr);  /* step back one utf8 character */
+                g_string_truncate(text, ptr - text->str);
+                queue_redraw();
             }
             break;
         case App::Escape:
@@ -80,7 +85,7 @@ void InputTextActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
         default:
             if (keycode >= ' ') {
                 g_string_append_unichar(text, keycode);
-                redraw_event();
+                queue_redraw();
             }
             break;
     }
@@ -92,6 +97,6 @@ void InputTextActivity::timer_event(int ms_elapsed) {
     if (ms > 400) {
         blink = !blink;
         ms -= 400;
-        redraw_event();
+        queue_redraw();
     }
 }

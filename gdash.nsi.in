@@ -4,7 +4,6 @@
 !include "MUI2.nsh"
 
 !define MUI_ICON "gdash.ico"
-!define MUI_UNICON "gdash.ico"
 !define MUI_COMPONENTSPAGE_NODESC
 
 !insertmacro MUI_PAGE_WELCOME
@@ -51,7 +50,6 @@ Section "GDash (required)"
   File "include\gdash_screen.png"
   File "include\gdash_tile.png"
   File "gdash.ico"
-  File /oname=README.txt "README"
   File /oname=TODO.txt "TODO"
   File /oname=COPYING.txt "COPYING"
   File /oname=COPYING_SDL.txt "COPYING.SDL"
@@ -110,15 +108,35 @@ Section "GDash (required)"
   File ${MINGWDIR}\bin\libpng14-14.dll
   File ${MINGWDIR}\bin\libjpeg-8.dll
 
+  ; Shaders
+  SetOutPath $INSTDIR\shaders
+  File "shaders\*.shader"
+
+  ; Translations
+  SetOutPath $INSTDIR\hu\LC_MESSAGES
+  File /r ${MINGWDIR}\share\locale\hu\LC_MESSAGES\gtk20.mo
+  File /r ${MINGWDIR}\share\locale\hu\LC_MESSAGES\glib20.mo
+  SetOutPath $INSTDIR\de\LC_MESSAGES
+  File /r ${MINGWDIR}\share\locale\de\LC_MESSAGES\gtk20.mo
+  File /r ${MINGWDIR}\share\locale\de\LC_MESSAGES\glib20.mo
+  SetOutPath $INSTDIR\hu\LC_MESSAGES
+  File /oname=gdash.mo "po\hu.gmo"
+  SetOutPath $INSTDIR\de\LC_MESSAGES
+  File /oname=gdash.mo "po\de.gmo"
 
   ; Documentation
-  SetOutPath $INSTDIR
-  File docs\replay_to_avi.html
+  SetOutPath $INSTDIR\docs
   File docs\style.css
   File docs\background.png
   File docs\gdash.png
-  File docs\avidemux_codec.png
-  File docs\avidemux_fps.png
+  File docs\Doc-*.html
+  File docs\image_*.png
+  CreateDirectory "$SMPROGRAMS\GDash"
+  CreateDirectory "$SMPROGRAMS\GDash\Documentation"
+  CreateShortCut "$SMPROGRAMS\GDash\Documentation\English.lnk" "$INSTDIR\docs\Doc-English.html" "" "" 0
+  CreateShortCut "$SMPROGRAMS\GDash\Documentation\Deutsch.lnk" "$INSTDIR\docs\Doc-Deutsch.html" "" "" 0
+  CreateShortCut "$SMPROGRAMS\GDash\Documentation\Magyar.lnk" "$INSTDIR\docs\Doc-Magyar.html" "" "" 0
+
 
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\GDash "Install_Dir" "$INSTDIR"
@@ -133,52 +151,32 @@ Section "GDash (required)"
 SectionEnd
 
 ; Optional section (can be disabled by the user)
-; The stuff to install
 Section "Cave sets"
-
   ; Set output path to the installation directory.
   SetOutPath $INSTDIR\caves
   
   ; Put files there
   File /r /x Makefile* /x create_makefile.sh "caves\*"
-
 SectionEnd
 
+
+; Optional section
 Section "Sound files"
   SetOutPath $INSTDIR\sound
   File "sound\*.ogg"
 
   SetOutPath $INSTDIR\music
   File "music\*.ogg"
-
-SectionEnd
-
-Section "Translations"
-  ; Translations
-  SetOutPath $INSTDIR\hu\LC_MESSAGES
-  File /r ${MINGWDIR}\share\locale\hu\LC_MESSAGES\gtk20.mo
-  File /r ${MINGWDIR}\share\locale\hu\LC_MESSAGES\glib20.mo
-  SetOutPath $INSTDIR\de\LC_MESSAGES
-  File /r ${MINGWDIR}\share\locale\de\LC_MESSAGES\gtk20.mo
-  File /r ${MINGWDIR}\share\locale\de\LC_MESSAGES\glib20.mo
-
-  SetOutPath $INSTDIR\hu\LC_MESSAGES
-  File /oname=gdash.mo "po\hu.gmo"
-  SetOutPath $INSTDIR\de\LC_MESSAGES
-  File /oname=gdash.mo "po\de.gmo"
 SectionEnd
 
 
 ; Optional section (can be disabled by the user)
 Section "Start Menu Shortcuts"
-
   SetOutPath $INSTDIR
   CreateDirectory "$SMPROGRAMS\GDash"
   CreateShortCut "$SMPROGRAMS\GDash\GDash.lnk" "$INSTDIR\gdash.exe" "" "$INSTDIR\gdash.ico" 0
-  CreateShortCut "$SMPROGRAMS\GDash\README.lnk" "$INSTDIR\README.txt" "" "" 0
-  CreateShortCut "$SMPROGRAMS\GDash\Replay to AVI HOWTO.lnk" "$INSTDIR\replay_to_avi.html" "" "" 0
+  CreateShortCut "$SMPROGRAMS\GDash\GDash (default settings).lnk" "$INSTDIR\gdash.exe" "--default-settings" "$INSTDIR\gdash.ico" 0
   CreateShortCut "$SMPROGRAMS\GDash\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
-  
 SectionEnd
 
 
@@ -213,8 +211,7 @@ Section "Uninstall"
   DeleteRegKey HKCR "GDash.Caveset"
 
   ; Remove shortcuts, if any
-  Delete "$SMPROGRAMS\GDash\*.*"
-  RMDir "$SMPROGRAMS\GDash"
+  RMDir /r "$SMPROGRAMS\GDash"
 
   ; Remove directories used
   RMDir /r "$INSTDIR"
