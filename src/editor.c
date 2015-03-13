@@ -3079,7 +3079,7 @@ cave_colors_random_combo_cb(GtkWidget *widget, gpointer data)
 static void
 cave_colors_cb(GtkWidget *widget, gpointer data)
 {
-	GtkWidget *dialog, *table=NULL, *label;
+	GtkWidget *dialog, *table=NULL;
 	GtkWidget *random_combo;
 	GList *combos=NULL;
 	int i, row=0;
@@ -3132,10 +3132,8 @@ cave_colors_cb(GtkWidget *widget, gpointer data)
 	g_signal_connect(random_combo, "changed", G_CALLBACK(cave_colors_random_combo_cb), combos);
 
 	/* hint label */
-	label=gd_label_new_printf_centered(_("<i>Hint: As the palette can be changed for C64 and Atari colors, "
-	"it is not recommended to use different types together (for example, RGB color for background, Atari color for Slime.)</i>"));
-	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-	gtk_table_attach(GTK_TABLE(table), label, 0, 2, row, row+1, GTK_FILL|GTK_EXPAND, GTK_FILL|GTK_SHRINK, 0, 0);
+	gd_dialog_add_hint(GTK_DIALOG(dialog), _("Hint: As the palette can be changed for C64 and Atari colors, "
+	"it is not recommended to use different types together (for example, RGB color for background, Atari color for Slime.)"));
 	
 	gtk_widget_show_all(dialog);
 	colorchange_update_disabled=FALSE;

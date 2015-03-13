@@ -26,6 +26,7 @@ void gd_show_error(GdErrorMessage *error);
 
 gboolean gd_ask_yes_no(const char *question, const char *answer1, const char *answer2, gboolean *result);
 char *gd_input_string(const char *title, const char *current);
+int gd_select_key(const char *title);
 gboolean gd_discard_changes();
 
 void gd_about();

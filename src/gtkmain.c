@@ -227,32 +227,39 @@ delete_event (GtkWidget * widget, GdkEvent * event, gpointer data)
    connected this function to key press and key release.
  */
 static gboolean
-keypress_event (GtkWidget * widget, GdkEventKey * event, gpointer data)
+keypress_event (GtkWidget * widget, GdkEventKey* event, gpointer data)
 {
 	gboolean press=event->type==GDK_KEY_PRESS;	/* true for press, false for release */
-	switch (event->keyval) {
-	case GDK_Up:
-		key_up=press;
-		return TRUE;
-	case GDK_Down:
-		key_down=press;
-		return TRUE;
-	case GDK_Left:
+	
+	if (event->keyval==gd_gtk_key_left) {
 		key_left=press;
 		return TRUE;
-	case GDK_Right:
+	}
+	if (event->keyval==gd_gtk_key_right) {
 		key_right=press;
 		return TRUE;
-	case GDK_Control_R:
-		key_rctrl=press;
+	}
+	if (event->keyval==gd_gtk_key_up) {
+		key_up=press;
 		return TRUE;
-	case GDK_Control_L:
+	}
+	if (event->keyval==gd_gtk_key_down) {
+		key_down=press;
+		return TRUE;
+	}
+	if (event->keyval==gd_gtk_key_fire_1) {
 		key_lctrl=press;
 		return TRUE;
-	case GDK_F2:
+	}
+	if (event->keyval==gd_gtk_key_fire_2) {
+		key_rctrl=press;
+		return TRUE;
+	}
+	if (event->keyval==gd_gtk_key_suicide) {
 		key_suicide=press;
 		return TRUE;
 	}
+
 	return FALSE;	/* if any other key, we did not process it. go on, let gtk handle it. */
 }
 
@@ -260,7 +267,7 @@ keypress_event (GtkWidget * widget, GdkEventKey * event, gpointer data)
 /* mouse leaves drawing area event */
 /* if pointer not inside window, no control of player. */
 static gboolean
-drawing_area_leave_event (const GtkWidget * widget, const GdkEventCrossing * event, const gpointer data)
+drawing_area_leave_event(GtkWidget * widget, GdkEventCrossing* event, gpointer data)
 {
 	mouse_cell_x=-1;
 	mouse_cell_y=-1;
@@ -270,7 +277,7 @@ drawing_area_leave_event (const GtkWidget * widget, const GdkEventCrossing * eve
 
 /* mouse button press event */
 static gboolean
-drawing_area_button_event (const GtkWidget * widget, const GdkEventButton * event, const gpointer data)
+drawing_area_button_event(GtkWidget * widget, GdkEventButton * event, gpointer data)
 {
 	/* see if it is a click or a release. */
 	mouse_cell_click=event->type == GDK_BUTTON_PRESS;
@@ -279,7 +286,7 @@ drawing_area_button_event (const GtkWidget * widget, const GdkEventButton * even
 
 /* mouse motion event */
 static gboolean
-drawing_area_motion_event (const GtkWidget * widget, const GdkEventMotion * event, const gpointer data)
+drawing_area_motion_event(GtkWidget * widget, GdkEventMotion * event, gpointer data)
 {
 	int x, y;
 	GdkModifierType state;
@@ -417,6 +424,12 @@ static void
 preferences_cb(GtkWidget *widget, gpointer data)
 {
 	gd_preferences(((GDMainWindow *)data)->window);
+}
+
+static void
+control_settings_cb(GtkWidget *widget, gpointer data)
+{
+	gd_control_settings(((GDMainWindow *)data)->window);
 }
 
 static void
@@ -1267,7 +1280,7 @@ recent_chooser_activated_cb(GtkRecentChooser *chooser, gpointer data)
 		char *display_name;
 
 		display_name=gtk_recent_info_get_uri_display(current);
-		gd_errormessage(_("Cannot load file from network link."), display_name);
+		gd_errormessage(_("GDash cannot load file from a network link."), display_name);
 		g_free(display_name);
 		return;
 	}
@@ -1415,7 +1428,7 @@ static void
 show_replays_cb(GtkWidget *widget, gpointer data)
 {
 	static GtkWidget *dialog=NULL;
-	GtkWidget *scroll, *view, *label, *button;
+	GtkWidget *scroll, *view, *button;
 	GList *iter;
 	GtkTreeStore *model;
 	GtkCellRenderer *renderer;
@@ -1426,22 +1439,20 @@ show_replays_cb(GtkWidget *widget, gpointer data)
 		return;
 	}
 	
-	dialog=gtk_dialog_new_with_buttons(_("Replays"), GTK_WINDOW(main_window.window), GTK_DIALOG_NO_SEPARATOR, NULL);
+	dialog=gtk_dialog_new_with_buttons(_("Replays"), GTK_WINDOW(main_window.window), 0, NULL);
 	g_signal_connect(G_OBJECT(dialog), "destroy", G_CALLBACK(gtk_widget_destroyed), &dialog);
 	g_signal_connect(G_OBJECT(dialog), "response", G_CALLBACK(show_replays_response_cb), NULL);
 	gtk_window_set_default_size(GTK_WINDOW(dialog), 480, 360);
 	gtk_box_set_spacing(GTK_BOX(GTK_DIALOG(dialog)->vbox), 6);
+	
+	gd_dialog_add_hint(GTK_DIALOG(dialog), _("Hint: When watching a replay, you can use the usual movement keys (left, right...) to "
+    "stop the replay and immediately continue the playing of the cave yourself."));
 	
 	/* scrolled window to show replays tree view */
 	scroll=gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(scroll), GTK_SHADOW_ETCHED_IN);
 	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), scroll);
 
-	label=gd_label_new_printf_centered(_("<i>Hint: When watching a replay, you can use the usual movement keys (left, right...) to "
-	"stop the replay and immediately continue the playing of the cave yourself.</i>"));
-	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), label, FALSE, TRUE, 0);
-	
 	/* create store containing replays */
 	model=gtk_tree_store_new(COL_REPLAY_MAX, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_BOOLEAN);
 	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
@@ -1701,11 +1712,12 @@ gd_create_main_window(void)
 		{"About", GTK_STOCK_ABOUT, NULL, NULL, NULL, G_CALLBACK(about_cb)},
 		{"Errors", GTK_STOCK_DIALOG_ERROR, N_("_Error console"), NULL, NULL, G_CALLBACK(show_errors_cb)},
 		{"Help", GTK_STOCK_HELP, NULL, NULL, NULL, G_CALLBACK(help_cb)},
-		{"CaveInfo", GTK_STOCK_DIALOG_INFO, N_("Caveset _information"), NULL, N_("Show information about the and its caves"), G_CALLBACK(cave_info_cb)},
+		{"CaveInfo", GTK_STOCK_DIALOG_INFO, N_("Caveset _information"), NULL, N_("Show information about the game and its caves"), G_CALLBACK(cave_info_cb)},
 	};
 
 	static GtkActionEntry action_entries_title[]={
 		{"GamePreferences", GTK_STOCK_PREFERENCES, NULL, NULL, NULL, G_CALLBACK(preferences_cb)},
+		{"GameControlSettings", GD_ICON_KEYBOARD, N_("_Control keys"), NULL, NULL, G_CALLBACK(control_settings_cb)},
 		{"NewGame", GTK_STOCK_MEDIA_PLAY, N_("_New game"), "<control>N", N_("Start new game"), G_CALLBACK(new_game_cb)},
 		{"CaveEditor", GD_ICON_CAVE_EDITOR, N_("Cave _editor"), NULL, NULL, G_CALLBACK(cave_editor_cb)},
 		{"OpenFile", GTK_STOCK_OPEN, NULL, NULL, NULL, G_CALLBACK(open_caveset_cb)},
@@ -1765,6 +1777,7 @@ gd_create_main_window(void)
 		"<menuitem action='ShowReplays'/>"
 		"<separator/>"
 		"<menuitem action='FullScreen'/>"
+		"<menuitem action='GameControlSettings'/>"
 		"<menuitem action='GamePreferences'/>"
 		"</menu>"
 		"<menu action='HelpMenu'>"
@@ -1925,7 +1938,6 @@ gd_create_main_window(void)
 	gtk_window_present(GTK_WINDOW(main_window.window));
 }
 
-
 /*
 	main()
 	function
@@ -1974,6 +1986,7 @@ main(int argc, char *argv[])
 	gd_install_log_handler();
 
 	gd_settings_init_dirs();
+
 	gd_load_settings();
 
 	gtk_set_locale();

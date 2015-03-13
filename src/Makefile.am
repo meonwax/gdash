@@ -113,6 +113,8 @@ noinst_HEADERS = \
 
 
 
+# gtk cflags also for the sdl version - for settings.c
+# sdl is needed for sound.
 gdash_CFLAGS = -g -Wall @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@
 gdash_LDFLAGS = -g -Wall
 gdash_LDADD = @GTK_LIBS@ @GLIB_LIBS@ @LIBINTL@ @SDL_LIBS@ -lSDL_mixer
@@ -125,8 +127,9 @@ gdash_SOURCES = \
 
 
 
-
-sdash_CFLAGS = -g -Wall @GLIB_CFLAGS@ @SDL_CFLAGS@
+# gtk cflags also for the sdl version - for settings.c
+# sdl is needed for gfx and sound.
+sdash_CFLAGS = -g -Wall @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@
 sdash_LDFLAGS = -g -Wall
 sdash_LDADD = @GLIB_LIBS@ @SDL_LIBS@ -lSDL_mixer
 sdash_SOURCES = \

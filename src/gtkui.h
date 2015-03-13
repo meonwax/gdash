@@ -45,13 +45,15 @@
 #define GD_ICON_OBJECT_NOT_ON_ALL "icon-object-not-on-all"
 #define GD_ICON_OBJECT_NOT_ON_CURRENT "icon-object-not-on-current"
 #define GD_ICON_REPLAY "icon-replay"
+#define GD_ICON_KEYBOARD "icon-keyboard"
 
-void gd_create_stock_icons(void);
+void gd_create_stock_icons();
 
-GdkPixbuf *gd_icon(void);
-GdkPixmap **gd_create_title_animation(void);
+GdkPixbuf *gd_icon();
+GdkPixmap **gd_create_title_animation();
 
 void gd_preferences(GtkWidget *parent);
+void gd_control_settings(GtkWidget *parent);
 
 void gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, Cave *highlight_cave, int highlight_rank);
 
@@ -79,6 +81,10 @@ void gd_label_set_markup_printf(GtkLabel *label, const char *format, ...);
 
 void gd_show_errors(GtkWidget *parent);
 void gd_show_last_error(GtkWidget *parent);
+
+GtkWidget *gd_keysim_button(const char *what_for, guint *keyval);
+
+void gd_dialog_add_hint(GtkDialog *dialog, const char *hint);
 
 #endif
 

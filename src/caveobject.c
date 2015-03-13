@@ -34,9 +34,9 @@ GdObjectDescription gd_object_description[]={
 	{ /* join */  N_("Join"), NULL, NULL, N_("Distance"), NULL, N_("Search element"), N_("Add element"), N_("Find"), N_("Draw") },
 	{ /* flodr */ N_("Replace fill"), N_("Starting coordinates"), NULL, NULL, NULL, N_("Search element"), N_("Fill element"), NULL, N_("Replace") },
 	{ /* flodb */ N_("Fill to border"), N_("Starting coordinates"), NULL, NULL, NULL, N_("Border element"), N_("Fill element"), N_("Border"), N_("Fill")  },
-	{ /* maze */  N_("Maze"), N_("Starting coordinates"), N_("Ending coordinates"), N_("Wall and path"), N_("Random seed %d"), N_("Wall element"), N_("Path element"), N_("Wall"), N_("Path") , N_("Horizontal (%)")},
-	{ /* umaze */ N_("Unicursal maze"), N_("Starting coordinates"), N_("Ending coordinates"), N_("Wall and path"), N_("Random seed %d"), N_("Wall element"), N_("Path element"), N_("Wall"), N_("Path") , N_("Horizontal (%)")},
-	{ /* Bmaze */ N_("Braid maze"), N_("Starting coordinates"), N_("Ending coordinates"), N_("Wall and path"), N_("Random seed %d"), N_("Wall element"), N_("Path element"), N_("Wall"), N_("Path") , N_("Horizontal (%)")},
+	{ /* maze */  N_("Maze"), N_("Starting coordinates"), N_("Ending coordinates"), N_("Wall and path"), N_("Random seed %d"), N_("Wall element"), N_("Path element"), N_("Wall"), N_("Path") , N_("Horizontal (%%)")},
+	{ /* umaze */ N_("Unicursal maze"), N_("Starting coordinates"), N_("Ending coordinates"), N_("Wall and path"), N_("Random seed %d"), N_("Wall element"), N_("Path element"), N_("Wall"), N_("Path") , N_("Horizontal (%%)")},
+	{ /* Bmaze */ N_("Braid maze"), N_("Starting coordinates"), N_("Ending coordinates"), N_("Wall and path"), N_("Random seed %d"), N_("Wall element"), N_("Path element"), N_("Wall"), N_("Path") , N_("Horizontal (%%)")},
 	{ /* random */N_("Random fill"), N_("Starting coordinates"), N_("Ending coordinates"), NULL, N_("Random seed %d"), N_("Replace only this element"), NULL, N_("Random 1"), N_("Initial"), NULL, N_("C64 random numbers")},
 	{ /* copyps */N_("Copy and paste"), N_("Starting coordinates"), N_("Width and height"), N_("Paste coordinates"), NULL, NULL, NULL, NULL, NULL, NULL, NULL, N_("Mirror"), N_("Flip")},
 };
@@ -375,7 +375,7 @@ gd_get_object_description_markup (GdObject *selected)
 		return g_markup_printf_escaped(_("Random fill from %d,%d to %d,%d, replacing %s"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
 
 	case COPY_PASTE:
-		return g_markup_printf_escaped(_("Copy from %d,%d-%d,%d, paste to %d, %d"), selected->x1, selected->y1, selected->x2, selected->y2, selected->dx, selected->dy);
+		return g_markup_printf_escaped(_("Copy from %d,%d-%d,%d, paste to %d,%d"), selected->x1, selected->y1, selected->x2, selected->y2, selected->dx, selected->dy);
 
 		
 	case NONE:

@@ -381,7 +381,7 @@ gd_cave_properties[] = {
 	{"AMOEBA2EXPLOSIONeffect", GD_TYPE_EFFECT, 0, N_("   Explodes to"), CAVE_OFFSET(amoeba_2_explodes_to), 1, N_("An amoeba 2 explodes to this element, when touched by the original amoeba.")},
 	{"AMOEBA2BOULDEReffect", GD_TYPE_EFFECT, 0, N_("If too big, converts to"), CAVE_OFFSET(too_big_amoeba_2_to), 1, N_("Controls which element an overgrown amoeba converts to.")},
 	{"AMOEBA2DIAMONDeffect", GD_TYPE_EFFECT, 0, N_("If enclosed, converts to"), CAVE_OFFSET(enclosed_amoeba_2_to), 1, N_("Controls which element an enclosed amoeba converts to.")},
-	{"AMOEBA2LOOKSLIKEeffect", GD_TYPE_EFFECT, 0, N_("Looks like"), CAVE_OFFSET(amoeba_2_looks_like), 1, N_("Amoeba 2 can look like any other element. Tip: it can also look like a normal amoeba. Or it can look like slime, and then you have two different colored amoebas!")},
+	{"AMOEBA2LOOKSLIKEeffect", GD_TYPE_EFFECT, 0, N_("Looks like"), CAVE_OFFSET(amoeba_2_looks_like), 1, N_("Amoeba 2 can look like any other element. Hint: it can also look like a normal amoeba. Or it can look like slime, and then you have two different colored amoebas!")},
 
 	/* ACTIVE 1 */
 	{"", GD_TAB, 0, N_("Active elements")},
@@ -484,7 +484,7 @@ gd_cave_properties[] = {
 	{"", GD_TAB, 0, N_("Compatibility")},
 	{"", GD_LABEL, 0, N_("Compatibility")},
 	{"BorderProperties.lineshift", GD_TYPE_BOOLEAN, 0, N_("Line shifting border"), CAVE_OFFSET(lineshift), 1, N_("If this is set to true, the player exiting on either side will appear one row lower or upper on the other side.")},
-	{"BorderProperties.objectwraparound", GD_TYPE_BOOLEAN, 0, N_("Objects wrap around"), CAVE_OFFSET(wraparound_objects), 1, N_("If true, object will wrap around the cave borders as well, ie. if you drag a line to the left, part of it will appear on the right hand side of the cave. The drawing in this case is also affected by the line shifting border property. If that one is enabled, too, crossing the left hand side or right hand side boundary will decrement or increment the row, and crossing the top or the bottom boundary will have no effect at all.")},
+	{"BorderProperties.objectwraparound", GD_TYPE_BOOLEAN, 0, N_("Objects wrap around"), CAVE_OFFSET(wraparound_objects), 1, N_("If true, objects will wrap around the cave borders as well, ie. if you drag a line to the left, part of it will appear on the right hand side of the cave. The drawing in this case is also affected by the line shifting border property. If that one is enabled, too, crossing the left hand side or right hand side boundary will decrement or increment the row, and crossing the top or the bottom boundary will have no effect at all.")},
 	{"BorderProperties.scan", GD_TYPE_BOOLEAN, 0, N_("Scan first and last row"), CAVE_OFFSET(border_scan_first_and_last), 1, N_("Elements move on first and last row, too.")},
 	{"ShortExplosions", GD_TYPE_BOOLEAN, 0, N_("Short explosions"), CAVE_OFFSET(short_explosions), 1, N_("In 1stB, explosions were longer, took five cave frames to complete, as opposed to four in the original.")},
 	{"SkeletonsWorthDiamonds", GD_TYPE_INT, 0, N_("Skeletons worth diamonds"), CAVE_OFFSET(skeletons_worth_diamonds), 1, N_("The number of diamonds each skeleton is worth."), 0, 10},

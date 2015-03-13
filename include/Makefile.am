@@ -49,7 +49,8 @@ ICONS = \
 	object_on_all.png \
 	object_not_on_all.png \
 	object_not_on_current.png \
-	replay.png
+	replay.png \
+	keyboard.png
 
 TITLE = \
 	gdash_screen.png \

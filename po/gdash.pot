@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: gdash 20081218\n"
+"Project-Id-Version: gdash 20081227\n"
 "Report-Msgid-Bugs-To: cirix@fw.hu\n"
-"POT-Creation-Date: 2008-12-18 21:03+0100\n"
+"POT-Creation-Date: 2008-12-27 11:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -148,7 +148,7 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-#: src/cave.c:34
+#: src/cave.c:34 src/gtkui.c:807
 msgid "Up"
 msgstr ""
 
@@ -156,7 +156,7 @@ msgstr ""
 msgid "Up+right"
 msgstr ""
 
-#: src/cave.c:34
+#: src/cave.c:34 src/gtkui.c:808
 msgid "Right"
 msgstr ""
 
@@ -164,7 +164,7 @@ msgstr ""
 msgid "Down+right"
 msgstr ""
 
-#: src/cave.c:34
+#: src/cave.c:34 src/gtkui.c:809
 msgid "Down"
 msgstr ""
 
@@ -172,7 +172,7 @@ msgstr ""
 msgid "Down+left"
 msgstr ""
 
-#: src/cave.c:34
+#: src/cave.c:34 src/gtkui.c:810
 msgid "Left"
 msgstr ""
 
@@ -972,7 +972,7 @@ msgstr ""
 msgid "Cave data"
 msgstr ""
 
-#: src/cavedb.c:278 src/caveset.c:56 src/gtkmain.c:1479 src/gtkui.c:877
+#: src/cavedb.c:278 src/caveset.c:56 src/gtkmain.c:1490 src/gtkui.c:914
 msgid "Name"
 msgstr ""
 
@@ -996,7 +996,7 @@ msgstr ""
 msgid "Name of author"
 msgstr ""
 
-#: src/cavedb.c:281 src/caveset.c:59 src/gtkmain.c:1483
+#: src/cavedb.c:281 src/caveset.c:59 src/gtkmain.c:1494
 msgid "Date"
 msgstr ""
 
@@ -1036,7 +1036,7 @@ msgstr ""
 msgid "This sets whether the game can be started at this cave."
 msgstr ""
 
-#: src/cavedb.c:287 src/editorexport.c:564 src/gtkmain.c:1581
+#: src/cavedb.c:287 src/editorexport.c:564 src/gtkmain.c:1592
 msgid "Intermission"
 msgstr ""
 
@@ -1547,7 +1547,7 @@ msgstr ""
 
 #: src/cavedb.c:384
 msgid ""
-"Amoeba 2 can look like any other element. Tip: it can also look like a "
+"Amoeba 2 can look like any other element. Hint: it can also look like a "
 "normal amoeba. Or it can look like slime, and then you have two different "
 "colored amoebas!"
 msgstr ""
@@ -1872,7 +1872,7 @@ msgid ""
 "option sets the number of seconds to wait."
 msgstr ""
 
-#: src/cavedb.c:462 src/gtkui.c:563
+#: src/cavedb.c:462 src/gtkui.c:565
 msgid "Sound"
 msgstr ""
 
@@ -1980,9 +1980,9 @@ msgstr ""
 
 #: src/cavedb.c:487
 msgid ""
-"If true, object will wrap around the cave borders as well, ie. if you drag a "
-"line to the left, part of it will appear on the right hand side of the cave. "
-"The drawing in this case is also affected by the line shifting border "
+"If true, objects will wrap around the cave borders as well, ie. if you drag "
+"a line to the left, part of it will appear on the right hand side of the "
+"cave. The drawing in this case is also affected by the line shifting border "
 "property. If that one is enabled, too, crossing the left hand side or right "
 "hand side boundary will decrement or increment the row, and crossing the top "
 "or the bottom boundary will have no effect at all."
@@ -2178,7 +2178,8 @@ msgid "Path"
 msgstr ""
 
 #: src/caveobject.c:37 src/caveobject.c:38 src/caveobject.c:39
-msgid "Horizontal (%)"
+#, c-format
+msgid "Horizontal (%%)"
 msgstr ""
 
 #: src/caveobject.c:38 src/help.c:152
@@ -2291,7 +2292,7 @@ msgstr ""
 
 #: src/caveobject.c:378
 #, c-format
-msgid "Copy from %d,%d-%d,%d, paste to %d, %d"
+msgid "Copy from %d,%d-%d,%d, paste to %d,%d"
 msgstr ""
 
 #: src/caveset.c:55
@@ -2621,93 +2622,93 @@ msgstr ""
 
 #: src/editor.c:3135
 msgid ""
-"<i>Hint: As the palette can be changed for C64 and Atari colors, it is not "
+"Hint: As the palette can be changed for C64 and Atari colors, it is not "
 "recommended to use different types together (for example, RGB color for "
-"background, Atari color for Slime.)</i>"
+"background, Atari color for Slime.)"
 msgstr ""
 
-#: src/editor.c:3182
+#: src/editor.c:3180
 msgid "Do you really want to delete cave(s)?"
 msgstr ""
 
-#: src/editor.c:3182
+#: src/editor.c:3180
 msgid "This operation cannot be undone."
 msgstr ""
 
-#: src/editor.c:3355
+#: src/editor.c:3353
 msgid ""
 "At least one object would have been totally hidden (not visible on any of "
 "the levels)."
 msgstr ""
 
-#: src/editor.c:3355
+#: src/editor.c:3353
 msgid "Enabled those objects on the current level."
 msgstr ""
 
-#: src/editor.c:3546
+#: src/editor.c:3544
 msgid "Do you really want to clear cave objects?"
 msgstr ""
 
-#: src/editor.c:3567
+#: src/editor.c:3565
 msgid "Do you really want to remove cave map?"
 msgstr ""
 
-#: src/editor.c:3567
+#: src/editor.c:3565
 msgid "This operation destroys all cave objects."
 msgstr ""
 
-#: src/editor.c:3588
+#: src/editor.c:3586
 msgid "This cave has no objects."
 msgstr ""
 
-#: src/editor.c:3592
+#: src/editor.c:3590
 msgid "Do you really want to flatten cave?"
 msgstr ""
 
-#: src/editor.c:3592
+#: src/editor.c:3590
 msgid ""
 "This operation merges all cave objects currently seen in a single map. "
 "Further objects may later be added, but the ones already seen will behave "
 "like the random fill elements; they will not be editable."
 msgstr ""
 
-#: src/editor.c:3725
+#: src/editor.c:3723
 msgid "Save Cave Set in HTML"
 msgstr ""
 
-#: src/editor.c:3733
+#: src/editor.c:3731
 msgid "HTML files"
 msgstr ""
 
-#: src/editor.c:3769
+#: src/editor.c:3767
 msgid "Export Cave as CrLi Cave File"
 msgstr ""
 
-#: src/editor.c:3808
+#: src/editor.c:3806
 msgid "Export Cave as CrLi Cave Pack"
 msgstr ""
 
-#: src/editor.c:3919
+#: src/editor.c:3917
 msgid "Create New Cave"
 msgstr ""
 
-#: src/editor.c:3930 src/gtkmain.c:989
+#: src/editor.c:3928 src/gtkmain.c:1002
 msgid "Name:"
 msgstr ""
 
-#: src/editor.c:3936
+#: src/editor.c:3934
 msgid "New cave"
 msgstr ""
 
-#: src/editor.c:3940
+#: src/editor.c:3938
 msgid "Description:"
 msgstr ""
 
-#: src/editor.c:3949
+#: src/editor.c:3947
 msgid "Intermission:"
 msgstr ""
 
-#: src/editor.c:3951
+#: src/editor.c:3949
 msgid ""
 "Intermission caves are usually small and fast caves, which are not required "
 "to be solved. The player will not lose a life if he is not successful. The "
@@ -2716,11 +2717,11 @@ msgid ""
 "intermissions."
 msgstr ""
 
-#: src/editor.c:4079
+#: src/editor.c:4077
 msgid "Do you really want to remove unknown cave tags?"
 msgstr ""
 
-#: src/editor.c:4079
+#: src/editor.c:4077
 msgid ""
 "This operation removes all unknown tags associated with all caves. Unknown "
 "tags might come from another BDCFF-compatible game or an older version of "
@@ -2728,436 +2729,436 @@ msgid ""
 "you use this caveset in this application, they are of no use."
 msgstr ""
 
-#: src/editor.c:4196 src/editor.c:4207
+#: src/editor.c:4194 src/editor.c:4205
 #, c-format
 msgid "%s Element"
 msgstr ""
 
-#: src/editor.c:4200 src/editor.c:4217
+#: src/editor.c:4198 src/editor.c:4215
 msgid "Draw Element"
 msgstr ""
 
-#: src/editor.c:4211 src/editor.c:4221
+#: src/editor.c:4209 src/editor.c:4219
 msgid "Fill Element"
 msgstr ""
 
-#: src/editor.c:4370 src/gtkmain.c:1697
+#: src/editor.c:4368 src/gtkmain.c:1708
 msgid "_File"
 msgstr ""
 
-#: src/editor.c:4371
+#: src/editor.c:4369
 msgid "_Cave"
 msgstr ""
 
-#: src/editor.c:4372
+#: src/editor.c:4370
 msgid "_Edit"
 msgstr ""
 
-#: src/editor.c:4373
+#: src/editor.c:4371
 msgid "_View"
 msgstr ""
 
-#: src/editor.c:4374
+#: src/editor.c:4372
 msgid "_Tools"
 msgstr ""
 
-#: src/editor.c:4375 src/gtkmain.c:1699
+#: src/editor.c:4373 src/gtkmain.c:1710
 msgid "_Help"
 msgstr ""
 
-#: src/editor.c:4376
+#: src/editor.c:4374
 msgid "Close cave editor"
 msgstr ""
 
-#: src/editor.c:4377
+#: src/editor.c:4375
 msgid "New _cave"
 msgstr ""
 
-#: src/editor.c:4377
+#: src/editor.c:4375
 msgid "Create new cave"
 msgstr ""
 
-#: src/editor.c:4379
+#: src/editor.c:4377
 msgid "Save cave set to file"
 msgstr ""
 
-#: src/editor.c:4380
+#: src/editor.c:4378
 msgid "Save cave set as new file"
 msgstr ""
 
-#: src/editor.c:4381
+#: src/editor.c:4379
 msgid "Load cave set from file"
 msgstr ""
 
-#: src/editor.c:4382 src/gtkmain.c:1714
+#: src/editor.c:4380 src/gtkmain.c:1726
 msgid "O_pen shipped"
 msgstr ""
 
-#: src/editor.c:4382
+#: src/editor.c:4380
 msgid "Load shipped cave set from file"
 msgstr ""
 
-#: src/editor.c:4383 src/gtkmain.c:1717
+#: src/editor.c:4381 src/gtkmain.c:1729
 msgid "Hi_ghscores"
 msgstr ""
 
-#: src/editor.c:4384
+#: src/editor.c:4382
 msgid "Select all items"
 msgstr ""
 
-#: src/editor.c:4385
+#: src/editor.c:4383
 msgid "Cave set _properties"
 msgstr ""
 
-#: src/editor.c:4385
+#: src/editor.c:4383
 msgid "Set properties of cave set"
 msgstr ""
 
-#: src/editor.c:4390
+#: src/editor.c:4388
 msgid "_Edit cave"
 msgstr ""
 
-#: src/editor.c:4390
+#: src/editor.c:4388
 msgid "Edit selected cave"
 msgstr ""
 
-#: src/editor.c:4391
+#: src/editor.c:4389
 msgid "_Rename cave"
 msgstr ""
 
-#: src/editor.c:4391
+#: src/editor.c:4389
 msgid "Rename selected cave"
 msgstr ""
 
-#: src/editor.c:4392
+#: src/editor.c:4390
 msgid "Make cave _selectable"
 msgstr ""
 
-#: src/editor.c:4392
+#: src/editor.c:4390
 msgid "Make the cave selectable as game start"
 msgstr ""
 
-#: src/editor.c:4393
+#: src/editor.c:4391
 msgid "Make cave _unselectable"
 msgstr ""
 
-#: src/editor.c:4393
+#: src/editor.c:4391
 msgid "Make the cave unselectable as game start"
 msgstr ""
 
-#: src/editor.c:4398
+#: src/editor.c:4396
 msgid "_New cave set"
 msgstr ""
 
-#: src/editor.c:4398
+#: src/editor.c:4396
 msgid "Create new cave set with no caves"
 msgstr ""
 
-#: src/editor.c:4399
+#: src/editor.c:4397
 msgid "Save _HTML gallery"
 msgstr ""
 
-#: src/editor.c:4399
+#: src/editor.c:4397
 msgid "Save game in a HTML gallery"
 msgstr ""
 
-#: src/editor.c:4400
+#: src/editor.c:4398
 msgid "Export _CrLi cave pack"
 msgstr ""
 
-#: src/editor.c:4401
+#: src/editor.c:4399
 msgid "_Make caves selectable"
 msgstr ""
 
-#: src/editor.c:4402
+#: src/editor.c:4400
 msgid "All _caves"
 msgstr ""
 
-#: src/editor.c:4402
+#: src/editor.c:4400
 msgid "Make all caves selectable as game start"
 msgstr ""
 
-#: src/editor.c:4403
+#: src/editor.c:4401
 msgid "All _but intermissions"
 msgstr ""
 
-#: src/editor.c:4403
+#: src/editor.c:4401
 msgid "Make all caves but intermissions selectable as game start"
 msgstr ""
 
-#: src/editor.c:4404
+#: src/editor.c:4402
 msgid "All _after intermissions"
 msgstr ""
 
-#: src/editor.c:4404
+#: src/editor.c:4402
 msgid "Make all caves after intermissions selectable as game start"
 msgstr ""
 
-#: src/editor.c:4405
+#: src/editor.c:4403
 msgid "Remove all unknown tags"
 msgstr ""
 
-#: src/editor.c:4405
+#: src/editor.c:4403
 msgid "Removes all unknown tags found in the BDCFF file"
 msgstr ""
 
-#: src/editor.c:4410
+#: src/editor.c:4408
 msgid "_Export as CrLi cave file"
 msgstr ""
 
-#: src/editor.c:4411
+#: src/editor.c:4409
 msgid "Open cave selector"
 msgstr ""
 
-#: src/editor.c:4412
+#: src/editor.c:4410
 msgid "_Next cave"
 msgstr ""
 
-#: src/editor.c:4412
+#: src/editor.c:4410
 msgid "Next cave"
 msgstr ""
 
-#: src/editor.c:4413
+#: src/editor.c:4411
 msgid "_Previous cave"
 msgstr ""
 
-#: src/editor.c:4413
+#: src/editor.c:4411
 msgid "Previous cave"
 msgstr ""
 
-#: src/editor.c:4414
+#: src/editor.c:4412
 msgid "_Test"
 msgstr ""
 
-#: src/editor.c:4414 src/help.c:198
+#: src/editor.c:4412 src/help.c:198
 msgid "Test cave"
 msgstr ""
 
-#: src/editor.c:4415
+#: src/editor.c:4413
 msgid "Ca_ve properties"
 msgstr ""
 
-#: src/editor.c:4415
+#: src/editor.c:4413
 msgid "Cave settings"
 msgstr ""
 
-#: src/editor.c:4416
+#: src/editor.c:4414
 msgid "Set engine defaults"
 msgstr ""
 
-#: src/editor.c:4417
+#: src/editor.c:4415
 msgid "Cave co_lors"
 msgstr ""
 
-#: src/editor.c:4417
+#: src/editor.c:4415
 msgid "Select cave colors"
 msgstr ""
 
-#: src/editor.c:4418
+#: src/editor.c:4416
 msgid "Remove objects"
 msgstr ""
 
-#: src/editor.c:4418
+#: src/editor.c:4416
 msgid "Clear cave objects"
 msgstr ""
 
-#: src/editor.c:4419
+#: src/editor.c:4417
 msgid "Convert to map"
 msgstr ""
 
-#: src/editor.c:4419
+#: src/editor.c:4417
 msgid "Flatten cave to a single cave map without objects"
 msgstr ""
 
-#: src/editor.c:4420
+#: src/editor.c:4418
 msgid "O_verview"
 msgstr ""
 
-#: src/editor.c:4420
+#: src/editor.c:4418
 msgid "Full screen overview of cave"
 msgstr ""
 
-#: src/editor.c:4421
+#: src/editor.c:4419
 msgid "O_verview (simple)"
 msgstr ""
 
-#: src/editor.c:4421
+#: src/editor.c:4419
 msgid "Full screen overview of cave almost as in game"
 msgstr ""
 
-#: src/editor.c:4422
+#: src/editor.c:4420
 msgid "_Auto shrink"
 msgstr ""
 
-#: src/editor.c:4422
+#: src/editor.c:4420
 msgid "Automatically set the visible region of the cave"
 msgstr ""
 
-#: src/editor.c:4427
+#: src/editor.c:4425
 msgid "To _bottom"
 msgstr ""
 
-#: src/editor.c:4427
+#: src/editor.c:4425
 msgid "Push object to bottom"
 msgstr ""
 
-#: src/editor.c:4428
+#: src/editor.c:4426
 msgid "To t_op"
 msgstr ""
 
-#: src/editor.c:4428
+#: src/editor.c:4426
 msgid "Bring object to top"
 msgstr ""
 
-#: src/editor.c:4429
+#: src/editor.c:4427
 msgid "Show on this level"
 msgstr ""
 
-#: src/editor.c:4429
+#: src/editor.c:4427
 msgid "Enable object on currently visible level"
 msgstr ""
 
-#: src/editor.c:4430
+#: src/editor.c:4428
 msgid "Hide on this level"
 msgstr ""
 
-#: src/editor.c:4430
+#: src/editor.c:4428
 msgid "Disable object on currently visible level"
 msgstr ""
 
-#: src/editor.c:4431
+#: src/editor.c:4429
 msgid "Only on this level"
 msgstr ""
 
-#: src/editor.c:4431
+#: src/editor.c:4429
 msgid "Enable object only on the currently visible level"
 msgstr ""
 
-#: src/editor.c:4432
+#: src/editor.c:4430
 msgid "Show on all levels"
 msgstr ""
 
-#: src/editor.c:4432
+#: src/editor.c:4430
 msgid "Enable object on all levels"
 msgstr ""
 
-#: src/editor.c:4436
+#: src/editor.c:4434
 msgid "Ob_ject properties"
 msgstr ""
 
-#: src/editor.c:4436
+#: src/editor.c:4434
 msgid "Set object properties"
 msgstr ""
 
-#: src/editor.c:4441
+#: src/editor.c:4439
 msgid "Map"
 msgstr ""
 
-#: src/editor.c:4442
+#: src/editor.c:4440
 msgid "Shift _left"
 msgstr ""
 
-#: src/editor.c:4443
+#: src/editor.c:4441
 msgid "Shift _right"
 msgstr ""
 
-#: src/editor.c:4444
+#: src/editor.c:4442
 msgid "Shift _up"
 msgstr ""
 
-#: src/editor.c:4445
+#: src/editor.c:4443
 msgid "Shift _down"
 msgstr ""
 
-#: src/editor.c:4446
+#: src/editor.c:4444
 msgid "Remove m_ap"
 msgstr ""
 
-#: src/editor.c:4446
+#: src/editor.c:4444
 msgid "Remove cave map, if it has one"
 msgstr ""
 
-#: src/editor.c:4451
+#: src/editor.c:4449
 msgid "Setup cave _random fill"
 msgstr ""
 
-#: src/editor.c:4451
+#: src/editor.c:4449
 msgid "Setup initial fill random elements for the cave"
 msgstr ""
 
-#: src/editor.c:4456
+#: src/editor.c:4454
 msgid "Cut to clipboard"
 msgstr ""
 
-#: src/editor.c:4457
+#: src/editor.c:4455
 msgid "Copy to clipboard"
 msgstr ""
 
-#: src/editor.c:4458
+#: src/editor.c:4456
 msgid "Delete"
 msgstr ""
 
-#: src/editor.c:4463
+#: src/editor.c:4461
 msgid "Paste object from clipboard"
 msgstr ""
 
-#: src/editor.c:4468
+#: src/editor.c:4466
 msgid "Undo last action"
 msgstr ""
 
-#: src/editor.c:4473
+#: src/editor.c:4471
 msgid "Redo last action"
 msgstr ""
 
-#: src/editor.c:4481
+#: src/editor.c:4479
 msgid "_Animated view"
 msgstr ""
 
-#: src/editor.c:4481
+#: src/editor.c:4479
 msgid "Animated view"
 msgstr ""
 
-#: src/editor.c:4482
+#: src/editor.c:4480
 msgid "_Colored objects"
 msgstr ""
 
-#: src/editor.c:4482
+#: src/editor.c:4480
 msgid "Cave objects are colored"
 msgstr ""
 
-#: src/editor.c:4483
+#: src/editor.c:4481
 msgid "_Object list"
 msgstr ""
 
-#: src/editor.c:4483
+#: src/editor.c:4481
 msgid "Object list sidebar"
 msgstr ""
 
-#: src/editor.c:4484
+#: src/editor.c:4482
 msgid "_Show variables in test"
 msgstr ""
 
-#: src/editor.c:4484
+#: src/editor.c:4482
 msgid "Show a label during tests with some cave parameters"
 msgstr ""
 
-#: src/editor.c:4815
+#: src/editor.c:4813
 msgid "Level shown:"
 msgstr ""
 
-#: src/editor.c:4819
+#: src/editor.c:4817
 msgid ""
 "Element used to draw points, lines, and rectangles. You can use middle-click "
 "to pick one from the cave."
 msgstr ""
 
-#: src/editor.c:4824
+#: src/editor.c:4822
 msgid ""
 "Element used to fill rectangles, and second element of joins. You can use "
 "Ctrl + middle-click to pick one from the cave."
 msgstr ""
 
-#: src/editor.c:4861
+#: src/editor.c:4859
 msgid "_Objects"
 msgstr ""
 
@@ -3195,12 +3196,7 @@ msgstr ""
 msgid "Notes:<BR>%s<BR>\n"
 msgstr ""
 
-#: src/editorexport.c:552 src/editorexport.c:561
-#, c-format
-msgid "<TR><TD>%s</TD><TD>%s</TD></TR>\n"
-msgstr ""
-
-#: src/editorexport.c:564 src/gtkmain.c:1581
+#: src/editorexport.c:564 src/gtkmain.c:1592
 msgid "Normal cave"
 msgstr ""
 
@@ -3274,379 +3270,383 @@ msgstr ""
 msgid "You have %d points."
 msgstr ""
 
-#: src/gtkmain.c:531
+#: src/gtkmain.c:544
 #, c-format
 msgid "Time: <b>%02d:%02d</b>"
 msgstr ""
 
-#: src/gtkmain.c:533
+#: src/gtkmain.c:546
 #, c-format
 msgid "Time: <b>%03d</b>"
 msgstr ""
 
-#: src/gtkmain.c:539
+#: src/gtkmain.c:552
 #, c-format
 msgid "Lives: <b>%d</b>"
 msgstr ""
 
-#: src/gtkmain.c:541
+#: src/gtkmain.c:554
 msgid "<b>Bonus life</b>"
 msgstr ""
 
-#: src/gtkmain.c:544
+#: src/gtkmain.c:557
 msgid "Continuing from <b>snapshot</b>"
 msgstr ""
 
-#: src/gtkmain.c:547
+#: src/gtkmain.c:560
 msgid "<b>Testing</b> cave"
 msgstr ""
 
-#: src/gtkmain.c:550
+#: src/gtkmain.c:563
 msgid "Playing <b>replay</b>"
 msgstr ""
 
-#: src/gtkmain.c:553
+#: src/gtkmain.c:566
 msgid "Continuing <b>replay</b>"
 msgstr ""
 
-#: src/gtkmain.c:557
+#: src/gtkmain.c:570
 #, c-format
 msgid "Score: <b>%d</b>"
 msgstr ""
 
-#: src/gtkmain.c:560
+#: src/gtkmain.c:573
 #, c-format
 msgid "Value: <b>%d</b>"
 msgstr ""
 
-#: src/gtkmain.c:564
+#: src/gtkmain.c:577
 #, c-format
 msgid "Diamonds: <b>%d</b>"
 msgstr ""
 
-#: src/gtkmain.c:567
+#: src/gtkmain.c:580
 msgid "Diamonds: <b>???</b>"
 msgstr ""
 
-#: src/gtkmain.c:571
+#: src/gtkmain.c:584
 #, c-format
 msgid "Skeletons: <b>%d</b>"
 msgstr ""
 
-#: src/gtkmain.c:574
+#: src/gtkmain.c:587
 #, c-format
 msgid "Key 1: <b>%d</b>"
 msgstr ""
 
-#: src/gtkmain.c:575
+#: src/gtkmain.c:588
 #, c-format
 msgid "Key 2: <b>%d</b>"
 msgstr ""
 
-#: src/gtkmain.c:576
+#: src/gtkmain.c:589
 #, c-format
 msgid "Key 3: <b>%d</b>"
 msgstr ""
 
-#: src/gtkmain.c:579
+#: src/gtkmain.c:592
 #, c-format
 msgid "Gravity change: <b>%d</b>"
 msgstr ""
 
-#: src/gtkmain.c:684
+#: src/gtkmain.c:697
 #, c-format
 msgid "<b>%s</b>, level %d"
 msgstr ""
 
-#: src/gtkmain.c:974
+#: src/gtkmain.c:987
 msgid "There are no caves in this cave set!"
 msgstr ""
 
-#: src/gtkmain.c:978
+#: src/gtkmain.c:991
 msgid "Select cave to play"
 msgstr ""
 
-#: src/gtkmain.c:1000
+#: src/gtkmain.c:1013
 msgid "Cave:"
 msgstr ""
 
-#: src/gtkmain.c:1021
+#: src/gtkmain.c:1034
 msgid "Level:"
 msgstr ""
 
-#: src/gtkmain.c:1032
+#: src/gtkmain.c:1045
 msgid "Preview"
 msgstr ""
 
-#: src/gtkmain.c:1270
-msgid "Cannot load file from network link."
+#: src/gtkmain.c:1283
+msgid "GDash cannot load file from a network link."
 msgstr ""
 
-#: src/gtkmain.c:1289
+#: src/gtkmain.c:1302
 msgid "Loaded caveset from file:"
 msgstr ""
 
-#: src/gtkmain.c:1429 src/help.c:102
+#: src/gtkmain.c:1442 src/help.c:102
 msgid "Replays"
 msgstr ""
 
-#: src/gtkmain.c:1440
+#: src/gtkmain.c:1448
 msgid ""
-"<i>Hint: When watching a replay, you can use the usual movement keys (left, "
+"Hint: When watching a replay, you can use the usual movement keys (left, "
 "right...) to stop the replay and immediately continue the playing of the "
-"cave yourself.</i>"
+"cave yourself."
 msgstr ""
 
-#: src/gtkmain.c:1490 src/gtkui.c:882
+#: src/gtkmain.c:1501 src/gtkui.c:919
 msgid "Score"
 msgstr ""
 
-#: src/gtkmain.c:1495
+#: src/gtkmain.c:1506
 msgid "Comment"
 msgstr ""
 
-#: src/gtkmain.c:1502
+#: src/gtkmain.c:1513
 msgid "Saved"
 msgstr ""
 
-#: src/gtkmain.c:1543 src/gtkmain.c:1586
+#: src/gtkmain.c:1554 src/gtkmain.c:1597
 msgid "Description: "
 msgstr ""
 
-#: src/gtkmain.c:1548 src/gtkmain.c:1591
+#: src/gtkmain.c:1559 src/gtkmain.c:1602
 msgid "Author: "
 msgstr ""
 
-#: src/gtkmain.c:1553 src/gtkmain.c:1596
+#: src/gtkmain.c:1564 src/gtkmain.c:1607
 msgid "Date: "
 msgstr ""
 
-#: src/gtkmain.c:1558
+#: src/gtkmain.c:1569
 msgid "Diffuculty: "
 msgstr ""
 
-#: src/gtkmain.c:1563 src/gtkmain.c:1606
+#: src/gtkmain.c:1574 src/gtkmain.c:1617
 msgid "Remark: "
 msgstr ""
 
-#: src/gtkmain.c:1568 src/gtkmain.c:1611
+#: src/gtkmain.c:1579 src/gtkmain.c:1622
 msgid "Notes:\n"
 msgstr ""
 
-#: src/gtkmain.c:1580
+#: src/gtkmain.c:1591
 msgid "Type: "
 msgstr ""
 
-#: src/gtkmain.c:1601
+#: src/gtkmain.c:1612
 msgid "Difficulty: "
 msgstr ""
 
-#: src/gtkmain.c:1631
+#: src/gtkmain.c:1642
 msgid "Caveset information"
 msgstr ""
 
-#: src/gtkmain.c:1696
+#: src/gtkmain.c:1707
 msgid "_Play"
 msgstr ""
 
-#: src/gtkmain.c:1698
+#: src/gtkmain.c:1709
 msgid "_Settings"
 msgstr ""
 
-#: src/gtkmain.c:1702
+#: src/gtkmain.c:1713
 msgid "_Error console"
 msgstr ""
 
-#: src/gtkmain.c:1704
+#: src/gtkmain.c:1715
 msgid "Caveset _information"
 msgstr ""
 
-#: src/gtkmain.c:1704
-msgid "Show information about the and its caves"
+#: src/gtkmain.c:1715
+msgid "Show information about the game and its caves"
 msgstr ""
 
-#: src/gtkmain.c:1709
+#: src/gtkmain.c:1720
+msgid "_Control keys"
+msgstr ""
+
+#: src/gtkmain.c:1721
 msgid "_New game"
 msgstr ""
 
-#: src/gtkmain.c:1709
+#: src/gtkmain.c:1721
 msgid "Start new game"
 msgstr ""
 
-#: src/gtkmain.c:1710
+#: src/gtkmain.c:1722
 msgid "Cave _editor"
 msgstr ""
 
-#: src/gtkmain.c:1712
+#: src/gtkmain.c:1724
 msgid "Load _internal game"
 msgstr ""
 
-#: src/gtkmain.c:1713
+#: src/gtkmain.c:1725
 msgid "Open _recent"
 msgstr ""
 
-#: src/gtkmain.c:1718
+#: src/gtkmain.c:1730
 msgid "Show _replays"
 msgstr ""
 
-#: src/gtkmain.c:1722
+#: src/gtkmain.c:1734
 msgid "_Take snapshot"
 msgstr ""
 
-#: src/gtkmain.c:1723
+#: src/gtkmain.c:1735
 msgid "Re_start level"
 msgstr ""
 
-#: src/gtkmain.c:1723
+#: src/gtkmain.c:1735
 msgid "Restart current level"
 msgstr ""
 
-#: src/gtkmain.c:1724
+#: src/gtkmain.c:1736
 msgid "_End game"
 msgstr ""
 
-#: src/gtkmain.c:1724
+#: src/gtkmain.c:1736
 msgid "End current game"
 msgstr ""
 
-#: src/gtkmain.c:1728
+#: src/gtkmain.c:1740
 msgid "_Revert to snapshot"
 msgstr ""
 
-#: src/gtkmain.c:1732
+#: src/gtkmain.c:1744
 msgid "Pause game"
 msgstr ""
 
-#: src/gtkmain.c:1733
+#: src/gtkmain.c:1745
 msgid "Fullscreen mode during play"
 msgstr ""
 
-#: src/gtkmain.c:1734
+#: src/gtkmain.c:1746
 msgid "Fast for_ward"
 msgstr ""
 
-#: src/gtkmain.c:1734
+#: src/gtkmain.c:1746
 msgid "Fast forward"
 msgstr ""
 
-#: src/gtkmain.c:1946
+#: src/gtkmain.c:1958
 msgid "Start editor"
 msgstr ""
 
-#: src/gtkmain.c:1947
+#: src/gtkmain.c:1959
 msgid "Save caveset in a HTML gallery"
 msgstr ""
 
-#: src/gtkmain.c:1948
+#: src/gtkmain.c:1960
 msgid ""
 "Save cave C, level L in a PNG image. If no cave selected, uses a random one"
 msgstr ""
 
-#: src/gtkmain.c:1949
+#: src/gtkmain.c:1961
 msgid "Set PNG image size. Default is 128x96, set to 0x0 for unscaled"
 msgstr ""
 
-#: src/gtkmain.c:1950
+#: src/gtkmain.c:1962
 msgid "Save caveset in a BDCFF file"
 msgstr ""
 
-#: src/gtkmain.c:1951
+#: src/gtkmain.c:1963
 msgid "Batch mode: quit after specified tasks"
 msgstr ""
 
-#: src/gtkmain.c:2002 src/sdlmain.c:1004
+#: src/gtkmain.c:2015 src/sdlmain.c:1035
 #, c-format
 msgid "Errors during loading caveset from file '%s'"
 msgstr ""
 
-#: src/gtkmain.c:2007 src/sdlmain.c:1011
+#: src/gtkmain.c:2020 src/sdlmain.c:1042
 #, c-format
 msgid "%d: no such internal caveset"
 msgstr ""
 
-#: src/gtkmain.c:2036 src/sdlmain.c:1021
+#: src/gtkmain.c:2049 src/sdlmain.c:1052
 msgid "Invalid cave or level number!\n"
 msgstr ""
 
-#: src/gtkmain.c:2049
+#: src/gtkmain.c:2062
 #, c-format
 msgid "Invalid image size: %s"
 msgstr ""
 
-#: src/gtkui.c:284
+#: src/gtkui.c:286
 msgid "Default"
 msgstr ""
 
-#: src/gtkui.c:373
+#: src/gtkui.c:375
 msgid "All image files"
 msgstr ""
 
-#: src/gtkui.c:418
+#: src/gtkui.c:420
 msgid "Add Theme from Image File"
 msgstr ""
 
-#: src/gtkui.c:464
+#: src/gtkui.c:466
 msgid "The selected image cannot be used as a GDash theme."
 msgstr ""
 
-#: src/gtkui.c:491
+#: src/gtkui.c:493
 #, c-format
 msgid "Do you really want to remove theme '%s'?"
 msgstr ""
 
-#: src/gtkui.c:492
+#: src/gtkui.c:494
 #, c-format
 msgid "The image file of the theme is '%s'."
 msgstr ""
 
-#: src/gtkui.c:504
+#: src/gtkui.c:506
 msgid "Cannot delete the image file."
 msgstr ""
 
-#: src/gtkui.c:552
+#: src/gtkui.c:554
 msgid "<b>Language</b> (requires restart)"
 msgstr ""
 
-#: src/gtkui.c:553
+#: src/gtkui.c:555
 msgid "The language of the application. Requires restart!"
 msgstr ""
 
-#: src/gtkui.c:554
+#: src/gtkui.c:556
 msgid "<b>Cave options</b>"
 msgstr ""
 
-#: src/gtkui.c:555
+#: src/gtkui.c:557
 msgid "Mouse play (experimental!)"
 msgstr ""
 
-#: src/gtkui.c:555
+#: src/gtkui.c:557
 msgid "Use the mouse to play. The player will follow the cursor!"
 msgstr ""
 
-#: src/gtkui.c:556
+#: src/gtkui.c:558
 msgid "All caves selectable"
 msgstr ""
 
-#: src/gtkui.c:556
+#: src/gtkui.c:558
 msgid "All caves and intermissions can be selected at game start."
 msgstr ""
 
-#: src/gtkui.c:557
+#: src/gtkui.c:559
 msgid "Import as all caves selectable"
 msgstr ""
 
-#: src/gtkui.c:557
+#: src/gtkui.c:559
 msgid ""
 "Original, C64 games are imported not with A, E, I, M caves selectable, but "
 "all caves (ABCD, EFGH... excluding intermissions). This does not affect "
 "BDCFF caves."
 msgstr ""
 
-#: src/gtkui.c:558
+#: src/gtkui.c:560
 msgid "Use BDCFF highscore"
 msgstr ""
 
-#: src/gtkui.c:558
+#: src/gtkui.c:560
 msgid ""
 "Use BDCFF highscores. GDash saves highscores in its own configuration "
 "directory and also in the *.bd files. However, it prefers loading them from "
@@ -3655,225 +3655,264 @@ msgid ""
 "selected for a specific file in the file open dialog, too."
 msgstr ""
 
-#: src/gtkui.c:560
+#: src/gtkui.c:562
 msgid "Time as min:sec"
 msgstr ""
 
-#: src/gtkui.c:560
+#: src/gtkui.c:562
 msgid "Show times in minutes and seconds, instead of seconds only."
 msgstr ""
 
-#: src/gtkui.c:561
+#: src/gtkui.c:563
 msgid "No invisible outbox"
 msgstr ""
 
-#: src/gtkui.c:561
-msgid "Show invisible outboxes as visible (blinking) ones.!"
+#: src/gtkui.c:563
+msgid "Show invisible outboxes as visible (blinking) ones."
 msgstr ""
 
-#: src/gtkui.c:562
+#: src/gtkui.c:564
 msgid "<b>Sound options</b> (require restart)"
 msgstr ""
 
-#: src/gtkui.c:563
+#: src/gtkui.c:565
 msgid "Play sounds. Enabling this setting requires a restart!"
 msgstr ""
 
-#: src/gtkui.c:564
+#: src/gtkui.c:566
 msgid "Classic sounds only"
 msgstr ""
 
-#: src/gtkui.c:564
+#: src/gtkui.c:566
 msgid "Play only classic sounds taken from the original game."
 msgstr ""
 
-#: src/gtkui.c:565
+#: src/gtkui.c:567
 msgid "16-bit mixing"
 msgstr ""
 
-#: src/gtkui.c:565
+#: src/gtkui.c:567
 msgid ""
 "Use 16-bit mixing of sounds. Try changing this setting if sound is clicky. "
 "Changing this setting requires a restart!"
 msgstr ""
 
-#: src/gtkui.c:566
+#: src/gtkui.c:568
 msgid "44kHz mixing"
 msgstr ""
 
-#: src/gtkui.c:566
+#: src/gtkui.c:568
 msgid ""
 "Use 44kHz mixing of sounds. Try changing this setting if sound is clicky. "
 "Changing this setting requires a restart!"
 msgstr ""
 
-#: src/gtkui.c:569
+#: src/gtkui.c:572
 msgid "<b>Display options</b>"
 msgstr ""
 
-#: src/gtkui.c:570
+#: src/gtkui.c:573
 msgid "Random colors"
 msgstr ""
 
-#: src/gtkui.c:570
-msgid "Use randomly selected colors for C64 graphics."
+#: src/gtkui.c:573
+msgid "Use randomly selected colors for caves."
 msgstr ""
 
-#: src/gtkui.c:575
+#: src/gtkui.c:578
 msgid "PAL emulation for game"
 msgstr ""
 
-#: src/gtkui.c:575 src/gtkui.c:576
+#: src/gtkui.c:578 src/gtkui.c:579
 msgid "Use PAL emulated graphics, ie. lines are striped."
 msgstr ""
 
-#: src/gtkui.c:576
+#: src/gtkui.c:579
 msgid "PAL emulation for editor"
 msgstr ""
 
-#: src/gtkui.c:578
+#: src/gtkui.c:581
 msgid "Fine scroll"
 msgstr ""
 
-#: src/gtkui.c:578
+#: src/gtkui.c:581
 msgid "Fine scroll - 50 frames per second."
 msgstr ""
 
-#: src/gtkui.c:579
+#: src/gtkui.c:582
 #, c-format
 msgid "PAL scanline shade (%%)"
 msgstr ""
 
-#: src/gtkui.c:579
+#: src/gtkui.c:582
 msgid "Darker rows for PAL emulation."
 msgstr ""
 
-#: src/gtkui.c:580
+#: src/gtkui.c:583
 msgid "<b>C64 palette</b>"
 msgstr ""
 
-#: src/gtkui.c:581
+#: src/gtkui.c:584
 msgid "The color palette for games imported from C64 files."
 msgstr ""
 
-#: src/gtkui.c:582
+#: src/gtkui.c:585
 msgid "<b>C64 DTV palette</b>"
 msgstr ""
 
-#: src/gtkui.c:583
+#: src/gtkui.c:586
 msgid "The color palette for imported C64 DTV games."
 msgstr ""
 
-#: src/gtkui.c:584
+#: src/gtkui.c:587
 msgid "<b>Atari palette</b>"
 msgstr ""
 
-#: src/gtkui.c:585
+#: src/gtkui.c:588
 msgid "The color palette for imported Atari games."
 msgstr ""
 
-#: src/gtkui.c:586
+#: src/gtkui.c:589
 msgid "<b>Preferred palette</b>"
 msgstr ""
 
-#: src/gtkui.c:587
+#: src/gtkui.c:590
 msgid "New caves and random colored caves use this palette."
 msgstr ""
 
-#: src/gtkui.c:599
+#: src/gtkui.c:602
 msgid "GDash Preferences"
 msgstr ""
 
-#: src/gtkui.c:604
+#: src/gtkui.c:607
 msgid "_Remove theme"
 msgstr ""
 
-#: src/gtkui.c:609
+#: src/gtkui.c:612
 msgid "_Add theme"
 msgstr ""
 
-#: src/gtkui.c:686
+#: src/gtkui.c:689
 msgid ""
 "This is the list of available themes. Use the Add Theme button to install a "
 "new one."
 msgstr ""
 
-#: src/gtkui.c:707
+#: src/gtkui.c:710
 msgid "<b>Theme</b>"
 msgstr ""
 
-#: src/gtkui.c:867 src/help.c:193
+#: src/gtkui.c:797
+msgid "GDash Control Keys"
+msgstr ""
+
+#: src/gtkui.c:806
+msgid "<b>Movements</b>"
+msgstr ""
+
+#: src/gtkui.c:811
+msgid "<b>Fire</b>"
+msgstr ""
+
+#: src/gtkui.c:812
+msgid "Fire"
+msgstr ""
+
+#: src/gtkui.c:813
+msgid "Fire (alternative)"
+msgstr ""
+
+#: src/gtkui.c:814
+msgid "<b>Suicide</b>"
+msgstr ""
+
+#: src/gtkui.c:815
+msgid "Suicide"
+msgstr ""
+
+#: src/gtkui.c:817
+msgid ""
+"Click on a button to change a key. You can set two keys for fire (snapping) "
+"for convenience. Those behave exactly the same way in the game."
+msgstr ""
+
+#: src/gtkui.c:904 src/help.c:193
 msgid "Highscores"
 msgstr ""
 
-#: src/gtkui.c:873
+#: src/gtkui.c:910
 msgid "Rank"
 msgstr ""
 
-#: src/gtkui.c:1010
+#: src/gtkui.c:1047
 #, c-format
 msgid "Cave set \"%s\" is edited. Discard changes?"
 msgstr ""
 
-#: src/gtkui.c:1011
+#: src/gtkui.c:1048
 msgid "If you discard the caveset, all changes and new replays will be lost."
 msgstr ""
 
-#: src/gtkui.c:1015
+#: src/gtkui.c:1052
 msgid "_Discard"
 msgstr ""
 
-#: src/gtkui.c:1034
+#: src/gtkui.c:1071
 #, c-format
 msgid "The file (%s) already exists, and will be overwritten."
 msgstr ""
 
-#: src/gtkui.c:1035
+#: src/gtkui.c:1072
 msgid "The file already exists. Do you want to overwrite it?"
 msgstr ""
 
-#: src/gtkui.c:1103
+#: src/gtkui.c:1140
 msgid "Save File As"
 msgstr ""
 
-#: src/gtkui.c:1107
+#: src/gtkui.c:1144
 msgid "BDCFF cave sets (*.bd)"
 msgstr ""
 
-#: src/gtkui.c:1112 src/gtkui.c:1167
+#: src/gtkui.c:1149
 msgid "All files (*)"
 msgstr ""
 
-#: src/gtkui.c:1158
-msgid "Save Replays As"
-msgstr ""
-
-#: src/gtkui.c:1162
-msgid "BDCFF replays (*.bdr)"
-msgstr ""
-
-#: src/gtkui.c:1257
+#: src/gtkui.c:1240
 msgid "Open File"
 msgstr ""
 
-#: src/gtkui.c:1259
+#: src/gtkui.c:1242
 msgid "Load _highscores from BDCFF file"
 msgstr ""
 
-#: src/gtkui.c:1266
+#: src/gtkui.c:1249
 msgid "GDash cave sets"
 msgstr ""
 
-#: src/gtkui.c:1316
+#: src/gtkui.c:1299
 msgid "Loaded game:"
 msgstr ""
 
-#: src/gtkui.c:1392
+#: src/gtkui.c:1375
 msgid "GDash Errors"
 msgstr ""
 
-#: src/gtkui.c:1462
+#: src/gtkui.c:1445
 msgid "_Show all"
+msgstr ""
+
+#: src/gtkui.c:1495
+msgid "Select Key"
+msgstr ""
+
+#: src/gtkui.c:1503
+msgid "Press key for action:"
+msgstr ""
+
+#: src/gtkui.c:1531
+#, c-format
+msgid "Click here to set the key for action: %s"
 msgstr ""
 
 #: src/help.c:38
@@ -4692,58 +4731,58 @@ msgstr ""
 msgid "GDash Help"
 msgstr ""
 
-#: src/settings.c:27
+#: src/settings.c:36
 msgid "Original"
 msgstr ""
 
-#: src/settings.c:27
+#: src/settings.c:36
 msgid "2x nearest"
 msgstr ""
 
-#: src/settings.c:27
+#: src/settings.c:36
 msgid "2x bilinear"
 msgstr ""
 
-#: src/settings.c:27
+#: src/settings.c:36
 msgid "3x nearest"
 msgstr ""
 
-#: src/settings.c:27
+#: src/settings.c:36
 msgid "3x bilinear"
 msgstr ""
 
-#: src/settings.c:27
+#: src/settings.c:36
 msgid "4x nearest"
 msgstr ""
 
-#: src/settings.c:27
+#: src/settings.c:36
 msgid "4x bilinear"
 msgstr ""
 
-#: src/settings.c:32
+#: src/settings.c:42
 msgid "System default"
 msgstr ""
 
-#: src/settings.c:446
+#: src/settings.c:589
 msgid "Select cave number C"
 msgstr ""
 
-#: src/settings.c:447
+#: src/settings.c:590
 msgid "Select level number L"
 msgstr ""
 
-#: src/settings.c:448
+#: src/settings.c:591
 msgid "Load internal caveset number I"
 msgstr ""
 
-#: src/settings.c:449
+#: src/settings.c:592
 msgid "Show license and quit"
 msgstr ""
 
-#: src/settings.c:450
+#: src/settings.c:593
 msgid "Cave names"
 msgstr ""
 
-#: src/settings.c:455
+#: src/settings.c:598
 msgid "[FILE NAME]"
 msgstr ""

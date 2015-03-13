@@ -220,10 +220,14 @@ static void
 game_help()
 {
 	const char* strings_menu[]={
-		"CURSOR", "MOVE",
-		"CTRL", "FIRE (SNAP)",
-		"F2", "SUICIDE",
-		"F", "FASH FORWARD (HOLD)",
+		gd_key_name(gd_sdl_key_left), "MOVE LEFT",
+		gd_key_name(gd_sdl_key_right), "MOVE RIGHT",
+		gd_key_name(gd_sdl_key_up), "MOVE UP",
+		gd_key_name(gd_sdl_key_down), "MOVE DOWN",
+		gd_key_name(gd_sdl_key_fire_1), "FIRE (SNAP)",
+		gd_key_name(gd_sdl_key_suicide), "SUICIDE",
+		"", "", 
+		"F", "FAST FORWARD (HOLD)",
 		"SHIFT", "STATUS BAR (HOLD)",
 		"", "",
 		"SPACE", "PAUSE",
@@ -529,12 +533,13 @@ replays_menu()
 	}
 	
 	gd_backup_and_dark_screen();
-	gd_status_line("CRSR:MOVE  FIRE:PLAY  S:SAVED  ESC:EXIT");
+	gd_status_line("CRSR:MOVE  SPACE:PLAY  S:SAVED  ESC:EXIT");
 	
 	current=1;
 	finished=FALSE;
 	while (!finished && !gd_quit) {
 		page=current/lines_per_page;	/* show 18 lines per page */
+		SDL_Event event;
 		
 		/* show lines */
 		gd_clear_line(gd_screen, 0);	/* for empty top row */
@@ -596,44 +601,69 @@ replays_menu()
 			}
 		}
 		SDL_Flip(gd_screen);	/* draw to usere's screen */
-
-		SDL_Delay(160);
 		
-		/* do events; keys will be processed below */
-		gd_process_pending_events();
-
-		/* cursor movement */
-		if (gd_up())
-			do {
-				current=gd_clamp(current-1, 1, items->len-1);
-			} while (((Item *)g_ptr_array_index(items, current))->replay==NULL && current>=1);
-		if (gd_down())
-			do {
-				current=gd_clamp(current+1, 1, items->len-1);
-			} while (((Item *)g_ptr_array_index(items, current))->replay==NULL && current<items->len);
-		if (gd_keystate[SDLK_s]) {
-			Item *i=(Item *)g_ptr_array_index(items, current);
+		SDL_WaitEvent(&event);
+		switch (event.type) {
+			case SDL_QUIT:
+				gd_quit=TRUE;
+				break;
+				
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym) {
+					case SDLK_UP:
+						do {
+							current=gd_clamp(current-1, 1, items->len-1);
+						} while (((Item *)g_ptr_array_index(items, current))->replay==NULL && current>=1);
+						break;
+					case SDLK_DOWN:
+						do {
+							current=gd_clamp(current+1, 1, items->len-1);
+						} while (((Item *)g_ptr_array_index(items, current))->replay==NULL && current<items->len);
+						break;
+					case SDLK_s:
+						{
+							Item *i=(Item *)g_ptr_array_index(items, current);
+							
+							if (i->replay) {
+								i->replay->saved=!i->replay->saved;
+								gd_caveset_edited=TRUE;
+							}
+						}
+						break;
+					case SDLK_SPACE:
+					case SDLK_RETURN:
+						{
+							Item *i=(Item *)g_ptr_array_index(items, current);
+							
+							if (i->replay) {
+								gd_backup_and_black_screen();
+								play_replay(i->cave, i->replay);
+								gd_restore_screen();
+							}
+						}
+						break;
+					case SDLK_ESCAPE:
+						finished=TRUE;
+						break;
+					
+					case SDLK_PAGEUP:
+						current=gd_clamp(current-lines_per_page, 0, items->len-1);
+						break;
+						
+					case SDLK_PAGEDOWN:
+						current=gd_clamp(current+lines_per_page, 0, items->len-1);
+						break;
+						
+					default:
+						/* other keys do nothing */
+						break;
+				}
+				break;
 			
-			if (i->replay) {
-				i->replay->saved=!i->replay->saved;
-				gd_caveset_edited=TRUE;
-			}
+			default:
+				/* other events do nothing */
+				break;
 		}
-		if (gd_fire() || gd_keystate[SDLK_RETURN] || gd_keystate[SDLK_SPACE]) {
-			Item *i=(Item *)g_ptr_array_index(items, current);
-			
-			if (i->replay) {
-				gd_backup_and_black_screen();
-				play_replay(i->cave, i->replay);
-				gd_restore_screen();
-			}
-		}
-		if (gd_keystate[SDLK_ESCAPE])
-			finished=TRUE;
-		if (gd_keystate[SDLK_PAGEUP])
-			current=gd_clamp(current-lines_per_page, 0, items->len-1);
-		if (gd_keystate[SDLK_PAGEDOWN])
-			current=gd_clamp(current+lines_per_page, 0, items->len-1);
 	}
 	
 	/* set the theme. other variables are already set by the above code. */
@@ -778,6 +808,7 @@ main_menu()
 		/* not all frames process the joystick - otherwise it would be too fast. */
 		waitcycle=(waitcycle+1)%2;
 		
+		/* we use gd_down() and functions like that, so the joystick also works */
 		if (waitcycle==0) {
 			/* joystick or keyboard up */		
 			if (gd_up() && i==0) {
@@ -829,7 +860,7 @@ main_help()
 		"", "",
 		"L", "LOAD CAVESET",
 		"C", "LOAD FROM INSTALLED CAVES",
-		"S", "SAVE CAVESET",
+		"S", "SAVE CAVESET (REPLAYS)",
 		"N", "SAVE AS NEW FILE",
 		"", "",
 		"O", "OPTIONS",
@@ -1032,37 +1063,6 @@ main(int argc, char *argv[])
 	gd_create_dark_background();
 	
 	username=g_strdup(g_get_real_name());
-	
-#if 0
-	{
-		int x, y;
-		SDL_Surface *image;
-		
-		image=SDL_CreateRGBSurface(0, 16*24, 16*24, 32, 0, 0, 0, 0);
-		
-		for (y=0; y<16; y++) {
-			int bg;
-			GdColor c=GD_GDASH_colors[y].rgb;
-			SDL_Rect r;
-			
-			bg=SDL_MapRGB(image->format, (c>>16)&0xff, (c>>8)&0xff, c&0xff);
-			r.x=0;
-			r.y=y*24;
-			r.w=16*24;
-			r.h=24;
-			SDL_FillRect(image, &r, bg);
-			
-			for (x=0; x<16; x++) {
-				gd_blittext_n(image, x*24+4, y*24+4, GD_GDASH_colors[x].rgb, "A");
-			}
-				
-		}
-		gd_pal_emu(image->pixels, image->w, image->h, image->pitch, image->format->Rshift, image->format->Gshift, image->format->Bshift, image->format->Ashift);
-		SDL_SaveBMP(image, "a.bmp");
-		SDL_BlitSurface(image, NULL, gd_screen, NULL);
-//		return 0;
-	}
-#endif
 	
 	while (!gd_quit) {
 		/* if a cavenum was given on the command line */

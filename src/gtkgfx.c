@@ -48,7 +48,7 @@ static gboolean using_png_gfx;
 void gd_create_pixbuf_for_builtin_gfx()
 {
 	/* just to set some default - this will also be the color of the builtin gfx in the preferences window */
-	gd_select_pixbuf_colors(0x000000, 0x5555aa, 0xc68e71, 0xffffff, 0xffffff, 0xffffff);
+	gd_select_pixbuf_colors(GD_GDASH_BLACK, GD_GDASH_MIDDLEBLUE, GD_GDASH_LIGHTRED, GD_GDASH_WHITE, GD_GDASH_WHITE, GD_GDASH_WHITE);
 	gd_pixbuf_for_builtin=gdk_pixbuf_copy(cells_pb[ABS(gd_elements[O_PLAYER].image_game)]);
 }
 

@@ -18,6 +18,7 @@
 #include <glib/gstdio.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <string.h>
+#include <gdk/gdkkeysyms.h>
 #include "cavedb.h"
 #include "gtkgfx.h"
 #include "caveset.h"
@@ -37,7 +38,7 @@ static char *last_folder=NULL;
 
 
 void
-gd_create_stock_icons (void)
+gd_create_stock_icons()
 {
 	static struct {
 		const guint8 *data;
@@ -67,6 +68,7 @@ gd_create_stock_icons (void)
 		{ object_not_on_all, GD_ICON_OBJECT_NOT_ON_ALL},
 		{ object_not_on_current, GD_ICON_OBJECT_NOT_ON_CURRENT},
 		{ replay, GD_ICON_REPLAY},
+		{ keyboard, GD_ICON_KEYBOARD},
 	};
 
 	GtkIconFactory *factory;
@@ -88,7 +90,7 @@ gd_create_stock_icons (void)
 
 
 GdkPixbuf *
-gd_icon (void)
+gd_icon ()
 {
 	return gdk_pixbuf_new_from_inline (-1, gdash, FALSE, NULL);
 }
@@ -98,7 +100,7 @@ gd_icon (void)
    up to the caller to free.
  */
 GdkPixmap **
-gd_create_title_animation (void)
+gd_create_title_animation ()
 {
 	GdkPixbuf *screen;
 	GdkPixbuf *tile;
@@ -558,16 +560,17 @@ gd_preferences (GtkWidget *parent)
 		{TypeBoolean, N_("Use BDCFF highscore"), N_("Use BDCFF highscores. GDash saves highscores in its own configuration directory and also in the *.bd files. However, it prefers loading them from the configuration directory; as the *.bd files might be read-only. You can enable this setting to let GDash load them from the *.bd files. This can be selected for a specific file in the file open dialog, too."), &gd_use_bdcff_highscore, FALSE},
 #ifdef GD_SOUND
 		{TypeBoolean, N_("Time as min:sec"), N_("Show times in minutes and seconds, instead of seconds only."), &gd_time_min_sec, FALSE},
-		{TypeBoolean, N_("No invisible outbox"), N_("Show invisible outboxes as visible (blinking) ones.!"), &gd_no_invisible_outbox, FALSE},
+		{TypeBoolean, N_("No invisible outbox"), N_("Show invisible outboxes as visible (blinking) ones."), &gd_no_invisible_outbox, FALSE},
 		{TypeLabel, N_("<b>Sound options</b> (require restart)"), NULL, NULL},
 		{TypeBoolean, N_("Sound"), N_("Play sounds. Enabling this setting requires a restart!"), &gd_sdl_sound, FALSE},
 		{TypeBoolean, N_("Classic sounds only"), N_("Play only classic sounds taken from the original game."), &gd_classic_sound, FALSE},
 		{TypeBoolean, N_("16-bit mixing"), N_("Use 16-bit mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_16bit_mixing, FALSE},
 		{TypeBoolean, N_("44kHz mixing"), N_("Use 44kHz mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_44khz_mixing, FALSE},
 #endif
+
 		{TypeNewColumn, },
 		{TypeLabel, N_("<b>Display options</b>"), NULL, NULL},
-		{TypeBoolean, N_("Random colors"), N_("Use randomly selected colors for C64 graphics."), &gd_random_colors, FALSE},
+		{TypeBoolean, N_("Random colors"), N_("Use randomly selected colors for caves."), &gd_random_colors, FALSE},
 /*
    XXX currently dirt mod is not shown to the user.
 		{N_("Allow dirt mod"), N_("Enable caves to use alternative dirt graphics. This applies only to imported caves, not BDCFF (*.bd) files."), &allow_dirt_mod, FALSE},
@@ -619,8 +622,8 @@ gd_preferences (GtkWidget *parent)
 	table=gtk_table_new (1, 1, FALSE);
 	gtk_box_pack_start(GTK_BOX(hbox), table, 0, 0, FALSE);
 	gtk_container_set_border_width (GTK_CONTAINER (table), 6);
-	gtk_table_set_row_spacings (GTK_TABLE (table), 6);
-	gtk_table_set_col_spacings (GTK_TABLE (table), 12);
+	gtk_table_set_row_spacings (GTK_TABLE (table), 3);
+	gtk_table_set_col_spacings (GTK_TABLE (table), 6);
 
 	/* game booleans */
 	row=0;
@@ -662,14 +665,14 @@ gd_preferences (GtkWidget *parent)
 				break;
 			
 			case TypeStringv:
-				g_assert(!options[i].update);
+				g_assert(!options[i].update);	/* must be false */
 				widget=gd_combo_box_new_from_stringv(options[i].stringv);
 				gtk_widget_set_tooltip_text(widget, _(options[i].description));
 				gtk_combo_box_set_active(GTK_COMBO_BOX(widget), *(int *)options[i].value);
 				g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(combo_box_stringv_changed), options[i].value);
 				gtk_table_attach_defaults(GTK_TABLE(table), widget, col+1, col+2, row, row+1);
 				break;
-
+				
 			case TypeNewColumn:
 				col+=2;
 				row=-1;	/* so row++ under will result in zero */
@@ -744,7 +747,7 @@ gd_preferences (GtkWidget *parent)
 	settings_window_update (&info);
 
 	/* run dialog */
-	gtk_widget_show_all (dialog);
+	gtk_widget_show_all(dialog);
 	gtk_dialog_run(GTK_DIALOG(dialog));
 
 	/* get cell sizes */
@@ -786,6 +789,40 @@ gd_preferences (GtkWidget *parent)
 
 
 
+void
+gd_control_settings(GtkWidget *parent)
+{
+	GtkWidget *dialog, *table;
+
+	dialog=gtk_dialog_new_with_buttons(_("GDash Control Keys"), (GtkWindow *) parent, 0, GTK_STOCK_CLOSE, GTK_RESPONSE_ACCEPT, NULL);
+	gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
+	gtk_dialog_set_default_response(GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
+
+	table=gtk_table_new (1, 1, TRUE);	/* homogenous! */
+	gtk_box_pack_start_defaults (GTK_BOX (GTK_DIALOG (dialog)->vbox), table);
+	gtk_container_set_border_width (GTK_CONTAINER (table), 6);
+	gtk_table_set_row_spacings (GTK_TABLE (table), 6);
+	gtk_table_set_col_spacings (GTK_TABLE (table), 6);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf(_("<b>Movements</b>")), 0, 1, 0, 1);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_keysim_button(_("Up"), &gd_gtk_key_up), 2, 3, 0, 1);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_keysim_button(_("Right"), &gd_gtk_key_right), 3, 4, 1, 2);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_keysim_button(_("Down"), &gd_gtk_key_down), 2, 3, 2, 3);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_keysim_button(_("Left"), &gd_gtk_key_left), 1, 2, 1, 2);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf(_("<b>Fire</b>")), 0, 1, 3, 4);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_keysim_button(_("Fire"), &gd_gtk_key_fire_1), 1, 2, 3, 4);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_keysim_button(_("Fire (alternative)"), &gd_gtk_key_fire_2), 2, 3, 3, 4);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf(_("<b>Suicide</b>")), 0, 1, 4, 5);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_keysim_button(_("Suicide"), &gd_gtk_key_suicide), 1, 2, 4, 5);
+
+	gd_dialog_add_hint(GTK_DIALOG(dialog), _("Click on a button to change a key. You can set two keys for fire (snapping) for convenience. "
+		"Those behave exactly the same way in the game."));
+
+	/* run dialog */
+	gtk_widget_show_all(dialog);
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	
+	gtk_widget_destroy(dialog);
+}
 
 
 
@@ -1147,60 +1184,6 @@ gd_save_caveset_as(GtkWidget *parent)
 	gtk_widget_destroy (dialog);
 }
 
-#if 0
-void
-gd_save_replays_as(GtkWidget *parent)
-{
-	GtkWidget *dialog;
-	GtkFileFilter *filter;
-	char *filename=NULL, *suggested_name;
-
-	dialog=gtk_file_chooser_dialog_new (_("Save Replays As"), GTK_WINDOW(parent), GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
-	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
-
-	filter=gtk_file_filter_new();
-	gtk_file_filter_set_name (filter, _("BDCFF replays (*.bdr)"));
-	gtk_file_filter_add_pattern (filter, "*.bdr");
-	gtk_file_chooser_add_filter (GTK_FILE_CHOOSER(dialog), filter);
-
-	filter=gtk_file_filter_new();
-	gtk_file_filter_set_name (filter, _("All files (*)"));
-	gtk_file_filter_add_pattern (filter, "*");
-	gtk_file_chooser_add_filter (GTK_FILE_CHOOSER(dialog), filter);
-
-	suggested_name=g_strdup_printf("Replays of %s.bdr", gd_caveset_data->name);
-	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), suggested_name);
-	g_free(suggested_name);
-
-	if (gtk_dialog_run (GTK_DIALOG (dialog))==GTK_RESPONSE_ACCEPT)
-		filename=gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-
-	/* check if .bd extension should be added */
-	if (filename) {
-		char *suffixed;
-
-		/* if it has no .bd extension, add one */
-		if (!g_str_has_suffix(filename, ".bdr")) {
-			suffixed=g_strdup_printf("%s.bdr", filename);
-
-			g_free(filename);
-			filename=suffixed;
-		}
-	}
-
-	/* if we have a filename, do the save */
-	if (filename && (!g_file_test(filename, G_FILE_TEST_EXISTS) || gd_ask_overwrite(filename))) {
-		gboolean saved;
-		
-		saved=gd_caveset_save(filename, TRUE);
-		if (!saved)
-			gd_show_last_error(guess_active_toplevel());
-	}
-
-	g_free(filename);
-	gtk_widget_destroy (dialog);
-}
-#endif
 
 void
 gd_save_caveset(GtkWidget *parent)
@@ -1485,4 +1468,91 @@ gd_question_yesno(const char *primary, const char *secondary)
 	return response==GTK_RESPONSE_YES;
 }
 
+
+
+
+
+
+static gboolean
+keysim_button_keypress_event(GtkWidget* widget, GdkEventKey* event, gpointer data)
+{
+	g_assert(event->type==GDK_KEY_PRESS);	/* must be true. */
+
+	gtk_dialog_response(GTK_DIALOG(widget), event->keyval);
+	return TRUE;	/* and say that we processed the key. */
+}
+
+#define GDASH_KEYSIM_WHAT_FOR "gdash-keysim-what-for"
+static void
+keysim_button_clicked_cb(GtkWidget *button, gpointer data)
+{
+	const char *what_for=g_object_get_data(G_OBJECT(button), GDASH_KEYSIM_WHAT_FOR);
+	guint *keyval=(guint *)data;
+	GtkWidget *dialog, *table;
+	int result;
+	
+	/* dialog which has its keypress event connected to the handler above */
+	dialog=gtk_dialog_new_with_buttons(_("Select Key"), GTK_WINDOW(gtk_widget_get_toplevel(button)),
+		GTK_DIALOG_MODAL | GTK_DIALOG_NO_SEPARATOR,
+		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+	table=gtk_table_new(1,1, FALSE);
+	gtk_table_set_row_spacings(GTK_TABLE(table), 6);
+	gtk_table_set_col_spacings(GTK_TABLE(table), 6);
+	gtk_container_set_border_width(GTK_CONTAINER(table), 6);
+	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), table);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf(_("Press key for action:")), 0, 1, 0, 1);
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf("<b>%s</b>", what_for), 0, 1, 1, 2);
+	g_signal_connect(G_OBJECT(dialog), "key_press_event", G_CALLBACK(keysim_button_keypress_event), dialog);
+
+	gtk_widget_show_all(dialog);
+	result=gtk_dialog_run(GTK_DIALOG(dialog));
+	if (result>=0) {
+		/* if positive, it must be a keyval. gtk_response_cancel and gtk_response delete is negative. */
+		*keyval=result;
+		gtk_button_set_label(GTK_BUTTON(button), gdk_keyval_name(*keyval));
+	}
+	gtk_widget_destroy(dialog);
+}
+
+
+
+GtkWidget *
+gd_keysim_button(const char *what_for, guint *keyval)
+{
+	GtkWidget *button;
+	char *tooltip;
+	
+	g_assert(keyval!=NULL);
+	
+	/* the button shows the current value in its name */
+	button=gtk_button_new_with_label(gdk_keyval_name(*keyval));
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(keysim_button_clicked_cb), keyval);
+	g_object_set_data(G_OBJECT(button), GDASH_KEYSIM_WHAT_FOR, (gpointer) what_for);
+	tooltip=g_strdup_printf(_("Click here to set the key for action: %s"), what_for);
+	gtk_widget_set_tooltip_text(button, tooltip);
+	g_free(tooltip);
+	
+	return button;
+}
+
+#undef GDASH_KEYSIM_WHAT_FOR
+
+
+
+
+void
+gd_dialog_add_hint(GtkDialog *dialog, const char *hint)
+{
+	GtkWidget *hbox, *label;
+	/* turn off separator, as it does not look nice with the hint */
+	gtk_dialog_set_has_separator(dialog, FALSE);
+	
+	hbox=gtk_hbox_new(FALSE, 6);
+	label=gd_label_new_printf_centered(hint);
+	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+
+	gtk_box_pack_end(GTK_BOX(GTK_DIALOG(dialog)->vbox), hbox, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_image_new_from_stock(GTK_STOCK_DIALOG_INFO, GTK_ICON_SIZE_DIALOG), FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 0);
+}
 

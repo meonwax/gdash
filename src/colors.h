@@ -70,24 +70,26 @@ gboolean gd_color_is_unknown(GdColor color);
 int gd_color_get_c64_index(GdColor color);
 int gd_color_get_c64_index_try(GdColor color);
 
-int gd_gdash_color_from_current_palette(int c);
+int gd_gdash_color(int c);
 
-#define GD_GDASH_BLACK (gd_gdash_color_from_current_palette(0))
-#define GD_GDASH_WHITE (gd_gdash_color_from_current_palette(1))
-#define GD_GDASH_RED (gd_gdash_color_from_current_palette(2))
-#define GD_GDASH_PURPLE (gd_gdash_color_from_current_palette(4))
-#define GD_GDASH_CYAN (gd_gdash_color_from_current_palette(3))
-#define GD_GDASH_GREEN (gd_gdash_color_from_current_palette(5))
-#define GD_GDASH_BLUE (gd_gdash_color_from_current_palette(6))
-#define GD_GDASH_YELLOW (gd_gdash_color_from_current_palette(7))
-#define GD_GDASH_ORANGE (gd_gdash_color_from_current_palette(8))
-#define GD_GDASH_BROWN (gd_gdash_color_from_current_palette(9))
-#define GD_GDASH_LIGHTRED (gd_gdash_color_from_current_palette(10))
-#define GD_GDASH_GRAY1 (gd_gdash_color_from_current_palette(11))
-#define GD_GDASH_GRAY2 (gd_gdash_color_from_current_palette(12))
-#define GD_GDASH_LIGHTGREEN (gd_gdash_color_from_current_palette(13))
-#define GD_GDASH_LIGHTBLUE (gd_gdash_color_from_current_palette(14))
-#define GD_GDASH_GRAY3 (gd_gdash_color_from_current_palette(15))
+#define GD_GDASH_BLACK (gd_gdash_color(0))
+#define GD_GDASH_WHITE (gd_gdash_color(1))
+#define GD_GDASH_RED (gd_gdash_color(2))
+#define GD_GDASH_PURPLE (gd_gdash_color(4))
+#define GD_GDASH_CYAN (gd_gdash_color(3))
+#define GD_GDASH_GREEN (gd_gdash_color(5))
+#define GD_GDASH_BLUE (gd_gdash_color(6))
+#define GD_GDASH_YELLOW (gd_gdash_color(7))
+#define GD_GDASH_ORANGE (gd_gdash_color(8))
+#define GD_GDASH_BROWN (gd_gdash_color(9))
+#define GD_GDASH_LIGHTRED (gd_gdash_color(10))
+#define GD_GDASH_GRAY1 (gd_gdash_color(11))
+#define GD_GDASH_GRAY2 (gd_gdash_color(12))
+#define GD_GDASH_LIGHTGREEN (gd_gdash_color(13))
+#define GD_GDASH_LIGHTBLUE (gd_gdash_color(14))
+#define GD_GDASH_GRAY3 (gd_gdash_color(15))
+
+#define GD_GDASH_MIDDLEBLUE (gd_gdash_color(16))
 
 #define GD_COLOR_INVALID (0xFFFFFFFF)
 #define GD_COLOR_BLACK (gd_color_from_rgb(0,0,0))

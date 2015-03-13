@@ -105,6 +105,154 @@ static int cell_size=16;
 
 
 
+/* return name of key. names taken from sdl documentation */
+/*
+	w3m -dump file:///usr/share/doc/libsdl1.2-dev/docs/html/sdlkey.html |grep -v "──" |
+		cut -c 1-19,38- |sed "s/│$//;s/ *$//g;s/│/case /;s/ *│/: return \"/;s/$/\";/"|tee ~/keys.txt
+*/
+const char *
+gd_key_name(guint keysym)
+{
+	static char keyname[30];
+	switch(keysym) {
+		case SDLK_BACKSPACE: return "BACKSPACE";
+		case SDLK_TAB: return "TAB";
+		case SDLK_CLEAR: return "CLEAR";
+		case SDLK_RETURN: return "RETURN";
+		case SDLK_PAUSE: return "PAUSE";
+		case SDLK_ESCAPE: return "ESCAPE";
+		case SDLK_SPACE: return "SPACE";
+		case SDLK_EXCLAIM: return "EXCLAIM";
+		case SDLK_QUOTEDBL: return "QUOTEDBL";
+		case SDLK_HASH: return "HASH";
+		case SDLK_DOLLAR: return "DOLLAR";
+		case SDLK_AMPERSAND: return "AMPERSAND";
+		case SDLK_QUOTE: return "QUOTE";
+		case SDLK_LEFTPAREN: return "LEFT PARENTHESIS";
+		case SDLK_RIGHTPAREN: return "RIGHT PARENTHESIS";
+		case SDLK_ASTERISK: return "ASTERISK";
+		case SDLK_PLUS: return "PLUS SIGN";
+		case SDLK_COMMA: return "COMMA";
+		case SDLK_MINUS: return "MINUS SIGN";
+		case SDLK_PERIOD: return "PERIOD";
+		case SDLK_SLASH: return "FORWARD SLASH";
+		case SDLK_0: return "0";
+		case SDLK_1: return "1";
+		case SDLK_2: return "2";
+		case SDLK_3: return "3";
+		case SDLK_4: return "4";
+		case SDLK_5: return "5";
+		case SDLK_6: return "6";
+		case SDLK_7: return "7";
+		case SDLK_8: return "8";
+		case SDLK_9: return "9";
+		case SDLK_COLON: return "COLON";
+		case SDLK_SEMICOLON: return "SEMICOLON";
+		case SDLK_LESS: return "LESS-THAN SIGN";
+		case SDLK_EQUALS: return "EQUALS SIGN";
+		case SDLK_GREATER: return "GREATER-THAN SIGN";
+		case SDLK_QUESTION: return "QUESTION MARK";
+		case SDLK_AT: return "AT";
+		case SDLK_LEFTBRACKET: return "LEFT BRACKET";
+		case SDLK_BACKSLASH: return "BACKSLASH";
+		case SDLK_RIGHTBRACKET: return "RIGHT BRACKET";
+		case SDLK_CARET: return "CARET";
+		case SDLK_UNDERSCORE: return "UNDERSCORE";
+		case SDLK_BACKQUOTE: return "GRAVE";
+		case SDLK_a: return "A";
+		case SDLK_b: return "B";
+		case SDLK_c: return "C";
+		case SDLK_d: return "D";
+		case SDLK_e: return "E";
+		case SDLK_f: return "F";
+		case SDLK_g: return "G";
+		case SDLK_h: return "H";
+		case SDLK_i: return "I";
+		case SDLK_j: return "J";
+		case SDLK_k: return "K";
+		case SDLK_l: return "L";
+		case SDLK_m: return "M";
+		case SDLK_n: return "N";
+		case SDLK_o: return "O";
+		case SDLK_p: return "P";
+		case SDLK_q: return "Q";
+		case SDLK_r: return "R";
+		case SDLK_s: return "S";
+		case SDLK_t: return "T";
+		case SDLK_u: return "U";
+		case SDLK_v: return "V";
+		case SDLK_w: return "W";
+		case SDLK_x: return "X";
+		case SDLK_y: return "Y";
+		case SDLK_z: return "Z";
+		case SDLK_DELETE: return "DELETE";
+		case SDLK_KP0: return "KEYPAD 0";
+		case SDLK_KP1: return "KEYPAD 1";
+		case SDLK_KP2: return "KEYPAD 2";
+		case SDLK_KP3: return "KEYPAD 3";
+		case SDLK_KP4: return "KEYPAD 4";
+		case SDLK_KP5: return "KEYPAD 5";
+		case SDLK_KP6: return "KEYPAD 6";
+		case SDLK_KP7: return "KEYPAD 7";
+		case SDLK_KP8: return "KEYPAD 8";
+		case SDLK_KP9: return "KEYPAD 9";
+		case SDLK_KP_PERIOD: return "KEYPAD PERIOD";
+		case SDLK_KP_DIVIDE: return "KEYPAD DIVIDE";
+		case SDLK_KP_MULTIPLY: return "KEYPAD MULTIPLY";
+		case SDLK_KP_MINUS: return "KEYPAD MINUS";
+		case SDLK_KP_PLUS: return "KEYPAD PLUS";
+		case SDLK_KP_ENTER: return "KEYPAD ENTER";
+		case SDLK_KP_EQUALS: return "KEYPAD EQUALS";
+		case SDLK_UP: return "UP ARROW";
+		case SDLK_DOWN: return "DOWN ARROW";
+		case SDLK_RIGHT: return "RIGHT ARROW";
+		case SDLK_LEFT: return "LEFT ARROW";
+		case SDLK_INSERT: return "INSERT";
+		case SDLK_HOME: return "HOME";
+		case SDLK_END: return "END";
+		case SDLK_PAGEUP: return "PAGE UP";
+		case SDLK_PAGEDOWN: return "PAGE DOWN";
+		case SDLK_F1: return "F1";
+		case SDLK_F2: return "F2";
+		case SDLK_F3: return "F3";
+		case SDLK_F4: return "F4";
+		case SDLK_F5: return "F5";
+		case SDLK_F6: return "F6";
+		case SDLK_F7: return "F7";
+		case SDLK_F8: return "F8";
+		case SDLK_F9: return "F9";
+		case SDLK_F10: return "F10";
+		case SDLK_F11: return "F11";
+		case SDLK_F12: return "F12";
+		case SDLK_F13: return "F13";
+		case SDLK_F14: return "F14";
+		case SDLK_F15: return "F15";
+		case SDLK_NUMLOCK: return "NUMLOCK";
+		case SDLK_CAPSLOCK: return "CAPSLOCK";
+		case SDLK_SCROLLOCK: return "SCROLLOCK";
+		case SDLK_RSHIFT: return "RIGHT SHIFT";
+		case SDLK_LSHIFT: return "LEFT SHIFT";
+		case SDLK_RCTRL: return "RIGHT CTRL";
+		case SDLK_LCTRL: return "LEFT CTRL";
+		case SDLK_RALT: return "RIGHT ALT";
+		case SDLK_LALT: return "LEFT ALT";
+		case SDLK_RMETA: return "RIGHT META";
+		case SDLK_LMETA: return "LEFT META";
+		case SDLK_LSUPER: return "LEFT WINDOWS KEY";
+		case SDLK_RSUPER: return "RIGHT WINDOWS KEY";
+		case SDLK_MODE: return "MODE SHIFT";
+		case SDLK_HELP: return "HELP";
+		case SDLK_PRINT: return "PRINT-SCREEN";
+		case SDLK_SYSREQ: return "SYSRQ";
+		case SDLK_BREAK: return "BREAK";
+		case SDLK_MENU: return "MENU";
+		case SDLK_POWER: return "POWER";
+		case SDLK_EURO: return "EURO";
+		default:
+			sprintf(keyname, "KEY %04X", keysym);
+			return g_intern_string(keyname);	/* abuse? :) */
+	}
+}
 
 
 
@@ -604,6 +752,7 @@ gd_sdl_init(GdScalingType scaling_type)
 	statusbar_mid*=gd_scale;
 
 	SDL_Init(SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK);
+	SDL_EnableKeyRepeat(250, 100);
 	gd_screen=SDL_SetVideoMode(play_area_w, play_area_h+statusbar_height, 32, SDL_ANYFORMAT | (gd_sdl_fullscreen?SDL_FULLSCREEN:0));
 	SDL_ShowCursor(SDL_DISABLE);
 	if (!gd_screen)
@@ -665,31 +814,31 @@ gd_joy_fire()
 gboolean
 gd_up()
 {
-	return gd_keystate[SDLK_UP] || gd_joy_up();
+	return gd_keystate[gd_sdl_key_up] || gd_joy_up();
 }
 
 gboolean
 gd_down()
 {
-	return gd_keystate[SDLK_DOWN] || gd_joy_down();
+	return gd_keystate[gd_sdl_key_down] || gd_joy_down();
 }
 
 gboolean
 gd_left()
 {
-	return gd_keystate[SDLK_LEFT] || gd_joy_left();
+	return gd_keystate[gd_sdl_key_left] || gd_joy_left();
 }
 
 gboolean
 gd_right()
 {
-	return gd_keystate[SDLK_RIGHT] || gd_joy_right();
+	return gd_keystate[gd_sdl_key_right] || gd_joy_right();
 }
 
 gboolean
 gd_fire()
 {
-	return gd_keystate[SDLK_LCTRL] || gd_keystate[SDLK_RCTRL] || gd_joy_fire();
+	return gd_keystate[gd_sdl_key_fire_1] || gd_keystate[gd_sdl_key_fire_2] || gd_joy_fire();
 }
 
 

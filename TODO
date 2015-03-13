@@ -1,5 +1,7 @@
 DONE
 ----- 
+CRASH: Hi, unfortunately I have got a new problem with the latest version. If I want to change the properties of mazes and therefore click on the object, I get an application error immediately and Gdash is closed. Only mazes are concerned; I've checked the other objects, too.
+selectable keys
 
 
 REFUSED
@@ -8,11 +10,9 @@ REFUSED
 
 TO DO
 -----
-reentrans game
+magyar fordítás
 
-gtk	-fullscreen
-	
-sdl event kezelés
+reentrans game
 
 copy&paste elengedés után movera vált,
 
@@ -20,8 +20,6 @@ brc slime permeability
 if (random(slime*4)<4) and (tab[x,y+2]=0) then
       Begin tab[x,y]:=0;col[x,y+2]:=col[x,y];tab[x,y+2]:=27;mat[x,y+2]:=9;Voice4:=2;end;
 - Time bonus of -100 really seems odd.
-
-control keys
 
 - teszt
 - replay checksumon gondolkozni

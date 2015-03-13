@@ -417,45 +417,24 @@ gd_color_get_c64_index_try(GdColor color)
 
 
 int
-gd_gdash_color_from_current_palette(int c)
+gd_gdash_color(int c)
 {
-#if 0
-	GdColor colors_for_rgb[]={	/* the c64 frodo */
-		0x000000, 0xFFFFFF, 0xCC0000, 0x00FFCC, 0xFF00FF, 0x00CC00, 0x0000CC, 0xFFFF00,
-		0xFF8800, 0x884400, 0xFF8888, 0x444444, 0x888888, 0x88FF88, 0x8888FF, 0xCCCCCC,
-	};
-	int colors_for_atari[]={	/* hand-selected */
-		0x00, 0x0f, 0x34, 0x98, 0x46, 0xc6, 0x62, 0xef,
-		0xfa, 0x13, 0x3a, 0x03, 0x07, 0xcc, 0x7d, 0x0b, 
-	};
-	int colors_for_dtv[]={	/* hand-selected */
-		0x00, 0x0f, 0x34, 0xaf, 0x58, 0xe8, 0x93, 0x1f,
-		0x18, 0x13, 0x3d, 0x03, 0x07, 0xed, 0x8d, 0x0b, 
-	};
-	g_assert(c>=0 && c<16);
-	
-	switch (gd_preferred_palette) {
-		case GD_COLOR_TYPE_RGB:		return colors_for_rgb[c];
-		case GD_COLOR_TYPE_C64:		return gd_c64_color(c);
-		case GD_COLOR_TYPE_C64DTV:	return gd_c64dtv_color(colors_for_dtv[c]);
-		case GD_COLOR_TYPE_ATARI:	return gd_atari_color(colors_for_atari[c]);
-		default:
-			g_assert_not_reached();
-	}
-	return colors_for_rgb[c];	/* to avoid compiler warning */
-#endif
 	/* these values are taken from the title screen, drawn by cws. */
 	/* so menus and everything else will look nice! */
 	/* the 16 colors that can be used are the same as on c64. */
 	/* "Black", "White", "Red", "Cyan", "Purple", "Green", "Blue", "Yellow", */
 	/* "Orange", "Brown", "LightRed", "Gray1", "Gray2", "LightGreen", "LightBlue", "Gray3", */
 	/* not in the png: cyan, purple. gray3 is darker in the png. */
-	GdColor gdash_colors[]={
+	/* 17th color is the player's leg in the png. i not connected it to any c64 */
+	/* color, but it is used for theme images for example. */
+	const GdColor gdash_colors[]={
 		0x000000, 0xffffff, 0xe33939, 0x55aaaa, 0xaa55aa, 0x71aa55, 0x0039ff, 0xffff55,
 		0xe37139, 0xaa7139, 0xe09080, 0x555555, 0x717171, 0xc6e38e, 0xaaaaff, 0x8e8e8e,
+		
+		0x5555aa,
 	};
 	
-	g_assert(c>=0 && c<16);
+	g_assert(c>=0 && c<G_N_ELEMENTS(gdash_colors));
 	return gdash_colors[c];
 }
 

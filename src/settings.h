@@ -16,6 +16,7 @@
 #ifndef _GD_SETTINGS_H
 #define _GD_SETTINGS_H
 #include <glib.h>
+#include "config.h"
 #include "colors.h"
 
 typedef enum _scaling_type {
@@ -42,53 +43,93 @@ extern int gd_param_cave, gd_param_level, gd_param_internal;
 extern int gd_param_license;
 extern char **gd_param_cavenames;
 
+
+
+
+/* GTK settings */
+#ifdef USE_GTK	/* only if having gtk */
+
 /* editor settings */
 extern gboolean gd_game_view;	/* show animated cells instead of arrows & ... */
 extern gboolean gd_colored_objects;	/* show objects with different color */
-extern gboolean gd_show_object_list;	/* show object list in editor */
-extern gboolean gd_show_test_label;	/* label with cave variables in tests */
-
+extern gboolean gd_show_object_list;	/* show object list */
+extern gboolean gd_show_test_label;	/* show a label with some variables, for testing */
 extern int gd_editor_window_width;	/* window size */
 extern int gd_editor_window_height;	/* window size */
 
+/* preferences */
 extern int gd_language;
-
-/* settings */
 extern gboolean gd_time_min_sec;
-extern gboolean gd_no_invisible_outbox;
-extern gboolean gd_all_caves_selectable;
-extern gboolean gd_import_as_all_caves_selectable;
 extern gboolean gd_mouse_play;
-extern gboolean gd_random_colors;
 extern gboolean gd_show_preview;
-extern gboolean gd_allow_dirt_mod;
-extern gboolean gd_use_bdcff_highscore;
-extern gboolean gd_show_name_of_game;
 
+/* graphics */
 extern char *gd_theme;
-
 extern GdScalingType gd_cell_scale_game;
 extern gboolean gd_pal_emulation_game;
 extern GdScalingType gd_cell_scale_editor;
 extern gboolean gd_pal_emulation_editor;
 
-extern gboolean gd_sdl_fullscreen;
-extern GdScalingType gd_sdl_scale;
-extern char *gd_sdl_theme;
-extern gboolean gd_sdl_pal_emulation;
+/* keyboard */
+extern guint gd_gtk_key_left;
+extern guint gd_gtk_key_right;
+extern guint gd_gtk_key_up;
+extern guint gd_gtk_key_down;
+extern guint gd_gtk_key_fire_1;
+extern guint gd_gtk_key_fire_2;
+extern guint gd_gtk_key_suicide;
 
-extern gboolean gd_sdl_sound;
-extern gboolean gd_sdl_16bit_mixing;
-extern gboolean gd_sdl_44khz_mixing;
-extern gboolean gd_classic_sound;
+#endif	/* only if having gtk */
 
-extern int gd_pal_emu_scanline_shade;		/* in percent */
-extern gboolean gd_even_line_pal_emu_vertical_scroll;
+
+
+/* universal settings */
+extern gboolean gd_no_invisible_outbox;
+extern gboolean gd_all_caves_selectable;
+extern gboolean gd_import_as_all_caves_selectable;
+extern gboolean gd_random_colors;
+extern gboolean gd_use_bdcff_highscore;
+extern int gd_pal_emu_scanline_shade;
 extern gboolean gd_fine_scroll;
+
+/* palette settings */
 extern int gd_c64_palette;
 extern int gd_c64dtv_palette;
 extern int gd_atari_palette;
 extern GdColorType gd_preferred_palette;
+
+
+
+#ifdef USE_SDL	/* only if having sdl */
+extern guint gd_sdl_key_left;
+extern guint gd_sdl_key_right;
+extern guint gd_sdl_key_up;
+extern guint gd_sdl_key_down;
+extern guint gd_sdl_key_fire_1;
+extern guint gd_sdl_key_fire_2;
+extern guint gd_sdl_key_suicide;
+extern gboolean gd_even_line_pal_emu_vertical_scroll;
+extern gboolean gd_sdl_fullscreen;
+extern GdScalingType gd_sdl_scale;
+extern char *gd_sdl_theme;
+extern gboolean gd_sdl_pal_emulation;
+extern gboolean gd_show_name_of_game;
+#endif	/* use_sdl */
+
+
+
+
+/* sound settings */
+#ifdef GD_SOUND
+extern gboolean gd_sdl_sound;
+extern gboolean gd_sdl_16bit_mixing;
+extern gboolean gd_sdl_44khz_mixing;
+extern gboolean gd_classic_sound;
+#endif	/* if gd_sound */
+
+
+
+
 
 /* gdash directories */
 extern char *gd_user_config_dir;

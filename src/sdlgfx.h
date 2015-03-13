@@ -86,6 +86,8 @@ int gd_line_height();
 
 void gd_load_theme();
 
+const char *gd_key_name(guint keysym);
+
 
 #endif
 
