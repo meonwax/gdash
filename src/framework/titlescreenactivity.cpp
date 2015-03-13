@@ -42,19 +42,43 @@
 
 
 TitleScreenActivity::TitleScreenActivity(App *app)
-    :
-    Activity(app),
-    scale(app->pixbuf_factory->get_pixmap_scale()),
-    image_centered_threshold(164*scale),
-    frames(0), time_ms(0), animcycle(0),
-    alternate_status(false) {
+  : Activity(app)
+  , scale(app->pixbuf_factory->get_pixmap_scale())
+  , image_centered_threshold(164*scale)
+  , frames(0), time_ms(0), animcycle(0)
+  , alternate_status(false) {
     cavenum = app->caveset->last_selected_cave;
     levelnum = app->caveset->last_selected_level;
+    app->screen->register_pixmap_storage(this);
 }
 
 
 TitleScreenActivity::~TitleScreenActivity() {
+    app->screen->unregister_pixmap_storage(this);
     clear_animation();
+}
+
+
+void TitleScreenActivity::release_pixmaps() {
+    clear_animation();
+}
+
+
+void TitleScreenActivity::render_animation() {
+    if (animation.empty()) {
+        animation = get_title_animation_pixmap(app->caveset->title_screen, app->caveset->title_screen_scroll, false, *app->pixbuf_factory);
+        /* this is required because the caveset might have changed since the last redraw, and
+         * thus the title screen might have changed, and the new title screen might have fewer
+         * frames than the original. */
+        animcycle = 0;
+    }
+}
+
+
+void TitleScreenActivity::clear_animation() {
+    for (unsigned x=0; x<animation.size(); x++)
+        delete animation[x];
+    animation.clear();
 }
 
 
@@ -63,7 +87,7 @@ void TitleScreenActivity::shown_event() {
     app->screen->set_size(scale * 320, scale * 200);
 
     /* render title screen animation in memory pixmap */
-    animation = get_title_animation_pixmap(app->caveset->title_screen, app->caveset->title_screen_scroll, false, *app->pixbuf_factory);
+    render_animation();
 
     /* height of title screen, then decide which lines to show and where */
     image_h=animation[0]->get_height();
@@ -90,20 +114,8 @@ void TitleScreenActivity::shown_event() {
         show_status=true;
     }
 
-    /* this is required because the caveset might have changed since the last redraw, and
-     * thus the title screen might have changed, and the new title screen might have fewer
-     * frames than the original. */
-    animcycle = 0;
-    
     app->screen->set_title(CPrintf("GDash - %s") % app->caveset->name);
     gd_music_play_random();
-}
-
-
-void TitleScreenActivity::clear_animation() {
-    for (unsigned x=0; x<animation.size(); x++)
-        delete animation[x];
-    animation.clear();
 }
 
 
@@ -114,6 +126,9 @@ void TitleScreenActivity::hidden_event() {
 
 void TitleScreenActivity::redraw_event() {
     app->clear_screen();
+    
+    // If the screen was resized, the animation might have disappeared
+    render_animation();
 
     if (y_gameline!=-1) {
         // TRANSLATORS: Game here is like caveset, the loaded game from which the user will select the cave to play

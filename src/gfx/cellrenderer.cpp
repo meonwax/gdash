@@ -56,22 +56,28 @@ CellRenderer::~CellRenderer() {
     delete cells_all;
 }
 
-/* remove pixmaps from x server */
+/** Remove colored Pixbufs and Pixmaps created. */
 void CellRenderer::remove_cached() {
-    /* if cells loaded, delete them */
     for (unsigned i=0; i<G_N_ELEMENTS(cells_pixbufs); ++i) {
         delete cells_pixbufs[i];
-        cells_pixbufs[i]=0;
+        cells_pixbufs[i] = NULL;
     }
+    CellRenderer::release_pixmaps();
+    if (is_c64_colored) {
+        delete cells_all;
+        cells_all = NULL;
+    }
+}
+
+
+void CellRenderer::release_pixmaps() {
     for (unsigned i=0; i<G_N_ELEMENTS(cells); ++i) {
         delete cells[i];
         cells[i]=0;
     }
-    if (is_c64_colored) {
-        delete cells_all;
-        cells_all = 0;
-    }
 }
+
+
 
 Pixbuf &CellRenderer::cell_pixbuf(unsigned i) {
     g_assert(i<G_N_ELEMENTS(cells_pixbufs));

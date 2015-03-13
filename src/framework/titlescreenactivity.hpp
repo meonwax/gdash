@@ -18,10 +18,11 @@
 #define _GD_TITLESCREENAPPLET
 
 #include "framework/app.hpp"
+#include "gfx/screen.hpp"
 
 class Pixmap;
 
-class TitleScreenActivity: public Activity {
+class TitleScreenActivity: public Activity, public PixmapStorage {
 public:
     explicit TitleScreenActivity(App *app);
     virtual void redraw_event();
@@ -30,6 +31,9 @@ public:
     virtual void shown_event();
     virtual void hidden_event();
     ~TitleScreenActivity();
+    
+    /// Implement PixbufStorage
+    virtual void release_pixmaps();
 
 private:
     const int scale;
@@ -41,6 +45,7 @@ private:
     bool show_status, alternate_status;
     int cavenum, levelnum;
 
+    void render_animation();
     void clear_animation();
 };
 

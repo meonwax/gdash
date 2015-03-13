@@ -30,9 +30,6 @@
 
 
 SDLScreen::SDLScreen() {
-    previous_configured_w = -1;
-    previous_configured_h = -1;
-    previous_configured_fullscreen = false;
     surface = NULL;
 }
 
@@ -44,41 +41,30 @@ SDLScreen::~SDLScreen() {
 
 
 void SDLScreen::configure_size() {
-    /* check if the previous size and fullscreen state matches the currently requested one.
-     * if this is so, then do nothing. if the new one is different, reconfigure the screen.
-     * on the first call of configure_size, this part of the code will surely be executed,
-     * as the default values of previous* are -1, which can't be a screen size. */
-    if (w != previous_configured_w || h != previous_configured_h || gd_fullscreen != previous_configured_fullscreen) {
-        /* remember new size */
-        previous_configured_w = w;
-        previous_configured_h = h;
-        previous_configured_fullscreen = gd_fullscreen;
+    /* close window, if already exists, to create a new one */
+    if (SDL_WasInit(SDL_INIT_VIDEO))
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+    /* init screen */
+    SDL_InitSubSystem(SDL_INIT_VIDEO);
+    /* for some reason, keyboard settings must be done here */
+    SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+    SDL_EnableUNICODE(1);
+    /* icon */
+    SDLPixbuf icon(sizeof(gdash_icon_32), gdash_icon_32);
+    SDL_WM_SetIcon(icon.get_surface(), NULL);
+    set_title("GDash");
 
-        /* close window, if already exists, to create a new one */
-        if (SDL_WasInit(SDL_INIT_VIDEO))
-            SDL_QuitSubSystem(SDL_INIT_VIDEO);
-        /* init screen */
-        SDL_InitSubSystem(SDL_INIT_VIDEO);
-        /* for some reason, keyboard settings must be done here */
-        SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-        SDL_EnableUNICODE(1);
-        /* icon */
-        SDLPixbuf icon(sizeof(gdash_icon_32), gdash_icon_32);
-        SDL_WM_SetIcon(icon.get_surface(), NULL);
-        set_title("GDash");
-
-        /* create screen */
-        Uint32 flags = SDL_ANYFORMAT | SDL_ASYNCBLIT;
-        surface = SDL_SetVideoMode(w, h, 32, flags | (gd_fullscreen?SDL_FULLSCREEN:0));
-        if (gd_fullscreen && !surface)
-            surface=SDL_SetVideoMode(w, h, 32, flags);        // try the same, without fullscreen
-        if (!surface)
-            throw std::runtime_error("cannot initialize sdl video");
-        /* do not show mouse cursor */
-        SDL_ShowCursor(SDL_DISABLE);
-        /* warp mouse pointer so cursor cannot be seen, if the above call did nothing for some reason */
-        SDL_WarpMouse(w-1, h-1);
-    }
+    /* create screen */
+    Uint32 flags = SDL_ANYFORMAT | SDL_ASYNCBLIT;
+    surface = SDL_SetVideoMode(w, h, 32, flags | (gd_fullscreen?SDL_FULLSCREEN:0));
+    if (gd_fullscreen && !surface)
+        surface=SDL_SetVideoMode(w, h, 32, flags);        // try the same, without fullscreen
+    if (!surface)
+        throw std::runtime_error("cannot initialize sdl video");
+    /* do not show mouse cursor */
+    SDL_ShowCursor(SDL_DISABLE);
+    /* warp mouse pointer so cursor cannot be seen, if the above call did nothing for some reason */
+    SDL_WarpMouse(w-1, h-1);
 }
 
 

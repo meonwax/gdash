@@ -23,6 +23,7 @@
 
 #include "cave/cavetypes.hpp"
 #include "cave/helper/colors.hpp"
+#include "gfx/pixmap.hpp"
 
 class PixbufFactory;
 class Pixbuf;
@@ -30,13 +31,13 @@ class Pixmap;
 
 /// @ingroup Graphics
 /// @brief The class which is responsible for rendering the cave pixbufs.
-/// In its constructor, it takes a pixbuf factory as a parameter (for the graphics
+/// In its constructor, it takes a PixbufFactory as a parameter (for the graphics
 /// subsystem), and the name of a theme file to load.
 /// If the theme file cannot be loaded, or an empty string is given as file name,
 /// it switches to the builtin default theme.
 /// After loading the theme file, select_pixbuf_colors is used to select a color theme.
-/// A pixbuf of a cell can be retrieved using cell(i).
-class CellRenderer {
+/// A Pixbuf of a cell can be retrieved using cell(i).
+class CellRenderer : public PixmapStorage {
 protected:
     /// The pixbuf which was loaded from the disk.
     Pixbuf *loaded;
@@ -73,6 +74,9 @@ public:
 
     /// Constructor. Loads a theme file (or nothing); uses pixbuf_factory as a gfx engine.
     CellRenderer(PixbufFactory &pixbuf_factory_, const std::string &theme_file);
+
+    /// To implement PixbufStorage.
+    virtual void release_pixmaps();
 
     /// Destructor.
     virtual ~CellRenderer();

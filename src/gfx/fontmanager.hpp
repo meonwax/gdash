@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "cave/helper/colors.hpp"
+#include "gfx/pixmap.hpp"
 
 class Pixbuf;
 class Pixmap;
@@ -69,7 +70,7 @@ class RenderedFont;
  * these sizes are enlarged by the pixbuf factory.)
  *
  */
-class FontManager {
+class FontManager : public PixmapStorage {
 private:
     /// Raw font data. Its format is very similar
     /// to the one used by cells.
@@ -131,7 +132,7 @@ public:
     FontManager(const PixbufFactory &pixbuf_factory_, const std::string &theme_file);
 
     /// @brief Destructor.
-    ~FontManager();
+    virtual ~FontManager();
 
     /// @brief Set the color for the next piece of text drawn.
     void set_color(GdColor const &color) {
@@ -170,6 +171,9 @@ public:
 
     /// @brief Destroy cache.
     void clear();
+    
+    /// @brief Implement PixmapStorage.
+    virtual void release_pixmaps();
 
     /// @brief Get scale factor for drawing. @todo Remove?
     int get_pixmap_scale() const;

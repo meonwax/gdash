@@ -26,6 +26,7 @@
 
 #include "misc/smartptr.hpp"
 #include "framework/activity.hpp"
+#include "gfx/screen.hpp"
 
 
 class GdColor;
@@ -38,7 +39,6 @@ class Command;
 class GameInputHandler;
 class App;
 class Activity;
-class Screen;
 class Setting;
 template <typename T> class Command1Param;
 
@@ -92,7 +92,7 @@ std::string help_strings_to_string(char const **strings);
  * specialization can provide the builtin file selection dialog of GTK+ instead of
  * the one implemented by the SelectFileActivity class.
  */
-class App {
+class App : public PixmapStorage {
 public:
     /**
      * These keycodes are an abstraction to the keycodes provided by the graphics
@@ -156,6 +156,8 @@ public:
     void set_request_restart_command(SmartPtr<Command> command);
     /** Set the command to be executed on an App::start_editor() call. */
     void set_start_editor_command(SmartPtr<Command> command);
+    /** The app stores a Pixmap (the background), so it is a PixmapStorage. */
+    virtual void release_pixmaps();
 
     /* drawing */
     /** Clear the screen with a nice dark background. */
@@ -171,7 +173,7 @@ public:
     void status_line(const char *text);
     /** Draw a black window with a small frame. */
     void draw_window(int rx, int ry, int rw, int rh);
-
+    
     /* customizable ui features */
     /** Create a file selection dialog, and when the user accepts
      * the selection, parametrize the command with the name of the file and execute it.

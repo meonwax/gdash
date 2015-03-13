@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gdash 20130317unstable\n"
 "Report-Msgid-Bugs-To: http://code.google.com/p/gdash/\n"
-"POT-Creation-Date: 2013-03-19 13:19+0100\n"
+"POT-Creation-Date: 2013-03-20 22:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -61,7 +61,7 @@ msgstr ""
 msgid "Open _recent"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:99 src/editor/editor.cpp:3466
+#: src/gtk/gtkmainwindow.cpp:99 src/editor/editor.cpp:3464
 msgid "O_pen shipped"
 msgstr ""
 
@@ -368,7 +368,7 @@ msgid ""
 "an x-shape to many different elements."
 msgstr ""
 
-#: src/gtk/help.cpp:92 src/cave/cavestored.cpp:194 src/cave/cavestored.cpp:275
+#: src/gtk/help.cpp:92 src/cave/cavestored.cpp:201 src/cave/cavestored.cpp:282
 msgid "Biter"
 msgstr ""
 
@@ -451,47 +451,54 @@ msgid ""
 "direction... and then quickly run away! You can hold only one bomb at a time."
 msgstr ""
 
+#: src/gtk/help.cpp:104
+msgid ""
+"If you find a rocket launcher, you can pick it up, and fire rockets. To use "
+"it, press fire and a direction key. Be careful not to make an explosion "
+"which is too close to the player!"
+msgstr ""
+
 #: src/gtk/help.cpp:105
 msgid ""
 "Eat this sweet and you will become strong. You will be able to push stones "
 "at once. You will also be able to push chasing stones."
 msgstr ""
 
-#: src/gtk/help.cpp:108
+#: src/gtk/help.cpp:106
 msgid "This is an indestructible door with a diamond."
 msgstr ""
 
-#: src/gtk/help.cpp:109
+#: src/gtk/help.cpp:107
 msgid ""
 "If you get this key, all doors will convert into diamonds you can collect."
 msgstr ""
 
-#: src/gtk/help.cpp:110
+#: src/gtk/help.cpp:108
 msgid "Keys"
 msgstr ""
 
-#: src/gtk/help.cpp:110
+#: src/gtk/help.cpp:108
 msgid ""
 "There are three types of keys, which open three different colored doors. You "
 "can collect more from these; and for every door, always one key is used."
 msgstr ""
 
-#: src/gtk/help.cpp:111
+#: src/gtk/help.cpp:109
 msgid "Doors"
 msgstr ""
 
-#: src/gtk/help.cpp:111
+#: src/gtk/help.cpp:109
 msgid "This is a door which can only be opened by the key of the same color."
 msgstr ""
 
-#: src/gtk/help.cpp:112
+#: src/gtk/help.cpp:110
 msgid ""
 "Sometimes you have to block a passage, for example to protect a voodoo. This "
 "is when a box like this comes handy. You can push it in every direction "
 "using the Ctrl key."
 msgstr ""
 
-#: src/gtk/help.cpp:113
+#: src/gtk/help.cpp:111
 msgid ""
 "Sometimes diamonds or keys are buried in brick walls. You can use a "
 "pneumatic hammer to break these walls, or simple brick walls which contain "
@@ -499,18 +506,18 @@ msgid ""
 "hammer on a wall which is near the player, next to the element you stand on."
 msgstr ""
 
-#: src/gtk/help.cpp:114
+#: src/gtk/help.cpp:112
 msgid ""
 "This machine replicates the element which is on the top of it. At regular "
 "intervals, a new element drops out underneath; if there is space to do this. "
 "The rate of materializing the new elements can be different in every cave."
 msgstr ""
 
-#: src/gtk/help.cpp:115 src/cave/cavestored.cpp:208
+#: src/gtk/help.cpp:113 src/cave/cavestored.cpp:215
 msgid "Conveyor belt"
 msgstr ""
 
-#: src/gtk/help.cpp:115
+#: src/gtk/help.cpp:113
 msgid ""
 "The indestructible and immobile conveyor belt carries free-moving elements. "
 "Its direction can be changed or its power can be turned completely off with "
@@ -519,27 +526,27 @@ msgid ""
 "will also be carried."
 msgstr ""
 
-#: src/gtk/help.cpp:116
+#: src/gtk/help.cpp:114
 msgid ""
 "Heavy elemenets sink into the lava and disappear without any trace left. "
 "Creatures can also step into the lava."
 msgstr ""
 
-#: src/gtk/help.cpp:117
+#: src/gtk/help.cpp:115
 msgid "Collect this to get extra time."
 msgstr ""
 
-#: src/gtk/help.cpp:118
+#: src/gtk/help.cpp:116
 msgid ""
 "Bladders can be pushed around easily. They slowly climb up; if they touch a "
 "voodoo, they convert into clocks. They can also pass slime."
 msgstr ""
 
-#: src/gtk/help.cpp:119
+#: src/gtk/help.cpp:117
 msgid "If there is space above it, the bladder spender turns to a bladder."
 msgstr ""
 
-#: src/gtk/help.cpp:120
+#: src/gtk/help.cpp:118
 msgid ""
 "This is your player's look-alike. You must protect him against flies. If a "
 "voodoo dies by one of them, your player dies immediately too. This doll can "
@@ -549,75 +556,75 @@ msgid ""
 "may not turn into a gravestone by nearby explosions."
 msgstr ""
 
-#: src/gtk/help.cpp:121
+#: src/gtk/help.cpp:119
 msgid ""
 "The teleporter will move you from one place to another, if you step into it. "
 "The destination teleporter depends on which direction you step the current "
 "one into."
 msgstr ""
 
-#: src/gtk/help.cpp:122
+#: src/gtk/help.cpp:120
 msgid ""
 "Stir the pot, and then you will be able to use the gravity switch. While you "
 "are stirring the pot, there is no gravity at all. Press fire after using the "
 "pot."
 msgstr ""
 
-#: src/gtk/help.cpp:123
+#: src/gtk/help.cpp:121
 msgid ""
 "Sometimes you have to collect skeletons before you can use the pot. In some "
 "other caves, they must be collected like diamonds to open the exit."
 msgstr ""
 
-#: src/gtk/help.cpp:124
+#: src/gtk/help.cpp:122
 msgid ""
 "When this switch is active, you can use it to change the gravity. The "
 "direction from which you use it will determine the direction the gravity "
 "will change to."
 msgstr ""
 
-#: src/gtk/help.cpp:125
+#: src/gtk/help.cpp:123
 msgid "With this switch you can controll the direction of the expanding wall."
 msgstr ""
 
-#: src/gtk/help.cpp:126
+#: src/gtk/help.cpp:124
 msgid ""
 "With this you can change the direction of creatures, like guards and "
 "butterflies. Sometimes it works automatically."
 msgstr ""
 
-#: src/gtk/help.cpp:127
+#: src/gtk/help.cpp:125
 msgid "This switch controls the speed of biters."
 msgstr ""
 
-#: src/gtk/help.cpp:128
+#: src/gtk/help.cpp:126
 msgid "This turns the replicator on or off."
 msgstr ""
 
-#: src/gtk/help.cpp:129
+#: src/gtk/help.cpp:127
 msgid "This switch can be used to reverse the direction of conveyor belts."
 msgstr ""
 
-#: src/gtk/help.cpp:130
+#: src/gtk/help.cpp:128
 msgid ""
 "The conveyor belts also have a switch which can completely stop their action."
 msgstr ""
 
-#: src/gtk/help.cpp:131
+#: src/gtk/help.cpp:129
 msgid "Strange elements"
 msgstr ""
 
-#: src/gtk/help.cpp:131
+#: src/gtk/help.cpp:129
 msgid ""
 "Some caves contain strange elements, for example, diamonds which cannot be "
 "collected, a player that cannot move... Don't be surprised!"
 msgstr ""
 
-#: src/gtk/help.cpp:133
+#: src/gtk/help.cpp:131
 msgid "Playing hints"
 msgstr ""
 
-#: src/gtk/help.cpp:133
+#: src/gtk/help.cpp:131
 msgid ""
 "Obviously, holding fire and pushing a direction causes you to 'touch' an "
 "adjacent square without moving into it, collecting diamonds or removing "
@@ -626,13 +633,13 @@ msgid ""
 "have to use this."
 msgstr ""
 
-#: src/gtk/help.cpp:134
+#: src/gtk/help.cpp:132
 msgid ""
 "Stones do not roll off of the side of magic walls. In some caves it is shown "
 "where these walls are by placing a stone to show you that it's magic."
 msgstr ""
 
-#: src/gtk/help.cpp:135
+#: src/gtk/help.cpp:133
 msgid ""
 "Expanding walls are always horizontally expanding on both sides. In some "
 "caves it is shown which parts of the wall are expanding by forcing you to "
@@ -640,7 +647,7 @@ msgid ""
 "this eliminates some guessword in the next puzzle."
 msgstr ""
 
-#: src/gtk/help.cpp:136
+#: src/gtk/help.cpp:134
 msgid ""
 "The screen starts scrolling at the edge of the screen. This means it's a bad "
 "idea to run in places where enemies are likely to be, since you won't have "
@@ -651,7 +658,7 @@ msgid ""
 "need to."
 msgstr ""
 
-#: src/gtk/help.cpp:137
+#: src/gtk/help.cpp:135
 msgid ""
 "Enemies like to have dirt to move around on. Clearing lots of dirt can "
 "create safe patches for you. This technique can be used on levels where you "
@@ -661,7 +668,7 @@ msgid ""
 "way)."
 msgstr ""
 
-#: src/gtk/help.cpp:138
+#: src/gtk/help.cpp:136
 msgid ""
 "Magic walls often have a fairly strict time limit, some more than others. "
 "Collect up as many stones as you can just above the magic wall, leaving one "
@@ -670,26 +677,26 @@ msgid ""
 "under the wall ;)"
 msgstr ""
 
-#: src/gtk/help.cpp:139
+#: src/gtk/help.cpp:137
 msgid ""
 "Voodoo dolls need to be protected from enemies at all costs, but dropping a "
 "stone on one is usually harmless!"
 msgstr ""
 
-#: src/gtk/help.cpp:140
+#: src/gtk/help.cpp:138
 msgid ""
 "You can't collect diamonds which are falling, but you can collect them when "
 "they momentarily bounce off of something or down the side of a pile."
 msgstr ""
 
-#: src/gtk/help.cpp:141
+#: src/gtk/help.cpp:139
 msgid ""
 "Some levels have hidden exits. These always look like titanium wall, but "
 "don't flash. You can always tell where they are by visual clues and "
 "deduction."
 msgstr ""
 
-#: src/gtk/help.cpp:142
+#: src/gtk/help.cpp:140
 msgid ""
 "Don't blindly take all diamonds. Some of them are red herrings, some may be "
 "unobtainable or part of a trap, and believe it or not, sometimes a diamond "
@@ -697,11 +704,11 @@ msgid ""
 "sadistic puzzles :)"
 msgstr ""
 
-#: src/gtk/help.cpp:145
+#: src/gtk/help.cpp:143
 msgid "Keys to control the player"
 msgstr ""
 
-#: src/gtk/help.cpp:145
+#: src/gtk/help.cpp:143
 msgid ""
 "To play the game, press the New Game button. You can select which level you "
 "start playing at. During the game, you can control your player with the "
@@ -713,30 +720,30 @@ msgid ""
 "skeletons collected, hold down the left shift button."
 msgstr ""
 
-#: src/gtk/help.cpp:148
+#: src/gtk/help.cpp:146
 msgid "Snapshots"
 msgstr ""
 
-#: src/gtk/help.cpp:148
+#: src/gtk/help.cpp:146
 msgid ""
 "You can experiment with levels by saving and reloading snapshots. However, "
 "if you are playing a reloaded cave, you will not get score or extra lives."
 msgstr ""
 
 #. TRANSLATORS: 40 chars max
-#: src/gtk/help.cpp:149 src/framework/titlescreenactivity.cpp:260
+#: src/gtk/help.cpp:147 src/framework/titlescreenactivity.cpp:274
 #: src/framework/replaymenuactivity.cpp:69
 msgid "Replays"
 msgstr ""
 
-#: src/gtk/help.cpp:149
+#: src/gtk/help.cpp:147
 msgid ""
 "Every time you play a game, GDash records all your movements. These "
 "recordings can be viewed later, and can be saved with the caveset. To check "
 "them out, click on Show replays in the Play menu."
 msgstr ""
 
-#: src/gtk/help.cpp:150
+#: src/gtk/help.cpp:148
 msgid ""
 "If you were very lucky in a cave, or something interesting happened, you do "
 "not have to be worry, as all played caves are recorded. In the Replays "
@@ -746,7 +753,7 @@ msgid ""
 "unsuccessful missions for others to discuss."
 msgstr ""
 
-#: src/gtk/help.cpp:151
+#: src/gtk/help.cpp:149
 msgid ""
 "During the replay of the cave, you can gain control of the replay if you use "
 "the usual cursor keys (left, up, etc.) to move. From that point, you can "
@@ -755,11 +762,11 @@ msgid ""
 "original player!"
 msgstr ""
 
-#: src/gtk/help.cpp:155
+#: src/gtk/help.cpp:153
 msgid "Themes"
 msgstr ""
 
-#: src/gtk/help.cpp:155
+#: src/gtk/help.cpp:153
 msgid ""
 "The game also supports themes. You can use the installed png file as a "
 "template. Cells can have any arbitrary size, not necessarily 16x16 pixels. "
@@ -784,11 +791,11 @@ msgid ""
 "- White 0xffffff: for the editor; will the color of arrows.\n"
 msgstr ""
 
-#: src/gtk/help.cpp:172
+#: src/gtk/help.cpp:170
 msgid "Some words of warning"
 msgstr ""
 
-#: src/gtk/help.cpp:173
+#: src/gtk/help.cpp:171
 msgid ""
 "- Importing may not be complete and correct for all games and engines. There "
 "may be some unplayable caves, as older games had no precise timing.\n"
@@ -800,17 +807,17 @@ msgid ""
 "option in the editor menu to get rid of older or unknown options.\n"
 msgstr ""
 
-#: src/gtk/help.cpp:185
+#: src/gtk/help.cpp:183
 msgid ""
 "This editor lets you create your own levels and cave sets. It can operate in "
 "two modes, a game editor mode, and a cave edit mode.\n"
 msgstr ""
 
-#: src/gtk/help.cpp:186
+#: src/gtk/help.cpp:184
 msgid "Game editor"
 msgstr ""
 
-#: src/gtk/help.cpp:186
+#: src/gtk/help.cpp:184
 msgid ""
 "In this one, you are presented with an overview of your game. You can click "
 "on any cave to select it. Then you can select File|Edit Cave to view or "
@@ -820,19 +827,19 @@ msgid ""
 "File|New Cave."
 msgstr ""
 
-#: src/gtk/help.cpp:187
+#: src/gtk/help.cpp:185
 msgid "Cave editor"
 msgstr ""
 
-#: src/gtk/help.cpp:187
+#: src/gtk/help.cpp:185
 msgid "In this mode, you can edit a cave."
 msgstr ""
 
-#: src/gtk/help.cpp:188
+#: src/gtk/help.cpp:186
 msgid "How a cave is generated"
 msgstr ""
 
-#: src/gtk/help.cpp:188
+#: src/gtk/help.cpp:186
 msgid ""
 "A cave is built up of different objects. First, it is filled with random "
 "elements, of which there can be five. The probabilities of each can be set. "
@@ -840,76 +847,76 @@ msgid ""
 "the ability to import different file formats, used by other games.)"
 msgstr ""
 
-#: src/gtk/help.cpp:189
+#: src/gtk/help.cpp:187
 msgid ""
 "After this step, series of cave objects are rendered over the random data, "
 "which can be of various types: points, lines, rectangles and so. These are "
 "the following:"
 msgstr ""
 
-#: src/gtk/help.cpp:190 src/cave/object/caveobjectpoint.cpp:53
+#: src/gtk/help.cpp:188 src/cave/object/caveobjectpoint.cpp:53
 msgid "Point"
 msgstr ""
 
-#: src/gtk/help.cpp:190
+#: src/gtk/help.cpp:188
 msgid "This is a single element. Click anywhere on the cave map to create one."
 msgstr ""
 
-#: src/gtk/help.cpp:191
+#: src/gtk/help.cpp:189
 msgid "Freehand"
 msgstr ""
 
-#: src/gtk/help.cpp:191
+#: src/gtk/help.cpp:189
 msgid ""
 "This is a freehand editing tool, which places many points as you click and "
 "drag the mouse. Use it wisely; lines and other drawing elements are more "
 "simple and the resulting cave is easier to edit."
 msgstr ""
 
-#: src/gtk/help.cpp:192 src/cave/object/caveobjectline.cpp:89
+#: src/gtk/help.cpp:190 src/cave/object/caveobjectline.cpp:89
 msgid "Line"
 msgstr ""
 
-#: src/gtk/help.cpp:192
+#: src/gtk/help.cpp:190
 msgid ""
 "Click on the map to select the start point, then drag the mouse and finally "
 "release the button, to set the end point."
 msgstr ""
 
-#: src/gtk/help.cpp:193
+#: src/gtk/help.cpp:191
 msgid "Outline"
 msgstr ""
 
-#: src/gtk/help.cpp:193
+#: src/gtk/help.cpp:191
 msgid ""
 "Click on the map and then drag the mouse, to define the two corners of the "
 "rectangle."
 msgstr ""
 
-#: src/gtk/help.cpp:194 src/cave/object/caveobjectrectangle.cpp:69
+#: src/gtk/help.cpp:192 src/cave/object/caveobjectrectangle.cpp:69
 msgid "Rectangle"
 msgstr ""
 
-#: src/gtk/help.cpp:194
+#: src/gtk/help.cpp:192
 msgid "Similar to the above, but this is filled with a second element."
 msgstr ""
 
-#: src/gtk/help.cpp:195 src/cave/object/caveobjectraster.cpp:73
+#: src/gtk/help.cpp:193 src/cave/object/caveobjectraster.cpp:73
 msgid "Raster"
 msgstr ""
 
-#: src/gtk/help.cpp:195
+#: src/gtk/help.cpp:193
 msgid ""
 "This one is like a filled rectangle, but the horizontal and vertical "
 "distance of the elements can be changed. Use the object properties dialog to "
 "set the distances after creating the raster."
 msgstr ""
 
-#: src/gtk/help.cpp:196
+#: src/gtk/help.cpp:194
 msgid "Join"
 msgstr ""
 
-#: src/gtk/help.cpp:196
+#: src/gtk/help.cpp:194
 msgid ""
 "This one is tricky. A join object scans the map, from top to bottom, "
 "searching for a specific element. If it finds one, it draws the second "
@@ -924,11 +931,11 @@ msgid ""
 "cave parts."
 msgstr ""
 
-#: src/gtk/help.cpp:197
+#: src/gtk/help.cpp:195
 msgid "Fill to border"
 msgstr ""
 
-#: src/gtk/help.cpp:197
+#: src/gtk/help.cpp:195
 msgid ""
 "This tool places a flood fill object. The object will fill an area of any "
 "shape in the cave with a specific element. The border of the area is set by "
@@ -938,11 +945,11 @@ msgid ""
 "otherwise it might fill the whole cave for different random seed values."
 msgstr ""
 
-#: src/gtk/help.cpp:199
+#: src/gtk/help.cpp:197
 msgid "Fill by replacement"
 msgstr ""
 
-#: src/gtk/help.cpp:199
+#: src/gtk/help.cpp:197
 msgid ""
 "This tool places another kind of fill object. This one will replace an "
 "element with another one; the area in which this replacement takes place "
@@ -952,11 +959,11 @@ msgid ""
 "place the object."
 msgstr ""
 
-#: src/gtk/help.cpp:203 src/cave/object/caveobjectmaze.cpp:356
+#: src/gtk/help.cpp:201 src/cave/object/caveobjectmaze.cpp:356
 msgid "Maze"
 msgstr ""
 
-#: src/gtk/help.cpp:203
+#: src/gtk/help.cpp:201
 msgid ""
 "You can use random generated mazes in cave designs. The walls and paths of "
 "the maze can be made from any freely chosen element. Also you can select 'No "
@@ -966,27 +973,27 @@ msgid ""
 "played. If the seed value is -1, the maze is always different."
 msgstr ""
 
-#: src/gtk/help.cpp:204
+#: src/gtk/help.cpp:202
 msgid "Unicursal maze"
 msgstr ""
 
-#: src/gtk/help.cpp:204
+#: src/gtk/help.cpp:202
 msgid "The unicursal maze is a long and curvy path."
 msgstr ""
 
-#: src/gtk/help.cpp:205
+#: src/gtk/help.cpp:203
 msgid "Braid maze"
 msgstr ""
 
-#: src/gtk/help.cpp:205
+#: src/gtk/help.cpp:203
 msgid "The maze like that in PacMan: there are no dead ends."
 msgstr ""
 
-#: src/gtk/help.cpp:206 src/cave/object/caveobjectrandomfill.cpp:180
+#: src/gtk/help.cpp:204 src/cave/object/caveobjectrandomfill.cpp:180
 msgid "Random Fill"
 msgstr ""
 
-#: src/gtk/help.cpp:206
+#: src/gtk/help.cpp:204
 msgid ""
 "This tool can be used to fill a part of a cave with random elements. It is "
 "similar to the random cave setup. At most five elements can be specified. "
@@ -999,11 +1006,11 @@ msgid ""
 "so the cave will be different every time you play."
 msgstr ""
 
-#: src/gtk/help.cpp:207
+#: src/gtk/help.cpp:205
 msgid "Copy and paste"
 msgstr ""
 
-#: src/gtk/help.cpp:207
+#: src/gtk/help.cpp:205
 msgid ""
 "This tool is simple: copies a rectangular part of the cave, and pastes it "
 "into a new location. The source and destination area may overlap. To select "
@@ -1014,29 +1021,29 @@ msgid ""
 "object properties window to set this behavior."
 msgstr ""
 
-#: src/gtk/help.cpp:208
+#: src/gtk/help.cpp:206
 msgid ""
 "To select an element, you can middle-click any time on the cave map to pick "
 "one you already use. Use Ctrl together with middle-click to pick a fill "
 "element. With middle-click you can pick an element from the cave."
 msgstr ""
 
-#: src/gtk/help.cpp:209
+#: src/gtk/help.cpp:207
 msgid "Managing cave objects"
 msgstr ""
 
-#: src/gtk/help.cpp:209
+#: src/gtk/help.cpp:207
 msgid "Use this tool to modify already existing cave objects."
 msgstr ""
 
-#: src/gtk/help.cpp:210
+#: src/gtk/help.cpp:208
 msgid ""
 "By looking at the cave, you can see that every object is drawn with a slight "
 "yellowish color to distinguish them from random data. Click on any object to "
 "select it."
 msgstr ""
 
-#: src/gtk/help.cpp:213
+#: src/gtk/help.cpp:211
 msgid ""
 "A selected object can be repositioned with the mouse by clicking and "
 "dragging. You can resize lines and rectangles by moving them by their end "
@@ -1046,13 +1053,13 @@ msgid ""
 "to edit. "
 msgstr ""
 
-#: src/gtk/help.cpp:217
+#: src/gtk/help.cpp:215
 msgid ""
 "By double-clicking on an object, or selecting object properties from the "
 "menu, a dialog pops up, which shows its parameters that you can modify."
 msgstr ""
 
-#: src/gtk/help.cpp:218
+#: src/gtk/help.cpp:216
 msgid ""
 "The order these objects are drawn also affects the cave. To reorder them, "
 "you can click on the To top and To bottom menu items. The object list on the "
@@ -1060,11 +1067,11 @@ msgid ""
 "You can also delete them, or use the standard cut, copy and paste operations."
 msgstr ""
 
-#: src/gtk/help.cpp:219
+#: src/gtk/help.cpp:217
 msgid "Cave properties"
 msgstr ""
 
-#: src/gtk/help.cpp:219
+#: src/gtk/help.cpp:217
 msgid ""
 "To view cave properties, select Edit|Cave properties from the menu. A dialog "
 "will pop up with many different options. Those are not explained here; most "
@@ -1072,13 +1079,13 @@ msgid ""
 "them with your mouse."
 msgstr ""
 
-#: src/gtk/help.cpp:221
+#: src/gtk/help.cpp:219
 msgid ""
 "If you want to restart editing, all cave objects can be deleted at once. A "
 "cave map can also be deleted by selecting Remove map from the menu."
 msgstr ""
 
-#: src/gtk/help.cpp:224
+#: src/gtk/help.cpp:222
 msgid ""
 "Cave objects can be merged into a single map. If you designed a new cave, "
 "this has no particular use; but for editing an imported, map-based cave, it "
@@ -1087,11 +1094,11 @@ msgid ""
 "application, which does not support BDCFF cave objects.)"
 msgstr ""
 
-#: src/gtk/help.cpp:226
+#: src/gtk/help.cpp:224
 msgid "More on random cave data"
 msgstr ""
 
-#: src/gtk/help.cpp:227
+#: src/gtk/help.cpp:225
 msgid ""
 "The elements which fill the cave initially are not really random. They are "
 "generated using a predictable random number generator, which can come up "
@@ -1105,7 +1112,7 @@ msgid ""
 "the top right corner of the editor window."
 msgstr ""
 
-#: src/gtk/help.cpp:237
+#: src/gtk/help.cpp:235
 msgid ""
 "A cave can be made totally random, by entering -1 in the random seed entry. "
 "Remember that you cannot test every cave that is generated this way, and "
@@ -1114,18 +1121,18 @@ msgid ""
 "game they are counted, and the number you specify is subtracted."
 msgstr ""
 
-#: src/gtk/help.cpp:243
+#: src/gtk/help.cpp:241
 msgid ""
 "The Edit menu contains a random elements setup tool, which can be used to "
 "setup the random number generator for the cave. It is able to edit all five "
 "levels, and updates the cave at every change."
 msgstr ""
 
-#: src/gtk/help.cpp:247
+#: src/gtk/help.cpp:245
 msgid "Visible region of a cave"
 msgstr ""
 
-#: src/gtk/help.cpp:248
+#: src/gtk/help.cpp:246
 msgid ""
 "Every cave can have a rectangular area, which may be smaller than the cave "
 "itself, and will be visible during the game. Cave elements outside this "
@@ -1134,11 +1141,11 @@ msgid ""
 "and inbox/outbox elements."
 msgstr ""
 
-#: src/gtk/help.cpp:254
+#: src/gtk/help.cpp:252
 msgid "Shift cave map"
 msgstr ""
 
-#: src/gtk/help.cpp:255
+#: src/gtk/help.cpp:253
 msgid ""
 "If the cave is map-based, you can use the shift tools to move the map. This "
 "might be useful if you want to enlarge it and otherwise there would be no "
@@ -1147,21 +1154,21 @@ msgid ""
 "object at once and move them together."
 msgstr ""
 
-#: src/gtk/help.cpp:260
+#: src/gtk/help.cpp:258
 msgid "Cave stories"
 msgstr ""
 
-#: src/gtk/help.cpp:261
+#: src/gtk/help.cpp:259
 msgid ""
 "Every cave can have a story associated to it, which will be shown when the "
 "cave is played. This story can connect the caves to each other."
 msgstr ""
 
-#: src/gtk/help.cpp:265 src/cave/caveset.cpp:57
+#: src/gtk/help.cpp:263 src/cave/caveset.cpp:57
 msgid "Title screen"
 msgstr ""
 
-#: src/gtk/help.cpp:266
+#: src/gtk/help.cpp:264
 msgid ""
 "A caveset can have its own title screen. To add one, click Cave set title "
 "image in the File menu. If your image is transparent (has a transparent "
@@ -1170,30 +1177,30 @@ msgid ""
 "beneath the big one."
 msgstr ""
 
-#: src/gtk/help.cpp:270 src/editor/editor.cpp:3503
+#: src/gtk/help.cpp:268 src/editor/editor.cpp:3501
 msgid "Test cave"
 msgstr ""
 
-#: src/gtk/help.cpp:270
+#: src/gtk/help.cpp:268
 msgid "If you are finished with drawing, use this button to test the cave."
 msgstr ""
 
-#: src/gtk/help.cpp:271
+#: src/gtk/help.cpp:269
 msgid "Loading and saving"
 msgstr ""
 
-#: src/gtk/help.cpp:271
+#: src/gtk/help.cpp:269
 msgid ""
 "To save your work, use the File|Save button from the main window. You can "
 "save games in a BDCFF file, which is a text format used widely on the "
 "Internet."
 msgstr ""
 
-#: src/gtk/help.cpp:273
+#: src/gtk/help.cpp:271
 msgid "HTML Galleries"
 msgstr ""
 
-#: src/gtk/help.cpp:273
+#: src/gtk/help.cpp:271
 msgid ""
 "This program is able to save cave sets in a HTML gallery, which you can put "
 "on a web server, so other ones can preview them online. To do this, select "
@@ -1201,11 +1208,11 @@ msgid ""
 "files will be put in the same directory and with a similar name."
 msgstr ""
 
-#: src/gtk/help.cpp:277
+#: src/gtk/help.cpp:275
 msgid "Converting to a cavepack"
 msgstr ""
 
-#: src/gtk/help.cpp:277
+#: src/gtk/help.cpp:275
 msgid ""
 "You can convert your individual caves or the complete caveset to a cavepack, "
 "which is a file format readable by the Crazy Light Construction Kit, written "
@@ -1221,7 +1228,7 @@ msgid ""
 "these applications."
 msgstr ""
 
-#: src/gtk/help.cpp:328 src/framework/titlescreenactivity.cpp:275
+#: src/gtk/help.cpp:326 src/framework/titlescreenactivity.cpp:289
 msgid "GDash Help"
 msgstr ""
 
@@ -1246,28 +1253,28 @@ msgstr ""
 msgid "GDash Preferences"
 msgstr ""
 
-#: src/framework/app.cpp:230
+#: src/framework/app.cpp:237
 msgid "Copyright"
 msgstr ""
 
-#: src/framework/app.cpp:230
+#: src/framework/app.cpp:237
 msgid "Website"
 msgstr ""
 
-#: src/framework/app.cpp:236
+#: src/framework/app.cpp:243
 msgid "Authors"
 msgstr ""
 
-#: src/framework/app.cpp:237
+#: src/framework/app.cpp:244
 msgid "Artists"
 msgstr ""
 
-#: src/framework/app.cpp:238
+#: src/framework/app.cpp:245
 msgid "Documenters"
 msgstr ""
 
 #. TRANSLATORS: about dialog box categories.
-#: src/framework/app.cpp:254
+#: src/framework/app.cpp:261
 msgid "License"
 msgstr ""
 
@@ -1289,111 +1296,127 @@ msgid "N"
 msgstr ""
 
 #. TRANSLATORS: Game here is like caveset, the loaded game from which the user will select the cave to play
-#: src/framework/titlescreenactivity.cpp:121 src/settings.cpp:195
+#: src/framework/titlescreenactivity.cpp:135 src/settings.cpp:195
 msgid "Game"
 msgstr ""
 
 #. TRANSLATORS: 40 chars max. Joy here is the joystick (that one can also select the cave)
-#: src/framework/titlescreenactivity.cpp:135
+#: src/framework/titlescreenactivity.cpp:149
 msgid "Joy: select   Fire: play"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:139
-msgid "Crsr: select   Space: Play   H: Help"
+#: src/framework/titlescreenactivity.cpp:153
+msgid "Crsr: select   Space: play   H: help"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:141
-msgid "Crsr: select   Space: Play   X: Errors"
+#: src/framework/titlescreenactivity.cpp:155
+msgid "Crsr: select   Space: play   X: errors"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:147
+#: src/framework/titlescreenactivity.cpp:161
 #, c-format
 msgid "%cNo caves."
 msgstr ""
 
 #. TRANSLATORS: Cave is the name of the cave to play
-#: src/framework/titlescreenactivity.cpp:150
+#: src/framework/titlescreenactivity.cpp:164
 #, c-format
 msgid "%cCave: %c%s%c/%c%d"
 msgstr ""
 
 #. TRANSLATORS: 40 chars max
-#: src/framework/titlescreenactivity.cpp:239
+#: src/framework/titlescreenactivity.cpp:253
 msgid "GDASH ERROR CONSOLE"
 msgstr ""
 
 #. TRANSLATORS: cursor keys selected for playing, or joystick movement
-#: src/framework/titlescreenactivity.cpp:250
+#: src/framework/titlescreenactivity.cpp:264
 msgid "Cursor, joy"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:250
+#: src/framework/titlescreenactivity.cpp:264
 msgid "Select cave & level"
 msgstr ""
 
 #. TRANSLATORS: users press space of game/joystick fire button to play
-#: src/framework/titlescreenactivity.cpp:252
+#: src/framework/titlescreenactivity.cpp:266
 msgid "Space, Fire1"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:252
+#: src/framework/titlescreenactivity.cpp:266
 msgid "Play the game"
 msgstr ""
 
 #. TRANSLATORS: string should be short (~20 chars)
-#: src/framework/titlescreenactivity.cpp:255
+#: src/framework/titlescreenactivity.cpp:269
 msgid "Load (installed caves)"
 msgstr ""
 
 #. TRANSLATORS: string should be short (~20 chars)
-#: src/framework/titlescreenactivity.cpp:257
+#: src/framework/titlescreenactivity.cpp:271
 msgid "Save (Save as)"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:258
+#: src/framework/titlescreenactivity.cpp:272
 msgid "Caveset info"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:259
+#: src/framework/titlescreenactivity.cpp:273
 msgid "Hall of fame"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:262
+#: src/framework/titlescreenactivity.cpp:276
 msgid "Editor"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:264
+#: src/framework/titlescreenactivity.cpp:278
 #: src/framework/gameactivity.cpp:109
 msgid "Sound volume"
 msgstr ""
 
 #. TRANSLATORS: string should be short (~20 chars)
-#: src/framework/titlescreenactivity.cpp:266
+#: src/framework/titlescreenactivity.cpp:280
 msgid "Fullscreen on/off"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:267
+#: src/framework/titlescreenactivity.cpp:281
 msgid "Options"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:268
+#: src/framework/titlescreenactivity.cpp:282
 msgid "Keyboard options"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:269
+#: src/framework/titlescreenactivity.cpp:283
 msgid "Error console"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:270
+#: src/framework/titlescreenactivity.cpp:284
 msgid "About GDash"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:272
+#: src/framework/titlescreenactivity.cpp:286
 msgid "Quit game"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:331
+#: src/framework/titlescreenactivity.cpp:345
 msgid "Enter your name"
+msgstr ""
+
+#: src/framework/titlescreenactivity.cpp:357
+msgid "Quit game?"
+msgstr ""
+
+#: src/framework/titlescreenactivity.cpp:357
+#: src/framework/settingsactivity.cpp:289
+#: src/framework/replaymenuactivity.cpp:194
+msgid "yes"
+msgstr ""
+
+#: src/framework/titlescreenactivity.cpp:357
+#: src/framework/settingsactivity.cpp:289
+#: src/framework/replaymenuactivity.cpp:194
+msgid "no"
 msgstr ""
 
 #. TRANSLATORS: showing highscore, categories
@@ -1599,6 +1622,14 @@ msgstr ""
 msgid "Replay Saved"
 msgstr ""
 
+#: src/framework/replaysaveractivity.cpp:239
+msgid "Saving Replay"
+msgstr ""
+
+#: src/framework/replaysaveractivity.cpp:240
+msgid "Please wait"
+msgstr ""
+
 #: src/framework/settingsactivity.cpp:100
 msgid "Cannot install theme!"
 msgstr ""
@@ -1621,21 +1652,11 @@ msgstr ""
 
 #. TRANSLATORS: 40 chars max. Change means to change the setting
 #: src/framework/settingsactivity.cpp:273
-msgid "Space:Change   H:Help   Esc:Exit"
+msgid "Space: change   H: help   Esc: exit"
 msgstr ""
 
 #: src/framework/settingsactivity.cpp:277
 msgid "Press T to install a new theme."
-msgstr ""
-
-#: src/framework/settingsactivity.cpp:289
-#: src/framework/replaymenuactivity.cpp:194
-msgid "yes"
-msgstr ""
-
-#: src/framework/settingsactivity.cpp:289
-#: src/framework/replaymenuactivity.cpp:194
-msgid "no"
 msgstr ""
 
 #: src/framework/replaymenuactivity.cpp:69
@@ -1739,24 +1760,24 @@ msgstr ""
 msgid "Crsr: move     Esc: exit"
 msgstr ""
 
-#: src/fileops/c64import.cpp:2009 src/fileops/c64import.cpp:2057
-#: src/fileops/c64import.cpp:2128
+#: src/fileops/c64import.cpp:2010 src/fileops/c64import.cpp:2058
+#: src/fileops/c64import.cpp:2129
 #, c-format
 msgid "Intermission %d"
 msgstr ""
 
-#: src/fileops/c64import.cpp:2011 src/fileops/c64import.cpp:2059
-#: src/fileops/c64import.cpp:2134
+#: src/fileops/c64import.cpp:2012 src/fileops/c64import.cpp:2060
+#: src/fileops/c64import.cpp:2135
 #, c-format
 msgid "Cave %c"
 msgstr ""
 
-#: src/fileops/c64import.cpp:2126
+#: src/fileops/c64import.cpp:2127
 #, c-format
 msgid "Intermission %02d"
 msgstr ""
 
-#: src/fileops/c64import.cpp:2132
+#: src/fileops/c64import.cpp:2133
 #, c-format
 msgid "Cave %02d"
 msgstr ""
@@ -2114,37 +2135,37 @@ msgstr ""
 msgid "not selectable"
 msgstr ""
 
-#: src/editor/editor.cpp:832
+#: src/editor/editor.cpp:830
 #, c-format
 msgid "<b>%ms</b>, %d caves"
 msgstr ""
 
-#: src/editor/editor.cpp:921
+#: src/editor/editor.cpp:919
 msgid "Object Properties"
 msgstr ""
 
-#: src/editor/editor.cpp:932
+#: src/editor/editor.cpp:930
 msgid "The object should be visible on at least one level."
 msgstr ""
 
-#: src/editor/editor.cpp:932
+#: src/editor/editor.cpp:930
 msgid "Enabled this object on all levels."
 msgstr ""
 
-#: src/editor/editor.cpp:1656
+#: src/editor/editor.cpp:1654
 msgid "Cave Name"
 msgstr ""
 
-#: src/editor/editor.cpp:1742
+#: src/editor/editor.cpp:1740
 #, c-format
 msgid "%d caves selected"
 msgstr ""
 
-#: src/editor/editor.cpp:1953
+#: src/editor/editor.cpp:1951
 msgid "Cave Random Fill"
 msgstr ""
 
-#: src/editor/editor.cpp:1959
+#: src/editor/editor.cpp:1957
 msgid ""
 "Hint: The random fill works by generating a random number between 0 and 255, "
 "then choosing an element from the list above. If the number generated is "
@@ -2154,127 +2175,127 @@ msgid ""
 "descending order."
 msgstr ""
 
-#: src/editor/editor.cpp:1993
+#: src/editor/editor.cpp:1991
 msgid "Save Cave as PNG Image"
 msgstr ""
 
-#: src/editor/editor.cpp:2000
+#: src/editor/editor.cpp:1998
 msgid "PNG files"
 msgstr ""
 
-#: src/editor/editor.cpp:2061
+#: src/editor/editor.cpp:2059
 msgid "Cave Overview"
 msgstr ""
 
-#: src/editor/editor.cpp:2062
+#: src/editor/editor.cpp:2060
 msgid "Save as _PNG"
 msgstr ""
 
-#: src/editor/editor.cpp:2292
+#: src/editor/editor.cpp:2290
 msgid "Cave Colors"
 msgstr ""
 
-#: src/editor/editor.cpp:2302
+#: src/editor/editor.cpp:2300
 msgid "Set random..."
 msgstr ""
 
-#: src/editor/editor.cpp:2309
+#: src/editor/editor.cpp:2307
 msgid ""
 "Hint: As the palette can be changed for C64 and Atari colors, it is not "
 "recommended to use different types together (for example, RGB color for "
 "background, Atari color for Slime.)"
 msgstr ""
 
-#: src/editor/editor.cpp:2343
+#: src/editor/editor.cpp:2341
 msgid "Do you really want to delete cave(s)?"
 msgstr ""
 
-#: src/editor/editor.cpp:2343
+#: src/editor/editor.cpp:2341
 msgid "This operation cannot be undone."
 msgstr ""
 
-#: src/editor/editor.cpp:2476
+#: src/editor/editor.cpp:2474
 msgid ""
 "At least one object would have been totally hidden (not visible on any of "
 "the levels)."
 msgstr ""
 
-#: src/editor/editor.cpp:2476
+#: src/editor/editor.cpp:2474
 msgid "Enabled those objects on the current level."
 msgstr ""
 
-#: src/editor/editor.cpp:2637
+#: src/editor/editor.cpp:2635
 msgid "Do you really want to remove cave map?"
 msgstr ""
 
-#: src/editor/editor.cpp:2637
+#: src/editor/editor.cpp:2635
 msgid "This operation destroys all cave objects."
 msgstr ""
 
-#: src/editor/editor.cpp:2657
+#: src/editor/editor.cpp:2655
 msgid "This cave has no objects."
 msgstr ""
 
-#: src/editor/editor.cpp:2661
+#: src/editor/editor.cpp:2659
 msgid "Do you really want to flatten cave?"
 msgstr ""
 
-#: src/editor/editor.cpp:2661
+#: src/editor/editor.cpp:2659
 msgid ""
 "This operation merges all cave objects currently seen in a single map. "
 "Further objects may later be added, but the ones already seen will behave "
 "like the random fill elements; they will not be editable."
 msgstr ""
 
-#: src/editor/editor.cpp:2747
+#: src/editor/editor.cpp:2745
 msgid "Save Cave Set in HTML"
 msgstr ""
 
-#: src/editor/editor.cpp:2755
+#: src/editor/editor.cpp:2753
 msgid "HTML files"
 msgstr ""
 
-#: src/editor/editor.cpp:2771
+#: src/editor/editor.cpp:2769
 msgid "Errors - Saving Gallery to File"
 msgstr ""
 
-#: src/editor/editor.cpp:2786
+#: src/editor/editor.cpp:2784
 msgid "Export Cave as CrLi Cave File"
 msgstr ""
 
-#: src/editor/editor.cpp:2804
+#: src/editor/editor.cpp:2802
 msgid "Errors - Exporting Cave to CrLi Format"
 msgstr ""
 
-#: src/editor/editor.cpp:2822
+#: src/editor/editor.cpp:2820
 msgid "Export Cave as CrLi Cave Pack"
 msgstr ""
 
-#: src/editor/editor.cpp:2843
+#: src/editor/editor.cpp:2841
 msgid "Errors - Exporting Caves to File"
 msgstr ""
 
-#: src/editor/editor.cpp:2925
+#: src/editor/editor.cpp:2923
 msgid "Create New Cave"
 msgstr ""
 
-#: src/editor/editor.cpp:2936
+#: src/editor/editor.cpp:2934
 msgid "Name:"
 msgstr ""
 
-#: src/editor/editor.cpp:2939
+#: src/editor/editor.cpp:2937
 msgid "New cave"
 msgstr ""
 
-#: src/editor/editor.cpp:2943
+#: src/editor/editor.cpp:2941
 msgid "Description:"
 msgstr ""
 
-#: src/editor/editor.cpp:2949
+#: src/editor/editor.cpp:2947
 msgid "Intermission:"
 msgstr ""
 
-#: src/editor/editor.cpp:2951
+#: src/editor/editor.cpp:2949
 msgid ""
 "Intermission caves are usually small and fast caves, which are not required "
 "to be solved. The player will not lose a life if he is not successful. The "
@@ -2283,11 +2304,11 @@ msgid ""
 "intermissions."
 msgstr ""
 
-#: src/editor/editor.cpp:3065
+#: src/editor/editor.cpp:3063
 msgid "Do you really want to remove unknown cave tags?"
 msgstr ""
 
-#: src/editor/editor.cpp:3065
+#: src/editor/editor.cpp:3063
 msgid ""
 "This operation removes all unknown tags associated with all caves. Unknown "
 "tags might come from another BDCFF-compatible game or an older version of "
@@ -2295,77 +2316,77 @@ msgid ""
 "you use this caveset in this application, they are of no use."
 msgstr ""
 
-#: src/editor/editor.cpp:3159 src/editor/editor.cpp:3170
+#: src/editor/editor.cpp:3157 src/editor/editor.cpp:3168
 #, c-format
 msgid "%s Element"
 msgstr ""
 
-#: src/editor/editor.cpp:3163
+#: src/editor/editor.cpp:3161
 msgid "Draw Element"
 msgstr ""
 
-#: src/editor/editor.cpp:3174
+#: src/editor/editor.cpp:3172
 msgid "Fill Element"
 msgstr ""
 
-#: src/editor/editor.cpp:3223
+#: src/editor/editor.cpp:3221
 #, c-format
 msgid "%s: removed %d replay(s)\n"
 msgstr ""
 
-#: src/editor/editor.cpp:3229
+#: src/editor/editor.cpp:3227
 msgid "Some replays were removed."
 msgstr ""
 
-#: src/editor/editor.cpp:3255
+#: src/editor/editor.cpp:3253
 #, c-format
 msgid "%s: marked %d replay(s) as working ones\n"
 msgstr ""
 
-#: src/editor/editor.cpp:3261
+#: src/editor/editor.cpp:3259
 msgid ""
 "Some replay checksums were recalculated. This does not mean that those "
 "replays actually play correctly!"
 msgstr ""
 
-#: src/editor/editor.cpp:3313 src/editor/editor.cpp:3326
+#: src/editor/editor.cpp:3311 src/editor/editor.cpp:3324
 msgid "Error loading image file."
 msgstr ""
 
-#: src/editor/editor.cpp:3313
+#: src/editor/editor.cpp:3311
 msgid "Cannot recognize file format."
 msgstr ""
 
-#: src/editor/editor.cpp:3318
+#: src/editor/editor.cpp:3316
 msgid "The image selected is too big!"
 msgstr ""
 
-#: src/editor/editor.cpp:3318
+#: src/editor/editor.cpp:3316
 #, c-format
 msgid "Maximum sizes: %dx%d pixels"
 msgstr ""
 
-#: src/editor/editor.cpp:3350
+#: src/editor/editor.cpp:3348
 msgid "Select Image File for Title Screen"
 msgstr ""
 
-#: src/editor/editor.cpp:3356
+#: src/editor/editor.cpp:3354
 msgid "Select Image File for Background Tile"
 msgstr ""
 
-#: src/editor/editor.cpp:3368
+#: src/editor/editor.cpp:3366
 msgid "Set Title Image"
 msgstr ""
 
-#: src/editor/editor.cpp:3384
+#: src/editor/editor.cpp:3382
 msgid "Load _image"
 msgstr ""
 
-#: src/editor/editor.cpp:3385
+#: src/editor/editor.cpp:3383
 msgid "Load _tile"
 msgstr ""
 
-#: src/editor/editor.cpp:3391
+#: src/editor/editor.cpp:3389
 #, c-format
 msgid ""
 "Recommended image sizes are 320x176 pixels for title image and 8x8 pixels "
@@ -2384,447 +2405,447 @@ msgstr ""
 #. * translate this string to "lowercase-element-names-no".
 #. * Otherwise translate this to "lowercase-element-values-yes".
 #.
-#: src/editor/editor.cpp:3422
+#: src/editor/editor.cpp:3420
 msgid "lowercase-element-names-yes"
 msgstr ""
 
-#: src/editor/editor.cpp:3451
+#: src/editor/editor.cpp:3449
 msgid "_File"
 msgstr ""
 
-#: src/editor/editor.cpp:3452
+#: src/editor/editor.cpp:3450
 msgid "_Edit"
 msgstr ""
 
-#: src/editor/editor.cpp:3453
+#: src/editor/editor.cpp:3451
 msgid "_View"
 msgstr ""
 
-#: src/editor/editor.cpp:3454
+#: src/editor/editor.cpp:3452
 msgid "_Tools"
 msgstr ""
 
-#: src/editor/editor.cpp:3455
+#: src/editor/editor.cpp:3453
 msgid "_Help"
 msgstr ""
 
-#: src/editor/editor.cpp:3456
+#: src/editor/editor.cpp:3454
 msgid "_Object"
 msgstr ""
 
-#: src/editor/editor.cpp:3457
+#: src/editor/editor.cpp:3455
 msgid "_Cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3458
+#: src/editor/editor.cpp:3456
 msgid "Cave_set"
 msgstr ""
 
-#: src/editor/editor.cpp:3459
+#: src/editor/editor.cpp:3457
 msgid "Close cave editor"
 msgstr ""
 
-#: src/editor/editor.cpp:3460
+#: src/editor/editor.cpp:3458
 msgid "New _cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3460
+#: src/editor/editor.cpp:3458
 msgid "Create new cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3461
+#: src/editor/editor.cpp:3459
 msgid "_Editor help"
 msgstr ""
 
-#: src/editor/editor.cpp:3462
+#: src/editor/editor.cpp:3460
 msgid "_Game help"
 msgstr ""
 
-#: src/editor/editor.cpp:3463
+#: src/editor/editor.cpp:3461
 msgid "Save cave set to file"
 msgstr ""
 
-#: src/editor/editor.cpp:3464
+#: src/editor/editor.cpp:3462
 msgid "Save cave set as new file"
 msgstr ""
 
-#: src/editor/editor.cpp:3465
+#: src/editor/editor.cpp:3463
 msgid "Load cave set from file"
 msgstr ""
 
-#: src/editor/editor.cpp:3466
+#: src/editor/editor.cpp:3464
 msgid "Load shipped cave set from file"
 msgstr ""
 
-#: src/editor/editor.cpp:3467
+#: src/editor/editor.cpp:3465
 msgid "Select all items"
 msgstr ""
 
-#: src/editor/editor.cpp:3468
+#: src/editor/editor.cpp:3466
 msgid "Cave set _properties"
 msgstr ""
 
-#: src/editor/editor.cpp:3468
+#: src/editor/editor.cpp:3466
 msgid "Set properties of cave set"
 msgstr ""
 
-#: src/editor/editor.cpp:3469
+#: src/editor/editor.cpp:3467
 msgid "Cave set _title image"
 msgstr ""
 
-#: src/editor/editor.cpp:3469
+#: src/editor/editor.cpp:3467
 msgid "Set caveset title image"
 msgstr ""
 
-#: src/editor/editor.cpp:3475
+#: src/editor/editor.cpp:3473
 msgid "_Role in caveset"
 msgstr ""
 
-#: src/editor/editor.cpp:3476
+#: src/editor/editor.cpp:3474
 msgid "_Edit cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3476
+#: src/editor/editor.cpp:3474
 msgid "Edit selected cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3477
+#: src/editor/editor.cpp:3475
 msgid "_Rename cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3477
+#: src/editor/editor.cpp:3475
 msgid "Rename selected cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3478
+#: src/editor/editor.cpp:3476
 msgid "Make cave _selectable"
 msgstr ""
 
-#: src/editor/editor.cpp:3478
+#: src/editor/editor.cpp:3476
 msgid "Make the cave selectable as game start"
 msgstr ""
 
-#: src/editor/editor.cpp:3479
+#: src/editor/editor.cpp:3477
 msgid "Make cave _unselectable"
 msgstr ""
 
-#: src/editor/editor.cpp:3479
+#: src/editor/editor.cpp:3477
 msgid "Make the cave unselectable as game start"
 msgstr ""
 
-#: src/editor/editor.cpp:3484
+#: src/editor/editor.cpp:3482
 msgid "_New cave set"
 msgstr ""
 
-#: src/editor/editor.cpp:3484
+#: src/editor/editor.cpp:3482
 msgid "Create new cave set with no caves"
 msgstr ""
 
-#: src/editor/editor.cpp:3485
+#: src/editor/editor.cpp:3483
 msgid "Save _HTML gallery"
 msgstr ""
 
-#: src/editor/editor.cpp:3485
+#: src/editor/editor.cpp:3483
 msgid "Save game in a HTML gallery"
 msgstr ""
 
-#: src/editor/editor.cpp:3486
+#: src/editor/editor.cpp:3484
 msgid "Export _CrLi cave pack"
 msgstr ""
 
-#: src/editor/editor.cpp:3487
+#: src/editor/editor.cpp:3485
 msgid "_Selectable caves"
 msgstr ""
 
-#: src/editor/editor.cpp:3488
+#: src/editor/editor.cpp:3486
 msgid "All _caves"
 msgstr ""
 
-#: src/editor/editor.cpp:3488
+#: src/editor/editor.cpp:3486
 msgid "Make all caves selectable as game start"
 msgstr ""
 
-#: src/editor/editor.cpp:3489
+#: src/editor/editor.cpp:3487
 msgid "All _but intermissions"
 msgstr ""
 
-#: src/editor/editor.cpp:3489
+#: src/editor/editor.cpp:3487
 msgid "Make all caves but intermissions selectable as game start"
 msgstr ""
 
-#: src/editor/editor.cpp:3490
+#: src/editor/editor.cpp:3488
 msgid "All _after intermissions"
 msgstr ""
 
-#: src/editor/editor.cpp:3490
+#: src/editor/editor.cpp:3488
 msgid "Make all caves after intermissions selectable as game start"
 msgstr ""
 
-#: src/editor/editor.cpp:3491
+#: src/editor/editor.cpp:3489
 msgid "Remove all unknown tags"
 msgstr ""
 
-#: src/editor/editor.cpp:3491
+#: src/editor/editor.cpp:3489
 msgid "Removes all unknown tags found in the BDCFF file"
 msgstr ""
 
-#: src/editor/editor.cpp:3492
+#: src/editor/editor.cpp:3490
 msgid "Remove bad replays"
 msgstr ""
 
-#: src/editor/editor.cpp:3492
+#: src/editor/editor.cpp:3490
 msgid "Removes replays which won't play as they have their caves modified."
 msgstr ""
 
-#: src/editor/editor.cpp:3493
+#: src/editor/editor.cpp:3491
 msgid "Fix replay checksums"
 msgstr ""
 
-#: src/editor/editor.cpp:3493
+#: src/editor/editor.cpp:3491
 msgid "Treats all replays with wrong checksums as working ones."
 msgstr ""
 
-#: src/editor/editor.cpp:3498
+#: src/editor/editor.cpp:3496
 msgid "_Map"
 msgstr ""
 
-#: src/editor/editor.cpp:3499
+#: src/editor/editor.cpp:3497
 msgid "_Export as CrLi cave file"
 msgstr ""
 
-#: src/editor/editor.cpp:3500
+#: src/editor/editor.cpp:3498
 msgid "Open cave selector"
 msgstr ""
 
-#: src/editor/editor.cpp:3501
+#: src/editor/editor.cpp:3499
 msgid "_Next cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3501
+#: src/editor/editor.cpp:3499
 msgid "Next cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3502
+#: src/editor/editor.cpp:3500
 msgid "_Previous cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3502
+#: src/editor/editor.cpp:3500
 msgid "Previous cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3503
+#: src/editor/editor.cpp:3501
 msgid "_Test"
 msgstr ""
 
-#: src/editor/editor.cpp:3504
+#: src/editor/editor.cpp:3502
 msgid "Ca_ve properties"
 msgstr ""
 
-#: src/editor/editor.cpp:3504
+#: src/editor/editor.cpp:3502
 msgid "Cave settings"
 msgstr ""
 
-#: src/editor/editor.cpp:3505
+#: src/editor/editor.cpp:3503
 msgid "Set engine defaults"
 msgstr ""
 
-#: src/editor/editor.cpp:3506
+#: src/editor/editor.cpp:3504
 msgid "Cave co_lors"
 msgstr ""
 
-#: src/editor/editor.cpp:3506
+#: src/editor/editor.cpp:3504
 msgid "Select cave colors"
 msgstr ""
 
-#: src/editor/editor.cpp:3507
+#: src/editor/editor.cpp:3505
 msgid "Convert to map"
 msgstr ""
 
-#: src/editor/editor.cpp:3507
+#: src/editor/editor.cpp:3505
 msgid "Flatten cave to a single cave map without objects"
 msgstr ""
 
-#: src/editor/editor.cpp:3508
+#: src/editor/editor.cpp:3506
 msgid "O_verview"
 msgstr ""
 
-#: src/editor/editor.cpp:3508
+#: src/editor/editor.cpp:3506
 msgid "Full screen overview of cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3509
+#: src/editor/editor.cpp:3507
 msgid "O_verview (simple)"
 msgstr ""
 
-#: src/editor/editor.cpp:3509
+#: src/editor/editor.cpp:3507
 msgid "Full screen overview of cave almost as in game"
 msgstr ""
 
-#: src/editor/editor.cpp:3510
+#: src/editor/editor.cpp:3508
 msgid "_Auto shrink"
 msgstr ""
 
-#: src/editor/editor.cpp:3510
+#: src/editor/editor.cpp:3508
 msgid "Automatically set the visible region of the cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3515
+#: src/editor/editor.cpp:3513
 msgid "Send to _back"
 msgstr ""
 
-#: src/editor/editor.cpp:3515
+#: src/editor/editor.cpp:3513
 msgid "Send object to bottom of object list (draw first)"
 msgstr ""
 
-#: src/editor/editor.cpp:3516
+#: src/editor/editor.cpp:3514
 msgid "Bring to _front"
 msgstr ""
 
-#: src/editor/editor.cpp:3516
+#: src/editor/editor.cpp:3514
 msgid "Bring object to front of object list (drawn last)"
 msgstr ""
 
-#: src/editor/editor.cpp:3517
+#: src/editor/editor.cpp:3515
 msgid "Show on this level"
 msgstr ""
 
-#: src/editor/editor.cpp:3517
+#: src/editor/editor.cpp:3515
 msgid "Enable object on currently visible level"
 msgstr ""
 
-#: src/editor/editor.cpp:3518
+#: src/editor/editor.cpp:3516
 msgid "Hide on this level"
 msgstr ""
 
-#: src/editor/editor.cpp:3518
+#: src/editor/editor.cpp:3516
 msgid "Disable object on currently visible level"
 msgstr ""
 
-#: src/editor/editor.cpp:3519
+#: src/editor/editor.cpp:3517
 msgid "Only on this level"
 msgstr ""
 
-#: src/editor/editor.cpp:3519
+#: src/editor/editor.cpp:3517
 msgid "Enable object only on the currently visible level"
 msgstr ""
 
-#: src/editor/editor.cpp:3520
+#: src/editor/editor.cpp:3518
 msgid "Show on all levels"
 msgstr ""
 
-#: src/editor/editor.cpp:3520
+#: src/editor/editor.cpp:3518
 msgid "Enable object on all levels"
 msgstr ""
 
-#: src/editor/editor.cpp:3524
+#: src/editor/editor.cpp:3522
 msgid "Ob_ject properties"
 msgstr ""
 
-#: src/editor/editor.cpp:3524
+#: src/editor/editor.cpp:3522
 msgid "Set object properties"
 msgstr ""
 
-#: src/editor/editor.cpp:3529
+#: src/editor/editor.cpp:3527
 msgid "Shift _left"
 msgstr ""
 
-#: src/editor/editor.cpp:3530
+#: src/editor/editor.cpp:3528
 msgid "Shift _right"
 msgstr ""
 
-#: src/editor/editor.cpp:3531
+#: src/editor/editor.cpp:3529
 msgid "Shift _up"
 msgstr ""
 
-#: src/editor/editor.cpp:3532
+#: src/editor/editor.cpp:3530
 msgid "Shift _down"
 msgstr ""
 
-#: src/editor/editor.cpp:3533
+#: src/editor/editor.cpp:3531
 msgid "Remove m_ap"
 msgstr ""
 
-#: src/editor/editor.cpp:3533
+#: src/editor/editor.cpp:3531
 msgid "Remove cave map, if it has one"
 msgstr ""
 
-#: src/editor/editor.cpp:3538
+#: src/editor/editor.cpp:3536
 msgid "Setup cave _random fill"
 msgstr ""
 
-#: src/editor/editor.cpp:3538
+#: src/editor/editor.cpp:3536
 msgid "Setup initial fill random elements for the cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3543
+#: src/editor/editor.cpp:3541
 msgid "Cut to clipboard"
 msgstr ""
 
-#: src/editor/editor.cpp:3544
+#: src/editor/editor.cpp:3542
 msgid "Copy to clipboard"
 msgstr ""
 
-#: src/editor/editor.cpp:3545
+#: src/editor/editor.cpp:3543
 msgid "Delete"
 msgstr ""
 
-#: src/editor/editor.cpp:3550
+#: src/editor/editor.cpp:3548
 msgid "Paste object from clipboard"
 msgstr ""
 
-#: src/editor/editor.cpp:3555
+#: src/editor/editor.cpp:3553
 msgid "Undo last action"
 msgstr ""
 
-#: src/editor/editor.cpp:3560
+#: src/editor/editor.cpp:3558
 msgid "Redo last action"
 msgstr ""
 
-#: src/editor/editor.cpp:3570
+#: src/editor/editor.cpp:3568
 msgid "_Animated view"
 msgstr ""
 
-#: src/editor/editor.cpp:3570 src/settings.cpp:221
+#: src/editor/editor.cpp:3568 src/settings.cpp:221
 msgid "Animated view"
 msgstr ""
 
-#: src/editor/editor.cpp:3571
+#: src/editor/editor.cpp:3569
 msgid "_Colored objects"
 msgstr ""
 
-#: src/editor/editor.cpp:3571
+#: src/editor/editor.cpp:3569
 msgid "Cave objects are colored"
 msgstr ""
 
-#: src/editor/editor.cpp:3572
+#: src/editor/editor.cpp:3570
 msgid "_Object list"
 msgstr ""
 
-#: src/editor/editor.cpp:3572
+#: src/editor/editor.cpp:3570
 msgid "Object list sidebar"
 msgstr ""
 
-#: src/editor/editor.cpp:3919
+#: src/editor/editor.cpp:3917
 msgid "Level shown:"
 msgstr ""
 
-#: src/editor/editor.cpp:3928
+#: src/editor/editor.cpp:3926
 msgid "Draw on:"
 msgstr ""
 
-#: src/editor/editor.cpp:3933
+#: src/editor/editor.cpp:3931
 msgid ""
 "Element used to draw points, lines, and rectangles. You can use middle-click "
 "to pick one from the cave."
 msgstr ""
 
-#: src/editor/editor.cpp:3938
+#: src/editor/editor.cpp:3936
 msgid ""
 "Element used to fill rectangles, and second element of joins. You can use "
 "Ctrl + middle-click to pick one from the cave."
 msgstr ""
 
-#: src/editor/editor.cpp:3975
+#: src/editor/editor.cpp:3973
 msgid "_Objects"
 msgstr ""
 
@@ -2973,50 +2994,50 @@ msgid ""
 "the original game."
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:187 src/cave/cavestored.cpp:321
+#: src/cave/object/caveobjectrandomfill.cpp:187 src/cave/cavestored.cpp:328
 msgid "Random seed"
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:187 src/cave/cavestored.cpp:322
+#: src/cave/object/caveobjectrandomfill.cpp:187 src/cave/cavestored.cpp:329
 msgid ""
 "Random seed value controls the predictable random number generator, which "
 "fills the cave initially. If set to -1, cave is totally random every time it "
 "is played."
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:188 src/cave/cavestored.cpp:324
+#: src/cave/object/caveobjectrandomfill.cpp:188 src/cave/cavestored.cpp:331
 msgid "Initial fill"
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:189 src/cave/cavestored.cpp:325
+#: src/cave/object/caveobjectrandomfill.cpp:189 src/cave/cavestored.cpp:332
 msgid "Probability 1"
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:190 src/cave/cavestored.cpp:326
+#: src/cave/object/caveobjectrandomfill.cpp:190 src/cave/cavestored.cpp:333
 msgid "Random fill 1"
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:191 src/cave/cavestored.cpp:327
+#: src/cave/object/caveobjectrandomfill.cpp:191 src/cave/cavestored.cpp:334
 msgid "Probability 2"
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:192 src/cave/cavestored.cpp:328
+#: src/cave/object/caveobjectrandomfill.cpp:192 src/cave/cavestored.cpp:335
 msgid "Random fill 2"
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:193 src/cave/cavestored.cpp:329
+#: src/cave/object/caveobjectrandomfill.cpp:193 src/cave/cavestored.cpp:336
 msgid "Probability 3"
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:194 src/cave/cavestored.cpp:330
+#: src/cave/object/caveobjectrandomfill.cpp:194 src/cave/cavestored.cpp:337
 msgid "Random fill 3"
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:195 src/cave/cavestored.cpp:331
+#: src/cave/object/caveobjectrandomfill.cpp:195 src/cave/cavestored.cpp:338
 msgid "Probability 4"
 msgstr ""
 
-#: src/cave/object/caveobjectrandomfill.cpp:196 src/cave/cavestored.cpp:332
+#: src/cave/object/caveobjectrandomfill.cpp:196 src/cave/cavestored.cpp:339
 msgid "Random fill 4"
 msgstr ""
 
@@ -3612,126 +3633,144 @@ msgstr ""
 msgid "If it is true, mega stones can be pushed after eating sweet."
 msgstr ""
 
-#: src/cave/cavestored.cpp:117 src/cave/cavestored.cpp:278
+#: src/cave/cavestored.cpp:117 src/cave/elementproperties.cpp:742
+msgid "Rocket launcher"
+msgstr ""
+
+#: src/cave/cavestored.cpp:118
+msgid "Infinite rockets"
+msgstr ""
+
+#: src/cave/cavestored.cpp:118
+msgid ""
+"If it is true, the player is able to launch an infinite number of rockets. "
+"Otherwise every rocket launcher contains only a single rocket."
+msgstr ""
+
+#: src/cave/cavestored.cpp:121 src/cave/cavestored.cpp:285
 #: src/cave/elementproperties.cpp:423
 msgid "Pneumatic hammer"
 msgstr ""
 
-#: src/cave/cavestored.cpp:118
+#: src/cave/cavestored.cpp:122
 msgid "Time for hammer (frames)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:118
+#: src/cave/cavestored.cpp:122
 msgid ""
 "This is the number of game frames, a pneumatic hammer is required to break a "
 "wall."
 msgstr ""
 
-#: src/cave/cavestored.cpp:119
+#: src/cave/cavestored.cpp:123
 msgid "Hammered walls reappear"
 msgstr ""
 
-#: src/cave/cavestored.cpp:119
+#: src/cave/cavestored.cpp:123
 msgid ""
 "If this is set to true, walls broken with a pneumatic hammer will reappear "
 "later."
 msgstr ""
 
-#: src/cave/cavestored.cpp:120
+#: src/cave/cavestored.cpp:124
 msgid "   Timer for reappear (frames)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:120
+#: src/cave/cavestored.cpp:124
 msgid ""
 "This sets the number of game frames, after hammered walls reappear, when the "
 "above setting is true."
 msgstr ""
 
-#: src/cave/cavestored.cpp:122 src/cave/elementproperties.cpp:412
+#: src/cave/cavestored.cpp:126 src/cave/elementproperties.cpp:412
 msgid "Clock"
 msgstr ""
 
-#: src/cave/cavestored.cpp:123
+#: src/cave/cavestored.cpp:127
 msgid "Time bonus (s)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:123
+#: src/cave/cavestored.cpp:127
 msgid "Bonus time when a clock is collected."
 msgstr ""
 
-#: src/cave/cavestored.cpp:125
+#: src/cave/cavestored.cpp:129
 msgid "Voodoo Doll"
 msgstr ""
 
-#: src/cave/cavestored.cpp:126
+#: src/cave/cavestored.cpp:130
 msgid "Can collect diamonds"
 msgstr ""
 
-#: src/cave/cavestored.cpp:126
+#: src/cave/cavestored.cpp:130
 msgid "Controls if a voodoo doll can collect diamonds for the player."
 msgstr ""
 
-#: src/cave/cavestored.cpp:127
+#: src/cave/cavestored.cpp:131
 msgid "Dies if hit by a stone"
 msgstr ""
 
-#: src/cave/cavestored.cpp:127
+#: src/cave/cavestored.cpp:131
 msgid ""
 "Controls if the voodoo doll dies if it is hit by a stone. Then the player "
 "gets a time penalty, and it is turned to a gravestone surrounded by steel "
 "wall."
 msgstr ""
 
-#: src/cave/cavestored.cpp:128
+#: src/cave/cavestored.cpp:132
 msgid "Disappear in explosion"
 msgstr ""
 
-#: src/cave/cavestored.cpp:128
+#: src/cave/cavestored.cpp:132
 msgid ""
 "Controls if the voodoo can be destroyed by an explosion nearby. If not, it "
 "is converted to a gravestone, and you get a time penalty. If yes, the voodoo "
 "simply disappears."
 msgstr ""
 
-#: src/cave/cavestored.cpp:129
+#: src/cave/cavestored.cpp:133
 msgid "Any way hurt, player explodes"
 msgstr ""
 
-#: src/cave/cavestored.cpp:129
+#: src/cave/cavestored.cpp:133
 msgid ""
 "If this setting is enabled, the player will explode if the voodoo is hurt in "
 "any possible way, i.e. touched by a firefly, hit by a stone or an explosion."
 msgstr ""
 
-#: src/cave/cavestored.cpp:130
+#: src/cave/cavestored.cpp:134
 msgid "Time penalty (s)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:130
+#: src/cave/cavestored.cpp:134
 msgid "Penalty time when the voodoo is destroyed by a stone."
 msgstr ""
 
-#: src/cave/cavestored.cpp:133 src/cave/cavestored.cpp:137
-#: src/cave/cavestored.cpp:269 src/cave/elementproperties.cpp:464
+#: src/cave/cavestored.cpp:137 src/cave/cavestored.cpp:142
+#: src/cave/cavestored.cpp:276 src/cave/elementproperties.cpp:464
 msgid "Amoeba"
 msgstr ""
 
-#: src/cave/cavestored.cpp:134
+#: src/cave/cavestored.cpp:138 src/cave/cavestored.cpp:162
+msgid "Timing"
+msgstr ""
+
+#: src/cave/cavestored.cpp:139
 msgid "Timer started immediately"
 msgstr ""
 
-#: src/cave/cavestored.cpp:134
+#: src/cave/cavestored.cpp:139
 msgid ""
 "If this flag is enabled, the amoeba slow growth timer will start at the "
 "beginning of the cave, regardless of the amoeba being let free or not. This "
 "can make a big difference when playing the cave!"
 msgstr ""
 
-#: src/cave/cavestored.cpp:135 src/cave/cavestored.cpp:159
+#: src/cave/cavestored.cpp:140 src/cave/cavestored.cpp:164
 msgid "Timer waits for hatching"
 msgstr ""
 
-#: src/cave/cavestored.cpp:135
+#: src/cave/cavestored.cpp:140
 msgid ""
 "This determines if the amoeba timer starts before the player appearing. "
 "Amoeba can always be activated before that; but if this is set to true, the "
@@ -3741,224 +3780,237 @@ msgid ""
 "slow growth time to fit your needs instead."
 msgstr ""
 
-#: src/cave/cavestored.cpp:138 src/cave/cavestored.cpp:145
+#: src/cave/cavestored.cpp:143 src/cave/cavestored.cpp:150
 msgid "Threshold (cells)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:138 src/cave/cavestored.cpp:145
+#: src/cave/cavestored.cpp:143 src/cave/cavestored.cpp:150
 msgid ""
 "If the amoeba grows more than this fraction of the cave, it is considered "
 "too big and it converts to the element specified below."
 msgstr ""
 
-#: src/cave/cavestored.cpp:139 src/cave/cavestored.cpp:146
+#: src/cave/cavestored.cpp:144 src/cave/cavestored.cpp:151
 msgid "Slow growth time (s)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:139 src/cave/cavestored.cpp:146
+#: src/cave/cavestored.cpp:144 src/cave/cavestored.cpp:151
 msgid "After this time, amoeba will grow very quickly."
 msgstr ""
 
-#: src/cave/cavestored.cpp:140 src/cave/cavestored.cpp:147
+#: src/cave/cavestored.cpp:145 src/cave/cavestored.cpp:152
 msgid "Growth ratio, slow (%)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:140 src/cave/cavestored.cpp:147
+#: src/cave/cavestored.cpp:145 src/cave/cavestored.cpp:152
 msgid "This sets the speed at which a slow amoeba grows."
 msgstr ""
 
-#: src/cave/cavestored.cpp:141 src/cave/cavestored.cpp:148
+#: src/cave/cavestored.cpp:146 src/cave/cavestored.cpp:153
 msgid "Growth ratio, fast (%)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:141 src/cave/cavestored.cpp:148
+#: src/cave/cavestored.cpp:146 src/cave/cavestored.cpp:153
 msgid "This sets the speed at which a fast amoeba grows."
 msgstr ""
 
-#: src/cave/cavestored.cpp:142 src/cave/cavestored.cpp:151
+#: src/cave/cavestored.cpp:147 src/cave/cavestored.cpp:156
 msgid "If too big, converts to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:142 src/cave/cavestored.cpp:151
+#: src/cave/cavestored.cpp:147 src/cave/cavestored.cpp:156
 msgid "Controls which element an overgrown amoeba converts to."
 msgstr ""
 
-#: src/cave/cavestored.cpp:143 src/cave/cavestored.cpp:152
+#: src/cave/cavestored.cpp:148 src/cave/cavestored.cpp:157
 msgid "If enclosed, converts to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:143 src/cave/cavestored.cpp:152
+#: src/cave/cavestored.cpp:148 src/cave/cavestored.cpp:157
 msgid "Controls which element an enclosed amoeba converts to."
 msgstr ""
 
-#: src/cave/cavestored.cpp:144 src/cave/elementproperties.cpp:472
+#: src/cave/cavestored.cpp:149 src/cave/elementproperties.cpp:472
 msgid "Amoeba 2"
 msgstr ""
 
-#: src/cave/cavestored.cpp:149
+#: src/cave/cavestored.cpp:154
 msgid "Explodes by amoeba"
 msgstr ""
 
-#: src/cave/cavestored.cpp:149
+#: src/cave/cavestored.cpp:154
 msgid ""
 "If this setting is enabled, an amoeba 2 will explode if it is touched by a "
 "normal amoeba."
 msgstr ""
 
-#: src/cave/cavestored.cpp:150
+#: src/cave/cavestored.cpp:155
 msgid "   Explosion ends in"
 msgstr ""
 
-#: src/cave/cavestored.cpp:150
+#: src/cave/cavestored.cpp:155
 msgid ""
 "An amoeba 2 explodes to this element, when touched by the original amoeba."
 msgstr ""
 
-#: src/cave/cavestored.cpp:153
+#: src/cave/cavestored.cpp:158
 msgid "Looks like"
 msgstr ""
 
-#: src/cave/cavestored.cpp:153
+#: src/cave/cavestored.cpp:158
 msgid ""
 "Amoeba 2 can look like any other element. Hint: it can also look like a "
 "normal amoeba. Or it can look like slime, and then you have two different "
 "colored amoebas!"
 msgstr ""
 
-#: src/cave/cavestored.cpp:156
+#: src/cave/cavestored.cpp:161
 msgid "Magic Wall"
 msgstr ""
 
-#: src/cave/cavestored.cpp:157
-msgid "Timing"
-msgstr ""
-
-#: src/cave/cavestored.cpp:158
+#: src/cave/cavestored.cpp:163
 msgid "Milling time (s)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:158
+#: src/cave/cavestored.cpp:163
 msgid "Magic wall will stop after this time, and it cannot be activated again."
 msgstr ""
 
-#: src/cave/cavestored.cpp:159
+#: src/cave/cavestored.cpp:164
 msgid ""
 "This determines if the magic wall timer starts before the player appearing. "
 "Magic can always be activated before that; but if this is set to true, the "
 "timer will not start."
 msgstr ""
 
-#: src/cave/cavestored.cpp:160
-msgid "Stops amoeba"
-msgstr ""
-
-#: src/cave/cavestored.cpp:160
-msgid "When the magic wall is activated, it can convert amoeba into diamonds."
-msgstr ""
-
-#: src/cave/cavestored.cpp:161
+#: src/cave/cavestored.cpp:165
 msgid "Conversions"
 msgstr ""
 
-#: src/cave/cavestored.cpp:162
+#: src/cave/cavestored.cpp:166
 msgid "Diamond to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:162
+#: src/cave/cavestored.cpp:166
 msgid ""
 "As a special effect, magic walls can convert diamonds to any other element."
 msgstr ""
 
-#: src/cave/cavestored.cpp:163
+#: src/cave/cavestored.cpp:167
 msgid "Stone to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:163
+#: src/cave/cavestored.cpp:167
 msgid ""
 "As a special effect, magic walls can convert stones to any other element."
 msgstr ""
 
-#: src/cave/cavestored.cpp:164
+#: src/cave/cavestored.cpp:168
 msgid "Mega stone to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:164
+#: src/cave/cavestored.cpp:168
 msgid "If a mega stone falls into the magic wall, it will drop this element."
 msgstr ""
 
-#: src/cave/cavestored.cpp:165
+#: src/cave/cavestored.cpp:169
 msgid "Nitro pack to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:165
+#: src/cave/cavestored.cpp:169
 msgid ""
 "If a nitro pack falls into the magic wall, it will be turned to this element."
 msgstr ""
 
-#: src/cave/cavestored.cpp:166
+#: src/cave/cavestored.cpp:170
 msgid "Nut to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:166
+#: src/cave/cavestored.cpp:170
 msgid "As a special effect, magic walls can convert nuts to any other element."
 msgstr ""
 
-#: src/cave/cavestored.cpp:167
+#: src/cave/cavestored.cpp:171
 msgid "Flying stone to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:167
+#: src/cave/cavestored.cpp:171
 msgid ""
 "If a flying stone climbs up into the magic wall, it will be turned to this "
 "element. Remember that flying stones enter the magic wall from its bottom, "
 "not from the top!"
 msgstr ""
 
-#: src/cave/cavestored.cpp:168
+#: src/cave/cavestored.cpp:172
 msgid "Flying diamonds to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:168
+#: src/cave/cavestored.cpp:172
 msgid ""
 "If a flying diamond enters the magic wall, it will be turned to this "
 "element. Remember that flying diamonds enter the magic wall from its bottom, "
 "not from the top!"
 msgstr ""
 
-#: src/cave/cavestored.cpp:171 src/cave/cavestored.cpp:271
+#: src/cave/cavestored.cpp:173
+msgid "With amoeba"
+msgstr ""
+
+#: src/cave/cavestored.cpp:174
+msgid "Stops amoeba"
+msgstr ""
+
+#: src/cave/cavestored.cpp:174
+msgid "When the magic wall is activated, it can convert amoeba into diamonds."
+msgstr ""
+
+#: src/cave/cavestored.cpp:175
+msgid "BD1 amoeba bug"
+msgstr ""
+
+#: src/cave/cavestored.cpp:175
+msgid ""
+"This setting emulates the BD1 bug, where a stone or a diamond falling into a "
+"magic wall sometimes caused the active amoeba to convert into a diamond. The "
+"rule is: if all amoeba cells above or left to the point where the stone or "
+"the diamond falls into the magic wall are enclosed, the amoeba is converted. "
+"The timing implications of the bug are not emulated."
+msgstr ""
+
+#: src/cave/cavestored.cpp:178 src/cave/cavestored.cpp:278
 #: src/cave/elementproperties.cpp:485
 msgid "Slime"
 msgstr ""
 
-#: src/cave/cavestored.cpp:172
+#: src/cave/cavestored.cpp:179
 msgid "Permeability"
 msgstr ""
 
-#: src/cave/cavestored.cpp:173
+#: src/cave/cavestored.cpp:180
 msgid "Predictable"
 msgstr ""
 
-#: src/cave/cavestored.cpp:173
+#: src/cave/cavestored.cpp:180
 msgid ""
 "Controls if the predictable random generator is used for slime. It is "
 "required for compatibility with some older caves."
 msgstr ""
 
-#: src/cave/cavestored.cpp:175
+#: src/cave/cavestored.cpp:182
 msgid "Permeability (unpredictable, %)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:175
+#: src/cave/cavestored.cpp:182
 msgid ""
 "This controls the rate at which elements go through the slime. Higher values "
 "represent higher probability of passing. This one is for unpredictable slime."
 msgstr ""
 
-#: src/cave/cavestored.cpp:176
+#: src/cave/cavestored.cpp:183
 msgid "Permeability (predictable, bits)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:176
+#: src/cave/cavestored.cpp:183
 msgid ""
 "This controls the rate at which elements go through the slime. This one is "
 "for predictable slime, and the value is used for a bitwise AND function. The "
@@ -3966,110 +4018,110 @@ msgid ""
 "255."
 msgstr ""
 
-#: src/cave/cavestored.cpp:177
+#: src/cave/cavestored.cpp:184
 msgid "Random seed (predictable)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:177
+#: src/cave/cavestored.cpp:184
 msgid ""
 "The random number seed for predictable slime. Use -1 to leave on its "
 "default. Not recommended to change. Does not affect unpredictable slime."
 msgstr ""
 
-#: src/cave/cavestored.cpp:178
+#: src/cave/cavestored.cpp:185
 msgid "Passing elements"
 msgstr ""
 
-#: src/cave/cavestored.cpp:179 src/cave/cavestored.cpp:181
-#: src/cave/cavestored.cpp:183
+#: src/cave/cavestored.cpp:186 src/cave/cavestored.cpp:188
+#: src/cave/cavestored.cpp:190
 msgid "Eats this..."
 msgstr ""
 
-#: src/cave/cavestored.cpp:179 src/cave/cavestored.cpp:180
-#: src/cave/cavestored.cpp:181 src/cave/cavestored.cpp:182
-#: src/cave/cavestored.cpp:183 src/cave/cavestored.cpp:184
+#: src/cave/cavestored.cpp:186 src/cave/cavestored.cpp:187
+#: src/cave/cavestored.cpp:188 src/cave/cavestored.cpp:189
+#: src/cave/cavestored.cpp:190 src/cave/cavestored.cpp:191
 msgid ""
 "Slime can let other elements than stone and diamond go through. It always "
 "lets a waiting or a chasing stone pass, though. Also, flying diamonds and "
 "stones, as well as bladders are always passed."
 msgstr ""
 
-#: src/cave/cavestored.cpp:180 src/cave/cavestored.cpp:182
-#: src/cave/cavestored.cpp:184
+#: src/cave/cavestored.cpp:187 src/cave/cavestored.cpp:189
+#: src/cave/cavestored.cpp:191
 msgid "  ... and converts to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:187
+#: src/cave/cavestored.cpp:194
 msgid "Other elements"
 msgstr ""
 
-#: src/cave/cavestored.cpp:189 src/cave/cavestored.cpp:274
+#: src/cave/cavestored.cpp:196 src/cave/cavestored.cpp:281
 #: src/cave/elementproperties.cpp:385
 msgid "Acid"
 msgstr ""
 
-#: src/cave/cavestored.cpp:190
+#: src/cave/cavestored.cpp:197
 msgid "Eats this element"
 msgstr ""
 
-#: src/cave/cavestored.cpp:190
+#: src/cave/cavestored.cpp:197
 msgid ""
 "The element which acid eats. If it cannot find any, it simply disappears."
 msgstr ""
 
-#: src/cave/cavestored.cpp:191
+#: src/cave/cavestored.cpp:198
 msgid "Spread ratio (%)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:191
+#: src/cave/cavestored.cpp:198
 msgid ""
 "The probability at which an acid will explode and eat neighbouring elements."
 msgstr ""
 
-#: src/cave/cavestored.cpp:192
+#: src/cave/cavestored.cpp:199
 msgid "Leaves this behind"
 msgstr ""
 
-#: src/cave/cavestored.cpp:192
+#: src/cave/cavestored.cpp:199
 msgid ""
 "If acid converts to an explosion puff on spreading or any other element."
 msgstr ""
 
-#: src/cave/cavestored.cpp:195 src/cave/cavestored.cpp:206
+#: src/cave/cavestored.cpp:202 src/cave/cavestored.cpp:213
 msgid "Delay (frame)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:195
+#: src/cave/cavestored.cpp:202
 msgid "Number of frames biters wait between movements."
 msgstr ""
 
-#: src/cave/cavestored.cpp:196
+#: src/cave/cavestored.cpp:203
 msgid "Eats this"
 msgstr ""
 
-#: src/cave/cavestored.cpp:196
+#: src/cave/cavestored.cpp:203
 msgid "Biters eat this element. (They always eat dirt.)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:198 src/cave/cavestored.cpp:276
+#: src/cave/cavestored.cpp:205 src/cave/cavestored.cpp:283
 #: src/cave/elementproperties.cpp:486
 msgid "Bladder"
 msgstr ""
 
-#: src/cave/cavestored.cpp:199
+#: src/cave/cavestored.cpp:206
 msgid "Converts to clock by touching"
 msgstr ""
 
-#: src/cave/cavestored.cpp:201 src/cave/cavestored.cpp:267
+#: src/cave/cavestored.cpp:208 src/cave/cavestored.cpp:274
 #: src/cave/elementproperties.cpp:345
 msgid "Expanding wall"
 msgstr ""
 
-#: src/cave/cavestored.cpp:202 src/cave/cavestored.cpp:210
+#: src/cave/cavestored.cpp:209 src/cave/cavestored.cpp:217
 msgid "Direction changed"
 msgstr ""
 
-#: src/cave/cavestored.cpp:202
+#: src/cave/cavestored.cpp:209
 msgid ""
 "If this option is enabled, the direction of growing for the horizontal and "
 "vertical expanding wall is switched. As you can use both horizontal and "
@@ -4078,28 +4130,28 @@ msgid ""
 "the correct direction from the element box when drawing the cave."
 msgstr ""
 
-#: src/cave/cavestored.cpp:204 src/cave/cavestored.cpp:273
+#: src/cave/cavestored.cpp:211 src/cave/cavestored.cpp:280
 #: src/cave/elementproperties.cpp:479
 msgid "Replicator"
 msgstr ""
 
-#: src/cave/cavestored.cpp:205 src/cave/cavestored.cpp:209
+#: src/cave/cavestored.cpp:212 src/cave/cavestored.cpp:216
 msgid "Active at start"
 msgstr ""
 
-#: src/cave/cavestored.cpp:205
+#: src/cave/cavestored.cpp:212
 msgid "Whether the replicators are turned on or off at the cave start."
 msgstr ""
 
-#: src/cave/cavestored.cpp:206
+#: src/cave/cavestored.cpp:213
 msgid "Number of frames to wait between replicating elements."
 msgstr ""
 
-#: src/cave/cavestored.cpp:209
+#: src/cave/cavestored.cpp:216
 msgid "Whether the conveyor belts are moving when the cave starts."
 msgstr ""
 
-#: src/cave/cavestored.cpp:210
+#: src/cave/cavestored.cpp:217
 msgid ""
 "If the conveyor belts' movement is changed, i.e. they are running in the "
 "opposite direction. As you can freely use left and right going versions of "
@@ -4107,450 +4159,450 @@ msgid ""
 "rather you should select the correct one from the element box when drawing."
 msgstr ""
 
-#: src/cave/cavestored.cpp:212 src/cave/cavestored.cpp:277
+#: src/cave/cavestored.cpp:219 src/cave/cavestored.cpp:284
 #: src/cave/elementproperties.cpp:426
 msgid "Water"
 msgstr ""
 
-#: src/cave/cavestored.cpp:213
+#: src/cave/cavestored.cpp:220
 msgid "Does not flow downwards"
 msgstr ""
 
-#: src/cave/cavestored.cpp:213
+#: src/cave/cavestored.cpp:220
 msgid ""
 "In CrDr, the water element had the odd property that it did not flow "
 "downwards, only in other directions. This flag emulates this behaviour."
 msgstr ""
 
-#: src/cave/cavestored.cpp:215 src/cave/cavestored.cpp:265
+#: src/cave/cavestored.cpp:222 src/cave/cavestored.cpp:272
 #: src/cave/elementproperties.cpp:311
 msgid "Nut"
 msgstr ""
 
-#: src/cave/cavestored.cpp:216
+#: src/cave/cavestored.cpp:223
 msgid "Turns to when crushed"
 msgstr ""
 
-#: src/cave/cavestored.cpp:216
+#: src/cave/cavestored.cpp:223
 msgid ""
 "Normally, a nut contains a diamond. If you crush it with a stone, the "
 "diamond will appear after the usual nut explosion sequence. This setting can "
 "be used to change the element the nut contains."
 msgstr ""
 
-#: src/cave/cavestored.cpp:219
+#: src/cave/cavestored.cpp:226
 msgid "Effects"
 msgstr ""
 
-#: src/cave/cavestored.cpp:221
+#: src/cave/cavestored.cpp:228
 msgid "Stone and diamond effects"
 msgstr ""
 
-#: src/cave/cavestored.cpp:222
+#: src/cave/cavestored.cpp:229
 msgid "Falling stones convert to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:222
+#: src/cave/cavestored.cpp:229
 msgid "When a stone begins falling, it converts to this element."
 msgstr ""
 
-#: src/cave/cavestored.cpp:223
+#: src/cave/cavestored.cpp:230
 msgid "Bouncing stones convert to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:223
+#: src/cave/cavestored.cpp:230
 msgid "When a stone stops falling and rolling, it converts to this element."
 msgstr ""
 
-#: src/cave/cavestored.cpp:224
+#: src/cave/cavestored.cpp:231
 msgid "Falling diamonds convert to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:224
+#: src/cave/cavestored.cpp:231
 msgid "When a diamond begins falling, it converts to this element."
 msgstr ""
 
-#: src/cave/cavestored.cpp:225
+#: src/cave/cavestored.cpp:232
 msgid "Bouncing diamonds convert to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:225
+#: src/cave/cavestored.cpp:232
 msgid "When a diamond stops falling and rolling, it converts to this element."
 msgstr ""
 
-#: src/cave/cavestored.cpp:227
+#: src/cave/cavestored.cpp:234
 msgid "Creature explosion effects"
 msgstr ""
 
-#: src/cave/cavestored.cpp:228
+#: src/cave/cavestored.cpp:235
 msgid "Fireflies explode to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:228
+#: src/cave/cavestored.cpp:235
 msgid ""
 "When a firefly explodes, it will create this element. Change this setting "
 "wisely. The firefly is a traditional element which is expected to explode to "
 "empty space."
 msgstr ""
 
-#: src/cave/cavestored.cpp:229
+#: src/cave/cavestored.cpp:236
 msgid "Alt. fireflies explode to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:229
+#: src/cave/cavestored.cpp:236
 msgid ""
 "When an alternative firefly explodes, it will create this element. Use this "
 "setting wisely. Do not create a firefly which explodes to stones, for "
 "example: use the stonefly instead."
 msgstr ""
 
-#: src/cave/cavestored.cpp:230
+#: src/cave/cavestored.cpp:237
 msgid "Butterflies explode to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:230
+#: src/cave/cavestored.cpp:237
 msgid ""
 "When a butterfly explodes, it will create this element. Use this setting "
 "wisely. Butterflies should explode to diamonds. If you need a creature which "
 "explodes to space, use the firefly instead."
 msgstr ""
 
-#: src/cave/cavestored.cpp:231
+#: src/cave/cavestored.cpp:238
 msgid "Alt. butterflies explode to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:231
+#: src/cave/cavestored.cpp:238
 msgid ""
 "When an alternative butterfly explodes, it will create this element. Use "
 "this setting wisely."
 msgstr ""
 
-#: src/cave/cavestored.cpp:232
+#: src/cave/cavestored.cpp:239
 msgid "Stoneflies explode to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:232
+#: src/cave/cavestored.cpp:239
 msgid "When a stonefly explodes, it will create this element."
 msgstr ""
 
-#: src/cave/cavestored.cpp:233
+#: src/cave/cavestored.cpp:240
 msgid "Dragonflies explode to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:233
+#: src/cave/cavestored.cpp:240
 msgid "When a dragonfly explodes, it will create this element."
 msgstr ""
 
-#: src/cave/cavestored.cpp:235
+#: src/cave/cavestored.cpp:242
 msgid "Explosion effects"
 msgstr ""
 
-#: src/cave/cavestored.cpp:236
+#: src/cave/cavestored.cpp:243
 msgid "Explosions end in"
 msgstr ""
 
-#: src/cave/cavestored.cpp:236
+#: src/cave/cavestored.cpp:243
 msgid "This element appears in places where an explosion finishes."
 msgstr ""
 
-#: src/cave/cavestored.cpp:237
+#: src/cave/cavestored.cpp:244
 msgid "Diamond births end in"
 msgstr ""
 
-#: src/cave/cavestored.cpp:237
+#: src/cave/cavestored.cpp:244
 msgid ""
 "When a diamond birth animation reaches its end, it will leave this element "
 "there. This can be used to change the element butterflies explode to."
 msgstr ""
 
-#: src/cave/cavestored.cpp:238
+#: src/cave/cavestored.cpp:245
 msgid "Bombs explosions end in"
 msgstr ""
 
-#: src/cave/cavestored.cpp:238
+#: src/cave/cavestored.cpp:245
 msgid "Use this setting to select the element the exploding bomb creates."
 msgstr ""
 
-#: src/cave/cavestored.cpp:239
+#: src/cave/cavestored.cpp:246
 msgid "Nitro explosions end in"
 msgstr ""
 
-#: src/cave/cavestored.cpp:239
+#: src/cave/cavestored.cpp:246
 msgid "The nitro explosions can create some element other than space."
 msgstr ""
 
-#: src/cave/cavestored.cpp:242
+#: src/cave/cavestored.cpp:249
 msgid "More effects"
 msgstr ""
 
-#: src/cave/cavestored.cpp:244
+#: src/cave/cavestored.cpp:251
 msgid "Visual effects"
 msgstr ""
 
-#: src/cave/cavestored.cpp:245
+#: src/cave/cavestored.cpp:252
 msgid "Expanding wall looks like"
 msgstr ""
 
-#: src/cave/cavestored.cpp:245
+#: src/cave/cavestored.cpp:252
 msgid ""
 "This is a compatibility setting for old caves. If you need an expanding wall "
 "which looks like steel, you should rather choose the expanding steel wall "
 "from the element box."
 msgstr ""
 
-#: src/cave/cavestored.cpp:246
+#: src/cave/cavestored.cpp:253
 msgid "Dirt looks like"
 msgstr ""
 
-#: src/cave/cavestored.cpp:246
+#: src/cave/cavestored.cpp:253
 msgid ""
 "Compatibility setting. Use it wisely! Anything other than Dirt 2 (which can "
 "be used to emulate the Dirt Mod) is not recommended."
 msgstr ""
 
-#: src/cave/cavestored.cpp:249
+#: src/cave/cavestored.cpp:256
 msgid "Creature movement"
 msgstr ""
 
-#: src/cave/cavestored.cpp:250
+#: src/cave/cavestored.cpp:257
 msgid "Start backwards"
 msgstr ""
 
-#: src/cave/cavestored.cpp:250
+#: src/cave/cavestored.cpp:257
 msgid ""
 "Whether the direction creatures travel will already be switched at the cave "
 "start."
 msgstr ""
 
-#: src/cave/cavestored.cpp:251
+#: src/cave/cavestored.cpp:258
 msgid "Automatically turn (s)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:251
+#: src/cave/cavestored.cpp:258
 msgid ""
 "If this is greater than zero, creatures will automatically change direction "
 "in every x seconds."
 msgstr ""
 
-#: src/cave/cavestored.cpp:252
+#: src/cave/cavestored.cpp:259
 msgid "Auto turn on hatching"
 msgstr ""
 
-#: src/cave/cavestored.cpp:252
+#: src/cave/cavestored.cpp:259
 msgid ""
 "If this is set to true, creatures also turn at the start signal. If false, "
 "the first change in direction occurs only later."
 msgstr ""
 
-#: src/cave/cavestored.cpp:254 src/cave/cavestored.cpp:282
+#: src/cave/cavestored.cpp:261 src/cave/cavestored.cpp:289
 msgid "Gravity change"
 msgstr ""
 
-#: src/cave/cavestored.cpp:255
+#: src/cave/cavestored.cpp:262
 msgid "Direction"
 msgstr ""
 
-#: src/cave/cavestored.cpp:255
+#: src/cave/cavestored.cpp:262
 msgid "The direction where stones and diamonds fall."
 msgstr ""
 
-#: src/cave/cavestored.cpp:256
+#: src/cave/cavestored.cpp:263
 msgid "Switch active at start"
 msgstr ""
 
-#: src/cave/cavestored.cpp:256
+#: src/cave/cavestored.cpp:263
 msgid ""
 "If set to true, the gravity switch will be already activated, when the cave "
 "is started, as if a pot has already been collected."
 msgstr ""
 
-#: src/cave/cavestored.cpp:257
+#: src/cave/cavestored.cpp:264
 msgid "Skeletons needed for pot"
 msgstr ""
 
-#: src/cave/cavestored.cpp:257
+#: src/cave/cavestored.cpp:264
 msgid "The number of skeletons to be collected to be able to use a pot."
 msgstr ""
 
-#: src/cave/cavestored.cpp:258
+#: src/cave/cavestored.cpp:265
 msgid "Gravity switch delay"
 msgstr ""
 
-#: src/cave/cavestored.cpp:258
+#: src/cave/cavestored.cpp:265
 msgid ""
 "The gravity changes after a while using the gravity switch. This option sets "
 "the number of seconds to wait."
 msgstr ""
 
-#: src/cave/cavestored.cpp:261 src/settings.cpp:228 src/settings.cpp:229
+#: src/cave/cavestored.cpp:268 src/settings.cpp:228 src/settings.cpp:229
 msgid "Sound"
 msgstr ""
 
-#: src/cave/cavestored.cpp:262
+#: src/cave/cavestored.cpp:269
 msgid "Sound for elements"
 msgstr ""
 
-#: src/cave/cavestored.cpp:263 src/cave/elementproperties.cpp:279
+#: src/cave/cavestored.cpp:270 src/cave/elementproperties.cpp:279
 msgid "Diamond"
 msgstr ""
 
-#: src/cave/cavestored.cpp:263
+#: src/cave/cavestored.cpp:270
 msgid "If true, falling diamonds will have sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:264 src/cave/elementproperties.cpp:231
+#: src/cave/cavestored.cpp:271 src/cave/elementproperties.cpp:231
 msgid "Stone"
 msgstr ""
 
-#: src/cave/cavestored.cpp:264
+#: src/cave/cavestored.cpp:271
 msgid "If true, falling and pushed stones will have sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:265
+#: src/cave/cavestored.cpp:272
 msgid "If true, falling and cracked nuts have sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:266 src/cave/elementproperties.cpp:762
+#: src/cave/cavestored.cpp:273 src/cave/elementproperties.cpp:762
 msgid "Nitro pack"
 msgstr ""
 
-#: src/cave/cavestored.cpp:266
+#: src/cave/cavestored.cpp:273
 msgid "If true, falling and pushed nitro packs will have sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:267
+#: src/cave/cavestored.cpp:274
 msgid "If true, expanding wall will have sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:268 src/cave/elementproperties.cpp:393
+#: src/cave/cavestored.cpp:275 src/cave/elementproperties.cpp:393
 msgid "Falling wall"
 msgstr ""
 
-#: src/cave/cavestored.cpp:268
+#: src/cave/cavestored.cpp:275
 msgid "If true, falling wall will have sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:269
+#: src/cave/cavestored.cpp:276
 msgid "Controls if the living amoeba has sound or not."
 msgstr ""
 
-#: src/cave/cavestored.cpp:270 src/cave/elementproperties.cpp:179
+#: src/cave/cavestored.cpp:277 src/cave/elementproperties.cpp:179
 msgid "Magic wall"
 msgstr ""
 
-#: src/cave/cavestored.cpp:270
+#: src/cave/cavestored.cpp:277
 msgid "If true, the activated magic wall will have sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:271
+#: src/cave/cavestored.cpp:278
 msgid "If true, the elements passing slime will have sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:272 src/cave/elementproperties.cpp:482
+#: src/cave/cavestored.cpp:279 src/cave/elementproperties.cpp:482
 msgid "Lava"
 msgstr ""
 
-#: src/cave/cavestored.cpp:272
+#: src/cave/cavestored.cpp:279
 msgid "If true, the elements sinking in lava will have sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:273
+#: src/cave/cavestored.cpp:280
 msgid ""
 "If true, the new element appearing under the replicator will make sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:274
+#: src/cave/cavestored.cpp:281
 msgid "If true, the acid spreading will have sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:275
+#: src/cave/cavestored.cpp:282
 msgid "Biters eating something or pushing a stone will have sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:276
+#: src/cave/cavestored.cpp:283
 msgid "Bladders moving and being pushed can have sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:277
+#: src/cave/cavestored.cpp:284
 msgid "If true, the cave containing water will have sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:278
+#: src/cave/cavestored.cpp:285
 msgid "If true, using the pneumatic hammer will have sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:279
+#: src/cave/cavestored.cpp:286
 msgid "Bladder spender"
 msgstr ""
 
-#: src/cave/cavestored.cpp:279
+#: src/cave/cavestored.cpp:286
 msgid "If true, the bladder spender will make sound, when the bladder appears."
 msgstr ""
 
-#: src/cave/cavestored.cpp:280
+#: src/cave/cavestored.cpp:287
 msgid "Bladder convert"
 msgstr ""
 
-#: src/cave/cavestored.cpp:280
+#: src/cave/cavestored.cpp:287
 msgid "If true, the bladder converting to a clock will make sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:281
+#: src/cave/cavestored.cpp:288
 msgid "Event sounds"
 msgstr ""
 
-#: src/cave/cavestored.cpp:282
+#: src/cave/cavestored.cpp:289
 msgid "If true, the gravity changing will make sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:283
+#: src/cave/cavestored.cpp:290
 msgid "Creature direction change"
 msgstr ""
 
-#: src/cave/cavestored.cpp:283
+#: src/cave/cavestored.cpp:290
 msgid ""
 "If this is set to true, creatures changing direction will be signaled by a "
 "sound."
 msgstr ""
 
-#: src/cave/cavestored.cpp:286
+#: src/cave/cavestored.cpp:293
 msgid "Compatibility"
 msgstr ""
 
-#: src/cave/cavestored.cpp:287 src/cave/elementproperties.cpp:425
+#: src/cave/cavestored.cpp:294 src/cave/elementproperties.cpp:425
 msgid "Skeleton"
 msgstr ""
 
-#: src/cave/cavestored.cpp:288
+#: src/cave/cavestored.cpp:295
 msgid "Skeletons worth diamonds"
 msgstr ""
 
-#: src/cave/cavestored.cpp:288
+#: src/cave/cavestored.cpp:295
 msgid ""
 "The number of diamonds each skeleton is worth. Normally skeletons are used "
 "for letting the player use the pot! They are not intended to be used as a "
 "second kind of diamond."
 msgstr ""
 
-#: src/cave/cavestored.cpp:289
+#: src/cave/cavestored.cpp:296
 msgid "Borders"
 msgstr ""
 
-#: src/cave/cavestored.cpp:290
+#: src/cave/cavestored.cpp:297
 msgid "Line shifting border"
 msgstr ""
 
-#: src/cave/cavestored.cpp:290
+#: src/cave/cavestored.cpp:297
 msgid ""
 "If this is set to true, the player exiting on either side will appear one "
 "row lower or upper on the other side."
 msgstr ""
 
-#: src/cave/cavestored.cpp:291
+#: src/cave/cavestored.cpp:298
 msgid "Objects wrap around"
 msgstr ""
 
-#: src/cave/cavestored.cpp:291
+#: src/cave/cavestored.cpp:298
 msgid ""
 "If true, objects will wrap around the cave borders as well, i.e. if you drag "
 "a line to the left, part of it will appear on the right hand side of the "
@@ -4560,11 +4612,11 @@ msgid ""
 "or the bottom boundary will have no effect at all."
 msgstr ""
 
-#: src/cave/cavestored.cpp:292
+#: src/cave/cavestored.cpp:299
 msgid "Scan first and last row"
 msgstr ""
 
-#: src/cave/cavestored.cpp:292
+#: src/cave/cavestored.cpp:299
 msgid ""
 "Elements move on first and last row, too. Usually those rows are the border. "
 "The games created by the original editor were not allowed to put anything "
@@ -4573,25 +4625,25 @@ msgid ""
 "not recommended to change this setting for newly designed caves, though."
 msgstr ""
 
-#: src/cave/cavestored.cpp:293
+#: src/cave/cavestored.cpp:300
 msgid "Other"
 msgstr ""
 
-#: src/cave/cavestored.cpp:294
+#: src/cave/cavestored.cpp:301
 msgid "Short explosions"
 msgstr ""
 
-#: src/cave/cavestored.cpp:294
+#: src/cave/cavestored.cpp:301
 msgid ""
 "In 1stB and newer engines, explosions were longer, they took five cave "
 "frames to complete, as opposed to four frames in the original."
 msgstr ""
 
-#: src/cave/cavestored.cpp:295
+#: src/cave/cavestored.cpp:302
 msgid "Gravity change affects everything"
 msgstr ""
 
-#: src/cave/cavestored.cpp:295
+#: src/cave/cavestored.cpp:302
 msgid ""
 "If this is enabled, changing the gravity will also affect bladders (moving "
 "and pushing), bladder spenders, falling walls and waiting stones. Otherwise, "
@@ -4600,94 +4652,94 @@ msgid ""
 "imported caves."
 msgstr ""
 
-#: src/cave/cavestored.cpp:296
+#: src/cave/cavestored.cpp:303
 msgid "Explosion stage 3 to"
 msgstr ""
 
-#: src/cave/cavestored.cpp:296
+#: src/cave/cavestored.cpp:303
 msgid ""
 "This element appears as the next stage of explosion 3. Not recommended to "
 "change. Check explosion effects on the effects page for a better alternative."
 msgstr ""
 
-#: src/cave/cavestored.cpp:299
+#: src/cave/cavestored.cpp:306
 msgid "Unknown tags"
 msgstr ""
 
-#: src/cave/cavestored.cpp:300
+#: src/cave/cavestored.cpp:307
 msgid "Tags which were read from the BDCFF, but are not understood by GDash."
 msgstr ""
 
-#: src/cave/cavestored.cpp:306
+#: src/cave/cavestored.cpp:313
 msgid "Colors"
 msgstr ""
 
-#: src/cave/cavestored.cpp:307
+#: src/cave/cavestored.cpp:314
 msgid "Border color"
 msgstr ""
 
-#: src/cave/cavestored.cpp:307
+#: src/cave/cavestored.cpp:314
 msgid ""
 "Border color for C64 graphics. Only for compatibility, not used by GDash."
 msgstr ""
 
-#: src/cave/cavestored.cpp:308
+#: src/cave/cavestored.cpp:315
 msgid "Background color"
 msgstr ""
 
-#: src/cave/cavestored.cpp:308
+#: src/cave/cavestored.cpp:315
 msgid "Background color for C64 graphics"
 msgstr ""
 
-#: src/cave/cavestored.cpp:309
+#: src/cave/cavestored.cpp:316
 msgid "Color 1 (dirt)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:309
+#: src/cave/cavestored.cpp:316
 msgid "Foreground color 1 for C64 graphics"
 msgstr ""
 
-#: src/cave/cavestored.cpp:310
+#: src/cave/cavestored.cpp:317
 msgid "Color 2 (steel wall)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:310
+#: src/cave/cavestored.cpp:317
 msgid "Foreground color 2 for C64 graphics"
 msgstr ""
 
-#: src/cave/cavestored.cpp:311
+#: src/cave/cavestored.cpp:318
 msgid "Color 3 (brick wall)"
 msgstr ""
 
-#: src/cave/cavestored.cpp:311
+#: src/cave/cavestored.cpp:318
 msgid "Foreground color 3 for C64 graphics"
 msgstr ""
 
-#: src/cave/cavestored.cpp:312
+#: src/cave/cavestored.cpp:319
 msgid "Amoeba color"
 msgstr ""
 
-#: src/cave/cavestored.cpp:312
+#: src/cave/cavestored.cpp:319
 msgid "Amoeba color for C64 graphics"
 msgstr ""
 
-#: src/cave/cavestored.cpp:313
+#: src/cave/cavestored.cpp:320
 msgid "Slime color"
 msgstr ""
 
-#: src/cave/cavestored.cpp:313
+#: src/cave/cavestored.cpp:320
 msgid "Slime color for C64 graphics"
 msgstr ""
 
-#: src/cave/cavestored.cpp:318
+#: src/cave/cavestored.cpp:325
 msgid "Random fill"
 msgstr ""
 
-#: src/cave/cavestored.cpp:333
+#: src/cave/cavestored.cpp:340
 msgid "Initial border"
 msgstr ""
 
-#: src/cave/cavestored.cpp:333
+#: src/cave/cavestored.cpp:340
 msgid ""
 "The border which is drawn around the cave, after filling it. You can set it "
 "to no element to skip the drawing."
@@ -5650,10 +5702,6 @@ msgstr ""
 msgid "Player stirring"
 msgstr ""
 
-#: src/cave/elementproperties.cpp:742
-msgid "Rocket launcher"
-msgstr ""
-
 #: src/cave/elementproperties.cpp:743 src/cave/elementproperties.cpp:744
 msgid "Rocket (right)"
 msgstr ""
@@ -5939,48 +5987,48 @@ msgid "No element"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long
-#: src/cave/gamerender.cpp:368
+#: src/cave/gamerender.cpp:372
 msgid "PLAYING REPLAY"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long
-#: src/cave/gamerender.cpp:383
+#: src/cave/gamerender.cpp:387
 msgid "CONTINUING REPLAY"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long
-#: src/cave/gamerender.cpp:390
+#: src/cave/gamerender.cpp:394
 msgid "PLAYING SNAPSHOT"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long
-#: src/cave/gamerender.cpp:397
+#: src/cave/gamerender.cpp:401
 msgid "TESTING CAVE"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long
-#: src/cave/gamerender.cpp:407
+#: src/cave/gamerender.cpp:411
 msgid "ONE LIFE EXTRA"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long
-#: src/cave/gamerender.cpp:475
+#: src/cave/gamerender.cpp:479
 msgid "OUT OF TIME"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long
-#: src/cave/gamerender.cpp:545
+#: src/cave/gamerender.cpp:549
 msgid "SPACEBAR TO RESUME"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long.
 #. the c64 original had these spaces - you are allowed to do so.
-#: src/cave/gamerender.cpp:552
+#: src/cave/gamerender.cpp:556
 msgid "G A M E   O V E R"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 40 characters long
-#: src/cave/gamerender.cpp:743
+#: src/cave/gamerender.cpp:745
 msgid "UP, DOWN: MOVE    FIRE: CONTINUE"
 msgstr ""
 

@@ -47,6 +47,7 @@ SDLApp::SDLApp() {
     pixbuf_factory = new SDLOGLPixbufFactory;
     pixbuf_factory->set_properties(GdScalingType(gd_cell_scale_game), gd_pal_emulation_game);
     font_manager = new FontManager(*pixbuf_factory, "");
+    screen->register_pixmap_storage(font_manager);
     gameinput = new SDLGameInputHandler;
 }
 
@@ -149,7 +150,7 @@ static void run_the_app(App &the_app, NextAction &na) {
                     if ((ev.key.keysym.sym == SDLK_F11)
                             || (ev.key.keysym.sym == SDLK_RETURN && (ev.key.keysym.mod & (KMOD_LALT | KMOD_RALT)))) {
                         gd_fullscreen = !gd_fullscreen;
-                        the_app.screen->reinit();
+                        the_app.screen->set_size(the_app.screen->get_width(), the_app.screen->get_height());
                         the_app.redraw_event();
                     }
                     else if ((ev.key.keysym.sym == SDLK_q) && (ev.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))) {

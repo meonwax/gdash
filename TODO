@@ -15,7 +15,24 @@ DONE
 
 TO DO
 -----
-opengl stuff
+restart level (esc) nem csökkenti az életek számát
+
+utolsó elfogyott élet után tűzgomb, de nem mutatja a game over feliratot
+
+screen::set_size valahogy átnevezni, reinit vagy bármi
+
+a pixmapstorage-t egy külön headerbe tenni. aki örököl belőle, elég lenne csak azt includeolja
+
+most már a felesleges includeokat el kell tűntetni
+
+opengl stuff teszt
+
+opengl esetén ne legyen replay saver. vagy megoldani valahogy, full pixbufokkal az egészet? 
+speciális pixmap (= pixbuf) és speciális screen (= pixbuf), az lenne a legszebb.
+
+
+az ikon ne legyen két (három?!) helyre is bepastelve. talán a screen-be kéne menjen?
+
 
 pixbuffactory::gimme_a_screen  ?
 

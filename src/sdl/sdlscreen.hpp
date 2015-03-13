@@ -26,8 +26,6 @@ class SDLScreen: public SDLAbstractScreen {
 private:
     SDLScreen(const SDLScreen &);       // not impl
     SDLScreen &operator=(const SDLScreen &);    // not impl
-    int previous_configured_w, previous_configured_h;
-    bool previous_configured_fullscreen;
 
 public:
     SDLScreen();
@@ -36,9 +34,6 @@ public:
     virtual void set_title(char const *title);
     virtual bool must_redraw_all_before_flip();
     virtual void flip();
-    void reinit() {
-        configure_size();
-    }
 };
 
 

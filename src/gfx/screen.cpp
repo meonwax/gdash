@@ -14,16 +14,31 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <algorithm>
 #include "gfx/screen.hpp"
 
-void Screen::set_size(int w, int h) {
-    this->w = w;
-    this->h = h;
-    configure_size();
+void Screen::set_size(int w, int h, bool fullscreen) {
+    if (w != this->w || h != this->h || fullscreen != this->fullscreen) {
+        /* notify pixmap storages before the actual change */
+        for (std::vector<PixmapStorage *>::const_iterator it = pixmap_storages.begin(); it != pixmap_storages.end(); ++it)
+            (*it)->release_pixmaps();
+        /* then change the resolution */
+        this->w = w;
+        this->h = h;
+        this->fullscreen = fullscreen;
+        configure_size();
+    }
 }
 
 
-void Screen::reinit() {
+void Screen::register_pixmap_storage(PixmapStorage *ps) {
+    unregister_pixmap_storage(ps);
+    pixmap_storages.push_back(ps);
+}
+
+
+void Screen::unregister_pixmap_storage(PixmapStorage *ps) {
+    pixmap_storages.erase(std::remove(pixmap_storages.begin(), pixmap_storages.end(), ps), pixmap_storages.end());
 }
 
 

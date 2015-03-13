@@ -71,9 +71,6 @@ int OGLPixmap::get_height() const {
 
 
 SDLOGLScreen::SDLOGLScreen() {
-    previous_configured_w = -1;
-    previous_configured_h = -1;
-    previous_configured_fullscreen = false;
 }
 
 
@@ -84,62 +81,51 @@ SDLOGLScreen::~SDLOGLScreen() {
 
 
 void SDLOGLScreen::configure_size() {
-    /* check if the previous size and fullscreen state matches the currently requested one.
-     * if this is so, then do nothing. if the new one is different, reconfigure the screen.
-     * on the first call of configure_size, this part of the code will surely be executed,
-     * as the default values of previous* are -1, which can't be a screen size. */
-    if (w != previous_configured_w || h != previous_configured_h || gd_fullscreen != previous_configured_fullscreen) {
-        /* remember new size */
-        previous_configured_w = w;
-        previous_configured_h = h;
-        previous_configured_fullscreen = gd_fullscreen;
+    /* close window, if already exists, to create a new one */
+    if (SDL_WasInit(SDL_INIT_VIDEO))
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+    /* init screen */
+    SDL_InitSubSystem(SDL_INIT_VIDEO);
+    /* for some reason, keyboard settings must be done here */
+    SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+    SDL_EnableUNICODE(1);
+    /* icon */
+    SDLPixbuf icon(sizeof(gdash_icon_32), gdash_icon_32);
+    SDL_WM_SetIcon(icon.get_surface(), NULL);
+    set_title("GDash");
 
-        /* close window, if already exists, to create a new one */
-        if (SDL_WasInit(SDL_INIT_VIDEO))
-            SDL_QuitSubSystem(SDL_INIT_VIDEO);
-        /* init screen */
-        SDL_InitSubSystem(SDL_INIT_VIDEO);
-        /* for some reason, keyboard settings must be done here */
-        SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-        SDL_EnableUNICODE(1);
-        /* icon */
-        SDLPixbuf icon(sizeof(gdash_icon_32), gdash_icon_32);
-        SDL_WM_SetIcon(icon.get_surface(), NULL);
-        set_title("GDash");
+    /* create screen */
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE,   5);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,  5);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
+    
+    Uint32 flags = SDL_OPENGL;
+    SDL_Surface *surface = SDL_SetVideoMode(w, h, 0, flags | (gd_fullscreen?SDL_FULLSCREEN:0));
+    if (gd_fullscreen && !surface)
+        surface=SDL_SetVideoMode(w, h, 0, flags);        // try the same, without fullscreen
+    if (!surface)
+        throw std::runtime_error("cannot initialize sdl video");
+    /* do not show mouse cursor */
+    SDL_ShowCursor(SDL_DISABLE);
+    /* warp mouse pointer so cursor cannot be seen, if the above call did nothing for some reason */
+    SDL_WarpMouse(w-1, h-1);
 
-        /* create screen */
-        SDL_GL_SetAttribute(SDL_GL_RED_SIZE,   8);
-        SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-        SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,  8);
-        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-        SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
-        
-        Uint32 flags = SDL_OPENGL;
-        SDL_Surface *surface = SDL_SetVideoMode(w, h, 0, flags | (gd_fullscreen?SDL_FULLSCREEN:0));
-        if (gd_fullscreen && !surface)
-            surface=SDL_SetVideoMode(w, h, 0, flags);        // try the same, without fullscreen
-        if (!surface)
-            throw std::runtime_error("cannot initialize sdl video");
-        /* do not show mouse cursor */
-        SDL_ShowCursor(SDL_DISABLE);
-        /* warp mouse pointer so cursor cannot be seen, if the above call did nothing for some reason */
-        SDL_WarpMouse(w-1, h-1);
-
-        /* opengl mode setting */
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_DITHER);
-        glEnable(GL_BLEND);
-        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glClearColor(0.0, 0.0, 0.0, 0.0);
-        /* opengl view initialization */
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glViewport(0, 0, w, h);
-        glOrtho(0.0, w, h, 0.0, 0.0, 1.0);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-    }
+    /* opengl mode setting */
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_DITHER);
+    glEnable(GL_BLEND);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    /* opengl view initialization */
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glViewport(0, 0, w, h);
+    glOrtho(0.0, w, h, 0.0, 0.0, 1.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 }
 
 
@@ -163,9 +149,9 @@ void SDLOGLScreen::fill_rect(int x, int y, int w, int h, const GdColor& c) {
     glColor3ub(c.get_r(), c.get_g(), c.get_b());
     glBegin(GL_TRIANGLE_STRIP);
         glVertex2i(x, y);
-        glVertex2i(x+w-1, y);
-        glVertex2i(x, y+h-1);
-        glVertex2i(x+w-1, y+h-1);
+        glVertex2i(x+w, y);
+        glVertex2i(x, y+h);
+        glVertex2i(x+w, y+h);
     glEnd();
 }
 

@@ -20,27 +20,34 @@
 
 class GdColor;
 class ParticleSet;
+class PixmapStorage;
 
+#include <vector>
 #include "gfx/pixmap.hpp"
+#include "settings.hpp"
 
 /// @ingroup Graphics
 /// A class which represents a screen (or a drawing area in a window) to draw pixmaps to.
+/// A Screen object can know about one or mor PixmapStorage objects, which are notified
+/// before a video mode change.
 class Screen {
+private:
+    std::vector<PixmapStorage *> pixmap_storages;
+
 protected:
     int w, h;
-    virtual void configure_size() = 0;
+    bool fullscreen;
 
 public:
     Screen(): w(0), h(0) {}
     virtual ~Screen() {}
-    void set_size(int w, int h);
-    virtual void reinit();
-    int get_width() const {
-        return w;
-    }
-    int get_height() const {
-        return h;
-    }
+    
+    void set_size(int w, int h, bool fullscreen = gd_fullscreen);
+    virtual void configure_size() = 0;
+    void register_pixmap_storage(PixmapStorage *ps);
+    void unregister_pixmap_storage(PixmapStorage *ps);
+    int get_width() const { return w; }
+    int get_height() const { return h; }
 
     virtual void set_title(char const *title) = 0;
 
@@ -48,7 +55,6 @@ public:
     void fill(const GdColor &c) {
         fill_rect(0, 0, get_width(), get_height(), c);
     }
-
     virtual void blit_full(Pixmap const &src, int dx, int dy, int x, int y, int w, int h) const = 0;
     void blit(Pixmap const &src, int dx, int dy) const {
         blit_full(src, dx, dy, 0, 0, src.get_width(), src.get_height());

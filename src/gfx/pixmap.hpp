@@ -30,4 +30,17 @@ public:
 };
 
 
+/// @ingroup Graphics
+/// A class which stores rendered Pixmap objects can be notified by a Screen object
+/// when the resolution or the video mode change. The Screen object does this by calling
+/// the PixmapStorage::release_pixmaps() function of the storage object. The storage object
+/// should be able to recreate its Pixmap objects, i.e. it should be able to recover after
+/// a resolution change.
+class PixmapStorage {
+public:
+    /// Notifying the PixmapStorage object that its Pixmap objects are to be deleted.
+    /// This function is called just before the resolution change.
+    virtual void release_pixmaps() = 0;
+};
+
 #endif

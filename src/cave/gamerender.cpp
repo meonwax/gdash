@@ -63,9 +63,11 @@ GameRenderer::GameRenderer(Screen &screen_, CellRenderer &cells_, FontManager &f
         scroll_desired_x(0), scroll_desired_y(0),
         story_background(NULL),
         statusbar_since(0) {
+    screen.register_pixmap_storage(&cells);
 }
 
 GameRenderer::~GameRenderer() {
+    screen.unregister_pixmap_storage(&cells);
 }
 
 void GameRenderer::set_show_replay_sign(bool srs) {

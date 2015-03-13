@@ -152,12 +152,18 @@ App::App() {
 
 App::~App() {
     pop_all_activities();
-    delete background_image;
-    delete screen;
+    gd_music_stop();
+    release_pixmaps();
     delete gameinput;
     delete font_manager;
     delete pixbuf_factory;
-    gd_music_stop();
+    delete screen;
+}
+
+
+void App::release_pixmaps() {
+    delete background_image;
+    background_image = NULL;
 }
 
 
@@ -186,6 +192,7 @@ void App::clear_screen() {
         Pixbuf *pixbuf = pixbuf_factory->create_from_inline(sizeof(background), background);
         background_image = pixbuf_factory->create_pixmap_from_pixbuf(*pixbuf, false);
         delete pixbuf;
+        screen->register_pixmap_storage(this);
     }
     screen->blit(*background_image, 0, 0);
 }

@@ -48,8 +48,6 @@ class SDLOGLScreen : public Screen {
 private:
     SDLOGLScreen(const SDLOGLScreen &);               // not impl
     SDLOGLScreen& operator=(const SDLOGLScreen &);    // not impl
-    int previous_configured_w, previous_configured_h;
-    bool previous_configured_fullscreen;
 
 public:
     SDLOGLScreen();

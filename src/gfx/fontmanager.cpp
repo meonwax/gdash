@@ -465,6 +465,10 @@ void FontManager::clear() {
     _wide.clear();
 }
 
+void FontManager::release_pixmaps() {
+    clear();
+}
+
 int FontManager::get_pixmap_scale() const {
     return pixbuf_factory.get_pixmap_scale();
 }
