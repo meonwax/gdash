@@ -268,7 +268,6 @@ play_game_func()
 	SDL_TimerID tim;
 	SDL_Event event;
 	gboolean restart, suicide;	/* for sdl key_downs */
-	int interval;
 
 	exit_game=FALSE;
 	show_highscore=FALSE;
@@ -358,14 +357,12 @@ play_game_func()
 					case GD_GAME_LABELS_CHANGED:
 						showheader_game(statusbar_since);
 						suicide=FALSE;	/* clear detected keypresses, as cave was iterated and they were processed */
-						restart=FALSE;		
 						break;
 
 					case GD_GAME_TIMEOUT_NOW:
 						statusbar_since=0;
 						showheader_game(statusbar_since);	/* also update the status bar here. */
 						suicide=FALSE;	/* clear detected keypresses, as cave was iterated and they were processed */
-						restart=FALSE;		
 						break;
 					
 					case GD_GAME_NO_MORE_LIVES:

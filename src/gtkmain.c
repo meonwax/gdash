@@ -43,7 +43,7 @@ static gboolean paused=FALSE;
 static gboolean fast_forward=FALSE;
 static gboolean fullscreen=FALSE;
 	
-static gboolean restart;
+static gboolean quit_thread;
 
 typedef struct _gd_main_window {
 	GtkWidget *window;
@@ -63,6 +63,7 @@ typedef struct _gd_main_window {
 static GDMainWindow main_window;
 
 static gboolean key_lctrl=FALSE, key_rctrl=FALSE, key_right=FALSE, key_up=FALSE, key_down=FALSE, key_left=FALSE, key_suicide=FALSE;
+static gboolean restart;	/* keys which control the game, but are handled differently than the above */
 static int mouse_cell_x=-1, mouse_cell_y=-1, mouse_cell_click=0;
 
 static void init_mainwindow(Cave *);
@@ -109,6 +110,7 @@ set_fullscreen(void)
 static void
 uninstall_game_timeout()
 {
+	quit_thread=TRUE;
 	/* remove timeout associated to game play */
 	while (g_source_remove_by_user_data (main_window.window)) {
 		/* nothing */
@@ -124,7 +126,7 @@ gd_main_stop_game()
 	set_fullscreen();
 	/* if editor is active, go back to its window. */
 	if (editor_window)
-		gtk_window_present (GTK_WINDOW(editor_window));
+		gtk_window_present(GTK_WINDOW(editor_window));
 }
 
 void
@@ -1053,9 +1055,7 @@ new_game_cb (const GtkWidget * widget, const gpointer data)
 
 
 /* THE MAIN GAME TIMER */
-/* called 25hz or 50hz, depending on fine or normal scroll */
-
-
+/* called at 50hz */
 /* for the gtk version, it seems nicer if we first draw, then scroll. */
 /* this is because there is an expose event; scrolling the "old" drawing would draw the old, and then the new. */
 /* (this is not true for the sdl version) */
@@ -1072,6 +1072,12 @@ main_int(gpointer data)
 	GdDirection player_move;
 	gboolean fire;
 	GdGameState state;
+	
+#if 0
+	called++;
+	if (called%100==0)
+		g_message("%8d. call, avg %gms", called, g_timer_elapsed(timer, NULL)*1000/called);
+#endif
 
 	if (gd_gameplay.type==GD_GAMETYPE_REPLAY)
 		gtk_widget_show(main_window.replay_image_align);
@@ -1097,7 +1103,6 @@ main_int(gpointer data)
 	player_move=gd_direction_from_keypress(up, down, left, right);
 	/* tell the interrupt that 20ms has passed. */
 	state=gd_game_main_int(20, player_move, fire, key_suicide, restart, !paused && !gd_gameplay.out_of_window, paused, fast_forward);
-	restart=FALSE;
 
 	/* the game "interrupt" gives signals to us, which we act upon: update status bar, resize the drawing area... */
 	switch (state) {
@@ -1109,6 +1114,7 @@ main_int(gpointer data)
 			gd_select_pixbuf_colors(gd_gameplay.cave->color0, gd_gameplay.cave->color1, gd_gameplay.cave->color2, gd_gameplay.cave->color3, gd_gameplay.cave->color4, gd_gameplay.cave->color5);
 			init_mainwindow(gd_gameplay.cave);
 			showheader();
+			restart=FALSE;	/* so we do not remember the restart key from a previous cave run */
 			break;
 
 		case GD_GAME_NO_MORE_LIVES:	/* <- only used by sdl version */
@@ -1124,7 +1130,8 @@ main_int(gpointer data)
 
 		case GD_GAME_STOP:
 			gd_main_stop_game();
-			return FALSE;	/* remove timeout */
+			quit_thread=TRUE;
+			return FALSE;	/* do not call again - it will be created later */
 
 		case GD_GAME_GAME_OVER:
 			gd_main_stop_game();
@@ -1132,7 +1139,8 @@ main_int(gpointer data)
 				game_over_highscore();			/* achieved a high score! */
 			else
 				game_over_without_highscore();			/* no high score */
-			return FALSE;	/* remove timeout */
+			quit_thread=TRUE;
+			return FALSE;	/* do not call again - it will be created later */
 	}
 
 	/* if fine scrolling, drawing is called at a 50hz rate. */
@@ -1146,7 +1154,80 @@ main_int(gpointer data)
 		scroll();
 	}
 
-	return TRUE; /* call again */
+	return TRUE;	/* call again */
+}
+
+/* this is a simple wrapper which makes the main_int to be callable as an idle func. */
+/* when used as an idle func by the thread routine, it should run only once for every g_idle_add */
+static gboolean
+main_int_return_false_wrapper(gpointer data)
+{
+	main_int(data);
+	return FALSE;
+}
+
+/* this function will run in its own thread, and add the main int as an idle func in every 20ms */
+static gpointer
+timer_thread(gpointer data)
+{
+	int interval_msec=20;
+
+	/* wait before we first call it */	
+	g_usleep(interval_msec*1000);
+	while (!quit_thread) {
+		/* add processing as an idle func */
+		/* no need to lock the main loop context, as glib does that automatically */
+		g_idle_add(main_int_return_false_wrapper, data);
+
+		g_usleep(interval_msec*1000);
+	}
+	return NULL;
+}
+
+static void
+install_game_timer()
+{
+	GThread *thread;
+	GError *error=NULL;
+	
+	/* remove timer, if it is installed for some reason */
+	uninstall_game_timeout();
+
+	if (!paused)
+		gtk_window_present(GTK_WINDOW(main_window.window));
+
+#if 0
+	if (!timer)
+		timer=g_timer_new();
+#endif
+
+	/* this makes the main int load the first cave, and then we do the drawing. */
+	main_int(main_window.window);
+	gdk_window_process_all_updates();
+	/* after that, install timer. create a thread with higher priority than normal: */
+	/* so its priority will be higher than the main thread, which does the drawing etc. */
+	/* if the scheduling thread wants to do something, it gets processed first. this makes */
+	/* the intervals more even. */
+	quit_thread=FALSE;
+#ifdef G_THREADS_ENABLED
+	thread=g_thread_create_full(timer_thread, main_window.window, 0, FALSE, FALSE, G_THREAD_PRIORITY_HIGH, &error);
+#else
+	thread=NULL;	/* if glib without thread support, we will use timeout source. */
+#endif
+	if (!thread) {
+		/* if unable to create thread */
+		if (error) {
+			g_critical("%s", error->message);
+			g_error_free(error);
+		}
+		/* use the main int as a timeout routine. */
+		g_timeout_add(20, main_int, main_window.window);
+	}
+	
+#if 0
+	g_timer_start(timer);
+	called=0;
+#endif
 }
 
 static void
@@ -1155,20 +1236,6 @@ highscore_cb(GtkWidget *widget, gpointer data)
 	gd_show_highscore(main_window.window, NULL, FALSE, NULL, -1);
 }
 
-static void
-install_game_timer()
-{
-	/* remove timer, if it is installed for some reason */
-	uninstall_game_timeout();
-
-	if (!paused)
-		gtk_window_present(GTK_WINDOW(main_window.window));
-
-	/* we request a "sleep" time which is somewhat shorter than what we need (17 instead of 20).
-	   glib tends to be a bit slower than requested. */
-	/* the intended - 3ms seems to work well on linux and windows as well. */
-	g_timeout_add(17, main_int, main_window.window);
-}
 
 
 static void
@@ -1863,7 +1930,7 @@ gd_create_main_window(void)
 	main()
 	function
  */
-
+ 
 int
 main(int argc, char *argv[])
 {
@@ -2013,14 +2080,19 @@ main(int argc, char *argv[])
 
 	init_mainwindow(NULL);
 
+#ifdef G_THREADS_ENABLED
+	if (!g_thread_supported())
+		g_thread_init(NULL);
+#endif
+
 	if (gd_param_cave) {
 		/* if cave number given, start game */
-		new_game (g_get_real_name(), gd_param_cave-1, gd_param_level-1);
+		new_game(g_get_real_name(), gd_param_cave-1, gd_param_level-1);
 	}
 	else if (editor)
-		cave_editor_cb (NULL, &main_window);
-	
-	gtk_main ();
+		cave_editor_cb(NULL, &main_window);
+
+	gtk_main();
 
 	gd_save_highscore(gd_user_config_dir);
 

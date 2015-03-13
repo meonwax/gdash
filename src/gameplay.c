@@ -242,6 +242,7 @@ gd_new_game(const char *player_name, const int cave, const int level)
 	gd_gameplay.player_lives=gd_caveset_data->initial_lives;
 	gd_gameplay.player_score=0;
 	gd_gameplay.replay_from=NULL;
+	gd_gameplay.replay_record=NULL;
 
 	gd_gameplay.type=GD_GAMETYPE_NORMAL;
 	gd_gameplay.state_counter=GAME_INT_LOAD_CAVE;
@@ -259,6 +260,7 @@ gd_new_game_snapshot(Cave *snapshot)
 	gd_gameplay.original_cave=NULL;		/* we do not use this for snapshots */
 	gd_gameplay.cave=gd_cave_new_from_cave(snapshot);
 	gd_gameplay.replay_from=NULL;
+	gd_gameplay.replay_record=NULL;
 
 	gd_gameplay.type=GD_GAMETYPE_SNAPSHOT;
 	gd_gameplay.state_counter=GAME_INT_LOAD_CAVE;
@@ -276,6 +278,7 @@ gd_new_game_test(Cave *cave, int level)
 	gd_gameplay.original_cave=cave;
 	gd_gameplay.level_num=level;
 	gd_gameplay.replay_from=NULL;
+	gd_gameplay.replay_record=NULL;
 
 	gd_gameplay.type=GD_GAMETYPE_TEST;
 	gd_gameplay.state_counter=GAME_INT_LOAD_CAVE;
@@ -292,6 +295,7 @@ gd_new_game_replay(Cave *cave, GdReplay *replay)
 	gd_gameplay.cave=NULL;		/* we do not use this for replay */
 	gd_gameplay.original_cave=cave;
 	gd_gameplay.replay_from=replay;
+	gd_gameplay.replay_record=NULL;
 
 	gd_gameplay.type=GD_GAMETYPE_REPLAY;
 	gd_gameplay.state_counter=GAME_INT_LOAD_CAVE;

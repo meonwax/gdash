@@ -1,10 +1,5 @@
 DONE
 ----- 
-Hi, there seems to be a problem with level testing at the new version. No matter which level is actually shown, when I want to test my cave, it always goes to level 1...
-timings
-labels
-20-40 ms időzítés további feladatok  midnenhol 20ms?
-sdash 20ms miatt a statusbar_since
 
 
 REFUSED
@@ -13,6 +8,10 @@ REFUSED
 
 TO DO
 -----
+reentrans game
+
+gtk	-fullscreen
+	
 sdl event kezelés
 
 copy&paste elengedés után movera vált,

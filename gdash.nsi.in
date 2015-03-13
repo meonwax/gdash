@@ -53,6 +53,7 @@ Section "GDash (required)"
   File ${MINGWDIR}\bin\libgio-2.0-0.dll
   File ${MINGWDIR}\bin\libgmodule-2.0-0.dll
   File ${MINGWDIR}\bin\libgobject-2.0-0.dll
+  File ${MINGWDIR}\bin\libgthread-2.0-0.dll
   
   ; Program files, GTK+ dlls
   SetOutPath $INSTDIR
