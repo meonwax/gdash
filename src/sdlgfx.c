@@ -35,7 +35,7 @@
 int gd_scale=1;	/* a graphics scale things which sets EVERYTHING. it is set with gd_sdl_init, and cannot be modified later. */
 int gd_scale_type=GD_SCALING_ORIGINAL;
 
-static SDL_Surface *cells[2*NUM_OF_CELLS];
+static SDL_Surface *cells[2*NUM_OF_CELLS];	/* CANNOT BE NUM_OF_CELLS_X*NUM_OF_CELLS_Y, as the cave rendering routine in cave.c uses this. */
 static const guchar *font;
 static GHashTable *font_w, *font_n;
 static GList *font_color_recently_used;
@@ -873,7 +873,7 @@ gd_sdl_init(GdScalingType scaling_type)
 
 	SDL_Init(SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK);
 	SDL_EnableKeyRepeat(250, 100);
-	gd_screen=SDL_SetVideoMode(play_area_w, play_area_h+gd_statusbar_height, 32, SDL_DOUBLEBUF | SDL_ANYFORMAT | (gd_sdl_fullscreen?SDL_FULLSCREEN:0));
+	gd_screen=SDL_SetVideoMode(play_area_w, play_area_h+gd_statusbar_height, 32, SDL_ANYFORMAT | (gd_sdl_fullscreen?SDL_FULLSCREEN:0));
 	/* do not show mouse cursor */
 	SDL_ShowCursor(SDL_DISABLE);
 	/* warp mouse pointer so cursor cannot be seen, if the above call did nothing for some reason */

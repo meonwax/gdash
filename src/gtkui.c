@@ -1075,9 +1075,9 @@ guess_active_toplevel()
 			if (gtk_window_has_toplevel_focus(GTK_WINDOW(iter->data)))
 				parent=iter->data;
 
-    /* if any of them is focused, just choose the first from the list as a fallback. */
+    /* if any of them is focused, just choose the last from the list as a fallback. */
     if (!parent && toplevels)
-    	parent=toplevels->data;
+    	parent=g_list_last(toplevels)->data;
     g_list_free(toplevels);
 
     return parent;

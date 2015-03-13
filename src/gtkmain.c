@@ -74,6 +74,11 @@ static GdCave *snapshot=NULL;
 
 
 
+static void main_stop_game_but_maybe_highscore();
+static void main_free_game();
+
+
+
 
 /************************************************
  *
@@ -257,10 +262,15 @@ drawing_area_expose_event(GtkWidget *widget, GdkEventExpose *event, gpointer dat
 	 * this function gets called only when the main window gets exposed
 	 * by the user removing another window. */
 	/* these are screen coordinates. */
-	x1=event->area.x / gd_cell_size_game;
-	y1=event->area.y / gd_cell_size_game;
-	x2=(event->area.x + event->area.width-1) / gd_cell_size_game;
-	y2=(event->area.y + event->area.height-1) / gd_cell_size_game;
+	x1=event->area.x/gd_cell_size_game;
+	y1=event->area.y/gd_cell_size_game;
+	x2=(event->area.x+event->area.width-1)/gd_cell_size_game;
+	y2=(event->area.y+event->area.height-1)/gd_cell_size_game;
+	/* when resizing the cave, we may get events which store the old size, if the drawing area is not yet resized. */
+	if (x1<0) x1=0;
+	if (y1<0) x1=0;
+	if (x2>=main_window.game->cave->w) x2=main_window.game->cave->w-1;
+	if (y2>=main_window.game->cave->h) y2=main_window.game->cave->h-1;
 
 	/* run through screen coordinates to refresh. */
 	/* inside the loop, calculate cave coordinates, which might not be equal to screen coordinates. */
@@ -916,16 +926,15 @@ main_int(gpointer data)
 
 		case GD_GAME_STOP:
 			gd_main_stop_game();
-			main_int_quit_thread=TRUE;
 			return FALSE;	/* do not call again - it will be created later */
 
 		case GD_GAME_GAME_OVER:
-			gd_main_stop_game();
+			main_stop_game_but_maybe_highscore();
 			if (gd_is_highscore(gd_caveset_data->highscore, main_window.game->player_score))
 				game_over_highscore();			/* achieved a high score! */
 			else
 				game_over_without_highscore();			/* no high score */
-			main_int_quit_thread=TRUE;
+			main_free_game();
 			return FALSE;	/* do not call again - it will be created later */
 	}
 
@@ -1032,15 +1041,11 @@ main_int_install_timer()
 #endif
 }
 
-void
-gd_main_stop_game()
+static void
+main_stop_game_but_maybe_highscore()
 {
 	main_int_uninstall_timer();
-
-	if (main_window.game) {
-		gd_game_free(main_window.game);
-		main_window.game=NULL;
-	}
+	gd_sound_off();	/* hack for game over dialog */
 
 	main_window_init_title();
 	main_window_set_fullscreen();
@@ -1048,6 +1053,23 @@ gd_main_stop_game()
 	if (gd_editor_window)
 		gtk_window_present(GTK_WINDOW(gd_editor_window));
 }
+
+static void
+main_free_game()
+{
+	if (main_window.game) {
+		gd_game_free(main_window.game);
+		main_window.game=NULL;
+	}
+}
+
+void
+gd_main_stop_game()
+{
+	main_stop_game_but_maybe_highscore();
+	main_free_game();
+}
+
 
 
 /* this starts a new game */
@@ -2069,6 +2091,9 @@ create_main_window()
 	for (i=0; gd_caveset_extensions[i]!=NULL; i++)
 		gtk_recent_filter_add_pattern(recent_filter, gd_caveset_extensions[i]);
 	gtk_recent_chooser_add_filter(GTK_RECENT_CHOOSER(recent_chooser), recent_filter);
+	gtk_recent_chooser_set_local_only(GTK_RECENT_CHOOSER(recent_chooser), TRUE);
+	gtk_recent_chooser_set_limit(GTK_RECENT_CHOOSER(recent_chooser), 10);
+	gtk_recent_chooser_set_sort_type(GTK_RECENT_CHOOSER(recent_chooser), GTK_RECENT_SORT_MRU);
 	gtk_menu_item_set_submenu (GTK_MENU_ITEM (gtk_ui_manager_get_widget (ui, "/MenuBar/FileMenu/LoadRecent")), recent_chooser);
 	g_signal_connect(G_OBJECT(recent_chooser), "item-activated", G_CALLBACK(recent_chooser_activated_cb), NULL);
 
@@ -2135,6 +2160,7 @@ main(int argc, char *argv[])
 	char *gallery_filename=NULL;
 	char *png_filename=NULL, *png_size=NULL;
 	char *save_cave_name=NULL;
+	gboolean force_quit_no_gtk;
 
 	GError *error=NULL;
 	GOptionContext *context;
@@ -2150,7 +2176,7 @@ main(int argc, char *argv[])
 
 	context=gd_option_context_new();
 	g_option_context_add_main_entries (context, entries, PACKAGE);	/* gdash (gtk version) parameters */
-	g_option_context_add_group (context, gtk_get_option_group (TRUE));	/* add gtk parameters */
+	g_option_context_add_group (context, gtk_get_option_group(FALSE));	/* add gtk parameters */
 	g_option_context_parse (context, &argc, &argv, &error);
 	g_option_context_free (context);
 	if (error) {
@@ -2176,7 +2202,10 @@ main(int argc, char *argv[])
 	gtk_set_locale();
 	gd_settings_set_locale();
 	
-	gtk_init(&argc, &argv);
+	force_quit_no_gtk=FALSE;
+	if (!gtk_init_check(&argc, &argv)) {
+	    force_quit_no_gtk=TRUE;
+	}
 
 	gd_settings_init_translation();
 
@@ -2203,10 +2232,9 @@ main(int argc, char *argv[])
 		if (!gd_caveset_load_from_internal (gd_param_internal-1, gd_user_config_dir))
 			g_critical (_("%d: no such internal caveset"), gd_param_internal);
 	}
-
-	/* if failed or nothing requested, load default */
-	if (gd_caveset==NULL)
-		gd_caveset_load_from_internal (0, gd_user_config_dir);
+	else
+	/* if nothing requested, load default */
+		gd_caveset_load_from_internal(0, gd_user_config_dir);
 
 	/* always load c64 graphics, as it is the builtin, and we need an icon for the theme selector. */
 	gd_loadcells_default();
@@ -2224,13 +2252,14 @@ main(int argc, char *argv[])
 	}
 
 	/* after loading cells... see if generating a gallery. */
-	if (gallery_filename)
+	/* but only if there are any caves at all. */
+	if (gd_caveset && gallery_filename)
 		gd_save_html (gallery_filename, NULL);
 
 	/* if cave or level values given, check range */
 	if (gd_param_cave)
-		if (gd_param_cave<1 || gd_param_cave>=gd_caveset_count () || gd_param_level<1 || gd_param_level>5)
-			g_critical (_("Invalid cave or level number!\n"));
+		if (gd_param_cave<1 || gd_param_cave>gd_caveset_count() || gd_param_level<1 || gd_param_level>5)
+			g_critical (_("Invalid cave or level number!"));
 
 	/* save cave png */
 	if (png_filename) {
@@ -2267,6 +2296,10 @@ main(int argc, char *argv[])
 	/* if batch mode, quit now */
 	if (quit)
 		return 0;
+	if (force_quit_no_gtk) {
+	    g_critical("Cannot initialize GUI");
+	    return 1;
+	}
 
 	/* create window */
 	gd_register_stock_icons();

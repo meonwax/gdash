@@ -67,7 +67,8 @@ am__objects_2 = gdash-gtkgfx.$(OBJEXT) gdash-gtkui.$(OBJEXT) \
 am__objects_3 = gdash-sound.$(OBJEXT)
 am_gdash_OBJECTS = $(am__objects_1) $(am__objects_2) $(am__objects_3)
 gdash_OBJECTS = $(am_gdash_OBJECTS)
-gdash_DEPENDENCIES =
+am__DEPENDENCIES_1 =
+gdash_DEPENDENCIES = $(am__DEPENDENCIES_1)
 gdash_LINK = $(CCLD) $(gdash_CFLAGS) $(CFLAGS) $(gdash_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__objects_4 = sdash-colors.$(OBJEXT) sdash-cave.$(OBJEXT) \
@@ -82,7 +83,7 @@ am__objects_5 = sdash-sdlgfx.$(OBJEXT) sdash-sdlmain.$(OBJEXT) \
 am__objects_6 = sdash-sound.$(OBJEXT)
 am_sdash_OBJECTS = $(am__objects_4) $(am__objects_5) $(am__objects_6)
 sdash_OBJECTS = $(am_sdash_OBJECTS)
-sdash_DEPENDENCIES =
+sdash_DEPENDENCIES = $(am__DEPENDENCIES_1)
 sdash_LINK = $(CCLD) $(sdash_CFLAGS) $(CFLAGS) $(sdash_LDFLAGS) \
 	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -317,7 +318,8 @@ noinst_HEADERS = \
 # sdl is needed for sound.
 gdash_CFLAGS = -g -Wall @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@
 gdash_LDFLAGS = -g -Wall
-gdash_LDADD = @GTK_LIBS@ @GLIB_LIBS@ @LIBINTL@ @SDL_LIBS@ -lSDL_mixer
+@SDL_TRUE@GDASH_LIBADD = -lSDL_mixer
+gdash_LDADD = @GTK_LIBS@ @GLIB_LIBS@ @LIBINTL@ @SDL_LIBS@ $(GDASH_LIBADD)
 gdash_SOURCES = \
 	$(base_sources) \
 	$(gtksources) \
@@ -328,7 +330,8 @@ gdash_SOURCES = \
 # sdl is needed for gfx and sound.
 sdash_CFLAGS = -g -Wall @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@
 sdash_LDFLAGS = -g -Wall
-sdash_LDADD = @GLIB_LIBS@ @SDL_LIBS@ -lSDL_mixer -lSDL_image
+@SDL_TRUE@SDASH_LIBADD = -lSDL_mixer -lSDL_image
+sdash_LDADD = @GLIB_LIBS@ @SDL_LIBS@ $(SDASH_LIBADD)
 sdash_SOURCES = \
 	$(base_sources) \
 	$(sdlsources) \

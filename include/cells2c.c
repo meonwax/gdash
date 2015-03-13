@@ -50,7 +50,7 @@ main(int argc, char *argv[])
 	int i;
 	int w, h, x, y;
 	
-	gtk_init(&argc, &argv);
+	gtk_init_check(&argc, &argv);
 	if (argc!=2) {
 		g_critical("Usage: %s <filename.png>", argv[0]);
 

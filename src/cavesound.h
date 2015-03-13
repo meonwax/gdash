@@ -21,6 +21,7 @@
 #include "cave.h"
 
 #ifdef GD_SOUND
+const char *gd_sound_get_filename(GdSound sound);
 gboolean gd_sound_is_looped(GdSound sound);
 gboolean gd_sound_is_fake(GdSound sound);
 gboolean gd_sound_is_classic(GdSound sound);

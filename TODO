@@ -1,17 +1,6 @@
 DONE
 ----- 
-sdash bd1 intermissions scroll. disable scrolling for these somehow?
-replay checksum
-In GDash, the cave info bar at the bottom-left of the editor doesn't change when you press the next/previous cave buttons. Could you fix this?
-In SDash, being able to change the color of the cave status bar to classic BD1/BD2 style would be neat.
-pal emu enhanced for letters/fonts
-mesemondás
-replay window mutassa a levelt
-Tweak the vertical scrolling a little the same as you did with the horizontal so Rockford doesn't catch the top of the screen. You can reach the top of the screen with even BD1 level 1 speeds.
-An easier to read status bar for the top of Gdash.
-story új változó a GdCave-ben
-c64 color status bar, if mostly c64 colors in cave
-It would be very interesting if it would be possible to use an own title screen for each game. I do not know if this is possible but this would make it even more authentic.
+
 
 REFUSED
 -------
@@ -20,6 +9,22 @@ REFUSED
 
 TO DO
 -----
+c64 grafika tomb meretet ellenorizni, legalabb a szorzat meglegyen
+
+I really like the new scrolling function, but at cave start a problem can appear. If the game is paused with the screen on the opposite side of the cave as the "start", Rockford will hatch offscreen before the scrolling catches up to him. Allowing a fast scroll at cave start - until hatch would fix it.
+
+
+new elements sound
+
+Amoeba2 sound
+new slime sound
+replicator sound
+
+flying diamonds, flying stones
+
+flying stone=baloon
+
+
 theme image glob pattern
 
 amikor bezárja az editor ablakot, akkor kéne egy replay checksum update?
@@ -37,8 +42,6 @@ Maybe game notes can be displayed under the title screen as soon as the game is 
 Maybe a button to apply certain settings to all caves. We'd have to think of which may be appropriate. Timing maybe. Or color palette type. Dunno about this one.
 
 Already suggested I think: Atari sounds.
-
-Amoeba2 sound
 
 copy&paste elengedés után movera vált,
 
@@ -58,8 +61,6 @@ bdcff beolvasás miért hash table?
 
 design tips?
 
-surprise element
-
 extensive commenting
 
 cow not perfect
@@ -69,4 +70,6 @@ option "More than 1 bomb" in the cave settings
 compat:
 	*) magicwall breakscan; De Luxe Caves 1 Cave L, De Luxe Caves 2 Cave A, Deluxe Caves 3 Cave A 
 	*) frustidash
+
+portable conveyor belts?	destructible, convey each other.
 

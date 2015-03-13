@@ -83,8 +83,10 @@ loadsound(GdSound which, const char *filename)
 	g_assert(sounds[which]==NULL);
 	
 	full_filename=gd_find_file(filename);
-	if (!full_filename)	/* if cannot find file, exit now */
+	if (!full_filename)	{/* if cannot find file, exit now */
+		g_warning("No such sound file: %s", filename);
 		return;
+	}
 		
 	sounds[which]=Mix_LoadWAV(full_filename);
 	if (sounds[which]==NULL)
@@ -169,76 +171,13 @@ gd_sound_init()
 		return FALSE;
 	}
 	mixer_started=TRUE;
+	/* add callback when a sound stops playing */
 	Mix_ChannelFinished(channel_done);
 	
-	loadsound(GD_S_AMOEBA, "amoeba.ogg");
-	loadsound(GD_S_MAGIC_WALL, "magic_wall.ogg");
-	loadsound(GD_S_CRACK, "crack.ogg");
-	loadsound(GD_S_COVER, "cover.ogg");
-	loadsound(GD_S_GRAVITY_CHANGE, "gravity_change.ogg");
-
-	loadsound(GD_S_TIMEOUT_1, "timeout_1.ogg");
-	loadsound(GD_S_TIMEOUT_2, "timeout_2.ogg");
-	loadsound(GD_S_TIMEOUT_3, "timeout_3.ogg");
-	loadsound(GD_S_TIMEOUT_4, "timeout_4.ogg");
-	loadsound(GD_S_TIMEOUT_5, "timeout_5.ogg");
-	loadsound(GD_S_TIMEOUT_6, "timeout_6.ogg");
-	loadsound(GD_S_TIMEOUT_7, "timeout_7.ogg");
-	loadsound(GD_S_TIMEOUT_8, "timeout_8.ogg");
-	loadsound(GD_S_TIMEOUT_9, "timeout_9.ogg");
-	loadsound(GD_S_TIMEOUT, "timeout.ogg");
-	loadsound(GD_S_FINISHED, "finished.ogg");
-
-	loadsound(GD_S_EXPLOSION, "explosion.ogg");
-	loadsound(GD_S_WALK_EARTH, "walk_earth.ogg");
-	loadsound(GD_S_WALK_EMPTY, "walk_empty.ogg");
-	loadsound(GD_S_WALL_REAPPEAR, "wall_reappear.ogg");
-	loadsound(GD_S_PNEUMATIC_HAMMER, "pneumatic.ogg");
-	loadsound(GD_S_DOOR_OPEN, "door_open.ogg");
-	loadsound(GD_S_STIRRING, "stirring.ogg");
-	loadsound(GD_S_DIAMOND_COLLECT, "diamond_collect.ogg");
-	loadsound(GD_S_SKELETON_COLLECT, "skeleton_collect.ogg");
-	loadsound(GD_S_TELEPORTER, "teleporter.ogg");
-
-	loadsound(GD_S_STONE, "stone.ogg");
-	loadsound(GD_S_NITRO, "nitro.ogg");
-	loadsound(GD_S_FALLING_WALL, "falling_wall.ogg");
-	loadsound(GD_S_EXPANDING_WALL, "expanding_wall.ogg");
-	loadsound(GD_S_DIAMOND_1, "diamond_1.ogg");
-	loadsound(GD_S_DIAMOND_2, "diamond_2.ogg");
-	loadsound(GD_S_DIAMOND_3, "diamond_3.ogg");
-	loadsound(GD_S_DIAMOND_4, "diamond_4.ogg");
-	loadsound(GD_S_DIAMOND_5, "diamond_5.ogg");
-	loadsound(GD_S_DIAMOND_6, "diamond_6.ogg");
-	loadsound(GD_S_DIAMOND_7, "diamond_7.ogg");
-	loadsound(GD_S_DIAMOND_8, "diamond_8.ogg");
-	loadsound(GD_S_SLIME, "slime.ogg");
-	loadsound(GD_S_KEY_COLLECT, "key_collect.ogg");
-	loadsound(GD_S_DIAMOND_KEY_COLLECT, "diamond_key_collect.ogg");
-	loadsound(GD_S_BLADDER_SPENDER, "bladder_spender.ogg");
-	loadsound(GD_S_BLADDER_CONVERT, "bladder_convert.ogg");
-	loadsound(GD_S_BLADDER_MOVE, "bladder_move.ogg");
-	loadsound(GD_S_BITER_EAT, "biter_eat.ogg");
-	loadsound(GD_S_BOMB_EXPLOSION, "bomb_explosion.ogg");
-	loadsound(GD_S_GHOST_EXPLOSION, "ghost_explosion.ogg");
-	loadsound(GD_S_VOODOO_EXPLOSION, "voodoo_explosion.ogg");
-	loadsound(GD_S_NITRO_EXPLOSION, "nitro_explosion.ogg");
-	loadsound(GD_S_BOMB_PLACE, "bomb_place.ogg");
+	for (i=0; i<GD_S_MAX; i++)
+		if (gd_sound_get_filename(i)!=NULL)
+			loadsound(i, gd_sound_get_filename(i));
 	
-	loadsound(GD_S_PNEUMATIC_COLLECT, "pneumatic_collect.ogg");
-	loadsound(GD_S_CLOCK_COLLECT, "clock_collect.ogg");
-	loadsound(GD_S_BOMB_COLLECT, "bomb_collect.ogg");
-	loadsound(GD_S_SWEET_COLLECT, "sweet_collect.ogg");
-	loadsound(GD_S_BOX_PUSH, "box_push.ogg");
-	loadsound(GD_S_SWITCH_BITER, "switch_biter.ogg");
-	loadsound(GD_S_SWITCH_CREATURES, "switch_creatures.ogg");
-	loadsound(GD_S_SWITCH_GRAVITY, "switch_gravity.ogg");
-	loadsound(GD_S_SWITCH_EXPANDING, "switch_expanding.ogg");
-
-	loadsound(GD_S_ACID_SPREAD, "acid_spread.ogg");
-	loadsound(GD_S_BONUS_LIFE, "bonus_life.ogg");
-	loadsound(GD_S_WATER, "water.ogg");
-
 	return TRUE;
 #else
 	/* if compiled without sound support, return TRUE, "sound init successful" */
@@ -281,7 +220,9 @@ play_sounds(GdSound sound1, GdSound sound2, GdSound sound3)
 
 	/* CHANNEL 1 is for small sounds */
 	if (sound1!=GD_S_NONE) {
-		play_sound(1, sound1);
+		/* start new sound if higher or same precedence than the one currently playing */
+		if (gd_sound_get_precedence(sound1)>=gd_sound_get_precedence(sound_playing(1)))
+			play_sound(1, sound1);
 	} else {
 		/* only interrupt looped sounds. non-looped sounds will go away automatically. */
 		if (gd_sound_is_looped(sound_playing(1)))

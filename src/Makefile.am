@@ -117,7 +117,10 @@ noinst_HEADERS = \
 # sdl is needed for sound.
 gdash_CFLAGS = -g -Wall @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@
 gdash_LDFLAGS = -g -Wall
-gdash_LDADD = @GTK_LIBS@ @GLIB_LIBS@ @LIBINTL@ @SDL_LIBS@ -lSDL_mixer
+if SDL
+    GDASH_LIBADD=-lSDL_mixer
+endif
+gdash_LDADD = @GTK_LIBS@ @GLIB_LIBS@ @LIBINTL@ @SDL_LIBS@ $(GDASH_LIBADD)
 gdash_SOURCES = \
 	$(base_sources) \
 	$(gtksources) \
@@ -131,7 +134,10 @@ gdash_SOURCES = \
 # sdl is needed for gfx and sound.
 sdash_CFLAGS = -g -Wall @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@
 sdash_LDFLAGS = -g -Wall
-sdash_LDADD = @GLIB_LIBS@ @SDL_LIBS@ -lSDL_mixer -lSDL_image
+if SDL
+    SDASH_LIBADD=-lSDL_mixer -lSDL_image
+endif
+sdash_LDADD = @GLIB_LIBS@ @SDL_LIBS@ $(SDASH_LIBADD)
 sdash_SOURCES = \
 	$(base_sources) \
 	$(sdlsources) \

@@ -665,6 +665,8 @@ cave_copy_from_bd1(GdCave *cave, const guint8 *data, int remaining_bytes, GdCave
 
 	for (level=0; level<5; level++) {
 		cave->level_amoeba_time[level]=data[1];
+		if (cave->level_amoeba_time[level]==0)	/* 0 immediately underflowed to 999, so we use 999. example: sendydash 3, cave 02. */
+			cave->level_amoeba_time[level]=999;
 		cave->level_magic_wall_time[level]=data[1];
 		cave->level_rand[level]=data[4 + level];
 		cave->level_diamonds[level]=data[9 + level] % 100;	/* check comment above */
@@ -815,7 +817,7 @@ cave_copy_from_bd1(GdCave *cave, const guint8 *data, int remaining_bytes, GdCave
 /* import bd2 cave data into our format. return number of bytes if pointer passed.
 	this is pretty the same as above, only the encoding was different. */
 static int
-cave_copy_from_bd2 (GdCave *cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
+cave_copy_from_bd2(GdCave *cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
 {
 	int index;
 	GdObject object;
@@ -844,6 +846,8 @@ cave_copy_from_bd2 (GdCave *cave, const guint8 *data, int remaining_bytes, GdCav
 
 	for (i=0; i<5; i++) {
 		cave->level_amoeba_time[i]=data[0];
+		if (cave->level_amoeba_time[i]==0)	/* 0 immediately underflowed to 999, so we use 999. example: sendydash 3, cave 02. */
+			cave->level_amoeba_time[i]=999;
 		cave->level_rand[i]=data[13+i];
 		cave->level_diamonds[i]=data[8+i];
 		if (cave->level_diamonds[i]==0)		/* gate opening is checked AFTER adding to diamonds collected, so 0 here is 1000 needed */
@@ -1054,7 +1058,7 @@ cave_copy_from_bd2 (GdCave *cave, const guint8 *data, int remaining_bytes, GdCav
 /* import plck cave data into our format.
 	length is always 512 bytes, and contains if it is an intermission cave. */
 static int
-cave_copy_from_plck (GdCave *cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
+cave_copy_from_plck(GdCave *cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
 {
 	/* i don't really think that all this table is needed, but included to be complete. */
 	/* this is for the dirt and expanding wall looks like effect. */
@@ -1118,9 +1122,11 @@ cave_copy_from_plck (GdCave *cave, const guint8 *data, int remaining_bytes, GdCa
 
 	cave->diamond_value=data[0x1be];
 	cave->extra_diamond_value=data[0x1c0];
-	for (i=0; i < 5; i++) {
+	for (i=0; i<5; i++) {
 		/* plck doesnot really have levels, so just duplicate data five times */
 		cave->level_amoeba_time[i]=data[0x1c4];
+		if (cave->level_amoeba_time[i]==0)	/* immediately underflowed to 999, so we use 999. example: sendydash 3, cave 02. */
+			cave->level_amoeba_time[i]=999;
 		cave->level_time[i]=data[0x1ba];
 		cave->level_diamonds[i]=data[0x1bc];
 		if (cave->level_diamonds[i]==0)		/* gate opening is checked AFTER adding to diamonds collected, so 0 here is 1000 needed */
@@ -1204,7 +1210,7 @@ cave_copy_from_plck (GdCave *cave, const guint8 *data, int remaining_bytes, GdCa
 /* no one's delight boulder dash
 	essentially: rle compressed plck maps. */
 static int
-cave_copy_from_dlb (GdCave *cave, const guint8 *data, int remaining_bytes)
+cave_copy_from_dlb(GdCave *cave, const guint8 *data, int remaining_bytes)
 {
 	guint8 decomp[512];
 	enum {
@@ -1226,7 +1232,9 @@ cave_copy_from_dlb (GdCave *cave, const guint8 *data, int remaining_bytes)
 		if (cave->level_diamonds[i]==0)		/* gate opening is checked AFTER adding to diamonds collected, so 0 here is 1000 needed */
 			cave->level_diamonds[i]=1000;
 		cave->level_ckdelay[i]=data[0];
-		cave->level_amoeba_time[i]=data[6];		cave->level_magic_wall_time[i]=data[7];
+		cave->level_amoeba_time[i]=data[6];		if (cave->level_amoeba_time[i]==0)	/* 0 immediately underflowed to 999, so we use 999. example: sendydash 3, cave 02. */
+			cave->level_amoeba_time[i]=999;
+		cave->level_magic_wall_time[i]=data[7];
 		cave->level_slime_permeability_c64[i]=slime_shift_msb(data[5]);
 	}
 	cave->diamond_value=data[3];
@@ -1319,7 +1327,7 @@ cave_copy_from_dlb (GdCave *cave, const guint8 *data, int remaining_bytes)
 
 /* import plck cave data into our format. */
 static int
-cave_copy_from_1stb (GdCave *cave, const guint8 *data, int remaining_bytes)
+cave_copy_from_1stb(GdCave *cave, const guint8 *data, int remaining_bytes)
 {
 	int i;
 	int x, y;
@@ -1372,6 +1380,8 @@ cave_copy_from_1stb (GdCave *cave, const guint8 *data, int remaining_bytes)
 			cave->level_diamonds[i]=1000;
 		cave->level_ckdelay[i]=data[0x38a];
 		cave->level_amoeba_time[i]=256*(int)data[0x37c]+data[0x37d];
+		if (cave->level_amoeba_time[i]==0)	/* 0 immediately underflowed to 999, so we use 999. example: sendydash 3, cave 02. */
+			cave->level_amoeba_time[i]=999;
 		cave->level_magic_wall_time[i]=256*(int)data[0x37e]+data[0x37f];
 		cave->level_slime_permeability_c64[i]=data[0x38b];
 		cave->level_bonus_time[i]=data[0x392];
@@ -1483,6 +1493,8 @@ cave_copy_from_crdr_7 (GdCave *cave, const guint8 *data, int remaining_bytes)
 		cave->level_ckdelay[i]=data[0x1A];
 		cave->level_rand[i]=data[0x40];
 		cave->level_amoeba_time[i]=(int)data[0xC] * 256 + data[0xD];
+		if (cave->level_amoeba_time[i]==0)	/* 0 immediately underflowed to 999, so we use 999. example: sendydash 3, cave 02. */
+			cave->level_amoeba_time[i]=999;
 		cave->level_magic_wall_time[i]=(int)data[0xE] * 256 + data[0xF];
 		cave->level_slime_permeability_c64[i]=data[0x1B];
 		cave->level_bonus_time[i]=data[0x22];
@@ -1979,6 +1991,8 @@ cave_copy_from_crli (GdCave *cave, const guint8 *data, int remaining_bytes)
 			cave->level_diamonds[i]=1000;
 		cave->level_ckdelay[i]=uncompressed[0x38A];
 		cave->level_amoeba_time[i]=(int)uncompressed[0x37C] * 256 + uncompressed[0x37D];
+		if (cave->level_amoeba_time[i]==0)	/* 0 immediately underflowed to 999, so we use 999. example: sendydash 3, cave 02. */
+			cave->level_amoeba_time[i]=999;
 		cave->level_magic_wall_time[i]=(int)uncompressed[0x37E] * 256 + uncompressed[0x37F];
 		cave->level_slime_permeability_c64[i]=uncompressed[0x38B];
 		cave->level_bonus_time[i]=uncompressed[0x392];

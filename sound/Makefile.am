@@ -24,6 +24,7 @@ sounddata = \
 	diamond_8.ogg \
 	diamond_collect.ogg \
 	diamond_key_collect.ogg \
+	dirt_ball.ogg \
 	door_open.ogg \
 	expanding_wall.ogg \
 	explosion.ogg \
@@ -32,6 +33,8 @@ sounddata = \
 	ghost_explosion.ogg \
 	gravity_change.ogg \
 	key_collect.ogg \
+	lava.ogg \
+	replicator.ogg \
 	magic_wall.ogg \
 	nitro.ogg \
 	nitro_explosion.ogg \
@@ -43,9 +46,11 @@ sounddata = \
 	stone.ogg \
 	sweet_collect.ogg \
 	switch_biter.ogg \
+	switch_conveyor.ogg \
 	switch_creatures.ogg \
 	switch_gravity.ogg \
 	switch_expanding.ogg \
+	switch_replicator.ogg \
 	teleporter.ogg \
 	timeout_1.ogg \
 	timeout_2.ogg \

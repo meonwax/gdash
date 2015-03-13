@@ -957,8 +957,9 @@ swapd(double *i1, double *i2)
 void
 gd_cave_set_random_rgb_colors(GdCave *cave)
 {
+	const double hue_max=10.0/30.0;
 	double hue=g_random_double();	/* any hue allowed */
-	double hue_spread=g_random_double_range(1.0/30.0, 1.0/3.0);	/* hue spread is min. 12 degrees, max 120 degrees (1/3) */
+	double hue_spread=g_random_double_range(2.0/30.0, hue_max);	/* hue 360 degress=1.  hue spread is min. 24 degrees, max 120 degrees (1/3) */
 	double h1=hue, h2=hue+hue_spread, h3=hue+2*hue_spread;
 	double v1, v2, v3;
 	double s1, s2, s3;
@@ -966,23 +967,23 @@ gd_cave_set_random_rgb_colors(GdCave *cave)
 	if (g_random_boolean()) {
 		/* when hue spread is low, brightness(saturation) spread is high */
 		/* this formula gives a number (x) between 0.1 and 0.4, which will be 0.5-x and 0.5+x, so the range is 0.1->0.9 */
-		double spread=0.1+0.3*(1-hue_spread/(1.0/3.0));
-		v1=0.7;				/* brightness is same for all colors - a not too bright one */
+		double spread=0.1+0.3*(1-hue_spread/hue_max);
+		v1=0.6;				/* brightness variation, too */
 		v2=0.7;
-		v3=0.7;
+		v3=0.8;
 		s1=0.5;				/* saturation is different */
 		s2=0.5-spread;
 		s3=0.5+spread;
 	} else {	
 		/* when hue spread is low, brightness(saturation) spread is high */
-		/* this formula gives a number (x) between 0 and 0.2, which will be 0.5+x and 0.5+2x, so the range is 0.5->0.9 */
-		double spread=0.2*(1-hue_spread/(1.0/3.0));
+		/* this formula gives a number (x) between 0.1 and 0.25, which will be 0.5+x and 0.5+2x, so the range is 0.5->0.9 */
+		double spread=0.1+0.15*(1-hue_spread/hue_max);
 		v1=0.5;				/* brightness is different */
 		v2=0.5+spread;
 		v3=0.5+2*spread;
-		s1=0.8;				/* saturation is same - a not fully saturated one */
+		s1=0.7;				/* saturation is same - a not fully saturated one */
 		s2=0.8;
-		s3=0.8;
+		s3=0.9;
 	}
 	/* randomly change values, but do not touch v3, as cave->color3 should be a bright color */
 	if (g_random_boolean())	swapd(&v1, &v2);
@@ -1314,8 +1315,8 @@ gd_cave_count_diamonds(GdCave *cave)
 /* takes a cave and a gfx buffer, and fills the buffer with cell indexes.
    the indexes might change if bonus life flash is active (small lines in "SPACE" cells),
    for the paused state (which is used in gdash but not in sdash) - yellowish color.
-   also one can select if the next animation cycle is requested or not.
-   XXX this might be changed to the "int animcycle" itself, might be better
+   also one can select the animation frame (0..7) to draw the cave on. so the caller manages
+   increasing that.
    
    if a cell is changed, it is flagged with GD_REDRAW; the flag can be cleared by the caller.
  */
@@ -1352,6 +1353,28 @@ gd_drawcave_game(const GdCave *cave, int **gfx_buffer, gboolean bonus_life_flash
 	elemdrawing[O_CREATURE_SWITCH]=gd_elements[cave->creatures_backwards ? O_CREATURE_SWITCH_ON : O_CREATURE_SWITCH].image_game;
 	elemdrawing[O_EXPANDING_WALL_SWITCH]=gd_elements[cave->expanding_wall_changed ? O_EXPANDING_WALL_SWITCH_VERT : O_EXPANDING_WALL_SWITCH_HORIZ].image_game;
 	elemdrawing[O_GRAVITY_SWITCH]=gd_elements[cave->gravity_switch_active?O_GRAVITY_SWITCH_ACTIVE:O_GRAVITY_SWITCH].image_game;
+	elemdrawing[O_REPLICATOR_SWITCH]=gd_elements[cave->replicators_active?O_REPLICATOR_SWITCH_ON:O_REPLICATOR_SWITCH_OFF].image_game;
+	if (!cave->replicators_active)
+		/* if the replicators are inactive, do not animate them. */
+		elemdrawing[O_REPLICATOR]=ABS(elemdrawing[O_REPLICATOR]);
+	elemdrawing[O_CONVEYOR_SWITCH]=gd_elements[cave->conveyor_belts_active?O_CONVEYOR_SWITCH_ON:O_CONVEYOR_SWITCH_OFF].image_game;
+	if (cave->conveyor_belts_direction_changed) {
+		/* if direction is changed, animation is changed. */
+		int temp;
+		
+		temp=elemdrawing[O_CONVEYOR_LEFT];
+		elemdrawing[O_CONVEYOR_LEFT]=elemdrawing[O_CONVEYOR_RIGHT];
+		elemdrawing[O_CONVEYOR_RIGHT]=temp;
+		
+		elemdrawing[O_CONVEYOR_DIR_SWITCH]=gd_elements[O_CONVEYOR_DIR_CHANGED].image_game;
+	}
+	else
+		elemdrawing[O_CONVEYOR_DIR_SWITCH]=gd_elements[O_CONVEYOR_DIR_NORMAL].image_game;
+	if (!cave->conveyor_belts_active) {
+		/* if they are not running, do not animate them. */
+		elemdrawing[O_CONVEYOR_LEFT]=ABS(elemdrawing[O_CONVEYOR_LEFT]);
+		elemdrawing[O_CONVEYOR_RIGHT]=ABS(elemdrawing[O_CONVEYOR_RIGHT]);
+	}
 	if (animcycle&2) {
 		elemdrawing[O_PNEUMATIC_ACTIVE_LEFT]+=2;	/* also a hack, like biter_switch */
 		elemdrawing[O_PNEUMATIC_ACTIVE_RIGHT]+=2;

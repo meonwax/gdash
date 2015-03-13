@@ -977,10 +977,11 @@ cave_properties(GdCave *cave, gboolean show_cancel)
 			cave->x2=cave->w-1;
 			cave->y2=cave->h-1;
 		}
-
+		
 		/* do some validation */
 		gd_cave_correct_visible_size(cave);
-		/* check ratios */
+
+		/* check ratios, so they are not larger than number of cells in cave (width*height) */
 		for (i=0; gd_cave_properties[i].identifier!=NULL; i++)
 			if (gd_cave_properties[i].type==GD_TYPE_RATIO) {
 				int *value=G_STRUCT_MEMBER_P(cave, gd_cave_properties[i].offset);
@@ -1102,11 +1103,11 @@ render_cave()
 	int x, y;
 	GList *iter;
 	GList *selected;
-	g_return_if_fail (edited_cave!=NULL);
+	g_return_if_fail(edited_cave!=NULL);
 
-	gd_cave_free (rendered_cave);
+	gd_cave_free(rendered_cave);
 	/* rendering cave for editor: seed=random, so the user sees which elements are truly random */
-	rendered_cave=gd_cave_new_rendered (edited_cave, edit_level, g_random_int());
+	rendered_cave=gd_cave_new_rendered(edited_cave, edit_level, g_random_int());
 	/* create a gfx buffer for displaying */
 	gd_cave_map_free(gfx_buffer);
 	gd_cave_map_free(object_highlight_map);
@@ -1942,7 +1943,7 @@ drawing_area_expose_event(GtkWidget *widget, GdkEventExpose *event, gpointer dat
 {
 	int x, y, x1, y1, x2, y2;
 
-	if (!widget->window || gfx_buffer==NULL)
+	if (!widget->window || gfx_buffer==NULL || rendered_cave==NULL)
 		return FALSE;
 
 	/* calculate which area to update */
@@ -1950,6 +1951,11 @@ drawing_area_expose_event(GtkWidget *widget, GdkEventExpose *event, gpointer dat
 	y1=event->area.y/gd_cell_size_editor;
 	x2=(event->area.x+event->area.width-1)/gd_cell_size_editor;
 	y2=(event->area.y+event->area.height-1)/gd_cell_size_editor;
+	/* when resizing the cave, we may get events which store the old size, if the drawing area is not yet resized. */
+	if (x1<0) x1=0;
+	if (y1<0) x1=0;
+	if (x2>=rendered_cave->w) x2=rendered_cave->w-1;
+	if (y2>=rendered_cave->h) y2=rendered_cave->h-1;
 
 	for (y=y1; y<=y2; y++)
 		for (x=x1; x<=x2; x++)
@@ -2801,7 +2807,7 @@ icon_view_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer 
  */
 
 static void
-select_cave_for_edit (GdCave * cave)
+select_cave_for_edit(GdCave *cave)
 {
 	object_list_clear_selection();
 
@@ -2859,7 +2865,7 @@ select_cave_for_edit (GdCave * cave)
 			gtk_container_add (GTK_CONTAINER (align), drawing_area);
 		}
 		render_cave();
-		gtk_widget_set_size_request(drawing_area, edited_cave->w * gd_cell_size_editor, edited_cave->h * gd_cell_size_editor);
+		gtk_widget_set_size_request(drawing_area, edited_cave->w*gd_cell_size_editor, edited_cave->h*gd_cell_size_editor);
 		
 		set_status_label_for_cave(cave);
 	}

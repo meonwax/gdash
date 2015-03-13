@@ -76,10 +76,10 @@ typedef struct _gd_property_default {
 
 /* these define the number of the cells in the png file */
 #define NUM_OF_CELLS_X 8
-#define NUM_OF_CELLS_Y 38
+#define NUM_OF_CELLS_Y 45
 
-/* +72: placeholder for cells which are rendered by the game; for example diamond+arrow = falling diamond */
-#define NUM_OF_CELLS (NUM_OF_CELLS_X*NUM_OF_CELLS_Y+72)
+/* +74: placeholder for cells which are rendered by the game; for example diamond+arrow = falling diamond */
+#define NUM_OF_CELLS (NUM_OF_CELLS_X*NUM_OF_CELLS_Y+76)
 
 
 
@@ -104,6 +104,10 @@ typedef enum _element {
 	O_DIRT_SLOPED_UP_LEFT,
 	O_DIRT_SLOPED_DOWN_LEFT,
 	O_DIRT_SLOPED_DOWN_RIGHT,
+	O_DIRT_BALL,
+	O_DIRT_BALL_F,
+	O_DIRT_LOOSE,
+	O_DIRT_LOOSE_F,
 	O_DIRT2,
 	O_BRICK,
 	O_BRICK_SLOPED_UP_RIGHT,
@@ -135,9 +139,15 @@ typedef enum _element {
 	O_H_EXPANDING_WALL,
 	O_V_EXPANDING_WALL,
 	O_EXPANDING_WALL,
+	O_H_EXPANDING_STEEL_WALL,
+	O_V_EXPANDING_STEEL_WALL,
+	O_EXPANDING_STEEL_WALL,
 	O_EXPANDING_WALL_SWITCH,
 	O_CREATURE_SWITCH,
 	O_BITER_SWITCH,
+	O_REPLICATOR_SWITCH,
+	O_CONVEYOR_SWITCH,
+	O_CONVEYOR_DIR_SWITCH,
 	O_ACID,
 	O_FALLING_WALL,
 	O_FALLING_WALL_F,
@@ -197,6 +207,10 @@ typedef enum _element {
 
 	O_AMOEBA,
 	O_AMOEBA_2,
+	O_REPLICATOR,
+	O_CONVEYOR_LEFT,
+	O_CONVEYOR_RIGHT,
+	O_LAVA,
 	O_SWEET,
 	O_VOODOO,
 	O_SLIME,
@@ -237,6 +251,10 @@ typedef enum _element {
 	O_BITER_2,
 	O_BITER_3,
 	O_BITER_4,
+	O_DRAGONFLY_1,
+	O_DRAGONFLY_2,
+	O_DRAGONFLY_3,
+	O_DRAGONFLY_4,
 
 	O_PRE_PL_1,
 	O_PRE_PL_2,
@@ -297,6 +315,11 @@ typedef enum _element {
 	O_AMOEBA_2_EXPL_2,
 	O_AMOEBA_2_EXPL_3,
 	O_AMOEBA_2_EXPL_4,
+	O_DRAGONFLY_EXPLODE_1,
+	O_DRAGONFLY_EXPLODE_2,
+	O_DRAGONFLY_EXPLODE_3,
+	O_DRAGONFLY_EXPLODE_4,
+	O_DRAGONFLY_EXPLODE_5,
 
 	/* these are used internally for the pneumatic hammer, and should not be used in the editor! */
 	/* (not even as an effect destination or something like that) */
@@ -324,6 +347,12 @@ typedef enum _element {
 	O_EXPANDING_WALL_SWITCH_HORIZ,
 	O_EXPANDING_WALL_SWITCH_VERT,
 	O_GRAVITY_SWITCH_ACTIVE,
+	O_REPLICATOR_SWITCH_ON,
+	O_REPLICATOR_SWITCH_OFF,
+	O_CONVEYOR_DIR_NORMAL,
+	O_CONVEYOR_DIR_CHANGED,
+	O_CONVEYOR_SWITCH_OFF,
+	O_CONVEYOR_SWITCH_ON,
 
 	O_QUESTION_MARK,
 	O_EATABLE,
@@ -343,34 +372,61 @@ typedef enum _element {
 
 
 
-
-
-typedef enum _element_property {
-	/* properties */
-	P_SLOPED_LEFT = 1<<0,	/* stones and diamonds roll down to left on this */
-	P_SLOPED_RIGHT = 1<<1,	/* stones and diamonds roll down to right on this */
-	P_SLOPED_UP = 1<<2,
-	P_SLOPED_DOWN = 1<<3,
-	P_SLOPED = P_SLOPED_LEFT|P_SLOPED_RIGHT|P_SLOPED_UP|P_SLOPED_DOWN,			/* flag to say "any direction" */
-	P_BLADDER_SLOPED = 1<<4,	/* element act sloped also for the bladder */
+enum _element_property {
+	E_P_SLOPED_LEFT,	/* stones and diamonds roll down to left on this */
+	E_P_SLOPED_RIGHT,	/* stones and diamonds roll down to right on this */
+	E_P_SLOPED_UP,
+	E_P_SLOPED_DOWN,
+	E_P_BLADDER_SLOPED,	/* element act sloped also for the bladder */
 	
-	P_AMOEBA_CONSUMES = 1<<5,		/* amoeba can eat this */
-	P_DIRT = 1<<6,					/* it is dirt, or something similar (dirt2 or sloped dirt) */
-	P_BLOWS_UP_FLIES = 1<<7,		/* flies blow up, if they touch this */
+	E_P_AMOEBA_CONSUMES,		/* amoeba can eat this */
+	E_P_DIRT,					/* it is dirt, or something similar (dirt2 or sloped dirt) */
+	E_P_BLOWS_UP_FLIES,		/* flies blow up, if they touch this */
 
-	P_EXPLODES_TO_SPACE = 1<<8,			/* explodes if hit by a rock */
-	P_EXPLODES_TO_DIAMONDS = 1<<9,		/* explodes to diamonds if hit by a rock */
-	P_EXPLODES_TO_STONES = 1<<10,		/* explodes to rocks if hit by a rock */
-	P_EXPLODES_AS_NITRO = 1<<11,		/* explodes as nitro pack */
-	P_EXPLODES=P_EXPLODES_TO_SPACE|P_EXPLODES_TO_DIAMONDS|P_EXPLODES_TO_STONES|P_EXPLODES_AS_NITRO,	/* explodes to something if hit */
-	P_EXPLOSION_FIRST_STAGE = 1<<12,			/* set for first stage of every explosion. helps slower/faster explosions changing */
+	E_P_EXPLODES_TO_SPACE,			/* explodes if hit by a rock */
+	E_P_EXPLODES_AS_DRAGONFLY,	/* explodes as a dragonfly does */
+	E_P_EXPLODES_TO_DIAMONDS,		/* explodes to diamonds if hit by a rock */
+	E_P_EXPLODES_TO_STONES,		/* explodes to rocks if hit by a rock */
+	E_P_EXPLODES_AS_NITRO,		/* explodes as nitro pack */
 
-	P_NON_EXPLODABLE = 1<<13,		/* selfexplaining */
-	P_CCW = 1<<14,					/* this creature has a default counterclockwise rotation (for example, o_fire_1) */
-	P_CAN_BE_HAMMERED = 1<<15,		/* can be broken by pneumatic hammer */
-	P_VISUAL_EFFECT = 1<<16,		/* if the element can use a visual effect. used to check consistency of the code */
-	P_PLAYER = 1<<17,						/* easier to find out if it is a player element */
-} GdElementProperties;
+	E_P_EXPLOSION_FIRST_STAGE,			/* set for first stage of every explosion. helps slower/faster explosions changing */
+
+	E_P_NON_EXPLODABLE,		/* selfexplaining */
+	E_P_CCW,					/* this creature has a default counterclockwise rotation (for example, o_fire_1) */
+	E_P_CAN_BE_HAMMERED,		/* can be broken by pneumatic hammer */
+	E_P_VISUAL_EFFECT,		/* if the element can use a visual effect. used to check consistency of the code */
+	E_P_PLAYER,				/* easier to find out if it is a player element */
+	E_P_MOVED_BY_CONVEYOR, 	/* can be moved by conveyor belt */
+};
+
+/* properties */
+#define P_SLOPED_LEFT (1<<E_P_SLOPED_LEFT)
+#define P_SLOPED_RIGHT (1<<E_P_SLOPED_RIGHT)
+#define P_SLOPED_UP (1<<E_P_SLOPED_UP)
+#define P_SLOPED_DOWN (1<<E_P_SLOPED_DOWN)
+/* flag to say "any direction" */
+#define P_SLOPED (P_SLOPED_LEFT|P_SLOPED_RIGHT|P_SLOPED_UP|P_SLOPED_DOWN)
+#define P_BLADDER_SLOPED (1<<E_P_BLADDER_SLOPED)
+	
+#define P_AMOEBA_CONSUMES (1<<E_P_AMOEBA_CONSUMES)
+#define P_DIRT (1<<E_P_DIRT)
+#define P_BLOWS_UP_FLIES (1<<E_P_BLOWS_UP_FLIES)
+
+#define P_EXPLODES_TO_SPACE (1<<E_P_EXPLODES_TO_SPACE)
+#define P_EXPLODES_TO_DIAMONDS (1<<E_P_EXPLODES_TO_DIAMONDS)
+#define P_EXPLODES_TO_STONES (1<<E_P_EXPLODES_TO_STONES)
+#define P_EXPLODES_AS_NITRO (1<<E_P_EXPLODES_AS_NITRO)
+#define P_EXPLODES_AS_DRAGONFLY (1<<E_P_EXPLODES_AS_DRAGONFLY)
+/* explodes to something if hit */
+#define P_EXPLODES (P_EXPLODES_TO_SPACE|P_EXPLODES_TO_DIAMONDS|P_EXPLODES_TO_STONES|P_EXPLODES_AS_NITRO|P_EXPLODES_AS_DRAGONFLY)
+#define P_EXPLOSION_FIRST_STAGE (1<<E_P_EXPLOSION_FIRST_STAGE)
+
+#define P_NON_EXPLODABLE (1<<E_P_NON_EXPLODABLE)
+#define P_CCW (1<<E_P_CCW)
+#define P_CAN_BE_HAMMERED (1<<E_P_CAN_BE_HAMMERED)
+#define P_VISUAL_EFFECT (1<<E_P_VISUAL_EFFECT)
+#define P_PLAYER (1<<E_P_PLAYER)
+#define P_MOVED_BY_CONVEYOR (1<<E_P_MOVED_BY_CONVEYOR)
 
 
 
@@ -437,6 +493,7 @@ typedef enum _sound {
 	GD_S_NONE,
 
 	GD_S_STONE,
+	GD_S_DIRT_BALL,
 	GD_S_NITRO,
 	GD_S_FALLING_WALL,
 	GD_S_EXPANDING_WALL,
@@ -459,6 +516,8 @@ typedef enum _sound {
 	GD_S_KEY_COLLECT,
 	GD_S_DIAMOND_KEY_COLLECT,
 	GD_S_SLIME,
+	GD_S_LAVA,
+	GD_S_REPLICATOR,
 	GD_S_ACID_SPREAD,
 	GD_S_BLADDER_MOVE,
 	GD_S_BLADDER_CONVERT,
@@ -492,6 +551,8 @@ typedef enum _sound {
 	GD_S_SWITCH_CREATURES,
 	GD_S_SWITCH_GRAVITY,
 	GD_S_SWITCH_EXPANDING,
+	GD_S_SWITCH_CONVEYOR,
+	GD_S_SWITCH_REPLICATOR,
 
 	GD_S_AMOEBA,			/* loop */
 	GD_S_MAGIC_WALL,		/* loop */
@@ -681,6 +742,8 @@ typedef struct _gd_cave {
 	GdElement slime_eats_2, slime_converts_2;
 	gboolean slime_sound;			/* slime has sound */
 
+	gboolean lava_sound;			/* elements sinking in lava have sound */
+
 	int level_hatching_delay_frame[5];		/* Scan frames before Player's birth. */
 	int level_hatching_delay_time[5];		/* Scan frames before Player's birth. */
 	
@@ -701,10 +764,18 @@ typedef struct _gd_cave {
 	gboolean biter_sound;		/* biters have sound */	
 
 	gboolean expanding_wall_changed;	/* expanding wall direction is changed */
+	
+	int	replicator_delay_frame;		/* replicator delay in frames (number of frames to wait between creating a new element) */
+	gboolean replicators_active;		/* replicators are active. */
+	gboolean replicator_sound;		/* when replicating an element, play sound or not. */
+	
+	gboolean conveyor_belts_active;
+	gboolean conveyor_belts_direction_changed;
 
 	/* effects */
 	GdElement explosion_to;			/* explosion converts to this element */
 	GdElement diamond_birth_to;		/* a diamond birth converts to this element */
+	GdElement dragonfly_explosion_to;	/* dragonfly explosion will create this */
 	GdElement falling_stone_to;		/* a falling stone converts to this element */
 	GdElement falling_diamond_to;	/* a falling diamond converts to this element */
 	GdElement bouncing_stone_to;	/* a bouncing stone converts to this element */
@@ -715,6 +786,8 @@ typedef struct _gd_cave {
 
 	GdElement magic_stone_to;		/* magic wall converts falling stone to */
 	GdElement magic_diamond_to;		/* magic wall converts falling diamond to */
+	GdElement magic_mega_stone_to;	/* magic wall converts a falling mega stone to */
+	GdElement magic_nitro_pack_to;	/* magic wall converts a falling nitro pack to */
 
 	GdElement bomb_explode_to;		/* bombs explode to this element */
 	GdElement nitro_explode_to;		/* nitro packs explode to this element */
@@ -792,6 +865,7 @@ typedef struct _gd_cave {
 	GdDirection last_direction;		/* last direction player moved. used by draw routines */
 	GdDirection last_horizontal_direction;
 	int biters_wait_frame;				/* number of frames to wait until biteres will move again */
+	int replicators_wait_frame;			/* number of frames to wait until replicators are activated again */
 	int creatures_direction_will_change;	/* creatures automatically change direction every x seconds */
 	GdC64RandomGenerator c64_rand;	/* used for predictable random generator during the game. */
 
