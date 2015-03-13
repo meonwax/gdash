@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -275,33 +275,34 @@ const GdStructDescriptor
 gd_cave_properties[] = {
 	/* default data */
 	{"", GD_TAB, 0, N_("Cave data")},
-	{"Name", GD_TYPE_STRING, 0, N_("Name"), G_STRUCT_OFFSET(Cave, name), 1, N_("Name of game")},
-	{"Description", GD_TYPE_STRING, 0, N_("Description"), G_STRUCT_OFFSET(Cave, description), 1, N_("Some words about the game")},
-	{"Author", GD_TYPE_STRING, 0, N_("Author"), G_STRUCT_OFFSET(Cave, author), 1, N_("Name of author")},
-	{"Date", GD_TYPE_STRING, 0, N_("Date"), G_STRUCT_OFFSET(Cave, date), 1, N_("Date of creation")},
-	{"WWW", GD_TYPE_STRING, 0, N_("WWW"), G_STRUCT_OFFSET(Cave, www), 1, N_("Web page or e-mail address")},
-	{"Difficulty", GD_TYPE_STRING, 0, N_("Difficulty"), G_STRUCT_OFFSET(Cave, difficulty), 1, N_("Difficulty (informative)")},
-	{"Remark", GD_TYPE_STRING, 0, N_("Remark"), G_STRUCT_OFFSET(Cave, remark), 1, N_("Remark (informative)")},
+	{"Name", GD_TYPE_STRING, 0, N_("Name"), G_STRUCT_OFFSET(GdCave, name), 1, N_("Name of game")},
+	{"Description", GD_TYPE_STRING, 0, N_("Description"), G_STRUCT_OFFSET(GdCave, description), 1, N_("Some words about the game")},
+	{"Author", GD_TYPE_STRING, 0, N_("Author"), G_STRUCT_OFFSET(GdCave, author), 1, N_("Name of author")},
+	{"Date", GD_TYPE_STRING, 0, N_("Date"), G_STRUCT_OFFSET(GdCave, date), 1, N_("Date of creation")},
+	{"WWW", GD_TYPE_STRING, 0, N_("WWW"), G_STRUCT_OFFSET(GdCave, www), 1, N_("Web page or e-mail address")},
+	{"Difficulty", GD_TYPE_STRING, 0, N_("Difficulty"), G_STRUCT_OFFSET(GdCave, difficulty), 1, N_("Difficulty (informative)")},
 
-	{"Selectable", GD_TYPE_BOOLEAN, 0, N_("Selectable as start"), G_STRUCT_OFFSET(Cave, selectable), 1, N_("This sets whether the game can be started at this cave.")},
-	{"Intermission", GD_TYPE_BOOLEAN, GD_ALWAYS_SAVE, N_("Intermission"), G_STRUCT_OFFSET(Cave, intermission), 1, N_("Intermission caves are usually small and fast caves, which are not required to be solved. The player will not lose a life if he is not successful. The game always proceeds to the next cave.")},
-	{"IntermissionProperties.instantlife", GD_TYPE_BOOLEAN, 0, N_("   Instant life"), G_STRUCT_OFFSET(Cave, intermission_instantlife), 1, N_("If true, an extra life is given to the player, when the intermission cave is reached.")},
-	{"IntermissionProperties.rewardlife", GD_TYPE_BOOLEAN, 0, N_("   Reward life"), G_STRUCT_OFFSET(Cave, intermission_rewardlife), 1, N_("If true, an extra life is given to the player, when the intermission cave is successfully finished.")},
-	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Width"), G_STRUCT_OFFSET(Cave, w), 1, N_("Width of cave. The standard size for a cave is 40x22, and 20x12 for an intermission."), 12, 128},
-	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Height"), G_STRUCT_OFFSET(Cave, h), 1, N_("Height of cave. The standard size for a cave is 40x22, and 20x12 for an intermission."), 12, 128},
-	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, left"), G_STRUCT_OFFSET(Cave, x1), 1, N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
-	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, upper"), G_STRUCT_OFFSET(Cave, y1), 1, N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
-	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, right"), G_STRUCT_OFFSET(Cave, x2), 1, N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
-	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, lower"), G_STRUCT_OFFSET(Cave, y2), 1, N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
-	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Border color"), G_STRUCT_OFFSET(Cave, colorb), 1, N_("Border color for C64 graphics. Only for compatibility, not used by GDash.")},
-	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Background color"), G_STRUCT_OFFSET(Cave, color0), 1, N_("Background color for C64 graphics")},
-	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Color 1 (dirt)"), G_STRUCT_OFFSET(Cave, color1), 1, N_("Foreground color 1 for C64 graphics")},
-	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Color 2 (steel wall)"), G_STRUCT_OFFSET(Cave, color2), 1, N_("Foreground color 2 for C64 graphics")},
-	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Color 3 (brick wall)"), G_STRUCT_OFFSET(Cave, color3), 1, N_("Foreground color 3 for C64 graphics")},
-	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Amoeba color"), G_STRUCT_OFFSET(Cave, color4), 1, N_("Amoeba color for C64 graphics")},
-	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Slime color"), G_STRUCT_OFFSET(Cave, color5), 1, N_("Slime color for C64 graphics")},
-	{"Charset", GD_TYPE_STRING, 0, N_("Character set"), G_STRUCT_OFFSET(Cave, charset), 1, N_("Theme used for displaying the game. Not used by GDash.")},
-	{"Fontset", GD_TYPE_STRING, 0, N_("Font set"), G_STRUCT_OFFSET(Cave, fontset), 1, N_("Font used during the game. Not used by GDash.")},
+	{"Selectable", GD_TYPE_BOOLEAN, 0, N_("Selectable as start"), G_STRUCT_OFFSET(GdCave, selectable), 1, N_("This sets whether the game can be started at this cave.")},
+	{"Intermission", GD_TYPE_BOOLEAN, GD_ALWAYS_SAVE, N_("Intermission"), G_STRUCT_OFFSET(GdCave, intermission), 1, N_("Intermission caves are usually small and fast caves, which are not required to be solved. The player will not lose a life if he is not successful. The game always proceeds to the next cave.")},
+	{"IntermissionProperties.instantlife", GD_TYPE_BOOLEAN, 0, N_("   Instant life"), G_STRUCT_OFFSET(GdCave, intermission_instantlife), 1, N_("If true, an extra life is given to the player, when the intermission cave is reached.")},
+	{"IntermissionProperties.rewardlife", GD_TYPE_BOOLEAN, 0, N_("   Reward life"), G_STRUCT_OFFSET(GdCave, intermission_rewardlife), 1, N_("If true, an extra life is given to the player, when the intermission cave is successfully finished.")},
+	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Width"), G_STRUCT_OFFSET(GdCave, w), 1, N_("Width of cave. The standard size for a cave is 40x22, and 20x12 for an intermission."), 12, 128},
+	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Height"), G_STRUCT_OFFSET(GdCave, h), 1, N_("Height of cave. The standard size for a cave is 40x22, and 20x12 for an intermission."), 12, 128},
+	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, left"), G_STRUCT_OFFSET(GdCave, x1), 1, N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
+	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, upper"), G_STRUCT_OFFSET(GdCave, y1), 1, N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
+	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, right"), G_STRUCT_OFFSET(GdCave, x2), 1, N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
+	{"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, lower"), G_STRUCT_OFFSET(GdCave, y2), 1, N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
+	{"Charset", GD_TYPE_STRING, 0, N_("Character set"), G_STRUCT_OFFSET(GdCave, charset), 1, N_("Theme used for displaying the game. Not used by GDash.")},
+	{"Fontset", GD_TYPE_STRING, 0, N_("Font set"), G_STRUCT_OFFSET(GdCave, fontset), 1, N_("Font used during the game. Not used by GDash.")},
+	
+	{"", GD_TAB, 0, N_("Colors")},
+	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Border color"), G_STRUCT_OFFSET(GdCave, colorb), 1, N_("Border color for C64 graphics. Only for compatibility, not used by GDash.")},
+	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Background color"), G_STRUCT_OFFSET(GdCave, color0), 1, N_("Background color for C64 graphics")},
+	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Color 1 (dirt)"), G_STRUCT_OFFSET(GdCave, color1), 1, N_("Foreground color 1 for C64 graphics")},
+	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Color 2 (steel wall)"), G_STRUCT_OFFSET(GdCave, color2), 1, N_("Foreground color 2 for C64 graphics")},
+	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Color 3 (brick wall)"), G_STRUCT_OFFSET(GdCave, color3), 1, N_("Foreground color 3 for C64 graphics")},
+	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Amoeba color"), G_STRUCT_OFFSET(GdCave, color4), 1, N_("Amoeba color for C64 graphics")},
+	{"Colors", GD_TYPE_COLOR, GD_ALWAYS_SAVE, N_("Slime color"), G_STRUCT_OFFSET(GdCave, color5), 1, N_("Slime color for C64 graphics")},
 
 	/* difficulty */
 	{"", GD_TAB, 0, N_("Difficulty")},
@@ -491,7 +492,10 @@ gd_cave_properties[] = {
 	{"GravityAffectsAll", GD_TYPE_BOOLEAN, 0, N_("Gravity change affects everything"), CAVE_OFFSET(gravity_affects_all), 1, N_("If this is enabled, changing the gravity will also affect bladders (moving and pushing), bladder spenders, falling walls and waiting stones. Otherwise, those elements behave as gravity was always pointing downwards.")},
 
 	/* notes - a tab on its own */
-	{"Notes", GD_TYPE_LONGSTRING, 0, N_("Notes"), G_STRUCT_OFFSET(Cave, notes), 1, N_("Long description of the cave.")},
+	{"Story", GD_TYPE_LONGSTRING, 0, N_("Story"), G_STRUCT_OFFSET(GdCave, story), 1, N_("Story for the cave. It will be shown when the cave is played.")},
+
+	/* remark - also a tab on its own */
+	{"Remark", GD_TYPE_LONGSTRING, 0, N_("Remark"), G_STRUCT_OFFSET(GdCave, remark), 1, N_("Remark (informative). Can contain supplementary information about the design of the cave. It is not shown during the game, only when the user requests the cave info dialog, so can also contain spoilers and hints.")},
 
 	{NULL}
 };
@@ -518,6 +522,7 @@ gd_replay_properties[] = {
 	{"Score", GD_TYPE_INT, 0, NULL, G_STRUCT_OFFSET(GdReplay, score), 1, NULL},
 	{"Duration", GD_TYPE_INT, 0, NULL, G_STRUCT_OFFSET(GdReplay, duration), 1, NULL},
 	{"Success", GD_TYPE_BOOLEAN, 0, NULL, G_STRUCT_OFFSET(GdReplay, success), 1, NULL},
+	{"Checksum", GD_TYPE_INT, 0, NULL, G_STRUCT_OFFSET(GdReplay, checksum), 1, NULL},
 	{NULL}
 };
 
@@ -694,7 +699,7 @@ GdPropertyDefault gd_cave_defaults_gdash[] = {
 /* return new element, which appears after elem is hammered. */
 /* returns o_none, if elem is invalid for hammering. */
 GdElement
-gd_get_hammered_element(GdElement elem)
+gd_element_get_hammered(GdElement elem)
 {
 	switch (elem) {	/* what is under the pneumatic hammer? */
 		case O_WALLED_KEY_1:
@@ -774,7 +779,7 @@ gd_cave_db_init()
 		if (gd_elements[i].image<0)
 			g_critical("editor pixbuf for element %x (%s) should not be animated", i, gd_elements[i].name);
 			
-		if (gd_elements[i].properties&P_CAN_BE_HAMMERED && gd_get_hammered_element((GdElement) i)==O_NONE)
+		if (gd_elements[i].properties&P_CAN_BE_HAMMERED && gd_element_get_hammered((GdElement) i)==O_NONE)
 			g_critical("element %x (%s) can be hammered, but get_hammered_element does not define another one", i, gd_elements[i].name);
 			
 		m=gd_elements[i].image<0?8:1;
@@ -834,10 +839,6 @@ gd_cave_db_init()
 			case GD_TYPE_LONGSTRING:
 				if (gd_cave_properties[i].count!=1) {
 					g_critical ("longstring arrays have no sense cave properties: %s", gd_cave_properties[i].identifier);
-					g_assert_not_reached();
-				}
-				if (gd_cave_properties[i+1].identifier!=NULL && gd_cave_properties[i+1].type!=GD_TAB) {
-					g_critical ("every longstring must be followed by a new tab (this is for the editor): %s", gd_cave_properties[i].identifier);
 					g_assert_not_reached();
 				}
 				break;	

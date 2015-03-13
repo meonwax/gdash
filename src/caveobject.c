@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -49,54 +49,54 @@ GdObjectLevels gd_levels_mask[]={GD_OBJECT_LEVEL1, GD_OBJECT_LEVEL2, GD_OBJECT_L
 
 /* bdcff text description of object. caller should free string. */
 char *
-gd_object_to_bdcff(const GdObject *object)
+gd_object_get_bdcff(const GdObject *object)
 {
 	GString *str;
 	int j;
 	const char *type;
 	
 	switch (object->type) {
-	case POINT:
+	case GD_POINT:
 		return g_strdup_printf("Point=%d %d %s", object->x1, object->y1, gd_elements[object->element].filename);
 
-	case LINE:
+	case GD_LINE:
 		return g_strdup_printf("Line=%d %d %d %d %s", object->x1, object->y1, object->x2, object->y2, gd_elements[object->element].filename);
 
-	case RECTANGLE:
+	case GD_RECTANGLE:
 		return g_strdup_printf("Rectangle=%d %d %d %d %s", object->x1, object->y1, object->x2, object->y2, gd_elements[object->element].filename);
 
-	case FILLED_RECTANGLE:
+	case GD_FILLED_RECTANGLE:
 		/* if elements are not the same */
 		if (object->fill_element!=object->element)
 			return g_strdup_printf("FillRect=%d %d %d %d %s %s", object->x1, object->y1, object->x2, object->y2, gd_elements[object->element].filename, gd_elements[object->fill_element].filename);
 		/* they are the same */
 		return g_strdup_printf("FillRect=%d %d %d %d %s", object->x1, object->y1, object->x2, object->y2, gd_elements[object->element].filename);
 
-	case RASTER:
+	case GD_RASTER:
 		return g_strdup_printf("Raster=%d %d %d %d %d %d %s", object->x1, object->y1, (object->x2-object->x1)/object->dx+1, (object->y2-object->y1)/object->dy+1, object->dx, object->dy, gd_elements[object->element].filename);
 
-	case JOIN:
+	case GD_JOIN:
 		return g_strdup_printf("Add=%d %d %s %s", object->dx, object->dy, gd_elements[object->element].filename, gd_elements[object->fill_element].filename);
 
-	case FLOODFILL_BORDER:
+	case GD_FLOODFILL_BORDER:
 		return g_strdup_printf("BoundaryFill=%d %d %s %s", object->x1, object->y1, gd_elements[object->fill_element].filename, gd_elements[object->element].filename);
 
-	case FLOODFILL_REPLACE:
+	case GD_FLOODFILL_REPLACE:
 		return g_strdup_printf("FloodFill=%d %d %s %s", object->x1, object->y1, gd_elements[object->fill_element].filename, gd_elements[object->element].filename);
 		
-	case MAZE:
-	case MAZE_UNICURSAL:
-	case MAZE_BRAID:
+	case GD_MAZE:
+	case GD_MAZE_UNICURSAL:
+	case GD_MAZE_BRAID:
 		switch(object->type) {
-			case MAZE: type="perfect"; break;
-			case MAZE_UNICURSAL: type="unicursal"; break;
-			case MAZE_BRAID: type="braid"; break;
+			case GD_MAZE: type="perfect"; break;
+			case GD_MAZE_UNICURSAL: type="unicursal"; break;
+			case GD_MAZE_BRAID: type="braid"; break;
 			default:
 				g_assert_not_reached();
 		}
 		return g_strdup_printf("Maze=%d %d %d %d %d %d %d %d %d %d %d %d %s %s %s", object->x1, object->y1, object->x2, object->y2, object->dx, object->dy, object->horiz, object->seed[0], object->seed[1], object->seed[2], object->seed[3], object->seed[4], gd_elements[object->element].filename, gd_elements[object->fill_element].filename, type);
 		
-	case RANDOM_FILL:
+	case GD_RANDOM_FILL:
 		str=g_string_new(NULL);
 		g_string_append_printf(str, "%s=%d %d %d %d %d %d %d %d %d %s", object->c64_random?"RandomFillC64":"RandomFill", object->x1, object->y1, object->x2, object->y2, object->seed[0], object->seed[1], object->seed[2], object->seed[3], object->seed[4], gd_elements[object->fill_element].filename);	/* seed and initial fill */
 		for (j=0; j<4; j++)
@@ -108,7 +108,7 @@ gd_object_to_bdcff(const GdObject *object)
 		/* free string but do not free char *; return char *. */
 		return g_string_free(str, FALSE);
 
-	case COPY_PASTE:
+	case GD_COPY_PASTE:
 		return g_strdup_printf("CopyPaste=%d %d %d %d %d %d %s %s", object->x1, object->y1, object->x2, object->y2, object->dx, object->dy, object->mirror?"mirror":"nomirror", object->flip?"flip":"noflip");
 
 	
@@ -141,7 +141,7 @@ gd_object_new_from_string(char *str)
 	
 	/* INDIVIDUAL POINT CAVE OBJECT */
 	if (g_ascii_strcasecmp(name, "Point")==0) {
-		object.type=POINT;
+		object.type=GD_POINT;
 		if (sscanf(param, "%d %d %s", &object.x1, &object.y1, elem0)==3) {
 			object.element=gd_get_element_from_string(elem0);
 			return g_memdup(&object, sizeof (GdObject));
@@ -151,7 +151,7 @@ gd_object_new_from_string(char *str)
 
 	/* LINE OBJECT */
 	if (g_ascii_strcasecmp(name, "Line")==0) {
-		object.type=LINE;
+		object.type=GD_LINE;
 		if (sscanf(param, "%d %d %d %d %s", &object.x1, &object.y1, &object.x2, &object.y2, elem0)==5) {
 			object.element=gd_get_element_from_string(elem0);
 			return g_memdup(&object, sizeof (GdObject));
@@ -162,7 +162,7 @@ gd_object_new_from_string(char *str)
 	/* RECTANGLE OBJECT */
 	if (g_ascii_strcasecmp(name, "Rectangle")==0) {
 		if (sscanf (param, "%d %d %d %d %s", &object.x1, &object.y1, &object.x2, &object.y2, elem0)==5) {
-			object.type=RECTANGLE;
+			object.type=GD_RECTANGLE;
 			object.element=gd_get_element_from_string (elem0);
 			return g_memdup(&object, sizeof (GdObject));
 		}
@@ -174,7 +174,7 @@ gd_object_new_from_string(char *str)
 		int paramcount;
 		
 		paramcount=sscanf(param, "%d %d %d %d %s %s", &object.x1, &object.y1, &object.x2, &object.y2, elem0, elem1);
-		object.type=FILLED_RECTANGLE;
+		object.type=GD_FILLED_RECTANGLE;
 		if (paramcount==6) {
 			object.element=gd_get_element_from_string (elem0);
 			object.fill_element=gd_get_element_from_string (elem1);
@@ -195,7 +195,7 @@ gd_object_new_from_string(char *str)
 			nx--; ny--;
 			object.x2=object.x1 + nx*object.dx;
 			object.y2=object.y1 + ny*object.dy;
-			object.type=RASTER;
+			object.type=GD_RASTER;
 			object.element=gd_get_element_from_string (elem0);
 			return g_memdup(&object, sizeof (GdObject));
 		}
@@ -205,7 +205,7 @@ gd_object_new_from_string(char *str)
 	/* JOIN */
 	if (g_ascii_strcasecmp(name, "Join")==0 || g_ascii_strcasecmp(name, "Add")==0) {
 		if (sscanf (param, "%d %d %s %s", &object.dx, &object.dy, elem0, elem1)==4) {
-			object.type=JOIN;
+			object.type=GD_JOIN;
 			object.element=gd_get_element_from_string (elem0);
 			object.fill_element=gd_get_element_from_string (elem1);
 			return g_memdup(&object, sizeof (GdObject));
@@ -216,7 +216,7 @@ gd_object_new_from_string(char *str)
 	/* FILL TO BORDER OBJECT */
 	if (g_ascii_strcasecmp(name, "BoundaryFill")==0) {
 		if (sscanf (param, "%d %d %s %s", &object.x1, &object.y1, elem0, elem1)==4) {
-			object.type=FLOODFILL_BORDER;
+			object.type=GD_FLOODFILL_BORDER;
 			object.fill_element=gd_get_element_from_string (elem0);
 			object.element=gd_get_element_from_string (elem1);
 			return g_memdup(&object, sizeof (GdObject));
@@ -227,7 +227,7 @@ gd_object_new_from_string(char *str)
 	/* REPLACE FILL OBJECT */
 	if (g_ascii_strcasecmp(name, "FloodFill")==0) {
 		if (sscanf (param, "%d %d %s %s", &object.x1, &object.y1, elem0, elem1)==4) {
-			object.type=FLOODFILL_REPLACE;
+			object.type=GD_FLOODFILL_REPLACE;
 			object.fill_element=gd_get_element_from_string (elem0);
 			object.element=gd_get_element_from_string (elem1);
 			return g_memdup(&object, sizeof (GdObject));
@@ -243,14 +243,14 @@ gd_object_new_from_string(char *str)
 		
 		if (sscanf (param, "%d %d %d %d %d %d %d %d %d %d %d %d %s %s %s", &object.x1, &object.y1, &object.x2, &object.y2, &object.dx, &object.dy, &object.horiz, &object.seed[0], &object.seed[1], &object.seed[2], &object.seed[3], &object.seed[4], elem0, elem1, type)>=14) {
 			if (g_ascii_strcasecmp(type, "unicursal")==0)
-				object.type=MAZE_UNICURSAL;
+				object.type=GD_MAZE_UNICURSAL;
 			else if (g_ascii_strcasecmp(type, "perfect")==0)
-				object.type=MAZE;
+				object.type=GD_MAZE;
 			else if (g_ascii_strcasecmp(type, "braid")==0)
-				object.type=MAZE_BRAID;
+				object.type=GD_MAZE_BRAID;
 			else {
 				g_warning("unknown maze type: %s, defaulting to perfect", type);
-				object.type=MAZE;
+				object.type=GD_MAZE;
 			}
 			object.element=gd_get_element_from_string (elem0);
 			object.fill_element=gd_get_element_from_string (elem1);
@@ -264,7 +264,7 @@ gd_object_new_from_string(char *str)
 		static char **words=NULL;
 		int l, i;
 
-		object.type=RANDOM_FILL;
+		object.type=GD_RANDOM_FILL;
 		if (g_ascii_strcasecmp(name, "RandomFillC64")==0)	/* totally the same, but uses c64 random generator */
 			object.c64_random=TRUE;
 		else
@@ -301,7 +301,7 @@ gd_object_new_from_string(char *str)
 	if (g_ascii_strcasecmp(name, "CopyPaste")==0) {
 		char mirror[100]="nomirror";
 		char flip[100]="noflip";
-		object.type=COPY_PASTE;
+		object.type=GD_COPY_PASTE;
 		
 		object.flip=object.mirror=FALSE;
 
@@ -333,48 +333,48 @@ gd_object_new_from_string(char *str)
 
 
 char *
-gd_get_object_description_markup (GdObject *selected)
+gd_object_get_description_markup (GdObject *selected)
 {
 	g_return_val_if_fail (selected != NULL, NULL);
 
 	switch (selected->type) {
-	case POINT:
+	case GD_POINT:
 		return g_markup_printf_escaped(_("Point of <b>%s</b> at %d,%d"), gd_elements[selected->element].lowercase_name, selected->x1, selected->y1);
 
-	case LINE:
+	case GD_LINE:
 		return g_markup_printf_escaped(_("Line from %d,%d to %d,%d of <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
 
-	case RECTANGLE:
+	case GD_RECTANGLE:
 		return g_markup_printf_escaped(_("Rectangle from %d,%d to %d,%d of <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
 
-	case FILLED_RECTANGLE:
+	case GD_FILLED_RECTANGLE:
 		return g_markup_printf_escaped(_("Rectangle from %d,%d to %d,%d of <b>%s</b>, filled with <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
 
-	case RASTER:
+	case GD_RASTER:
 		return g_markup_printf_escaped(_("Raster from %d,%d to %d,%d of <b>%s</b>, distance %+d,%+d"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, selected->dx, selected->dy);
 
-	case JOIN:
+	case GD_JOIN:
 		return g_markup_printf_escaped(_("Join <b>%s</b> to every <b>%s</b>, distance %+d,%+d"), gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name, selected->dx, selected->dy);
 
-	case FLOODFILL_BORDER:
+	case GD_FLOODFILL_BORDER:
 		return g_markup_printf_escaped(_("Floodfill from %d,%d of <b>%s</b>, border <b>%s</b>"), selected->x1, selected->y1, gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name);
 
-	case FLOODFILL_REPLACE:
+	case GD_FLOODFILL_REPLACE:
 		return g_markup_printf_escaped(_("Floodfill from %d,%d of <b>%s</b>, replacing <b>%s</b>"), selected->x1, selected->y1, gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name);
 
-	case MAZE:
+	case GD_MAZE:
 		return g_markup_printf_escaped(_("Maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
 
-	case MAZE_UNICURSAL:
+	case GD_MAZE_UNICURSAL:
 		return g_markup_printf_escaped(_("Unicursal maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
 
-	case MAZE_BRAID:
+	case GD_MAZE_BRAID:
 		return g_markup_printf_escaped(_("Braid maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
 
-	case RANDOM_FILL:
+	case GD_RANDOM_FILL:
 		return g_markup_printf_escaped(_("Random fill from %d,%d to %d,%d, replacing %s"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
 
-	case COPY_PASTE:
+	case GD_COPY_PASTE:
 		return g_markup_printf_escaped(_("Copy from %d,%d-%d,%d, paste to %d,%d"), selected->x1, selected->y1, selected->x2, selected->y2, selected->dx, selected->dy);
 
 		
@@ -388,32 +388,32 @@ gd_get_object_description_markup (GdObject *selected)
 
 
 char *
-gd_get_object_coordinates_text (GdObject *selected)
+gd_object_get_coordinates_text (GdObject *selected)
 {
 	g_return_val_if_fail (selected!=NULL, NULL);
 
 	switch (selected->type) {
-	case POINT:
-	case FLOODFILL_BORDER:
-	case FLOODFILL_REPLACE:
+	case GD_POINT:
+	case GD_FLOODFILL_BORDER:
+	case GD_FLOODFILL_REPLACE:
 		return g_strdup_printf("%d,%d", selected->x1, selected->y1);
 
-	case LINE:
-	case RECTANGLE:
-	case FILLED_RECTANGLE:
-	case RANDOM_FILL:
+	case GD_LINE:
+	case GD_RECTANGLE:
+	case GD_FILLED_RECTANGLE:
+	case GD_RANDOM_FILL:
 		return g_strdup_printf("%d,%d-%d,%d", selected->x1, selected->y1, selected->x2, selected->y2);
 
-	case RASTER:
-	case MAZE_UNICURSAL:
-	case MAZE_BRAID:
-	case MAZE:
+	case GD_RASTER:
+	case GD_MAZE_UNICURSAL:
+	case GD_MAZE_BRAID:
+	case GD_MAZE:
 		return g_strdup_printf("%d,%d-%d,%d (%d,%d)", selected->x1, selected->y1, selected->x2, selected->y2, selected->dx, selected->dy);
 
-	case JOIN:
+	case GD_JOIN:
 		return g_strdup_printf("%+d,%+d", selected->dx, selected->dy);
 
-	case COPY_PASTE:
+	case GD_COPY_PASTE:
 		return g_strdup_printf("%d,%d-%d,%d, %d,%d", selected->x1, selected->y1, selected->x2, selected->y2, selected->dx, selected->dy);
 
 	case NONE:
@@ -432,7 +432,7 @@ gd_get_object_coordinates_text (GdObject *selected)
 
 /** drawing a line, using bresenham's */
 static void
-draw_line (Cave *cave, const GdObject *object)
+draw_line (GdCave *cave, const GdObject *object)
 {
 	int x, y, x1, y1, x2, y2;
 	gboolean steep;
@@ -479,7 +479,7 @@ draw_line (Cave *cave, const GdObject *object)
 
 
 static void
-draw_fill_replace_proc(Cave *cave, int x, int y, const GdObject *object)
+draw_fill_replace_proc(GdCave *cave, int x, int y, const GdObject *object)
 {
 	/* fill with border so we do not come back */
 	gd_cave_store_rc(cave, x, y, object->fill_element, object);
@@ -491,7 +491,7 @@ draw_fill_replace_proc(Cave *cave, int x, int y, const GdObject *object)
 }
 
 static void
-draw_fill_replace (Cave *cave, const GdObject *object)
+draw_fill_replace (GdCave *cave, const GdObject *object)
 {
 	/* check bounds */
 	if (object->x1<0 || object->y1<0 || object->x1>=cave->w || object->y1>=cave->h)
@@ -505,7 +505,7 @@ draw_fill_replace (Cave *cave, const GdObject *object)
 
 
 static void
-draw_fill_border_proc (Cave *cave, int x, int y, const GdObject *object)
+draw_fill_border_proc (GdCave *cave, int x, int y, const GdObject *object)
 {
 	/* fill with border so we do not come back */
 	gd_cave_store_rc(cave, x, y, object->element, object);
@@ -517,7 +517,7 @@ draw_fill_border_proc (Cave *cave, int x, int y, const GdObject *object)
 }
 
 static void
-draw_fill_border (Cave *cave, const GdObject *object)
+draw_fill_border (GdCave *cave, const GdObject *object)
 {
 	int x, y;
 
@@ -540,7 +540,7 @@ draw_fill_border (Cave *cave, const GdObject *object)
 
 /* rectangle, frame only */
 static void
-draw_rectangle(Cave *cave, const GdObject *object)
+draw_rectangle(GdCave *cave, const GdObject *object)
 {
 	int x1, y1, x2, y2, x, y;
 	
@@ -572,7 +572,7 @@ draw_rectangle(Cave *cave, const GdObject *object)
 
 /* rectangle, filled one */
 static void
-draw_filled_rectangle(Cave *cave, const GdObject *object)
+draw_filled_rectangle(GdCave *cave, const GdObject *object)
 {
 	int x1, y1, x2, y2, x, y;
 	
@@ -599,7 +599,7 @@ draw_filled_rectangle(Cave *cave, const GdObject *object)
 
 /* something like ordered fill, increment is dx and dy. */
 static void
-draw_raster(Cave *cave, const GdObject *object)
+draw_raster(GdCave *cave, const GdObject *object)
 {
 	int x, y, x1, y1, x2, y2;
 	int dx, dy;
@@ -630,7 +630,7 @@ draw_raster(Cave *cave, const GdObject *object)
 
 /* find every object, and put fill_element next to it. relative coordinates dx,dy */
 static void
-draw_join(Cave *cave, const GdObject *object)
+draw_join(GdCave *cave, const GdObject *object)
 {
 	int x, y;
 
@@ -920,7 +920,7 @@ braidmaze(GRand *rand, gboolean **maze, int w, int h)
 
 
 static void
-draw_maze(Cave *cave, const GdObject *object, int level)
+draw_maze(GdCave *cave, const GdObject *object, int level)
 {
 	int x, y;
 	gboolean **map;
@@ -964,7 +964,7 @@ draw_maze(Cave *cave, const GdObject *object, int level)
 	w=(x2-x1+1+wall)/(path+wall);
 	h=(y2-y1+1+wall)/(path+wall);
 	/* and we calculate the size of the internal map */
-	if (object->type==MAZE_UNICURSAL) {
+	if (object->type==GD_MAZE_UNICURSAL) {
 		/* for unicursal maze, width and height must be mod2=0, and we will convert to paths&walls later */
 		w=w/2*2;
 		h=h/2*2;
@@ -985,11 +985,11 @@ draw_maze(Cave *cave, const GdObject *object, int level)
 	rand=g_rand_new_with_seed(object->seed[level]==-1?g_rand_int(cave->random):object->seed[level]);
 	if (w>=1 && h>=1)
 		mazegen(rand, map, w, h, 0, 0, object->horiz);
-	if (object->type==MAZE_BRAID)
+	if (object->type==GD_MAZE_BRAID)
 		braidmaze(rand, map, w, h);
 	g_rand_free(rand);
 
-	if (w>=1 && h>=1 && object->type==MAZE_UNICURSAL) {
+	if (w>=1 && h>=1 && object->type==GD_MAZE_UNICURSAL) {
 		gboolean **unicursal;
 
 		/* convert to unicursal maze */
@@ -1075,7 +1075,7 @@ draw_maze(Cave *cave, const GdObject *object, int level)
 
 
 static void
-draw_random_fill(Cave *cave, const GdObject *object, int level)
+draw_random_fill(GdCave *cave, const GdObject *object, int level)
 {
 	int x, y;
 	int x1=object->x1;
@@ -1136,7 +1136,7 @@ draw_random_fill(Cave *cave, const GdObject *object, int level)
 
 
 static void
-draw_copy_paste(Cave *cave, const GdObject *object)
+draw_copy_paste(GdCave *cave, const GdObject *object)
 {
 	int x1=object->x1, y1=object->y1, x2=object->x2, y2=object->y2;
 	int x, y;	/* iterators */
@@ -1183,7 +1183,7 @@ draw_copy_paste(Cave *cave, const GdObject *object)
 /* draw the specified game object into cave's data.
 	also remember, which cell was set by which cave object. */
 void
-gd_cave_draw_object(Cave *cave, const GdObject *object, int level)
+gd_cave_draw_object(GdCave *cave, const GdObject *object, int level)
 {
 	g_assert (cave!=NULL);
 	g_assert (cave->map!=NULL);
@@ -1192,50 +1192,50 @@ gd_cave_draw_object(Cave *cave, const GdObject *object, int level)
 	g_assert (level==cave->rendered-1);
 
 	switch (object->type) {
-		case POINT:
+		case GD_POINT:
 			/* single point */
 			gd_cave_store_rc(cave, object->x1, object->y1, object->element, object);
 			break;
 
-		case LINE:
+		case GD_LINE:
 			draw_line(cave, object);
 			break;
 
-		case RECTANGLE:
+		case GD_RECTANGLE:
 			draw_rectangle(cave, object);
 			break;
 
-		case FILLED_RECTANGLE:
+		case GD_FILLED_RECTANGLE:
 			draw_filled_rectangle(cave, object);
 			break;
 			
-		case RASTER:
+		case GD_RASTER:
 			draw_raster(cave, object);
 			break;
 
-		case JOIN:
+		case GD_JOIN:
 			draw_join(cave, object);
 			break;
 
-		case FLOODFILL_BORDER:
+		case GD_FLOODFILL_BORDER:
 			draw_fill_border(cave, object);
 			break;
 			
-		case FLOODFILL_REPLACE:
+		case GD_FLOODFILL_REPLACE:
 			draw_fill_replace(cave, object);
 			break;
 			
-		case MAZE:
-		case MAZE_UNICURSAL:
-		case MAZE_BRAID:
+		case GD_MAZE:
+		case GD_MAZE_UNICURSAL:
+		case GD_MAZE_BRAID:
 			draw_maze(cave, object, level);
 			break;
 
-		case RANDOM_FILL:
+		case GD_RANDOM_FILL:
 			draw_random_fill(cave, object, level);
 			break;
 			
-		case COPY_PASTE:
+		case GD_COPY_PASTE:
 			draw_copy_paste(cave, object);
 			break;
 			
@@ -1254,10 +1254,10 @@ gd_cave_draw_object(Cave *cave, const GdObject *object, int level)
 
 
 /* load cave to play... also can be called rendering the cave elements */
-Cave *
-gd_cave_new_rendered (const Cave *data, const int level, const guint32 seed)
+GdCave *
+gd_cave_new_rendered (const GdCave *data, const int level, const guint32 seed)
 {
-	Cave *cave;
+	GdCave *cave;
 	GdElement element;
 	int x, y;
 	GList *iter;
@@ -1377,9 +1377,9 @@ gd_cave_new_rendered (const Cave *data, const int level, const guint32 seed)
    the cave will be map-based.
  */
 void
-gd_flatten_cave(Cave *cave, const int level)
+gd_flatten_cave(GdCave *cave, const int level)
 {
-	Cave *rendered;
+	GdCave *rendered;
 
 	g_return_if_fail(cave != NULL);
 

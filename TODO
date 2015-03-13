@@ -1,18 +1,44 @@
 DONE
 ----- 
-CRASH: Hi, unfortunately I have got a new problem with the latest version. If I want to change the properties of mazes and therefore click on the object, I get an application error immediately and Gdash is closed. Only mazes are concerned; I've checked the other objects, too.
-selectable keys
-
+sdash bd1 intermissions scroll. disable scrolling for these somehow?
+replay checksum
+In GDash, the cave info bar at the bottom-left of the editor doesn't change when you press the next/previous cave buttons. Could you fix this?
+In SDash, being able to change the color of the cave status bar to classic BD1/BD2 style would be neat.
+pal emu enhanced for letters/fonts
+mesemondás
+replay window mutassa a levelt
+Tweak the vertical scrolling a little the same as you did with the horizontal so Rockford doesn't catch the top of the screen. You can reach the top of the screen with even BD1 level 1 speeds.
+An easier to read status bar for the top of Gdash.
+story új változó a GdCave-ben
+c64 color status bar, if mostly c64 colors in cave
+It would be very interesting if it would be possible to use an own title screen for each game. I do not know if this is possible but this would make it even more authentic.
 
 REFUSED
 -------
 
 
+
 TO DO
 -----
-magyar fordítás
+theme image glob pattern
 
-reentrans game
+amikor bezárja az editor ablakot, akkor kéne egy replay checksum update?
+vagy a delete event, és akkor rákérdez
+
+TITLE SCREEN
+	Animated intro screen would be nice. It's not necessary to see a complete game or so but animated walls, diamonds, butterflies, etc. would be nice. Same as in the original C64 games.
+	Maybe animate the intro screen? It might be cool to have a little background cave where the elements move around. Or something.
+
+STATUS BAR
+	As for the status bar in GDash: Maybe a little bit larger font would do the thing. There is enough space to use a larger font.
+
+Maybe game notes can be displayed under the title screen as soon as the game is loaded. Optionally at least if someone does not like to show it automatically. 
+
+Maybe a button to apply certain settings to all caves. We'd have to think of which may be appropriate. Timing maybe. Or color palette type. Dunno about this one.
+
+Already suggested I think: Atari sounds.
+
+Amoeba2 sound
 
 copy&paste elengedés után movera vált,
 
@@ -21,37 +47,18 @@ if (random(slime*4)<4) and (tab[x,y+2]=0) then
       Begin tab[x,y]:=0;col[x,y+2]:=col[x,y];tab[x,y+2]:=27;mat[x,y+2]:=9;Voice4:=2;end;
 - Time bonus of -100 really seems odd.
 
-- teszt
-- replay checksumon gondolkozni
-	- átlalános cave checksum az elemek bdcff karaktere alapján?	
-
-replay folyamatos lejátszás? - egymás után nyomja őket
-
 amoeba threshold - belül %-ban tárolódik,
 de az editor átállítja?
 
-
 gtk verzióba		{TypeBoolean, N_("Even lines vertical scroll"), N_("Even lines vertical scroll"), &gd_even_line_pal_emu_vertical_scroll, FALSE},
-
 
 bdcff beolvasás miért hash table?
   size és hasonló szarok miatt
   de tobb értéket is kéne tárolni esetleg, a hash table ezt akadályozza
 
-As there is an Amoeba 2 now, I think it would be nice to be able to set a different color for that then Amoeba 1!
-
-sound:
-	amoeba2
-	creature change dir
-	themes
-
 design tips?
 
 surprise element
-
-Scheduling:	different settings for clck, 1stb?
-	
-sdash bd1 intermissions scroll. disable scrolling for these somehow?
 
 extensive commenting
 

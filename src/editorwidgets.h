@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -32,10 +32,10 @@ void gd_element_button_set(GtkWidget *button, const GdElement element);
 void gd_element_button_update_pixbuf(GtkWidget *button);
 
 GtkWidget *gd_direction_combo_new(const GdDirection initial);
-GdDirection gd_direction_combo_get(GtkWidget *combo);
+GdDirection gd_direction_combo_get_direction(GtkWidget *combo);
 
 GtkWidget *gd_scheduling_combo_new(const GdScheduling initial);
-GdScheduling gd_scheduling_combo_get(GtkWidget *combo);
+GdScheduling gd_scheduling_combo_get_scheduling(GtkWidget *combo);
 
 
 #endif

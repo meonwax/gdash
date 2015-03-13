@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -480,7 +480,7 @@ typedef enum _dirt_mod {
 } DirtModType;
 
 static void
-set_dirt_mod (Cave *cave, DirtModType mod_type)
+set_dirt_mod (GdCave *cave, DirtModType mod_type)
 {
 	GdElement elem1, elem2;
 	gboolean dirt=FALSE;
@@ -566,7 +566,7 @@ gd_get_engine_default_array(GdEngine engine)
 
 
 void
-gd_cave_set_engine_defaults(Cave *cave, GdEngine engine)
+gd_cave_set_engine_defaults(GdCave *cave, GdEngine engine)
 {
 	gd_cave_set_defaults_from_array(cave, gd_get_engine_default_array(engine));
 
@@ -626,7 +626,7 @@ gd_cave_get_engine_from_string(const char *param)
 
 /* import bd1 cave data into our format. */
 static int
-cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
+cave_copy_from_bd1(GdCave *cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
 {
 	int length, direction;
 	int index;
@@ -724,7 +724,7 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, GdCavefi
 			int x, y;
 			
 			/* as this one uses nonstandard dx dy values, create points instead */
-			object.type=POINT;
+			object.type=GD_POINT;
 			object.element=import_func(data[index+1], index+1);
 			x1=data[index+2];
 			y1=data[index+3]-2;
@@ -748,7 +748,7 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, GdCavefi
 			object.element=import_func(code & 0x3F, index);
 			switch ((code >> 6) & 3) {
 			case 0:				/* 00: POINT */
-				object.type=POINT;
+				object.type=GD_POINT;
 				object.x1=data[index+1];
 				object.y1=data[index+2]-2;
 				if (object.x1>=cave->w || object.y1>=cave->h)
@@ -757,7 +757,7 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, GdCavefi
 				index+=3;
 				break;
 			case 1:				/* 01: LINE */
-				object.type=LINE;
+				object.type=GD_LINE;
 				object.x1=data[index+1];
 				object.y1=data[index+2]-2;
 				length=(gint8)data[index+3]-1;
@@ -778,7 +778,7 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, GdCavefi
 				index+=5;
 				break;
 			case 2:				/* 10: FILLED RECTANGLE */
-				object.type=FILLED_RECTANGLE;
+				object.type=GD_FILLED_RECTANGLE;
 				object.x1=data[index+1];
 				object.y1=data[index+2] - 2;
 				object.x2=object.x1+data[index+3]-1;	/* width */
@@ -790,7 +790,7 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, GdCavefi
 				index+=6;
 				break;
 			case 3:				/* 11: OPEN RECTANGLE (OUTLINE) */
-				object.type=RECTANGLE;
+				object.type=GD_RECTANGLE;
 				object.x1=data[index+1];
 				object.y1=data[index+2]-2;
 				object.x2=object.x1+data[index+3]-1;
@@ -815,7 +815,7 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, GdCavefi
 /* import bd2 cave data into our format. return number of bytes if pointer passed.
 	this is pretty the same as above, only the encoding was different. */
 static int
-cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
+cave_copy_from_bd2 (GdCave *cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
 {
 	int index;
 	GdObject object;
@@ -872,7 +872,7 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes, GdCavef
 
 		switch (data[index]) {
 		case 0:				/* LINE */
-			object.type=LINE;
+			object.type=GD_LINE;
 			object.element=bd1_import(data[index+1], index+1);
 			object.y1=data[index+2];
 			object.x1=data[index+3];
@@ -889,7 +889,7 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes, GdCavef
 			index+=6;
 			break;
 		case 1:				/* OPEN RECTANGLE */
-			object.type=RECTANGLE;
+			object.type=GD_RECTANGLE;
 			object.element=bd1_import(data[index+1], index+1);
 			object.y1=data[index+2];
 			object.x1=data[index+3];
@@ -900,7 +900,7 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes, GdCavef
 			index+=6;
 			break;
 		case 2:				/* FILLED RECTANGLE */
-			object.type=FILLED_RECTANGLE;
+			object.type=GD_FILLED_RECTANGLE;
 			object.element=bd1_import(data[index+1], index+1);
 			object.y1=data[index+2];
 			object.x1=data[index+3];
@@ -912,7 +912,7 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes, GdCavef
 			index+=7;
 			break;
 		case 3:				/* POINT */
-			object.type=POINT;
+			object.type=GD_POINT;
 			object.element=bd1_import(data[index+1], index+1);
 			object.y1=data[index+2];
 			object.x1=data[index+3];
@@ -921,7 +921,7 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes, GdCavef
 			index+=4;
 			break;
 		case 4:				/* RASTER */
-			object.type=RASTER;
+			object.type=GD_RASTER;
 			object.element=bd1_import(data[index+1], index+1);
 			object.y1=data[index+2];
 			object.x1=data[index+3];
@@ -949,7 +949,7 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes, GdCavef
 			addr-=0x0850;	/* this was a pointer to the cave work memory (used during game). */
 			if (addr>=cave->w*cave->h)
 				g_warning("invalid bitmap start address at byte %d", index-4);
-			object.type=POINT;
+			object.type=GD_POINT;
 			object.x1=addr%40;
 			object.y1=addr/40;
 			for (i=0; i<bytes; i++) {	/* for ("bytes" number of bytes) */
@@ -970,7 +970,7 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes, GdCavef
 			object.type=NONE;	/* prevent appending object to list */
 			break;
 		case 6:				/* JOIN */
-			object.type=JOIN;
+			object.type=GD_JOIN;
 			object.element=bd1_import(data[index+1], index+1);
 			object.fill_element=bd1_import(data[index+2], index+2);
 			object.dy=data[index+3]/40;
@@ -1054,7 +1054,7 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes, GdCavef
 /* import plck cave data into our format.
 	length is always 512 bytes, and contains if it is an intermission cave. */
 static int
-cave_copy_from_plck (Cave *cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
+cave_copy_from_plck (GdCave *cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
 {
 	/* i don't really think that all this table is needed, but included to be complete. */
 	/* this is for the dirt and expanding wall looks like effect. */
@@ -1204,7 +1204,7 @@ cave_copy_from_plck (Cave *cave, const guint8 *data, int remaining_bytes, GdCave
 /* no one's delight boulder dash
 	essentially: rle compressed plck maps. */
 static int
-cave_copy_from_dlb (Cave *cave, const guint8 *data, int remaining_bytes)
+cave_copy_from_dlb (GdCave *cave, const guint8 *data, int remaining_bytes)
 {
 	guint8 decomp[512];
 	enum {
@@ -1319,7 +1319,7 @@ cave_copy_from_dlb (Cave *cave, const guint8 *data, int remaining_bytes)
 
 /* import plck cave data into our format. */
 static int
-cave_copy_from_1stb (Cave *cave, const guint8 *data, int remaining_bytes)
+cave_copy_from_1stb (GdCave *cave, const guint8 *data, int remaining_bytes)
 {
 	int i;
 	int x, y;
@@ -1436,7 +1436,7 @@ cave_copy_from_1stb (Cave *cave, const guint8 *data, int remaining_bytes)
 
 /* crazy dream 7 */
 static int
-cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
+cave_copy_from_crdr_7 (GdCave *cave, const guint8 *data, int remaining_bytes)
 {
 	int i, index;
 	guint8 checksum;
@@ -1585,7 +1585,7 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 
 		switch(data[index]) {
 			case 1:	/* point */
-				object.type=POINT;
+				object.type=GD_POINT;
 				object.element=crazydream_import_table[data[index+1]];
 				object.x1=data[index+2];
 				object.y1=data[index+3];
@@ -1594,7 +1594,7 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 				index+=4;
 				break;
 			case 2: /* rectangle */
-				object.type=RECTANGLE;
+				object.type=GD_RECTANGLE;
 				object.element=crazydream_import_table[data[index+1]];
 				object.x1=data[index+2];
 				object.y1=data[index+3];
@@ -1605,7 +1605,7 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 				index+=6;
 				break;
 			case 3: /* fillrect */
-				object.type=FILLED_RECTANGLE;
+				object.type=GD_FILLED_RECTANGLE;
 				object.element=crazydream_import_table[data[index+1]];
 				object.fill_element=crazydream_import_table[data[index+1]];
 				object.x1=data[index+2];
@@ -1618,7 +1618,7 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 				break;
 
 			case 4: /* line */
-				object.type=LINE;
+				object.type=GD_LINE;
 				object.element=crazydream_import_table[data[index+1]];
 				if(object.element==O_UNKNOWN)
 					g_warning("%x", data[index+1]);
@@ -1633,7 +1633,7 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 				object.y2=object.y1+(length-1)*ny;
 				/* if either is bigger than one, we cannot treat this as a line. create points instead */
 				if (ABS(nx)>=2 || ABS(ny>=2)) {
-					object.type=POINT;
+					object.type=GD_POINT;
 					for (i=0; i<length; i++) {
 						cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(GdObject)));
 						object.x1+=nx;
@@ -1659,7 +1659,7 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 				index+=5;
 				break;
 			case 7: /* paste */
-				object.type=COPY_PASTE;
+				object.type=GD_COPY_PASTE;
 				object.x1=cx1;
 				object.y1=cy1;
 				object.x2=cx1+cw-1;			/* original stored width and height, we store the coordinates of the source area */
@@ -1673,7 +1673,7 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 				index+=3;
 				break;
 			case 11: /* raster */
-				object.type=RASTER;
+				object.type=GD_RASTER;
 				object.element=crazydream_import_table[data[index+1]];
 				object.x1=data[index+2];
 				object.y1=data[index+3];
@@ -1712,7 +1712,7 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 }
 
 static void
-addition_crazy_dream_9(Cave *cave, const guint8 *buf, const int length)
+crazy_dream_9_add_specials(GdCave *cave, const guint8 *buf, const int length)
 {
 	guint8 checksum;
 	int i;
@@ -1728,7 +1728,7 @@ addition_crazy_dream_9(Cave *cave, const guint8 *buf, const int length)
 		
 		GdObject object;
 
-		object.type=RANDOM_FILL;
+		object.type=GD_RANDOM_FILL;
 		object.levels=GD_OBJECT_LEVEL_ALL;
 		for (i=0; i<5; i++)
 			object.seed[i]=-1;
@@ -1756,7 +1756,7 @@ addition_crazy_dream_9(Cave *cave, const guint8 *buf, const int length)
 		GdObject object;
 		int i;
 
-		object.type=RANDOM_FILL;
+		object.type=GD_RANDOM_FILL;
 		object.levels=GD_OBJECT_LEVEL_ALL;
 		for (i=0; i<5; i++)
 			object.seed[i]=-1;
@@ -1784,7 +1784,7 @@ addition_crazy_dream_9(Cave *cave, const guint8 *buf, const int length)
 		GdObject object;
 		int i;
 		
-		object.type=MAZE;
+		object.type=GD_MAZE;
 		object.levels=GD_OBJECT_LEVEL_ALL;
 		for (i=0; i<5; i++)
 			object.seed[i]=-1;
@@ -1805,7 +1805,7 @@ addition_crazy_dream_9(Cave *cave, const guint8 *buf, const int length)
 		GdObject object;
 		int i;
 		
-		object.type=MAZE;
+		object.type=GD_MAZE;
 		object.levels=GD_OBJECT_LEVEL_ALL;
 		for (i=0; i<5; i++)
 			object.seed[i]=-1;
@@ -1822,7 +1822,7 @@ addition_crazy_dream_9(Cave *cave, const guint8 *buf, const int length)
 		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
 
 		/* replace object - x1,y1,x2,y2 stay :) */
-		object.type=RANDOM_FILL;
+		object.type=GD_RANDOM_FILL;
 		object.element=O_BLADDER_SPENDER;	/* element to replace */
 		object.fill_element=O_DIRT;	/* initial fill */
 		object.random_fill_probability[0]=0x18;
@@ -1842,7 +1842,7 @@ addition_crazy_dream_9(Cave *cave, const guint8 *buf, const int length)
 		GdObject object;
 		int i;
 		
-		object.type=MAZE_UNICURSAL;
+		object.type=GD_MAZE_UNICURSAL;
 		object.levels=GD_OBJECT_LEVEL_ALL;
 		for (i=0; i<5; i++)
 			object.seed[i]=-1;
@@ -1858,7 +1858,7 @@ addition_crazy_dream_9(Cave *cave, const guint8 *buf, const int length)
 		cave->objects=g_list_append(cave->objects, g_memdup(&object, sizeof(object)));
 
 		/* a point which "breaks" the unicursal maze */		
-		object.type=POINT;
+		object.type=GD_POINT;
 		object.element=O_BRICK;
 		object.x1=35;
 		object.y1=18;
@@ -1870,7 +1870,7 @@ addition_crazy_dream_9(Cave *cave, const guint8 *buf, const int length)
 
 /* crazy light contruction kit */
 static int
-cave_copy_from_crli (Cave *cave, const guint8 *data, int remaining_bytes)
+cave_copy_from_crli (GdCave *cave, const guint8 *data, int remaining_bytes)
 {
 	guint8 uncompressed[1024];
 	int datapos, cavepos, i, x, y;
@@ -2081,7 +2081,7 @@ cave_copy_from_crli (Cave *cave, const guint8 *data, int remaining_bytes)
 
 
 GdCavefileFormat
-gd_caveset_imported_format(const guint8 *buf)
+gd_caveset_imported_get_format(const guint8 *buf)
 {
 	const char *s_bd1="GDashBD1";
 	const char *s_bd1_atari="GDashB1A";
@@ -2149,7 +2149,7 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 		g_warning("file length and data size mismatch in GDash datafile");
 		return NULL;
 	}
-	format=gd_caveset_imported_format(buf);
+	format=gd_caveset_imported_get_format(buf);
 	if (format==GD_FORMAT_UNKNOWN) {
 		g_warning("buffer does not contain a GDash datafile");
 		return NULL;
@@ -2162,7 +2162,7 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 
 	cavenum=0;
 	while (bufp<length) {
-		Cave *newcave;
+		GdCave *newcave;
 		int insertpos=-1;	/* default is to append cave to caveset; g_list_insert appends when pos=-1 */
 		
 		newcave=gd_cave_new();
@@ -2244,7 +2244,7 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 		case GD_FORMAT_CRDR_9:
 			cavelength=cave_copy_from_crli (newcave, buf+bufp, length-bufp);
 			if (cavelength!=-1)
-				addition_crazy_dream_9(newcave, buf, cavelength);
+				crazy_dream_9_add_specials(newcave, buf, cavelength);
 			break;
 		
 		case GD_FORMAT_UNKNOWN:
@@ -2282,7 +2282,7 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 			standard=(g_list_length(caveset)%5)==0;	/* cave count % 5 != 0 -> nonstandard */
 			
 			for (n=0, iter=caveset; iter!=NULL; n++, iter=iter->next) {
-				Cave *cave=iter->data;
+				GdCave *cave=iter->data;
 				
 				if ((n%5==4 && !cave->intermission) || (n%5!=4 && cave->intermission))
 					standard=FALSE;	/* 4 cave, 1 intermission */
@@ -2291,7 +2291,7 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 			/* if test passed, update selectability */
 			if (standard)
 				for (n=0, iter=caveset; iter!=NULL; n++, iter=iter->next) {
-					Cave *cave=iter->data;
+					GdCave *cave=iter->data;
 
 					/* update "selectable" */
 					cave->selectable=(n%5)==0;
@@ -2304,7 +2304,7 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 	/* use numbering instead of letters, if following formats or too many caves (as we would run out of letters) */
 	numbering=format==GD_FORMAT_PLC || format==GD_FORMAT_CRLI || g_list_length(caveset)>26;
 	for (iter=caveset; iter!=NULL; iter=iter->next) {
-		Cave *cave=(Cave *)iter->data;
+		GdCave *cave=(GdCave *)iter->data;
 		
 		if (!g_str_equal(cave->name, ""))	/* if it already has a name, skip */
 			continue;
@@ -2334,7 +2334,7 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 	/* if the uses requests, we make all caves selectable. intermissions not. */	
 	if (gd_import_as_all_caves_selectable)
 		for (iter=caveset; iter!=NULL; iter=iter->next) {
-			Cave *cave=(Cave *)iter->data;
+			GdCave *cave=(GdCave *)iter->data;
 			
 			/* make selectable if not an intermission. */
 			/* also selectable, if it was selectable originally, for some reason. */

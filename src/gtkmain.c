@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -35,177 +35,44 @@
 #include "editorexport.h"
 #include "about.h"
 #include "sound.h"
-
+#include "gfxutil.h"
 #include "gtkmain.h"
 
 /* game info */
 static gboolean paused=FALSE;
 static gboolean fast_forward=FALSE;
 static gboolean fullscreen=FALSE;
-	
-static gboolean quit_thread;
 
 typedef struct _gd_main_window {
 	GtkWidget *window;
 	GtkActionGroup *actions_normal, *actions_title, *actions_game, *actions_snapshot;
 	GtkWidget *scroll_window;
-	GtkWidget *drawing_area, *title_image;	   /* two things that could be drawn in the main window */
+	GtkWidget *drawing_area, *title_image, *story_label;	   /* three things that could be drawn in the main window */
 	GdkPixmap **title_pixmaps;
 	GtkWidget *labels;		/* parts of main window which have to be shown or hidden */
-	GtkWidget *label_score, *label_value, *label_time, *label_cave_name, *label_diamonds, *label_skeletons, *label_lives;		/* different text labels in main window */
-	GtkWidget *label_key1, *label_key2, *label_key3, *label_gravity_will_change;
+	GtkWidget *label_topleft, *label_topright;
+	GtkWidget *label_bottomleft, *label_bottomright;
 	GtkWidget *label_variables;
 	GtkWidget *error_hbox, *error_label;
 	GtkWidget *menubar, *toolbar;
 	GtkWidget *replay_image_align;
-} GDMainWindow;
+	
+	GdGame *game;
+} GdMainWindow;
 
-static GDMainWindow main_window;
+static GdMainWindow main_window;
 
-static gboolean key_lctrl=FALSE, key_rctrl=FALSE, key_right=FALSE, key_up=FALSE, key_down=FALSE, key_left=FALSE, key_suicide=FALSE;
+static gboolean key_fire_1=FALSE, key_fire_2=FALSE, key_right=FALSE, key_up=FALSE, key_down=FALSE, key_left=FALSE, key_suicide=FALSE;
+static gboolean key_alt_status_bar=FALSE;
 static gboolean restart;	/* keys which control the game, but are handled differently than the above */
 static int mouse_cell_x=-1, mouse_cell_y=-1, mouse_cell_click=0;
 
-static void init_mainwindow(Cave *);
-static void install_game_timer();
 
-Cave *snapshot=NULL;
+static GdCave *snapshot=NULL;
 
 
 
 
-
-
-static gboolean
-fullscreen_idle_func(gpointer data)
-{
-	gtk_window_fullscreen(GTK_WINDOW(data));
-	return FALSE;
-}
-
-/* set or unset fullscreen if necessary */
-/* hack: gtk-win32 does not correctly handle fullscreen & removing widgets.
-   so we put fullscreening call into a low priority idle function, which will be called
-   after all window resizing & the like did take place. */
-void
-set_fullscreen(void)
-{
-	if (gd_gameplay.cave && fullscreen) {
-		gtk_widget_hide(main_window.menubar);
-		gtk_widget_hide(main_window.toolbar);
-		g_idle_add_full(G_PRIORITY_LOW, (GSourceFunc) fullscreen_idle_func, main_window.window, NULL);
-	}
-	else {
-		g_idle_remove_by_data (main_window.window);
-		gtk_window_unfullscreen (GTK_WINDOW(main_window.window));
-		gtk_widget_show(main_window.menubar);
-		gtk_widget_show(main_window.toolbar);
-	}
-}
-
-
-/*
-	uninstall game timers, if any installed.
-*/
-static void
-uninstall_game_timeout()
-{
-	quit_thread=TRUE;
-	/* remove timeout associated to game play */
-	while (g_source_remove_by_user_data (main_window.window)) {
-		/* nothing */
-	}
-}
-
-void
-gd_main_stop_game()
-{
-	uninstall_game_timeout();
-	init_mainwindow(NULL);
-	gd_stop_game();
-	set_fullscreen();
-	/* if editor is active, go back to its window. */
-	if (editor_window)
-		gtk_window_present(GTK_WINDOW(editor_window));
-}
-
-void
-gd_main_window_set_title()
-{
-	if (!g_str_equal(gd_caveset_data->name, "")) {
-		char *text;
-
-		text=g_strdup_printf("GDash - %s", gd_caveset_data->name);
-		gtk_window_set_title (GTK_WINDOW(main_window.window), text);
-		g_free (text);
-	}
-	else
-		gtk_window_set_title (GTK_WINDOW(main_window.window), "GDash");
-}
-
-
-
-
-
-/* game over, and highscore is achieved. ask for name, and if given, record it! */
-static void
-game_over_highscore()
-{
-	char *text;
-	int rank;
-
-	text=g_strdup_printf(_("You have %d points, and achieved a highscore."), gd_gameplay.player_score);
-	gd_infomessage(_("Game over!"), text);
-	g_free(text);
-
-	/* enter to highscore table */
-	rank=gd_add_highscore(gd_caveset_data->highscore, gd_gameplay.player_name, gd_gameplay.player_score);
-	gd_show_highscore(main_window.window, NULL, FALSE, NULL, rank);
-}
-
-static void
-game_over_without_highscore()
-{
-	gchar *text;
-
-	text=g_strdup_printf(_("You have %d points."), gd_gameplay.player_score);
-	gd_infomessage(_("Game over!"), text);
-	g_free(text);
-
-}
-
-
-
-/* this starts a new game */
-static void
-new_game(const char *player_name, const int cave, const int level)
-{
-	gd_new_game(player_name, cave, level);
-	install_game_timer();
-}
-
-
-void
-gd_main_new_game_snapshot(Cave *snapshot)
-{
-	gd_new_game_snapshot(snapshot);
-	install_game_timer();
-}
-
-void
-gd_main_new_game_test(Cave *test, int level)
-{
-	gd_new_game_test(test, level);
-	install_game_timer();
-}
-
-
-static void
-gd_main_new_game_replay(Cave *cave, GdReplay *replay)
-{
-	gd_new_game_replay(cave, replay);
-	install_game_timer();
-}
 
 
 /************************************************
@@ -214,20 +81,22 @@ gd_main_new_game_replay(Cave *cave, GdReplay *replay)
  *
  */
 
-/* closing the window by the window manager */
+/* closing the window by the window manager.
+ * ask the user if he want to save the cave first, and
+ * only then do quit the main loop. */
 static gboolean
-delete_event (GtkWidget * widget, GdkEvent * event, gpointer data)
+main_window_delete_event (GtkWidget * widget, GdkEvent * event, gpointer data)
 {
 	if (gd_discard_changes(main_window.window))
-		gtk_main_quit ();
+		gtk_main_quit();
 	return TRUE;
 }
 
-/* keypress. key_* can be event_type==gdk_key_press, as we
-   connected this function to key press and key release.
+/* keypress. key_* can be (event_type==gdk_key_press), as we
+ * connected this function to key press and key release.
  */
 static gboolean
-keypress_event (GtkWidget * widget, GdkEventKey* event, gpointer data)
+main_window_keypress_event (GtkWidget * widget, GdkEventKey* event, gpointer data)
 {
 	gboolean press=event->type==GDK_KEY_PRESS;	/* true for press, false for release */
 	
@@ -248,11 +117,15 @@ keypress_event (GtkWidget * widget, GdkEventKey* event, gpointer data)
 		return TRUE;
 	}
 	if (event->keyval==gd_gtk_key_fire_1) {
-		key_lctrl=press;
+		key_fire_1=press;
+		return TRUE;
+	}
+	if (event->keyval==GDK_Shift_L) {
+		key_alt_status_bar=press;
 		return TRUE;
 	}
 	if (event->keyval==gd_gtk_key_fire_2) {
-		key_rctrl=press;
+		key_fire_2=press;
 		return TRUE;
 	}
 	if (event->keyval==gd_gtk_key_suicide) {
@@ -261,6 +134,23 @@ keypress_event (GtkWidget * widget, GdkEventKey* event, gpointer data)
 	}
 
 	return FALSE;	/* if any other key, we did not process it. go on, let gtk handle it. */
+}
+
+/* focus leaves game play window. remember that keys are not pressed!
+	as we don't receive key released events along with focus out. */
+static gboolean
+main_window_focus_out_event(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+	key_fire_1=FALSE;
+	key_fire_2=FALSE;
+	key_right=FALSE;
+	key_up=FALSE;
+	key_down=FALSE;
+	key_left=FALSE;
+	key_suicide=FALSE;
+	key_alt_status_bar=FALSE;
+	
+	return FALSE;
 }
 
 /* for mouse play. */
@@ -307,18 +197,21 @@ drawing_area_motion_event(GtkWidget * widget, GdkEventMotion * event, gpointer d
 
 
 /*
- * draws the cave during game play
+ * draws the cave during game play. also called by the timers,
+ * and the drawing area expose event.
  */
 static void
-drawcave()
+drawing_area_draw_cave()
 {
 	int x, y, xd, yd;
 
 	if (!main_window.drawing_area->window)
 		return;
-	if (!gd_gameplay.cave)	/* if already no cave, just return */
+	if (!main_window.game)
 		return;
-	if (!gd_gameplay.gfx_buffer)	/* if already no cave, just return */
+	if (!main_window.game->cave)	/* if already no cave, just return */
+		return;
+	if (!main_window.game->gfx_buffer)	/* if already no cave, just return */
 		return;
 
 	/* x and y are cave coordinates, which might not start from 0, as the top or the left hand side of the cave might not be visible. */
@@ -332,11 +225,12 @@ drawcave()
 	 *     w...|o    p........   visible part
 	 *     w...|..d...........
 	 */
-	for (y=gd_gameplay.cave->y1, yd=0; y<=gd_gameplay.cave->y2; y++, yd++) {
-		for (x=gd_gameplay.cave->x1, xd=0; x<=gd_gameplay.cave->x2; x++, xd++) {
-			if (gd_gameplay.gfx_buffer[y][x] & GD_REDRAW) {
-				gd_gameplay.gfx_buffer[y][x] &= ~GD_REDRAW;
-				gdk_draw_drawable(main_window.drawing_area->window, main_window.drawing_area->style->black_gc, gd_game_pixmap(gd_gameplay.gfx_buffer[y][x]),
+	/* before drawing, process all pending events for the drawing area, so no confusion occurs. */
+	for (y=main_window.game->cave->y1, yd=0; y<=main_window.game->cave->y2; y++, yd++) {
+		for (x=main_window.game->cave->x1, xd=0; x<=main_window.game->cave->x2; x++, xd++) {
+			if (main_window.game->gfx_buffer[y][x] & GD_REDRAW) {
+				main_window.game->gfx_buffer[y][x] &= ~GD_REDRAW;
+				gdk_draw_drawable(main_window.drawing_area->window, main_window.drawing_area->style->black_gc, gd_game_pixmap(main_window.game->gfx_buffer[y][x]),
 								  0, 0, xd*gd_cell_size_game, yd*gd_cell_size_game, gd_cell_size_game, gd_cell_size_game);
 			}
 		}
@@ -352,9 +246,11 @@ drawing_area_expose_event(GtkWidget *widget, GdkEventExpose *event, gpointer dat
 
 	if (!widget->window)
 		return FALSE;
-	if (!gd_gameplay.cave)	/* if already no cave, just return */
+	if (!main_window.game)
 		return FALSE;
-	if (!gd_gameplay.gfx_buffer)	/* if already no cave, just return */
+	if (!main_window.game->cave)	/* if already no cave, just return */
+		return FALSE;
+	if (!main_window.game->gfx_buffer)	/* if already no cave, just return */
 		return FALSE;
 
 	/* redraw entire area, not specific rectangles.
@@ -378,35 +274,856 @@ drawing_area_expose_event(GtkWidget *widget, GdkEventExpose *event, gpointer dat
 	 */
 	/* mark all cells to be redrawn with GD_REDRAW, and then call the normal drawcave routine. */
 	for (yd=y1; yd<=y2; yd++) {
-		int y=yd+gd_gameplay.cave->y1;
+		int y=yd+main_window.game->cave->y1;
 		for (xd=x1; xd<=x2; xd++) {
-			int x=xd+gd_gameplay.cave->x1;
-			if (gd_gameplay.gfx_buffer[y][x]!=-1) {
-				if (!(gd_gameplay.gfx_buffer[y][x] & GD_REDRAW))
-					gd_gameplay.gfx_buffer[y][x] |= GD_REDRAW;
-			}
+			int x=xd+main_window.game->cave->x1;
+			if (main_window.game->gfx_buffer[y][x]!=-1)
+				main_window.game->gfx_buffer[y][x] |= GD_REDRAW;
 		}
 	}
-	drawcave();
+	drawing_area_draw_cave();
 
 	return TRUE;
 }
 
-/* focus leaves game play window. remember that keys are not pressed!
-	as we don't receive key released events along with focus out. */
+
+
+
+
+
+/*
+ * functions for the main window
+ * - fullscreen
+ * - game
+ * - title animation
+ */
+
+
 static gboolean
-focus_out_event(GtkWidget *widget, GdkEvent *event, gpointer data)
+main_window_set_fullscreen_idle_func(gpointer data)
 {
-	key_lctrl=FALSE;
-	key_rctrl=FALSE;
-	key_right=FALSE;
-	key_up=FALSE;
-	key_down=FALSE;
-	key_left=FALSE;
-	key_suicide=FALSE;
-	
+	gtk_window_fullscreen(GTK_WINDOW(data));
 	return FALSE;
 }
+
+/* set or unset fullscreen if necessary */
+/* hack: gtk-win32 does not correctly handle fullscreen & removing widgets.
+   so we put fullscreening call into a low priority idle function, which will be called
+   after all window resizing & the like did take place. */
+static void
+main_window_set_fullscreen()
+{
+	if (main_window.game && fullscreen) {
+		gtk_widget_hide(main_window.menubar);
+		gtk_widget_hide(main_window.toolbar);
+		g_idle_add_full(G_PRIORITY_LOW, (GSourceFunc) main_window_set_fullscreen_idle_func, main_window.window, NULL);
+	}
+	else {
+		g_idle_remove_by_data(main_window.window);
+		gtk_window_unfullscreen(GTK_WINDOW(main_window.window));
+		gtk_widget_show(main_window.menubar);
+		gtk_widget_show(main_window.toolbar);
+	}
+}
+
+
+/*
+ * init mainwindow
+ * creates title screen or drawing area
+ *
+ */
+static gboolean
+main_window_title_animation_func(gpointer data)
+{
+	static int animcycle=0;
+	int count;
+	
+	/* if title image widget does not exist for some reason, we quit now */
+	if (main_window.title_image==NULL)
+		return FALSE;
+
+	/* count the number of frames. */
+	count=0;
+	while (main_window.title_pixmaps[count]!=NULL)
+		count++;
+
+	if (gtk_window_has_toplevel_focus(GTK_WINDOW(main_window.window))) {
+		animcycle=(animcycle+1)%count;
+		gtk_image_set_from_pixmap(GTK_IMAGE(main_window.title_image), main_window.title_pixmaps[animcycle], NULL);
+	}
+	return TRUE;
+}
+
+static void
+main_window_title_animation_remove()
+{
+	int i;
+
+	g_source_remove_by_user_data(main_window_title_animation_func);
+	i=0;
+	/* free animation frames, if any */
+	if (main_window.title_pixmaps!=NULL) {
+		while (main_window.title_pixmaps[i]!=NULL) {
+			g_object_unref(main_window.title_pixmaps[i]);
+			i++;
+		}
+		g_free(main_window.title_pixmaps);
+		main_window.title_pixmaps=NULL;
+	}
+}
+
+void
+gd_main_window_set_title_animation()
+{
+	int w, h;
+
+	/* if main window does not exist, ignore. */
+	if (main_window.window==NULL)
+		return;
+	/* if exists but not showing a title image, that is an error. */
+	g_return_if_fail(main_window.title_image!=NULL);
+	
+	main_window_title_animation_remove();
+	main_window.title_pixmaps=gd_create_title_animation();
+	/* set first frame immediately */
+	gtk_image_set_from_pixmap(GTK_IMAGE(main_window.title_image), main_window.title_pixmaps[0], NULL);
+	/* and if more frames, add animation timeout */
+	if (main_window.title_pixmaps[1]!=NULL)
+		g_timeout_add(40, main_window_title_animation_func, main_window_title_animation_func);	/* 25fps animation */
+
+	/* resize the scrolling window so the image fits - a bit larger than the image so scroll bars do not appear*/
+	gdk_drawable_get_size(GDK_DRAWABLE(main_window.title_pixmaps[0]), &w, &h);
+	/* also some minimum size... 320x200 is some adhoc value only. */
+	gtk_widget_set_size_request(main_window.scroll_window, MAX(w, 320)+24, MAX(h, 200)+24);
+
+	/* with the title screen, it is usually smaller than in the game. shrink it. */
+	gtk_window_resize(GTK_WINDOW(main_window.window), 1, 1);
+}
+
+static void
+main_window_init_title()
+{
+	if (!main_window.title_image) {
+		/* destroy current widget in main window */
+		if (gtk_bin_get_child(GTK_BIN(main_window.scroll_window)))
+			gtk_widget_destroy(gtk_bin_get_child(GTK_BIN(main_window.scroll_window)));
+
+		/* title screen */
+		main_window.title_image=gtk_image_new();
+		g_signal_connect (G_OBJECT(main_window.title_image), "destroy", G_CALLBACK(gtk_widget_destroyed), &main_window.title_image);
+		g_signal_connect (G_OBJECT(main_window.title_image), "destroy", G_CALLBACK(main_window_title_animation_remove), NULL);
+		gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW(main_window.scroll_window), main_window.title_image);
+		
+		gd_main_window_set_title_animation();
+
+		/* show newly created widgets */
+		gtk_widget_show_all(main_window.scroll_window);
+	}
+
+	/* hide cave data */
+	gtk_widget_hide(main_window.labels);
+	gtk_widget_hide(main_window.label_variables);
+	if (gd_has_new_error()) {
+		gtk_widget_show(main_window.error_hbox);
+		gtk_label_set(GTK_LABEL(main_window.error_label), ((GdErrorMessage *)(g_list_last(gd_errors)->data))->message);
+	} else {
+		gtk_widget_hide(main_window.error_hbox);
+	}
+
+	/* set or unset fullscreen if necessary */
+	main_window_set_fullscreen();
+
+	/* enable menus and buttons of game */
+	gtk_action_group_set_sensitive(main_window.actions_title, !gd_editor_window);
+	gtk_action_group_set_sensitive(main_window.actions_game, FALSE);
+	gtk_action_group_set_sensitive(main_window.actions_snapshot, snapshot!=NULL);
+	/* if editor window exists, no music. */
+	if (gd_editor_window)
+		gd_music_stop();
+	else
+		gd_music_play_random();
+	if (gd_editor_window)
+		gtk_widget_set_sensitive(gd_editor_window, TRUE);
+	gtk_widget_hide(main_window.replay_image_align);
+}
+
+
+
+static void
+main_window_init_cave(GdCave *cave)
+{
+	char *name_escaped;
+	
+	g_assert(cave!=NULL);
+
+	/* cave drawing */
+	if (!main_window.drawing_area) {
+		GtkWidget *align;
+
+		/* destroy current widget in main window */
+		if (gtk_bin_get_child(GTK_BIN(main_window.scroll_window)))
+			gtk_widget_destroy(gtk_bin_get_child(GTK_BIN(main_window.scroll_window)));
+
+		/* put drawing area in an alignment, so window can be any large w/o problems */
+		align=gtk_alignment_new(0.5, 0.5, 0, 0);
+		gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW(main_window.scroll_window), align);
+
+		main_window.drawing_area=gtk_drawing_area_new();
+		gtk_widget_set_events (main_window.drawing_area, GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_LEAVE_NOTIFY_MASK);
+		g_signal_connect (G_OBJECT(main_window.drawing_area), "button_press_event", G_CALLBACK(drawing_area_button_event), NULL);
+		g_signal_connect (G_OBJECT(main_window.drawing_area), "button_release_event", G_CALLBACK(drawing_area_button_event), NULL);
+		g_signal_connect (G_OBJECT(main_window.drawing_area), "motion_notify_event", G_CALLBACK(drawing_area_motion_event), NULL);
+		g_signal_connect (G_OBJECT(main_window.drawing_area), "leave_notify_event", G_CALLBACK(drawing_area_leave_event), NULL);
+		g_signal_connect (G_OBJECT(main_window.drawing_area), "expose_event", G_CALLBACK(drawing_area_expose_event), NULL);
+		g_signal_connect (G_OBJECT(main_window.drawing_area), "destroy", G_CALLBACK(gtk_widget_destroyed), &main_window.drawing_area);
+		gtk_container_add (GTK_CONTAINER (align), main_window.drawing_area);
+		if (gd_mouse_play)
+			gdk_window_set_cursor (main_window.drawing_area->window, gdk_cursor_new(GDK_CROSSHAIR));
+
+		/* show newly created widgets */
+		gtk_widget_show_all(main_window.scroll_window);
+	}
+	/* set the minimum size of the scroll window: 20*12 cells */
+	/* XXX adding some pixels for the scrollbars-here we add 24 */
+	gtk_widget_set_size_request(main_window.scroll_window, 20*gd_cell_size_game+24, 12*gd_cell_size_game+24);
+	gtk_widget_set_size_request(main_window.drawing_area, (cave->x2-cave->x1+1)*gd_cell_size_game, (cave->y2-cave->y1+1)*gd_cell_size_game);
+
+	/* show cave data */
+	gtk_widget_show(main_window.labels);
+	if (main_window.game->type==GD_GAMETYPE_TEST && gd_show_test_label)
+		gtk_widget_show(main_window.label_variables);
+	else
+		gtk_widget_hide(main_window.label_variables);
+	gtk_widget_hide(main_window.error_hbox);
+
+	name_escaped=g_markup_escape_text(cave->name, -1);
+	/* TRANSLATORS: cave name, level x */
+	gd_label_set_markup_printf(GTK_LABEL(main_window.label_topleft), _("<b>%s</b>, level %d"), name_escaped, cave->rendered);
+	g_free(name_escaped);
+
+	/* set or unset fullscreen if necessary */
+	main_window_set_fullscreen();
+
+	/* enable menus and buttons of game */
+	gtk_action_group_set_sensitive(main_window.actions_title, FALSE);
+	gtk_action_group_set_sensitive(main_window.actions_game, TRUE);
+	gtk_action_group_set_sensitive(main_window.actions_snapshot, snapshot!=NULL);
+
+	gd_music_stop();
+	if (gd_editor_window)
+		gtk_widget_set_sensitive(gd_editor_window, FALSE);
+	gtk_widget_hide(main_window.replay_image_align);	/* it will be shown if needed. */
+}
+
+static void
+main_window_init_story(GdCave *cave)
+{
+	char *escaped_name, *escaped_story;
+	
+	if (!main_window.story_label) {
+		/* destroy current widget in main window */
+		if (gtk_bin_get_child(GTK_BIN(main_window.scroll_window)))
+			gtk_widget_destroy(gtk_bin_get_child(GTK_BIN(main_window.scroll_window)));
+
+		/* title screen */
+		main_window.story_label=gtk_label_new(NULL);
+		gtk_label_set_line_wrap(GTK_LABEL(main_window.story_label), TRUE);
+		g_signal_connect(G_OBJECT(main_window.story_label), "destroy", G_CALLBACK(gtk_widget_destroyed), &main_window.story_label);
+		gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW(main_window.scroll_window), main_window.story_label);
+
+		/* show newly created widgets */
+		gtk_widget_show_all(main_window.scroll_window);
+	}
+	escaped_name=g_markup_escape_text(cave->name, -1);
+	escaped_story=g_markup_escape_text(cave->story->str, -1);
+	gd_label_set_markup_printf(GTK_LABEL(main_window.story_label), _("<big><b>%s</b></big>\n\n%s\n\n<i>Press fire to continue</i>"), escaped_name, escaped_story);
+	g_free(escaped_name);
+	g_free(escaped_story);
+	/* the width of the label is 320, as the windows is usually not smaller than 320x200 */
+	gtk_widget_set_size_request(main_window.story_label, 320, -1);
+
+	/* hide cave data */
+	gtk_widget_hide(main_window.labels);
+	gtk_widget_hide(main_window.label_variables);
+	if (gd_has_new_error()) {
+		gtk_widget_show(main_window.error_hbox);
+		gtk_label_set(GTK_LABEL(main_window.error_label), ((GdErrorMessage *)(g_list_last(gd_errors)->data))->message);
+	} else {
+		gtk_widget_hide(main_window.error_hbox);
+	}
+
+	/* set or unset fullscreen if necessary */
+	main_window_set_fullscreen();
+
+	/* enable menus and buttons of game */
+	gtk_action_group_set_sensitive(main_window.actions_title, FALSE);
+	gtk_action_group_set_sensitive(main_window.actions_game, TRUE);
+	gtk_action_group_set_sensitive(main_window.actions_snapshot, snapshot!=NULL);
+	/* if editor window exists, no music. */
+	gd_music_stop();
+	if (gd_editor_window)
+		gtk_widget_set_sensitive(gd_editor_window, FALSE);
+	gtk_widget_hide(main_window.replay_image_align);
+}
+
+
+
+/* game over, and highscore is achieved.
+ * ask for name, and if given, record it! */
+static void
+game_over_highscore()
+{
+	char *text;
+	int rank;
+
+	text=g_strdup_printf(_("You have %d points, and achieved a highscore."), main_window.game->player_score);
+	gd_infomessage(_("Game over!"), text);
+	g_free(text);
+
+	/* enter to highscore table */
+	rank=gd_add_highscore(gd_caveset_data->highscore, main_window.game->player_name, main_window.game->player_score);
+	gd_show_highscore(main_window.window, NULL, FALSE, NULL, rank);
+}
+
+/* game over, but no highscore.
+ * only pops up a simple dialog box. */
+static void
+game_over_without_highscore()
+{
+	gchar *text;
+
+	text=g_strdup_printf(_("You have %d points."), main_window.game->player_score);
+	gd_infomessage(_("Game over!"), text);
+	g_free(text);
+
+}
+
+
+
+
+static void
+main_int_set_labels()
+{
+	const GdCave *cave=main_window.game->cave;
+	int time;
+	
+	/* lives reamining in game. */
+	/* not trivial, but this sometimes DOES change during the running of a cave. */
+	/* as when playing a replay, it might change from playing replay to continuing replay. */
+	switch (main_window.game->type) {
+		/* for a normal cave, show number of lives or "bonus life" if it is an intermission */
+		case GD_GAMETYPE_NORMAL:
+			if (!cave->intermission)
+				gd_label_set_markup_printf(GTK_LABEL(main_window.label_topright), _("Lives: <b>%d</b>"), main_window.game->player_lives);
+			else
+				gd_label_set_markup_printf(GTK_LABEL(main_window.label_topright), _("<b>Bonus life</b>"));
+			break;
+			
+		/* for other game types, the number of lives is zero. so show the game type */
+		case GD_GAMETYPE_SNAPSHOT:
+			gd_label_set_markup_printf(GTK_LABEL(main_window.label_topright), _("Continuing from <b>snapshot</b>"));
+			break;
+		case GD_GAMETYPE_TEST:
+			gd_label_set_markup_printf(GTK_LABEL(main_window.label_topright), _("<b>Testing</b> cave"));
+			break;
+		case GD_GAMETYPE_REPLAY:
+			gd_label_set_markup_printf(GTK_LABEL(main_window.label_topright), _("Playing <b>replay</b>"));
+			break;
+		case GD_GAMETYPE_CONTINUE_REPLAY:
+			gd_label_set_markup_printf(GTK_LABEL(main_window.label_topright), _("Continuing <b>replay</b>"));
+			break;
+	}
+	
+	
+	/* SECOND ROW OF STATUS BAR. */
+	/* if the user is not pressing the left shift, show the normal status bar. otherwise, show the alternative. */
+	if (!key_alt_status_bar) {
+		/* NORMAL STATUS BAR */
+		/* diamond value */
+		if (cave->diamonds_needed>0)
+			gd_label_set_markup_printf(GTK_LABEL(main_window.label_bottomleft), _("Diamonds: <b>%03d</b>  Value: <b>%02d</b>"), cave->diamonds_collected>=cave->diamonds_needed?0:cave->diamonds_needed-cave->diamonds_collected, cave->diamond_value);
+		else
+			gd_label_set_markup_printf(GTK_LABEL(main_window.label_bottomleft), _("Diamonds: <b>??""?</b>  Value: <b>%02d</b>"), cave->diamond_value);/* "" to avoid C trigraph ??< */
+
+		/* show time & score */
+		time=gd_cave_time_show(cave, cave->time);
+		if (gd_time_min_sec)
+			gd_label_set_markup_printf(GTK_LABEL(main_window.label_bottomright), "Time: <b>%02d:%02d</b>  Score: <b>%06d</b>", time/60, time%60, main_window.game->player_score);
+		else
+			gd_label_set_markup_printf(GTK_LABEL(main_window.label_bottomright), "Time: <b>%03d</b>  Score: <b>%06d</b>", time, main_window.game->player_score);
+	} else {
+		/* ALTERNATIVE STATUS BAR */
+		gd_label_set_markup_printf(GTK_LABEL(main_window.label_bottomleft), _("Keys: <b>%d</b>, <b>%d</b>, <b>%d</b>"), cave->key1, cave->key2, cave->key3);
+		gd_label_set_markup_printf(GTK_LABEL(main_window.label_bottomright), _("Skeletons: <b>%d</b>  Gravity change: <b>%d</b>"), cave->skeletons_collected, gd_cave_time_show(cave, cave->gravity_will_change));
+	}
+
+	if (gd_editor_window && gd_show_test_label) {
+		gd_label_set_markup_printf(GTK_LABEL(main_window.label_variables),
+								_("Speed: %dms, Amoeba timer: %ds %d, %ds %d, Magic wall timer: %ds\n"
+								"Expanding wall: %s, Creatures: %ds, %s, Gravity: %s\n"
+								"Kill player: %s, Sweet eaten: %s, Diamond key: %s"),
+								cave->speed,
+								gd_cave_time_show(cave, cave->amoeba_time),
+								cave->amoeba_state,
+								gd_cave_time_show(cave, cave->amoeba_2_time),
+								cave->amoeba_2_state,
+								gd_cave_time_show(cave, cave->magic_wall_time),
+// XXX							cave->magic_wall_state,
+								cave->expanding_wall_changed?_("vertical"):_("horizontal"),
+								gd_cave_time_show(cave, cave->creatures_direction_will_change),
+								cave->creatures_backwards?_("backwards"):_("forwards"),
+								gd_direction_get_visible_name(cave->gravity_disabled?MV_STILL:cave->gravity),
+								cave->kill_player?_("yes"):_("no"),
+								cave->sweet_eaten?_("yes"):_("no"),
+								cave->diamond_key_collected?_("yes"):_("no")
+								);
+	}
+}
+
+
+/* THE MAIN GAME TIMER */
+/* called at 50hz */
+/* for the gtk version, it seems nicer if we first draw, then scroll. */
+/* this is because there is an expose event; scrolling the "old" drawing would draw the old, and then the new. */
+/* (this is not true for the sdl version) */
+#if 0
+static GTimer *timer=NULL;
+static int called=0;
+#endif
+
+/* SCROLLING
+ *
+ * scrolls to the player during game play.
+ */
+static void
+main_int_scroll()
+{
+	static int scroll_desired_x=0, scroll_desired_y=0;
+	GtkAdjustment *adjustment;
+	int scroll_center_x, scroll_center_y;
+	gboolean out_of_window=FALSE;
+	gboolean changed;
+	int i;
+	int player_x, player_y;
+	const GdCave *cave=main_window.game->cave;
+	gboolean exact_scroll;
+	/* hystheresis size is this, multiplied by two.
+	 * so player can move half the window without scrolling. */
+	int scroll_start_x=main_window.scroll_window->allocation.width/4;
+	int scroll_to_x=main_window.scroll_window->allocation.width/8;
+	int scroll_start_y=main_window.scroll_window->allocation.height/5;	/* window usually smaller vertically, so let the region be also smaller than the horizontal one */
+	int scroll_to_y=main_window.scroll_window->allocation.height/10;
+	int scroll_speed;
+
+	/* if cave not yet rendered, return. (might be the case for 50hz scrolling */
+	if (main_window.game==NULL || main_window.game->cave==NULL)
+		return;	
+	if (paused)
+		return;	/* no scrolling when pause button is pressed */	
+		
+	/* max scrolling speed depends on the speed of the cave. */
+	/* game moves cell_size_game* 1s/cave time pixels in a second. */
+	/* scrolling moves scroll speed * 1s/scroll_time in a second. */
+	/* these should be almost equal; scrolling speed a little slower. */
+	/* that way, the player might reach the border with a small probability, */
+	/* but the scrolling will not "oscillate", ie. turn on for little intervals as it has */
+	/* caught up with the desired position. smaller is better. */
+	scroll_speed=gd_cell_size_game*(gd_fine_scroll?20:40)/cave->speed;
+		
+	/* check player state. */
+	switch (main_window.game->cave->player_state) {
+		case GD_PL_NOT_YET:
+			exact_scroll=TRUE;
+			break;
+
+		case GD_PL_LIVING:
+		case GD_PL_EXITED:
+			exact_scroll=FALSE;
+			break;
+
+		case GD_PL_TIMEOUT:
+		case GD_PL_DIED:
+			/* do not scroll when the player is dead or cave time is over. */
+			return;	/* return from function */
+	}
+
+	player_x=cave->player_x-cave->x1;
+	player_y=cave->player_y-cave->y1;
+
+	/* get the size of the window so we know where to place player.
+	 * first guess is the middle of the screen.
+	 * main_window.drawing_area->parent->parent is the viewport.
+	 * +cellsize/2 gets the stomach of player :) so the very center */
+	scroll_center_x=player_x*gd_cell_size_game + gd_cell_size_game/2-main_window.drawing_area->parent->parent->allocation.width/2;
+	scroll_center_y=player_y*gd_cell_size_game + gd_cell_size_game/2-main_window.drawing_area->parent->parent->allocation.height/2;
+
+	/* HORIZONTAL */
+	/* hystheresis function.
+	 * when scrolling left, always go a bit less left than player being at the middle.
+	 * when scrolling right, always go a bit less to the right. */
+	adjustment=gtk_scrolled_window_get_hadjustment (GTK_SCROLLED_WINDOW(main_window.scroll_window));
+	if (exact_scroll)
+		scroll_desired_x=scroll_center_x;
+	else {
+		if (adjustment->value+scroll_start_x<scroll_center_x)
+			scroll_desired_x=scroll_center_x-scroll_to_x;
+		if (adjustment->value-scroll_start_x>scroll_center_x)
+			scroll_desired_x=scroll_center_x+scroll_to_x;
+	}
+	scroll_desired_x=CLAMP(scroll_desired_x, 0, adjustment->upper-adjustment->step_increment-adjustment->page_increment);
+
+	changed=FALSE;
+	if (adjustment->value<scroll_desired_x) {
+		for (i=0; i<scroll_speed; i++)
+			if ((int)adjustment->value<scroll_desired_x)
+				adjustment->value++;
+		changed=TRUE;
+	}
+	if (adjustment->value>scroll_desired_x) {
+		for (i=0; i<scroll_speed; i++)
+			if ((int)adjustment->value>scroll_desired_x)
+				adjustment->value--;
+		changed=TRUE;
+	}
+	if (changed)
+		gtk_adjustment_value_changed (adjustment);
+
+	/* check if active player is outside drawing area. if yes, we should wait for scrolling */
+	if ((player_x*gd_cell_size_game)<adjustment->value || (player_x*gd_cell_size_game+gd_cell_size_game-1)>adjustment->value+main_window.drawing_area->parent->parent->allocation.width)
+		/* but only do the wait, if the player SHOULD BE visible, ie. he is inside the defined visible area of the cave */
+		if (cave->player_x>=cave->x1 && cave->player_x<=cave->x2)
+			out_of_window=TRUE;
+
+
+
+
+	/* VERTICAL */
+	adjustment=gtk_scrolled_window_get_vadjustment (GTK_SCROLLED_WINDOW(main_window.scroll_window));
+	if (exact_scroll)
+		scroll_desired_y=scroll_center_y;
+	else {
+		if (adjustment->value+scroll_start_y<scroll_center_y)
+			scroll_desired_y=scroll_center_y-scroll_to_y;
+		if (adjustment->value-scroll_start_y>scroll_center_y)
+			scroll_desired_y=scroll_center_y+scroll_to_y;
+	}
+	scroll_desired_y=CLAMP(scroll_desired_y, 0, adjustment->upper-adjustment->step_increment-adjustment->page_increment);
+
+	changed=FALSE;
+	if (adjustment->value<scroll_desired_y) {
+		for (i=0; i<scroll_speed; i++)
+			if ((int)adjustment->value<scroll_desired_y)
+				adjustment->value++;
+		changed=TRUE;
+	}
+	if (adjustment->value > scroll_desired_y) {
+		for (i=0; i<scroll_speed; i++)
+			if ((int)adjustment->value>scroll_desired_y)
+				adjustment->value--;
+		changed=TRUE;
+	}
+	if (changed)
+		gtk_adjustment_value_changed(adjustment);
+
+	/* check if active player is outside drawing area. if yes, we should wait for scrolling */
+	if ((player_y*gd_cell_size_game)<adjustment->value || (player_y*gd_cell_size_game+gd_cell_size_game-1)>adjustment->value+main_window.drawing_area->parent->parent->allocation.height)
+		/* but only do the wait, if the player SHOULD BE visible, ie. he is inside the defined visible area of the cave */
+		if (cave->player_y>=cave->y1 && cave->player_y<=cave->y2)
+			out_of_window=TRUE;
+
+	/* remember if player is visible inside window */
+	main_window.game->out_of_window=out_of_window;
+
+	/* if not yet born, we treat as visible. so cave will run. the user is unable to control an unborn player, so this is the right behaviour. */
+	if (main_window.game->cave->player_state==GD_PL_NOT_YET)
+		main_window.game->out_of_window=FALSE;
+		
+	gdk_window_process_updates(main_window.drawing_area->window, TRUE);
+}
+
+/* the timing thread runs in a separate thread. this variable is set to true,
+ * then the function exits (and also the thread.) */
+static gboolean main_int_quit_thread;
+
+static gboolean
+main_int(gpointer data)
+{
+	static gboolean toggle=FALSE;	/* value irrelevant */
+	int up, down, left, right;
+	GdDirection player_move;
+	gboolean fire;
+	GdGameState state;
+	
+#if 0
+	called++;
+	if (called%100==0)
+		g_message("%8d. call, avg %gms", called, g_timer_elapsed(timer, NULL)*1000/called);
+#endif
+
+	if (main_window.game->type==GD_GAMETYPE_REPLAY)
+		gtk_widget_show(main_window.replay_image_align);
+	else
+		gtk_widget_hide(main_window.replay_image_align);
+	
+	up=key_up;
+	down=key_down;
+	left=key_left;
+	right=key_right;
+	fire=key_fire_1 || key_fire_2;
+
+	/* compare mouse coordinates to player coordinates, and make up movements */
+	if (gd_mouse_play && mouse_cell_x>=0) {
+		down=down || (main_window.game->cave->player_y<mouse_cell_y);
+		up=up || (main_window.game->cave->player_y>mouse_cell_y);
+		left=left || (main_window.game->cave->player_x>mouse_cell_x);
+		right=right || (main_window.game->cave->player_x<mouse_cell_x);
+		fire=fire || mouse_cell_click;
+	}
+
+	/* call the game "interrupt" to do all things. */
+	player_move=gd_direction_from_keypress(up, down, left, right);
+	/* tell the interrupt that 20ms has passed. */
+	state=gd_game_main_int(main_window.game, 20, player_move, fire, key_suicide, restart, !paused && !main_window.game->out_of_window, paused, fast_forward);
+
+	/* the game "interrupt" gives signals to us, which we act upon: update status bar, resize the drawing area... */
+	switch (state) {
+		case GD_GAME_INVALID_STATE:
+			g_assert_not_reached();
+			break;
+			
+		case GD_GAME_SHOW_STORY:
+			main_window_init_story(main_window.game->cave);
+			main_int_set_labels();
+			break;
+			
+		case GD_GAME_CAVE_LOADED:
+			gd_select_pixbuf_colors(main_window.game->cave->color0, main_window.game->cave->color1, main_window.game->cave->color2, main_window.game->cave->color3, main_window.game->cave->color4, main_window.game->cave->color5);
+			main_window_init_cave(main_window.game->cave);
+			main_int_set_labels();
+			restart=FALSE;	/* so we do not remember the restart key from a previous cave run */
+			break;
+
+		case GD_GAME_NO_MORE_LIVES:	/* <- only used by sdl version */
+		case GD_GAME_NOTHING:
+			/* normally continue. */
+			break;
+
+		case GD_GAME_LABELS_CHANGED:
+		case GD_GAME_TIMEOUT_NOW:	/* <- maybe we should do something else for this */
+			/* normal, but we are told that the labels (score, ...) might have changed. */
+			main_int_set_labels();
+			break;
+
+		case GD_GAME_STOP:
+			gd_main_stop_game();
+			main_int_quit_thread=TRUE;
+			return FALSE;	/* do not call again - it will be created later */
+
+		case GD_GAME_GAME_OVER:
+			gd_main_stop_game();
+			if (gd_is_highscore(gd_caveset_data->highscore, main_window.game->player_score))
+				game_over_highscore();			/* achieved a high score! */
+			else
+				game_over_without_highscore();			/* no high score */
+			main_int_quit_thread=TRUE;
+			return FALSE;	/* do not call again - it will be created later */
+	}
+
+	/* if drawing area already exists, draw cave. */
+	/* remember that the drawings are cached, so if we did no change, this will barely do anything - so will not slow down. */
+	if (main_window.drawing_area)
+		drawing_area_draw_cave();
+	/* do the scrolling at the given interval. */
+	/* but only if the drawing area already exists. */
+	/* if fine scrolling, drawing is called at a 50hz rate. */
+	/* if not, only at a 25hz rate */
+	toggle=!toggle;
+	if (main_window.drawing_area && (gd_fine_scroll || toggle)) {
+		main_int_scroll();
+	}
+
+	return TRUE;	/* call again */
+}
+
+/* this is a simple wrapper which makes the main_int to be callable as an idle func. */
+/* when used as an idle func by the thread routine, it should run only once for every g_idle_add */
+static gboolean
+main_int_return_false_wrapper(gpointer data)
+{
+	main_int(data);
+	return FALSE;
+}
+
+/* this function will run in its own thread, and add the main int as an idle func in every 20ms */
+static gpointer
+main_int_timer_thread(gpointer data)
+{
+	int interval_msec=20;
+
+	/* wait before we first call it */	
+	g_usleep(interval_msec*1000);
+	while (!main_int_quit_thread) {
+		/* add processing as an idle func */
+		/* no need to lock the main loop context, as glib does that automatically */
+		g_idle_add(main_int_return_false_wrapper, data);
+
+		g_usleep(interval_msec*1000);
+	}
+	return NULL;
+}
+
+/*
+	uninstall game timers, if any installed.
+*/
+static void
+main_int_uninstall_timer()
+{
+	main_int_quit_thread=TRUE;
+	/* remove timeout associated to game play */
+	while (g_source_remove_by_user_data (main_window.window)) {
+		/* nothing */
+	}
+}
+
+
+static void
+main_int_install_timer()
+{
+	GThread *thread;
+	GError *error=NULL;
+	
+	/* remove timer, if it is installed for some reason */
+	main_int_uninstall_timer();
+
+	if (!paused)
+		gtk_window_present(GTK_WINDOW(main_window.window));
+
+#if 0
+	if (!timer)
+		timer=g_timer_new();
+#endif
+
+	/* this makes the main int load the first cave, and then we do the drawing. */
+	main_int(main_window.window);
+	gdk_window_process_all_updates();
+	/* after that, install timer. create a thread with higher priority than normal: */
+	/* so its priority will be higher than the main thread, which does the drawing etc. */
+	/* if the scheduling thread wants to do something, it gets processed first. this makes */
+	/* the intervals more even. */
+	main_int_quit_thread=FALSE;
+#ifdef G_THREADS_ENABLED
+	thread=g_thread_create_full(main_int_timer_thread, main_window.window, 0, FALSE, FALSE, G_THREAD_PRIORITY_HIGH, &error);
+#else
+	thread=NULL;	/* if glib without thread support, we will use timeout source. */
+#endif
+	if (!thread) {
+		/* if unable to create thread */
+		if (error) {
+			g_critical("%s", error->message);
+			g_error_free(error);
+		}
+		/* use the main int as a timeout routine. */
+		g_timeout_add(20, main_int, main_window.window);
+	}
+	
+#if 0
+	g_timer_start(timer);
+	called=0;
+#endif
+}
+
+void
+gd_main_stop_game()
+{
+	main_int_uninstall_timer();
+
+	if (main_window.game) {
+		gd_game_free(main_window.game);
+		main_window.game=NULL;
+	}
+
+	main_window_init_title();
+	main_window_set_fullscreen();
+	/* if editor is active, go back to its window. */
+	if (gd_editor_window)
+		gtk_window_present(GTK_WINDOW(gd_editor_window));
+}
+
+
+/* this starts a new game */
+static void
+main_new_game(const char *player_name, const int cave, const int level)
+{
+	if (main_window.game)
+		gd_main_stop_game();
+	
+	main_window.game=gd_game_new(player_name, cave, level);
+	main_int_install_timer();
+}
+
+
+static void
+main_new_game_snapshot(GdCave *snapshot)
+{
+	if (main_window.game)
+		gd_main_stop_game();
+	
+	main_window.game=gd_game_new_snapshot(snapshot);
+	main_int_install_timer();
+}
+
+/* the new game for testing a level is global, not static.
+ * it is used by the editor. */
+void
+gd_main_new_game_test(GdCave *test, int level)
+{
+	if (main_window.game)
+		gd_main_stop_game();
+	
+	main_window.game=gd_game_new_test(test, level);
+	main_int_install_timer();
+}
+
+
+static void
+main_new_game_replay(GdCave *cave, GdReplay *replay)
+{
+	if (main_window.game)
+		gd_main_stop_game();
+	
+	main_window.game=gd_game_new_replay(cave, replay);
+	main_int_install_timer();
+}
+
+
+
+
+
+
+
+
+/*
+ * set the main window title from the caveset name.
+ * made global, as the editor might ocassionally call it.
+ * 
+ */
+void
+gd_main_window_set_title()
+{
+	if (!g_str_equal(gd_caveset_data->name, "")) {
+		char *text;
+
+		text=g_strdup_printf("GDash - %s", gd_caveset_data->name);
+		gtk_window_set_title (GTK_WINDOW(main_window.window), text);
+		g_free (text);
+	}
+	else
+		gtk_window_set_title (GTK_WINDOW(main_window.window), "GDash");
+}
+
+
+
+
 
 /**********************************-
  *
@@ -417,28 +1134,29 @@ focus_out_event(GtkWidget *widget, GdkEvent *event, gpointer data)
 static void
 help_cb(GtkWidget * widget, gpointer data)
 {
-	gd_show_game_help (((GDMainWindow *)data)->window);
+	gd_show_game_help (((GdMainWindow *)data)->window);
 }
 
 static void
 preferences_cb(GtkWidget *widget, gpointer data)
 {
-	gd_preferences(((GDMainWindow *)data)->window);
+	gd_preferences(((GdMainWindow *)data)->window);
 }
 
 static void
 control_settings_cb(GtkWidget *widget, gpointer data)
 {
-	gd_control_settings(((GDMainWindow *)data)->window);
+	gd_control_settings(((GdMainWindow *)data)->window);
 }
 
 static void
 quit_cb(GtkWidget * widget, const gpointer data)
 {
-	gtk_main_quit();
+	if (gd_discard_changes(main_window.window))
+		gtk_main_quit ();
 }
 
-void
+static void
 stop_game_cb(GtkWidget *widget, gpointer data)
 {
 	gd_main_stop_game();
@@ -450,7 +1168,7 @@ save_snapshot_cb(GtkWidget * widget, gpointer data)
 	if (snapshot)
 		gd_cave_free(snapshot);
 	
-	snapshot=gd_create_snapshot();
+	snapshot=gd_create_snapshot(main_window.game);
 	gtk_action_group_set_sensitive (main_window.actions_snapshot, snapshot!=NULL);
 }
 
@@ -458,14 +1176,15 @@ static void
 load_snapshot_cb(GtkWidget * widget, gpointer data)
 {
 	g_return_if_fail(snapshot!=NULL);
-	gd_main_new_game_snapshot(snapshot);
+	main_new_game_snapshot(snapshot);
 }
 
 /* restart level button clicked */
 static void
 restart_level_cb(GtkWidget * widget, gpointer data)
 {
-	g_return_if_fail(gd_gameplay.cave!=NULL);
+	g_return_if_fail(main_window.game!=NULL);
+	g_return_if_fail(main_window.game->cave!=NULL);
 	/* sets the restart variable, which will be interpreted by the iterate routine */
 	restart=TRUE;
 }
@@ -511,739 +1230,6 @@ load_internal_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-toggle_pause_cb(GtkWidget * widget, gpointer data)
-{
-	paused=gtk_toggle_action_get_active(GTK_TOGGLE_ACTION (widget));
-
-	if (paused)
-		gd_no_sound();
-}
-
-static void
-toggle_fullscreen_cb (GtkWidget * widget, gpointer data)
-{
-	fullscreen=gtk_toggle_action_get_active(GTK_TOGGLE_ACTION (widget));
-	set_fullscreen();
-}
-
-static void
-toggle_fast_cb (GtkWidget * widget, gpointer data)
-{
-	fast_forward=gtk_toggle_action_get_active (GTK_TOGGLE_ACTION (widget));
-}
-
-static void
-showheader()
-{
-	const Cave *cave=gd_gameplay.cave;
-	int time;
-	
-	/* show time */
-	time=gd_cave_time_show(cave, cave->time);
-	if (gd_time_min_sec)
-		gd_label_set_markup_printf(GTK_LABEL(main_window.label_time), _("Time: <b>%02d:%02d</b>"), time/60, time%60);
-	else
-		gd_label_set_markup_printf(GTK_LABEL(main_window.label_time), _("Time: <b>%03d</b>"), time);
-
-	/* lives reamining in game */
-	switch (gd_gameplay.type) {
-		case GD_GAMETYPE_NORMAL:
-			if (!cave->intermission)
-				gd_label_set_markup_printf(GTK_LABEL(main_window.label_lives), _("Lives: <b>%d</b>"), gd_gameplay.player_lives);
-			else
-				gd_label_set_markup_printf(GTK_LABEL(main_window.label_lives), _("<b>Bonus life</b>"));
-			break;
-		case GD_GAMETYPE_SNAPSHOT:
-			gd_label_set_markup_printf(GTK_LABEL(main_window.label_lives), _("Continuing from <b>snapshot</b>"));
-			break;
-		case GD_GAMETYPE_TEST:
-			gd_label_set_markup_printf(GTK_LABEL(main_window.label_lives), _("<b>Testing</b> cave"));
-			break;
-		case GD_GAMETYPE_REPLAY:
-			gd_label_set_markup_printf(GTK_LABEL(main_window.label_lives), _("Playing <b>replay</b>"));
-			break;
-		case GD_GAMETYPE_CONTINUE_REPLAY:
-			gd_label_set_markup_printf(GTK_LABEL(main_window.label_lives), _("Continuing <b>replay</b>"));
-			break;
-	}
-	/* game score */
-	gd_label_set_markup_printf(GTK_LABEL(main_window.label_score), _("Score: <b>%d</b>"), gd_gameplay.player_score);
-
-	/* diamond value */
-	gd_label_set_markup_printf(GTK_LABEL(main_window.label_value), _("Value: <b>%d</b>"), cave->diamond_value);
-
-	/* diamonds needed */
-	if (cave->diamonds_needed>0)
-		gd_label_set_markup_printf(GTK_LABEL(main_window.label_diamonds), _("Diamonds: <b>%d</b>"), cave->diamonds_collected>=cave->diamonds_needed?0:cave->diamonds_needed-cave->diamonds_collected);
-	else
-		/* did not already count diamonds */
-		gd_label_set_markup_printf(GTK_LABEL(main_window.label_diamonds), _("Diamonds: <b>??""?</b>"));	/* "" to avoid C trigraph ??< */
-
-
-	/* skeletons collected */
-	gd_label_set_markup_printf(GTK_LABEL(main_window.label_skeletons), _("Skeletons: <b>%d</b>"), cave->skeletons_collected);
-
-	/* keys label */
-	gd_label_set_markup_printf(GTK_LABEL(main_window.label_key1), _("Key 1: <b>%d</b>"), cave->key1);
-	gd_label_set_markup_printf(GTK_LABEL(main_window.label_key2), _("Key 2: <b>%d</b>"), cave->key2);
-	gd_label_set_markup_printf(GTK_LABEL(main_window.label_key3), _("Key 3: <b>%d</b>"), cave->key3);
-
-	/* gravity label */
-	gd_label_set_markup_printf(GTK_LABEL(main_window.label_gravity_will_change), _("Gravity change: <b>%d</b>"), gd_cave_time_show(cave, cave->gravity_will_change));
-
-	if (editor_window && gd_show_test_label) {
-		gd_label_set_markup_printf(GTK_LABEL(main_window.label_variables),
-								"Speed: %dms, Amoeba timer: %ds %d, %ds %d, Magic wall timer: %ds\n"
-								"Expanding wall: %s, Creatures: %ds, %s, Gravity: %s\n"
-								"Kill player: %s, Sweet eaten: %s, Diamond key: %s",
-								cave->speed,
-								gd_cave_time_show(cave, cave->amoeba_time),
-								cave->amoeba_state,
-								gd_cave_time_show(cave, cave->amoeba_2_time),
-								cave->amoeba_2_state,
-								gd_cave_time_show(cave, cave->magic_wall_time),
-// XXX							cave->magic_wall_state,
-								cave->expanding_wall_changed?"vertical":"horizontal",
-								gd_cave_time_show(cave, cave->creatures_direction_will_change),
-								cave->creatures_backwards?"backwards":"forwards",
-								gd_direction_get_visible_name(cave->gravity_disabled?MV_STILL:cave->gravity),
-								cave->kill_player?"yes":"no",
-								cave->sweet_eaten?"yes":"no",
-								cave->diamond_key_collected?"yes":"no"
-								);
-	}
-}
-
-
-/*
- * init mainwindow
- * creates title screen or drawing area
- *
- */
-gboolean title_animation_func(gpointer data)
-{
-	static int animcycle=0;
-	int count;
-
-	/* count the number of frames. */
-	count=0;
-	while (main_window.title_pixmaps[count]!=NULL)
-		count++;
-
-	if (gtk_window_has_toplevel_focus (GTK_WINDOW(main_window.window))) {
-		animcycle=(animcycle+1)%count;
-		gtk_image_set_from_pixmap(GTK_IMAGE(main_window.title_image), main_window.title_pixmaps[animcycle], NULL);
-	}
-	return TRUE;
-}
-
-void title_animation_remove()
-{
-	int i;
-
-	g_source_remove_by_user_data(title_animation_func);
-	i=0;
-	while (main_window.title_pixmaps[i]!=NULL) {
-		g_object_unref(main_window.title_pixmaps[i]);
-		i++;
-	}
-	g_free(main_window.title_pixmaps);
-	main_window.title_pixmaps=NULL;
-}
-
-static void
-init_mainwindow(Cave *cave)
-{
-	if (cave) {
-		char *name_escaped;
-
-		/* cave drawing */
-		if (main_window.title_image)
-			gtk_widget_destroy (main_window.title_image->parent);	/* bit tricky, destroy the viewport which was automatically added */
-
-		if (!main_window.drawing_area) {
-			GtkWidget *align;
-
-			/* put drawing area in an alignment, so window can be any large w/o problems */
-			align=gtk_alignment_new(0.5, 0.5, 0, 0);
-			gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW(main_window.scroll_window), align);
-
-			main_window.drawing_area=gtk_drawing_area_new();
-			gtk_widget_set_events (main_window.drawing_area, GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_LEAVE_NOTIFY_MASK);
-			g_signal_connect (G_OBJECT(main_window.drawing_area), "button_press_event", G_CALLBACK(drawing_area_button_event), NULL);
-			g_signal_connect (G_OBJECT(main_window.drawing_area), "button_release_event", G_CALLBACK(drawing_area_button_event), NULL);
-			g_signal_connect (G_OBJECT(main_window.drawing_area), "motion_notify_event", G_CALLBACK(drawing_area_motion_event), NULL);
-			g_signal_connect (G_OBJECT(main_window.drawing_area), "leave_notify_event", G_CALLBACK(drawing_area_leave_event), NULL);
-			g_signal_connect (G_OBJECT(main_window.drawing_area), "expose_event", G_CALLBACK(drawing_area_expose_event), NULL);
-			g_signal_connect (G_OBJECT(main_window.drawing_area), "destroy", G_CALLBACK(gtk_widget_destroyed), &main_window.drawing_area);
-			gtk_container_add (GTK_CONTAINER (align), main_window.drawing_area);
-			if (gd_mouse_play)
-				gdk_window_set_cursor (main_window.drawing_area->window, gdk_cursor_new(GDK_CROSSHAIR));
-		}
-		/* set the minimum size of the scroll window: 20*12 cells */
-		/* XXX adding some pixels for the scrollbars-here we add 24 */
-		gtk_widget_set_size_request(main_window.scroll_window, 20*gd_cell_size_game+24, 12*gd_cell_size_game+24);
-		gtk_widget_set_size_request(main_window.drawing_area, (cave->x2-cave->x1+1)*gd_cell_size_game, (cave->y2-cave->y1+1)*gd_cell_size_game);
-
-		/* show cave data */
-		gtk_widget_show(main_window.labels);
-		if (editor_window && gd_show_test_label)
-			gtk_widget_show(main_window.label_variables);
-		else
-			gtk_widget_hide(main_window.label_variables);
-		gtk_widget_hide(main_window.error_hbox);
-
-		name_escaped=g_markup_escape_text(cave->name, -1);
-		gd_label_set_markup_printf(GTK_LABEL(main_window.label_cave_name), _("<b>%s</b>, level %d"), name_escaped, cave->rendered);
-		g_free(name_escaped);
-	}
-	else {
-		if (main_window.drawing_area)
-			/* parent is the align, parent of align is the viewport automatically added. */
-			gtk_widget_destroy (main_window.drawing_area->parent->parent);
-
-		if (!main_window.title_image) {
-			int w, h;
-
-			/* title screen */
-			main_window.title_pixmaps=gd_create_title_animation();
-			main_window.title_image=gtk_image_new();
-			g_signal_connect (G_OBJECT(main_window.title_image), "destroy", G_CALLBACK(gtk_widget_destroyed), &main_window.title_image);
-			g_signal_connect (G_OBJECT(main_window.title_image), "destroy", G_CALLBACK(title_animation_remove), NULL);
-			g_timeout_add(40, title_animation_func, title_animation_func);
-			gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW(main_window.scroll_window), main_window.title_image);
-
-			/* resize the scrolling window so the image fits - a bit larger than the image so scroll bars do not appear*/
-			gdk_drawable_get_size(GDK_DRAWABLE(main_window.title_pixmaps[0]), &w, &h);
-			gtk_widget_set_size_request(main_window.scroll_window, w+24, h+24);
-		}
-
-		/* hide cave data */
-		gtk_widget_hide(main_window.labels);
-		gtk_widget_hide(main_window.label_variables);
-		if (gd_has_new_error()) {
-			gtk_widget_show(main_window.error_hbox);
-			gtk_label_set(GTK_LABEL(main_window.error_label), ((GdErrorMessage *)(g_list_last(gd_errors)->data))->message);
-		} else {
-			gtk_widget_hide(main_window.error_hbox);
-		}
-	}
-
-	/* show newly created widgets */
-	gtk_widget_show_all(main_window.scroll_window);
-
-	/* set or unset fullscreen if necessary */
-	set_fullscreen ();
-
-	/* enable menus and buttons of game */
-	gtk_action_group_set_sensitive(main_window.actions_title, cave==NULL && !editor_window);
-	gtk_action_group_set_sensitive(main_window.actions_game, cave!=NULL);
-	gtk_action_group_set_sensitive(main_window.actions_snapshot, snapshot!=NULL);
-	/* if playing a cave or editor window exists, no music. */
-	if (cave || editor_window)
-		gd_music_stop();
-	else
-		gd_music_play_random();
-	if (editor_window)
-		gtk_widget_set_sensitive(editor_window, cave==NULL);
-	gtk_widget_hide(main_window.replay_image_align);	/* it will be shown if needed. */
-}
-
-/* SCROLLING
- *
- * scrolls to the player during game play.
- */
-static void
-scroll()
-{
-	static int scroll_desired_x=0, scroll_desired_y=0;
-	static int scroll_speed_x=0, scroll_speed_y=0;
-	GtkAdjustment *adjustment;
-	int scroll_center_x, scroll_center_y;
-	gboolean out_of_window=FALSE;
-	gboolean changed;
-	int i;
-	int player_x, player_y;
-	const Cave *cave=gd_gameplay.cave;
-	gboolean exact_scroll;
-	int scroll_divisor;
-
-	scroll_divisor=12;	/* some sort of scrolling speed */
-	if (gd_fine_scroll)
-		scroll_divisor*=2;	/* as fine scrolling is 50hz, whereas normal is 25hz only */
-
-	/* if cave not yet rendered, return. (might be the case for 50hz scrolling */
-	if (gd_gameplay.cave==NULL)
-		return;	
-	/* no scrolling when pause button is pressed */	
-	if (paused)
-		return;
-
-	/* check player state. */
-	switch (gd_gameplay.cave->player_state) {
-		case GD_PL_NOT_YET:
-			exact_scroll=TRUE;
-			break;
-
-		case GD_PL_LIVING:
-		case GD_PL_EXITED:
-			exact_scroll=FALSE;
-			break;
-
-		case GD_PL_TIMEOUT:
-		case GD_PL_DIED:
-			/* do not scroll when the player is dead or cave time is over. */
-			return;	/* return from function */
-	}
-
-	player_x=cave->player_x-cave->x1;
-	player_y=cave->player_y-cave->y1;
-	/* hystheresis size is this, multiplied by two.
-	 * so player can move half the window without scrolling. */
-	int scroll_start_x=main_window.scroll_window->allocation.width/4;
-	int scroll_to_x=main_window.scroll_window->allocation.width/8;
-	int scroll_start_y=main_window.scroll_window->allocation.height/4;
-	int scroll_to_y=main_window.scroll_window->allocation.height/8;
-
-	/* get the size of the window so we know where to place player.
-	 * first guess is the middle of the screen.
-	 * main_window.drawing_area->parent->parent is the viewport.
-	 * +cellsize/2 gets the stomach of player :) so the very center */
-	scroll_center_x=player_x*gd_cell_size_game + gd_cell_size_game/2-main_window.drawing_area->parent->parent->allocation.width/2;
-	scroll_center_y=player_y*gd_cell_size_game + gd_cell_size_game/2-main_window.drawing_area->parent->parent->allocation.height/2;
-
-	/* HORIZONTAL */
-	/* hystheresis function.
-	 * when scrolling left, always go a bit less left than player being at the middle.
-	 * when scrolling right, always go a bit less to the right. */
-	adjustment=gtk_scrolled_window_get_hadjustment (GTK_SCROLLED_WINDOW(main_window.scroll_window));
-	if (exact_scroll)
-		scroll_desired_x=scroll_center_x;
-	else {
-		if (adjustment->value+scroll_start_x<scroll_center_x)
-			scroll_desired_x=scroll_center_x-scroll_to_x;
-		if (adjustment->value-scroll_start_x>scroll_center_x)
-			scroll_desired_x=scroll_center_x+scroll_to_x;
-	}
-	scroll_desired_x=CLAMP(scroll_desired_x, 0, adjustment->upper-adjustment->step_increment-adjustment->page_increment);
-	/* check if active player is outside drawing area. if yes, we should wait for scrolling */
-	if ((player_x*gd_cell_size_game)<adjustment->value || (player_x*gd_cell_size_game+gd_cell_size_game-1)>adjustment->value+main_window.drawing_area->parent->parent->allocation.width)
-		/* but only do the wait, if the player SHOULD BE visible, ie. he is inside the defined visible area of the cave */
-		if (cave->player_x>=cave->x1 && cave->player_x<=cave->x2)
-			out_of_window=TRUE;
-
-	/* adaptive scrolling speed.
-	 * gets faster with distance.
-	 * minimum speed is 1, to allow scrolling precisely to the desired positions (important at borders).
-	 */
-	if (scroll_speed_x<ABS(scroll_desired_x-adjustment->value)/scroll_divisor+1)
-		scroll_speed_x++;
-	if (scroll_speed_x>ABS(scroll_desired_x-adjustment->value)/scroll_divisor+1)
-		scroll_speed_x--;
-	changed=FALSE;
-	if (adjustment->value<scroll_desired_x) {
-		for (i=0; i<scroll_speed_x; i++)
-			if ((int)adjustment->value<scroll_desired_x)
-				adjustment->value++;
-		changed=TRUE;
-	}
-	if (adjustment->value > scroll_desired_x) {
-		for (i=0; i < scroll_speed_x; i++)
-			if ((int)adjustment->value>scroll_desired_x)
-				adjustment->value--;
-		changed=TRUE;
-	}
-	if (changed)
-		gtk_adjustment_value_changed (adjustment);
-
-	/* VERTICAL */
-	adjustment=gtk_scrolled_window_get_vadjustment (GTK_SCROLLED_WINDOW(main_window.scroll_window));
-	if (exact_scroll)
-		scroll_desired_y=scroll_center_y;
-	else {
-		if (adjustment->value + scroll_start_y < scroll_center_y)
-			scroll_desired_y=scroll_center_y-scroll_to_y;
-		if (adjustment->value-scroll_start_y > scroll_center_y)
-			scroll_desired_y=scroll_center_y + scroll_to_y;
-	}
-	scroll_desired_y=CLAMP(scroll_desired_y, 0, adjustment->upper-adjustment->step_increment-adjustment->page_increment);
-	/* check if active player is outside drawing area. if yes, we should wait for scrolling */
-	if ((player_y*gd_cell_size_game)<adjustment->value || (player_y*gd_cell_size_game+gd_cell_size_game-1)>adjustment->value+main_window.drawing_area->parent->parent->allocation.height)
-		/* but only do the wait, if the player SHOULD BE visible, ie. he is inside the defined visible area of the cave */
-		if (cave->player_y>=cave->y1 && cave->player_y<=cave->y2)
-			out_of_window=TRUE;
-
-	if (scroll_speed_y<ABS(scroll_desired_y-adjustment->value)/scroll_divisor+1)
-		scroll_speed_y++;
-	if (scroll_speed_y>ABS(scroll_desired_y-adjustment->value)/scroll_divisor+1)
-		scroll_speed_y--;
-	changed=FALSE;
-	if (adjustment->value < scroll_desired_y) {
-		for (i=0; i < scroll_speed_y; i++)
-			if ((int)adjustment->value < scroll_desired_y)
-				adjustment->value++;
-		changed=TRUE;
-	}
-	if (adjustment->value > scroll_desired_y) {
-		for (i=0; i < scroll_speed_y; i++)
-			if ((int)adjustment->value > scroll_desired_y)
-				adjustment->value--;
-		changed=TRUE;
-	}
-	if (changed)
-		gtk_adjustment_value_changed (adjustment);
-
-	/* remember if player is visible inside window */
-	gd_gameplay.out_of_window=out_of_window;
-
-	/* if not yet born, we treat as visible. so cave will run. the user is unable to control an unborn player, so this is the right behaviour. */
-	if (gd_gameplay.cave->player_state==GD_PL_NOT_YET)
-		gd_gameplay.out_of_window=FALSE;
-}
-
-
-
-
-
-
-
-
-/*
- * START NEW GAME DIALOG
- *
- * show a dialog to the user so he can select the cave to start game at.
- *
- */
-
-typedef struct _gd_jump_dialog {
-	GtkWidget *dialog;
-	GtkWidget *combo_cave;
-	GtkWidget *spin_level;
-	GtkWidget *entry_name;
-
-	GtkWidget *image;
-} GDJumpDialog;
-
-/* keypress. key_* can be event_type==gdk_key_press, as we
-   connected this function to key press and key release.
- */
-static gboolean
-new_game_keypress_event(GtkWidget *widget, GdkEventKey *event, gpointer data)
-{
-	GDJumpDialog *jump_dialog=(GDJumpDialog *)data;
-	int level=gtk_range_get_value (GTK_RANGE(jump_dialog->spin_level));
-
-	switch (event->keyval) {
-	case GDK_Left:
-		level--;
-		if (level<1)
-			level=1;
-		gtk_range_set_value (GTK_RANGE(jump_dialog->spin_level), level);
-		return TRUE;
-	case GDK_Right:
-		level++;
-		if (level>5)
-			level=5;
-		gtk_range_set_value (GTK_RANGE(jump_dialog->spin_level), level);
-		return TRUE;
-	case GDK_Return:
-		gtk_dialog_response(GTK_DIALOG(jump_dialog->dialog), GTK_RESPONSE_ACCEPT);
-		return TRUE;
-	}
-	return FALSE;	/* if any other key, we did not process it. go on, let gtk handle it. */
-}
-
-
-/* update pixbuf */
-static void
-jump_cave_changed_signal(GtkWidget *widget, gpointer data)
-{
-	GDJumpDialog *jump_dialog=(GDJumpDialog *)data;
-	GdkPixbuf *cave_image;
-	Cave *cave;
-
-	/* loading cave, draw cave and scale to specified size. seed=0 */
-	cave=gd_cave_new_from_caveset(gtk_combo_box_get_active(GTK_COMBO_BOX (jump_dialog->combo_cave)), gtk_range_get_value (GTK_RANGE(jump_dialog->spin_level))-1, 0);
-	cave_image=gd_drawcave_to_pixbuf(cave, 320, 240, TRUE);
-	gtk_image_set_from_pixbuf(GTK_IMAGE (jump_dialog->image), cave_image);
-	g_object_unref(cave_image);
-
-	/* freeing temporary cave data */
-	gd_cave_free(cave);
-}
-
-static void
-new_game_cb (const GtkWidget * widget, const gpointer data)
-{
-	static GdString player_name="";
-	GtkWidget *table, *expander, *eventbox;
-	GDJumpDialog jump_dialog;
-	GtkCellRenderer *renderer;
-	GtkListStore *store;
-	GList *iter;
-
-	/* check if caveset is empty! */
-	if (gd_caveset_count()==0) {
-		gd_warningmessage(_("There are no caves in this cave set!"), NULL);
-		return;
-	}
-
-	jump_dialog.dialog=gtk_dialog_new_with_buttons(_("Select cave to play"), GTK_WINDOW(main_window.window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_JUMP_TO, GTK_RESPONSE_ACCEPT, NULL);
-	gtk_dialog_set_default_response (GTK_DIALOG(jump_dialog.dialog), GTK_RESPONSE_ACCEPT);
-	gtk_window_set_resizable (GTK_WINDOW(jump_dialog.dialog), FALSE);
-
-	table=gtk_table_new(0, 0, FALSE);
-	gtk_box_pack_start(GTK_BOX (GTK_DIALOG(jump_dialog.dialog)->vbox), table, FALSE, FALSE, 0);
-	gtk_container_set_border_width(GTK_CONTAINER (table), 6);
-	gtk_table_set_row_spacings(GTK_TABLE(table), 6);
-	gtk_table_set_col_spacings(GTK_TABLE(table), 6);
-
-	/* name, which will be used for highscore & the like */
-	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf(_("Name:")), 0, 1, 0, 1);
-	if (g_str_equal(player_name, ""))
-		gd_strcpy(player_name, g_get_real_name());
-	jump_dialog.entry_name=gtk_entry_new();
-	/* little inconsistency below: max length has unicode characters, while gdstring will have utf-8.
-	   however this does not make too much difference */
-	gtk_entry_set_max_length(GTK_ENTRY(jump_dialog.entry_name), sizeof(GdString));
-	gtk_entry_set_activates_default(GTK_ENTRY(jump_dialog.entry_name), TRUE);
-	gtk_entry_set_text(GTK_ENTRY(jump_dialog.entry_name), player_name);
-	gtk_table_attach_defaults(GTK_TABLE(table), jump_dialog.entry_name, 1, 2, 0, 1);
-
-	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf(_("Cave:")), 0, 1, 1, 2);
-
-	/* store of caves: cave pointer, cave name, selectable */
-	store=gtk_list_store_new(3, G_TYPE_POINTER, G_TYPE_STRING, G_TYPE_BOOLEAN);
-	for (iter=gd_caveset; iter; iter=g_list_next (iter)) {
-		Cave *cave=iter->data;
-		GtkTreeIter treeiter;
-
-		gtk_list_store_insert_with_values (store, &treeiter, -1, 0, iter->data, 1, cave->name, 2, cave->selectable || gd_all_caves_selectable, -1);
-	}
-	jump_dialog.combo_cave=gtk_combo_box_new_with_model (GTK_TREE_MODEL (store));
-	g_object_unref(store);
-
-	renderer=gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(jump_dialog.combo_cave), renderer, TRUE);
-	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT(jump_dialog.combo_cave), renderer, "text", 1, "sensitive", 2, NULL);
-	/* we put the combo in an event box, so we can receive keypresses on our own */
-	eventbox=gtk_event_box_new();
-	gtk_container_add(GTK_CONTAINER(eventbox), jump_dialog.combo_cave);
-	gtk_table_attach_defaults(GTK_TABLE(table), eventbox, 1, 2, 1, 2);
-
-	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf(_("Level:")), 0, 1, 2, 3);
-	jump_dialog.spin_level=gtk_hscale_new_with_range(1.0, 5.0, 1.0);
-	gtk_scale_set_value_pos(GTK_SCALE(jump_dialog.spin_level), GTK_POS_LEFT);
-	gtk_table_attach_defaults(GTK_TABLE(table), jump_dialog.spin_level, 1, 2, 2, 3);
-
-	g_signal_connect(G_OBJECT(jump_dialog.combo_cave), "changed", G_CALLBACK(jump_cave_changed_signal), &jump_dialog);
-	gtk_widget_add_events(eventbox, GDK_KEY_PRESS_MASK);
-	g_signal_connect(G_OBJECT(eventbox), "key_press_event", G_CALLBACK(new_game_keypress_event), &jump_dialog);
-	g_signal_connect(G_OBJECT(jump_dialog.spin_level), "value-changed", G_CALLBACK(jump_cave_changed_signal), &jump_dialog);
-
-	/* this allows the user to select if he wants to see a preview of the cave */
-	expander=gtk_expander_new(_("Preview"));
-	gtk_expander_set_expanded(GTK_EXPANDER (expander), gd_show_preview);
-	gtk_table_attach_defaults(GTK_TABLE(table), expander, 0, 2, 3, 4);
-	jump_dialog.image=gtk_image_new();
-	gtk_container_add(GTK_CONTAINER (expander), jump_dialog.image);
-
-	gtk_widget_show_all(jump_dialog.dialog);
-	gtk_widget_grab_focus(jump_dialog.combo_cave);
-	gtk_editable_select_region(GTK_EDITABLE(jump_dialog.entry_name), 0, 0);
-	/* set default and also trigger redrawing */
-	gtk_combo_box_set_active(GTK_COMBO_BOX(jump_dialog.combo_cave), gd_caveset_last_selected);
-	gtk_range_set_value(GTK_RANGE(jump_dialog.spin_level), 1);
-
-	if (gtk_dialog_run (GTK_DIALOG(jump_dialog.dialog)) == GTK_RESPONSE_ACCEPT) {
-		gd_strcpy(player_name, gtk_entry_get_text(GTK_ENTRY(jump_dialog.entry_name)));
-		gd_caveset_last_selected=gtk_combo_box_get_active(GTK_COMBO_BOX(jump_dialog.combo_cave));
-		gd_caveset_last_selected_level=gtk_range_get_value(GTK_RANGE(jump_dialog.spin_level))-1;
-		new_game (player_name, gd_caveset_last_selected, gd_caveset_last_selected_level);
-	}
-	gd_show_preview=gtk_expander_get_expanded(GTK_EXPANDER (expander));	/* remember expander state-even if cancel pressed */
-	gtk_widget_destroy(jump_dialog.dialog);
-}
-
-
-
-/* THE MAIN GAME TIMER */
-/* called at 50hz */
-/* for the gtk version, it seems nicer if we first draw, then scroll. */
-/* this is because there is an expose event; scrolling the "old" drawing would draw the old, and then the new. */
-/* (this is not true for the sdl version) */
-#if 0
-static GTimer *timer=NULL;
-static int called=0;
-#endif
-
-static gboolean
-main_int(gpointer data)
-{
-	static gboolean toggle=FALSE;	/* value irrelevant */
-	int up, down, left, right;
-	GdDirection player_move;
-	gboolean fire;
-	GdGameState state;
-	
-#if 0
-	called++;
-	if (called%100==0)
-		g_message("%8d. call, avg %gms", called, g_timer_elapsed(timer, NULL)*1000/called);
-#endif
-
-	if (gd_gameplay.type==GD_GAMETYPE_REPLAY)
-		gtk_widget_show(main_window.replay_image_align);
-	else
-		gtk_widget_hide(main_window.replay_image_align);
-	
-	up=key_up;
-	down=key_down;
-	left=key_left;
-	right=key_right;
-	fire=key_lctrl || key_rctrl;
-
-	/* compare mouse coordinates to player coordinates, and make up movements */
-	if (gd_mouse_play && mouse_cell_x>=0) {
-		down=down || (gd_gameplay.cave->player_y<mouse_cell_y);
-		up=up || (gd_gameplay.cave->player_y>mouse_cell_y);
-		left=left || (gd_gameplay.cave->player_x>mouse_cell_x);
-		right=right || (gd_gameplay.cave->player_x<mouse_cell_x);
-		fire=fire || mouse_cell_click;
-	}
-
-	/* call the game "interrupt" to do all things. */
-	player_move=gd_direction_from_keypress(up, down, left, right);
-	/* tell the interrupt that 20ms has passed. */
-	state=gd_game_main_int(20, player_move, fire, key_suicide, restart, !paused && !gd_gameplay.out_of_window, paused, fast_forward);
-
-	/* the game "interrupt" gives signals to us, which we act upon: update status bar, resize the drawing area... */
-	switch (state) {
-		case GD_GAME_INVALID_STATE:
-			g_assert_not_reached();
-			break;
-			
-		case GD_GAME_CAVE_LOADED:
-			gd_select_pixbuf_colors(gd_gameplay.cave->color0, gd_gameplay.cave->color1, gd_gameplay.cave->color2, gd_gameplay.cave->color3, gd_gameplay.cave->color4, gd_gameplay.cave->color5);
-			init_mainwindow(gd_gameplay.cave);
-			showheader();
-			restart=FALSE;	/* so we do not remember the restart key from a previous cave run */
-			break;
-
-		case GD_GAME_NO_MORE_LIVES:	/* <- only used by sdl version */
-		case GD_GAME_NOTHING:
-			/* normally continue. */
-			break;
-
-		case GD_GAME_LABELS_CHANGED:
-		case GD_GAME_TIMEOUT_NOW:	/* <- maybe we should do something else for this */
-			/* normal, but we are told that the labels (score, ...) might have changed. */
-			showheader();
-			break;
-
-		case GD_GAME_STOP:
-			gd_main_stop_game();
-			quit_thread=TRUE;
-			return FALSE;	/* do not call again - it will be created later */
-
-		case GD_GAME_GAME_OVER:
-			gd_main_stop_game();
-			if (gd_is_highscore(gd_caveset_data->highscore, gd_gameplay.player_score))
-				game_over_highscore();			/* achieved a high score! */
-			else
-				game_over_without_highscore();			/* no high score */
-			quit_thread=TRUE;
-			return FALSE;	/* do not call again - it will be created later */
-	}
-
-	/* if fine scrolling, drawing is called at a 50hz rate. */
-	/* if not, only at a 25hz rate */
-	toggle=!toggle;
-
-	/* do the scrolling at the given interval. */
-	/* but only if the drawing area already exists. */
-	if (main_window.drawing_area && (gd_fine_scroll || toggle)) {
-		drawcave();
-		scroll();
-	}
-
-	return TRUE;	/* call again */
-}
-
-/* this is a simple wrapper which makes the main_int to be callable as an idle func. */
-/* when used as an idle func by the thread routine, it should run only once for every g_idle_add */
-static gboolean
-main_int_return_false_wrapper(gpointer data)
-{
-	main_int(data);
-	return FALSE;
-}
-
-/* this function will run in its own thread, and add the main int as an idle func in every 20ms */
-static gpointer
-timer_thread(gpointer data)
-{
-	int interval_msec=20;
-
-	/* wait before we first call it */	
-	g_usleep(interval_msec*1000);
-	while (!quit_thread) {
-		/* add processing as an idle func */
-		/* no need to lock the main loop context, as glib does that automatically */
-		g_idle_add(main_int_return_false_wrapper, data);
-
-		g_usleep(interval_msec*1000);
-	}
-	return NULL;
-}
-
-static void
-install_game_timer()
-{
-	GThread *thread;
-	GError *error=NULL;
-	
-	/* remove timer, if it is installed for some reason */
-	uninstall_game_timeout();
-
-	if (!paused)
-		gtk_window_present(GTK_WINDOW(main_window.window));
-
-#if 0
-	if (!timer)
-		timer=g_timer_new();
-#endif
-
-	/* this makes the main int load the first cave, and then we do the drawing. */
-	main_int(main_window.window);
-	gdk_window_process_all_updates();
-	/* after that, install timer. create a thread with higher priority than normal: */
-	/* so its priority will be higher than the main thread, which does the drawing etc. */
-	/* if the scheduling thread wants to do something, it gets processed first. this makes */
-	/* the intervals more even. */
-	quit_thread=FALSE;
-#ifdef G_THREADS_ENABLED
-	thread=g_thread_create_full(timer_thread, main_window.window, 0, FALSE, FALSE, G_THREAD_PRIORITY_HIGH, &error);
-#else
-	thread=NULL;	/* if glib without thread support, we will use timeout source. */
-#endif
-	if (!thread) {
-		/* if unable to create thread */
-		if (error) {
-			g_critical("%s", error->message);
-			g_error_free(error);
-		}
-		/* use the main int as a timeout routine. */
-		g_timeout_add(20, main_int, main_window.window);
-	}
-	
-#if 0
-	g_timer_start(timer);
-	called=0;
-#endif
-}
-
-static void
 highscore_cb(GtkWidget *widget, gpointer data)
 {
 	gd_show_highscore(main_window.window, NULL, FALSE, NULL, -1);
@@ -1264,7 +1250,7 @@ cave_editor_cb()
 	gd_open_cave_editor();
 	/* to be sure no cave is playing. */
 	/* this will also stop music. to be called after opening editor window, so the music stops. */
-	init_mainwindow(NULL);
+	main_window_init_title();
 }
 
 /* called from the menu when a recent file is activated. */
@@ -1306,10 +1292,201 @@ recent_chooser_activated_cb(GtkRecentChooser *chooser, gpointer data)
 }
 
 
+
+static void
+toggle_pause_cb(GtkWidget * widget, gpointer data)
+{
+	paused=gtk_toggle_action_get_active(GTK_TOGGLE_ACTION (widget));
+
+	if (paused)
+		gd_sound_off();
+}
+
+static void
+toggle_fullscreen_cb (GtkWidget * widget, gpointer data)
+{
+	fullscreen=gtk_toggle_action_get_active(GTK_TOGGLE_ACTION (widget));
+	main_window_set_fullscreen();
+}
+
+static void
+toggle_fast_cb (GtkWidget * widget, gpointer data)
+{
+	fast_forward=gtk_toggle_action_get_active (GTK_TOGGLE_ACTION (widget));
+}
+
+
+
+
+
+
+
+
+
+/*
+ * START NEW GAME DIALOG
+ *
+ * show a dialog to the user so he can select the cave to start game at.
+ *
+ */
+
+typedef struct _new_game_dialog {
+	GtkWidget *dialog;
+	GtkWidget *combo_cave;
+	GtkWidget *spin_level;
+	GtkWidget *entry_name;
+
+	GtkWidget *image;
+} NewGameDialog;
+
+/* keypress. key_* can be event_type==gdk_key_press, as we
+   connected this function to key press and key release.
+ */
+static gboolean
+new_game_keypress_event(GtkWidget *widget, GdkEventKey *event, gpointer data)
+{
+	NewGameDialog *jump_dialog=(NewGameDialog *)data;
+	int level=gtk_range_get_value (GTK_RANGE(jump_dialog->spin_level));
+
+	switch (event->keyval) {
+	case GDK_Left:
+		level--;
+		if (level<1)
+			level=1;
+		gtk_range_set_value (GTK_RANGE(jump_dialog->spin_level), level);
+		return TRUE;
+	case GDK_Right:
+		level++;
+		if (level>5)
+			level=5;
+		gtk_range_set_value (GTK_RANGE(jump_dialog->spin_level), level);
+		return TRUE;
+	case GDK_Return:
+		gtk_dialog_response(GTK_DIALOG(jump_dialog->dialog), GTK_RESPONSE_ACCEPT);
+		return TRUE;
+	}
+	return FALSE;	/* if any other key, we did not process it. go on, let gtk handle it. */
+}
+
+
+/* update pixbuf */
+static void
+new_game_update_preview(GtkWidget *widget, gpointer data)
+{
+	NewGameDialog *jump_dialog=(NewGameDialog *)data;
+	GdkPixbuf *cave_image;
+	GdCave *cave;
+
+	/* loading cave, draw cave and scale to specified size. seed=0 */
+	cave=gd_cave_new_from_caveset(gtk_combo_box_get_active(GTK_COMBO_BOX (jump_dialog->combo_cave)), gtk_range_get_value (GTK_RANGE(jump_dialog->spin_level))-1, 0);
+	cave_image=gd_drawcave_to_pixbuf(cave, 320, 240, TRUE);
+	gtk_image_set_from_pixbuf(GTK_IMAGE (jump_dialog->image), cave_image);
+	g_object_unref(cave_image);
+
+	/* freeing temporary cave data */
+	gd_cave_free(cave);
+}
+
+static void
+new_game_cb (const GtkWidget * widget, const gpointer data)
+{
+	static GdString player_name="";
+	GtkWidget *table, *expander, *eventbox;
+	NewGameDialog jump_dialog;
+	GtkCellRenderer *renderer;
+	GtkListStore *store;
+	GList *iter;
+
+	/* check if caveset is empty! */
+	if (gd_caveset_count()==0) {
+		gd_warningmessage(_("There are no caves in this cave set!"), NULL);
+		return;
+	}
+
+	jump_dialog.dialog=gtk_dialog_new_with_buttons(_("Select cave to play"), GTK_WINDOW(main_window.window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_JUMP_TO, GTK_RESPONSE_ACCEPT, NULL);
+	gtk_dialog_set_default_response (GTK_DIALOG(jump_dialog.dialog), GTK_RESPONSE_ACCEPT);
+	gtk_window_set_resizable (GTK_WINDOW(jump_dialog.dialog), FALSE);
+
+	table=gtk_table_new(0, 0, FALSE);
+	gtk_box_pack_start(GTK_BOX (GTK_DIALOG(jump_dialog.dialog)->vbox), table, FALSE, FALSE, 0);
+	gtk_container_set_border_width(GTK_CONTAINER (table), 6);
+	gtk_table_set_row_spacings(GTK_TABLE(table), 6);
+	gtk_table_set_col_spacings(GTK_TABLE(table), 6);
+
+	/* name, which will be used for highscore & the like */
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf(_("Name:")), 0, 1, 0, 1);
+	if (g_str_equal(player_name, ""))
+		gd_strcpy(player_name, g_get_real_name());
+	jump_dialog.entry_name=gtk_entry_new();
+	/* little inconsistency below: max length has unicode characters, while gdstring will have utf-8.
+	   however this does not make too much difference */
+	gtk_entry_set_max_length(GTK_ENTRY(jump_dialog.entry_name), sizeof(GdString));
+	gtk_entry_set_activates_default(GTK_ENTRY(jump_dialog.entry_name), TRUE);
+	gtk_entry_set_text(GTK_ENTRY(jump_dialog.entry_name), player_name);
+	gtk_table_attach_defaults(GTK_TABLE(table), jump_dialog.entry_name, 1, 2, 0, 1);
+
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf(_("Cave:")), 0, 1, 1, 2);
+
+	/* store of caves: cave pointer, cave name, selectable */
+	store=gtk_list_store_new(3, G_TYPE_POINTER, G_TYPE_STRING, G_TYPE_BOOLEAN);
+	for (iter=gd_caveset; iter; iter=g_list_next (iter)) {
+		GdCave *cave=iter->data;
+		GtkTreeIter treeiter;
+
+		gtk_list_store_insert_with_values (store, &treeiter, -1, 0, iter->data, 1, cave->name, 2, cave->selectable || gd_all_caves_selectable, -1);
+	}
+	jump_dialog.combo_cave=gtk_combo_box_new_with_model (GTK_TREE_MODEL (store));
+	g_object_unref(store);
+
+	renderer=gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(jump_dialog.combo_cave), renderer, TRUE);
+	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT(jump_dialog.combo_cave), renderer, "text", 1, "sensitive", 2, NULL);
+	/* we put the combo in an event box, so we can receive keypresses on our own */
+	eventbox=gtk_event_box_new();
+	gtk_container_add(GTK_CONTAINER(eventbox), jump_dialog.combo_cave);
+	gtk_table_attach_defaults(GTK_TABLE(table), eventbox, 1, 2, 1, 2);
+
+	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf(_("Level:")), 0, 1, 2, 3);
+	jump_dialog.spin_level=gtk_hscale_new_with_range(1.0, 5.0, 1.0);
+	gtk_scale_set_value_pos(GTK_SCALE(jump_dialog.spin_level), GTK_POS_LEFT);
+	gtk_table_attach_defaults(GTK_TABLE(table), jump_dialog.spin_level, 1, 2, 2, 3);
+
+	g_signal_connect(G_OBJECT(jump_dialog.combo_cave), "changed", G_CALLBACK(new_game_update_preview), &jump_dialog);
+	gtk_widget_add_events(eventbox, GDK_KEY_PRESS_MASK);
+	g_signal_connect(G_OBJECT(eventbox), "key_press_event", G_CALLBACK(new_game_keypress_event), &jump_dialog);
+	g_signal_connect(G_OBJECT(jump_dialog.spin_level), "value-changed", G_CALLBACK(new_game_update_preview), &jump_dialog);
+
+	/* this allows the user to select if he wants to see a preview of the cave */
+	expander=gtk_expander_new(_("Preview"));
+	gtk_expander_set_expanded(GTK_EXPANDER (expander), gd_show_preview);
+	gtk_table_attach_defaults(GTK_TABLE(table), expander, 0, 2, 3, 4);
+	jump_dialog.image=gtk_image_new();
+	gtk_container_add(GTK_CONTAINER (expander), jump_dialog.image);
+
+	gtk_widget_show_all(jump_dialog.dialog);
+	gtk_widget_grab_focus(jump_dialog.combo_cave);
+	gtk_editable_select_region(GTK_EDITABLE(jump_dialog.entry_name), 0, 0);
+	/* set default and also trigger redrawing */
+	gtk_combo_box_set_active(GTK_COMBO_BOX(jump_dialog.combo_cave), gd_caveset_last_selected);
+	gtk_range_set_value(GTK_RANGE(jump_dialog.spin_level), 1);
+
+	if (gtk_dialog_run (GTK_DIALOG(jump_dialog.dialog))==GTK_RESPONSE_ACCEPT) {
+		gd_strcpy(player_name, gtk_entry_get_text(GTK_ENTRY(jump_dialog.entry_name)));
+		gd_caveset_last_selected=gtk_combo_box_get_active(GTK_COMBO_BOX(jump_dialog.combo_cave));
+		gd_caveset_last_selected_level=gtk_range_get_value(GTK_RANGE(jump_dialog.spin_level))-1;
+		main_new_game (player_name, gd_caveset_last_selected, gd_caveset_last_selected_level);
+	}
+	gd_show_preview=gtk_expander_get_expanded(GTK_EXPANDER(expander));	/* remember expander state-even if cancel pressed */
+	gtk_widget_destroy(jump_dialog.dialog);
+}
+
+
+
 enum _replay_fields {
 	COL_REPLAY_CAVE_POINTER,
 	COL_REPLAY_REPLAY_POINTER,
 	COL_REPLAY_NAME,	/* cave or player name */
+	COL_REPLAY_LEVEL,	/* level the replay is played on */
 	COL_REPLAY_DATE,
 	COL_REPLAY_SCORE,
 	COL_REPLAY_SUCCESS,
@@ -1324,23 +1501,23 @@ show_replays_tree_view_row_activated_cb(GtkTreeView *view, GtkTreePath *path, Gt
 {
 	GtkTreeModel *model=gtk_tree_view_get_model(view);
 	GtkTreeIter iter;
-	Cave *cave;
+	GdCave *cave;
 	GdReplay *replay;
 	
 	gtk_tree_model_get_iter(model, &iter, path);
 	gtk_tree_model_get(model, &iter, COL_REPLAY_CAVE_POINTER, &cave, COL_REPLAY_REPLAY_POINTER, &replay, -1);
 	if (cave!=NULL && replay!=NULL)
-		gd_main_new_game_replay(cave, replay);
+		main_new_game_replay(cave, replay);
 }
 
 static void
-show_replays_response_cb(GtkDialog *dialog, int response_id, gpointer data)
+show_replays_dialog_response(GtkDialog *dialog, int response_id, gpointer data)
 {
 	gtk_widget_destroy(GTK_WIDGET(dialog));
 }
 
 static void
-replay_comment_edited(GtkCellRendererText *cell, const gchar *path_string, const gchar *new_text, gpointer data)
+show_replays_comment_edited(GtkCellRendererText *cell, const gchar *path_string, const gchar *new_text, gpointer data)
 {
 	GtkTreeModel *model=(GtkTreeModel *)data;
 	GtkTreePath *path=gtk_tree_path_new_from_string(path_string);
@@ -1362,7 +1539,7 @@ replay_comment_edited(GtkCellRendererText *cell, const gchar *path_string, const
 }
 
 static void
-replay_saved_toggled(GtkCellRendererText *cell, const gchar *path_string, gpointer data)
+show_replays_saved_toggled(GtkCellRendererText *cell, const gchar *path_string, gpointer data)
 {
 	GtkTreeModel *model=(GtkTreeModel *)data;
 	GtkTreePath *path=gtk_tree_path_new_from_string(path_string);
@@ -1383,7 +1560,7 @@ replay_saved_toggled(GtkCellRendererText *cell, const gchar *path_string, gpoint
 }
 
 static void
-replay_play_button_clicked_cb(GtkWidget *widget, gpointer data)
+show_replays_play_button_clicked(GtkWidget *widget, gpointer data)
 {
 	GtkTreeView *view=GTK_TREE_VIEW(data);
 	GtkTreeSelection *selection=gtk_tree_view_get_selection(view);
@@ -1391,7 +1568,7 @@ replay_play_button_clicked_cb(GtkWidget *widget, gpointer data)
 	gboolean got_selected;
 	GtkTreeIter iter;
 	GdReplay *replay;
-	Cave *cave;
+	GdCave *cave;
 	
 	got_selected=gtk_tree_selection_get_selected(selection, &model, &iter);
 	if (!got_selected)	/* if nothing selected, return */
@@ -1399,12 +1576,12 @@ replay_play_button_clicked_cb(GtkWidget *widget, gpointer data)
 
 	gtk_tree_model_get(model, &iter, COL_REPLAY_CAVE_POINTER, &cave, COL_REPLAY_REPLAY_POINTER, &replay, -1);
 	if (cave!=NULL && replay!=NULL)
-		gd_main_new_game_replay(cave, replay);
+		main_new_game_replay(cave, replay);
 }
 
 /* enables or disables play button on selection change */
 static void
-replay_tree_view_selection_changed(GtkTreeSelection *selection, gpointer data)
+show_replays_tree_view_selection_changed(GtkTreeSelection *selection, gpointer data)
 {
 	GtkWidget *button=GTK_WIDGET(data);
 	GtkTreeModel *model;
@@ -1441,9 +1618,8 @@ show_replays_cb(GtkWidget *widget, gpointer data)
 	
 	dialog=gtk_dialog_new_with_buttons(_("Replays"), GTK_WINDOW(main_window.window), 0, NULL);
 	g_signal_connect(G_OBJECT(dialog), "destroy", G_CALLBACK(gtk_widget_destroyed), &dialog);
-	g_signal_connect(G_OBJECT(dialog), "response", G_CALLBACK(show_replays_response_cb), NULL);
+	g_signal_connect(G_OBJECT(dialog), "response", G_CALLBACK(show_replays_dialog_response), NULL);
 	gtk_window_set_default_size(GTK_WINDOW(dialog), 480, 360);
-	gtk_box_set_spacing(GTK_BOX(GTK_DIALOG(dialog)->vbox), 6);
 	
 	gd_dialog_add_hint(GTK_DIALOG(dialog), _("Hint: When watching a replay, you can use the usual movement keys (left, right...) to "
     "stop the replay and immediately continue the playing of the cave yourself."));
@@ -1451,13 +1627,13 @@ show_replays_cb(GtkWidget *widget, gpointer data)
 	/* scrolled window to show replays tree view */
 	scroll=gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(scroll), GTK_SHADOW_ETCHED_IN);
-	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), scroll);
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), scroll, TRUE, TRUE, 6);
 
 	/* create store containing replays */
-	model=gtk_tree_store_new(COL_REPLAY_MAX, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_BOOLEAN);
+	model=gtk_tree_store_new(COL_REPLAY_MAX, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_BOOLEAN);
 	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
 		GList *replayiter;
-		Cave *cave=(Cave *)iter->data;
+		GdCave *cave=(GdCave *)iter->data;
 		
 		/* if the cave has replays */
 		if (cave->replays) {
@@ -1471,12 +1647,18 @@ show_replays_cb(GtkWidget *widget, gpointer data)
 				GtkTreeIter riter;
 				GdReplay *replay=(GdReplay *)replayiter->data;
 				char score[20];
+				const char *imagestock;
 				
 				/* we have to store the score as string, as for the cave lines the unset score field would also show zero */
 				g_snprintf(score, sizeof(score), "%d", replay->score);
 				gtk_tree_store_append(model, &riter, &caveiter);
+				if (replay->wrong_checksum)
+					imagestock=GTK_STOCK_DIALOG_ERROR;
+				else
+					imagestock=replay->success?GTK_STOCK_YES:GTK_STOCK_NO;
 				gtk_tree_store_set(model, &riter, COL_REPLAY_CAVE_POINTER, cave, COL_REPLAY_REPLAY_POINTER, replay, COL_REPLAY_NAME, replay->player_name,
-					COL_REPLAY_DATE, replay->date, COL_REPLAY_SCORE, score, COL_REPLAY_SUCCESS, replay->success?GTK_STOCK_YES:GTK_STOCK_NO,
+					COL_REPLAY_LEVEL, replay->level+1, 
+					COL_REPLAY_DATE, replay->date, COL_REPLAY_SCORE, score, COL_REPLAY_SUCCESS, imagestock,
 					COL_REPLAY_COMMENT, replay->comment, COL_REPLAY_SAVED, replay->saved, COL_REPLAY_VISIBLE, TRUE, -1);
 			}
 		}
@@ -1491,32 +1673,37 @@ show_replays_cb(GtkWidget *widget, gpointer data)
 	gtk_tree_view_column_set_expand(gtk_tree_view_get_column(GTK_TREE_VIEW(view), 0), TRUE);	/* name column expands */
 
 	renderer=gtk_cell_renderer_text_new();
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), 1, _("Date"), renderer, "text", COL_REPLAY_DATE, NULL);	/* 1 = column number */
+	/* TRANSLATORS: "Lvl" here stands for Level. Some shorthand should be used.*/
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), 1, _("Lvl"), renderer, "text", COL_REPLAY_LEVEL, "visible", COL_REPLAY_VISIBLE, NULL);	/* 0 = column number */
+	gtk_tree_view_column_set_expand(gtk_tree_view_get_column(GTK_TREE_VIEW(view), 0), TRUE);	/* name column expands */
+
+	renderer=gtk_cell_renderer_text_new();
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), 2, _("Date"), renderer, "text", COL_REPLAY_DATE, NULL);	/* 1 = column number */
 
 	renderer=gtk_cell_renderer_pixbuf_new();
 	g_object_set(G_OBJECT(renderer), "stock-size", GTK_ICON_SIZE_MENU, NULL);
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), 2, NULL, renderer, "stock-id", COL_REPLAY_SUCCESS, NULL);
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), 3, NULL, renderer, "stock-id", COL_REPLAY_SUCCESS, NULL);
 
 	renderer=gtk_cell_renderer_text_new();
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), 3, _("Score"), renderer, "text", COL_REPLAY_SCORE, NULL);
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), 4, _("Score"), renderer, "text", COL_REPLAY_SCORE, NULL);
 
 	renderer=gtk_cell_renderer_text_new();
 	g_object_set(G_OBJECT(renderer), "editable", TRUE, "ellipsize", PANGO_ELLIPSIZE_END, NULL);
-	g_signal_connect(renderer, "edited", G_CALLBACK(replay_comment_edited), model);
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), 4, _("Comment"), renderer, "text", COL_REPLAY_COMMENT, "visible", COL_REPLAY_VISIBLE, NULL);
+	g_signal_connect(renderer, "edited", G_CALLBACK(show_replays_comment_edited), model);
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), 5, _("Comment"), renderer, "text", COL_REPLAY_COMMENT, "visible", COL_REPLAY_VISIBLE, NULL);
 	/* doubleclick will play the replay */
 	g_signal_connect(G_OBJECT(view), "row-activated", G_CALLBACK(show_replays_tree_view_row_activated_cb), NULL);
 	gtk_tree_view_column_set_expand(gtk_tree_view_get_column(GTK_TREE_VIEW(view), 4), TRUE);	/* name column expands */
 
 	renderer=gtk_cell_renderer_toggle_new();
-	g_signal_connect(renderer, "toggled", G_CALLBACK(replay_saved_toggled), model);
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), 5, _("Saved"), renderer, "active", COL_REPLAY_SAVED, "visible", COL_REPLAY_VISIBLE, NULL);
+	g_signal_connect(renderer, "toggled", G_CALLBACK(show_replays_saved_toggled), model);
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), 6, _("Saved"), renderer, "active", COL_REPLAY_SAVED, "visible", COL_REPLAY_VISIBLE, NULL);
 
 	/* play button */
 	button=gtk_button_new_from_stock(GTK_STOCK_MEDIA_PLAY);
 	gtk_widget_set_sensitive(button, FALSE);	/* not sensitive by default. when the user selects a line, it will be enabled */
-	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(replay_play_button_clicked_cb), view);
-	g_signal_connect(G_OBJECT(gtk_tree_view_get_selection(GTK_TREE_VIEW(view))), "changed", G_CALLBACK(replay_tree_view_selection_changed), button);
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(show_replays_play_button_clicked), view);
+	g_signal_connect(G_OBJECT(gtk_tree_view_get_selection(GTK_TREE_VIEW(view))), "changed", G_CALLBACK(show_replays_tree_view_selection_changed), button);
 	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->action_area), button);
 	
 	/* this must be added after the play button, so it is the rightmost one */
@@ -1570,20 +1757,20 @@ cave_info_combo_changed(GtkComboBox *widget, gpointer data)
 			gtk_text_buffer_insert(buffer, &iter, gd_caveset_data->difficulty, -1);
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
 		}
-		if (!g_str_equal(gd_caveset_data->remark, "")) {
-			gtk_text_buffer_insert_with_tags_by_name(buffer, &iter, _("Remark: "), -1, "name", NULL);
-			gtk_text_buffer_insert(buffer, &iter, gd_caveset_data->remark, -1);
+		if (!g_str_equal(gd_caveset_data->story->str, "")) {
+			gtk_text_buffer_insert_with_tags_by_name(buffer, &iter, _("Story:\n"), -1, "name", NULL);
+			gtk_text_buffer_insert(buffer, &iter, gd_caveset_data->story->str, -1);
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
 		}
-		if (!g_str_equal(gd_caveset_data->notes->str, "")) {
-			gtk_text_buffer_insert_with_tags_by_name(buffer, &iter, _("Notes:\n"), -1, "name", NULL);
-			gtk_text_buffer_insert(buffer, &iter, gd_caveset_data->notes->str, -1);
+		if (!g_str_equal(gd_caveset_data->remark->str, "")) {
+			gtk_text_buffer_insert_with_tags_by_name(buffer, &iter, _("Remark:\n"), -1, "name", NULL);
+			gtk_text_buffer_insert(buffer, &iter, gd_caveset_data->remark->str, -1);
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
 		}
 	}
 	else {
 		/* cave data */
-		Cave *cave=gd_return_nth_cave(i-1);
+		GdCave *cave=gd_return_nth_cave(i-1);
 
 		gtk_text_buffer_insert_with_tags_by_name(buffer, &iter, cave->name, -1, "heading", NULL);
 		gtk_text_buffer_insert(buffer, &iter, "\n\n", -1);
@@ -1613,14 +1800,15 @@ cave_info_combo_changed(GtkComboBox *widget, gpointer data)
 			gtk_text_buffer_insert(buffer, &iter, cave->difficulty, -1);
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
 		}
-		if (!g_str_equal(cave->remark, "")) {
-			gtk_text_buffer_insert_with_tags_by_name(buffer, &iter, _("Remark: "), -1, "name", NULL);
-			gtk_text_buffer_insert(buffer, &iter, cave->remark, -1);
+
+		if (!g_str_equal(cave->story->str, "")) {
+			gtk_text_buffer_insert_with_tags_by_name(buffer, &iter, _("Story:\n"), -1, "name", NULL);
+			gtk_text_buffer_insert(buffer, &iter, cave->story->str, -1);
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
 		}
-		if (!g_str_equal(cave->notes->str, "")) {
-			gtk_text_buffer_insert_with_tags_by_name(buffer, &iter, _("Notes:\n"), -1, "name", NULL);
-			gtk_text_buffer_insert(buffer, &iter, cave->notes->str, -1);
+		if (!g_str_equal(cave->remark->str, "")) {
+			gtk_text_buffer_insert_with_tags_by_name(buffer, &iter, _("Remark:\n"), -1, "name", NULL);
+			gtk_text_buffer_insert(buffer, &iter, cave->remark->str, -1);
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
 		}
 	}
@@ -1653,7 +1841,7 @@ cave_info_cb(GtkWidget *widget, gpointer data)
 	gtk_combo_box_append_text(GTK_COMBO_BOX(combo), text);
 	g_free(text);
 	for (citer=gd_caveset; citer!=NULL; citer=citer->next) {
-		Cave *c=citer->data;
+		GdCave *c=citer->data;
 
 		gtk_combo_box_append_text(GTK_COMBO_BOX(combo), c->name);
 	}
@@ -1680,16 +1868,20 @@ cave_info_cb(GtkWidget *widget, gpointer data)
 	gtk_text_view_set_right_margin (GTK_TEXT_VIEW (view), 6);
 
 	g_signal_connect(G_OBJECT(combo), "changed", G_CALLBACK(cave_info_combo_changed), buffer);
-	/* select current cave. if no current cave, or not in the list, g_list_index will returns -1. */
-	/* we must add +1 anyway, so in that cave it will be 0 -> caveset info. :) */
-	gtk_combo_box_set_active(GTK_COMBO_BOX(combo), g_list_index(gd_caveset, gd_gameplay.original_cave)+1);
+	if (main_window.game && main_window.game->original_cave)
+		/* currently playing a cave - show info for that */
+		gtk_combo_box_set_active(GTK_COMBO_BOX(combo), g_list_index(gd_caveset, main_window.game->original_cave)+1);
+	else
+		/* show info for caveset */
+		gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 0);
+	
 
 	gtk_widget_show_all(dialog);
 	paused_save=paused;
 	paused=TRUE;	/* set paused game, so it stops while the users sees the message box */
 	gtk_dialog_run(GTK_DIALOG(dialog));
-	paused=paused_save;
 	gtk_widget_destroy(dialog);
+	paused=paused_save;
 }
 
 
@@ -1700,7 +1892,7 @@ cave_info_cb(GtkWidget *widget, gpointer data)
  *
  */
 static void
-gd_create_main_window(void)
+create_main_window()
 {
 	/* Menu UI */
 	static GtkActionEntry action_entries_normal[]={
@@ -1815,10 +2007,10 @@ gd_create_main_window(void)
 
 	main_window.window=gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_default_size(GTK_WINDOW(main_window.window), 360, 300);
-	g_signal_connect(G_OBJECT(main_window.window), "focus_out_event", G_CALLBACK(focus_out_event), NULL);
-	g_signal_connect(G_OBJECT(main_window.window), "delete_event", G_CALLBACK(delete_event), NULL);
-	g_signal_connect(G_OBJECT(main_window.window), "key_press_event", G_CALLBACK(keypress_event), NULL);
-	g_signal_connect(G_OBJECT(main_window.window), "key_release_event", G_CALLBACK(keypress_event), NULL);
+	g_signal_connect(G_OBJECT(main_window.window), "focus_out_event", G_CALLBACK(main_window_focus_out_event), NULL);
+	g_signal_connect(G_OBJECT(main_window.window), "delete_event", G_CALLBACK(main_window_delete_event), NULL);
+	g_signal_connect(G_OBJECT(main_window.window), "key_press_event", G_CALLBACK(main_window_keypress_event), NULL);
+	g_signal_connect(G_OBJECT(main_window.window), "key_release_event", G_CALLBACK(main_window_keypress_event), NULL);
 
 	/* vertical box */
 	vbox=gtk_vbox_new(FALSE, 0);
@@ -1898,29 +2090,21 @@ gd_create_main_window(void)
 	/* first hbox for labels ABOVE drawing */
 	hbox=gtk_hbox_new(FALSE, 12);
 	gtk_box_pack_start(GTK_BOX (main_window.labels), hbox, FALSE, FALSE, 0);
-	main_window.label_cave_name=gtk_label_new(NULL);	/* NAME label */
-	gtk_label_set_ellipsize (GTK_LABEL(main_window.label_cave_name), PANGO_ELLIPSIZE_END);
-	gtk_box_pack_start_defaults(GTK_BOX (hbox), main_window.label_cave_name);	/* NAME label */
-	gtk_misc_set_alignment(GTK_MISC(main_window.label_cave_name), 0, 0.5);
-	gtk_box_pack_start(GTK_BOX(hbox), main_window.label_key3=gtk_label_new(NULL), FALSE, FALSE, 0);	/* key3 label */
-	gtk_box_pack_start(GTK_BOX(hbox), main_window.label_key2=gtk_label_new(NULL), FALSE, FALSE, 0);	/* key2 label */
-	gtk_box_pack_start(GTK_BOX(hbox), main_window.label_key1=gtk_label_new(NULL), FALSE, FALSE, 0);	/* key1 label */
+	main_window.label_topleft=gtk_label_new(NULL);	/* NAME label */
+	gtk_label_set_ellipsize(GTK_LABEL(main_window.label_topleft), PANGO_ELLIPSIZE_END);	/* enable ellipsize, as the cave name might be a long string */
+	gtk_misc_set_alignment(GTK_MISC(main_window.label_topleft), 0, 0.5);	/* as it will be expanded, we must set left justify (0) */
+	gtk_box_pack_start(GTK_BOX(hbox), main_window.label_topleft, TRUE, TRUE, 0);	/* should expand, as it is ellipsized!! */
+
+	gtk_box_pack_end(GTK_BOX(hbox), main_window.label_topright=gtk_label_new(NULL), FALSE, FALSE, 0);
 
 	/* second row of labels */
 	hbox=gtk_hbox_new(FALSE, 12);
 	gtk_box_pack_start(GTK_BOX(main_window.labels), hbox, FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), main_window.label_lives=gtk_label_new(NULL), FALSE, FALSE, 0);	/* LIVES label */
-	gtk_box_pack_end(GTK_BOX(hbox), main_window.label_diamonds=gtk_label_new(NULL), FALSE, FALSE, 0);	/* DIAMONDS label */
-	gtk_box_pack_end(GTK_BOX(hbox), main_window.label_skeletons=gtk_label_new(NULL), FALSE, FALSE, 0);	/* SKELETONS label */
+	gtk_box_pack_start(GTK_BOX(hbox), main_window.label_bottomleft=gtk_label_new(NULL), FALSE, FALSE, 0);	/* diamonds label */
+	gtk_box_pack_end(GTK_BOX(hbox), main_window.label_bottomright=gtk_label_new(NULL), FALSE, FALSE, 0);	/* time, score label */
 
-	/* third row */
-	hbox=gtk_hbox_new(FALSE, 12);
-	gtk_box_pack_start(GTK_BOX(main_window.labels), hbox, FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), main_window.label_value=gtk_label_new(NULL), FALSE, FALSE, 0);	/* VALUE label */
-	gtk_box_pack_start(GTK_BOX(hbox), main_window.label_score=gtk_label_new(NULL), FALSE, FALSE, 0);	/* SCORE label */
-	gtk_box_pack_end(GTK_BOX(hbox), main_window.label_time=gtk_label_new(NULL), FALSE, FALSE, 0);	/* TIME label */
-	gtk_box_pack_end(GTK_BOX(hbox), main_window.label_gravity_will_change=gtk_label_new(NULL), FALSE, FALSE, 0);	/* gravity label */
 
+	/* scroll window which contains the cave or the title image, so this is the main content of the window */
 	main_window.scroll_window=gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(main_window.scroll_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_box_pack_start_defaults(GTK_BOX (vbox), main_window.scroll_window);
@@ -2026,7 +2210,7 @@ main(int argc, char *argv[])
 
 	/* always load c64 graphics, as it is the builtin, and we need an icon for the theme selector. */
 	gd_loadcells_default();
-	gd_create_pixbuf_for_builtin_gfx();
+	gd_create_pixbuf_for_builtin_theme();
 
 	/* load other theme, if specified in config. */
 	if (gd_theme!=NULL && !g_str_equal(gd_theme, "")) {
@@ -2052,7 +2236,7 @@ main(int argc, char *argv[])
 	if (png_filename) {
 		GError *error=NULL;
 		GdkPixbuf *pixbuf;
-		Cave *renderedcave;
+		GdCave *renderedcave;
 		unsigned int size_x=128, size_y=96;	/* default size */
 
 		if (gd_param_cave == 0)
@@ -2078,20 +2262,20 @@ main(int argc, char *argv[])
 	}
 
 	if (save_cave_name)
-		gd_caveset_save(save_cave_name, FALSE);
+		gd_caveset_save(save_cave_name);
 
 	/* if batch mode, quit now */
 	if (quit)
 		return 0;
 
 	/* create window */
-	gd_create_stock_icons();
-	gd_create_main_window();
+	gd_register_stock_icons();
+	create_main_window();
 	gd_main_window_set_title();
 
 	gd_sound_init();
 
-	init_mainwindow(NULL);
+	main_window_init_title();
 
 #ifdef G_THREADS_ENABLED
 	if (!g_thread_supported())
@@ -2100,7 +2284,7 @@ main(int argc, char *argv[])
 
 	if (gd_param_cave) {
 		/* if cave number given, start game */
-		new_game(g_get_real_name(), gd_param_cave-1, gd_param_level-1);
+		main_new_game(g_get_real_name(), gd_param_cave-1, gd_param_level-1);
 	}
 	else if (editor)
 		cave_editor_cb(NULL, &main_window);

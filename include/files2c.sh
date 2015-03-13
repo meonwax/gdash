@@ -15,6 +15,8 @@ for a in $*; do
 	bufs="$bufs $buf,"
 done
 
-echo "static const guint8 *"$prefix"_pointers[]={$bufs NULL};" >>$filename
-echo "static const char *"$prefix"_names[]={$names NULL};" >>$filename
+if test -n "$prefix"; then
+    echo "static const guint8 *"$prefix"_pointers[]={$bufs NULL};" >>$filename
+    echo "static const char *"$prefix"_names[]={$names NULL};" >>$filename
+fi
 echo >>$filename

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -51,7 +51,7 @@ typedef enum {
  * creates a small pixbuf with the specified color
  */
 static GdkPixbuf *
-color_pixbuf(GdColor col)
+color_combo_pixbuf_for_gd_color(GdColor col)
 {
 	int x, y;
     guint32 pixel;
@@ -88,7 +88,7 @@ gd_color_combo_set(GtkComboBox *combo, GdColor color)
 		
 		gtk_tree_model_get_iter(model, &iter, selected_color_path);
 
-		pixbuf=color_pixbuf(color);
+		pixbuf=color_combo_pixbuf_for_gd_color(color);
 		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, COL_COLOR_CODE, color, COL_COLOR_PIXBUF, pixbuf, COL_COLOR_NAME, gd_color_get_visible_name(color), -1);
 		g_object_unref(pixbuf);	/* now the tree store owns its own reference */
 
@@ -96,14 +96,8 @@ gd_color_combo_set(GtkComboBox *combo, GdColor color)
 	}
 }
 
-static void
-set_sensitive (GtkCellLayout *cell_layout, GtkCellRenderer *cell, GtkTreeModel *tree_model, GtkTreeIter *iter, gpointer data)
-{
-  g_object_set(cell, "sensitive", !gtk_tree_model_iter_has_child(tree_model, iter), NULL);
-}
-
 static gboolean
-drawing_area_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer data)
+color_combo_drawing_area_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
 	GtkDialog *dialog=GTK_DIALOG(data);
 	
@@ -198,7 +192,7 @@ color_combo_changed(GtkWidget *combo, gpointer data)
 					g_object_set_data(G_OBJECT(da), GDASH_COLOR, GUINT_TO_POINTER(i));	/* attach the color index as data */
 					gtk_widget_add_events(da, GDK_BUTTON_PRESS_MASK);
 					gtk_widget_set_tooltip_text(da, gd_color_get_visible_name(c));
-					g_signal_connect(G_OBJECT(da), "button_press_event", G_CALLBACK(drawing_area_button_press_event), dialog);	/* mouse click */
+					g_signal_connect(G_OBJECT(da), "button_press_event", G_CALLBACK(color_combo_drawing_area_button_press_event), dialog);	/* mouse click */
 					color.red=gd_color_get_r(c)*256;	/* 256 as gdk expect 16-bit/component */
 					color.green=gd_color_get_g(c)*256;
 					color.blue=gd_color_get_b(c)*256;
@@ -236,11 +230,10 @@ color_combo_changed(GtkWidget *combo, gpointer data)
 	}
 }
 /* A GtkTreeViewRowSeparatorFunc that demonstrates how rows can be
- * rendered as separators. This particular function does nothing 
- * useful and just turns the fourth row into a separator.
+ * rendered as separators. 
  */
 static gboolean
-is_separator (GtkTreeModel *model, GtkTreeIter  *iter, gpointer data)
+color_combo_is_separator (GtkTreeModel *model, GtkTreeIter  *iter, gpointer data)
 {
   GtkTreePath *path;
   gboolean result;
@@ -251,6 +244,13 @@ is_separator (GtkTreeModel *model, GtkTreeIter  *iter, gpointer data)
 
   return result;
 }
+
+static void
+color_combo_set_sensitive(GtkCellLayout *cell_layout, GtkCellRenderer *cell, GtkTreeModel *tree_model, GtkTreeIter *iter, gpointer data)
+{
+  g_object_set(cell, "sensitive", !gtk_tree_model_iter_has_child(tree_model, iter), NULL);
+}
+
 /* combo box creator. */
 GtkWidget *
 gd_color_combo_new(const GdColor color)
@@ -272,7 +272,7 @@ gd_color_combo_new(const GdColor color)
     for (i = 0; i<16; i++) {
         GdkPixbuf *pixbuf;
 
-        pixbuf=color_pixbuf(gd_c64_color(i));
+        pixbuf=color_combo_pixbuf_for_gd_color(gd_c64_color(i));
         gtk_tree_store_append(store, &iter, &parent);
         gtk_tree_store_set(store, &iter, COL_COLOR_ACTION, COLOR_ACTION_NONE, COL_COLOR_CODE, gd_c64_color(i), COL_COLOR_NAME, _(gd_color_get_visible_name(gd_c64_color(i))), COL_COLOR_PIXBUF, pixbuf, -1);
         g_object_unref (pixbuf);
@@ -292,13 +292,13 @@ gd_color_combo_new(const GdColor color)
 	renderer=gtk_cell_renderer_pixbuf_new ();
 	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT (combo), renderer, FALSE);
 	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "pixbuf", COL_COLOR_PIXBUF, NULL);
-	gtk_cell_layout_set_cell_data_func (GTK_CELL_LAYOUT (combo), renderer, set_sensitive, NULL, NULL);
+	gtk_cell_layout_set_cell_data_func (GTK_CELL_LAYOUT (combo), renderer, color_combo_set_sensitive, NULL, NULL);
 	/* second column, object name */
 	renderer = gtk_cell_renderer_text_new ();
 	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT (combo), renderer, TRUE);
-	gtk_cell_layout_set_cell_data_func (GTK_CELL_LAYOUT (combo), renderer, set_sensitive, NULL, NULL);
+	gtk_cell_layout_set_cell_data_func (GTK_CELL_LAYOUT (combo), renderer, color_combo_set_sensitive, NULL, NULL);
 	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "text", COL_COLOR_NAME, NULL);
-	gtk_combo_box_set_row_separator_func(GTK_COMBO_BOX(combo), is_separator, NULL, NULL);
+	gtk_combo_box_set_row_separator_func(GTK_COMBO_BOX(combo), color_combo_is_separator, NULL, NULL);
 
 	gd_color_combo_set(GTK_COMBO_BOX(combo), color);
 	g_signal_connect(G_OBJECT(combo), "changed", G_CALLBACK(color_combo_changed), NULL);
@@ -347,10 +347,11 @@ gd_color_combo_get_color(GtkWidget *widget)
 #define GDASH_WINDOW_TITLE "gdash-window-title"
 #define GDASH_DIALOG_VBOX "gdash-dialog-vbox"
 
-static int button_animcycle;
+static int element_button_animcycle;
 
+/* this draws one element in the element selector box. */
 static gboolean
-button_drawing_area_expose_event (const GtkWidget * widget, const GdkEventExpose * event, const gpointer data)
+element_button_drawing_area_expose_event (const GtkWidget * widget, const GdkEventExpose * event, const gpointer data)
 {
 	GdkDrawable *cell=g_object_get_data(G_OBJECT(widget), GDASH_CELL);
 
@@ -359,13 +360,13 @@ button_drawing_area_expose_event (const GtkWidget * widget, const GdkEventExpose
 	
 	if (cell)
 		gdk_draw_drawable (widget->window, widget->style->black_gc, cell, 0, 0, 2, 2, gd_cell_size_editor, gd_cell_size_editor);
-//	gdk_draw_rectangle (widget->window, widget->style->black_gc, FALSE, 0, 0, gd_cell_size_editor+3, gd_cell_size_editor+3);
-//	gdk_draw_rectangle (widget->window, widget->style->black_gc, FALSE, 1, 1, gd_cell_size_editor+1, gd_cell_size_editor+1);
 	return TRUE;
 }
 
+/* this is called when entering and exiting a drawing area with the mouse. */
+/* so they can be colored when the mouse is over. */
 static gboolean
-button_drawing_area_crossing_event (const GtkWidget *widget, const GdkEventCrossing *event, const gpointer data)
+element_button_drawing_area_crossing_event (const GtkWidget *widget, const GdkEventCrossing *event, const gpointer data)
 {
 	g_object_set_data(G_OBJECT(widget), GDASH_HOVER, GINT_TO_POINTER(event->type==GDK_ENTER_NOTIFY));
 	return FALSE;
@@ -377,7 +378,7 @@ redraw_timeout (gpointer data)
 	GList *areas=(GList *)data;
 	GList *iter;
 
-	button_animcycle=(button_animcycle+1)&7;
+	element_button_animcycle=(element_button_animcycle+1)&7;
 	
 	for (iter=areas; iter!=NULL; iter=iter->next) {
 		GtkWidget *da=(GtkWidget *)iter->data;
@@ -391,7 +392,7 @@ redraw_timeout (gpointer data)
 		/* get pixbuf index */
 		draw=gd_elements[element].image;
 		if (draw<0)
-			draw=-draw + button_animcycle;
+			draw=-draw + element_button_animcycle;
 		if (hover)
 			draw+=NUM_OF_CELLS;
 		/* set cell and queue draw if different from previous */
@@ -569,9 +570,9 @@ element_button_clicked_func(GtkWidget *button, gboolean stay_open)
         g_object_set_data(G_OBJECT(da), GDASH_BUTTON, button);	/* button to update on click */
 		gtk_widget_set_size_request(da, gd_cell_size_editor+4, gd_cell_size_editor+4);	/* 2px border around them */
         gtk_widget_set_tooltip_text(da, _(gd_elements[elements[i]].name));
-		g_signal_connect(G_OBJECT(da), "expose-event", G_CALLBACK(button_drawing_area_expose_event), GINT_TO_POINTER(elements[i]));
-		g_signal_connect(G_OBJECT(da), "leave-notify-event", G_CALLBACK(button_drawing_area_crossing_event), NULL);
-		g_signal_connect(G_OBJECT(da), "enter-notify-event", G_CALLBACK(button_drawing_area_crossing_event), NULL);
+		g_signal_connect(G_OBJECT(da), "expose-event", G_CALLBACK(element_button_drawing_area_expose_event), GINT_TO_POINTER(elements[i]));
+		g_signal_connect(G_OBJECT(da), "leave-notify-event", G_CALLBACK(element_button_drawing_area_crossing_event), NULL);
+		g_signal_connect(G_OBJECT(da), "enter-notify-event", G_CALLBACK(element_button_drawing_area_crossing_event), NULL);
         g_signal_connect(G_OBJECT(da), "button-press-event", G_CALLBACK(element_button_da_clicked), dialog);
         if (elements[i]==O_DIRT2)
         	/* the dirt2 the first element to be put in the effect list; from that one, always use table2 */
@@ -618,6 +619,9 @@ gd_element_button_get (GtkWidget *button)
 	return (GdElement)GPOINTER_TO_INT(element);
 }
 
+/* the pixbufs might be changed during the lifetime of an element button. *
+ * for example, when colors of a cave are redefined. so this is made
+ * global and can be called. */
 void
 gd_element_button_update_pixbuf(GtkWidget *button)
 {
@@ -668,6 +672,7 @@ gd_element_button_set_dialog_sensitive(GtkWidget *button, gboolean sens)
 		gtk_widget_set_sensitive(vbox, sens);
 }
 
+/* frees the special title text, and optionally destroys the dialog, if exists. */
 static void
 element_button_destroyed(GtkWidget *button, gpointer data)
 {
@@ -682,7 +687,9 @@ element_button_destroyed(GtkWidget *button, gpointer data)
 		gtk_widget_destroy(dialog);
 }
 
-
+/* creates a new element button. optionally the dialog created by
+ * the particular button can stay open, and accept many clicks.
+ * also, it can have some title line, like "draw element" */
 GtkWidget *
 gd_element_button_new(GdElement initial_element, gboolean stays_open, const char *special_title)
 {
@@ -737,8 +744,8 @@ enum
 };
 
 /* directions to be shown, and corresponding icons. */
-static GdDirection shown_dirs[]= { MV_UP, MV_RIGHT, MV_DOWN, MV_LEFT };
-static const char *dir_icons[]= { GTK_STOCK_GO_UP, GTK_STOCK_GO_FORWARD, GTK_STOCK_GO_DOWN, GTK_STOCK_GO_BACK };
+static const GdDirection direction_combo_shown_directions[]= { MV_UP, MV_RIGHT, MV_DOWN, MV_LEFT };
+static const char *direction_combo_shown_icons[]= { GTK_STOCK_GO_UP, GTK_STOCK_GO_FORWARD, GTK_STOCK_GO_DOWN, GTK_STOCK_GO_BACK };
 
 GtkWidget *
 gd_direction_combo_new(const GdDirection initial)
@@ -757,10 +764,10 @@ gd_direction_combo_new(const GdDirection initial)
 		cellview=gtk_cell_view_new();
 		store=gtk_list_store_new (NUM_DIR_COLS, GDK_TYPE_PIXBUF, G_TYPE_STRING);
 
-		for (i=0; i<G_N_ELEMENTS(shown_dirs); i++) {
+		for (i=0; i<G_N_ELEMENTS(direction_combo_shown_directions); i++) {
 			gtk_list_store_append(store, &iter);
-			pixbuf=gtk_widget_render_icon(cellview, dir_icons[i], GTK_ICON_SIZE_MENU, NULL);
-			gtk_list_store_set(store, &iter, DIR_PIXBUF_COL, pixbuf, DIR_TEXT_COL, _(gd_direction_get_visible_name(shown_dirs[i])), -1);
+			pixbuf=gtk_widget_render_icon(cellview, direction_combo_shown_icons[i], GTK_ICON_SIZE_MENU, NULL);
+			gtk_list_store_set(store, &iter, DIR_PIXBUF_COL, pixbuf, DIR_TEXT_COL, _(gd_direction_get_visible_name(direction_combo_shown_directions[i])), -1);
 		}
 
 		gtk_widget_destroy(cellview);
@@ -776,17 +783,17 @@ gd_direction_combo_new(const GdDirection initial)
     gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer, "text", DIR_TEXT_COL, NULL);
 
 	/* set to initial value */
-	for (i=0; i<G_N_ELEMENTS(shown_dirs); i++)
-		if (shown_dirs[i]==initial)
+	for (i=0; i<G_N_ELEMENTS(direction_combo_shown_directions); i++)
+		if (direction_combo_shown_directions[i]==initial)
 			gtk_combo_box_set_active(GTK_COMBO_BOX(combo), i);
 
 	return combo;
 }
 
 GdDirection
-gd_direction_combo_get(GtkWidget *combo)
+gd_direction_combo_get_direction(GtkWidget *combo)
 {
-	return (GdDirection) shown_dirs[gtk_combo_box_get_active(GTK_COMBO_BOX(combo))];
+	return (GdDirection) direction_combo_shown_directions[gtk_combo_box_get_active(GTK_COMBO_BOX(combo))];
 }
 
 
@@ -819,7 +826,7 @@ gd_scheduling_combo_new(const GdScheduling initial)
 }
 
 GdScheduling
-gd_scheduling_combo_get(GtkWidget *combo)
+gd_scheduling_combo_get_scheduling(GtkWidget *combo)
 {
 	return (GdScheduling)(gtk_combo_box_get_active(GTK_COMBO_BOX(combo)));
 }

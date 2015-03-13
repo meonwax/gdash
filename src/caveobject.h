@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,21 +18,21 @@
 
 #include "cave.h"
 
-typedef enum _object_enum {
+typedef enum _gd_object_type {
 	NONE,				/* this one to be zero. */
-	POINT,				/* single point of object1 */
-	LINE,				/* line from (1) to (2) of object1 */
-	RECTANGLE,			/* rectangle with corners (1) and (2) of object1 */
-	FILLED_RECTANGLE,	/* rectangle with corners (1) and (2) of object1, filled with object2 */
-	RASTER,				/* aligned plots */
-	JOIN,				/* every object1 has an object2 next to it, relative (dx,dy) */
-	FLOODFILL_REPLACE,	/* fill by replacing */
-	FLOODFILL_BORDER,	/* fill to another element, a border */
-	MAZE,				/* maze */
-	MAZE_UNICURSAL,		/* unicursal maze */
-	MAZE_BRAID,			/* braid maze */
-	RANDOM_FILL,		/* random fill */
-	COPY_PASTE,			/* copy & paste with optional mirror and flip */
+	GD_POINT,				/* single point of object1 */
+	GD_LINE,				/* line from (1) to (2) of object1 */
+	GD_RECTANGLE,			/* rectangle with corners (1) and (2) of object1 */
+	GD_FILLED_RECTANGLE,	/* rectangle with corners (1) and (2) of object1, filled with object2 */
+	GD_RASTER,				/* aligned plots */
+	GD_JOIN,				/* every object1 has an object2 next to it, relative (dx,dy) */
+	GD_FLOODFILL_REPLACE,	/* fill by replacing */
+	GD_FLOODFILL_BORDER,	/* fill to another element, a border */
+	GD_MAZE,				/* maze */
+	GD_MAZE_UNICURSAL,		/* unicursal maze */
+	GD_MAZE_BRAID,			/* braid maze */
+	GD_RANDOM_FILL,		/* random fill */
+	GD_COPY_PASTE,			/* copy & paste with optional mirror and flip */
 } GdObjectType;
 
 typedef enum _gd_object_levels {
@@ -46,7 +46,7 @@ typedef enum _gd_object_levels {
 
 extern GdObjectLevels gd_levels_mask[];
 
-typedef struct _object {
+typedef struct _gd_object {
 	GdObjectType type;		/* type */
 	GdObjectLevels levels;	/* levels to show this object on */
 	
@@ -65,7 +65,7 @@ typedef struct _object {
 	int random_fill_probability[4];
 } GdObject;
 
-typedef struct _objdesc {
+typedef struct _gd_object_description {
 	char *name;
 	char *x1;
 	char *x2;
@@ -83,14 +83,14 @@ typedef struct _objdesc {
 extern GdObjectDescription gd_object_description[];
 
 
-void gd_cave_draw_object (Cave *cave, const GdObject *object, int level);
-char *gd_object_to_bdcff(const GdObject *object);
-char *gd_get_object_coordinates_text (GdObject *selected);
-char *gd_get_object_description_markup (GdObject *selected);
+void gd_cave_draw_object (GdCave *cave, const GdObject *object, int level);
+char *gd_object_get_bdcff(const GdObject *object);
+char *gd_object_get_coordinates_text (GdObject *selected);
+char *gd_object_get_description_markup (GdObject *selected);
 GdObject *gd_object_new_from_string(char *str);
 
-Cave *gd_cave_new_rendered(const Cave * data, const int level, guint32 seed);
-void gd_flatten_cave (Cave * cave, const int level);
+GdCave *gd_cave_new_rendered(const GdCave * data, const int level, guint32 seed);
+void gd_flatten_cave(GdCave * cave, const int level);
 
 #endif	/* CAVEOBJECT.H */
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,8 +15,13 @@
  */
 #include <glib.h>
 
-void gd_pal_emu(gpointer pixels, int width, int height, int pitch, int rshift, int gshift, int bshift, int ashift);
+#define GD_TITLE_SCREEN_MAX_WIDTH 320
+#define GD_TITLE_SCREEN_MAX_HEIGHT 192
+#define GD_TITLE_SCROLL_MAX_WIDTH 320
+#define GD_TITLE_SCROLL_MAX_HEIGHT 32
 
-void gd_scale2x(guint8 *srcpix, int width, int height, int srcpitch, guint8 *dstpix, int dstpitch);
-void gd_scale3x(guint8 *srcpix, int width, int height, int srcpitch, guint8 *dstpix, int dstpitch);
+void gd_pal_emulate_raw(gpointer pixels, int width, int height, int pitch, int rshift, int gshift, int bshift, int ashift);
+
+void gd_scale2x_raw(guint8 *srcpix, int width, int height, int srcpitch, guint8 *dstpix, int dstpitch);
+void gd_scale3x_raw(guint8 *srcpix, int width, int height, int srcpitch, guint8 *dstpix, int dstpitch);
 

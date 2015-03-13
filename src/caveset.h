@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -26,9 +26,12 @@ typedef struct _gd_caveset_data {
 	GdString difficulty;		/* difficulty of the caveset, for info purposes */
 	GdString www;				/* link to author's webpage */
 	GdString date;				/* date of creation */
-	GdString remark;			/* some note */
 
-	GString *notes;				/* notes about the game */
+	GString *story;				/* story for the caves */
+	GString *remark;			/* notes about the game */
+	
+	GString *title_screen;		/* base64-encoded title screen image */
+	GString *title_screen_scroll;	/* scrolling background for title screen image */
 
 	GdString charset;			/* these are not used by gdash */
 	GdString fontset;
@@ -59,13 +62,13 @@ const gchar **gd_caveset_get_internal_game_names();
 /* caveset load from file; configdir passed to look for .hsc file */
 gboolean gd_caveset_load_from_file(const char *filename, const char *configdir);
 /* caveset save to bdcff file */
-gboolean gd_caveset_save(const char *filename, gboolean caves_with_replay_only);
+gboolean gd_caveset_save(const char *filename);
 
 /* misc caveset functions */
 int gd_caveset_count(void);
 void gd_caveset_clear(void);
-Cave *gd_return_nth_cave(const int cave);
-Cave *gd_cave_new_from_caveset(const int cave, const int level, guint32 seed);
+GdCave *gd_return_nth_cave(const int cave);
+GdCave *gd_cave_new_from_caveset(const int cave, const int level, guint32 seed);
 
 /* highscore in config directory */
 void gd_save_highscore(const char* directory);
@@ -73,6 +76,9 @@ gboolean gd_load_highscore(const char *directory);
 
 GdCavesetData *gd_caveset_data_new();
 void gd_caveset_data_free(GdCavesetData *data);
+
+/* check replays and optionally remove */
+int gd_cave_check_replays(GdCave *cave, gboolean report, gboolean remove, gboolean repair);
 
 
 #endif							/* _CAVESET_H */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -20,7 +20,7 @@
 #include "settings.h"
 
 GList *gd_errors=NULL;
-gboolean gd_new_error=FALSE;
+static gboolean has_new_error=FALSE;
 static char *error_context=NULL;
 
 
@@ -34,7 +34,7 @@ error_free(GdErrorMessage *error)
 void
 gd_clear_error_flag()
 {
-	gd_new_error=FALSE;
+	has_new_error=FALSE;
 }
 
 void
@@ -72,7 +72,7 @@ log_func(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message
 		error->message=g_strdup(message);
 
 	if ((log_level&G_LOG_LEVEL_MASK) <= G_LOG_LEVEL_WARNING)
-		gd_new_error=TRUE;
+		has_new_error=TRUE;
 	
 	gd_errors=g_list_append(gd_errors, error);
 	/* also call default handler to print to console; but with processed string */
@@ -81,7 +81,7 @@ log_func(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message
 
 gboolean gd_has_new_error()
 {
-	return gd_new_error;
+	return has_new_error;
 }
 
 void

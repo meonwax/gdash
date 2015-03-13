@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,10 +22,10 @@
 #include "cave.h"
 
 extern int gd_cell_size_game, gd_cell_size_editor;
-extern GdkPixbuf *gd_pixbuf_for_builtin;
+extern GdkPixbuf *gd_pixbuf_for_builtin_theme;
 
 /* tv stripes for a pixbuf. exported for the settings window */
-void gd_pal_pixbuf(GdkPixbuf *pixbuf);
+void gd_pal_emulate_pixbuf(GdkPixbuf *pixbuf);
 GdkPixbuf *gd_pixbuf_scale(GdkPixbuf *orig, GdScalingType type);
 
 /* png graphics loading */
@@ -43,10 +43,11 @@ GdkPixmap *gd_editor_pixmap(int index);
 
 GdkPixbuf *gd_get_element_pixbuf_with_border (GdElement element);
 GdkPixbuf *gd_get_element_pixbuf_simple_with_border (GdElement element);
-GdkPixbuf *gd_drawcave_to_pixbuf(const Cave * cave, const int width, const int height, const gboolean game_view);
+GdkPixbuf *gd_drawcave_to_pixbuf(const GdCave * cave, const int width, const int height, const gboolean game_view);
 
-void gd_create_pixbuf_for_builtin_gfx();
-
-
+void gd_create_pixbuf_for_builtin_theme();
+GdkPixbuf *gd_pixbuf_load_from_data(guchar *data, int length);
+GdkPixbuf *gd_pixbuf_load_from_base64(gchar *base64);
+GdkPixbuf *gd_create_title_image();
 #endif
 

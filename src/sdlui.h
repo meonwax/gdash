@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,8 +18,10 @@
 
 char *gd_select_file(const char *title, const char *start_dir, const char *glob, gboolean for_save);
 void gd_settings_menu();
-void gd_show_highscore(Cave *highlight_cave, int highlight_line);
+void gd_show_highscore(GdCave *highlight_cave, int highlight_line);
+void gd_show_cave_info(GdCave *show_cave);
 void gd_help(const char **strings);
+void gd_message(const char *message);
 
 void gd_error_console();
 void gd_show_error(GdErrorMessage *error);

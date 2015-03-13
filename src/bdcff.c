@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -97,7 +97,7 @@ replay_store_from_bdcff(GdReplay *replay, const char *str)
 	if (num)
 		sscanf(num, "%d", &count);
 	for (i=0; i<count; i++)
-		gd_replay_store_next(replay, dir, fire, suicide);
+		gd_replay_store_movement(replay, dir, fire, suicide);
 		
 	return TRUE;
 }
@@ -350,7 +350,7 @@ replay_process_tags(GdReplay *replay, GHashTable *tags)
    keys are attribs; values are params;
    the user data is the cave the hash table belongs to. */
 static gboolean
-cave_process_tags_func(const char *attrib, const char *param, Cave *cave)
+cave_process_tags_func(const char *attrib, const char *param, GdCave *cave)
 {
 	char **params;
 	int paramcount;
@@ -470,7 +470,7 @@ cave_process_tags_func(const char *attrib, const char *param, Cave *cave)
 static void
 cave_report_and_copy_unknown_tags_func(char *attrib, char *param, gpointer data)
 {
-	Cave *cave=(Cave *)data;
+	GdCave *cave=(GdCave *)data;
 	
 	g_warning("unknown tag '%s'", attrib);
 	g_hash_table_insert(cave->tags, g_strdup(attrib), g_strdup(param));
@@ -479,11 +479,11 @@ cave_report_and_copy_unknown_tags_func(char *attrib, char *param, gpointer data)
 
 /* having read all strings belonging to the cave, process it. */
 static void
-cave_process_tags(Cave *cave, GHashTable *tags, GList *maplines)
+cave_process_tags(GdCave *cave, GHashTable *tags, GList *maplines)
 {
 	char *value;
 
-	/* first check cave name, so we can report errors correctly (saying that Cave xy: error foobar) */
+	/* first check cave name, so we can report errors correctly (saying that GdCave xy: error foobar) */
 	value=g_hash_table_lookup(tags, "Name");
 	if (value)
 		cave_process_tags_func("Name", value, cave);
@@ -611,7 +611,8 @@ gd_caveset_load_from_bdcff(const char *contents)
 {
 	char **lines;
 	int lineno;
-	Cave *cave;
+	GdCave *cave;
+	GList *iter;
 	gboolean reading_replay=FALSE;
 	gboolean reading_map=FALSE;
 	gboolean reading_mapcodes=FALSE;
@@ -623,7 +624,7 @@ gd_caveset_load_from_bdcff(const char *contents)
 	int linenum;
 	GHashTable *tags, *replay_tags;
 	GdObjectLevels levels=GD_OBJECT_LEVEL_ALL;
-	Cave *default_cave;
+	GdCave *default_cave;
 
 	gd_caveset_clear();
 	
@@ -1020,7 +1021,7 @@ gd_caveset_load_from_bdcff(const char *contents)
 		g_warning("No BDCFF version, or 0.32. Using unspecified-intermission-size hack.");
 		
 		for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
-			Cave *cave=(Cave *)iter->data;
+			GdCave *cave=(GdCave *)iter->data;
 			
 			/* only applies to intermissions */
 			/* not applied to mapped caves, as maps are filled with initial border, if the map read is smaller */
@@ -1034,7 +1035,7 @@ gd_caveset_load_from_bdcff(const char *contents)
 				cave->x2=19; cave->y2=11;
 				
 				/* and cover the invisible area */
-				object.type=FILLED_RECTANGLE;
+				object.type=GD_FILLED_RECTANGLE;
 				object.x1=0; object.y1=11;	/* 11, because this will also be the border */
 				object.x2=39; object.y2=21;
 				object.element=cave->initial_border;
@@ -1049,6 +1050,10 @@ gd_caveset_load_from_bdcff(const char *contents)
 
 	if (!g_str_equal(version_read, BDCFF_VERSION))
 		g_warning("BDCFF version %s, loaded caveset may have errors.", version_read);
+
+	/* check for replays which are problematic */
+	for (iter=gd_caveset; iter!=NULL; iter=iter->next)
+		gd_cave_check_replays((GdCave *)iter->data, TRUE, FALSE, FALSE);
 
 	/* if there was some error message - return fail */
 	return !gd_has_new_error();
@@ -1292,9 +1297,9 @@ save_replay_func(GdReplay *replay, GPtrArray *out)
 /* output properties of a structure to a file. */
 /* g_list_foreach func, so "out" is the last parameter! */
 static void
-caveset_save_cave_func(Cave *cave, GPtrArray *out)
+caveset_save_cave_func(GdCave *cave, GPtrArray *out)
 {
-	Cave *default_cave;
+	GdCave *default_cave;
 	GString *line;	/* used for various purposes */
 	GPtrArray *this_out;
 	int i;
@@ -1392,7 +1397,7 @@ caveset_save_cave_func(Cave *cave, GPtrArray *out)
 				g_string_append_printf(line, "]");
 				g_ptr_array_add(out, g_strdup(line->str));
 			}
-			text=gd_object_to_bdcff(object);
+			text=gd_object_get_bdcff(object);
 			g_ptr_array_add(out, g_strdup(text));
 			g_free(text);
 			if (object->levels!=GD_OBJECT_LEVEL_ALL)
@@ -1413,7 +1418,7 @@ caveset_save_cave_func(Cave *cave, GPtrArray *out)
 /* save cave in bdcff format. */
 /* "out" will be added g_strdupped lines of bdcff description. */
 void
-gd_caveset_save_to_bdcff(GPtrArray *out, gboolean caves_with_replay_only)
+gd_caveset_save_to_bdcff(GPtrArray *out)
 {
 	int i;
 	GList *iter;
@@ -1428,7 +1433,7 @@ gd_caveset_save_to_bdcff(GPtrArray *out, gboolean caves_with_replay_only)
 	gd_create_char_to_element_table();
 	/* check all caves */
 	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
-		Cave *cave=(Cave *)iter->data;
+		GdCave *cave=(GdCave *)iter->data;
 		
 		/* if they have a map (random elements+object based maps do not need characters) */
 		if (cave->map) {
@@ -1488,14 +1493,8 @@ gd_caveset_save_to_bdcff(GPtrArray *out, gboolean caves_with_replay_only)
 	gd_caveset_data_free(default_caveset);
 	g_ptr_array_add(out, g_strdup("Levels=5"));
 	
-	/* for all caves */
-	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
-		Cave *cave=(Cave *) iter->data;
-
-		/* a) not only replays   OR  b) only replays and cave has replays */
-		if (!caves_with_replay_only || cave->replays!=NULL)
-			caveset_save_cave_func(cave, out);
-	}
+	g_list_foreach(gd_caveset, (GFunc) caveset_save_cave_func, out);
+	
 	g_ptr_array_add(out, g_strdup("[/game]"));
 	g_ptr_array_add(out, g_strdup("[/BDCFF]"));
 

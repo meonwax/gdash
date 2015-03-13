@@ -131,7 +131,7 @@ gdash_SOURCES = \
 # sdl is needed for gfx and sound.
 sdash_CFLAGS = -g -Wall @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@
 sdash_LDFLAGS = -g -Wall
-sdash_LDADD = @GLIB_LIBS@ @SDL_LIBS@ -lSDL_mixer
+sdash_LDADD = @GLIB_LIBS@ @SDL_LIBS@ -lSDL_mixer -lSDL_image
 sdash_SOURCES = \
 	$(base_sources) \
 	$(sdlsources) \

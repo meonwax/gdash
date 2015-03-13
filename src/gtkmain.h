@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,9 +18,10 @@
 
 #include "cave.h"
 
-void gd_main_new_game_test(Cave *test, int level);
+void gd_main_new_game_test(GdCave *test, int level);
 void gd_main_stop_game();	/* stop game if running, also used by editor */
 
 void gd_main_window_set_title();	/* set the title to the name of the caveset or the cave currently played. also used by editor */
+void gd_main_window_set_title_animation();	/* exported for the editor, and also for settings window. */
 
 #endif /* _GAME_H */

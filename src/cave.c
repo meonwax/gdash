@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -379,7 +379,7 @@ gd_struct_explain_defaults_in_string(const GdStructDescriptor *properties, GdPro
 
 
 void
-gd_cave_set_defaults_from_array(Cave* cave, GdPropertyDefault *defaults)
+gd_cave_set_defaults_from_array(GdCave* cave, GdPropertyDefault *defaults)
 {
 	gd_struct_set_defaults_from_array(cave, gd_cave_properties, defaults);
 }
@@ -390,7 +390,7 @@ gd_cave_set_defaults_from_array(Cave* cave, GdPropertyDefault *defaults)
 	these are default for gdash and bdcff.
 */
 void
-gd_cave_set_gdash_defaults(Cave* cave)
+gd_cave_set_gdash_defaults(GdCave* cave)
 {
 	int i;
 
@@ -435,7 +435,7 @@ gd_has_highscore(GdHighScore *hs)
 }
 
 void
-gd_cave_clear_highscore(Cave *cave)
+gd_cave_clear_highscore(GdCave *cave)
 {
 	gd_clear_highscore(cave->highscore);
 }
@@ -512,13 +512,13 @@ gd_str_case_hash(gconstpointer v)
 	create new cave with default values.
 	sets every value, also default size, diamond value etc.
 */
-Cave *
+GdCave *
 gd_cave_new(void)
 {
 	int i;
-	Cave *cave;
+	GdCave *cave;
 	
-	cave=g_new0(Cave, 1);
+	cave=g_new0(GdCave, 1);
 
 	/* hash table which stores unknown tags as strings. */
 	cave->tags=g_hash_table_new_full(gd_str_case_hash, gd_str_case_equal, g_free, g_free);
@@ -554,7 +554,7 @@ gd_cave_new(void)
 	one cell is cell_size bytes long.
 */
 gpointer
-gd_cave_map_new_for_cave(const Cave *cave, const int cell_size)
+gd_cave_map_new_for_cave(const GdCave *cave, const int cell_size)
 {
 	gpointer *rows;				/* this is void**, pointer to array of ... */
 	int y;
@@ -573,7 +573,7 @@ gd_cave_map_new_for_cave(const Cave *cave, const int cell_size)
 	if map is null, this also returns null.
 */
 gpointer
-gd_cave_map_dup_size(const Cave *cave, const gpointer map, const int cell_size)
+gd_cave_map_dup_size(const GdCave *cave, const gpointer map, const int cell_size)
 {
 	gpointer *rows;
 	gpointer *maplines=(gpointer *)map;
@@ -613,7 +613,7 @@ gd_cave_map_free(gpointer map)
 	frees memory associated to cave
 */
 void
-gd_cave_free(Cave *cave)
+gd_cave_free(GdCave *cave)
 {
 	int i;
 	
@@ -656,12 +656,12 @@ hash_copy_foreach(const char *key, const char *value, GHashTable *dest)
 
 /* copy cave from src to destination, with duplicating dynamically allocated data */
 void
-gd_cave_copy(Cave *dest, const Cave *src)
+gd_cave_copy(GdCave *dest, const GdCave *src)
 {
 	int i;
 	
 	/* copy entire data */
-	g_memmove(dest, src, sizeof(Cave));
+	g_memmove(dest, src, sizeof(GdCave));
 
 	/* but duplicate dynamic data */
 	dest->tags=g_hash_table_new_full(gd_str_case_hash, gd_str_case_equal, g_free, g_free);
@@ -702,10 +702,10 @@ gd_cave_copy(Cave *dest, const Cave *src)
 }
 
 /* create new cave, which is a copy of the cave given. */
-Cave *
-gd_cave_new_from_cave(const Cave *orig)
+GdCave *
+gd_cave_new_from_cave(const GdCave *orig)
 {
-	Cave *cave;
+	GdCave *cave;
 
 	cave=gd_cave_new();
 	gd_cave_copy(cave, orig);
@@ -722,7 +722,7 @@ gd_cave_new_from_cave(const Cave *orig)
 	order is a pointer to the GdObject describing this object. Thus the editor can identify which cell was created by which object.
 */
 void
-gd_cave_store_rc(Cave *cave, int x, int y, const GdElement element, const void* order)
+gd_cave_store_rc(GdCave *cave, int x, int y, const GdElement element, const void* order)
 {
 	/* if we do not need to draw, exit now */
 	if (element==O_NONE)
@@ -765,7 +765,7 @@ gd_cave_store_rc(Cave *cave, int x, int y, const GdElement element, const void* 
 }
 
 GdElement
-gd_cave_get_rc(const Cave *cave, int x, int y)
+gd_cave_get_rc(const GdCave *cave, int x, int y)
 {
 	/* always fix coordinates as if cave was wraparound. */
 	
@@ -832,7 +832,7 @@ gd_c64_random(GdC64RandomGenerator *rand)
 	Also by the predictable slime.
 */
 unsigned int
-gd_cave_c64_random(Cave *cave)
+gd_cave_c64_random(GdCave *cave)
 {
 	return gd_c64_random(&cave->c64_rand);
 }
@@ -845,7 +845,7 @@ gd_c64_random_set_seed(GdC64RandomGenerator *rand, int seed1, int seed2)
 }
 
 void
-gd_cave_c64_random_set_seed(Cave *cave, int seed1, int seed2)
+gd_cave_c64_random_set_seed(GdCave *cave, int seed1, int seed2)
 {
 	gd_c64_random_set_seed(&cave->c64_rand, seed1, seed2);
 }
@@ -872,7 +872,7 @@ swap(int *i1, int *i2)
 }
 
 void
-gd_cave_set_random_c64_colors(Cave *cave)
+gd_cave_set_random_c64_colors(GdCave *cave)
 {
 	const int bright_colors[]={1, 3, 7};
 	const int dark_colors[]={2, 6, 8, 9, 11};
@@ -897,7 +897,7 @@ gd_cave_set_random_c64_colors(Cave *cave)
 }
 
 static void
-cave_set_random_indexed_colors(Cave *cave, GdColor (*color_indexer_func) (int, int))
+cave_set_random_indexed_colors(GdCave *cave, GdColor (*color_indexer_func) (int, int))
 {
 	int hue=g_random_int_range(0, 15);
 	int hue_spread=g_random_int_range(1, 6);	/* 1..5 */
@@ -935,13 +935,13 @@ cave_set_random_indexed_colors(Cave *cave, GdColor (*color_indexer_func) (int, i
 }
 
 void
-gd_cave_set_random_atari_colors(Cave *cave)
+gd_cave_set_random_atari_colors(GdCave *cave)
 {
 	cave_set_random_indexed_colors(cave, gd_atari_color_huesat);
 }
 
 void
-gd_cave_set_random_c64dtv_colors(Cave *cave)
+gd_cave_set_random_c64dtv_colors(GdCave *cave)
 {
 	cave_set_random_indexed_colors(cave, gd_c64dtv_color_huesat);
 }
@@ -955,7 +955,7 @@ swapd(double *i1, double *i2)
 }
 
 void
-gd_cave_set_random_rgb_colors(Cave *cave)
+gd_cave_set_random_rgb_colors(GdCave *cave)
 {
 	double hue=g_random_double();	/* any hue allowed */
 	double hue_spread=g_random_double_range(1.0/30.0, 1.0/3.0);	/* hue spread is min. 12 degrees, max 120 degrees (1/3) */
@@ -1009,7 +1009,7 @@ gd_cave_set_random_rgb_colors(Cave *cave)
 
 
 void
-gd_cave_set_random_colors(Cave *cave, GdColorType type)
+gd_cave_set_random_colors(GdCave *cave, GdColorType type)
 {
 	switch (type) {
 		case GD_COLOR_TYPE_RGB:
@@ -1039,7 +1039,7 @@ gd_cave_set_random_colors(Cave *cave, GdColorType type)
 	after this, ew and eh will contain the effective width and height.
  */
 void
-gd_cave_auto_shrink(Cave *cave)
+gd_cave_auto_shrink(GdCave *cave)
 {
 
 	int x, y;
@@ -1162,7 +1162,7 @@ gd_cave_auto_shrink(Cave *cave)
    correct them if needed.
 */
 void
-gd_cave_correct_visible_size(Cave *cave)
+gd_cave_correct_visible_size(GdCave *cave)
 {
 	g_assert(cave!=NULL);
 
@@ -1203,7 +1203,7 @@ gd_cave_correct_visible_size(Cave *cave)
 	animating an element also caused some delay each frame; according to my measurements, around 2.6 ms/element.
 */
 static void
-cave_set_ckdelay_extra_for_animation(Cave *cave)
+cave_set_ckdelay_extra_for_animation(GdCave *cave)
 {
 	int x, y;
 	gboolean has_amoeba=FALSE, has_firefly=FALSE, has_butterfly=FALSE, has_slime=FALSE;
@@ -1246,7 +1246,7 @@ cave_set_ckdelay_extra_for_animation(Cave *cave)
 
 /* do some init - setup some cave variables before the game. */
 void
-gd_cave_setup_for_game(Cave *cave)
+gd_cave_setup_for_game(GdCave *cave)
 {
 	int x, y;
 
@@ -1287,7 +1287,7 @@ gd_cave_setup_for_game(Cave *cave)
 /* the number of diamonds found. */
 /* of course, this function is to be called from the cave engine, at the exact time of hatching. */
 void
-gd_cave_count_diamonds(Cave *cave)
+gd_cave_count_diamonds(GdCave *cave)
 {
 	int x, y;
 
@@ -1320,7 +1320,7 @@ gd_cave_count_diamonds(Cave *cave)
    if a cell is changed, it is flagged with GD_REDRAW; the flag can be cleared by the caller.
  */
 void
-gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, gboolean yellowish_color, int animcycle, gboolean hate_invisible_outbox)
+gd_drawcave_game(const GdCave *cave, int **gfx_buffer, gboolean bonus_life_flash, gboolean yellowish_color, int animcycle, gboolean hate_invisible_outbox)
 {
 	static int player_blinking=0;
 	static int player_tapping=0;
@@ -1428,7 +1428,7 @@ gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, 
    to zero, it is the exact moment of timeout. */
 /* internal time is milliseconds (or 1200 milliseconds for pal timing). */
 int
-gd_cave_time_show(const Cave *cave, int internal_time)
+gd_cave_time_show(const GdCave *cave, int internal_time)
 {
 	return (internal_time+cave->timing_factor-1)/cave->timing_factor;
 }
@@ -1479,7 +1479,7 @@ enum {
 
 /* store movement in a replay */
 void
-gd_replay_store_next(GdReplay *replay, GdDirection player_move, gboolean player_fire, gboolean suicide)
+gd_replay_store_movement(GdReplay *replay, GdDirection player_move, gboolean player_fire, gboolean suicide)
 {
 	guint8 data[1];
 	
@@ -1597,6 +1597,36 @@ gd_replay_movements_to_bdcff(GdReplay *replay)
 	}
 	
 	return g_string_free(str, FALSE);
+}
+
+
+/* calculate adler checksum for a rendered cave; this can be used for more caves. */
+void
+gd_cave_adler_checksum_more(GdCave *cave, guint32 *a, guint32 *b)
+{
+	int x, y;
+
+	g_assert(cave->rendered);
+
+	for (y=0; y<cave->h; y++)
+		for (x=0; x<cave->w; x++) {
+			*a+=gd_elements[cave->map[y][x]].character;
+			*b+=*a;
+
+			*a %= 65521;
+			*b %= 65521;
+		}
+}
+
+/* calculate adler checksum for a single rendered cave. */
+guint32
+gd_cave_adler_checksum(GdCave *cave)
+{
+	guint32 a=1;
+	guint32 b=0;
+	
+	gd_cave_adler_checksum_more(cave, &a, &b);
+	return (b<<16)+a;
 }
 
 

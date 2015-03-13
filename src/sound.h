@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,9 +18,9 @@
 #include "cave.h"
 
 void gd_sound_init();
-void gd_no_sound();
-void gd_cave_play_sounds(Cave *cave);
-void gd_play_bonus_life_sound();
+void gd_sound_off();
+void gd_sound_play_cave(GdCave *cave);
+void gd_sound_play_bonus_life();
 
 void gd_music_play_random();
 void gd_music_stop();

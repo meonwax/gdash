@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -91,6 +91,7 @@ extern gboolean gd_random_colors;
 extern gboolean gd_use_bdcff_highscore;
 extern int gd_pal_emu_scanline_shade;
 extern gboolean gd_fine_scroll;
+extern gboolean gd_show_story;
 
 /* palette settings */
 extern int gd_c64_palette;
@@ -114,6 +115,15 @@ extern GdScalingType gd_sdl_scale;
 extern char *gd_sdl_theme;
 extern gboolean gd_sdl_pal_emulation;
 extern gboolean gd_show_name_of_game;
+typedef enum _gd_status_bar_type {
+	GD_STATUS_BAR_ORIGINAL,
+	GD_STATUS_BAR_1STB,
+	GD_STATUS_BAR_CRLI,
+	GD_STATUS_BAR_FINAL,
+	GD_STATUS_BAR_ATARI_ORIGINAL,
+	GD_STATUS_BAR_MAX,
+} GdStatusBarType;
+extern GdStatusBarType gd_status_bar_type;
 #endif	/* use_sdl */
 
 
@@ -149,6 +159,10 @@ void gd_load_settings();
 
 /* command line arguments parsing */
 GOptionContext *gd_option_context_new();
+
+#ifdef USE_SDL
+const char **gd_status_bar_type_get_names();
+#endif	/* use_sdl */
 
 #endif
 

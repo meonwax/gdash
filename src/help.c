@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -32,6 +32,7 @@ struct helpdata {
 /********
  *
  * HELP FOR GAME
+ * 
  */
 
 static const struct helpdata gamehelp[] = {
@@ -43,8 +44,10 @@ static const struct helpdata gamehelp[] = {
 				"from other older file formats, like the No One's Final Boulder, the Construction Kit file format, "
 				"No One's Delight Boulder, an Atari game format, and many more.")},
 		{NULL, NULL, O_NONE, NULL},
+
 		{GTK_STOCK_MEDIA_PLAY, N_("Playing the game"), O_NONE,
-N_("To play the game, press the New Game button. You can select which level you start playing at. During the game, you can control your player with the cursor keys. The Ctrl key has a special meaning: you can snap items, ie. pick up things without moving. If you get stuck, press Escape to restart the level. If there are too many players in the cave and you cannot move, pressing F2 causes the active one to explode. With F11, you can switch to full screen mode.\nThese are the game elements:")},
+N_("To play the game, press the New Game button. You can select which level you start playing at. During the game, you can control your player with the cursor keys. The Ctrl key has a special meaning: you can snap items, ie. pick up things without moving. If you get stuck, press Escape to restart the level. If there are too many players in the cave and you cannot move, pressing F2 causes the active one to explode. With F11, you can switch to full screen mode. To view the alternative status bar which show keys and skeletons collected, hold down the left shift button.\nThese are the game elements:")},
+
 		{NULL, NULL, O_PLAYER, N_("This is the player. He can move through space and dirt. He can pick up diamonds and push stones, but he should avoid flies.")},
 		{NULL, NULL, O_SPACE, N_("Stones and diamonds fall down in space, creatures can freely move here.")},
 		{NULL, NULL, O_DIRT, N_("You can move through dirt leaving empty space behind. Amoeba eats it.")},
@@ -97,13 +100,26 @@ N_("To play the game, press the New Game button. You can select which level you 
 		{NULL, NULL, O_CREATURE_SWITCH, N_("With this you can change the direction of creatures, like guards and butterflies. Sometimes it works automatically.")},
 		{NULL, NULL, O_BITER_SWITCH, N_("This switch controls the speed of biters.")},
 		{NULL, N_("Strange elements"), O_DIRT_GLUED, N_("Some caves contain strange elements, for example, diamonds which cannot be collected, a player that cannot move... Don't be surprised!")},
+
+		{GTK_STOCK_DIALOG_INFO, N_("Playing hints"), O_NONE, N_("Obviously, holding fire and pushing a direction causes you to 'touch' an adjacent square without moving into it, collecting diamonds or removing dirt, but a move which is very useful is to push a boulder in this way. It's a good way of making sure you don't 'overpush' the boulder and later on you will have to use this.")},
+		{NULL, NULL, O_NONE, N_("Boulders do not roll off of the side of magic walls. In some caves it is shown where these walls are by placing a boulder to show you that it's magic.")},
+		{NULL, NULL, O_NONE, N_("Expanding walls are always horizontally expanding on both sides. In some caves it is shown which parts of the wall are expanding by forcing you to pass it on the other side. You will see the passage close in behind you and this eliminates some guessword in the next puzzle.")},
+		{NULL, NULL, O_NONE, N_("The screen starts scrolling at the edge of the screen. This means it's a bad idea to run in places where enemies are likely to be, since you won't have time to react. Either move very carefully in these situations, keep track of where the enemies roughly are in the cave, or take a different route away from danger - for example in empty space (where enemies are less likely to travel) or through undug mud. Never rush unless you're sure you can or you need to.")},
+		{NULL, NULL, O_NONE, N_("Enemies like to have dirt to move around on. Clearing lots of dirt can create safe patches for you. This technique can be used on levels where you let several fireflies loose and it's hard to kill them. Beware though - certain formations of enemies can hover in 'mid air' and even move slowly through empty space (when two enemies are circling each other in a certain way).")},
+		{NULL, NULL, O_NONE, N_("Magic walls often have a fairly strict time limit, some more than others. Collect up as many boulders as you can just above the magic wall, leaving one strip of mud, and then finally remove this strip and watch the goods get delivered. Just make sure you've cleared an appropriate amount of space under the wall ;)")},
+		{NULL, NULL, O_NONE, N_("Voodoo dolls need to be protected from enemies at all costs, but dropping a boulder on one is usually harmless!")},
+		{NULL, NULL, O_NONE, N_("You can't collect diamonds which are falling, but you can collect them when they momentarily bounce off of something or down the side of a pile.")},
+		{NULL, NULL, O_NONE, N_("Some levels have hidden exits. These always look like titanium wall, but don't flash. You can always tell where they are by visual clues and deduction.")},
+		{NULL, NULL, O_NONE, N_("Don't blindly take all diamonds. Some of them are red herrings, some may be unobtainable or part of a trap, and believe it or not, sometimes a diamond is more useful to you on the screen than it is collected, due to some sadistic puzzles :)")},
 		{NULL, NULL, O_NONE, NULL},
+
 		{GD_ICON_SNAPSHOT, N_("Snapshots"), O_NONE, N_("You can experiment with levels by saving and reloading snapshots. However, if you are playing a reloaded cave, you will not get score or extra lives.")},
 		{GD_ICON_REPLAY, N_("Replays"), O_NONE, N_("Every time you play a game, GDash records all your movements. These recordings can be viewed later, and can be saved with the caveset. To check them out, click on Show replays in the Play menu.")},
 		{NULL, NULL, O_NONE, N_("If you were very lucky in a cave, or something interesting happened, you do not have to be worry, as all played caves are recorded. In the Replays window, you can select some of them to be saved with the caveset. You can also add comments to selected movies. The replays are stored no matter if the cave was solved or not, so you can even send the recording of your unsuccessful missions for others to discuss.")},
 		{NULL, NULL,O_NONE, N_("During the replay of the cave, you can gain control of the replay if you use the usual cursor keys (left, up, etc.) to move. From that point, you can continue playing the cave as if it was a snapshot. You can answer your 'what would have happened if...' questions. Or see if you can do better than the original player!")},
 		{NULL, NULL, O_NONE, NULL},
-		{GTK_STOCK_SELECT_COLOR, N_("Themes"), O_NONE, N_("The game also supports themes. You can use the installed png file as a template. Cells can have any arbitrary size, not necessarily 16x16 pixels. However, they must be squares, and the image must have an alpha channel. If the image has only a small number of colors (fully saturated red for foreground color 1, fully "
+
+		{GTK_STOCK_SELECT_COLOR, N_("Themes"), O_NONE, N_("The game also supports themes. You can use the installed png file as a template. Cells can have any arbitrary size, not necessarily 16x16 pixels. However, they must be squares, and the image must have an alpha channel (or transparent layer in some graphics editors). If the image has only a small number of colors (fully saturated red for foreground color 1, fully "
 		"saturated green for amoeba...), the game will use original C64 colors, different ones for every cave. Whether the png file is interpreted as a true color "
 		"image or one with C64 colors, depends on the color values used, and is autodetected. An image file with only #000000, #00FF00 and the like is taken as "
 		"a C64 theme.\n"
@@ -190,6 +206,13 @@ static const struct helpdata editorhelp[] = {
 		N_("If the cave is map-based, you can use the shift tools to move the map. This might be useful if you want to enlarge it "
 		"and otherwise there would be no place to do this. Remember to check the visible region of the cave after shifting it in any "
 		"direction! For object-based caves, you can select all object at once and move them together.")},
+	{GTK_STOCK_FILE, N_("Cave stories"), O_NONE,
+		N_("Every cave can have a story associated to it, which will be shown when the cave is played. This story can connect the "
+			"caves to each other.")},
+	{GD_ICON_IMAGE, N_("Title screen"), O_NONE,
+		N_("A caveset can have its own title screen. To add one, click Cave set title image in the File menu. If your image is transparent "
+		"(has a transparent layer or alpha channel, the term depends on the graphics editor you use), you can also add a small background "
+		"image, which will be tiled and scrolled beneath the big one.") },
 	{GD_ICON_AWARD, N_("Highscores"), O_NONE, N_("The editor can also be used to delete highscore files of a game or any of the caves.")},
 	{NULL, NULL, O_NONE, N_("GDash uses two mechanisms to store "
 		"highscores: it can save them in a separate file (this is done automatically), and it can also save them in the BDCFF file. Separate files are always "
@@ -205,30 +228,30 @@ static const struct helpdata editorhelp[] = {
 
 /* opens a dialog, containing help. */
 static void
-gd_show_help_window (const struct helpdata *help_text, int lines, GtkWidget * parent)
+show_help_window (const struct helpdata *help_text, int lines, GtkWidget * parent)
 {
 	GtkWidget *dialog, *sw, *view;
 	unsigned int i;
 	
 	/* create text buffer */
 	GtkTextIter iter;
-	GtkTextBuffer *buffer = gtk_text_buffer_new (NULL);
+	GtkTextBuffer *buffer=gtk_text_buffer_new (NULL);
 	gtk_text_buffer_get_iter_at_offset (buffer, &iter, 0);
-	gtk_text_buffer_create_tag (buffer, "heading", "weight", PANGO_WEIGHT_BOLD, "scale", PANGO_SCALE_XX_LARGE, NULL);
-	gtk_text_buffer_create_tag (buffer, "name", "weight", PANGO_WEIGHT_BOLD, "scale", PANGO_SCALE_X_LARGE, NULL);
+	gtk_text_buffer_create_tag(buffer, "heading", "weight", PANGO_WEIGHT_BOLD, "scale", PANGO_SCALE_XX_LARGE, NULL);
+	gtk_text_buffer_create_tag(buffer, "name", "weight", PANGO_WEIGHT_BOLD, "scale", PANGO_SCALE_X_LARGE, NULL);
 	gtk_text_buffer_insert_with_tags_by_name (buffer, &iter, "GDash " PACKAGE_VERSION "\n\n", -1, "heading", NULL);
 	for (i = 0; i<lines; i++) {
 		GdElement element = help_text[i].element;
 		
 		if (help_text[i].stock_id) {
-			GdkPixbuf *pixbuf = gtk_widget_render_icon (parent, help_text[i].stock_id, GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
-			gtk_text_buffer_insert_pixbuf (buffer, &iter, pixbuf);
-			gtk_text_buffer_insert (buffer, &iter, " ", -1);
-			g_object_unref (pixbuf);
+			GdkPixbuf *pixbuf = gtk_widget_render_icon(parent, help_text[i].stock_id, GTK_ICON_SIZE_LARGE_TOOLBAR, NULL);
+			gtk_text_buffer_insert_pixbuf(buffer, &iter, pixbuf);
+			gtk_text_buffer_insert(buffer, &iter, " ", -1);
+			g_object_unref(pixbuf);
 		}
 		if (element!=O_NONE) {
-			gtk_text_buffer_insert_pixbuf (buffer, &iter, gd_get_element_pixbuf_simple_with_border (element));
-			gtk_text_buffer_insert (buffer, &iter, " ", -1);
+			gtk_text_buffer_insert_pixbuf(buffer, &iter, gd_get_element_pixbuf_simple_with_border (element));
+			gtk_text_buffer_insert(buffer, &iter, " ", -1);
 			if (help_text[i].heading == NULL) {
 				/* add element name only if no other text given */
 				gtk_text_buffer_insert_with_tags_by_name (buffer, &iter, _(gd_elements[element].name), -1, "name", NULL);
@@ -237,13 +260,13 @@ gd_show_help_window (const struct helpdata *help_text, int lines, GtkWidget * pa
 		}
 		if (help_text[i].heading) {
 			/* some words in big letters */
-			gtk_text_buffer_insert_with_tags_by_name (buffer, &iter, _(help_text[i].heading), -1, "name", NULL);
-			gtk_text_buffer_insert (buffer, &iter, "\n", -1);
+			gtk_text_buffer_insert_with_tags_by_name(buffer, &iter, _(help_text[i].heading), -1, "name", NULL);
+			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
 		}
 		if (help_text[i].description)
 			/* the long text */
-			gtk_text_buffer_insert (buffer, &iter, gettext(help_text[i].description), -1);
-		gtk_text_buffer_insert (buffer, &iter, "\n", -1);
+			gtk_text_buffer_insert(buffer, &iter, gettext(help_text[i].description), -1);
+		gtk_text_buffer_insert(buffer, &iter, "\n", -1);
 	}
 
 	dialog=gtk_dialog_new_with_buttons (_("GDash Help"), GTK_WINDOW (parent), GTK_DIALOG_NO_SEPARATOR, GTK_STOCK_CLOSE, GTK_RESPONSE_OK, NULL);
@@ -255,31 +278,31 @@ gd_show_help_window (const struct helpdata *help_text, int lines, GtkWidget * pa
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
 	/* get text and show it */
-	view=gtk_text_view_new_with_buffer (buffer);
-	gtk_container_add(GTK_CONTAINER (sw), view);
+	view=gtk_text_view_new_with_buffer(buffer);
+	gtk_container_add(GTK_CONTAINER(sw), view);
 	g_object_unref(buffer);
 
 	/* set some tags */
-	gtk_text_view_set_editable (GTK_TEXT_VIEW (view), FALSE);
-	gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (view), FALSE);
-	gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (view), GTK_WRAP_WORD);
-	gtk_text_view_set_pixels_above_lines (GTK_TEXT_VIEW (view), 3);
-	gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 6);
-	gtk_text_view_set_right_margin (GTK_TEXT_VIEW (view), 6);
-	gtk_widget_show_all (dialog);
-	gtk_dialog_run (GTK_DIALOG (dialog));
-	gtk_widget_destroy (dialog);
+	gtk_text_view_set_editable(GTK_TEXT_VIEW (view), FALSE);
+	gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW (view), FALSE);
+	gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW (view), GTK_WRAP_WORD);
+	gtk_text_view_set_pixels_above_lines(GTK_TEXT_VIEW (view), 3);
+	gtk_text_view_set_left_margin(GTK_TEXT_VIEW (view), 6);
+	gtk_text_view_set_right_margin(GTK_TEXT_VIEW (view), 6);
+	gtk_widget_show_all(dialog);
+	gtk_dialog_run(GTK_DIALOG (dialog));
+	gtk_widget_destroy(dialog);
 }
 
 void
-gd_show_game_help (GtkWidget *parent)
+gd_show_game_help(GtkWidget *parent)
 {
-	gd_show_help_window (gamehelp, G_N_ELEMENTS(gamehelp), parent);
+	show_help_window(gamehelp, G_N_ELEMENTS(gamehelp), parent);
 }
 
 void
-gd_show_editor_help (GtkWidget *parent)
+gd_show_editor_help(GtkWidget *parent)
 {
-	gd_show_help_window (editorhelp, G_N_ELEMENTS(editorhelp), parent);
+	show_help_window(editorhelp, G_N_ELEMENTS(editorhelp), parent);
 }
 

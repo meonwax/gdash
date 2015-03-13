@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -39,43 +39,41 @@ const int gd_scaling_scale[]={1, 2, 2, 2, 3, 3, 3, 4, 4, 4};
 
 #ifdef USE_GTK
 /* possible languages. */
+/* they are not translated, so every language name is show in that language itself. */
 const gchar *gd_languages_names[]={N_("System default"), "English", "Deutsch", "Magyar", NULL};
 /* this should correspond to the above one. */
 #ifdef G_OS_WIN32
-/* locale names used in windows. */
-static const gchar *language_locale[][7]={
-	{ "", NULL, },
-	{ "English", NULL, },
-	{ "German", NULL, },
-	{ "Hungarian", NULL, },
-};
-/* these will be used on windows for a putenv to trick gtk. */
-/* on linux, the setlocale call works correctly, and this is not needed. */
-static const gchar *languages_for_env[]={
-	NULL, "en", "de", "hu"
-};
+	/* locale names used in windows. */
+	static const gchar *language_locale_default[]= { "", NULL, };
+	static const gchar *language_locale_en[]= { "English", NULL, };
+	static const gchar *language_locale_de[]= { "German", NULL, };
+	static const gchar *language_locale_hu[]= { "Hungarian", NULL, };
+	/* these will be used on windows for a putenv to trick gtk. */
+	/* on linux, the setlocale call works correctly, and this is not needed. */
+	static const gchar *languages_for_env[]={ NULL, "en", "de", "hu" };
 #else
-/* locale names used in unix. */
-/* anyone, a better solution for this? */
-static const gchar *language_locale_default[]=
-	{ "", NULL, };
-static const gchar *language_locale_en[]=
-	{ "en_US.UTF-8", "en_US.UTF8", "en_US.ISO8859-15", "en_US.ISO8859-1", "en_US.US-ASCII", "en_US", "en", NULL, };
-static const gchar *language_locale_de[]=
-	{ "de_DE.UTF-8", "de_DE.UTF8", "de_DE.ISO8859-15", "de_DE.ISO8859-1", "de_DE",
-	  "de_AT.UTF-8", "de_AT.UTF8", "de_AT.ISO8859-15", "de_AT.ISO8859-1", "de_AT",
-	  "de_CH.UTF-8", "de_CH.UTF8", "de_CH.ISO8859-15", "de_CH.ISO8859-1", "de_CH",
-	  "de", NULL, };
-static const gchar *language_locale_hu[]=
-	{ "hu_HU.UTF-8", "hu_HU.ISO8859-2", "hu_HU", "hu", NULL, };
+	/* locale names used in unix. */
+	/* anyone, a better solution for this? */
+	static const gchar *language_locale_default[]=
+		{ "", NULL, };
+	static const gchar *language_locale_en[]=
+		{ "en_US.UTF-8", "en_US.UTF8", "en_US.ISO8859-15", "en_US.ISO8859-1", "en_US.US-ASCII", "en_US", "en", NULL, };
+	static const gchar *language_locale_de[]=
+		{ "de_DE.UTF-8", "de_DE.UTF8", "de_DE.ISO8859-15", "de_DE.ISO8859-1", "de_DE",
+		  "de_AT.UTF-8", "de_AT.UTF8", "de_AT.ISO8859-15", "de_AT.ISO8859-1", "de_AT",
+		  "de_CH.UTF-8", "de_CH.UTF8", "de_CH.ISO8859-15", "de_CH.ISO8859-1", "de_CH",
+		  "de", NULL, };
+	static const gchar *language_locale_hu[]=
+		{ "hu_HU.UTF-8", "hu_HU.ISO8859-2", "hu_HU", "hu", NULL, };
+#endif	/* ifdef g_os_win32 else */
+
+/* put the locales to be tried in an array - same for windows and unix */
 static const gchar **language_locale[]={
 	language_locale_default,
 	language_locale_en,
 	language_locale_de,
 	language_locale_hu,
 };
-#endif	/* ifdef g_os_win32 else */
-
 #endif /* ifdef use_gtk */
 
 
@@ -157,6 +155,8 @@ gboolean gd_use_bdcff_highscore=FALSE;
 int gd_pal_emu_scanline_shade=85;
 #define SETTING_FINE_SCROLL "fine_scroll"
 gboolean gd_fine_scroll=FALSE;
+#define SETTING_SHOW_STORY "show_story"
+gboolean gd_show_story=TRUE;
 
 /* palette settings */
 #define SETTING_C64_PALETTE "c64_palette"
@@ -197,6 +197,8 @@ char *gd_sdl_theme=NULL;
 gboolean gd_sdl_pal_emulation=FALSE;
 #define SETTING_SHOW_NAME_OF_GAME "show_name_of_game"
 gboolean gd_show_name_of_game=TRUE;
+#define SETTING_STATUS_BAR_TYPE "status_bar_type"
+GdStatusBarType gd_status_bar_type=GD_STATUS_BAR_ORIGINAL;
 #endif	/* use_sdl */
 
 
@@ -229,7 +231,21 @@ int gd_param_cave=0, gd_param_level=1, gd_param_internal=0;
 int gd_param_license=0;
 char **gd_param_cavenames=NULL;
 
-
+#ifdef USE_SDL
+const char **gd_status_bar_type_get_names()
+{
+	/* these are used only in the sdl version, so are not translated */
+	static const char *types[]={
+		"Original",
+		"1stB",
+		"CrLi",
+		"Final BD",
+		"Atari original",
+		NULL
+	};	
+	return types;
+}
+#endif
 
 /* gets boolean value from key file; returns def if not found or unreadable */
 static gboolean
@@ -319,6 +335,7 @@ gd_settings_set_locale()
 		setlocale(LC_ALL, "");
 	}
 #else
+	/* if no gtk, just set the system default locale. */
 	setlocale(LC_ALL, "");
 #endif
 }
@@ -430,6 +447,7 @@ gd_load_settings()
     gd_use_bdcff_highscore=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_USE_BDCFF_HIGHSCORE, gd_use_bdcff_highscore);
     gd_pal_emu_scanline_shade=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMU_SCANLINE_SHADE, gd_pal_emu_scanline_shade);
     gd_fine_scroll=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_FINE_SCROLL, gd_fine_scroll);
+    gd_show_story=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_STORY, gd_show_story);
 
 	/* palette settings */
     gd_c64_palette=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_C64_PALETTE, gd_c64_palette);
@@ -456,6 +474,9 @@ gd_load_settings()
 	gd_sdl_theme=g_key_file_get_string(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_THEME, NULL);
     gd_sdl_pal_emulation=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_PAL_EMULATION, gd_sdl_pal_emulation);
     gd_show_name_of_game=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_NAME_OF_GAME, gd_show_name_of_game);
+    gd_status_bar_type=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_STATUS_BAR_TYPE, gd_status_bar_type);
+    if (gd_status_bar_type<0 || gd_status_bar_type>=GD_STATUS_BAR_MAX)
+    	gd_status_bar_type=GD_STATUS_BAR_ORIGINAL;
 #endif	/* use_sdl */
 
 #ifdef GD_SOUND	/* sound settings */
@@ -522,6 +543,7 @@ gd_save_settings()
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_USE_BDCFF_HIGHSCORE, gd_use_bdcff_highscore);
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMU_SCANLINE_SHADE, gd_pal_emu_scanline_shade);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_FINE_SCROLL, gd_fine_scroll);
+    g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_STORY, gd_show_story);
 
 	/* palette settings */
     g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_C64_PALETTE, gd_c64_palette);
@@ -545,6 +567,7 @@ gd_save_settings()
 	    g_key_file_set_string(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_THEME, gd_sdl_theme);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_PAL_EMULATION, gd_sdl_pal_emulation);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_NAME_OF_GAME, gd_show_name_of_game);
+    g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_STATUS_BAR_TYPE, gd_status_bar_type);
 #endif	/* use_sdl */
 
 #ifdef GD_SOUND	/* sound settings */

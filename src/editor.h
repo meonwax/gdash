@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,7 +16,7 @@
 #ifndef _GD_EDITOR_H
 #define _GD_EDITOR_H
 
-extern GtkWidget *editor_window;
+extern GtkWidget *gd_editor_window;
 
 extern void gd_open_cave_editor();
 

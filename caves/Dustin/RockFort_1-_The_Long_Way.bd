@@ -1,0 +1,1107 @@
+[BDCFF]
+Version=0.5
+[game]
+Name=RockFort 1 - The Long Way
+Author=Dustin Bachstein
+Date=2008-10-07
+Difficulty=easy(level1) to very hard (level5)
+Lives=5 99
+Levels=5
+
+[cave]
+Name=Cave A. Minefield
+Author=Dustin Bachstein
+Date=2008-10-07
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Red LightRed Green White Cyan Brown
+DiamondsRequired=6 6 6 6 6
+DiamondValue=50 0
+CaveTime=100 60 60 55 50
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+SlimePermeabilityC64=0 0 0 0 0
+Story=The journey starts in a desert full of hidden diamonds and many, many parasites blocking the way to them. Rockford has to be fast, very fast. As such, he has not much time left to watch the wonderful sunset in the background.
+
+[objects]
+[Level=1,2]
+RandomFillC64=0 1 39 20 24 151 19 17 4 NONE FIREFLYl 18
+[/Level]
+[Level=3,4]
+RandomFillC64=0 1 39 20 24 151 19 17 4 NONE FIREFLYl 27
+[/Level]
+[Level=5]
+RandomFillC64=0 1 39 20 24 151 19 17 4 NONE FIREFLYl 28
+[/Level]
+FillRect=0 0 2 2 DIRT DIAMOND
+FillRect=19 0 21 2 DIRT DIAMOND
+FillRect=37 0 39 2 DIRT DIAMOND
+FillRect=37 19 39 21 DIRT DIAMOND
+FillRect=19 19 21 21 DIRT DIAMOND
+FillRect=0 19 2 21 DIRT DIAMOND
+Rectangle=0 0 39 21 STEELWALL
+FillRect=19 10 22 12 DIRT INBOX
+Point=21 11 OUTBOX
+[/objects]
+[/cave]
+
+[cave]
+Name=Cave B. Trap And Grab
+Author=Dustin Bachstein
+Date=2008-10-07
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Black Green LightRed White LightGreen Blue
+DiamondsRequired=10 50 100 120 150
+DiamondValue=3 6
+CaveTime=120 175 180 165 175
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+AmoebaProperties.waitforhatching=true
+AmoebaProperties.immediately=false
+AmoebaTime=50 75 75 75 75
+SlimePermeabilityC64=0 0 0 0 0
+Story=In a small oasis, Rockford meets the next animal; it is the well-known, growing one. Of course, he knows what to do but, before he starts his work, he should adapt his plan to the number of diamonds he needs...
+
+[objects]
+[Level=1]
+RandomFillC64=0 1 39 20 0 21 31 35 15 NONE BOULDER 30
+[/Level]
+[Level=2,3,4,5]
+RandomFillC64=0 1 39 20 0 21 31 35 15 NONE BOULDER 50
+[/Level]
+[Level=1]
+Rectangle=19 19 20 20 AMOEBA
+[/Level]
+[Level=2]
+Rectangle=19 15 20 16 AMOEBA
+[/Level]
+[Level=3,4]
+Rectangle=19 10 20 11 AMOEBA
+[/Level]
+[Level=5]
+Rectangle=19 8 20 9 AMOEBA
+[/Level]
+Point=1 1 INBOX
+Point=38 1 OUTBOX
+Rectangle=0 0 39 21 STEELWALL
+[/objects]
+[/cave]
+
+[cave]
+Name=Cave C. Magic Maze
+Author=Dustin Bachstein
+Date=2008-10-11
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Black LightRed Green White Cyan Gray1
+DiamondsRequired=35 36 44 46 43
+DiamondValue=10 0
+CaveTime=100 100 120 120 140
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+MagicWallTime=0 0 0 0 1
+SlimePermeabilityC64=0 0 0 0 0
+Story=Upon taking a short look at this area, Rockford knows what to do. Or does he? Once he drops the first boulder on one of the walls, he realizes where the problem is, and most likely it's too late then.
+
+[objects]
+[Level=1,2]
+RandomFillC64=0 1 39 20 3 1 14 9 40 NONE MAGICWALL 70 BOULDER 45 DIAMOND 15
+[/Level]
+[Level=3,4,5]
+RandomFillC64=0 1 39 20 3 1 14 9 40 NONE MAGICWALL 105 BOULDER 65 DIAMOND 15
+[/Level]
+Point=2 2 INBOX
+Point=37 2 OUTBOX
+[Level=1]
+Point=2 1 BOULDER
+[/Level]
+[Level=1]
+Point=2 3 MAGICWALL
+[/Level]
+Rectangle=0 0 39 21 STEELWALL
+[/objects]
+[/cave]
+
+[cave]
+Name=Cave D. Range
+Author=Dustin Bachstein
+Date=2008-10-11
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Black LightRed Green White Cyan Gray1
+DiamondsRequired=5 7 7 7 7
+DiamondValue=40 0
+CaveTime=100 120 130 130 180
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+SlimePermeabilityC64=0 0 0 0 0
+Story=Rockford encounters a landscape full of boulders and huge walls, hiding seven diamonds. These are the seven keys to open the door to the next world, the Big Mountain. He has to be very careful here, or he'll surely get stuck!
+
+[objects]
+[Level=1,2]
+RandomFillC64=0 1 39 20 12 8 7 6 10 NONE BOULDER 60
+[/Level]
+[Level=3,4]
+RandomFillC64=0 1 39 20 12 8 7 6 10 NONE BOULDER 72
+[/Level]
+[Level=5]
+RandomFillC64=0 1 39 20 12 8 7 6 10 NONE BOULDER 100
+[/Level]
+[Level=1]
+Raster=7 1 5 20 7 1 WALL
+[/Level]
+[Level=2,3,4,5]
+Raster=5 1 7 20 5 1 WALL
+[/Level]
+Line=1 20 38 20 DIRT
+[Level=1]
+Raster=4 1 5 1 7 1 DIAMOND
+[/Level]
+[Level=2,3,4,5]
+Raster=3 1 7 1 5 2 DIAMOND
+[/Level]
+Point=1 20 INBOX
+Point=37 1 OUTBOX
+Rectangle=0 0 39 21 STEELWALL
+[/objects]
+[/cave]
+
+[cave]
+Name=Intermission Q. Full Throttle
+Author=Dustin Bachstein
+Date=2008-10-11
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+Size=20 12 0 0 19 11
+Colors=Black Black Purple Cyan White White Red
+DiamondsRequired=1 1 1 1 1
+DiamondValue=50 0
+CaveTime=20 20 20 20 20
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=100 100 100 100 100
+HatchingDelay=8 8 8 8 8
+SlimePermeabilityC64=0 0 0 0 0
+Story=A butterfly follows Rockford through the whole cave; he has to be fast in order to gain an advantage or he'll never grab the only diamond safely...
+
+[objects]
+FillRect=2 2 4 10 STEELWALL
+Line=3 2 17 2 STEELWALL
+Line=17 2 17 9 STEELWALL
+Line=17 9 6 9 STEELWALL
+Line=6 4 15 4 STEELWALL
+Rectangle=6 4 7 9 STEELWALL
+Rectangle=9 6 15 7 STEELWALL
+Point=1 10 INBOX
+Point=15 5 OUTBOX
+Point=2 9 SPACE
+Point=3 9 BUTTERFLYr
+Point=7 5 DIAMOND
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+299 Czirkos Zoltan
+[/highscore]
+Name=Cave E. Rockslide
+Author=Dustin Bachstein
+Date=2008-10-15
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Black Gray2 LightGreen White Cyan Brown
+DiamondsRequired=10 15 20 25 28
+DiamondValue=12 20
+CaveTime=120 100 80 60 85
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+InitialFill=BOULDER
+SlimePermeabilityC64=0 0 0 0 0
+Story=The next world is the Big Mountain. Here, Rockford has to find a strange potion hidden behind a diamond at the top. The drinker of said potion, according to the rumours, can enter the inside of the Mountain. It is a strange world full of danger, but also where the fort is supposed to be...\nIn order to move onwards, Rockford has to cause a powerful rockslide and then be careful not to get entombed by it!
+
+[objects]
+Line=1 1 1 16 DIRT
+Line=1 16 7 16 DIRT
+Line=7 16 7 18 DIRT
+Line=2 18 7 18 DIRT
+Line=2 18 2 20 DIRT
+Line=2 20 9 20 DIRT
+Line=9 13 9 19 DIRT
+Line=6 13 9 13 DIRT
+Line=6 1 6 13 DIRT
+Line=12 1 12 8 DIRT
+Line=12 8 16 8 DIRT
+Line=16 8 16 15 DIRT
+Line=16 15 19 15 DIRT
+Line=19 15 19 19 DIRT
+Line=19 19 23 19 DIRT
+Line=23 10 23 19 DIRT
+Line=20 10 23 10 DIRT
+Line=20 2 20 9 DIRT
+Line=20 2 28 2 DIRT
+Line=28 2 28 15 DIRT
+[Level=1,2,3,4]
+Line=28 15 36 15 DIRT
+[/Level]
+Line=2 7 2 9 DIAMOND
+Line=5 8 5 11 DIAMOND
+Line=9 1 10 1 DIAMOND
+Line=15 11 15 12 DIAMOND
+[Level=2,3,4,5]
+Line=19 11 19 14 DIAMOND
+[/Level]
+[Level=2,3,4,5]
+Point=3 15 DIAMOND
+[/Level]
+[Level=2,3,4,5]
+Point=7 15 DIAMOND
+[/Level]
+Point=10 20 DIAMOND
+[Level=2,3,4,5]
+Point=11 20 DIAMOND
+[/Level]
+[Level=2,3,4,5]
+Point=10 2 DIAMOND
+[/Level]
+Point=21 5 DIAMOND
+Point=22 12 DIAMOND
+Point=24 14 DIAMOND
+Point=24 19 DIAMOND
+[Level=2,3,4,5]
+Point=29 2 DIAMOND
+[/Level]
+[Level=3,4]
+Point=37 15 DIAMOND
+[/Level]
+Point=8 13 WALL
+Line=9 13 9 15 WALL
+[Level=2,3,4,5]
+Raster=33 13 2 2 2 1 WALL
+[/Level]
+[Level=2,3,4,5]
+Raster=33 3 2 2 2 1 WALL
+[/Level]
+[Level=2,3,4,5]
+Raster=34 3 1 6 2 2 FIREFLYl
+[/Level]
+Point=1 1 INBOX
+Point=36 1 OUTBOX
+[Level=1,2]
+Point=2 6 DIRT
+[/Level]
+[Level=1]
+Point=2 10 DIRT
+[/Level]
+[Level=5]
+Point=12 20 DIAMOND
+[/Level]
+[Level=5]
+Point=10 18 DIAMOND
+[/Level]
+[Level=1]
+Point=7 15 DIRT
+[/Level]
+[Level=1]
+Line=29 2 29 14 DIRT
+[/Level]
+[Level=1]
+Line=37 4 37 15 DIRT
+[/Level]
+[Level=2,3,4,5]
+Point=34 1 DIRT
+[/Level]
+[Level=5]
+Rectangle=32 3 36 4 BOULDER
+[/Level]
+[Level=5]
+Point=33 3 DIRT
+[/Level]
+[Level=5]
+Line=28 16 28 18 DIRT
+[/Level]
+[Level=5]
+Line=28 18 31 18 DIRT
+[/Level]
+[Level=5]
+Line=31 19 33 19 DIRT
+[/Level]
+[Level=5]
+Line=33 20 35 20 DIRT
+[/Level]
+[Level=5]
+Line=35 19 36 19 DIRT
+[/Level]
+[Level=5]
+Line=36 15 36 18 DIRT
+[/Level]
+[Level=5]
+Raster=33 15 2 1 2 2 WALL
+[/Level]
+[Level=5]
+Point=19 14 BOULDER
+[/Level]
+[Level=5]
+Point=19 20 SPACE
+[/Level]
+[Level=5]
+Point=29 7 DIAMOND
+[/Level]
+[Level=1]
+Point=2 12 DIRT
+[/Level]
+[Level=1]
+Point=19 14 DIRT
+[/Level]
+[Level=1]
+Point=16 7 DIRT
+[/Level]
+[Level=1]
+Point=3 8 DIRT
+[/Level]
+[Level=1]
+Point=2 17 WALL
+[/Level]
+[Level=5]
+Point=33 2 DIAMOND
+[/Level]
+[Level=1]
+Point=11 1 DIAMOND
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+Name=Cave F. Exposure
+Author=Dustin Bachstein
+Date=2008-10-16
+Intermission=false
+IntermissionProperties.instantlife=true
+Size=40 22 0 0 39 21
+Colors=Black Black Gray2 LightGreen White Cyan Brown
+DiamondsRequired=10 10 20 30 30
+DiamondValue=5 10
+CaveTime=120 150 150 120 180
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+RandSeed=50 28 7 20 22
+RandomFill=BOULDER 45 SPACE 20 FIREFLYl 5 DIRT 0
+SlimePermeabilityC64=0 0 0 0 0
+Story=Now Rockford sees what he's done; the rockslide has entombed many, many diamonds! To move on, he has to blast away what he had caused.
+
+[objects]
+Line=1 20 38 20 DIAMOND
+[Level=1]
+Line=1 19 38 19 BOULDER
+[/Level]
+[Level=2,3,4]
+Rectangle=1 18 38 19 BOULDER
+[/Level]
+[Level=5]
+FillRect=1 17 38 19 BOULDER
+[/Level]
+Point=1 1 INBOX
+Point=38 1 OUTBOX
+[/objects]
+[/cave]
+
+[cave]
+Name=Cave G. Two Sources
+Author=Dustin Bachstein
+Date=2008-10-16
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Black Brown Gray1 Cyan LightGreen Blue
+DiamondsRequired=36 37 85 120 150
+DiamondValue=3 6
+CaveTime=160 160 210 210 210
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+AmoebaProperties.waitforhatching=true
+AmoebaProperties.immediately=false
+AmoebaTime=110 110 160 160 160
+SlimePermeabilityC64=0 0 0 0 0
+Story=The explosions of cave F have also uncovered this hidden gallery. But in order to get out again, Rockford has to collect at least 85 diamonds inside - and this turns out to be a problem. He can calculate, can't he? Nine butterflies make 81 diamonds at most! However, before despairing, he should think a bit. Maybe the flies aren't the only possible diamond source here...
+
+[objects]
+[Level=3,4,5]
+Raster=3 1 9 2 4 1 SPACE
+[/Level]
+[Level=3,4,5]
+Raster=4 1 9 2 4 1 SPACE
+[/Level]
+[Level=3,4,5]
+Raster=4 1 9 1 4 2 BUTTERFLYd
+[/Level]
+Line=19 19 20 19 AMOEBA
+Point=1 1 INBOX
+Point=38 1 OUTBOX
+[Level=1,2]
+Raster=7 1 4 2 8 1 SPACE
+[/Level]
+[Level=1,2]
+Raster=8 1 4 2 8 1 SPACE
+[/Level]
+Raster=8 1 4 1 8 2 BUTTERFLYd
+[Level=1,2]
+Raster=12 13 2 8 15 1 STEELWALL
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+Name=Cave H. Cross
+Author=Dustin Bachstein
+Date=2008-10-19
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Black Gray2 LightGreen White Cyan Orange
+DiamondsRequired=40 40 50 60 60
+DiamondValue=10 15
+CaveTime=200 200 240 240 280
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+RandSeed=33 206 31 203 60
+RandomFill=SPACE 100 BOULDER 70 DIAMOND 15 FIREFLYl 5
+MagicWallTime=190 190 230 230 270
+MagicWallProperties.waitforhatching=true
+SlimePermeabilityC64=0 0 0 0 0
+Story=It's out of the gallery, and back into the mountains! Once again, the number of needed diamonds exceeds the number of available ones by far. But, this time, the problem should be easier to solve. In addition, Rockford must free the exit - and be aware that it's not as solid as the other steel walls!
+
+[objects]
+Line=1 10 38 10 MAGICWALL
+Line=20 1 20 20 MAGICWALL
+[Level=1,2]
+Rectangle=1 1 38 20 DIRT
+[/Level]
+Point=38 1 INBOX
+[Level=1]
+Point=1 1 OUTBOX
+[/Level]
+[Level=2,3,4,5]
+Point=20 10 OUTBOX
+[/Level]
+[Level=5]
+Rectangle=18 8 22 12 MAGICWALL
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+Name=Intermission R. One And One
+Author=Dustin Bachstein
+Date=2008-10-19
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+Size=20 12 0 0 19 11
+Colors=Black Black Purple Cyan White White Gray1
+DiamondsRequired=2 2 2 2 2
+DiamondValue=40 0
+CaveTime=50 50 50 50 50
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=100 100 100 100 100
+HatchingDelay=8 8 8 8 8
+MagicWallTime=2 2 2 2 2
+MagicWallProperties.waitforhatching=true
+SlimePermeabilityC64=0 0 0 0 0
+Story=Rockford needn't solve this puzzle to continue, but his ambition forbids him to ignore it!
+
+[objects]
+Raster=6 1 2 10 6 1 MAGICWALL
+Line=1 6 18 6 MAGICWALL
+Raster=3 1 3 1 6 2 BOULDER
+Raster=1 7 3 1 6 2 BOULDER
+Raster=4 10 2 1 6 2 FIREFLYl
+Raster=3 10 2 1 6 2 SPACE
+Raster=16 5 1 2 2 5 FIREFLYl
+Raster=15 5 1 2 2 5 SPACE
+Raster=6 6 2 1 6 2 DIAMOND
+Point=18 1 INBOX
+Point=12 1 OUTBOX
+Point=18 7 BOULDER
+[/objects]
+[/cave]
+
+[cave]
+Name=Cave I. Giddiness
+Author=Dustin Bachstein
+Date=2008-10-19
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Black Gray2 LightGreen White Cyan Orange
+DiamondsRequired=1 1 1 1 1
+DiamondValue=100 0
+CaveTime=150 180 200 200 300
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+SlimePermeabilityC64=0 0 0 0 0
+Story=Rockford is nearly done - the top isn't far off anymore! But, where's that potion? To find it, Rockford has to go inside a squirming spiral, passing fireflies and boulders in a narrow space. Then he must return, fleeing from the fireflies, which seem to be trying to steal his magic ticket to the region of the fort...
+
+[objects]
+[Level=1,2,3,4]
+RandomFillC64=0 1 39 20 151 17 124 40 11 NONE SPACE 120 BOULDER 60 FIREFLYl 10
+[/Level]
+[Level=5]
+RandomFillC64=0 1 39 20 151 17 124 40 11 NONE SPACE 120 BOULDER 60 FIREFLYl 18
+[/Level]
+[Level=3,4,5]
+Line=33 6 33 20 STEELWALL
+[/Level]
+[Level=3,4,5]
+Line=6 6 33 6 STEELWALL
+[/Level]
+[Level=3,4,5]
+Line=6 15 6 7 STEELWALL
+[/Level]
+[Level=3,4,5]
+Line=27 15 7 15 STEELWALL
+[/Level]
+[Level=3,4,5]
+Line=27 11 27 15 STEELWALL
+[/Level]
+[Level=3,4,5]
+Line=11 11 26 11 STEELWALL
+[/Level]
+[Level=3,4,5]
+Point=26 14 DIAMOND
+[/Level]
+Point=36 19 INBOX
+[Level=2,3,4,5]
+Point=36 20 OUTBOX
+[/Level]
+[Level=1,2]
+Line=32 7 32 20 STEELWALL
+[/Level]
+[Level=1,2]
+Line=7 7 31 7 STEELWALL
+[/Level]
+[Level=1,2]
+Line=7 14 7 8 STEELWALL
+[/Level]
+[Level=1,2]
+Line=25 14 8 14 STEELWALL
+[/Level]
+[Level=1,2]
+Point=8 13 DIAMOND
+[/Level]
+[Level=1]
+Point=10 10 OUTBOX
+[/Level]
+Rectangle=0 0 39 21 STEELWALL
+[/objects]
+[/cave]
+
+[cave]
+Name=Cave J. Deflection
+Author=Dustin Bachstein
+Date=2008-10-19
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Black Blue Purple Yellow White Gray1
+DiamondsRequired=10 10 25 40 40
+DiamondValue=10 20
+CaveTime=180 180 180 180 210
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+SlimePermeabilityC64=0 0 0 0 0
+Story=Having sought shelter successfully, Rockford works up the courage and drinks... Everything starts to center him... He seems to dream... The next thing he realizes is that he has awakened in a completely different world; the many boulders of the mountains are gone. Everything around him is almost entirely silent (a falling pin would have made an almost disturbing noise.) Now, Rockford can't go back anymore.  He concentrates on the journey ahead, ready to face the danger and walks on...\nThere's a flock of fireflies hiding eight butterflies... Rockford has to show, above all, what he has learned in his former adventures about the favourite movement directions of both animals.
+
+[objects]
+[Level=2,3,4,5]
+Rectangle=7 6 17 16 FIREFLYl
+[/Level]
+Rectangle=9 8 15 14 FIREFLYl
+[Level=2,3,4,5]
+Line=7 11 17 11 FIREFLYl
+[/Level]
+[Level=2,3,4,5]
+Line=12 6 12 16 FIREFLYl
+[/Level]
+Line=38 3 30 3 BOULDER
+Point=1 1 INBOX
+[Level=1,2,3,4]
+Point=38 1 OUTBOX
+[/Level]
+[Level=1]
+Line=9 11 15 11 FIREFLYl
+[/Level]
+[Level=1]
+Line=12 8 12 14 FIREFLYl
+[/Level]
+[Level=1,2,3,4]
+FillRect=11 10 13 12 BUTTERFLYd DIRT
+[/Level]
+[Level=5]
+FillRect=11 10 13 12 BUTTERFLYd OUTBOX
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+Name=Cave K. Modern Liberator
+Author=Dustin Bachstein
+Date=2008-10-19
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Black Orange LightRed Purple Yellow Brown
+DiamondsRequired=30 30 80 150 280
+DiamondValue=3 6
+CaveTime=150 200 180 180 240
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+AmoebaProperties.waitforhatching=true
+AmoebaProperties.immediately=false
+AmoebaTime=200 200 200 200 150
+SlimePermeabilityC64=0 0 0 0 0
+Story=A tedious, but well-known noise is getting louder and louder; isn't Rockford safe from this slimy animal even here? But, he soon notes that this amoeba is his only hope to succeed here. It's his only weapon against the 40 butterflies but, if he isn't fast, many fireflies will destroy it...
+
+[objects]
+[Level=2,3,4,5]
+Rectangle=3 3 11 11 FIREFLYl
+[/Level]
+Raster=36 1 2 20 2 1 BUTTERFLYd
+Raster=35 1 2 20 2 1 WALL
+[Level=1]
+Rectangle=3 3 11 11 SPACE
+[/Level]
+Point=37 1 SPACE
+Point=35 20 SPACE
+Point=7 7 AMOEBA
+Point=1 1 INBOX
+[Level=1]
+Point=24 7 OUTBOX
+[/Level]
+[Level=2]
+Point=1 20 OUTBOX
+[/Level]
+[Level=3,4]
+Point=35 1 OUTBOX
+[/Level]
+[Level=5]
+Point=39 18 OUTBOX
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+Name=Cave L. Breakout And Revisit
+Author=Dustin Bachstein
+Date=2008-10-19
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Black Red Purple LightBlue Gray3 Blue
+DiamondsRequired=6 6 6 8 8
+DiamondValue=40 75
+CaveTime=80 70 60 60 50
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+AmoebaProperties.waitforhatching=true
+AmoebaProperties.immediately=false
+AmoebaTime=1 1 1 1 1
+MagicWallTime=2 2 2 2 2
+SlimePermeabilityC64=0 0 0 0 0
+Story=Rockford has to break out of a prison that's guarded by fireflies. Once he finally finds a way to do so, they'll pursue him as if they had noted his escape. And, in the whole cave, there's nothing to beat them...
+
+[objects]
+[Level=1,2]
+RandomFillC64=0 1 39 20 0 1 2 6 4 NONE MAGICWALL 20
+[/Level]
+[Level=3,4]
+RandomFillC64=0 1 39 20 0 1 2 6 4 NONE MAGICWALL 40
+[/Level]
+[Level=5]
+RandomFillC64=0 1 39 20 0 1 2 6 4 NONE MAGICWALL 67
+[/Level]
+Rectangle=1 12 6 20 FIREFLYl
+Point=3 16 INBOX
+Point=4 16 OUTBOX
+Raster=7 12 1 3 2 4 AMOEBA
+Raster=2 2 3 2 18 18 DIAMOND
+Raster=11 11 2 1 18 2 DIAMOND
+Add=0 1 DIAMOND MAGICWALL
+[Level=1]
+Point=4 19 AMOEBA
+[/Level]
+Rectangle=0 0 39 21 STEELWALL
+[/objects]
+[/cave]
+
+[cave]
+Name=Intermission S. One-Way Street
+Author=Dustin Bachstein
+Date=2008-10-19
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+Size=20 12 0 0 19 11
+Colors=Black Black Purple Cyan White Cyan Brown
+DiamondsRequired=0 0 0 0 0
+DiamondValue=3 0
+CaveTime=25 25 25 25 25
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=100 100 100 100 100
+HatchingDelay=8 8 8 8 8
+RandSeed=-1 -1 -1 -1 -1
+RandomFill=DIAMOND 33 DIRT 0 DIRT 0 DIRT 0
+SlimePermeabilityC64=0 0 0 0 0
+Story=This is a really strange world; after Rockford has escaped the flies, what originally seemed to be a solid wall suddenly comes into life and follows him! He has to be careful not to get stuck!
+
+[objects]
+Rectangle=9 5 10 6 EXPANDINGWALL
+Point=9 5 INBOX
+Point=10 6 OUTBOX
+[/objects]
+[/cave]
+
+[cave]
+Name=Cave M. Chessboard
+Author=Dustin Bachstein
+Date=2008-10-19
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Black Gray3 White White Yellow Brown
+DiamondsRequired=31 30 30 30 30
+DiamondValue=10 0
+CaveTime=120 90 90 40 90
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+SlimePermeabilityC64=0 0 0 0 0
+Story=O.K. 29 diamonds are not a big problem, but Rockford actually needs all 30! How could he do that? Every time, after he manages to get the 30th diamond, he cannot reach the exit any more. However, he thinks about it and comes to realize that it's time for a little detour! Once having discovered the trick, he'll never forget it again!
+
+[objects]
+Raster=1 5 38 4 1 5 HEXPANDINGWALL
+Raster=5 1 7 20 5 1 VEXPANDINGWALL
+Raster=5 2 7 4 5 5 DIRT
+Raster=2 5 8 4 5 5 DIRT
+FillRect=6 1 9 4 SPACE
+FillRect=16 1 19 4 SPACE
+FillRect=26 1 29 4 SPACE
+FillRect=36 1 38 4 SPACE
+FillRect=31 6 34 9 SPACE
+FillRect=21 6 24 9 SPACE
+FillRect=11 6 14 9 SPACE
+FillRect=1 6 4 9 SPACE
+FillRect=6 11 9 14 SPACE
+FillRect=16 11 19 14 SPACE
+FillRect=26 11 29 14 SPACE
+FillRect=36 11 38 14 SPACE
+FillRect=31 16 34 19 SPACE
+FillRect=21 16 24 19 SPACE
+FillRect=11 16 14 19 SPACE
+FillRect=1 16 4 19 SPACE
+Raster=2 2 8 4 5 5 DIAMOND
+Point=2 2 INBOX
+[Level=5]
+Line=5 10 35 10 HEXPANDINGWALL
+[/Level]
+[Level=1]
+Point=1 1 OUTBOX
+[/Level]
+[Level=2]
+Point=37 2 OUTBOX
+[/Level]
+[Level=3,4]
+Point=37 17 OUTBOX
+[/Level]
+[Level=5]
+Point=7 7 OUTBOX
+[/Level]
+Add=0 1 DIAMOND DIRT
+[/objects]
+[/cave]
+
+[cave]
+Name=Cave N. Quick-Change Artist
+Author=Dustin Bachstein
+Date=2008-10-19
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Black Green Blue White Yellow Gray1
+DiamondsRequired=92 30 30 44 100
+DiamondValue=5 10
+CaveTime=150 150 150 130 150
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+AmoebaProperties.waitforhatching=true
+AmoebaProperties.immediately=false
+AmoebaTime=10 10 10 10 10
+MagicWallTime=20 60 50 50 50
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.waitforhatching=true
+SlimePermeabilityC64=0 0 0 0 0
+Story=What's that? Is the amoeba already trapped, only requiring Rockford to free and immediately trap it again, so that it turns into diamonds (This is a nice trick that Rockford discovered in the late 1980's.)? But, then he notes that wall, counts the number of diamonds he'll get, compares with how many he needs, and draws a clear conclusion: there must be a more difficult trick! How can he make that wall useful instead of disturbing? That's it!
+
+[objects]
+[Level=1,2,3,4]
+Rectangle=2 11 24 20 SPACE
+[/Level]
+FillRect=2 0 24 9 STEELWALL AMOEBA
+[Level=2,3,4,5]
+Line=3 2 19 2 BOULDER
+[/Level]
+Line=4 2 11 9 BOULDER
+Line=11 9 18 2 BOULDER
+Point=11 7 BOULDER
+[Level=2,3,4,5]
+Point=20 1 BOULDER
+[/Level]
+Point=11 12 MAGICWALL
+Point=38 1 INBOX
+Point=1 1 OUTBOX
+[Level=3,4,5]
+Line=3 1 19 1 FIREFLYl
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+Name=Cave O. Timing
+Author=Dustin Bachstein
+Date=2008-10-19
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Blue Green Yellow White Red Gray1
+DiamondsRequired=20 20 25 30 25
+DiamondValue=10 20
+CaveTime=100 100 80 60 80
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+AmoebaProperties.waitforhatching=true
+AmoebaProperties.immediately=false
+AmoebaTime=100 100 100 100 100
+SlimePermeabilityC64=0 0 0 0 0
+Story=The amoeba appears again, and this time it has three outcomes. Rockford figures he can close them with some boulders. But, here's where the problem starts; there are no boulders at all, only some fireflies... How should they be used? The solution is based on the fact that the amoeba has to be trapped only for a split second!
+
+[objects]
+Rectangle=11 10 27 12 STEELWALL
+Rectangle=18 3 20 19 STEELWALL
+FillRect=16 8 22 14 STEELWALL AMOEBA
+Line=11 11 27 11 DIRT
+Line=19 3 19 19 DIRT
+Line=19 8 19 14 AMOEBA
+Line=16 11 22 11 AMOEBA
+[Level=1,2,3,4]
+FillRect=16 15 22 19 DIRT
+[/Level]
+Point=16 8 INBOX
+Point=22 8 OUTBOX
+[Level=1,2,3,4]
+Point=19 14 STEELWALL
+[/Level]
+Line=29 4 38 4 FIREFLYl
+Point=28 4 SPACE
+[Level=1]
+FillRect=18 3 20 7 DIRT
+[/Level]
+[Level=1]
+Line=19 8 19 8 STEELWALL
+[/Level]
+[Level=2,3,4,5]
+Line=29 2 38 2 FIREFLYl
+[/Level]
+[Level=2,3,4,5]
+Point=28 2 SPACE
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+Name=Cave P. Spinigma
+Author=Dustin Bachstein
+Date=2008-10-20
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Black Brown Cyan White Cyan Blue
+DiamondsRequired=8 10 22 22 22
+DiamondValue=15 0
+CaveTime=150 150 210 150 180
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+MagicWallTime=10 10 50 30 2
+SlimePermeabilityC64=0 0 0 0 0
+Story=The fort lies before Rockford, but the hardest puzzle shall come at the end of his quest. How can he deal with these spinning flies? How should he release the butterflies? And, possibly the most difficult question: How will he manage to grab all the 22 possible diamonds?
+
+[objects]
+FillRect=1 18 14 20 SPACE
+FillRect=16 16 21 20 SPACE
+Line=16 15 22 15 MAGICWALL
+Line=15 20 15 4 WALL
+[Level=3,4,5]
+Line=19 16 19 20 DIRT
+[/Level]
+Point=23 13 BOULDER
+Line=1 15 2 17 BOULDER
+Point=11 14 BOULDER
+Point=11 11 BOULDER
+Point=1 11 BOULDER
+Point=4 19 FIREFLYl
+[Level=3,4,5]
+Point=20 16 BUTTERFLYd
+[/Level]
+Point=17 16 BUTTERFLYd
+Point=1 16 OUTBOX
+Line=1 17 14 17 STEELWALL
+[Level=3,4,5]
+Point=16 14 BOULDER
+[/Level]
+[Level=3,4,5]
+Point=16 15 DIRT
+[/Level]
+[Level=2,3,4,5]
+Line=22 16 22 20 WALL
+[/Level]
+[Level=2,3,4,5]
+FillRect=27 10 38 20 SPACE
+[/Level]
+[Level=2,3,4,5]
+Rectangle=29 12 36 19 WALL
+[/Level]
+[Level=3,4,5]
+Point=23 20 BOULDER
+[/Level]
+[Level=3,4]
+Line=30 16 35 16 DIRT
+[/Level]
+[Level=3,4]
+Point=32 17 FIREFLYl
+[/Level]
+[Level=2,3,4,5]
+Point=28 19 FIREFLYl
+[/Level]
+[Level=5]
+Point=37 8 BOULDER
+[/Level]
+[Level=2,3,4,5]
+Point=33 6 BOULDER
+[/Level]
+[Level=2,3,4,5]
+Point=1 20 DIAMOND
+[/Level]
+[Level=3,4]
+Point=33 15 DIAMOND
+[/Level]
+[Level=3,4]
+Point=32 15 DIAMOND
+[/Level]
+[Level=5]
+Point=11 20 WALL
+[/Level]
+[Level=5]
+Rectangle=27 10 38 20 DIRT
+[/Level]
+[Level=5]
+Line=28 20 38 20 SPACE
+[/Level]
+Point=38 20 INBOX
+[Level=5]
+Line=16 16 16 20 DIRT
+[/Level]
+[Level=5]
+Point=10 14 DIAMOND
+[/Level]
+[Level=5]
+Point=9 9 DIAMOND
+[/Level]
+Point=11 17 MAGICWALL
+[/objects]
+[/cave]
+
+[cave]
+Name=Intermission T. Enter The Fort
+Author=Dustin Bachstein
+Date=2008-10-20
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+Size=20 12 0 0 19 11
+Colors=Black Black Purple Cyan White Cyan Gray1
+DiamondsRequired=2 2 2 2 2
+DiamondValue=40 0
+CaveTime=25 25 25 25 25
+CaveScheduling=ms
+PALTiming=true
+CaveDelay=0 0 0 0 0
+FrameTime=100 100 100 100 100
+HatchingDelay=8 8 8 8 8
+MagicWallTime=20 20 20 20 20
+SlimePermeabilityC64=0 0 0 0 0
+Story=There it is! The fortress is tied to one final task that Rockford doesn't even have to solve! He enters it and wonders what will be coming next... in the fort.
+
+[objects]
+FillRect=4 3 15 9 WALL
+Rectangle=4 3 5 5 DIRT
+Rectangle=14 3 15 5 DIRT
+Point=6 3 DIRT
+Point=13 3 DIRT
+Point=6 1 BOULDER
+Point=8 1 BOULDER
+Point=11 1 BOULDER
+Point=13 1 BOULDER
+Point=8 3 MAGICWALL
+Point=11 3 MAGICWALL
+Point=8 4 FIREFLYl
+Point=11 4 FIREFLYl
+Point=10 7 FIREFLYl
+Point=9 7 SPACE
+Line=9 8 10 8 DIRT
+Point=9 9 INBOX
+Point=10 9 OUTBOX
+[/objects]
+[/cave]
+[/game]
+[/BDCFF]

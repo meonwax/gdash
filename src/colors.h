@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -70,29 +70,46 @@ gboolean gd_color_is_unknown(GdColor color);
 int gd_color_get_c64_index(GdColor color);
 int gd_color_get_c64_index_try(GdColor color);
 
-int gd_gdash_color(int c);
+GdColor gd_gdash_color(int c);
 
-#define GD_GDASH_BLACK (gd_gdash_color(0))
-#define GD_GDASH_WHITE (gd_gdash_color(1))
-#define GD_GDASH_RED (gd_gdash_color(2))
-#define GD_GDASH_PURPLE (gd_gdash_color(4))
-#define GD_GDASH_CYAN (gd_gdash_color(3))
-#define GD_GDASH_GREEN (gd_gdash_color(5))
-#define GD_GDASH_BLUE (gd_gdash_color(6))
-#define GD_GDASH_YELLOW (gd_gdash_color(7))
-#define GD_GDASH_ORANGE (gd_gdash_color(8))
-#define GD_GDASH_BROWN (gd_gdash_color(9))
-#define GD_GDASH_LIGHTRED (gd_gdash_color(10))
-#define GD_GDASH_GRAY1 (gd_gdash_color(11))
-#define GD_GDASH_GRAY2 (gd_gdash_color(12))
-#define GD_GDASH_LIGHTGREEN (gd_gdash_color(13))
-#define GD_GDASH_LIGHTBLUE (gd_gdash_color(14))
-#define GD_GDASH_GRAY3 (gd_gdash_color(15))
+/* traditional c64 color indexes. */
+#define GD_COLOR_INDEX_BLACK (0)
+#define GD_COLOR_INDEX_WHITE (1)
+#define GD_COLOR_INDEX_RED (2)
+#define GD_COLOR_INDEX_PURPLE (4)
+#define GD_COLOR_INDEX_CYAN (3)
+#define GD_COLOR_INDEX_GREEN (5)
+#define GD_COLOR_INDEX_BLUE (6)
+#define GD_COLOR_INDEX_YELLOW (7)
+#define GD_COLOR_INDEX_ORANGE (8)
+#define GD_COLOR_INDEX_BROWN (9)
+#define GD_COLOR_INDEX_LIGHTRED (10)
+#define GD_COLOR_INDEX_GRAY1 (11)
+#define GD_COLOR_INDEX_GRAY2 (12)
+#define GD_COLOR_INDEX_LIGHTGREEN (13)
+#define GD_COLOR_INDEX_LIGHTBLUE (14)
+#define GD_COLOR_INDEX_GRAY3 (15)
+
+#define GD_GDASH_BLACK (gd_gdash_color(GD_COLOR_INDEX_BLACK))
+#define GD_GDASH_WHITE (gd_gdash_color(GD_COLOR_INDEX_WHITE))
+#define GD_GDASH_RED (gd_gdash_color(GD_COLOR_INDEX_RED))
+#define GD_GDASH_PURPLE (gd_gdash_color(GD_COLOR_INDEX_PURPLE))
+#define GD_GDASH_CYAN (gd_gdash_color(GD_COLOR_INDEX_CYAN))
+#define GD_GDASH_GREEN (gd_gdash_color(GD_COLOR_INDEX_GREEN))
+#define GD_GDASH_BLUE (gd_gdash_color(GD_COLOR_INDEX_BLUE))
+#define GD_GDASH_YELLOW (gd_gdash_color(GD_COLOR_INDEX_YELLOW))
+#define GD_GDASH_ORANGE (gd_gdash_color(GD_COLOR_INDEX_ORANGE))
+#define GD_GDASH_BROWN (gd_gdash_color(GD_COLOR_INDEX_BROWN))
+#define GD_GDASH_LIGHTRED (gd_gdash_color(GD_COLOR_INDEX_LIGHTRED))
+#define GD_GDASH_GRAY1 (gd_gdash_color(GD_COLOR_INDEX_GRAY1))
+#define GD_GDASH_GRAY2 (gd_gdash_color(GD_COLOR_INDEX_GRAY2))
+#define GD_GDASH_LIGHTGREEN (gd_gdash_color(GD_COLOR_INDEX_LIGHTGREEN))
+#define GD_GDASH_LIGHTBLUE (gd_gdash_color(GD_COLOR_INDEX_LIGHTBLUE))
+#define GD_GDASH_GRAY3 (gd_gdash_color(GD_COLOR_INDEX_GRAY3))
 
 #define GD_GDASH_MIDDLEBLUE (gd_gdash_color(16))
 
 #define GD_COLOR_INVALID (0xFFFFFFFF)
-#define GD_COLOR_BLACK (gd_color_from_rgb(0,0,0))
 
 #endif
 

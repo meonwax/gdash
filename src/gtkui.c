@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -26,6 +26,8 @@
 #include "util.h"
 #include "gtkui.h"
 #include "config.h"
+#include "gtkmain.h"
+#include "gfxutil.h"
 
 /* pixbufs of icons and the like */
 #include "icons.h"
@@ -38,7 +40,7 @@ static char *last_folder=NULL;
 
 
 void
-gd_create_stock_icons()
+gd_register_stock_icons()
 {
 	static struct {
 		const guint8 *data;
@@ -69,6 +71,7 @@ gd_create_stock_icons()
 		{ object_not_on_current, GD_ICON_OBJECT_NOT_ON_CURRENT},
 		{ replay, GD_ICON_REPLAY},
 		{ keyboard, GD_ICON_KEYBOARD},
+		{ image, GD_ICON_IMAGE },
 	};
 
 	GtkIconFactory *factory;
@@ -90,9 +93,9 @@ gd_create_stock_icons()
 
 
 GdkPixbuf *
-gd_icon ()
+gd_icon()
 {
-	return gdk_pixbuf_new_from_inline (-1, gdash, FALSE, NULL);
+	return gd_pixbuf_load_from_data(gdash, sizeof(gdash));
 }
 
 /* create and return an array of pixmaps, which contain the title animation.
@@ -100,10 +103,10 @@ gd_icon ()
    up to the caller to free.
  */
 GdkPixmap **
-gd_create_title_animation ()
+gd_create_title_animation()
 {
 	GdkPixbuf *screen;
-	GdkPixbuf *tile;
+	GdkPixbuf *tile, *tile_black;
 	GdkPixbuf *frame;
 	GdkPixbuf *bigone;
 	GdkPixmap **pixmaps;
@@ -111,26 +114,87 @@ gd_create_title_animation ()
 	int x, y;
 	int w, h, tw, th;
 
-	/* the screen */
-	screen=gdk_pixbuf_new_from_inline (-1, gdash_screen, FALSE, NULL);
+	screen=NULL;
+	tile=NULL;
+	if (gd_caveset_data->title_screen->len!=0) {
+		/* user defined title screen */
+		screen=gd_pixbuf_load_from_base64(gd_caveset_data->title_screen->str);
+		if (!screen) {
+			g_warning("Caveset is storing an invalid title screen image.");
+			g_string_assign(gd_caveset_data->title_screen, "");
+		} else {
+			/* if we loaded the screen, now try to load the tile. */
+			/* only if the screen has an alpha channel. otherwise it would not make any sense */
+			if (gdk_pixbuf_get_has_alpha(screen) && gd_caveset_data->title_screen_scroll->len!=0) {
+				tile=gd_pixbuf_load_from_base64(gd_caveset_data->title_screen_scroll->str);
+				
+				if (!tile) {
+					g_warning("Caveset is storing an invalid title screen background image.");
+					g_string_assign(gd_caveset_data->title_screen_scroll, "");
+				}
+			}
+		}
+		
+	}
+
+	/* if no special title image or unable to load that one, load the built-in */
+	if (!screen) {
+		/* the screen */
+		screen=gd_pixbuf_load_from_data(gdash_screen, sizeof(gdash_screen));
+		g_assert(screen!=NULL);
+		/* the tile to be put under the screen */
+		tile=gd_pixbuf_load_from_data(gdash_tile, sizeof(gdash_tile));
+		g_assert(tile!=NULL);
+	}
+
+	/* get sizes */
 	w=gdk_pixbuf_get_width(screen);
 	h=gdk_pixbuf_get_height(screen);
+	
+	/* if no tile, let it be black. */
+	/* the sdl version does the same. */
+	if (!tile) {
+		/* one-row pixbuf, so no animation. */
+		tile=gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, w, 1);
+		gdk_pixbuf_fill(tile, 0x000000FFU);	/* opaque black */
+	}
 
-	/* the tile to be put under the screen */
-	tile=gdk_pixbuf_new_from_inline (-1, gdash_tile, FALSE, NULL);
+	/* now we must have a tile pixbuf, so get that size too */
 	tw=gdk_pixbuf_get_width(tile);
 	th=gdk_pixbuf_get_height(tile);
 
 	/* do not allow more than 40 frames of animation */
-	g_assert(th<40);
+	if (th>GD_TITLE_SCROLL_MAX_HEIGHT) {
+		g_warning("Caveset is storing an oversized title screen background image.");
+		g_string_assign(gd_caveset_data->title_screen_scroll, "");
+	}
+	
+	/* either because the tile has no alpha channel, or because it cannot be transparent anymore... */
+	/* also needed because the "bigone" pixbuf will have an alpha channel, and pixbuf_copy would not work otherwise. */
+	tile_black=gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, tw, th);
+	gdk_pixbuf_fill(tile_black, 0x000000FFU);	/* fill with opaque black, as even the tile may have an alpha channel */
+	gdk_pixbuf_composite(tile, tile_black, 0, 0, tw, th, 0, 0, 1, 1, GDK_INTERP_NEAREST, 255);
+	g_object_unref(tile);
+	tile=tile_black;
 
 	/* create a big image, which is one tile larger than the title image size */
 	bigone=gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, w, h+th);
 	/* and fill it with the tile. */
 	for (y=0; y<h+th; y+=th)
-		for (x=0; x<w; x+=th)
-			gdk_pixbuf_copy_area(tile, 0, 0, tw, th, bigone, x, y);
-
+		for (x=0; x<w; x+=tw) {
+			int cw, ch;	/* copied width and height */
+			
+			/* check if out of bounds, as gdk does not clip rather sends errors */
+			if (x+tw>w)
+				cw=w-x;
+			else
+				cw=tw;
+			if (y+th>h+th)
+				ch=h+th-y;
+			else
+				ch=th;
+			gdk_pixbuf_copy_area(tile, 0, 0, cw, ch, bigone, x, y);
+	}
 	g_object_unref(tile);
 
 	pixmaps=g_new0(GdkPixmap *, th+1);	/* 'th' number of images, and a NULL to the end */
@@ -145,8 +209,8 @@ gd_create_title_animation ()
 		/* scale the title screen the same way as we scale the game */
 		scaled=gd_pixbuf_scale(frame, gd_cell_scale_game);
 		if (gd_pal_emulation_game)
-			gd_pal_pixbuf(scaled);
-		pixmaps[i]=gdk_pixmap_new (gdk_get_default_root_window(), gdk_pixbuf_get_width(scaled), gdk_pixbuf_get_height(scaled), -1);
+			gd_pal_emulate_pixbuf(scaled);
+		pixmaps[i]=gdk_pixmap_new(gdk_get_default_root_window(), gdk_pixbuf_get_width(scaled), gdk_pixbuf_get_height(scaled), -1);
 		gdk_draw_pixbuf(pixmaps[i], NULL, scaled, 0, 0, 0, 0, gdk_pixbuf_get_width(scaled), gdk_pixbuf_get_height(scaled), GDK_RGB_DITHER_MAX, 0, 0);
 		g_object_unref(scaled);
 	}
@@ -283,7 +347,7 @@ gd_create_themes_list()
 
 	/* default builtin theme */
 	gtk_list_store_append(store, &iter);
-	gtk_list_store_set(store, &iter, THEME_COL_FILENAME, NULL, THEME_COL_NAME, _("Default"), THEME_COL_PIXBUF, gd_pixbuf_for_builtin, -1);
+	gtk_list_store_set(store, &iter, THEME_COL_FILENAME, NULL, THEME_COL_NAME, _("Default"), THEME_COL_PIXBUF, gd_pixbuf_for_builtin_theme, -1);
 
 	/* add themes found in config directories */
 	add_dir_to_store(store, gd_system_data_dir);
@@ -324,14 +388,14 @@ settings_window_update(pref_info* info)
 	/* sample for game */
 	pb=gd_pixbuf_scale(orig_pb, gtk_combo_box_get_active(GTK_COMBO_BOX(info->sizecombo_game)));
 	if (gd_pal_emulation_game)
-		gd_pal_pixbuf(pb);
+		gd_pal_emulate_pixbuf(pb);
 	gtk_image_set_from_pixbuf(GTK_IMAGE(info->image_game), pb);
 	g_object_unref(pb);
 
 	/* sample for editor */
 	pb=gd_pixbuf_scale(orig_pb, gtk_combo_box_get_active(GTK_COMBO_BOX(info->sizecombo_editor)));
 	if (gd_pal_emulation_editor)
-		gd_pal_pixbuf(pb);
+		gd_pal_emulate_pixbuf(pb);
 	gtk_image_set_from_pixbuf(GTK_IMAGE(info->image_editor), pb);
 	g_object_unref(pb);
 }
@@ -407,17 +471,17 @@ image_load_filters()
 	return filters;
 }
 
-static void
-add_theme_cb(GtkWidget *widget, gpointer data)
+/* file open dialog, with filters for image types gdk-pixbuf recognizes. */
+char *
+gd_select_image_file(const char *title, GtkWidget *parent)
 {
 	GtkWidget *dialog;
 	GList *filters;
 	GList *iter;
 	int result;
-	char *filename=NULL;
-	pref_info *info=(pref_info *)data;
+	char *filename;
 
-	dialog=gtk_file_chooser_dialog_new (_("Add Theme from Image File"), GTK_WINDOW(info->dialog), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+	dialog=gtk_file_chooser_dialog_new (title, GTK_WINDOW(parent), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
 	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
 
 	/* obtain list of image filters, and add all to the window */
@@ -426,9 +490,23 @@ add_theme_cb(GtkWidget *widget, gpointer data)
 		gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), GTK_FILE_FILTER(iter->data));
 	g_list_free(filters);
 
-	result=gtk_dialog_run (GTK_DIALOG (dialog));
+	result=gtk_dialog_run(GTK_DIALOG(dialog));
 	if (result==GTK_RESPONSE_ACCEPT)
 		filename=gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(dialog));
+	else
+		filename=NULL;
+	gtk_widget_destroy (dialog);
+	
+	return filename;
+}
+
+static void
+add_theme_cb(GtkWidget *widget, gpointer data)
+{
+	pref_info *info=(pref_info *)data;
+	char *filename;
+	
+	filename=gd_select_image_file(_("Add Theme from Image File"), info->dialog);
 
 	if (filename) {
 		const char *error_msg;
@@ -466,8 +544,6 @@ add_theme_cb(GtkWidget *widget, gpointer data)
 			gd_errormessage(_("The selected image cannot be used as a GDash theme."), error_msg);
 		g_free(filename);
 	}
-
-	gtk_widget_destroy (dialog);
 }
 
 static void
@@ -558,6 +634,7 @@ gd_preferences (GtkWidget *parent)
 		{TypeBoolean, N_("All caves selectable"), N_("All caves and intermissions can be selected at game start."), &gd_all_caves_selectable, FALSE},
 		{TypeBoolean, N_("Import as all caves selectable"), N_("Original, C64 games are imported not with A, E, I, M caves selectable, but all caves (ABCD, EFGH... excluding intermissions). This does not affect BDCFF caves."), &gd_import_as_all_caves_selectable, FALSE},
 		{TypeBoolean, N_("Use BDCFF highscore"), N_("Use BDCFF highscores. GDash saves highscores in its own configuration directory and also in the *.bd files. However, it prefers loading them from the configuration directory; as the *.bd files might be read-only. You can enable this setting to let GDash load them from the *.bd files. This can be selected for a specific file in the file open dialog, too."), &gd_use_bdcff_highscore, FALSE},
+		{TypeBoolean, N_("Show story"), N_("If the cave has a story, it will be shown when the cave is first started."), &gd_show_story, FALSE },
 #ifdef GD_SOUND
 		{TypeBoolean, N_("Time as min:sec"), N_("Show times in minutes and seconds, instead of seconds only."), &gd_time_min_sec, FALSE},
 		{TypeBoolean, N_("No invisible outbox"), N_("Show invisible outboxes as visible (blinking) ones."), &gd_no_invisible_outbox, FALSE},
@@ -750,6 +827,8 @@ gd_preferences (GtkWidget *parent)
 	gtk_widget_show_all(dialog);
 	gtk_dialog_run(GTK_DIALOG(dialog));
 
+	/* and now process results. ***************/
+
 	/* get cell sizes */
 	gd_cell_scale_game=gtk_combo_box_get_active(GTK_COMBO_BOX(info.sizecombo_game));
 	gd_cell_scale_editor=gtk_combo_box_get_active(GTK_COMBO_BOX(info.sizecombo_editor));
@@ -779,6 +858,9 @@ gd_preferences (GtkWidget *parent)
 		gd_theme=NULL;
 		gd_loadcells_default();
 	}
+	
+	/* graphics settings might have changed (ie. pal emu or zoom), so recreate main winow. */
+	gd_main_window_set_title_animation();
 }
 
 
@@ -887,7 +969,7 @@ hs_clear_highscore(GtkWidget *widget, gpointer data)
 }
 
 void
-gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, Cave *highlight_cave, int highlight_rank)
+gd_show_highscore(GtkWidget *parent, GdCave *cave, gboolean show_clear_button, GdCave *highlight_cave, int highlight_rank)
 {
 	GtkWidget *dialog;
 	int i;
@@ -901,7 +983,7 @@ gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, Cav
 	int hl_cave;
 
 	/* dialog window */
-	dialog=gtk_dialog_new_with_buttons(_("Highscores"), (GtkWindow *) parent, GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL | GTK_DIALOG_NO_SEPARATOR, NULL);
+	dialog=gtk_dialog_new_with_buttons(_("Highscores"), (GtkWindow *) parent, GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR, NULL);
 
 	store=gtk_list_store_new(NUM_COLUMNS, G_TYPE_INT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT);
 	treeview=gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
@@ -933,7 +1015,7 @@ gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, Cav
 	g_free(text);
 
 	for (iter=gd_caveset, i=1; iter!=NULL; iter=iter->next, i++) {
-		Cave *c=iter->data;
+		GdCave *c=iter->data;
 
 		gtk_combo_box_append_text(GTK_COMBO_BOX(combo), c->name);
 
@@ -979,12 +1061,21 @@ guess_active_toplevel()
 
 	/* before doing anything, process updates, as windows may have been opened or closed right at the previous moment */
     gdk_window_process_all_updates();
+
     /* try to guess which window is active */
+    /* if we find a modal window, it is active. */
     toplevels=gtk_window_list_toplevels();
     for (iter=toplevels; iter!=NULL; iter=iter->next)
-    	if (gtk_window_has_toplevel_focus(GTK_WINDOW(iter->data)))
+    	if (gtk_window_get_modal(GTK_WINDOW(iter->data)))
     		parent=iter->data;
-    /* if any of them is focused, choose the first from the list. */
+
+	/* if no modal window found, search for a focused toplevel */
+    if (!parent)
+		for (iter=toplevels; iter!=NULL; iter=iter->next)
+			if (gtk_window_has_toplevel_focus(GTK_WINDOW(iter->data)))
+				parent=iter->data;
+
+    /* if any of them is focused, just choose the first from the list as a fallback. */
     if (!parent && toplevels)
     	parent=toplevels->data;
     g_list_free(toplevels);
@@ -996,7 +1087,7 @@ guess_active_toplevel()
  * show a warning window
  */
 static void
-show_message (GtkMessageType type, const char *primary, const char *secondary)
+show_message(GtkMessageType type, const char *primary, const char *secondary)
 {
     GtkWidget *dialog;
 
@@ -1013,21 +1104,21 @@ show_message (GtkMessageType type, const char *primary, const char *secondary)
 }
 
 void
-gd_warningmessage (const char *primary, const char *secondary)
+gd_warningmessage(const char *primary, const char *secondary)
 {
-	show_message (GTK_MESSAGE_WARNING, primary, secondary);
+	show_message(GTK_MESSAGE_WARNING, primary, secondary);
 }
 
 void
-gd_errormessage (const char *primary, const char *secondary)
+gd_errormessage(const char *primary, const char *secondary)
 {
-	show_message (GTK_MESSAGE_ERROR, primary, secondary);
+	show_message(GTK_MESSAGE_ERROR, primary, secondary);
 }
 
 void
-gd_infomessage (const char *primary, const char *secondary)
+gd_infomessage(const char *primary, const char *secondary)
 {
-	show_message (GTK_MESSAGE_INFO, primary, secondary);
+	show_message(GTK_MESSAGE_INFO, primary, secondary);
 }
 
 /* if necessary, ask the user if he doesn't want to save changes to cave */
@@ -1122,7 +1213,7 @@ caveset_save(const gchar *filename)
 {
 	gboolean saved;
 
-	saved=gd_caveset_save(filename, FALSE);
+	saved=gd_caveset_save(filename);
 	if (!saved)
 		gd_show_last_error(guess_active_toplevel());
 	else
@@ -1208,7 +1299,8 @@ gd_open_caveset_in_ui(const char *filename, gboolean highscore_load_from_bdcff)
 
 	gd_clear_error_flag();
 
-	loaded=gd_caveset_load_from_file (filename, gd_user_config_dir);
+	loaded=gd_caveset_load_from_file(filename, gd_user_config_dir);
+	gd_main_window_set_title_animation();
 	if (loaded)
 		caveset_file_operation_successful(filename);
 
@@ -1224,7 +1316,7 @@ gd_open_caveset_in_ui(const char *filename, gboolean highscore_load_from_bdcff)
 
 
 void
-gd_open_caveset (GtkWidget *parent, const char *directory)
+gd_open_caveset(GtkWidget *parent, const char *directory)
 {
 	GtkWidget *dialog, *check;
 	GtkFileFilter *filter;

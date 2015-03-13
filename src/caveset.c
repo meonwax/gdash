@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -59,13 +59,17 @@ gd_caveset_properties[] = {
 	{"Date", GD_TYPE_STRING, 0, N_("Date"), CAVESET_OFFSET(date), 1, N_("Date of creation")},
 	{"WWW", GD_TYPE_STRING, 0, N_("WWW"), CAVESET_OFFSET(www), 1, N_("Web page or e-mail address")},
 	{"Difficulty", GD_TYPE_STRING, 0, N_("Difficulty"), CAVESET_OFFSET(difficulty), 1, N_("Difficulty (informative)")},
-	{"Remark", GD_TYPE_STRING, 0, N_("Remark"), CAVESET_OFFSET(remark), 1, N_("Remark (informative)")},
 
 	{"Lives", GD_TYPE_INT, 0, N_("Initial lives"), CAVESET_OFFSET(initial_lives), 1, N_("Number of lives you get at game start."), 3, 9},
 	{"Lives", GD_TYPE_INT, 0, N_("Maximum lives"), CAVESET_OFFSET(maximum_lives), 1, N_("Maximum number of lives you can have by collecting bonus points."), 3, 99},
 	{"BonusLife", GD_TYPE_INT, 0, N_("Bonus life score"), CAVESET_OFFSET(bonus_life_score), 1, N_("Number of points to collect for a bonus life."), 100, 5000},
 	
-	{"Notes", GD_TYPE_LONGSTRING, 0, N_("Notes"), CAVESET_OFFSET(notes), 1, N_("Long description of the game.")},
+	{"Story", GD_TYPE_LONGSTRING, 0, N_("Story"), CAVESET_OFFSET(story), 1, N_("Long description of the game.")},
+	{"Remark", GD_TYPE_LONGSTRING, 0, N_("Remark"), CAVESET_OFFSET(remark), 1, N_("Remark (informative).")},
+	
+	{"TitleScreen", GD_TYPE_LONGSTRING, GD_DONT_SHOW_IN_EDITOR, N_("Title screen"), CAVESET_OFFSET(title_screen), 1, N_("Title screen image")},
+	{"TitleScreenScroll", GD_TYPE_LONGSTRING, GD_DONT_SHOW_IN_EDITOR, N_("Title screen, scrolling"), CAVESET_OFFSET(title_screen_scroll), 1, N_("Scrolling background for title screen image")},
+	
 	{NULL},
 };
 
@@ -119,6 +123,7 @@ gd_caveset_data_free(GdCavesetData *data)
  * highscores saving in config dir
  *
  */
+ 
 /* calculates an adler checksum, for which it uses all
    elements of all cave-rendereds. */
 static guint32
@@ -128,17 +133,10 @@ caveset_checksum()
 	GList *iter;
 
 	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
-		Cave *rendered=gd_cave_new_rendered(iter->data, 0, 0);	/* level=1, seed=0 */
-		int x, y;
-
-		for (y=0; y<rendered->h; y++)
-			for (x=0; x<rendered->w; x++) {
-				a+=rendered->map[y][x];
-				b+=a;
-
-				a%=65521;
-				b%=65521;
-			}
+		GdCave *rendered;
+		
+		rendered=gd_cave_new_rendered(iter->data, 0, 0);	/* level=1, seed=0 */
+		gd_cave_adler_checksum_more(rendered, &a, &b);
 		gd_cave_free(rendered);
 	}
 	return (b<<16) + a;
@@ -221,7 +219,7 @@ gd_save_highscore(const char *directory)
 	cave_highscore_to_keyfile_func(keyfile, gd_caveset_data->name, 0, gd_caveset_data->highscore);
 	/* and put the highscores of all caves in the keyfile */
 	for (iter=gd_caveset, i=1; iter!=NULL; iter=iter->next, i++) {
-		Cave *cave=(Cave *)iter->data;
+		GdCave *cave=(GdCave *)iter->data;
 
 		cave_highscore_to_keyfile_func(keyfile, cave->name, i, cave->highscore);
 	}
@@ -321,7 +319,7 @@ gd_load_highscore(const char *directory)
 
 	/* try to load for all caves */
 	for (iter=gd_caveset, i=1; iter!=NULL; iter=iter->next, i++) {
-		Cave *cave=iter->data;
+		GdCave *cave=iter->data;
 
 		cave_highscores_load_from_keyfile(keyfile, i, cave->highscore);
 	}
@@ -381,7 +379,7 @@ caveset_first_selectable_cave_index()
 	int i;
 
 	for (i=0, iter=gd_caveset; iter!=NULL; i++, iter=iter->next) {
-		Cave *cave=(Cave *)iter->data;
+		GdCave *cave=(GdCave *)iter->data;
 
 		if (cave->selectable)
 			return i;
@@ -393,7 +391,7 @@ caveset_first_selectable_cave_index()
 }
 
 /* return a cave identified by its index */
-Cave *
+GdCave *
 gd_return_nth_cave(const int cave)
 {
 	return g_list_nth_data(gd_caveset, cave);
@@ -401,7 +399,7 @@ gd_return_nth_cave(const int cave)
 
 
 /* pick a cave, identified by a number, and render it with level number. */
-Cave *
+GdCave *
 gd_cave_new_from_caveset(const int cave, const int level, guint32 seed)
 {
 	return gd_cave_new_rendered (gd_return_nth_cave(cave), level, seed);
@@ -483,7 +481,7 @@ brc_import(guint8 *data)
 	int x, y;
 	int level;
 	/* we import 100 caves, and the put them in the correct order. */
-	Cave *imported[100];
+	GdCave *imported[100];
 	gboolean import_effect;
 	
 	g_assert(G_N_ELEMENTS(brc_color_table)==G_N_ELEMENTS(brc_color_table_comp));
@@ -510,7 +508,7 @@ brc_import(guint8 *data)
 		int i;
 		
 		for (cavenum=0; cavenum<20; cavenum++) {
-			Cave *cave;
+			GdCave *cave;
 
 			int c=5*20*24;	/* 5 levels, 20 caves, 24 bytes - max 40*2 properties for each cave */
 			int datapos=(cavenum*5+level)*24+22;
@@ -608,7 +606,7 @@ brc_import(guint8 *data)
 
 		for (cavenum=0; cavenum<20; cavenum++) {
 			static const int reorder[]={0, 1, 2, 3, 16, 4, 5, 6, 7, 17, 8, 9, 10, 11, 18, 12, 13, 14, 15, 19};
-			Cave *cave=imported[level*20+reorder[cavenum]];
+			GdCave *cave=imported[level*20+reorder[cavenum]];
 			gboolean only_dirt;
 			int x, y;
 			
@@ -723,7 +721,7 @@ gd_caveset_load_from_file (const char *filename, const char *configdir)
 	}
 
 	/* BDCFF */
-	if (gd_caveset_imported_format((guint8 *) buf)==GD_FORMAT_UNKNOWN) {
+	if (gd_caveset_imported_get_format((guint8 *) buf)==GD_FORMAT_UNKNOWN) {
 		/* try to load as bdcff */
 		gboolean result;
 
@@ -803,7 +801,7 @@ gd_caveset_load_from_internal (const int i, const char *configdir)
 
 
 gboolean
-gd_caveset_save(const char *filename, gboolean caves_with_replay_only)
+gd_caveset_save(const char *filename)
 {
 	GPtrArray *saved;
 	char *contents;
@@ -811,7 +809,7 @@ gd_caveset_save(const char *filename, gboolean caves_with_replay_only)
 	gboolean success;
 
 	saved=g_ptr_array_sized_new(500);
-	gd_caveset_save_to_bdcff(saved, caves_with_replay_only);
+	gd_caveset_save_to_bdcff(saved);
 	g_ptr_array_add(saved, NULL);	/* so it can be used for strjoinv */
 #ifdef G_OS_WIN32
 	contents=g_strjoinv("\r\n", (char **)saved->pdata);
@@ -833,6 +831,56 @@ gd_caveset_save(const char *filename, gboolean caves_with_replay_only)
 	g_free(contents);
 
 	return success;
+}
+
+
+
+int
+gd_cave_check_replays(GdCave *cave, gboolean report, gboolean remove, gboolean repair)
+{
+	GList *riter;
+	int wrong=0;
+	
+	riter=cave->replays;
+	while (riter!=NULL) {
+		GdReplay *replay=(GdReplay *)riter->data;
+		guint32 checksum;
+		GdCave *rendered;
+		GList *next=riter->next;
+
+		rendered=gd_cave_new_rendered(cave, replay->level, replay->seed);		
+		checksum=gd_cave_adler_checksum(rendered);
+		gd_cave_free(rendered);
+		
+		replay->wrong_checksum=FALSE;
+		/* count wrong ones... the checksum might be changed later to "repair" */
+		if (replay->checksum!=0 && checksum!=replay->checksum)
+			wrong++;
+		
+		if (replay->checksum==0 || repair) {
+			/* if no checksum found, add one. or if repair requested, overwrite old one. */
+			replay->checksum=checksum;
+		} else {
+			/* if has a checksum, compare with this one. */
+			if (replay->checksum!=checksum) {
+				replay->wrong_checksum=TRUE;
+				
+				if (report)
+					g_warning("%s: replay played by %s at %s is invalid", cave->name, replay->player_name, replay->date);
+
+				if (remove) {
+					/* may remove */
+					cave->replays=g_list_remove_link(cave->replays, riter);
+					gd_replay_free(replay);
+				}
+			}
+		}
+		
+		/* advance to next list item which we remembered. the current one might have been deleted */
+		riter=next;
+	}
+	
+	return wrong;
 }
 
 

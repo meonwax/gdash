@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -27,15 +27,15 @@ typedef enum _gd_gametype {
 	GD_GAMETYPE_CONTINUE_REPLAY,
 } GdGameType;
 
-typedef struct _gd_gameplay {
+typedef struct _gd_game {
 	GdString player_name;	/* Name of player */
 	int player_score;		/* Score of player */
 	int player_lives;		/* Remaining lives of player */
 	
 	GdGameType type;
 
-	Cave *cave;				/* Copy of the cave. This is the iterated, changed (ruined...) one */
-	Cave *original_cave;	/* original cave from caveset. used to record highscore */
+	GdCave *cave;				/* Copy of the cave. This is the iterated, changed (ruined...) one */
+	GdCave *original_cave;	/* original cave from caveset. used to record highscore */
 	
 	GdReplay *replay_record;
 	GdReplay *replay_from;
@@ -57,10 +57,12 @@ typedef struct _gd_gameplay {
 	int milliseconds_anim;
 	
 	int replay_no_more_movements;
-} GdGameplay;
+	gboolean show_story;	/* variable to remember that the story for a particular cave was already shown. */
+} GdGame;
 
 typedef enum _gd_game_state {
 	GD_GAME_INVALID_STATE,
+	GD_GAME_SHOW_STORY,
 	GD_GAME_CAVE_LOADED,
 	GD_GAME_NOTHING,
 	GD_GAME_LABELS_CHANGED,
@@ -70,19 +72,17 @@ typedef enum _gd_game_state {
 	GD_GAME_GAME_OVER,
 } GdGameState;
 
-extern GdGameplay gd_gameplay;
-
 extern gboolean gd_wait_before_game_over;		/* wait some time before covering the cave, if there is a game over. main() should set it true for sdl, false for gtk+ */
 
-Cave *gd_create_snapshot();
+GdCave *gd_create_snapshot(GdGame *gameplay);
 
-void gd_stop_game();
-void gd_new_game(const char *player_name, const int cave, const int level);
-void gd_new_game_snapshot(Cave *snapshot);
-void gd_new_game_test(Cave *cave, int level);
-void gd_new_game_replay(Cave *cave, GdReplay *replay);
+void gd_game_free(GdGame *gameplay);
+GdGame *gd_game_new(const char *player_name, const int cave, const int level);
+GdGame *gd_game_new_snapshot(GdCave *snapshot);
+GdGame *gd_game_new_test(GdCave *cave, int level);
+GdGame *gd_game_new_replay(GdCave *cave, GdReplay *replay);
 
-GdGameState gd_game_main_int(int millisecs_elapsed, GdDirection player_move, gboolean fire, gboolean suicide, gboolean restart, gboolean allow_iterate, gboolean yellowish_draw, gboolean fast_forward);
+GdGameState gd_game_main_int(GdGame *gameplay, int millisecs_elapsed, GdDirection player_move, gboolean fire, gboolean suicide, gboolean restart, gboolean allow_iterate, gboolean yellowish_draw, gboolean fast_forward);
 
 
 #endif

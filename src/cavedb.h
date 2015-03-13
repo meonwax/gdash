@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -31,7 +31,7 @@ extern GdPropertyDefault gd_cave_defaults_gdash[];
 
 /* do some checks on the cave db */
 void gd_cave_db_init();
-GdElement gd_get_hammered_element(GdElement elem);
+GdElement gd_element_get_hammered(GdElement elem);
 
 #endif
 

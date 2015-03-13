@@ -209,7 +209,7 @@ SUBDIRS = po include src caves util docs sound music
 ACLOCAL_AMFLAGS = -I m4
 desktopdir = $(datadir)/applications
 desktop_DATA = gdash.desktop
-EXTRA_DIST = config.rpath mkinstalldirs m4/ChangeLog gdash.ico gdash.nsi.in $(desktop_DATA) gdk-pixbuf.loaders engine_tests.bd
+EXTRA_DIST = config.rpath mkinstalldirs m4/ChangeLog gdash.ico gdash.nsi.in $(desktop_DATA) gdk-pixbuf.loaders engine_tests.bd COPYING.SDL COPYING.GTK README-SDL.txt
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

@@ -45,8 +45,12 @@ Section "GDash (required)"
   File "gdash.ico"
   File /oname=README.txt "README"
   File /oname=TODO.txt "TODO"
+  File /oname=COPYING.txt "COPYING"
+  File /oname=COPYING_SDL.txt "COPYING.SDL"
+  File /oname=COPYING_GTK.txt "COPYING.GTK"
+  File README-SDL.txt
   
-  ; Profram files, Glib dlls
+  ; Program files, Glib dlls
   SetOutPath $INSTDIR
   File ${MINGWDIR}\bin\intl.dll
   File ${MINGWDIR}\bin\libglib-2.0-0.dll
@@ -74,6 +78,8 @@ Section "GDash (required)"
   SetOutPath $INSTDIR
   File ${MINGWDIR}\bin\SDL.dll
   File ${MINGWDIR}\bin\SDL_mixer.dll
+  File ${MINGWDIR}\bin\SDL_image.dll
+  File ${MINGWDIR}\bin\jpeg.dll
   File ${MINGWDIR}\bin\libvorbis-0.dll
   File ${MINGWDIR}\bin\libvorbisfile-3.dll
   File ${MINGWDIR}\bin\libogg-0.dll
@@ -136,7 +142,6 @@ Section "Start Menu Shortcuts"
   CreateShortCut "$SMPROGRAMS\GDash\GDash.lnk" "$INSTDIR\gdash.exe" "" "$INSTDIR\gdash.ico" 0
   CreateShortCut "$SMPROGRAMS\GDash\GDash (C64-like).lnk" "$INSTDIR\sdash.exe" "" "$INSTDIR\gdash.ico" 0
   CreateShortCut "$SMPROGRAMS\GDash\README.lnk" "$INSTDIR\README.txt" "" "" 0
-  CreateShortCut "$SMPROGRAMS\GDash\TODO.lnk" "$INSTDIR\TODO.txt" "" "" 0
   CreateShortCut "$SMPROGRAMS\GDash\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   
 SectionEnd

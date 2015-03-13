@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,10 +14,11 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include <SDL.h>
+#include <SDL_image.h>
 #include <glib.h>
 #include "colors.h"
-#include "gameplay.h"
 #include "cave.h"
+#include "gameplay.h"
 #include "settings.h"
 #include "sdlgfx.h"
 #include "util.h"
@@ -25,21 +26,11 @@
 #include "title.h"
 #include "c64_font.h"
 #include "gfxutil.h"
+#include "caveset.h" 	/* UGLY */
 
 #include "c64_png_colors.h"
 
-#define GD_NUM_OF_CHARS 128
-
-/* these can't be larger than 127, or they mess up with utf8 coding */
-#define UNKNOWN_CHAR_INDEX 31
-#define BACKSLASH_CHAR_INDEX 64
-#define TILDE_CHAR_INDEX 95
-#define UNDERSCORE_CHAR_INDEX 100
-#define OPEN_BRACKET_CHAR_INDEX 27
-#define CLOSE_BRACKET_CHAR_INDEX 29
-#define CHECKED_BOX_CHAR_INDEX 121
-#define CHECK_MARK_INDEX 122
-#define BALL_CHAR_INDEX 104
+#define NUM_OF_CHARS 128
 
 int gd_scale=1;	/* a graphics scale things which sets EVERYTHING. it is set with gd_sdl_init, and cannot be modified later. */
 int gd_scale_type=GD_SCALING_ORIGINAL;
@@ -47,6 +38,7 @@ int gd_scale_type=GD_SCALING_ORIGINAL;
 static SDL_Surface *cells[2*NUM_OF_CELLS];
 static const guchar *font;
 static GHashTable *font_w, *font_n;
+static GList *font_color_recently_used;
 static GdColor color0, color1, color2, color3, color4, color5;	/* currently used cell colors */
 static guint8 *c64_custom_gfx=NULL;
 static gboolean using_png_gfx;
@@ -60,21 +52,11 @@ static gboolean using_png_gfx;
     static guint32 gmask = 0x00ff0000;
     static guint32 bmask = 0x0000ff00;
     static guint32 amask = 0x000000ff;
-
-	/* for non-alpha channel gdk pixbuf includes */
-    static guint32 rmask_24 = 0xff0000;
-    static guint32 gmask_24 = 0x00ff00;
-    static guint32 bmask_24 = 0x0000ff;
 #else
     static guint32 rmask = 0x000000ff;
     static guint32 gmask = 0x0000ff00;
     static guint32 bmask = 0x00ff0000;
     static guint32 amask = 0xff000000;
-
-	/* for non-alpha channel gdk pixbuf includes */
-    static guint32 rmask_24 = 0x0000ff;
-    static guint32 gmask_24 = 0x00ff00;
-    static guint32 bmask_24 = 0xff0000;
 #endif
 
 
@@ -82,12 +64,12 @@ static gboolean using_png_gfx;
 SDL_Surface *gd_screen=NULL;
 static SDL_Surface *dark_background=NULL;
 static GList *backup_screens=NULL, *dark_screens=NULL;
-int play_area_w=320;
-int play_area_h=180;
-int statusbar_height=20;
-int statusbar_y1=1;
-int statusbar_y2=10;
-int statusbar_mid=(20-8)/2;
+static int play_area_w=320;
+static int play_area_h=180;
+int gd_statusbar_height=20;
+int gd_statusbar_y1=1;
+int gd_statusbar_y2=10;
+int gd_statusbar_mid=(20-8)/2;
 static int scroll_x, scroll_y;
 
 
@@ -95,7 +77,7 @@ static int scroll_x, scroll_y;
 gboolean gd_quit=FALSE;
 
 guint8 *gd_keystate;
-SDL_Joystick *gd_joy;
+static SDL_Joystick *joystick_1;
 
 static int cell_size=16;
 
@@ -256,7 +238,33 @@ gd_key_name(guint keysym)
 
 
 
+#if 0
 /* read a gdk-pixbuf source, and return an sdl surface. */
+/* these masks are always for RGB and RGBA ordering in memory.
+   that is what gdk-pixbuf uses, and also what sdl uses.
+   no BGR, no ABGR.
+ */
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    static guint32 rmask = 0xff000000;
+    static guint32 gmask = 0x00ff0000;
+    static guint32 bmask = 0x0000ff00;
+    static guint32 amask = 0x000000ff;
+
+	/* for non-alpha channel gdk pixbuf includes */
+    static guint32 rmask_24 = 0xff0000;
+    static guint32 gmask_24 = 0x00ff00;
+    static guint32 bmask_24 = 0x0000ff;
+#else
+    static guint32 rmask = 0x000000ff;
+    static guint32 gmask = 0x0000ff00;
+    static guint32 bmask = 0x00ff0000;
+    static guint32 amask = 0xff000000;
+
+	/* for non-alpha channel gdk pixbuf includes */
+    static guint32 rmask_24 = 0x0000ff;
+    static guint32 gmask_24 = 0x00ff00;
+    static guint32 bmask_24 = 0xff0000;
+#endif
 static SDL_Surface *
 surface_from_gdk_pixbuf_data(guint32 *data)
 {
@@ -275,8 +283,32 @@ surface_from_gdk_pixbuf_data(guint32 *data)
 	
 	return surface;
 }
+#endif
 
+static SDL_Surface *
+surface_from_raw_data(const guint8 *data, int length)
+{
+	SDL_RWops *rwop;
+	SDL_Surface *surface;
 
+	rwop=SDL_RWFromConstMem(data, length);
+	surface=IMG_Load_RW(rwop, 1);	/* 1 = automatically closes rwop */
+	return surface;
+}
+
+static SDL_Surface *
+surface_from_base64(const char *base64)
+{
+	guchar *data;
+	gsize length;
+	SDL_Surface *surface;
+	
+	data=g_base64_decode(base64, &length);
+	surface=surface_from_raw_data(data, length);
+	g_free(data);
+	
+	return surface;
+}
 
 /* This is taken from the SDL_gfx project. */
 /*  
@@ -286,15 +318,16 @@ surface_from_gdk_pixbuf_data(guint32 *data)
 	Zoomes 32bit RGBA/ABGR 'src' surface to 'dst' surface.
 */
 
-typedef struct tColorRGBA {
-	guint8 r;
-	guint8 g;
-	guint8 b;
-	guint8 a;
-} tColorRGBA;
-
-static void zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst, gboolean smooth)
+static void
+zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst, gboolean smooth)
 {
+	typedef struct tColorRGBA {
+		guint8 r;
+		guint8 g;
+		guint8 b;
+		guint8 a;
+	} tColorRGBA;
+
 	int x, y, sx, sy, *sax, *say, *csax, *csay, csx, csy, ex, ey, t1, t2, sstep;
 	tColorRGBA *c00, *c01, *c10, *c11;
 	tColorRGBA *sp, *csp, *dp;
@@ -319,8 +352,10 @@ static void zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst, gboolean smooth)
 	say=g_new(gint32, dst->h+1);
 
 	/* Precalculate row increments */
-	SDL_LockSurface(src);
-	SDL_LockSurface(dst);
+	if (SDL_MUSTLOCK(src))
+		SDL_LockSurface(src);
+	if (SDL_MUSTLOCK(dst))
+		SDL_LockSurface(dst);
 	sp = csp = (tColorRGBA *) src->pixels;
 	dp = (tColorRGBA *) dst->pixels;
 
@@ -420,8 +455,10 @@ static void zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst, gboolean smooth)
 
 	}
 
-	SDL_UnlockSurface(src);
-	SDL_UnlockSurface(dst);
+	if (SDL_MUSTLOCK(src))
+		SDL_UnlockSurface(src);
+	if (SDL_MUSTLOCK(dst))
+		SDL_UnlockSurface(dst);
 
 	/* Remove temp arrays */
 	g_free(sax);
@@ -438,11 +475,15 @@ scale2x(SDL_Surface *src, SDL_Surface *dst)
 	g_assert(src->format->BytesPerPixel==4);
 	g_assert(dst->format->BytesPerPixel==4);
 	
-	SDL_LockSurface(src);
-	SDL_LockSurface(dst);
-	gd_scale2x(src->pixels, src->w, src->h, src->pitch, dst->pixels, dst->pitch);
-	SDL_UnlockSurface(src);
-	SDL_UnlockSurface(dst);
+	if (SDL_MUSTLOCK(src))
+		SDL_LockSurface(src);
+	if (SDL_MUSTLOCK(dst))
+		SDL_LockSurface(dst);
+	gd_scale2x_raw(src->pixels, src->w, src->h, src->pitch, dst->pixels, dst->pitch);
+	if (SDL_MUSTLOCK(src))
+		SDL_UnlockSurface(src);
+	if (SDL_MUSTLOCK(dst))
+		SDL_UnlockSurface(dst);
 }
 
 static void
@@ -453,11 +494,15 @@ scale3x(SDL_Surface *src, SDL_Surface *dst)
 	g_assert(src->format->BytesPerPixel==4);
 	g_assert(dst->format->BytesPerPixel==4);
 	
-	SDL_LockSurface(src);
-	SDL_LockSurface(dst);
-	gd_scale3x(src->pixels, src->w, src->h, src->pitch, dst->pixels, dst->pitch);
-	SDL_UnlockSurface(src);
-	SDL_UnlockSurface(dst);
+	if (SDL_MUSTLOCK(src))
+		SDL_LockSurface(src);
+	if (SDL_MUSTLOCK(dst))
+		SDL_LockSurface(dst);
+	gd_scale3x_raw(src->pixels, src->w, src->h, src->pitch, dst->pixels, dst->pitch);
+	if (SDL_MUSTLOCK(src))
+		SDL_UnlockSurface(src);
+	if (SDL_MUSTLOCK(dst))
+		SDL_UnlockSurface(dst);
 }
 
 
@@ -483,8 +528,10 @@ scale_2x_nearest(SDL_Surface *src, SDL_Surface *dst)
 	g_assert(src->format->BytesPerPixel==4);
 	g_assert(dst->format->BytesPerPixel==4);
 
-	SDL_LockSurface(src);
-	SDL_LockSurface(dst);
+	if (SDL_MUSTLOCK(src))
+		SDL_LockSurface(src);
+	if (SDL_MUSTLOCK(dst))
+		SDL_LockSurface(dst);
 	for (y=0; y<height; ++y) {
 		for (x=0; x<width; ++x) {
 			E = *(guint32*)(srcpix + (y*srcpitch) + (4*x));
@@ -495,8 +542,10 @@ scale_2x_nearest(SDL_Surface *src, SDL_Surface *dst)
 			*(guint32*)(dstpix + (y*2+1)*dstpitch + (x*2+1)*4) = E;
 		}
 	}
-	SDL_UnlockSurface(src);
-	SDL_UnlockSurface(dst);
+	if (SDL_MUSTLOCK(src))
+		SDL_UnlockSurface(src);
+	if (SDL_MUSTLOCK(dst))
+		SDL_UnlockSurface(dst);
 }
 
 
@@ -518,8 +567,10 @@ scale_3x_nearest(SDL_Surface *src, SDL_Surface *dst)
 	g_assert(src->format->BytesPerPixel==4);
 	g_assert(dst->format->BytesPerPixel==4);
 
-	SDL_LockSurface(src);
-	SDL_LockSurface(dst);
+	if (SDL_MUSTLOCK(src))
+		SDL_LockSurface(src);
+	if (SDL_MUSTLOCK(dst))
+		SDL_LockSurface(dst);
 	for (y=0; y<height; ++y) {
 		int ny=y*3;	/* new coordinate */
 
@@ -539,23 +590,34 @@ scale_3x_nearest(SDL_Surface *src, SDL_Surface *dst)
 			*(guint32*)(dstpix + (ny+2)*dstpitch + (nx+2)*4) = E;
 		}
 	}
-	SDL_UnlockSurface(src);
-	SDL_UnlockSurface(dst);
+	if (SDL_MUSTLOCK(src))
+		SDL_UnlockSurface(src);
+	if (SDL_MUSTLOCK(dst))
+		SDL_UnlockSurface(dst);
 }
 
 
 
 /* scales a pixbuf with the appropriate scaling type. */
-SDL_Surface *
+static SDL_Surface *
 surface_scale(SDL_Surface *orig)
 {
 	SDL_Surface *dest, *dest2x;
 	
+	/* special case: no scaling. */
+	/* return a new pixbuf, but its pixels are at the same place as the original. (so the pixbuf struct can be freed on its own) */
+	if (gd_scale_type==GD_SCALING_ORIGINAL) {
+		g_assert(gd_scale==1);	/* just to be sure */
+		
+		return SDL_CreateRGBSurfaceFrom(orig->pixels, orig->w, orig->h, orig->format->BitsPerPixel, orig->pitch, orig->format->Rmask, orig->format->Gmask, orig->format->Bmask, orig->format->Amask);
+	}
+
 	dest=SDL_CreateRGBSurface(orig->flags, orig->w*gd_scale, orig->h*gd_scale, orig->format->BitsPerPixel, orig->format->Rmask, orig->format->Gmask, orig->format->Bmask, orig->format->Amask);
 	
 	switch (gd_scale_type) {
 		case GD_SCALING_ORIGINAL:
-			SDL_BlitSurface(orig, NULL, dest, NULL);
+			/* handled above */
+			g_assert_not_reached();
 			break;
 		
 		case GD_SCALING_2X:
@@ -615,9 +677,11 @@ surface_scale(SDL_Surface *orig)
 static void
 pal_emu_surface(SDL_Surface *image)
 {
-	SDL_LockSurface(image);
-	gd_pal_emu(image->pixels, image->w, image->h, image->pitch, image->format->Rshift, image->format->Gshift, image->format->Bshift, image->format->Ashift);
-	SDL_UnlockSurface(image);
+	if (SDL_MUSTLOCK(image))
+		SDL_LockSurface(image);
+	gd_pal_emulate_raw(image->pixels, image->w, image->h, image->pitch, image->format->Rshift, image->format->Gshift, image->format->Bshift, image->format->Ashift);
+	if (SDL_MUSTLOCK(image))
+		SDL_UnlockSurface(image);
 }
 
 
@@ -631,7 +695,6 @@ displayformat(SDL_Surface *orig)
 	/* at this point we must already be working with 32bit surfaces */	
 	g_assert(orig->format->BytesPerPixel==4);
 	
-//	pal_emu(orig);
 	scaled=surface_scale(orig);
 	if (gd_sdl_pal_emulation)
 		pal_emu_surface(scaled);
@@ -641,9 +704,27 @@ displayformat(SDL_Surface *orig)
 	return displayformat;
 }
 
+static SDL_Surface *
+displayformatalpha(SDL_Surface *orig)
+{
+	SDL_Surface *scaled, *displayformat;
+
+	/* at this point we must already be working with 32bit surfaces */	
+	g_assert(orig->format->BytesPerPixel==4);
+	
+	scaled=surface_scale(orig);
+	if (gd_sdl_pal_emulation)
+		pal_emu_surface(scaled);
+	displayformat=SDL_DisplayFormatAlpha(scaled);
+	SDL_FreeSurface(scaled);
+
+	return displayformat;
+}
+
+#if 0
 /* needed to alpha-copy an src image over dst.
    the resulting image of sdl_blitsurface is not exact?!
-   can't explain why. */
+   can't explain why. XXX. */
 static void
 copy_alpha(SDL_Surface *src, SDL_Surface *dst)
 {
@@ -667,6 +748,7 @@ copy_alpha(SDL_Surface *src, SDL_Surface *dst)
 	SDL_UnlockSurface(src);
 	SDL_UnlockSurface(dst);
 }
+#endif
 
 /* create and return an array of surfaces, which contain the title animation.
    the array is one pointer larger than all frames; the last pointer is a null.
@@ -682,8 +764,46 @@ gd_get_title_animation()
 	SDL_Surface **animation;
 	int x, y, i;
 	
-	screen=surface_from_gdk_pixbuf_data((guint32 *) gdash_screen);
-	tile=surface_from_gdk_pixbuf_data((guint32 *) gdash_tile);
+	screen=NULL;
+	tile=NULL;
+	if (gd_caveset_data->title_screen->len!=0) {
+		/* user defined title screen */
+		screen=surface_from_base64(gd_caveset_data->title_screen->str);
+		if (!screen) {
+			g_warning("Caveset is storing an invalid title screen image.");
+			g_string_assign(gd_caveset_data->title_screen, "");
+		} else {
+			/* if we loaded the screen, now try to load the tile. */
+			/* only if the screen has an alpha channel. otherwise it would not make any sense */
+			if (screen->format->Amask!=0 && gd_caveset_data->title_screen_scroll->len!=0) {
+				tile=surface_from_base64(gd_caveset_data->title_screen_scroll->str);
+				
+				if (!tile) {
+					g_warning("Caveset is storing an invalid title screen background image.");
+					g_string_assign(gd_caveset_data->title_screen_scroll, "");
+				}
+			}
+		}
+		
+	}
+
+	/* if no special title image or unable to load that one, load the built-in */
+	if (!screen) {
+		/* the screen */
+		screen=surface_from_raw_data(gdash_screen, sizeof(gdash_screen));
+		/* the tile to be put under the screen */
+		tile=surface_from_raw_data(gdash_tile, sizeof(gdash_tile));
+		g_assert(screen!=NULL);
+		g_assert(tile!=NULL);
+	}	
+
+	/* if no tile, let it be black. */
+	/* the sdl version does the same. */
+	if (!tile) {
+		/* one-row pixbuf, so no animation. */
+		tile=SDL_CreateRGBSurface(0, screen->w, 1, 32, 0, 0, 0, 0);
+		SDL_FillRect(tile, NULL, SDL_MapRGB(tile->format, 0, 0, 0));
+	}
 
 	/* do not allow more than 40 frames of animation */
 	g_assert(tile->h<40);
@@ -712,8 +832,8 @@ gd_get_title_animation()
 		src.h=screen->h;
 		SDL_BlitSurface(bigone, &src, frame, 0);
 		/* and composite it with the title image */
-		copy_alpha(screen, frame);
-
+//		copy_alpha(screen, frame);
+		SDL_BlitSurface(screen, NULL, frame, NULL);
 		animation[i]=displayformat(frame);
 	}
 	SDL_FreeSurface(frame);
@@ -746,31 +866,35 @@ gd_sdl_init(GdScalingType scaling_type)
 	gd_scale=gd_scaling_scale[gd_scale_type];
 	play_area_w*=gd_scale;
 	play_area_h*=gd_scale;
-	statusbar_y1*=gd_scale;
-	statusbar_y2*=gd_scale;
-	statusbar_height*=gd_scale;
-	statusbar_mid*=gd_scale;
+	gd_statusbar_y1*=gd_scale;
+	gd_statusbar_y2*=gd_scale;
+	gd_statusbar_height*=gd_scale;
+	gd_statusbar_mid*=gd_scale;
 
 	SDL_Init(SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK);
 	SDL_EnableKeyRepeat(250, 100);
-	gd_screen=SDL_SetVideoMode(play_area_w, play_area_h+statusbar_height, 32, SDL_ANYFORMAT | (gd_sdl_fullscreen?SDL_FULLSCREEN:0));
+	gd_screen=SDL_SetVideoMode(play_area_w, play_area_h+gd_statusbar_height, 32, SDL_DOUBLEBUF | SDL_ANYFORMAT | (gd_sdl_fullscreen?SDL_FULLSCREEN:0));
+	/* do not show mouse cursor */
 	SDL_ShowCursor(SDL_DISABLE);
+	/* warp mouse pointer so cursor cannot be seen, if the above call did nothing for some reason */
+	SDL_WarpMouse(gd_screen->w-1, gd_screen->h-1);
 	if (!gd_screen)
 		return FALSE;
 	
 	/* keyboard, joystick */
 	gd_keystate=SDL_GetKeyState(NULL);
 	if (SDL_NumJoysticks()>0)
-		gd_joy=SDL_JoystickOpen(0);
+		joystick_1=SDL_JoystickOpen(0);
 
 	/* icon */
-	icon=surface_from_gdk_pixbuf_data((guint32 *) gdash_32);
+	icon=surface_from_raw_data(gdash_32, sizeof(gdash_32));
 	SDL_WM_SetIcon(icon, NULL);
 	SDL_WM_SetCaption("GDash", NULL);
 	SDL_FreeSurface(icon);
 	
 	font_n=g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, rendered_font_free);
 	font_w=g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, rendered_font_free);
+	font_color_recently_used=NULL;
 	
 	return TRUE;
 }
@@ -779,33 +903,33 @@ gd_sdl_init(GdScalingType scaling_type)
 
 
 static inline gboolean
-gd_joy_up()
+get_joy_up()
 {
-	return gd_joy!=NULL && SDL_JoystickGetAxis(gd_joy, 1)<-3200;
+	return joystick_1!=NULL && SDL_JoystickGetAxis(joystick_1, 1)<-3200;
 }
 
 static inline gboolean
-gd_joy_down()
+get_joy_down()
 {
-	return gd_joy!=NULL && SDL_JoystickGetAxis(gd_joy, 1)>3200;
+	return joystick_1!=NULL && SDL_JoystickGetAxis(joystick_1, 1)>3200;
 }
 
 static inline gboolean
-gd_joy_left()
+get_joy_left()
 {
-	return gd_joy!=NULL && SDL_JoystickGetAxis(gd_joy, 0)<-3200;
+	return joystick_1!=NULL && SDL_JoystickGetAxis(joystick_1, 0)<-3200;
 }
 
 static inline gboolean
-gd_joy_right()
+get_joy_right()
 {
-	return gd_joy!=NULL && SDL_JoystickGetAxis(gd_joy, 0)>3200;
+	return joystick_1!=NULL && SDL_JoystickGetAxis(joystick_1, 0)>3200;
 }
 
 static inline gboolean
-gd_joy_fire()
+get_joy_fire()
 {
-	return gd_joy!=NULL && (SDL_JoystickGetButton(gd_joy, 0) || SDL_JoystickGetButton(gd_joy, 1));
+	return joystick_1!=NULL && (SDL_JoystickGetButton(joystick_1, 0) || SDL_JoystickGetButton(joystick_1, 1));
 }
 
 
@@ -814,31 +938,31 @@ gd_joy_fire()
 gboolean
 gd_up()
 {
-	return gd_keystate[gd_sdl_key_up] || gd_joy_up();
+	return gd_keystate[gd_sdl_key_up] || get_joy_up();
 }
 
 gboolean
 gd_down()
 {
-	return gd_keystate[gd_sdl_key_down] || gd_joy_down();
+	return gd_keystate[gd_sdl_key_down] || get_joy_down();
 }
 
 gboolean
 gd_left()
 {
-	return gd_keystate[gd_sdl_key_left] || gd_joy_left();
+	return gd_keystate[gd_sdl_key_left] || get_joy_left();
 }
 
 gboolean
 gd_right()
 {
-	return gd_keystate[gd_sdl_key_right] || gd_joy_right();
+	return gd_keystate[gd_sdl_key_right] || get_joy_right();
 }
 
 gboolean
 gd_fire()
 {
-	return gd_keystate[gd_sdl_key_fire_1] || gd_keystate[gd_sdl_key_fire_2] || gd_joy_fire();
+	return gd_keystate[gd_sdl_key_fire_1] || gd_keystate[gd_sdl_key_fire_2] || get_joy_fire();
 }
 
 
@@ -849,83 +973,49 @@ gboolean
 gd_space_or_enter_or_fire()
 {
 	/* set these to zero, so each keypress is reported only once */
-	return gd_joy_fire() || gd_keystate[SDLK_SPACE] || gd_keystate[SDLK_RETURN];
+	return get_joy_fire() || gd_keystate[SDLK_SPACE] || gd_keystate[SDLK_RETURN];
 }
 
 
-
-
-
-
-/*
-	width: width of playfield.
-	visible: visible part. (remember: player_x-x1!)
-
-	center: the coordinates to scroll to.
-	exact: scroll exactly
-	start: start scrolling
-	to: scroll to, if started
-	current
-
-	desired: the function stores its data here
-	speed: the function stores its data here
-*/
-gboolean
-cave_scroll(int width, int visible, int center, gboolean exact, int start, int to, int *current, int *desired, int *speed, int divisor)
+/* process pending events, so presses and releases are applied */
+/* also check for quit event */
+void
+gd_process_pending_events()
 {
-	int i;
-	gboolean changed;
-
-	changed=FALSE;
-
-	/* HORIZONTAL */
-	/* hystheresis function.
-	 * when scrolling left, always go a bit less left than player being at the middle.
-	 * when scrolling right, always go a bit less to the right. */
-	if (width<visible) {
-		*speed=0;
-		*desired=0;
-		if (*current!=0) {
-			*current=0;
-			changed=TRUE;
-		}
-
-		return changed;
-	}
-
-	if (exact)
-		*desired=center;
-	else {
-		if (*current+start<center)
-			*desired=center-to;
-		if (*current-start>center)
-			*desired=center+to;
-	}
-	*desired=CLAMP(*desired, 0, width-visible);
-
-	/* adaptive scrolling speed.
-	 * gets faster with distance.
-	 * minimum speed is 1, to allow scrolling precisely to the desired positions (important at borders).
-	 */
-	if (*speed<ABS(*desired-*current)/divisor+1)
-		(*speed)++;
-	if (*speed>ABS(*desired-*current)/divisor+1)
-		(*speed)--;
-	if (*current < *desired) {
-		for (i=0; i < *speed; i++)
-			if (*current < *desired)
-				(*current)++;
-		changed=TRUE;
-	}
-	if (*current > *desired) {
-		for (i=0; i < *speed; i++)
-			if (*current > *desired)
-				(*current)--;
-		changed=TRUE;
-	}
+	SDL_Event event;
 	
-	return changed;
+	/* process pending events, so presses and releases are applied */
+	while (SDL_PollEvent(&event)) {
+		/* meanwhile, if we receive a quit event, we set the global variable. */
+		if (event.type==SDL_QUIT)
+			gd_quit=TRUE;
+	}
 }
+
+
+
+/* this function waits until SPACE, ENTER and ESCAPE are released */
+void
+gd_wait_for_key_releases()
+{
+	/* wait until the user releases return and escape */
+	while (gd_keystate[SDLK_RETURN]!=0 || gd_keystate[SDLK_ESCAPE]!=0 || gd_keystate[SDLK_SPACE]!=0 || gd_keystate[SDLK_n]!=0 || gd_fire()) {
+		SDL_Event event;
+
+		/* process pending events, so presses and releases are applied */
+		while (SDL_PollEvent(&event)) {
+			/* meanwhile, if we receive a quit event, we set the global variable. */
+			if (event.type==SDL_QUIT)
+				gd_quit=TRUE;
+		}
+		
+		SDL_Delay(50);	/* do not eat cpu */
+	}
+}
+
+
+
+
 
 
 
@@ -949,7 +1039,7 @@ free_cells()
 
 
 static void
-loadcells(SDL_Surface *image)
+loadcells_from_surface(SDL_Surface *image)
 {
 	int i;
 	int pixbuf_cell_size;
@@ -990,7 +1080,7 @@ loadcells(SDL_Surface *image)
 
 /* sets one of the colors in the indexed palette of an sdl surface to a GdColor. */
 static void
-setpalette(SDL_Surface *image, int index, GdColor col)
+surface_setpalette(SDL_Surface *image, int index, GdColor col)
 {
 	SDL_Color c;
 	c.r=gd_color_get_r(col);
@@ -1001,7 +1091,7 @@ setpalette(SDL_Surface *image, int index, GdColor col)
 }
 
 static void
-loadcells_c64(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5)
+loadcells_from_c64_data(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5)
 {
 	const guint8 *gfx;	/* currently used graphics, will point to c64_gfx or c64_custom_gfx */
 	SDL_Surface *image;
@@ -1013,23 +1103,23 @@ loadcells_c64(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColo
 	/* from gfx[1], we have the color data, one byte/pixel. so this is an indexed color image: 8bit/pixel. */
 	image=SDL_CreateRGBSurfaceFrom((void *)(gfx+1), NUM_OF_CELLS_X*(int)gfx[0], NUM_OF_CELLS_Y*(int)gfx[0], 8, NUM_OF_CELLS_X*(int)gfx[0], 0, 0, 0, 0);
 	/* sdl supports paletted images, so this is very easy: */
-	setpalette(image, 0, 0);
-	setpalette(image, 1, c0);
-	setpalette(image, 2, c1);
-	setpalette(image, 3, c2);
-	setpalette(image, 4, c3);
-	setpalette(image, 5, c4);
-	setpalette(image, 6, c5);
-	setpalette(image, 7, 0);
-	setpalette(image, 8, 0);
+	surface_setpalette(image, 0, 0);
+	surface_setpalette(image, 1, c0);
+	surface_setpalette(image, 2, c1);
+	surface_setpalette(image, 3, c2);
+	surface_setpalette(image, 4, c3);
+	surface_setpalette(image, 5, c4);
+	surface_setpalette(image, 6, c5);
+	surface_setpalette(image, 7, 0);
+	surface_setpalette(image, 8, 0);
 
 	/* from here, same as any other image */
-	loadcells(image);
+	loadcells_from_surface(image);
 	SDL_FreeSurface(image);
 }
 
 /* takes a c64_gfx.png-coded 32-bit pixbuf, and creates a paletted pixbuf in our internal format. */
-guchar *
+static guchar *
 c64_gfx_data_from_pixbuf(SDL_Surface *image)
 {
 	int x, y;
@@ -1047,14 +1137,16 @@ c64_gfx_data_from_pixbuf(SDL_Surface *image)
 		guint32 *p=(guint32 *)((char *)image->pixels+y*image->pitch);
 
 		for (x=0; x<image->w; x++) {
-			int r, g, b, a;
+			int r, g, b;
 
 			r=(p[x]&image->format->Rmask) >> image->format->Rshift << image->format->Rloss;
 			g=(p[x]&image->format->Gmask) >> image->format->Gshift << image->format->Gloss;
 			b=(p[x]&image->format->Bmask) >> image->format->Bshift << image->format->Bloss;
-			a=(p[x]&image->format->Amask) >> image->format->Ashift << image->format->Aloss;
-			
-			data[out++]=c64_png_colors(r, g, b, a);
+			/* should be:
+				a=(p[x]&image->format->Amask) >> image->format->Ashift << image->format->Aloss;
+				but we do not use the alpha channel in sdash, so we just use 255 (max alpha)
+			*/
+			data[out++]=c64_png_colors(r, g, b, 255);
 		}
 	}
 	SDL_UnlockSurface(image);
@@ -1088,7 +1180,7 @@ check_if_pixbuf_c64_png(SDL_Surface *image)
 
 /* check if given surface is ok to be a gdash theme. */
 gboolean
-gd_is_surface_ok_for_theme (SDL_Surface *surface)
+gd_is_surface_ok_for_theme(SDL_Surface *surface)
 {
 	if ((surface->w % NUM_OF_CELLS_X != 0) || (surface->h % NUM_OF_CELLS_Y != 0) || (surface->w / NUM_OF_CELLS_X != surface->h / NUM_OF_CELLS_Y)) {
 		g_warning("image should contain %d cells in a row and %d in a column!", NUM_OF_CELLS_X, NUM_OF_CELLS_Y);
@@ -1101,7 +1193,7 @@ gd_is_surface_ok_for_theme (SDL_Surface *surface)
 }
 
 
-/* load theme from bmp file. */
+/* load theme from image file. */
 /* return true if successful. */
 gboolean
 gd_loadcells_file(const char *filename)
@@ -1110,7 +1202,7 @@ gd_loadcells_file(const char *filename)
 
 	/* load cell graphics */
 	/* load from file */
-	surface=SDL_LoadBMP(filename);
+	surface=IMG_Load(filename);
 
 	if (!surface) {
 		g_warning("%s: unable to load image", filename);
@@ -1124,7 +1216,8 @@ gd_loadcells_file(const char *filename)
 	}
 
 	/* convert to 32bit rgba */
-	converted=SDL_CreateRGBSurface(0, surface->w, surface->h, 32, rmask, bmask, gmask, amask);
+	converted=SDL_CreateRGBSurface(0, surface->w, surface->h, 32, rmask, gmask, bmask, amask);	/* 32bits per pixel, but we dont need an alpha channel */
+	SDL_SetAlpha(surface, 0, 0);	/* do not use the alpha blending for the copy */
 	SDL_BlitSurface(surface, NULL, converted, NULL);
 	SDL_FreeSurface(surface);
 
@@ -1138,7 +1231,7 @@ gd_loadcells_file(const char *filename)
 		g_free(c64_custom_gfx);
 		c64_custom_gfx=NULL;
 		using_png_gfx=TRUE;
-		loadcells(converted);
+		loadcells_from_surface(converted);
 	}
 	SDL_FreeSurface(converted);
 	color0=GD_COLOR_INVALID; /* this is an invalid gdash color; so redraw is forced */
@@ -1166,6 +1259,19 @@ gd_load_theme()
 }
 
 
+/* selects built-in graphics */
+void
+gd_loadcells_default()
+{
+	g_free(c64_custom_gfx);
+	c64_custom_gfx=NULL;
+	using_png_gfx=FALSE;
+	/* just to set some default */
+	color0=GD_COLOR_INVALID; /* this is an invalid gdash color; so redraw is forced */
+}
+
+
+
 
 /* C64 FONT HANDLING */
 
@@ -1185,37 +1291,55 @@ static void
 renderfont_color(GdColor color)
 {
 	int j, x, y;
-	guint32 col, black;
+	guint32 col, transparent;
 	SDL_Surface *image, *image_n;
 	SDL_Surface **fn, **fw;
 
 	/* check that we already got an rgb color */	
 	g_assert(gd_color_is_rgb(color));
-	
+
+	/* remove from list and add to the front */		
+	font_color_recently_used=g_list_remove(font_color_recently_used, GUINT_TO_POINTER(color));
+	font_color_recently_used=g_list_prepend(font_color_recently_used, GUINT_TO_POINTER(color));
+
 	/* if already rendered, return now */
 	if (g_hash_table_lookup(font_w, GUINT_TO_POINTER(color)))
 		return;
+
+	/* -------- RENDERING A NEW FONT -------- */
+	/* if storing too many fonts, free the oldest one. */
+	if (g_list_length(font_color_recently_used)>32) {
+		GList *last;
 		
-	fn=g_new0(SDL_Surface *, GD_NUM_OF_CHARS+1);
-	fw=g_new0(SDL_Surface *, GD_NUM_OF_CHARS+1);
+		/* if list too big, remove least recently used */
+		last=g_list_last(font_color_recently_used);
+		g_hash_table_remove(font_w, last->data);
+		g_hash_table_remove(font_n, last->data);
+		font_color_recently_used=g_list_delete_link(font_color_recently_used, last);
+	}
+		
+	fn=g_new0(SDL_Surface *, NUM_OF_CHARS+1);
+	fw=g_new0(SDL_Surface *, NUM_OF_CHARS+1);
 	
 	/* colors data into memory */
-	image=SDL_CreateRGBSurface(0, 16, 8, 32, rmask, gmask, bmask, amask);
-	image_n=SDL_CreateRGBSurface(0, 8, 8, 32, rmask, gmask, bmask, amask);
+	image=SDL_CreateRGBSurface(SDL_SRCALPHA, 16, 8, 32, rmask, gmask, bmask, amask);
+	image_n=SDL_CreateRGBSurface(SDL_SRCALPHA, 8, 8, 32, rmask, gmask, bmask, amask);
 
-	col=rgba_pixel_from_gdcolor(image->format, color, 0xff);
-	black=rgba_pixel_from_gdcolor(image->format, 0, 0xff);
+	col=rgba_pixel_from_gdcolor(image->format, color, SDL_ALPHA_OPAQUE);
+	transparent=rgba_pixel_from_gdcolor(image->format, 0, SDL_ALPHA_TRANSPARENT);	/* color does not matter as totally transparent */
 	
 	/* for all characters */
 	/* render character in "image", then do a displayformat(image) to generate the resulting one */
-	for (j=0; j<GD_NUM_OF_CHARS; j++) {
+	for (j=0; j<NUM_OF_CHARS; j++) {
 		int x1, y1;
 		
 		y1=(j/16)*8;	/* 16 characters in a row */
 		x1=(j%16)*8;
 		
-		SDL_LockSurface(image);
-		SDL_LockSurface(image_n);
+		if (SDL_MUSTLOCK(image))
+			SDL_LockSurface(image);
+		if (SDL_MUSTLOCK(image_n))
+			SDL_LockSurface(image_n);
 		for (y=0; y<8; y++) {
 			guint32 *p=(guint32*) ((char *)image->pixels + y*image->pitch);
 			guint32 *p_n=(guint32*) ((char *)image_n->pixels + y*image_n->pitch);
@@ -1227,24 +1351,25 @@ renderfont_color(GdColor color)
 					p[1]=col;
 					p_n[0]=col;	/* normal */
 				} else {
-					p[0]=black;	/* wide */
-					p[1]=black;
-					p_n[0]=black;	/* normal */
+					p[0]=transparent;	/* wide */
+					p[1]=transparent;
+					p_n[0]=transparent;	/* normal */
 				}
 				p+=2;
 				p_n++;
 			}
 		}
-		SDL_UnlockSurface(image);
-		SDL_UnlockSurface(image_n);
-		fw[j]=displayformat(image);
-		fn[j]=displayformat(image_n);
-		/* small font does not draw black background */
-		SDL_SetColorKey(fn[j], SDL_SRCCOLORKEY, SDL_MapRGB(fn[j]->format, 0, 0, 0));
+		if (SDL_MUSTLOCK(image))
+			SDL_UnlockSurface(image);
+		if (SDL_MUSTLOCK(image_n))
+			SDL_UnlockSurface(image_n);
+		fw[j]=displayformatalpha(image);	/* alpha channel is used! */
+		fn[j]=displayformatalpha(image_n);
 	}
 	SDL_FreeSurface(image);
 	SDL_FreeSurface(image_n);
-	
+
+	/* add newly rendered font to hash table. to the recently used list, it is already added. */	
 	g_hash_table_insert(font_w, GINT_TO_POINTER(color), fw);
 	g_hash_table_insert(font_n, GINT_TO_POINTER(color), fn);
 }
@@ -1256,6 +1381,8 @@ loadfont_buffer()
 	/* forget all previously rendered chars */
 	g_hash_table_remove_all(font_w);
 	g_hash_table_remove_all(font_n);
+	g_list_free(font_color_recently_used);
+	font_color_recently_used=NULL;
 }
 
 
@@ -1263,6 +1390,7 @@ loadfont_buffer()
 void
 gd_loadfont_file(const char *filename)
 {
+	/* not yet implemented */
 	g_assert_not_reached();
 }
 
@@ -1310,10 +1438,11 @@ gd_clear_line(SDL_Surface *screen, int y)
 
 
 
+
 /* function which draws characters on the screen. used internally. */
 /* x=-1 -> center horizontally */
 static int
-gd_blittext_font(SDL_Surface *screen, SDL_Surface **font, int x1, int y, const char *text)
+blittext_font(SDL_Surface *screen, SDL_Surface **font, int x1, int y, const char *text)
 {
 	const char *p=text;
 	SDL_Rect destrect;
@@ -1335,47 +1464,10 @@ gd_blittext_font(SDL_Surface *screen, SDL_Surface **font, int x1, int y, const c
 				y+=font[0]->h;
 			x=x1;
 		} else {
-			/* it is a normal character */
-			if (c==GD_CHECKED_BOX_CHAR)
-				i=CHECKED_BOX_CHAR_INDEX;
-			else
-			if (c==GD_BALL_CHAR)
-				i=BALL_CHAR_INDEX;
-			else
-			if (c==GD_CHECK_MARK_CHAR)
-				i=CHECK_MARK_INDEX;
-			else
-			if (c==GD_PLAYER_CHAR || c==GD_DIAMOND_CHAR || c==GD_UNCHECKED_BOX_CHAR)	/* special, by gdash */
+			if (c<NUM_OF_CHARS)
 				i=c;
 			else
-			if (c==GD_KEY_CHAR)
-				i=92;
-			else
-			if (c=='@')
-				i=0;
-			else
-			if (c>=' ' && c<='Z')	/* from space to Z, petscii=ascii */
-				i=c;
-			else
-			if (c>='a' && c<='z')
-				i=c-'a'+1;
-			else
-			if (c=='\\')
-				i=BACKSLASH_CHAR_INDEX;
-			else
-			if (c=='_')
-				i=UNDERSCORE_CHAR_INDEX;
-			else
-			if (c=='~')
-				i=TILDE_CHAR_INDEX;
-			else
-			if (c=='[')
-				i=OPEN_BRACKET_CHAR_INDEX;
-			else
-			if (c==']')
-				i=CLOSE_BRACKET_CHAR_INDEX;
-			else
-				i=UNKNOWN_CHAR_INDEX;
+				i=127;	/* unknown char */
 			
 			destrect.x=x;
 			destrect.y=y;
@@ -1398,7 +1490,7 @@ gd_blittext(SDL_Surface *screen, int x, int y, GdColor color, const char *text)
 {
 	color=gd_color_get_rgb(color);	/* convert to rgb, so they are stored that way in the hash table */
 	renderfont_color(color);
-	return gd_blittext_font(screen, g_hash_table_lookup(font_w, GUINT_TO_POINTER(color)), x, y, text);
+	return blittext_font(screen, g_hash_table_lookup(font_w, GUINT_TO_POINTER(color)), x, y, text);
 }
 
 /* write something to the screen, with normal characters. */
@@ -1408,7 +1500,7 @@ gd_blittext_n(SDL_Surface *screen, int x, int y, GdColor color, const char *text
 {
 	color=gd_color_get_rgb(color);	/* convert to rgb, so they are stored that way in the hash table */
 	renderfont_color(color);
-	return gd_blittext_font(screen, g_hash_table_lookup(font_n, GUINT_TO_POINTER(color)), x, y, text);
+	return blittext_font(screen, g_hash_table_lookup(font_n, GUINT_TO_POINTER(color)), x, y, text);
 }
 
 /* write something to the screen, with wide characters. */
@@ -1472,22 +1564,218 @@ gd_select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor 
 		color4=c4;
 		color5=c5;
 
-		loadcells_c64(c0, c1, c2, c3, c4, c5);
+		loadcells_from_c64_data(c0, c1, c2, c3, c4, c5);
 	}
 }
 
-/* selects built-in graphics */
-void
-gd_loadcells_default()
+
+
+
+
+
+/*
+	logical_size: logical pixel size of playfield, usually larger than the screen.
+	physical_size: visible part. (remember: player_x-x1!)
+
+	center: the coordinates to scroll to.
+	exact: scroll exactly
+	start: start scrolling if difference is larger than
+	to: scroll to, if started, until difference is smaller than
+	current
+
+	desired: the function stores its data here
+	speed: the function stores its data here
+	
+	cell_size: size of one cell. used to determine if the play field is only a slightly larger than the screen, in that case no scrolling is desirable
+*/
+static gboolean
+cave_scroll(int logical_size, int physical_size, int center, gboolean exact, int start, int to, int *current, int *desired, int speed, int cell_size)
 {
-	g_free(c64_custom_gfx);
-	c64_custom_gfx=NULL;
-	using_png_gfx=FALSE;
-	/* just to set some default */
-	color0=GD_COLOR_INVALID; /* this is an invalid gdash color; so redraw is forced */
+	int i;
+	gboolean changed;
+	int max;
+	
+	max=logical_size-physical_size;
+	if (max<0)
+		max=0;
+
+	changed=FALSE;
+
+	/* if cave size smaller than the screen, no scrolling req'd */
+	if (logical_size<physical_size) {
+		*desired=0;
+		if (*current!=0) {
+			*current=0;
+			changed=TRUE;
+		}
+
+		return changed;
+	}
+	
+	/* if cave size is only a slightly larger than the screen, also no scrolling */
+	if (logical_size<=physical_size+cell_size) {
+		*desired=max/2;	/* scroll to the middle of the cell */
+	} else {
+		/* hystheresis function.
+		 * when scrolling left, always go a bit less left than player being at the middle.
+		 * when scrolling right, always go a bit less to the right. */
+		if (exact)
+			*desired=center;
+		else {
+			if (*current+start<center)
+				*desired=center-to;
+			if (*current-start>center)
+				*desired=center+to;
+		}
+	}
+	*desired=gd_clamp(*desired, 0, max);
+
+	if (*current<*desired) {
+		for (i=0; i<speed; i++)
+			if (*current<*desired)
+				(*current)++;
+		changed=TRUE;
+	}
+	if (*current > *desired) {
+		for (i=0; i<speed; i++)
+			if (*current>*desired)
+				(*current)--;
+		changed=TRUE;
+	}
+	
+	return changed;
 }
 
+
+
+
+
+/* just set current viewport to upper left. */
+void
+gd_scroll_to_origin()
+{
+	scroll_x=0;
+	scroll_y=0;
+}
+
+
+/* SCROLLING
+ *
+ * scrolls to the player during game play.
+ * called by drawcave
+ * returns true, if player is not visible-ie it is out of the visible size in the drawing area.
+ */
+gboolean
+gd_scroll(GdGame *game, gboolean exact_scroll)
+{
+	static int scroll_desired_x=0, scroll_desired_y=0;
+	gboolean out_of_window;
+	int player_x, player_y, visible_x, visible_y;
+	gboolean changed;
+	int scroll_divisor;
+	/* max scrolling speed depends on the speed of the cave. */
+	/* game moves cell_size_game* 1s/cave time pixels in a second. */
+	/* scrolling moves scroll speed * 1s/scroll_time in a second. */
+	/* these should be almost equal; scrolling speed a little slower. */
+	/* that way, the player might reach the border with a small probability, */
+	/* but the scrolling will not "oscillate", ie. turn on for little intervals as it has */
+	/* caught up with the desired position. smaller is better. */
+	int scroll_speed=cell_size*(gd_fine_scroll?20:40)/game->cave->speed;
+	
+	player_x=game->cave->player_x-game->cave->x1;	/* cell coordinates of player */
+	player_y=game->cave->player_y-game->cave->y1;
+	visible_x=(game->cave->x2-game->cave->x1+1)*cell_size;	/* pixel size of visible part of the cave (may be smaller in intermissions) */
+	visible_y=(game->cave->y2-game->cave->y1+1)*cell_size;
+
+	/* cell_size contains the scaled size, but we need the original. */
+	changed=FALSE;
+	/* some sort of scrolling speed. with larger cells, the divisor must be smaller, so the scrolling faster. */
+	scroll_divisor=256/cell_size;
+	if (gd_fine_scroll)
+		scroll_divisor*=2;	/* as fine scrolling is 50hz, whereas normal is 25hz only */
+
+	if (cave_scroll(visible_x, play_area_w, player_x*cell_size+cell_size/2-play_area_w/2, exact_scroll, play_area_w/4, play_area_w/8, &scroll_x, &scroll_desired_x, scroll_speed, cell_size))
+		changed=TRUE;
+	if (cave_scroll(visible_y, play_area_h, player_y*cell_size+cell_size/2-play_area_h/2, exact_scroll, play_area_h/5, play_area_h/10, &scroll_y, &scroll_desired_y, scroll_speed, cell_size))
+		changed=TRUE;
+	
+	/* if scrolling, we should update entire gd_screen. */
+	if (changed) {
+		int x, y;
+		
+		for (y=0; y<game->cave->h; y++)
+			for (x=0; x<game->cave->w; x++)
+				game->gfx_buffer[y][x] |= GD_REDRAW;
+	}
+
+	/* check if active player is visible at the moment. */
+	out_of_window=FALSE;
+	/* check if active player is outside drawing area. if yes, we should wait for scrolling */
+	if ((player_x*cell_size)<scroll_x || (player_x*cell_size+cell_size-1)>scroll_x+play_area_w)
+		/* but only do the wait, if the player SHOULD BE visible, ie. he is inside the defined visible area of the cave */
+		if (game->cave->player_x>=game->cave->x1 && game->cave->player_x<=game->cave->x2)
+			out_of_window=TRUE;
+	if ((player_y*cell_size)<scroll_y || (player_y*cell_size+cell_size-1)>scroll_y+play_area_h)
+		/* but only do the wait, if the player SHOULD BE visible, ie. he is inside the defined visible area of the cave */
+		if (game->cave->player_y>=game->cave->y1 && game->cave->player_y<=game->cave->y2)
+			out_of_window=TRUE;
+
+	/* if not yet born, we treat as visible. so cave will run. the user is unable to control an unborn player, so this is the right behaviour. */
+	if (game->cave->player_state==GD_PL_NOT_YET)
+		return FALSE;
+	return out_of_window;
+}
+
+
+
+
+int
+gd_drawcave(SDL_Surface *dest, GdGame *game)
+{
+	int x, y, xd, yd;
+	SDL_Rect cliprect;
+	int scroll_y_aligned;
+
+	/* on-screen clipping rectangle */
+	cliprect.x=0;
+	cliprect.y=gd_statusbar_height;
+	cliprect.w=play_area_w;
+	cliprect.h=play_area_h;
+	SDL_SetClipRect(dest, &cliprect);
+
+	/* for the paused parameter, we set FALSE here, as the sdl version does not color the playfield when paused */
+	if (gd_sdl_pal_emulation && gd_even_line_pal_emu_vertical_scroll)
+		/* make it even (dividable by two) */
+		scroll_y_aligned=scroll_y/2*2;
+	else
+		scroll_y_aligned=scroll_y;
+	/* here we draw all cells to be redrawn. we do not take scrolling area into consideration - sdl will do the clipping. */
+	for (y=game->cave->y1, yd=0; y<=game->cave->y2; y++, yd++) {
+		for (x=game->cave->x1, xd=0; x<=game->cave->x2; x++, xd++) {
+			if (game->gfx_buffer[y][x] & GD_REDRAW) {	/* if it needs to be redrawn */
+				SDL_Rect offset;
+
+				offset.y=y*cell_size+gd_statusbar_height-scroll_y_aligned;	/* sdl_blitsurface destroys offset, so we have to set y here, too. (ie. in every iteration) */
+				offset.x=x*cell_size-scroll_x;
+
+				game->gfx_buffer[y][x]=game->gfx_buffer[y][x] & ~GD_REDRAW;	/* now we have drawn it */
+
+				SDL_BlitSurface(cells[game->gfx_buffer[y][x]], NULL, dest, &offset);
+			}
+		}
+	}
+
+	/* restore clipping to whole screen */
+	SDL_SetClipRect(dest, NULL);
+	return 0;
+}
+
+
+
+
+
 /* the dark gray background */
+/* to be called at application startup */
 void
 gd_create_dark_background()
 {
@@ -1499,7 +1787,7 @@ gd_create_dark_background()
 	if (dark_background)
 		SDL_FreeSurface(dark_background);
 
-	tile=surface_from_gdk_pixbuf_data((guint32 *) gdash_tile);
+	tile=surface_from_raw_data(gdash_tile, sizeof(gdash_tile));
 	/* 24bpp, as it has no alpha channel */
 	dark_tile=SDL_CreateRGBSurface(0, tile->w, tile->h, 24, 0, 0, 0, 0);
 	SDL_BlitSurface(tile, NULL, dark_tile, NULL);
@@ -1524,6 +1812,11 @@ gd_create_dark_background()
 	SDL_FreeSurface(dark_screen_tiled);
 }
 
+void
+gd_dark_screen()
+{
+	SDL_BlitSurface(dark_background, NULL, gd_screen, NULL);
+}
 
 
 /*
@@ -1586,158 +1879,4 @@ gd_restore_screen()
 }
 
 
-
-/* process pending events, so presses and releases are applied */
-/* also check for quit event */
-void
-gd_process_pending_events()
-{
-	SDL_Event event;
-	
-	/* process pending events, so presses and releases are applied */
-	while (SDL_PollEvent(&event)) {
-		/* meanwhile, if we receive a quit event, we set the global variable. */
-		if (event.type==SDL_QUIT)
-			gd_quit=TRUE;
-	}
-}
-
-
-
-/* this function waits until SPACE, ENTER and ESCAPE are released */
-void
-gd_wait_for_key_releases()
-{
-	/* wait until the user releases return and escape */
-	while (gd_keystate[SDLK_RETURN]!=0 || gd_keystate[SDLK_ESCAPE]!=0 || gd_keystate[SDLK_SPACE]!=0 || gd_keystate[SDLK_n]!=0 || gd_fire()) {
-		SDL_Event event;
-
-		/* process pending events, so presses and releases are applied */
-		while (SDL_PollEvent(&event)) {
-			/* meanwhile, if we receive a quit event, we set the global variable. */
-			if (event.type==SDL_QUIT)
-				gd_quit=TRUE;
-		}
-		
-		SDL_Delay(50);	/* do not eat cpu */
-	}
-}
-
-
-
-
-
-
-
-
-
-/* just set current viewport to upper left. */
-void
-gd_scroll_to_origin()
-{
-	scroll_x=0;
-	scroll_y=0;
-}
-
-
-/* SCROLLING
- *
- * scrolls to the player during game play.
- * called by drawcave
- * returns true, if player is not visible-ie it is out of the visible size in the drawing area.
- */
-gboolean
-gd_scroll(const Cave *cave, gboolean exact_scroll)
-{
-	static int scroll_desired_x=0, scroll_desired_y=0;
-	static int scroll_speed_x=0, scroll_speed_y=0;
-	gboolean out_of_window;
-	int player_x, player_y, visible_x, visible_y;
-	gboolean changed;
-	int scroll_divisor;
-
-	player_x=cave->player_x-cave->x1;	/* cell coordinates of player */
-	player_y=cave->player_y-cave->y1;
-	visible_x=(cave->x2-cave->x1+1)*cell_size;	/* pixel size of visible part of the cave (may be smaller in intermissions) */
-	visible_y=(cave->y2-cave->y1+1)*cell_size;
-
-	changed=FALSE;
-	scroll_divisor=12;	/* some sort of scrolling speed */
-	if (gd_fine_scroll)
-		scroll_divisor*=2;	/* as fine scrolling is 50hz, whereas normal is 25hz only */
-	if (cave_scroll(visible_x, play_area_w, player_x*cell_size+cell_size/2-play_area_w/2, exact_scroll, play_area_w/4, play_area_w/8, &scroll_x, &scroll_desired_x, &scroll_speed_x, scroll_divisor))
-		changed=TRUE;
-	if (cave_scroll(visible_y, play_area_h, player_y*cell_size+cell_size/2-play_area_h/2, exact_scroll, play_area_h/4, play_area_h/8, &scroll_y, &scroll_desired_y, &scroll_speed_y, scroll_divisor))
-		changed=TRUE;
-	
-	/* if scrolling, we should update entire gd_screen. */
-	if (changed) {
-		int x, y;
-		
-		for (y=0; y<gd_gameplay.cave->h; y++)
-			for (x=0; x<gd_gameplay.cave->w; x++)
-				gd_gameplay.gfx_buffer[y][x] |= GD_REDRAW;
-	}
-
-	/* check if active player is visible at the moment. */
-	out_of_window=FALSE;
-	/* check if active player is outside drawing area. if yes, we should wait for scrolling */
-	if ((player_x*cell_size)<scroll_x || (player_x*cell_size+cell_size-1)>scroll_x+play_area_w)
-		/* but only do the wait, if the player SHOULD BE visible, ie. he is inside the defined visible area of the cave */
-		if (cave->player_x>=cave->x1 && cave->player_x<=cave->x2)
-			out_of_window=TRUE;
-	if ((player_y*cell_size)<scroll_y || (player_y*cell_size+cell_size-1)>scroll_y+play_area_h)
-		/* but only do the wait, if the player SHOULD BE visible, ie. he is inside the defined visible area of the cave */
-		if (cave->player_y>=cave->y1 && cave->player_y<=cave->y2)
-			out_of_window=TRUE;
-
-	/* if not yet born, we treat as visible. so cave will run. the user is unable to control an unborn player, so this is the right behaviour. */
-	if (cave->player_state==GD_PL_NOT_YET)
-		return FALSE;
-	return out_of_window;
-}
-
-
-
-
-int
-gd_drawcave(SDL_Surface *dest, const Cave *cave, int **gfx_buffer)
-{
-	int x, y, xd, yd;
-	SDL_Rect cliprect;
-	int scroll_y_aligned;
-
-	/* on-screen clipping rectangle */
-	cliprect.x=0;
-	cliprect.y=statusbar_height;
-	cliprect.w=play_area_w;
-	cliprect.h=play_area_h;
-	SDL_SetClipRect(dest, &cliprect);
-
-	/* for the paused parameter, we set FALSE here, as the sdl version does not color the playfield when paused */
-	if (gd_sdl_pal_emulation && gd_even_line_pal_emu_vertical_scroll)
-		/* make it even (dividable by two) */
-		scroll_y_aligned=scroll_y/2*2;
-	else
-		scroll_y_aligned=scroll_y;
-	/* here we draw all cells to be redrawn. we do not take scrolling area into consideration - sdl will do the clipping. */
-	for (y=cave->y1, yd=0; y<=cave->y2; y++, yd++) {
-		for (x=cave->x1, xd=0; x<=cave->x2; x++, xd++) {
-			if (gd_gameplay.gfx_buffer[y][x] & GD_REDRAW) {	/* if it needs to be redrawn */
-				SDL_Rect offset;
-
-				offset.y=y*cell_size+statusbar_height-scroll_y_aligned;	/* sdl_blitsurface destroys offset, so we have to set y here, too. (ie. in every iteration) */
-				offset.x=x*cell_size-scroll_x;
-
-				gd_gameplay.gfx_buffer[y][x]=gd_gameplay.gfx_buffer[y][x] & ~GD_REDRAW;	/* now we have drawn it */
-
-				SDL_BlitSurface(cells[gfx_buffer[y][x]], NULL, dest, &offset);
-			}
-		}
-	}
-
-	/* restore clipping to whole screen */
-	SDL_SetClipRect(dest, NULL);
-	return 0;
-}
 

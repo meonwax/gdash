@@ -26,7 +26,7 @@ CaveTime=999 999 999 999 999
 CaveScheduling=ms
 PALTiming=true
 CaveDelay=0 0 0 0 0
-FrameTime=65 65 65 65 65
+FrameTime=100 100 100 100 100
 DummyProperties.diamondcollector=true
 DummyProperties.destructable=false
 DummyProperties.penalty=true
@@ -43,7 +43,7 @@ AcidProperties=DIRT 0.1000
 EnemyDirectionProperties.changeathatching=true
 BorderProperties.lineshift=true
 ShortExplosions=false
-Notes=Notes for the cave 'Voodoo'.\n\n\t\t/* dynamic string: split to lines */\n\t\tif (prop_desc[i].type==GD_TYPE_DYNSTRING) {\n\t\t\tchar *text=G_STRUCT_MEMBER(char *, str, prop_desc[i].offset);\n\t\t\tchar **lines;\n\t\t\tint j;\n\n\t\t\tif (!text || g_str_equal(text, \"\"))\n\t\t\t\tcontinue;\n\t\t\tlines=g_strsplit_set(text, \"\\n\", -1);\n\t\t\tfor (j=0; lines[j]!=NULL; j++)\n\t\t\t\tg_ptr_array_add(out, g_strdup_printf(\"%s=%s\", prop_desc[i].identifier, lines[j]));\n\t\t\tg_strfreev(lines);\n\t\t}\n
+Notes=Notes for the cave 'Voodoo'.\n\n  /* dynamic string: split to lines */\n  if (prop_desc[i].type==GD_TYPE_DYNSTRING) {\n   char *text=G_STRUCT_MEMBER(char *, str, prop_desc[i].offset);\n   char **lines;\n   int j;\n\n   if (!text || g_str_equal(text, \"\"))\n    continue;\n   lines=g_strsplit_set(text, \"\\n\", -1);\n   for (j=0; lines[j]!=NULL; j++)\n    g_ptr_array_add(out, g_strdup_printf(\"%s=%s\", prop_desc[i].identifier, lines[j]));\n   g_strfreev(lines);\n  }\n
 
 [objects]
 Point=3 4 INBOX

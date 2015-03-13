@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -247,7 +247,7 @@ gd_sound_init()
 }
 
 void
-gd_no_sound()
+gd_sound_off()
 {
 #ifdef GD_SOUND
 	int i;
@@ -262,7 +262,7 @@ gd_no_sound()
 }
 
 void
-gd_play_bonus_life_sound()
+gd_sound_play_bonus_life()
 {
 #ifdef GD_SOUND
 	if (!mixer_started || !gd_sdl_sound)
@@ -332,7 +332,7 @@ play_sounds(GdSound sound1, GdSound sound2, GdSound sound3)
 }
 
 void
-gd_cave_play_sounds(Cave *cave)
+gd_sound_play_cave(GdCave *cave)
 {
 	play_sounds(cave->sound1, cave->sound2, cave->sound3);
 }
@@ -385,7 +385,8 @@ gd_music_play_random()
 		return;
 	
 	music=Mix_LoadMUS(g_ptr_array_index(music_filenames, g_random_int_range(0, music_filenames->len)));
-	
+	if (!music)
+		g_warning("%s", SDL_GetError());
 	if (music)
 		Mix_PlayMusic(music, -1);
 #endif

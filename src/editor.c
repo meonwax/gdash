@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,6 +17,7 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 #include <gtk/gtk.h>
+#include "gfxutil.h"
 #include "cave.h"
 #include "cavedb.h"
 #include "c64import.h"
@@ -38,22 +39,22 @@ static GtkWidget *caveset_popup, *object_list_popup, *drawing_area_popup, *level
 static GtkActionGroup *actions, *actions_edit_tools, *actions_edit_cave, *actions_edit_caveset, *actions_edit_map,
 	*actions_edit_random, *actions_edit_object, *actions_edit_one_object, *actions_cave_selector, *actions_toggle,
 	*actions_clipboard_paste, *actions_edit_undo, *actions_edit_redo, *actions_clipboard;
-GtkWidget *editor_window;
+GtkWidget *gd_editor_window;
 
-static int action;	/**< activated edit tool, like move, plot, line... can be a gdobject, or there are other indexes which have meanings. */
-static int edit_level; /**< level shown in the editor... does not really affect editing */
+static int action;	/* activated edit tool, like move, plot, line... can be a gdobject, or there are other indexes which have meanings. */
+static int edit_level; /* level shown in the editor... does not really affect editing */
 
-static int clicked_x, clicked_y, mouse_x, mouse_y;	/**< variables for mouse movement handling */
-static gboolean button1_clicked;	/**< true if we got button1 press event, then set to false on release */
+static int clicked_x, clicked_y, mouse_x, mouse_y;	/* variables for mouse movement handling */
+static gboolean button1_clicked;	/* true if we got button1 press event, then set to false on release */
 
 static GList *undo_caves=NULL, *redo_caves=NULL;
 static gboolean undo_move_flag=FALSE;	/* this is set to false when the mouse is clicked. on any movement, undo is saved and set to true */
 
-static Cave *edited_cave;	/**< cave data actually edited in the editor */
-static Cave *rendered_cave;	/**< a cave with all objects rendered, and to be drawn */
+static GdCave *edited_cave;	/* cave data actually edited in the editor */
+static GdCave *rendered_cave;	/* a cave with all objects rendered, and to be drawn */
 
-static GList *object_clipboard=NULL;	/**< cave object clipboard. */
-static GList *cave_clipboard=NULL;	/**< copied caves */
+static GList *object_clipboard=NULL;	/* cave object clipboard. */
+static GList *cave_clipboard=NULL;	/* copied caves */
 
 
 static GtkWidget *scroll_window, *scroll_window_objects;
@@ -64,14 +65,14 @@ static GtkWidget *label_coordinate, *label_object, *label_first_element, *label_
 static GHashTable *cave_pixbufs;
 
 static int **gfx_buffer;
-static gboolean **object_highlight;
+static gboolean **object_highlight_map;
 
 static GtkListStore *object_list;
-static GtkWidget *object_tree_view;
+static GtkWidget *object_list_tree_view;
 static GList *selected_objects=NULL;
 
 /* objects index */
-enum {
+enum _object_list_columns {
 	INDEX_COLUMN,
 	LEVELS_PIXBUF_COLUMN,
 	TYPE_PIXBUF_COLUMN,
@@ -83,7 +84,7 @@ enum {
 };
 
 /* cave index */
-enum {
+enum _cave_icon_view_columns {
 	CAVE_COLUMN,
 	NAME_COLUMN,
 	PIXBUF_COLUMN,
@@ -100,19 +101,19 @@ static GtkRadioActionEntry action_objects[]={
 	{"Move", GD_ICON_EDITOR_MOVE, N_("_Move"), "F1", N_("Move object"), MOVE},
 	
 	/********** the order of these real cave object should be the same as the GdObject enum ***********/
-	{"Plot", GD_ICON_EDITOR_POINT, N_("_Point"), "F2", N_("Draw single element"), POINT},
-	{"Line", GD_ICON_EDITOR_LINE, N_("_Line"), "F4", N_("Draw line of elements"), LINE},
-	{"Rectangle", GD_ICON_EDITOR_RECTANGLE, N_("_Outline"), "F5", N_("Draw rectangle outline"), RECTANGLE},
-	{"FilledRectangle", GD_ICON_EDITOR_FILLRECT, N_("R_ectangle"), "F6", N_("Draw filled rectangle"), FILLED_RECTANGLE},
-	{"Raster", GD_ICON_EDITOR_RASTER, N_("Ra_ster"), NULL, N_("Draw raster"), RASTER},
-	{"Join", GD_ICON_EDITOR_JOIN, N_("_Join"), NULL, N_("Draw join"), JOIN},
-	{"FloodFillReplace", GD_ICON_EDITOR_FILL_REPLACE, N_("_Flood fill"), NULL, N_("Fill by replacing elements"), FLOODFILL_REPLACE},
-	{"FloodFillBorder", GD_ICON_EDITOR_FILL_BORDER, N_("_Boundary fill"), NULL, N_("Fill a closed area"), FLOODFILL_BORDER},
-	{"Maze", GD_ICON_EDITOR_MAZE, N_("Ma_ze"), NULL, N_("Draw maze"), MAZE},
-	{"UnicursalMaze", GD_ICON_EDITOR_MAZE_UNI, N_("U_nicursal maze"), NULL, N_("Draw unicursal maze"), MAZE_UNICURSAL},
-	{"BraidMaze", GD_ICON_EDITOR_MAZE_BRAID, N_("Bra_id maze"), NULL, N_("Draw braid maze"), MAZE_BRAID},
-	{"RandomFill", GD_ICON_RANDOM_FILL, N_("R_andom fill"), NULL, N_("Draw random elements"), RANDOM_FILL},
-	{"CopyPaste", GTK_STOCK_COPY, N_("_Copy and Paste"), "" /* not null or it would use ctrl+c hotkey */, N_("Copy and paste area"), COPY_PASTE},
+	{"Plot", GD_ICON_EDITOR_POINT, N_("_Point"), "F2", N_("Draw single element"), GD_POINT},
+	{"Line", GD_ICON_EDITOR_LINE, N_("_Line"), "F4", N_("Draw line of elements"), GD_LINE},
+	{"Rectangle", GD_ICON_EDITOR_RECTANGLE, N_("_Outline"), "F5", N_("Draw rectangle outline"), GD_RECTANGLE},
+	{"FilledRectangle", GD_ICON_EDITOR_FILLRECT, N_("R_ectangle"), "F6", N_("Draw filled rectangle"), GD_FILLED_RECTANGLE},
+	{"Raster", GD_ICON_EDITOR_RASTER, N_("Ra_ster"), NULL, N_("Draw raster"), GD_RASTER},
+	{"Join", GD_ICON_EDITOR_JOIN, N_("_Join"), NULL, N_("Draw join"), GD_JOIN},
+	{"FloodFillReplace", GD_ICON_EDITOR_FILL_REPLACE, N_("_Flood fill"), NULL, N_("Fill by replacing elements"), GD_FLOODFILL_REPLACE},
+	{"FloodFillBorder", GD_ICON_EDITOR_FILL_BORDER, N_("_Boundary fill"), NULL, N_("Fill a closed area"), GD_FLOODFILL_BORDER},
+	{"Maze", GD_ICON_EDITOR_MAZE, N_("Ma_ze"), NULL, N_("Draw maze"), GD_MAZE},
+	{"UnicursalMaze", GD_ICON_EDITOR_MAZE_UNI, N_("U_nicursal maze"), NULL, N_("Draw unicursal maze"), GD_MAZE_UNICURSAL},
+	{"BraidMaze", GD_ICON_EDITOR_MAZE_BRAID, N_("Bra_id maze"), NULL, N_("Draw braid maze"), GD_MAZE_BRAID},
+	{"RandomFill", GD_ICON_RANDOM_FILL, N_("R_andom fill"), NULL, N_("Draw random elements"), GD_RANDOM_FILL},
+	{"CopyPaste", GTK_STOCK_COPY, N_("_Copy and Paste"), "" /* not null or it would use ctrl+c hotkey */, N_("Copy and paste area"), GD_COPY_PASTE},
 	/* end of real cave objects */
 	
 	{"Freehand", GD_ICON_EDITOR_FREEHAND, N_("F_reehand"), "F3", N_("Draw freely"), FREEHAND},
@@ -121,9 +122,10 @@ static GtkRadioActionEntry action_objects[]={
 
 
 /* forward function declarations */
-static void select_cave_for_edit(Cave *);
+static void select_cave_for_edit(GdCave *);
 static void select_tool(int tool);
-
+static void render_cave();
+static void object_properties(GdObject *object);
 
 
 
@@ -176,7 +178,7 @@ object_list_select_object_func (GtkTreeModel *model, GtkTreePath *path, GtkTreeI
 
 	gtk_tree_model_get (model, iter, POINTER_COLUMN, &object, -1);
 	if (object==data) {
-		gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (object_tree_view)), iter);
+		gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (object_list_tree_view)), iter);
 		return TRUE;
 	}
 	return FALSE;
@@ -190,7 +192,7 @@ object_list_unselect_object_func (GtkTreeModel *model, GtkTreePath *path, GtkTre
 
 	gtk_tree_model_get (model, iter, POINTER_COLUMN, &object, -1);
 	if (object==data) {
-		gtk_tree_selection_unselect_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (object_tree_view)), iter);
+		gtk_tree_selection_unselect_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (object_list_tree_view)), iter);
 		return TRUE;
 	}
 	return FALSE;
@@ -201,20 +203,20 @@ object_list_clear_selection()
 {
 	GtkTreeSelection *selection;
 
-	selection=gtk_tree_view_get_selection(GTK_TREE_VIEW(object_tree_view));
+	selection=gtk_tree_view_get_selection(GTK_TREE_VIEW(object_list_tree_view));
 	gtk_tree_selection_unselect_all(selection);
 }
 
 static void
 object_list_add_to_selection(GdObject *object)
 {
-	gtk_tree_model_foreach (GTK_TREE_MODEL (object_list), (GtkTreeModelForeachFunc) object_list_select_object_func, object);
+	gtk_tree_model_foreach(GTK_TREE_MODEL (object_list), (GtkTreeModelForeachFunc) object_list_select_object_func, object);
 }
 
 static void
 object_list_remove_from_selection(GdObject *object)
 {
-	gtk_tree_model_foreach (GTK_TREE_MODEL (object_list), (GtkTreeModelForeachFunc) object_list_unselect_object_func, object);
+	gtk_tree_model_foreach(GTK_TREE_MODEL (object_list), (GtkTreeModelForeachFunc) object_list_unselect_object_func, object);
 }
 
 static void
@@ -237,7 +239,7 @@ object_list_selection_changed_signal (GtkTreeSelection *selection, gpointer data
 	selected_objects=NULL;
 
 	/* check all selected objects, and set all selected objects to highlighted */
-	selected_rows=gtk_tree_selection_get_selected_rows(gtk_tree_view_get_selection(GTK_TREE_VIEW(object_tree_view)), &model);
+	selected_rows=gtk_tree_selection_get_selected_rows(gtk_tree_view_get_selection(GTK_TREE_VIEW(object_list_tree_view)), &model);
 	for (siter=selected_rows; siter!=NULL; siter=siter->next) {
 		GtkTreePath *path=siter->data;
 		GtkTreeIter iter;
@@ -253,7 +255,7 @@ object_list_selection_changed_signal (GtkTreeSelection *selection, gpointer data
 	/* object highlight all to false */
 	for (y=0; y<rendered_cave->h; y++)
 		for (x=0; x<rendered_cave->w; x++)
-			object_highlight[y][x]=FALSE;
+			object_highlight_map[y][x]=FALSE;
 	
 	/* check all selected objects, and set all selected objects to highlighted */
 	for (siter=selected_objects; siter!=NULL; siter=siter->next) {
@@ -262,7 +264,7 @@ object_list_selection_changed_signal (GtkTreeSelection *selection, gpointer data
 		for (y=0; y<rendered_cave->h; y++)
 			for (x=0; x<rendered_cave->w; x++)
 				if (rendered_cave->objects_order[y][x]==object)
-					object_highlight[y][x]=TRUE;
+					object_highlight_map[y][x]=TRUE;
 		
 	}
 	
@@ -283,7 +285,7 @@ object_list_selection_changed_signal (GtkTreeSelection *selection, gpointer data
 		char *text;
 		GdObject *object=object_list_first_selected();
 
-		text=gd_get_object_description_markup (object);	/* to be g_freed */
+		text=gd_object_get_description_markup (object);	/* to be g_freed */
 		gtk_label_set_markup (GTK_LABEL (label_object), text);
 		g_free (text);
 	}
@@ -294,14 +296,14 @@ object_list_selection_changed_signal (GtkTreeSelection *selection, gpointer data
 
 /* for popup menu, by properties key */
 static void
-object_tree_view_popup_menu(GtkWidget *widget, gpointer data)
+object_list_show_popup_menu(GtkWidget *widget, gpointer data)
 {
 	gtk_menu_popup(GTK_MENU(object_list_popup), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
 }
 
 /* for popup menu, by right-click */
 static gboolean
-object_tree_view_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer data)
+object_list_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
 	if (event->type==GDK_BUTTON_PRESS && event->button==3) {
 		gtk_menu_popup(GTK_MENU(object_list_popup), NULL, NULL, NULL, NULL, event->button, event->time);
@@ -309,6 +311,78 @@ object_tree_view_button_press_event(GtkWidget *widget, GdkEventButton *event, gp
 	}
 	return FALSE;
 }
+
+/*******
+ * SIGNALS which are used when the object list is reordered by drag and drop.
+ *
+ * non-trivial.
+ * drag and drop emits the following signals: insert, changed, and delete.
+ * so there is a moment when the reordered row has TWO copies in the model.
+ * therefore we cannot use the changed signal to see the new order.
+ *
+ * we also cannot use the delete signal on its own, as it is also emitted when
+ * rendering the cave.
+ *
+ * instead, we connect to the changed and the delete signal. we have a flag,
+ * named "rowchangedbool", which is set to true by the changed signal, and
+ * therefore we know that the next delete signal is emitted by a reordering.
+ * at that point, we have the new order, and _AFTER_ resetting the flag,
+ * we rerender the cave. */
+static gboolean object_list_row_changed_bool=FALSE;
+
+static void
+object_list_row_changed(GtkTreeModel *model, GtkTreePath *changed_path, GtkTreeIter *changed_iter, gpointer user_data)
+{
+	/* set the flag so we know that the next delete signal is emitted by a drag-and-drop */
+	object_list_row_changed_bool=TRUE;
+}
+
+static gboolean
+object_list_new_order_func(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
+{
+	GList **list=(GList **)data;
+	GdObject *object;
+	
+	gtk_tree_model_get(model, iter, POINTER_COLUMN, &object, -1);
+	*list=g_list_append(*list, object);
+	
+	return FALSE;	/* continue traversing */
+}
+
+static void
+object_list_row_delete(GtkTreeModel *model, GtkTreePath *changed_path, gpointer user_data)
+{
+	if (object_list_row_changed_bool) {
+		GList *new_order=NULL;
+
+		/* reset the flag, as we handle the reordering here. */
+		object_list_row_changed_bool=FALSE;
+		
+		/* this will build the new object order to the list */
+		gtk_tree_model_foreach(model, object_list_new_order_func, &new_order);
+		
+		g_list_free(edited_cave->objects);
+		edited_cave->objects=new_order;
+
+		render_cave();
+	}
+}
+
+/* row activated - set properties of object */
+static void
+object_list_row_activated(GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data)
+{
+	GtkTreeModel *model=gtk_tree_view_get_model(tree_view);
+	GtkTreeIter iter;
+	GdObject *object;
+	
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_get(model, &iter, POINTER_COLUMN, &object, -1);
+	object_properties(object);
+	/* render cave after changing object properties */
+	render_cave();
+}
+
 
 
 
@@ -325,7 +399,7 @@ object_tree_view_button_press_event(GtkWidget *widget, GdkEventButton *event, gp
 static void
 help_cb(GtkWidget *widget, gpointer data)
 {
-	gd_show_editor_help (editor_window);
+	gd_show_editor_help (gd_editor_window);
 }
 
 
@@ -338,7 +412,7 @@ help_cb(GtkWidget *widget, gpointer data)
  */
 
 static void
-redo_free()
+redo_free_all()
 {
 	g_list_foreach(redo_caves, (GFunc) gd_cave_free, NULL);
 	g_list_free(redo_caves);
@@ -347,9 +421,9 @@ redo_free()
 
 /* delete the cave copies saved for undo. */
 static void
-undo_free()
+undo_free_all()
 {
-	redo_free();
+	redo_free_all();
 	g_list_foreach(undo_caves, (GFunc) gd_cave_free, NULL);
 	g_list_free(undo_caves);
 	undo_caves=NULL;
@@ -365,7 +439,7 @@ undo_save_current_state()
 	while (g_list_length(undo_caves) >= UNDO_STEPS) {
 		gpointer deleted=g_list_first(undo_caves)->data;
 		
-		gd_cave_free((Cave *)deleted);
+		gd_cave_free((GdCave *)deleted);
 		undo_caves=g_list_remove(undo_caves, deleted);
 	}
 	
@@ -387,7 +461,7 @@ undo_save()
 	g_hash_table_remove(cave_pixbufs, edited_cave);
 	
 	undo_save_current_state();
-	redo_free();	
+	redo_free_all();	
 	
 	/* now we have a cave to do an undo from, so sensitize the menu item */
 	gtk_action_group_set_sensitive (actions_edit_undo, TRUE);
@@ -395,12 +469,12 @@ undo_save()
 }
 
 static void
-do_undo()
+undo_do_one_step()
 {
-	Cave *backup;
+	GdCave *backup;
 
 	/* revert to last in list */
-	backup=(Cave *)g_list_last(undo_caves)->data;
+	backup=(GdCave *)g_list_last(undo_caves)->data;
 	
 	/* push current to redo list. we do not check the redo list size, as the undo size limits it automatically... */
 	redo_caves=g_list_prepend(redo_caves, gd_cave_new_from_cave(edited_cave));
@@ -421,14 +495,14 @@ undo_cb(GtkWidget *widget, gpointer data)
 	g_return_if_fail(undo_caves!=NULL);
 	g_return_if_fail(edited_cave!=NULL);
 	
-	do_undo();
+	undo_do_one_step();
 }
 
 /* do the redo - callback */
 static void
 redo_cb(GtkWidget *widget, gpointer data)
 {
-	Cave *backup;
+	GdCave *backup;
 
 	g_return_if_fail(redo_caves!=NULL);
 	g_return_if_fail(edited_cave!=NULL);
@@ -457,12 +531,12 @@ editor_window_set_title()
 	if (edited_cave) {
 		/* editing a specific cave */
 		title=g_strdup_printf(_("GDash Cave Editor - %s"), edited_cave->name);
-		gtk_window_set_title (GTK_WINDOW (editor_window), title);
+		gtk_window_set_title (GTK_WINDOW (gd_editor_window), title);
 		g_free (title);
 	} else {
 		/* editing the caveset */
 		title=g_strdup_printf(_("GDash Cave Editor - %s"), gd_caveset_data->name);
-		gtk_window_set_title (GTK_WINDOW (editor_window), title);
+		gtk_window_set_title (GTK_WINDOW (gd_editor_window), title);
 		g_free(title);
 	}
 }
@@ -496,7 +570,7 @@ editor_window_set_title()
    the widgets themselves hold the type and value; and also a pointer to the default value.
  */
 static void
-set_default(GtkWidget *widget, gpointer data)
+edit_properties_set_default_button(GtkWidget *widget, gpointer data)
 {
 	GList *rowwidgets=(GList *)data;
 	GList *iter;
@@ -532,7 +606,7 @@ set_default(GtkWidget *widget, gpointer data)
 
 /* for a destroyed signal; frees a list which is its user data */
 static void
-free_list_in_cb_user_data(GtkWidget *widget, gpointer data)
+edit_properties_free_list_in_user_data(GtkWidget *widget, gpointer data)
 {
 	g_list_free((GList *) data);
 }
@@ -554,7 +628,7 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 	int result;
 	GtkTextBuffer *textbuffer=NULL;
 	
-	dialog=gtk_dialog_new_with_buttons (title, GTK_WINDOW (editor_window), GTK_DIALOG_DESTROY_WITH_PARENT, NULL);
+	dialog=gtk_dialog_new_with_buttons (title, GTK_WINDOW (gd_editor_window), GTK_DIALOG_DESTROY_WITH_PARENT, NULL);
 	if (show_cancel)
 		gtk_dialog_add_button(GTK_DIALOG(dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT);
 	gtk_dialog_add_button(GTK_DIALOG(dialog), GTK_STOCK_OK, GTK_RESPONSE_ACCEPT);
@@ -564,9 +638,10 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 
 	/* tabbed notebook */
 	notebook=gtk_notebook_new();
+	gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_LEFT);
 	gtk_notebook_set_scrollable(GTK_NOTEBOOK(notebook), TRUE);
 	gtk_notebook_popup_enable(GTK_NOTEBOOK(notebook));
-	gtk_box_pack_start_defaults(GTK_BOX (GTK_DIALOG (dialog)->vbox), notebook);
+	gtk_box_pack_start(GTK_BOX (GTK_DIALOG (dialog)->vbox), notebook, TRUE, TRUE, 6);
 
 	/* create the entry widgets */
 	for (i=0; prop_desc[i].identifier!=NULL; i++) {
@@ -578,17 +653,12 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 			continue;
 		
 		if (prop_desc[i].type==GD_TAB) {
-			/* create a notebook tab */
-			GtkWidget *align=gtk_alignment_new(0.5, 0, 1, 0);
-			/* if needed, create notebook page */
 			/* create a table which will be the widget inside */
 			table=gtk_table_new(1, 1, FALSE);
-			gtk_container_set_border_width (GTK_CONTAINER (table), 6);
+			gtk_container_set_border_width (GTK_CONTAINER (table), 12);
 			gtk_table_set_row_spacings (GTK_TABLE(table), 3);
-			/* put the widget in an alignment */
-			gtk_container_add (GTK_CONTAINER (align), table);
 			/* and to the notebook */
-			gtk_notebook_append_page (GTK_NOTEBOOK (notebook), align, gtk_label_new(gettext(prop_desc[i].name)));
+			gtk_notebook_append_page (GTK_NOTEBOOK (notebook), table, gtk_label_new(gettext(prop_desc[i].name)));
 			row=0;
 			continue;
 		}
@@ -601,9 +671,9 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 			textbuffer=gtk_text_buffer_new(NULL);
 			view=gtk_text_view_new_with_buffer(textbuffer);
 			gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(view), GTK_WRAP_WORD);
+			gtk_widget_set_tooltip_text(view, prop_desc[i].tooltip);
 			
-			if (G_STRUCT_MEMBER(GString *, str, prop_desc[i].offset)->len!=0)
-				gtk_text_buffer_insert_at_cursor(textbuffer, G_STRUCT_MEMBER(GString *, str, prop_desc[i].offset)->str, -1);
+			gtk_text_buffer_insert_at_cursor(textbuffer, G_STRUCT_MEMBER(GString *, str, prop_desc[i].offset)->str, -1);
 
 			/* a text view in its scroll windows, so it can be any large */
 			scroll=gtk_scrolled_window_new(NULL, NULL);
@@ -714,15 +784,15 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 				break;
 			}
 			/* put widget into list so values can be extracted later */
-			widgets=g_list_prepend (widgets, widget);
-			rowwidgets=g_list_prepend (rowwidgets, widget);
-			g_object_set_data (G_OBJECT (widget), GDASH_TYPE, GINT_TO_POINTER (prop_desc[i].type));
-			g_object_set_data (G_OBJECT (widget), GDASH_VALUE, value);
-			g_object_set_data (G_OBJECT (widget), GDASH_DEFAULT_VALUE, defpoint);
+			widgets=g_list_prepend(widgets, widget);
+			rowwidgets=g_list_prepend(rowwidgets, widget);
+			g_object_set_data(G_OBJECT(widget), GDASH_TYPE, GINT_TO_POINTER (prop_desc[i].type));
+			g_object_set_data(G_OBJECT(widget), GDASH_VALUE, value);
+			g_object_set_data(G_OBJECT(widget), GDASH_DEFAULT_VALUE, defpoint);
 			/* put widget to table */
 			gtk_table_attach(GTK_TABLE(table), widget, j+2, (prop_desc[i].count==1) ? 7 : j + 3, row, row+1, GTK_FILL|GTK_EXPAND, GTK_FILL|GTK_SHRINK, 3, 0);
 			if (prop_desc[i].tooltip)
-				tip=g_strdup_printf(_("%s\nDefault value: %s"), gettext (prop_desc[i].tooltip), defval ? defval : _("empty"));
+				tip=g_strdup_printf(_("%s\nDefault value: %s"), gettext(prop_desc[i].tooltip), defval ? defval : _("empty"));
 			else
 				tip=g_strdup_printf(_("Default value: %s"), defval ? defval : _("empty"));
 			g_free (defval);
@@ -735,9 +805,9 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 			gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
 			gtk_widget_set_tooltip_text(button, _("Set to default value"));
 			gtk_button_set_image(GTK_BUTTON(button), gtk_image_new_from_stock(GTK_STOCK_REFRESH, GTK_ICON_SIZE_MENU));
-			g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK(set_default), rowwidgets);
+			g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK(edit_properties_set_default_button), rowwidgets);
 			/* this will free the list when the button is destroyed */
-			g_signal_connect (G_OBJECT (button), "destroy", G_CALLBACK(free_list_in_cb_user_data), rowwidgets);
+			g_signal_connect (G_OBJECT (button), "destroy", G_CALLBACK(edit_properties_free_list_in_user_data), rowwidgets);
 			gtk_table_attach(GTK_TABLE(table), button, 1, 2, row, row+1, GTK_SHRINK, GTK_SHRINK, 3, 0);
 		} else
 			g_list_free(rowwidgets);
@@ -830,10 +900,10 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 				*(GdColor *) value=gd_color_combo_get_color(iter->data);
 				break;
 			case GD_TYPE_DIRECTION:
-				*(GdDirection *) value=gd_direction_combo_get(iter->data);
+				*(GdDirection *) value=gd_direction_combo_get_direction(iter->data);
 				break;
 			case GD_TYPE_SCHEDULING:
-				*(GdScheduling *) value=gd_scheduling_combo_get(iter->data);
+				*(GdScheduling *) value=gd_scheduling_combo_get_scheduling(iter->data);
 				break;
 			}
 		}
@@ -853,11 +923,13 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 
 
 
-
+/* call edit_properties for a cave, then do some cleanup.
+ * for example, if the size changed, the map has to be resized,
+ * etc. also the user may be warned about resizing the visible area. */
 static void
-cave_properties(Cave *cave, gboolean show_cancel)
+cave_properties(GdCave *cave, gboolean show_cancel)
 {
-	Cave *def_val;
+	GdCave *def_val;
 	int old_w, old_h;
 	int i;
 	gboolean edited;
@@ -940,7 +1012,7 @@ cave_properties(Cave *cave, gboolean show_cancel)
 }
 
 
-
+/* edit the properties of the caveset - nothing special. */
 static void
 caveset_properties(gboolean show_cancel)
 {
@@ -956,6 +1028,64 @@ caveset_properties(gboolean show_cancel)
 	if (edited)
 		gd_caveset_edited=TRUE;
 }
+
+
+
+/* select cave edit tool.
+   this activates the gtk action in question, so
+   toolbar and everything else will be updated */
+static void
+select_tool(int tool)
+{
+	int i;
+	
+	/* find specific object type in action_objects array. */
+	/* (the array indexes and tool integers do not correspond) */
+	for (i=0; i<G_N_ELEMENTS(action_objects); i++)
+		if (tool==action_objects[i].value)
+			gtk_action_activate (gtk_action_group_get_action (actions_edit_tools, action_objects[i].name));
+}
+
+
+
+static void
+set_status_label_for_cave(GdCave *cave)
+{
+	char *name_escaped;
+	
+	name_escaped=g_markup_escape_text(cave->name, -1);
+	gd_label_set_markup_printf(GTK_LABEL (label_object), _("<b>%s</b>, %s, %dx%d, time %d:%02d, diamonds %d"), name_escaped, cave->selectable?_("selectable"):_("not selectable"), cave->w, cave->h, cave->level_time[0]/60, cave->level_time[0] % 60, cave->level_diamonds[0]);
+	g_free(name_escaped);
+}
+
+
+static gboolean
+set_status_label_for_caveset_count_caves(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
+{
+	int *i=(int *)data;
+	
+	(*i)++;
+	return FALSE;	/* to continue counting */
+}
+
+static void
+set_status_label_for_caveset()
+{
+	char *name_escaped;
+	int count;
+	
+	if (iconview_cavelist) {
+		count=0;
+		gtk_tree_model_foreach(gtk_icon_view_get_model(GTK_ICON_VIEW(iconview_cavelist)), (GtkTreeModelForeachFunc) set_status_label_for_caveset_count_caves, &count);
+	}
+	else
+		count=gd_caveset_count();
+	
+	name_escaped=g_markup_escape_text(gd_caveset_data->name, -1);
+	gd_label_set_markup_printf(GTK_LABEL (label_object), _("<b>%s</b>, %d caves"), name_escaped, count);
+	g_free(name_escaped);
+}
+
 
 
 
@@ -979,13 +1109,13 @@ render_cave()
 	rendered_cave=gd_cave_new_rendered (edited_cave, edit_level, g_random_int());
 	/* create a gfx buffer for displaying */
 	gd_cave_map_free(gfx_buffer);
-	gd_cave_map_free(object_highlight);
+	gd_cave_map_free(object_highlight_map);
 	gfx_buffer=gd_cave_map_new(rendered_cave, int);
-	object_highlight=gd_cave_map_new(rendered_cave, gboolean);
+	object_highlight_map=gd_cave_map_new(rendered_cave, gboolean);
 	for (y=0; y<rendered_cave->h; y++)
 		for (x=0; x<rendered_cave->w; x++) {
 			gfx_buffer[y][x]=-1;
-			object_highlight[y][x]=FALSE;
+			object_highlight_map[y][x]=FALSE;
 		}
 
 	/* fill object list store with the objects. */
@@ -1000,22 +1130,22 @@ render_cave()
 		gchar *text;
 		const char *levels_stock;
 
-		text=gd_get_object_coordinates_text (object);
+		text=gd_object_get_coordinates_text (object);
 		switch (object->type) {	/* for ELEMENT */
-			case COPY_PASTE:
+			case GD_COPY_PASTE:
 				element=NULL; break;
 			default:
 				element=gd_get_element_pixbuf_with_border(object->element); break;
 		}
 
 		switch (object->type) {	/* for FILL ELEMENT */
-			case FILLED_RECTANGLE:
-			case JOIN:
-			case FLOODFILL_BORDER:
-			case FLOODFILL_REPLACE:
-			case MAZE:
-			case MAZE_UNICURSAL:
-			case MAZE_BRAID:
+			case GD_FILLED_RECTANGLE:
+			case GD_JOIN:
+			case GD_FLOODFILL_BORDER:
+			case GD_FLOODFILL_REPLACE:
+			case GD_MAZE:
+			case GD_MAZE_UNICURSAL:
+			case GD_MAZE_BRAID:
 				fillelement=gd_get_element_pixbuf_with_border(object->fill_element);
 				break;
 			default:
@@ -1038,221 +1168,15 @@ render_cave()
 
 		/* also do selection as now we have the iter in hand */
 		if (g_list_index(selected, object)!=-1)
-			gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (object_tree_view)), &treeiter);
+			gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (object_list_tree_view)), &treeiter);
 		g_free (text);
 	}
-	gtk_tree_view_columns_autosize (GTK_TREE_VIEW (object_tree_view));
+	gtk_tree_view_columns_autosize (GTK_TREE_VIEW (object_list_tree_view));
 	g_list_free(selected);
 
 	gtk_action_group_set_sensitive (actions_edit_map, edited_cave->map!=NULL);
 	gtk_action_group_set_sensitive (actions_edit_random, edited_cave->map==NULL);
 }
-
-
-/* this is the same scroll routine as the one used for the game. only the parameters are changed a bit. */
-static void
-scroll (int player_x, int player_y)
-{
-	static int scroll_desired_x=0, scroll_desired_y=0;
-	static int scroll_speed_x=0, scroll_speed_y=0;
-	GtkAdjustment *adjustment;
-	int scroll_center_x, scroll_center_y;
-	int i;
-	/* hystheresis size is this, multiplied by two. */
-	int scroll_start_x=scroll_window->allocation.width/2-2*gd_cell_size_editor;
-	int scroll_start_y=scroll_window->allocation.height/2-2*gd_cell_size_editor;
-	
-	/* get the size of the window so we know where to place player.
-	 * first guess is the middle of the screen.
-	 * drawing_area->parent->parent is the viewport.
-	 * +cellsize/2 gets the stomach of player :) so the very center */
-	scroll_center_x=player_x * gd_cell_size_editor + gd_cell_size_editor/2 - drawing_area->parent->parent->allocation.width/2;
-	scroll_center_y=player_y * gd_cell_size_editor + gd_cell_size_editor/2 - drawing_area->parent->parent->allocation.height/2;
-
-	/* HORIZONTAL */
-	/* hystheresis function.
-	 * when scrolling left, always go a bit less left than player being at the middle.
-	 * when scrolling right, always go a bit less to the right. */
-	adjustment=gtk_scrolled_window_get_hadjustment (GTK_SCROLLED_WINDOW (scroll_window));
-	if (adjustment->value + scroll_start_x < scroll_center_x)
-		scroll_desired_x=scroll_center_x - scroll_start_x;
-	if (adjustment->value - scroll_start_x > scroll_center_x)
-		scroll_desired_x=scroll_center_x + scroll_start_x;
-
-	scroll_desired_x=CLAMP (scroll_desired_x, 0, adjustment->upper - adjustment->step_increment - adjustment->page_increment);
-	/* adaptive scrolling speed.
-	 * gets faster with distance.
-	 * minimum speed is 1, to allow scrolling precisely to the desired positions (important at borders).
-	 */
-	if (scroll_speed_x < ABS (scroll_desired_x - adjustment->value)/12 + 1)
-		scroll_speed_x++;
-	if (scroll_speed_x > ABS (scroll_desired_x - adjustment->value)/12 + 1)
-		scroll_speed_x--;
-	if (adjustment->value < scroll_desired_x) {
-		for (i=0; i < scroll_speed_x; i++)
-			if (adjustment->value < scroll_desired_x)
-				adjustment->value++;
-		gtk_adjustment_value_changed (adjustment);
-	}
-	if (adjustment->value > scroll_desired_x) {
-		for (i=0; i < scroll_speed_x; i++)
-			if (adjustment->value > scroll_desired_x)
-				adjustment->value--;
-		gtk_adjustment_value_changed (adjustment);
-	}
-
-	/* VERTICAL */
-	adjustment=gtk_scrolled_window_get_vadjustment (GTK_SCROLLED_WINDOW (scroll_window));
-	if (adjustment->value + scroll_start_y < scroll_center_y)
-		scroll_desired_y=scroll_center_y - scroll_start_y;
-	if (adjustment->value - scroll_start_y > scroll_center_y)
-		scroll_desired_y=scroll_center_y + scroll_start_y;
-
-	scroll_desired_y=CLAMP (scroll_desired_y, 0, adjustment->upper - adjustment->step_increment - adjustment->page_increment);
-	if (scroll_speed_y < ABS (scroll_desired_y - adjustment->value)/12 + 1)
-		scroll_speed_y++;
-	if (scroll_speed_y > ABS (scroll_desired_y - adjustment->value)/12 + 1)
-		scroll_speed_y--;
-	if (adjustment->value < scroll_desired_y) {
-		for (i=0; i < scroll_speed_y; i++)
-			if (adjustment->value < scroll_desired_y)
-				adjustment->value++;
-		gtk_adjustment_value_changed (adjustment);
-	}
-	if (adjustment->value > scroll_desired_y) {
-		for (i=0; i < scroll_speed_y; i++)
-			if (adjustment->value > scroll_desired_y)
-				adjustment->value--;
-		gtk_adjustment_value_changed (adjustment);
-	}
-}
-
-
-/* timeout 'interrupt', drawing cave in cave editor. */
-static gboolean
-drawcave_int (const gpointer data)
-{
-	static int animcycle=0;
-	static int player_blinking=0;
-	static int cursor=0;
-	int x, y, draw;
-
-	/* if nothing to draw or nowhere to draw :) exit.
-	 * this is necessary as the interrupt is not uninstalled when the selector is running. */
-	if (!drawing_area || !rendered_cave)
-		return TRUE;
-
-	g_return_val_if_fail (gfx_buffer!=NULL, TRUE);
-
-	/* when mouse over a drawing object, cursor changes */
-	if (mouse_x >= 0 && mouse_y >= 0) {
-		int new_cursor=rendered_cave->objects_order[mouse_y][mouse_x] ? GDK_HAND1 : -1;
-		if (cursor!=new_cursor) {
-			cursor=new_cursor;
-			gdk_window_set_cursor (drawing_area->window, cursor==-1?NULL:gdk_cursor_new(cursor));
-		}
-	}
-
-	/* only do cell animations when window is active.
-	 * otherwise... user is testing the cave, animation would just waste cpu. */
-	if (gtk_window_has_toplevel_focus (GTK_WINDOW (editor_window)))
-		animcycle=(animcycle+1) & 7;
-
-	if (animcycle==0)			/* player blinking is started at the beginning of animation sequences. */
-		player_blinking=g_random_int_range (0, 4)==0;	/* 1/4 chance of blinking, every sequence. */
-
-	for (y=0; y<rendered_cave->h; y++) {
-		for (x=0; x<rendered_cave->w; x++) {
-			if (gd_game_view)
-				draw=gd_elements[rendered_cave->map[y][x]].image_simple;
-			else
-				draw=gd_elements[rendered_cave->map[y][x]].image;
-			/* special case is player - sometimes blinking :) */
-			if (player_blinking && (rendered_cave->map[y][x]==O_INBOX))
-				draw=gd_elements[O_PLAYER_BLINK].image_simple;
-			/* the biter switch also shows its state */
-			if (rendered_cave->map[y][x]==O_BITER_SWITCH)
-				draw=gd_elements[O_BITER_SWITCH].image_simple+rendered_cave->biter_delay_frame;
-
-			/* negative value means animation */
-			if (draw<0)
-				draw=-draw + animcycle;
-
-			/* object coloring */
-			if (action==VISIBLE_REGION) {
-				/* if showing visible region, different color applies for: */
-				if (x>=rendered_cave->x1 && x<=rendered_cave->x2 && y>=rendered_cave->y1 && y<=rendered_cave->y2)
-					draw+=NUM_OF_CELLS;
-				if (x==rendered_cave->x1 || x==rendered_cave->x2 || y==rendered_cave->y1 || y==rendered_cave->y2)
-					draw+=NUM_OF_CELLS;	/* once again */
-			} else {
-				if (object_highlight[y][x]) /* if it is a selected object, make it colored */
-					draw+=2*NUM_OF_CELLS;
-				else if (gd_colored_objects && rendered_cave->objects_order[y][x]!=NULL)
-					/* if it belongs to any other element, make it colored a bit */
-					draw+=NUM_OF_CELLS;
-			}
-			
-			/* the drawing itself */
-			if (gfx_buffer[y][x]!=draw) {
-				gdk_draw_drawable(drawing_area->window, drawing_area->style->black_gc, gd_editor_pixmap(draw), 0, 0, x*gd_cell_size_editor, y*gd_cell_size_editor, gd_cell_size_editor, gd_cell_size_editor);
-				gfx_buffer[y][x]=draw;
-			}
-			
-			/* for fill objects, we show their origin */	
-			if (object_highlight[y][x]
-				&& (((GdObject *)rendered_cave->objects_order[y][x])->type==FLOODFILL_BORDER
-					|| ((GdObject *)rendered_cave->objects_order[y][x])->type==FLOODFILL_REPLACE)) {
-				GdObject *object=rendered_cave->objects_order[y][x];
-				int x=object->x1;
-				int y=object->y1;
-
-				/* only draw if inside bounds */
-				if (x>=0 && x<rendered_cave->w && y>=0 && y<rendered_cave->h) {
-					gdk_draw_rectangle(drawing_area->window, drawing_area->style->white_gc, FALSE, x*gd_cell_size_editor, y*gd_cell_size_editor, gd_cell_size_editor - 1, gd_cell_size_editor - 1);
-					gdk_draw_line (drawing_area->window, drawing_area->style->white_gc, x*gd_cell_size_editor, y*gd_cell_size_editor, (x+1)*gd_cell_size_editor-1, (y+1)*gd_cell_size_editor-1);
-					gdk_draw_line (drawing_area->window, drawing_area->style->white_gc, x*gd_cell_size_editor, (y+1)*gd_cell_size_editor-1, (x+1)*gd_cell_size_editor-1, y*gd_cell_size_editor);
-					gfx_buffer[object->y1][object->x1]=-1;
-				}
-			}
-		}
-	}
-
-	if (mouse_x>=0 && mouse_y>=0) {
-		/* this is the cell the mouse is over */
-		gdk_draw_rectangle(drawing_area->window, drawing_area->style->white_gc, FALSE, mouse_x*gd_cell_size_editor, mouse_y*gd_cell_size_editor, gd_cell_size_editor-1, gd_cell_size_editor-1);
-		/* always redraw this cell the next frame - the easiest way to always get rid of the rectangle when the mouse is moved */
-		gfx_buffer[mouse_y][mouse_x]=-1;
-	}
-
-	if (mouse_x>=0 && mouse_y>=0 && button1_clicked)
-		scroll(mouse_x, mouse_y);
-
-	return TRUE;
-}
-
-/* cave drawing area expose event.
-*/
-static gboolean
-drawing_area_expose_event (const GtkWidget *widget, const GdkEventExpose *event, const gpointer data)
-{
-	int x, y, x1, y1, x2, y2;
-
-	if (!widget->window || gfx_buffer==NULL)
-		return FALSE;
-
-	x1=event->area.x/gd_cell_size_editor;
-	y1=event->area.y/gd_cell_size_editor;
-	x2=(event->area.x+event->area.width-1)/gd_cell_size_editor;
-	y2=(event->area.y+event->area.height-1)/gd_cell_size_editor;
-
-	for (y=y1; y<=y2; y++)
-		for (x=x1; x<=x2; x++)
-			if (gfx_buffer[y][x]!=-1)
-				gdk_draw_drawable (drawing_area->window, drawing_area->style->black_gc, gd_editor_pixmap(gfx_buffer[y][x]), 0, 0, x*gd_cell_size_editor, y*gd_cell_size_editor, gd_cell_size_editor, gd_cell_size_editor);
-	return TRUE;
-}
-
 
 
 
@@ -1266,7 +1190,7 @@ drawing_area_expose_event (const GtkWidget *widget, const GdkEventExpose *event,
  */
 #define GDASH_DATA_POINTER "gdash-data-pointer"
 static void
-spinbutton_changed(GtkWidget *widget, gpointer data)
+spin_button_with_update_changed(GtkWidget *widget, gpointer data)
 {
 	int value=gtk_spin_button_get_value(GTK_SPIN_BUTTON(widget));
 	int *pi;
@@ -1279,7 +1203,7 @@ spinbutton_changed(GtkWidget *widget, gpointer data)
 }
 
 static GtkWidget *
-spin_button_new_with_update(int min, int max, int *value)
+spin_button_with_update_new(int min, int max, int *value)
 {
 	GtkWidget *spin;
 	
@@ -1290,7 +1214,7 @@ spin_button_new_with_update(int min, int max, int *value)
 	spin=gtk_spin_button_new_with_range (min, max, 1);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(spin), *value);
 	g_object_set_data(G_OBJECT(spin), GDASH_DATA_POINTER, value);
-	g_signal_connect(G_OBJECT(spin), "value-changed", G_CALLBACK(spinbutton_changed), NULL);
+	g_signal_connect(G_OBJECT(spin), "value-changed", G_CALLBACK(spin_button_with_update_changed), NULL);
 	
 	return spin;
 }
@@ -1301,7 +1225,7 @@ spin_button_new_with_update(int min, int max, int *value)
  *
  */
 static void
-elementbutton_changed(GtkWidget *widget, gpointer data)
+element_button_with_update_changed(GtkWidget *widget, gpointer data)
 {
 	GdElement *elem=g_object_get_data(G_OBJECT(widget), GDASH_DATA_POINTER);
 	GdElement new_elem;
@@ -1314,14 +1238,14 @@ elementbutton_changed(GtkWidget *widget, gpointer data)
 }
 
 static GtkWidget *
-element_button_new_with_update(GdElement *value)
+element_button_with_update_new(GdElement *value)
 {
 	GtkWidget *button;
 	
 	button=gd_element_button_new(*value, FALSE, NULL);
 	g_object_set_data(G_OBJECT(button), GDASH_DATA_POINTER, value);
 	/* this "clicked" will be called after the button's own, internal clicked signal */
-	g_signal_connect(button, "clicked", G_CALLBACK(elementbutton_changed), NULL);
+	g_signal_connect(button, "clicked", G_CALLBACK(element_button_with_update_changed), NULL);
 
 	return button;
 }
@@ -1333,7 +1257,7 @@ element_button_new_with_update(GdElement *value)
  *
  */
 static void
-checkbutton_changed(GtkWidget *widget, gpointer data)
+check_button_with_update_changed(GtkWidget *widget, gpointer data)
 {
 	gboolean *value=(gboolean *) data;
 	
@@ -1342,13 +1266,13 @@ checkbutton_changed(GtkWidget *widget, gpointer data)
 }
 
 static GtkWidget *
-check_button_new_with_update(gboolean *value)
+check_button_with_update_new(gboolean *value)
 {
 	GtkWidget *button;
 	
 	button=gtk_check_button_new();
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), *value);
-	g_signal_connect(button, "toggled", G_CALLBACK(checkbutton_changed), value);
+	g_signal_connect(button, "toggled", G_CALLBACK(check_button_with_update_changed), value);
 
 	return button;
 }
@@ -1395,7 +1319,7 @@ widget_focus_in_set_level_cb(GtkWidget *widget, GdkEventFocus *event, gpointer d
 }
 
 static void
-widget_focus_in_set_level(GtkWidget *spin, GtkScale *scale, int level)
+widget_focus_in_add_level_set_hander(GtkWidget *spin, GtkScale *scale, int level)
 {
 	g_object_set_data(G_OBJECT(spin), GDASH_LEVEL_NUMBER, GINT_TO_POINTER(level));
 	gtk_widget_add_events(spin, GDK_FOCUS_CHANGE_MASK);
@@ -1518,9 +1442,9 @@ random_setup_widgets_to_table(GtkTable *table, int firstrow, GdElement *pborder,
 		row++;
 
 		for (i=0; i<5; i++) {
-			spin=spin_button_new_with_update(-1, 255, &pseed[i]);
+			spin=spin_button_with_update_new(-1, 255, &pseed[i]);
 			gtk_widget_set_tooltip_text(spin, _("Random seed value controls the predictable random number generator, which fills the cave initially. If set to -1, cave is totally random every time it is played."));
-			widget_focus_in_set_level(spin, GTK_SCALE(scale), i+1);
+			widget_focus_in_add_level_set_hander(spin, GTK_SCALE(scale), i+1);
 
 			gtk_table_attach(table, gd_label_new_printf(_("Random seed %d"), i+1), 0, 1, row, row+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
 			gtk_table_attach_defaults(table, spin, 1, 3, row, row+1);
@@ -1535,7 +1459,7 @@ random_setup_widgets_to_table(GtkTable *table, int firstrow, GdElement *pborder,
 	/* label */
 	if (pborder) {
 		gtk_table_attach(table, gd_label_new_printf(_("Initial border")), 0, 1, row, row+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
-		gtk_table_attach_defaults(table, element_button_new_with_update(pborder), 1, 2, row, row+1);
+		gtk_table_attach_defaults(table, element_button_with_update_new(pborder), 1, 2, row, row+1);
 		row++;
 	}
 	
@@ -1575,14 +1499,14 @@ random_setup_widgets_to_table(GtkTable *table, int firstrow, GdElement *pborder,
 
 		/* element button */		
 		pelem=(i==4)?pinitial:&(pfill[i]);
-		wid=element_button_new_with_update(pelem);
+		wid=element_button_with_update_new(pelem);
 		gtk_table_attach_defaults(table, wid, 1, 2, row, row+1);
 		
 		/* probability control, if this row is not for the initial fill */
 		if (i!=4) {
 			int *value=&(pprob[i]);	/* pointer to integer value to modify */
 			
-			wid=spin_button_new_with_update(0, 255, value);
+			wid=spin_button_with_update_new(0, 255, value);
 			scales[i]=wid;
 			g_object_set_data(G_OBJECT(wid), GDASH_SPIN_PROBABILITIES, pprob);
 			g_signal_connect(wid, "value-changed", G_CALLBACK(random_setup_probability_scale_changed), da);	/* spin button updates color bars */
@@ -1605,20 +1529,7 @@ random_setup_widgets_to_table(GtkTable *table, int firstrow, GdElement *pborder,
 
 
 
-/* select cave edit tool.
-   this activates the gtk action in question, so
-   toolbar and everything else will be updated */
-static void
-select_tool(int tool)
-{
-	int i;
-	
-	/* find specific object type in action_objects array. */
-	/* (the array indexes and tool integers do not correspond) */
-	for (i=0; i<G_N_ELEMENTS(action_objects); i++)
-		if (tool==action_objects[i].value)
-			gtk_action_activate (gtk_action_group_get_action (actions_edit_tools, action_objects[i].name));
-}
+
 
 
 
@@ -1637,6 +1548,10 @@ select_tool(int tool)
  *
  */
 
+/* these two functions implement a check box, which also selects
+ * the level to view. every check box created remembers which level
+ * it handles, and also they store pointers to the bitmask to update
+ * automatically. */
 #define GDASH_LEVEL_NUMBER "gdash-level-number"
 #define GDASH_DATA_POINTER "gdash-data-pointer"
 static void
@@ -1671,6 +1586,8 @@ check_button_new_level_enable(GdObjectLevels *levels, int level)
 #undef GDASH_LEVEL_NUMBER
 #undef GDASH_DATA_POINTER
 
+
+/* edit properties of an object */
 static void
 object_properties(GdObject *object)
 {
@@ -1684,7 +1601,7 @@ object_properties(GdObject *object)
 		object=object_list_first_selected();	/* select first from list... should be only one selected */
 	}
 
-	dialog=gtk_dialog_new_with_buttons (_("Object Properties"), GTK_WINDOW (editor_window), GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
+	dialog=gtk_dialog_new_with_buttons (_("Object Properties"), GTK_WINDOW (gd_editor_window), GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
 	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
 	gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
 
@@ -1725,7 +1642,7 @@ object_properties(GdObject *object)
 		GtkWidget *wid;
 		
 		wid=check_button_new_level_enable(&object->levels, n+1);
-		widget_focus_in_set_level(wid, GTK_SCALE(scale), n+1);
+		widget_focus_in_add_level_set_hander(wid, GTK_SCALE(scale), n+1);
 		gtk_box_pack_start_defaults(GTK_BOX(hbox), wid);
 	}
 	i++;
@@ -1733,37 +1650,37 @@ object_properties(GdObject *object)
 	/* OBJECT PROPERTIES ************/
 	if (gd_object_description[object->type].x1!=NULL) {
 		gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_(gd_object_description[object->type].x1)), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
-		gtk_table_attach_defaults(GTK_TABLE(table), spin_button_new_with_update(0, edited_cave->w-1, &object->x1), 1, 2, i, i+1);
-		gtk_table_attach_defaults(GTK_TABLE(table), spin_button_new_with_update(0, edited_cave->h-1, &object->y1), 2, 3, i, i+1);
+		gtk_table_attach_defaults(GTK_TABLE(table), spin_button_with_update_new(0, edited_cave->w-1, &object->x1), 1, 2, i, i+1);
+		gtk_table_attach_defaults(GTK_TABLE(table), spin_button_with_update_new(0, edited_cave->h-1, &object->y1), 2, 3, i, i+1);
 		i++;
 	}
 
 	/* points only have one coordinate. for other elements, */
 	if (gd_object_description[object->type].x2!=NULL) {
 		gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_(gd_object_description[object->type].x2)), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
-		gtk_table_attach_defaults(GTK_TABLE(table), spin_button_new_with_update(0, edited_cave->w-1, &object->x2), 1, 2, i, i+1);
-		gtk_table_attach_defaults(GTK_TABLE(table), spin_button_new_with_update(0, edited_cave->w-1, &object->y2), 2, 3, i, i+1);
+		gtk_table_attach_defaults(GTK_TABLE(table), spin_button_with_update_new(0, edited_cave->w-1, &object->x2), 1, 2, i, i+1);
+		gtk_table_attach_defaults(GTK_TABLE(table), spin_button_with_update_new(0, edited_cave->w-1, &object->y2), 2, 3, i, i+1);
 		i++;
 	}
 
 	/* mazes have horiz */
 	if (gd_object_description[object->type].horiz!=NULL) {
 		gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_(gd_object_description[object->type].horiz)), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
-		gtk_table_attach_defaults(GTK_TABLE(table), spin_button_new_with_update(0, 100, &object->horiz), 1, 3, i, i+1);
+		gtk_table_attach_defaults(GTK_TABLE(table), spin_button_with_update_new(0, 100, &object->horiz), 1, 3, i, i+1);
 		i++;
 	}
 
 	/* every element has an object parameter */
 	if (gd_object_description[object->type].element!=NULL) {
 		gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_(gd_object_description[object->type].element)), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
-		gtk_table_attach_defaults(GTK_TABLE(table), element_button_new_with_update(&object->element), 1, 3, i, i+1);
+		gtk_table_attach_defaults(GTK_TABLE(table), element_button_with_update_new(&object->element), 1, 3, i, i+1);
 		i++;
 	}
 	
 	/* joins and filled rectangles have a second object, but with different meaning */
 	if (gd_object_description[object->type].fill_element!=NULL) {
 		gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_(gd_object_description[object->type].fill_element)), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
-		gtk_table_attach_defaults(GTK_TABLE(table), element_button_new_with_update(&object->fill_element), 1, 3, i, i+1);
+		gtk_table_attach_defaults(GTK_TABLE(table), element_button_with_update_new(&object->fill_element), 1, 3, i, i+1);
 		i++;
 	}
 
@@ -1772,12 +1689,12 @@ object_properties(GdObject *object)
 		int rangemin=-40;
 		
 		/* for rasters and mazes, dx>=1 and dy>=1. for joins, these can be zero or even negative */
-		if (object->type==RASTER || object->type==MAZE)
+		if (object->type==GD_RASTER || object->type==GD_MAZE)
 			rangemin=1;
 
 		gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_(gd_object_description[object->type].dx)), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
-		gtk_table_attach_defaults(GTK_TABLE(table), spin_button_new_with_update(rangemin, 40, &object->dx), 1, 2, i, i+1);
-		gtk_table_attach_defaults(GTK_TABLE(table), spin_button_new_with_update(rangemin, 40, &object->dy), 2, 3, i, i+1);
+		gtk_table_attach_defaults(GTK_TABLE(table), spin_button_with_update_new(rangemin, 40, &object->dx), 1, 2, i, i+1);
+		gtk_table_attach_defaults(GTK_TABLE(table), spin_button_with_update_new(rangemin, 40, &object->dy), 2, 3, i, i+1);
 		i++;
 	}
 
@@ -1789,8 +1706,8 @@ object_properties(GdObject *object)
 			GtkWidget *spin;
 			
 			gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_(gd_object_description[object->type].seed), j+1), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
-			gtk_table_attach_defaults(GTK_TABLE(table), spin=spin_button_new_with_update(-1, 1<<24, &object->seed[j]), 1, 3, i, i+1);
-			widget_focus_in_set_level(spin, GTK_SCALE(scale), j+1);
+			gtk_table_attach_defaults(GTK_TABLE(table), spin=spin_button_with_update_new(-1, 1<<24, &object->seed[j]), 1, 3, i, i+1);
+			widget_focus_in_add_level_set_hander(spin, GTK_SCALE(scale), j+1);
 			gtk_widget_set_tooltip_text(spin, _("Random seed value controls the predictable random number generator. If set to -1, cave is totally random every time it is played."));
 		i++;
 		}
@@ -1799,25 +1716,25 @@ object_properties(GdObject *object)
 	/* random fill object has a c64 random toggle */
 	if (gd_object_description[object->type].c64_random!=NULL) {
 		gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_(gd_object_description[object->type].c64_random)), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
-		gtk_table_attach_defaults(GTK_TABLE(table), check_button_new_with_update(&object->c64_random), 1, 3, i, i+1);
+		gtk_table_attach_defaults(GTK_TABLE(table), check_button_with_update_new(&object->c64_random), 1, 3, i, i+1);
 		i++;
 	}
 
 	/* mirror */
 	if (gd_object_description[object->type].mirror!=NULL) {
 		gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_(gd_object_description[object->type].mirror)), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
-		gtk_table_attach_defaults(GTK_TABLE(table), check_button_new_with_update(&object->mirror), 1, 3, i, i+1);
+		gtk_table_attach_defaults(GTK_TABLE(table), check_button_with_update_new(&object->mirror), 1, 3, i, i+1);
 		i++;
 	}
 
 	/* flip */
 	if (gd_object_description[object->type].flip!=NULL) {
 		gtk_table_attach(GTK_TABLE(table), gd_label_new_printf(_(gd_object_description[object->type].flip)), 0, 1, i, i+1, GTK_FILL|GTK_SHRINK, GTK_FILL|GTK_SHRINK, 0, 0);
-		gtk_table_attach_defaults(GTK_TABLE(table), check_button_new_with_update(&object->flip), 1, 3, i, i+1);
+		gtk_table_attach_defaults(GTK_TABLE(table), check_button_with_update_new(&object->flip), 1, 3, i, i+1);
 		i++;
 	}
 
-	if (object->type==RANDOM_FILL)
+	if (object->type==GD_RANDOM_FILL)
 		/* pborder (first) and pseed (last) parameter are not needed here */
 		random_setup_widgets_to_table(GTK_TABLE(table), i, NULL, &object->fill_element, object->random_fill, object->random_fill_probability, NULL);
 	
@@ -1833,11 +1750,213 @@ object_properties(GdObject *object)
 	gtk_widget_destroy (dialog);
 
 	if (result==GTK_RESPONSE_REJECT)
-		do_undo();
+		undo_do_one_step();
 	else
 		render_cave();
 }
 
+
+
+
+
+
+
+
+
+/* this is the same scroll routine as the one used for the game. only the parameters are changed a bit. */
+static void
+drawcave_timeout_scroll(int player_x, int player_y)
+{
+	static int scroll_desired_x=0, scroll_desired_y=0;
+	GtkAdjustment *adjustment;
+	int scroll_center_x, scroll_center_y;
+	int i;
+	/* hystheresis size is this, multiplied by two. */
+	int scroll_start_x=scroll_window->allocation.width/2-2*gd_cell_size_editor;
+	int scroll_start_y=scroll_window->allocation.height/2-2*gd_cell_size_editor;
+	int scroll_speed=gd_cell_size_editor/4;
+	
+	/* get the size of the window so we know where to place player.
+	 * first guess is the middle of the screen.
+	 * drawing_area->parent->parent is the viewport.
+	 * +cellsize/2 gets the stomach of player :) so the very center */
+	scroll_center_x=player_x * gd_cell_size_editor + gd_cell_size_editor/2 - drawing_area->parent->parent->allocation.width/2;
+	scroll_center_y=player_y * gd_cell_size_editor + gd_cell_size_editor/2 - drawing_area->parent->parent->allocation.height/2;
+
+	/* HORIZONTAL */
+	/* hystheresis function.
+	 * when scrolling left, always go a bit less left than player being at the middle.
+	 * when scrolling right, always go a bit less to the right. */
+	adjustment=gtk_scrolled_window_get_hadjustment(GTK_SCROLLED_WINDOW(scroll_window));
+	if (adjustment->value+scroll_start_x<scroll_center_x)
+		scroll_desired_x=scroll_center_x-scroll_start_x;
+	if (adjustment->value-scroll_start_x>scroll_center_x)
+		scroll_desired_x=scroll_center_x+scroll_start_x;
+
+	scroll_desired_x=CLAMP (scroll_desired_x, 0, adjustment->upper - adjustment->step_increment - adjustment->page_increment);
+	if (adjustment->value<scroll_desired_x) {
+		for (i=0; i<scroll_speed; i++)
+			if (adjustment->value<scroll_desired_x)
+				adjustment->value++;
+		gtk_adjustment_value_changed(adjustment);
+	}
+	if (adjustment->value>scroll_desired_x) {
+		for (i=0; i<scroll_speed; i++)
+			if (adjustment->value>scroll_desired_x)
+				adjustment->value--;
+		gtk_adjustment_value_changed(adjustment);
+	}
+
+	/* VERTICAL */
+	adjustment=gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scroll_window));
+	if (adjustment->value+scroll_start_y<scroll_center_y)
+		scroll_desired_y=scroll_center_y-scroll_start_y;
+	if (adjustment->value-scroll_start_y>scroll_center_y)
+		scroll_desired_y=scroll_center_y+scroll_start_y;
+
+	scroll_desired_y=CLAMP (scroll_desired_y, 0, adjustment->upper - adjustment->step_increment - adjustment->page_increment);
+	if (adjustment->value<scroll_desired_y) {
+		for (i=0; i<scroll_speed; i++)
+			if (adjustment->value<scroll_desired_y)
+				adjustment->value++;
+		gtk_adjustment_value_changed(adjustment);
+	}
+	if (adjustment->value>scroll_desired_y) {
+		for (i=0; i<scroll_speed; i++)
+			if (adjustment->value>scroll_desired_y)
+				adjustment->value--;
+		gtk_adjustment_value_changed(adjustment);
+	}
+}
+
+
+/* timeout 'interrupt', drawing cave in cave editor. */
+static gboolean
+drawing_area_draw_timeout(gpointer data)
+{
+	static int animcycle=0;
+	static int player_blinking=0;
+	static int cursor=0;
+	int x, y, draw;
+
+	/* if nothing to draw or nowhere to draw :) exit.
+	 * this is necessary as the interrupt is not uninstalled when the selector is running. */
+	if (!drawing_area || !rendered_cave)
+		return TRUE;
+
+	g_return_val_if_fail (gfx_buffer!=NULL, TRUE);
+
+	/* when mouse over a drawing object, cursor changes */
+	if (mouse_x >= 0 && mouse_y >= 0) {
+		int new_cursor=rendered_cave->objects_order[mouse_y][mouse_x] ? GDK_HAND1 : -1;
+		if (cursor!=new_cursor) {
+			cursor=new_cursor;
+			gdk_window_set_cursor (drawing_area->window, cursor==-1?NULL:gdk_cursor_new(cursor));
+		}
+	}
+
+	/* only do cell animations when window is active.
+	 * otherwise... user is testing the cave, animation would just waste cpu. */
+	if (gtk_window_has_toplevel_focus (GTK_WINDOW (gd_editor_window)))
+		animcycle=(animcycle+1) & 7;
+
+	if (animcycle==0)			/* player blinking is started at the beginning of animation sequences. */
+		player_blinking=g_random_int_range (0, 4)==0;	/* 1/4 chance of blinking, every sequence. */
+
+	for (y=0; y<rendered_cave->h; y++) {
+		for (x=0; x<rendered_cave->w; x++) {
+			if (gd_game_view)
+				draw=gd_elements[rendered_cave->map[y][x]].image_simple;
+			else
+				draw=gd_elements[rendered_cave->map[y][x]].image;
+			/* special case is player - sometimes blinking :) */
+			if (player_blinking && (rendered_cave->map[y][x]==O_INBOX))
+				draw=gd_elements[O_PLAYER_BLINK].image_simple;
+			/* the biter switch also shows its state */
+			if (rendered_cave->map[y][x]==O_BITER_SWITCH)
+				draw=gd_elements[O_BITER_SWITCH].image_simple+rendered_cave->biter_delay_frame;
+
+			/* negative value means animation */
+			if (draw<0)
+				draw=-draw+animcycle;
+
+			/* object coloring */
+			if (action==VISIBLE_REGION) {
+				/* if showing visible region, different color applies for: */
+				if (x>=rendered_cave->x1 && x<=rendered_cave->x2 && y>=rendered_cave->y1 && y<=rendered_cave->y2)
+					draw+=NUM_OF_CELLS;
+				if (x==rendered_cave->x1 || x==rendered_cave->x2 || y==rendered_cave->y1 || y==rendered_cave->y2)
+					draw+=NUM_OF_CELLS;	/* once again */
+			} else {
+				if (object_highlight_map[y][x]) /* if it is a selected object, make it colored */
+					draw+=2*NUM_OF_CELLS;
+				else if (gd_colored_objects && rendered_cave->objects_order[y][x]!=NULL)
+					/* if it belongs to any other element, make it colored a bit */
+					draw+=NUM_OF_CELLS;
+			}
+			
+			/* the drawing itself */
+			if (gfx_buffer[y][x]!=draw) {
+				gdk_draw_drawable(drawing_area->window, drawing_area->style->black_gc, gd_editor_pixmap(draw), 0, 0, x*gd_cell_size_editor, y*gd_cell_size_editor, gd_cell_size_editor, gd_cell_size_editor);
+				gfx_buffer[y][x]=draw;
+			}
+			
+			/* for fill objects, we show their origin */	
+			if (object_highlight_map[y][x]
+				&& (((GdObject *)rendered_cave->objects_order[y][x])->type==GD_FLOODFILL_BORDER
+					|| ((GdObject *)rendered_cave->objects_order[y][x])->type==GD_FLOODFILL_REPLACE)) {
+				GdObject *object=rendered_cave->objects_order[y][x];
+				int x=object->x1;
+				int y=object->y1;
+
+				/* only draw if inside bounds */
+				if (x>=0 && x<rendered_cave->w && y>=0 && y<rendered_cave->h) {
+					gdk_draw_rectangle(drawing_area->window, drawing_area->style->white_gc, FALSE, x*gd_cell_size_editor, y*gd_cell_size_editor, gd_cell_size_editor-1, gd_cell_size_editor-1);
+					gdk_draw_line(drawing_area->window, drawing_area->style->white_gc, x*gd_cell_size_editor, y*gd_cell_size_editor, (x+1)*gd_cell_size_editor-1, (y+1)*gd_cell_size_editor-1);
+					gdk_draw_line(drawing_area->window, drawing_area->style->white_gc, x*gd_cell_size_editor, (y+1)*gd_cell_size_editor-1, (x+1)*gd_cell_size_editor-1, y*gd_cell_size_editor);
+					gfx_buffer[object->y1][object->x1]=-1;
+				}
+			}
+		}
+	}
+
+	if (mouse_x>=0 && mouse_y>=0) {
+		/* this is the cell the mouse is over */
+		gdk_draw_rectangle(drawing_area->window, drawing_area->style->white_gc, FALSE, mouse_x*gd_cell_size_editor, mouse_y*gd_cell_size_editor, gd_cell_size_editor-1, gd_cell_size_editor-1);
+		/* always redraw this cell the next frame - the easiest way to always get rid of the rectangle when the mouse is moved */
+		gfx_buffer[mouse_y][mouse_x]=-1;
+	}
+
+	/* automatic scrolling */
+	if (mouse_x>=0 && mouse_y>=0 && button1_clicked)
+		drawcave_timeout_scroll(mouse_x, mouse_y);
+
+	return TRUE;
+}
+
+/*
+ *cave drawing area expose event.
+ */
+static gboolean
+drawing_area_expose_event(GtkWidget *widget, GdkEventExpose *event, gpointer data)
+{
+	int x, y, x1, y1, x2, y2;
+
+	if (!widget->window || gfx_buffer==NULL)
+		return FALSE;
+
+	/* calculate which area to update */
+	x1=event->area.x/gd_cell_size_editor;
+	y1=event->area.y/gd_cell_size_editor;
+	x2=(event->area.x+event->area.width-1)/gd_cell_size_editor;
+	y2=(event->area.y+event->area.height-1)/gd_cell_size_editor;
+
+	for (y=y1; y<=y2; y++)
+		for (x=x1; x<=x2; x++)
+			if (gfx_buffer[y][x]!=-1)
+				gdk_draw_drawable(drawing_area->window, drawing_area->style->black_gc, gd_editor_pixmap(gfx_buffer[y][x]), 0, 0, x*gd_cell_size_editor, y*gd_cell_size_editor, gd_cell_size_editor, gd_cell_size_editor);
+	return TRUE;
+}
 
 
 
@@ -1851,7 +1970,7 @@ object_properties(GdObject *object)
 
 /* mouse button press event */
 static gboolean
-button_press_event (GtkWidget *widget, const GdkEventButton * event, const gpointer data)
+drawing_area_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
 	GdObject *new_object;
 
@@ -1911,7 +2030,7 @@ button_press_event (GtkWidget *widget, const GdkEventButton * event, const gpoin
 				/* CONTROL or SHIFT PRESSED: multiple selection */
 				/* if control-click on a non-object, do nothing. */
 				if (rendered_cave->objects_order[clicked_y][clicked_x]) {
-					if (object_highlight[clicked_y][clicked_x])		/* <- hackish way of checking if the clicked object is currently selected */
+					if (object_highlight_map[clicked_y][clicked_x])		/* <- hackish way of checking if the clicked object is currently selected */
 						object_list_remove_from_selection(rendered_cave->objects_order[clicked_y][clicked_x]);
 					else
 						object_list_add_to_selection(rendered_cave->objects_order[clicked_y][clicked_x]);
@@ -1923,7 +2042,7 @@ button_press_event (GtkWidget *widget, const GdkEventButton * event, const gpoin
 					/* if clicking on a non-object, deselect all */
 					object_list_clear_selection();
 				} else
-				if (!object_highlight[clicked_y][clicked_x])		/* <- hackish way of checking if the clicked object is currently non-selected */
+				if (!object_highlight_map[clicked_y][clicked_x])		/* <- hackish way of checking if the clicked object is currently non-selected */
 					object_list_select_one_object(rendered_cave->objects_order[clicked_y][clicked_x]);
 			}
 			
@@ -1942,7 +2061,7 @@ button_press_event (GtkWidget *widget, const GdkEventButton * event, const gpoin
 				
 				new_object=g_new0 (GdObject, 1);
 				new_object->levels=GD_OBJECT_LEVEL_ALL;
-				new_object->type=POINT;	/* freehand places points */
+				new_object->type=GD_POINT;	/* freehand places points */
 				new_object->x1=clicked_x;
 				new_object->y1=clicked_y;
 				new_object->element=gd_element_button_get(element_button);
@@ -1959,19 +2078,19 @@ button_press_event (GtkWidget *widget, const GdkEventButton * event, const gpoin
 			/* do nothing, the motion event will matter */
 			break;
 			
-		case POINT:
-		case LINE:
-		case RECTANGLE:
-		case FILLED_RECTANGLE:
-		case RASTER:
-		case JOIN:
-		case FLOODFILL_REPLACE:
-		case FLOODFILL_BORDER: 
-		case MAZE:
-		case MAZE_UNICURSAL:
-		case MAZE_BRAID:
-		case RANDOM_FILL:
-		case COPY_PASTE:
+		case GD_POINT:
+		case GD_LINE:
+		case GD_RECTANGLE:
+		case GD_FILLED_RECTANGLE:
+		case GD_RASTER:
+		case GD_JOIN:
+		case GD_FLOODFILL_REPLACE:
+		case GD_FLOODFILL_BORDER: 
+		case GD_MAZE:
+		case GD_MAZE_UNICURSAL:
+		case GD_MAZE_BRAID:
+		case GD_RANDOM_FILL:
+		case GD_COPY_PASTE:
 			/* CREATE A NEW OBJECT */
 			
 			/* ok not moving so drawing something new. */
@@ -1991,35 +2110,35 @@ button_press_event (GtkWidget *widget, const GdkEventButton * event, const gpoin
 
 			new_object->element=gd_element_button_get(element_button);
 			/* for floodfills, get the first (to-be-found) element from the map */
-			if (new_object->type==FLOODFILL_REPLACE)
+			if (new_object->type==GD_FLOODFILL_REPLACE)
 				new_object->element=rendered_cave->map[clicked_y][clicked_x];
 			new_object->fill_element=gd_element_button_get(fillelement_button);
 			
 			switch (action) {
-				case RASTER:
+				case GD_RASTER:
 				new_object->dx=2;
 				new_object->dy=2;
 				break;
 				
-				case JOIN:
+				case GD_JOIN:
 				new_object->dx=0;
 				new_object->dy=0;
 				break;
 				
-				case MAZE:
-				case MAZE_UNICURSAL:
-				case MAZE_BRAID:
+				case GD_MAZE:
+				case GD_MAZE_UNICURSAL:
+				case GD_MAZE_BRAID:
 				new_object->dx=1;
 				new_object->dy=1;
 				break;
 				
-				case COPY_PASTE:
+				case GD_COPY_PASTE:
 				/* paste coordinates. */
 				new_object->dx=clicked_x;
 				new_object->dy=clicked_y;
 				break;
 				
-				case RANDOM_FILL:
+				case GD_RANDOM_FILL:
 				{
 					int j;
 
@@ -2047,7 +2166,7 @@ button_press_event (GtkWidget *widget, const GdkEventButton * event, const gpoin
 }
 
 static gboolean
-button_release_event (GtkWidget *widget, GdkEventButton *event, gpointer data)
+drawing_area_button_release_event (GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
 	if (event->type==GDK_BUTTON_RELEASE && event->button==1)
 		button1_clicked=FALSE;
@@ -2056,7 +2175,7 @@ button_release_event (GtkWidget *widget, GdkEventButton *event, gpointer data)
 
 /* mouse leaves drawing area event */
 static gboolean
-leave_event (const GtkWidget *widget, const GdkEventCrossing * event, const gpointer data)
+drawing_area_leave_event (GtkWidget *widget, GdkEventCrossing * event, gpointer data)
 {
 	/* do not check if it as enter event, as we did not connect that one. */
 	gtk_label_set_text (GTK_LABEL (label_coordinate), "[x:   y:   ]");
@@ -2067,7 +2186,7 @@ leave_event (const GtkWidget *widget, const GdkEventCrossing * event, const gpoi
 
 /* mouse motion event */
 static gboolean
-motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpointer data)
+drawing_area_motion_event (GtkWidget *widget, GdkEventMotion *event, gpointer data)
 {
 	int x, y, dx, dy;
 	GdkModifierType state;
@@ -2174,7 +2293,7 @@ motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpoint
 			
 			new_object=g_new0 (GdObject, 1);
 			new_object->levels=GD_OBJECT_LEVEL_ALL;
-			new_object->type=POINT;	/* freehand places points */
+			new_object->type=GD_POINT;	/* freehand places points */
 			new_object->x1=x;
 			new_object->y1=y;
 			new_object->element=gd_element_button_get(element_button);
@@ -2201,9 +2320,9 @@ motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpoint
 			}
 
 			switch (object->type) {
-				case POINT:
-				case FLOODFILL_REPLACE:
-				case FLOODFILL_BORDER:
+				case GD_POINT:
+				case GD_FLOODFILL_REPLACE:
+				case GD_FLOODFILL_BORDER:
 					/* this one will be true for a point */
 					/* for other objects, only allow dragging by their origin */
 					if (clicked_x==object->x1 && clicked_y==object->y1) {
@@ -2212,7 +2331,7 @@ motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpoint
 					}
 					break;
 					
-				case LINE:
+				case GD_LINE:
 					/* these are the easy ones. for a line, try if endpoints are dragged.
 					 * if not, drag the whole line.
 					 * for a point, the first if() will always match.
@@ -2232,13 +2351,13 @@ motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpoint
 						object->y2+=dy;
 					}
 					break;
-				case RECTANGLE:
-				case FILLED_RECTANGLE:
-				case RASTER:
-				case MAZE:
-				case MAZE_UNICURSAL:
-				case MAZE_BRAID:
-				case RANDOM_FILL:
+				case GD_RECTANGLE:
+				case GD_FILLED_RECTANGLE:
+				case GD_RASTER:
+				case GD_MAZE:
+				case GD_MAZE_UNICURSAL:
+				case GD_MAZE_BRAID:
+				case GD_RANDOM_FILL:
 					/* dragging objects which are box-shaped */
 					/* XXX for raster, this not always works; as raster's x2,y2 may not be visible */
 					if (clicked_x==object->x1 && clicked_y==object->y1) {			/* try to drag (x1;y1) corner. */
@@ -2265,8 +2384,8 @@ motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpoint
 						object->y2+=dy;
 					}
 					break;
-				case JOIN:
-				case COPY_PASTE:
+				case GD_JOIN:
+				case GD_COPY_PASTE:
 					/* for join, dx dy are displacement, for paste, dx dy are new positions. */
 					object->dx+=dx;
 					object->dy+=dy;
@@ -2278,30 +2397,30 @@ motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpoint
 			break;
 
 		/* DRAGGING THE MOUSE, WHEN THE OBJECT WAS JUST CREATED */
-		case POINT:
-		case FLOODFILL_BORDER:
-		case FLOODFILL_REPLACE:
+		case GD_POINT:
+		case GD_FLOODFILL_BORDER:
+		case GD_FLOODFILL_REPLACE:
 			/* only dragging the created point further. wants the user another one, he must press the button again. */
 			if (object->x1!=x || object->y1!=y) {
 				object->x1=x;
 				object->y1=y;
 			}
 			break;
-		case LINE:
-		case RECTANGLE:
-		case FILLED_RECTANGLE:
-		case RASTER:
-		case MAZE:
-		case MAZE_UNICURSAL:
-		case MAZE_BRAID:
-		case RANDOM_FILL:
+		case GD_LINE:
+		case GD_RECTANGLE:
+		case GD_FILLED_RECTANGLE:
+		case GD_RASTER:
+		case GD_MAZE:
+		case GD_MAZE_UNICURSAL:
+		case GD_MAZE_BRAID:
+		case GD_RANDOM_FILL:
 			/* for these, dragging sets the second coordinate. */
 			if (object->x2!=x || object->y2!=y) {
 				object->x2=x;
 				object->y2=y;
 			}
 			break;
-		case COPY_PASTE:
+		case GD_COPY_PASTE:
 			/* dragging sets the second coordinate, but check paste coordinate */
 			if (object->x2!=x || object->y2!=y) {
 				object->x2=x;
@@ -2310,7 +2429,7 @@ motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpoint
 				object->dy=MIN(object->y1, object->y2);
 			}
 			break;
-		case JOIN:
+		case GD_JOIN:
 			/* dragging sets the distance of the new character placed. */
 			object->dx+=dx;
 			object->dy+=dy;
@@ -2333,8 +2452,8 @@ motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpoint
 			GdObject *object=iter->data;
 			
 			switch (object->type) {
-				case COPY_PASTE:	/* dx dy are new coordinates */
-				case JOIN:	/* dx dy are displacement */
+				case GD_COPY_PASTE:	/* dx dy are new coordinates */
+				case GD_JOIN:	/* dx dy are displacement */
 					object->dx+=dx;
 					object->dy+=dy;
 					break;
@@ -2372,10 +2491,10 @@ editor_window_configure_event (GtkWidget *widget, GdkEventConfigure *event, gpoi
 
 /* destroy editor window - do some cleanups */
 static gboolean
-destroy_event (GtkWidget *widget, GdkEvent *event, gpointer data)
+editor_window_destroy_event(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
 	/* remove drawing interrupt. */
-	g_source_remove_by_user_data (drawcave_int);
+	g_source_remove_by_user_data (drawing_area_draw_timeout);
 	/* if cave is drawn, free. */
 	gd_cave_free (rendered_cave);
 	rendered_cave=NULL;
@@ -2421,7 +2540,7 @@ icon_view_update_pixbufs_timeout(gpointer data)
 	created=0;
 	/* render a maximum of 5 pixbufs at a time */
 	while (created<5 && (finish=gtk_tree_model_get_iter (model, &iter, path))) {
-		Cave *cave;
+		GdCave *cave;
 		GdkPixbuf *pixbuf, *pixbuf_in_icon_view;
 
 		gtk_tree_model_get (model, &iter, CAVE_COLUMN, &cave, PIXBUF_COLUMN, &pixbuf_in_icon_view, -1);
@@ -2429,7 +2548,7 @@ icon_view_update_pixbufs_timeout(gpointer data)
 
 		/* if we have no pixbuf, generate one. */
 		if (!pixbuf) {
-			Cave *rendered;
+			GdCave *rendered;
 
 			pixbuf_in_icon_view=NULL;	/* to force update below */			
 			rendered=gd_cave_new_rendered (cave, 0, 0);	/* render at level 1, seed=0 */
@@ -2468,12 +2587,12 @@ icon_view_update_pixbufs()
 /* this is also called as an item activated signal. */
 /* so we do not use its parameters. */
 static void
-edit_cave_cb()
+icon_view_edit_cave_cb()
 {
 	GList *list;
 	GtkTreeIter iter;
 	GtkTreeModel *model;
-	Cave *cave;
+	GdCave *cave;
 
 	list=gtk_icon_view_get_selected_items (GTK_ICON_VIEW(iconview_cavelist));
 	g_return_if_fail (list!=NULL);
@@ -2487,12 +2606,12 @@ edit_cave_cb()
 }
 
 static void
-rename_cave_cb(GtkWidget *widget, gpointer data)
+icon_view_rename_cave_cb(GtkWidget *widget, gpointer data)
 {
 	GList *list;
 	GtkTreeIter iter;
 	GtkTreeModel *model;
-	Cave *cave;
+	GdCave *cave;
 	GtkWidget *dialog, *entry;
 	int result;
 
@@ -2506,7 +2625,7 @@ rename_cave_cb(GtkWidget *widget, gpointer data)
 	g_list_foreach (list, (GFunc) gtk_tree_path_free, NULL);	/* free the list of paths */
 	g_list_free (list);
 
-	dialog=gtk_dialog_new_with_buttons(_("Cave Name"), GTK_WINDOW(editor_window), GTK_DIALOG_NO_SEPARATOR|GTK_DIALOG_DESTROY_WITH_PARENT,
+	dialog=gtk_dialog_new_with_buttons(_("Cave Name"), GTK_WINDOW(gd_editor_window), GTK_DIALOG_NO_SEPARATOR|GTK_DIALOG_DESTROY_WITH_PARENT,
 		GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
 	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT);
 	entry=gtk_entry_new();
@@ -2525,12 +2644,12 @@ rename_cave_cb(GtkWidget *widget, gpointer data)
 }
 
 static void
-cave_make_selectable_cb(GtkWidget *widget, gpointer data)
+icon_view_cave_make_selectable_cb(GtkWidget *widget, gpointer data)
 {
 	GList *list;
 	GtkTreeIter iter;
 	GtkTreeModel *model;
-	Cave *cave;
+	GdCave *cave;
 
 	list=gtk_icon_view_get_selected_items (GTK_ICON_VIEW(iconview_cavelist));
 	g_return_if_fail (list!=NULL);
@@ -2549,12 +2668,12 @@ cave_make_selectable_cb(GtkWidget *widget, gpointer data)
 }
 
 static void
-cave_make_unselectable_cb(GtkWidget *widget, gpointer data)
+icon_view_cave_make_unselectable_cb(GtkWidget *widget, gpointer data)
 {
 	GList *list;
 	GtkTreeIter iter;
 	GtkTreeModel *model;
-	Cave *cave;
+	GdCave *cave;
 
 	list=gtk_icon_view_get_selected_items (GTK_ICON_VIEW(iconview_cavelist));
 	g_return_if_fail (list!=NULL);
@@ -2577,24 +2696,28 @@ icon_view_selection_changed_cb(GtkWidget *widget, gpointer data)
 {
 	GList *list;
 	GtkTreeModel *model;
+	int count;
 
 	list=gtk_icon_view_get_selected_items (GTK_ICON_VIEW (widget));
-	gtk_action_group_set_sensitive (actions_cave_selector, g_list_length(list)==1);
-	gtk_action_group_set_sensitive (actions_clipboard, list!=NULL);
-	if (list!=NULL) {
+	count=g_list_length(list);
+	gtk_action_group_set_sensitive(actions_cave_selector, count==1);
+	gtk_action_group_set_sensitive(actions_clipboard, count!=0);
+	if (count==0)
+		set_status_label_for_caveset();
+	else
+	if (count==1) {
 		GtkTreeIter iter;
-		Cave *cave;
-		char *name_escaped;
+		GdCave *cave;
 
 		model=gtk_icon_view_get_model (GTK_ICON_VIEW (widget));
 
 		gtk_tree_model_get_iter (model, &iter, list->data);
 		gtk_tree_model_get (model, &iter, CAVE_COLUMN, &cave, -1);
-
-		name_escaped=g_markup_escape_text(cave->name, -1);
-		gd_label_set_markup_printf(GTK_LABEL (label_object), _("<b>%s</b>, %s, %dx%d, time %d:%02d, diamonds %d"), name_escaped, cave->selectable?_("selectable"):_("not selectable"), cave->w, cave->h, cave->level_time[0]/60, cave->level_time[0] % 60, cave->level_diamonds[0]);
-		g_free(name_escaped);
+		
+		set_status_label_for_cave(cave);	/* status bar now shows some basic data for cave */
 	}
+	else
+		gd_label_set_markup_printf(GTK_LABEL (label_object), _("%d caves selected"), count);
 	g_list_foreach (list, (GFunc) gtk_tree_path_free, NULL);
 	g_list_free (list);
 }
@@ -2602,7 +2725,7 @@ icon_view_selection_changed_cb(GtkWidget *widget, gpointer data)
 
 /* for caveset icon view */
 static void
-caveset_icon_view_destroyed (GtkIconView * icon_view, gpointer data)
+icon_view_destroyed (GtkIconView * icon_view, gpointer data)
 {
 	GtkTreePath *path;
 	GtkTreeModel *model;
@@ -2614,7 +2737,7 @@ caveset_icon_view_destroyed (GtkIconView * icon_view, gpointer data)
 	model=gtk_icon_view_get_model(icon_view);
 	path=gtk_tree_path_new_first();
 	while (gtk_tree_model_get_iter (model, &iter, path)) {
-		Cave *cave;
+		GdCave *cave;
 
 		gtk_tree_model_get (model, &iter, CAVE_COLUMN, &cave, -1);
 		/* make a new list from the new order obtained from the icon view */
@@ -2628,14 +2751,14 @@ caveset_icon_view_destroyed (GtkIconView * icon_view, gpointer data)
 
 
 static void
-add_cave_to_icon_view(GtkListStore *store, Cave *cave)
+icon_view_add_cave(GtkListStore *store, GdCave *cave)
 {
 	GtkTreeIter treeiter;
 	GdkPixbuf *cave_pixbuf;
 	static GdkPixbuf *missing_image=NULL;
 	
 	if (!missing_image) {
-		missing_image=gtk_widget_render_icon(editor_window, GTK_STOCK_MISSING_IMAGE, GTK_ICON_SIZE_DIALOG, NULL);
+		missing_image=gtk_widget_render_icon(gd_editor_window, GTK_STOCK_MISSING_IMAGE, GTK_ICON_SIZE_DIALOG, NULL);
 	}
 	
 	/* if we already know the pixbuf, set it. */
@@ -2648,21 +2771,21 @@ add_cave_to_icon_view(GtkListStore *store, Cave *cave)
 /* does nothing else but sets caveset_edited to true. called by "reordering" (drag&drop), which is implemented by gtk+ by inserting and deleting */
 /* we only connect this signal after adding all caves to the icon view, so it is only activated by the user! */
 static void
-cave_list_row_inserted(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
+icon_view_row_inserted(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
 {
 	gd_caveset_edited=TRUE;
 }
 
 /* for popup menu, by properties key */
 static void
-iconview_popup_menu(GtkWidget *widget, gpointer data)
+icon_view_popup_menu(GtkWidget *widget, gpointer data)
 {
 	gtk_menu_popup(GTK_MENU(caveset_popup), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
 }
 
 /* for popup menu, by right-click */
 static gboolean
-iconview_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer data)
+icon_view_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
 	if (event->type==GDK_BUTTON_PRESS && event->button==3) {
 		gtk_menu_popup(GTK_MENU(caveset_popup), NULL, NULL, NULL, NULL, event->button, event->time);
@@ -2678,7 +2801,7 @@ iconview_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer d
  */
 
 static void
-select_cave_for_edit (Cave * cave)
+select_cave_for_edit (GdCave * cave)
 {
 	object_list_clear_selection();
 
@@ -2728,25 +2851,27 @@ select_cave_for_edit (Cave * cave)
 			/* enable some events */
 			gtk_widget_add_events(drawing_area, GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_LEAVE_NOTIFY_MASK);
 			g_signal_connect(G_OBJECT (drawing_area), "destroy", G_CALLBACK(gtk_widget_destroyed), &drawing_area);
-			g_signal_connect(G_OBJECT (drawing_area), "button_press_event", G_CALLBACK(button_press_event), NULL);
-			g_signal_connect(G_OBJECT (drawing_area), "button_release_event", G_CALLBACK(button_release_event), NULL);
-			g_signal_connect(G_OBJECT (drawing_area), "motion_notify_event", G_CALLBACK(motion_event), NULL);
-			g_signal_connect(G_OBJECT (drawing_area), "leave_notify_event", G_CALLBACK(leave_event), NULL);
+			g_signal_connect(G_OBJECT (drawing_area), "button_press_event", G_CALLBACK(drawing_area_button_press_event), NULL);
+			g_signal_connect(G_OBJECT (drawing_area), "button_release_event", G_CALLBACK(drawing_area_button_release_event), NULL);
+			g_signal_connect(G_OBJECT (drawing_area), "motion_notify_event", G_CALLBACK(drawing_area_motion_event), NULL);
+			g_signal_connect(G_OBJECT (drawing_area), "leave_notify_event", G_CALLBACK(drawing_area_leave_event), NULL);
 			g_signal_connect(G_OBJECT (drawing_area), "expose_event", G_CALLBACK(drawing_area_expose_event), NULL);
 			gtk_container_add (GTK_CONTAINER (align), drawing_area);
 		}
 		render_cave();
 		gtk_widget_set_size_request(drawing_area, edited_cave->w * gd_cell_size_editor, edited_cave->h * gd_cell_size_editor);
+		
+		set_status_label_for_cave(cave);
 	}
 	else {
 		/* if no cave given, show selector. */
 		/* forget undo caves */
-		undo_free();
+		undo_free_all();
 		
 		gd_cave_map_free(gfx_buffer);
 		gfx_buffer=NULL;
-		gd_cave_map_free(object_highlight);
-		object_highlight=NULL;
+		gd_cave_map_free(object_highlight_map);
+		object_highlight_map=NULL;
 
 		gtk_list_store_clear (object_list);
 		gtk_widget_hide (scroll_window_objects);
@@ -2764,9 +2889,9 @@ select_cave_for_edit (Cave * cave)
 			/* create list store for caveset */
 			cave_list=gtk_list_store_new(NUM_CAVESET_COLUMNS, G_TYPE_POINTER, G_TYPE_STRING, GDK_TYPE_PIXBUF);
 			for (iter=gd_caveset; iter; iter=g_list_next (iter))
-				add_cave_to_icon_view(cave_list, iter->data);
+				icon_view_add_cave(cave_list, iter->data);
 			/* we only connect this signal after adding all caves to the icon view, so it is only activated by the user! */
-			g_signal_connect(G_OBJECT(cave_list), "row-inserted", G_CALLBACK(cave_list_row_inserted), NULL);
+			g_signal_connect(G_OBJECT(cave_list), "row-inserted", G_CALLBACK(icon_view_row_inserted), NULL);
 			/* forget caveset; now we store caves in the GtkListStore */
 			g_list_free(gd_caveset);
 			gd_caveset=NULL;
@@ -2774,20 +2899,23 @@ select_cave_for_edit (Cave * cave)
 			iconview_cavelist=gtk_icon_view_new_with_model (GTK_TREE_MODEL (cave_list));
 			g_object_unref(cave_list);	/* now the icon view holds the reference */
 			icon_view_update_pixbufs();	/* create icons */
-			g_signal_connect(G_OBJECT(iconview_cavelist), "destroy", G_CALLBACK(caveset_icon_view_destroyed), &iconview_cavelist);
+			g_signal_connect(G_OBJECT(iconview_cavelist), "destroy", G_CALLBACK(icon_view_destroyed), &iconview_cavelist);
 			g_signal_connect(G_OBJECT(iconview_cavelist), "destroy", G_CALLBACK(gtk_widget_destroyed), &iconview_cavelist);
-			g_signal_connect(G_OBJECT(iconview_cavelist), "popup-menu", G_CALLBACK(iconview_popup_menu), NULL);
-			g_signal_connect(G_OBJECT(iconview_cavelist), "button-press-event", G_CALLBACK(iconview_button_press_event), NULL);
+			g_signal_connect(G_OBJECT(iconview_cavelist), "popup-menu", G_CALLBACK(icon_view_popup_menu), NULL);
+			g_signal_connect(G_OBJECT(iconview_cavelist), "button-press-event", G_CALLBACK(icon_view_button_press_event), NULL);
 
-			gtk_icon_view_set_text_column(GTK_ICON_VIEW (iconview_cavelist), NAME_COLUMN);
+			gtk_icon_view_set_text_column(GTK_ICON_VIEW(iconview_cavelist), NAME_COLUMN);
 			gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW (iconview_cavelist), PIXBUF_COLUMN);
-			gtk_icon_view_set_reorderable(GTK_ICON_VIEW (iconview_cavelist), TRUE);
+			gtk_icon_view_set_item_width(GTK_ICON_VIEW(iconview_cavelist), 128+24);	/* 128 is the size of the icons */
+			gtk_icon_view_set_reorderable(GTK_ICON_VIEW(iconview_cavelist), TRUE);
 			gtk_icon_view_set_selection_mode(GTK_ICON_VIEW (iconview_cavelist), GTK_SELECTION_MULTIPLE);
 			/* item (cave) activated. the enter button activates the menu item; this one is used for doubleclick */
-			g_signal_connect(iconview_cavelist, "item-activated", G_CALLBACK(edit_cave_cb), NULL);
+			g_signal_connect(iconview_cavelist, "item-activated", G_CALLBACK(icon_view_edit_cave_cb), NULL);
 			g_signal_connect(iconview_cavelist, "selection-changed", G_CALLBACK(icon_view_selection_changed_cb), NULL);
 			gtk_container_add(GTK_CONTAINER (scroll_window), iconview_cavelist);
 		}
+
+		set_status_label_for_caveset();
 	}
 	/* show all items inside scrolled window. some may have been newly created. */
 	gtk_widget_show_all (scroll_window);
@@ -2813,7 +2941,7 @@ cave_random_setup_cb(GtkWidget *widget, gpointer data)
 	/* save for undo here, as we do not have cancel button :P */
 	undo_save();
 
-	dialog=gtk_dialog_new_with_buttons (_("Cave Initial Random Fill"), GTK_WINDOW (editor_window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
+	dialog=gtk_dialog_new_with_buttons (_("Cave Initial Random Fill"), GTK_WINDOW (gd_editor_window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
 	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
 	
 	table=gtk_table_new(0, 0, FALSE);
@@ -2829,7 +2957,7 @@ cave_random_setup_cb(GtkWidget *widget, gpointer data)
 	gtk_widget_destroy(dialog);
 	/* if cancel clicked, revert to original */
 	if (result!=GTK_RESPONSE_ACCEPT)
-		do_undo();
+		undo_do_one_step();
 }
 
 
@@ -2850,7 +2978,7 @@ save_cave_png (GdkPixbuf *pixbuf)
 	/* check if in cave editor */
 	g_return_if_fail (edited_cave!=NULL);
 
-	dialog=gtk_file_chooser_dialog_new(_("Save Cave as PNG Image"), GTK_WINDOW (editor_window), GTK_FILE_CHOOSER_ACTION_SAVE,
+	dialog=gtk_file_chooser_dialog_new(_("Save Cave as PNG Image"), GTK_WINDOW (gd_editor_window), GTK_FILE_CHOOSER_ACTION_SAVE,
 		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 		GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
 		NULL);
@@ -2889,7 +3017,7 @@ save_cave_png (GdkPixbuf *pixbuf)
 
 	if (error) {
 		g_warning("%s: %s", filename, error->message);
-		gd_show_last_error(editor_window);
+		gd_show_last_error(gd_editor_window);
 		g_error_free (error);
 	}
 	g_free(filename);
@@ -2899,10 +3027,10 @@ save_cave_png (GdkPixbuf *pixbuf)
    this creates a pixbuf of the cave, and scales it down to fit the screen if needed.
    it is then presented to the user, with the option to save it in png */
 static void
-cave_overview (gboolean game_view)
+cave_overview (gboolean simple_view)
 {
 	/* view the RENDERED one, and the entire cave */
-	GdkPixbuf *pixbuf=gd_drawcave_to_pixbuf (rendered_cave, 0, 0, game_view), *scaled;
+	GdkPixbuf *pixbuf=gd_drawcave_to_pixbuf (rendered_cave, 0, 0, simple_view), *scaled;
 	GtkWidget *dialog, *button;
 	int sx, sy;
 	double fx, fy;
@@ -2933,7 +3061,7 @@ cave_overview (gboolean game_view)
 	}
 	
 	/* simple dialog with this image only */
-	dialog=gtk_dialog_new_with_buttons(_("Cave Overview"), GTK_WINDOW(editor_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, NULL);
+	dialog=gtk_dialog_new_with_buttons(_("Cave Overview"), GTK_WINDOW(gd_editor_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, NULL);
 	button=gtk_button_new_with_mnemonic(_("Save as _PNG"));
 	gtk_button_set_image(GTK_BUTTON(button), gtk_image_new_from_stock(GTK_STOCK_CONVERT, GTK_ICON_SIZE_BUTTON));
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, 1);
@@ -3000,7 +3128,7 @@ auto_shrink_cave_cb(GtkWidget *widget, gpointer data)
  */
 /* helper: update pixmaps and the like */
 static void
-color_changed()
+cave_colors_update_element_pixbufs()
 {
 	int x,y;
 	/* select new colors */
@@ -3016,7 +3144,7 @@ color_changed()
 	render_cave();
 }
 
-static gboolean colorchange_update_disabled;
+static gboolean cave_colors_colorchange_update_disabled;
 
 #define GDASH_PCOLOR "gdash-pcolor"
 /* when the user clicks the button and sets the color, we store the color to the cave,
@@ -3026,16 +3154,16 @@ static gboolean colorchange_update_disabled;
    happen when we automatically update the buttons.
  */
 static void
-colorbutton_changed(GtkWidget *widget, gpointer data)
+cave_colors_colorbutton_changed(GtkWidget *widget, gpointer data)
 {
-	if (!colorchange_update_disabled) {
+	if (!cave_colors_colorchange_update_disabled) {
 		GdColor* value;
 		
 		value=(GdColor *)g_object_get_data(G_OBJECT(widget), GDASH_PCOLOR);
 		g_assert(value!=NULL);
 			
 		*value=gd_color_combo_get_color(widget);	/* update cave data */
-		color_changed();
+		cave_colors_update_element_pixbufs();
 	}
 }
 
@@ -3059,7 +3187,7 @@ cave_colors_random_combo_cb(GtkWidget *widget, gpointer data)
 	gd_cave_set_random_colors(edited_cave, (GdColorType) (new_index-1));	/* -1: 0 is "set random...", 1 is rgb... */
 
 	/* and update combo boxes from cave */
-	colorchange_update_disabled=TRUE;	/* this is needed, otherwise all combos would want to update the pixbufs, one by one */
+	cave_colors_colorchange_update_disabled=TRUE;	/* this is needed, otherwise all combos would want to update the pixbufs, one by one */
 	for (iter=combos; iter!=NULL; iter=iter->next) {
 		GtkWidget *combo=(GtkWidget *)iter->data;
 		GdColor* value=(GdColor *)g_object_get_data(G_OBJECT(combo), GDASH_PCOLOR);
@@ -3068,8 +3196,8 @@ cave_colors_random_combo_cb(GtkWidget *widget, gpointer data)
 		
 		gd_color_combo_set(GTK_COMBO_BOX(combo), *value);
 	}
-	colorchange_update_disabled=FALSE;
-	color_changed();
+	cave_colors_colorchange_update_disabled=FALSE;
+	cave_colors_update_element_pixbufs();
 	
 	/* set back to "select random..." text */
 	gtk_combo_box_set_active(GTK_COMBO_BOX(widget), 0);
@@ -3092,7 +3220,7 @@ cave_colors_cb(GtkWidget *widget, gpointer data)
 	colored_objects_backup=gd_colored_objects;
 	gd_colored_objects=FALSE;
 
-	dialog=gtk_dialog_new_with_buttons (_("Cave Colors"), GTK_WINDOW (editor_window), GTK_DIALOG_DESTROY_WITH_PARENT, NULL);
+	dialog=gtk_dialog_new_with_buttons (_("Cave Colors"), GTK_WINDOW (gd_editor_window), GTK_DIALOG_DESTROY_WITH_PARENT, NULL);
 	gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
 	/* random combo */
 	random_combo=gtk_combo_box_new_text();
@@ -3119,7 +3247,7 @@ cave_colors_cb(GtkWidget *widget, gpointer data)
 			combos=g_list_append(combos, combo);
 			g_object_set_data(G_OBJECT(combo), GDASH_PCOLOR, value);
 			gtk_widget_set_tooltip_text(combo, _(gd_cave_properties[i].tooltip));
-			g_signal_connect(combo, "changed", G_CALLBACK(colorbutton_changed), value);
+			g_signal_connect(combo, "changed", G_CALLBACK(cave_colors_colorbutton_changed), value);
 			gtk_table_attach(GTK_TABLE(table), combo, 1, 2, row, row+1, GTK_FILL|GTK_EXPAND, GTK_FILL|GTK_SHRINK, 0, 0);
 			row++;
 		}
@@ -3136,13 +3264,13 @@ cave_colors_cb(GtkWidget *widget, gpointer data)
 	"it is not recommended to use different types together (for example, RGB color for background, Atari color for Slime.)"));
 	
 	gtk_widget_show_all(dialog);
-	colorchange_update_disabled=FALSE;
+	cave_colors_colorchange_update_disabled=FALSE;
 	result=gtk_dialog_run(GTK_DIALOG(dialog));
 	g_list_free(combos);
 	gtk_widget_destroy(dialog);
 	/* if the new colors were not accepted by the user (escape pressed), we undo the changes. */
 	if (result!=GTK_RESPONSE_ACCEPT)
-		do_undo();
+		undo_do_one_step();
 
 	/* restore colored objects setting. */
 	gd_colored_objects=colored_objects_backup;
@@ -3197,7 +3325,7 @@ delete_selected_cb(GtkWidget *widget, gpointer data)
 			GtkTreeRowReference *reference=listiter->data;
 			GtkTreePath *path;
 			GtkTreeIter iter;
-			Cave *cave;
+			GdCave *cave;
 			
 			path=gtk_tree_row_reference_get_path(reference);
 			gtk_tree_model_get_iter (model, &iter, path);
@@ -3375,7 +3503,7 @@ copy_selected_cb(GtkWidget *widget, gpointer data)
 		/* we do not need references here (as in cut), as we do not modify the treemodel */
 		model=gtk_icon_view_get_model (GTK_ICON_VIEW (iconview_cavelist));
 		for (listiter=list; listiter!=NULL; listiter=listiter->next) {
-			Cave *cave=NULL;
+			GdCave *cave=NULL;
 			GtkTreeIter iter;
 			
 			gtk_tree_model_get_iter (model, &iter, listiter->data);
@@ -3414,9 +3542,9 @@ paste_clipboard_cb(GtkWidget *widget, gpointer data)
 		GtkListStore *store=GTK_LIST_STORE(gtk_icon_view_get_model(GTK_ICON_VIEW(iconview_cavelist)));
 		
 		for(iter=cave_clipboard; iter!=NULL; iter=iter->next) {
-			Cave *cave=iter->data;
+			GdCave *cave=iter->data;
 			
-			add_cave_to_icon_view(store, gd_cave_new_from_cave(cave));
+			icon_view_add_cave(store, gd_cave_new_from_cave(cave));
 		}
 		icon_view_update_pixbufs();
 		
@@ -3478,7 +3606,7 @@ cut_selected_cb(GtkWidget *widget, gpointer data)
 		for (listiter=references; listiter!=NULL; listiter=listiter->next) {
 			GtkTreeRowReference *reference=listiter->data;
 			GtkTreePath *path;
-			Cave *cave=NULL;
+			GdCave *cave=NULL;
 			GtkTreeIter iter;
 			
 			path=gtk_tree_row_reference_get_path(reference);
@@ -3528,14 +3656,13 @@ select_all_cb(GtkWidget *widget, gpointer data)
 	if (edited_cave==NULL)	/* in game editor */
 		gtk_icon_view_select_all(GTK_ICON_VIEW(iconview_cavelist));		/* SELECT ALL CAVES */
 	else					/* in cave editor */
-		gtk_tree_selection_select_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(object_tree_view)));		/* SELECT ALL OBJECTS */
+		gtk_tree_selection_select_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(object_list_tree_view)));		/* SELECT ALL OBJECTS */
 }
 
 /* delete all cave elements */
 static void
 clear_cave_elements_cb(GtkWidget *widget, gpointer data)
 {
-
 	g_return_if_fail (edited_cave!=NULL);
 
 	if (edited_cave->objects) {
@@ -3592,7 +3719,7 @@ flatten_cave_cb(GtkWidget *widget, gpointer data)
 	if (response) {
 		undo_save();	/* changing; save for undo */
 
-		gd_flatten_cave (edited_cave, edit_level);
+		gd_flatten_cave(edited_cave, edit_level);
 		render_cave();
 	}
 }
@@ -3713,14 +3840,14 @@ save_html_cb(GtkWidget *widget, gpointer data)
 	/* if no filename given, */
 	GtkWidget *dialog;
 	GtkFileFilter *filter;
-	Cave *edited;
+	GdCave *edited;
 	
 	edited=edited_cave;
 	/* destroy icon view so it does not interfere with saving (when icon view is active, caveset=NULL) */
 	if (iconview_cavelist)
 		gtk_widget_destroy(iconview_cavelist);
 
-	dialog=gtk_file_chooser_dialog_new(_("Save Cave Set in HTML"), GTK_WINDOW (editor_window),
+	dialog=gtk_file_chooser_dialog_new(_("Save Cave Set in HTML"), GTK_WINDOW (gd_editor_window),
 		GTK_FILE_CHOOSER_ACTION_SAVE,
 		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 		GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
@@ -3743,9 +3870,9 @@ save_html_cb(GtkWidget *widget, gpointer data)
 	/* saving if got filename */
 	if (htmlname) {
 		gd_clear_error_flag();
-		gd_save_html(htmlname, editor_window);
+		gd_save_html(htmlname, gd_editor_window);
 		if (gd_has_new_error())
-			gd_show_last_error(editor_window);
+			gd_show_last_error(gd_editor_window);
 	}
 
 	g_free(htmlname);
@@ -3764,7 +3891,7 @@ export_cavefile_cb(GtkWidget *widget, gpointer data)
 	
 	g_return_if_fail(edited_cave!=NULL);
 
-	dialog=gtk_file_chooser_dialog_new(_("Export Cave as CrLi Cave File"), GTK_WINDOW (editor_window),
+	dialog=gtk_file_chooser_dialog_new(_("Export Cave as CrLi Cave File"), GTK_WINDOW (gd_editor_window),
 		GTK_FILE_CHOOSER_ACTION_SAVE,
 		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 		GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
@@ -3783,7 +3910,7 @@ export_cavefile_cb(GtkWidget *widget, gpointer data)
 		gd_clear_error_flag();
 		gd_export_cave_to_crli_cavefile(edited_cave, edit_level, outname);
 		if(gd_has_new_error())
-			gd_show_errors(editor_window);
+			gd_show_errors(gd_editor_window);
 		g_free(outname);
 	}
 }
@@ -3796,14 +3923,14 @@ export_cavepack_cb(GtkWidget *widget, gpointer data)
 	char *outname=NULL;
 	/* if no filename given, */
 	GtkWidget *dialog;
-	Cave *edited;
+	GdCave *edited;
 	
 	edited=edited_cave;
 	/* destroy icon view so it does not interfere with saving (when icon view is active, caveset=NULL) */
 	if (iconview_cavelist)
 		gtk_widget_destroy(iconview_cavelist);
 
-	dialog=gtk_file_chooser_dialog_new(_("Export Cave as CrLi Cave Pack"), GTK_WINDOW (editor_window),
+	dialog=gtk_file_chooser_dialog_new(_("Export Cave as CrLi Cave Pack"), GTK_WINDOW (gd_editor_window),
 		GTK_FILE_CHOOSER_ACTION_SAVE,
 		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 		GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
@@ -3822,7 +3949,7 @@ export_cavepack_cb(GtkWidget *widget, gpointer data)
 		gd_clear_error_flag();
 		gd_export_cave_list_to_crli_cavepack(gd_caveset, edit_level, outname);
 		if(gd_has_new_error())
-			gd_show_errors(editor_window);
+			gd_show_errors(gd_editor_window);
 		g_free(outname);
 	}
 
@@ -3911,10 +4038,10 @@ next_cave_cb(GtkWidget *widget, gpointer data)
 static void
 new_cave_cb(GtkWidget *widget, gpointer data)
 {
-	Cave *newcave;
+	GdCave *newcave;
 	GtkWidget *dialog, *entry_name, *entry_desc, *intermission_check, *table;
 
-	dialog=gtk_dialog_new_with_buttons(_("Create New Cave"), GTK_WINDOW(editor_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_NEW, GTK_RESPONSE_ACCEPT, NULL);
+	dialog=gtk_dialog_new_with_buttons(_("Create New Cave"), GTK_WINDOW(gd_editor_window), GTK_DIALOG_NO_SEPARATOR | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_NEW, GTK_RESPONSE_ACCEPT, NULL);
 	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
 	gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
 
@@ -3995,7 +4122,7 @@ open_caveset_cb(GtkWidget *widget, gpointer data)
 	if (iconview_cavelist)
 		gtk_widget_destroy(iconview_cavelist);
 	g_hash_table_remove_all(cave_pixbufs);
-	gd_open_caveset (editor_window, NULL);
+	gd_open_caveset (gd_editor_window, NULL);
 	gd_main_window_set_title();
 	select_cave_for_edit(NULL);
 }
@@ -4007,7 +4134,7 @@ open_installed_caveset_cb(GtkWidget *widget, gpointer data)
 	if (iconview_cavelist)
 		gtk_widget_destroy(iconview_cavelist);
 	g_hash_table_remove_all(cave_pixbufs);
-	gd_open_caveset (editor_window, gd_system_caves_dir);
+	gd_open_caveset (gd_editor_window, gd_system_caves_dir);
 	gd_main_window_set_title();
 	select_cave_for_edit(NULL);
 }
@@ -4015,26 +4142,26 @@ open_installed_caveset_cb(GtkWidget *widget, gpointer data)
 static void
 save_caveset_as_cb(GtkWidget *widget, gpointer data)
 {
-	Cave *edited;
+	GdCave *edited;
 	
 	edited=edited_cave;
 	/* destroy icon view so it does not interfere with the cave order, and the order of caves is saved */
 	if (iconview_cavelist)
 		gtk_widget_destroy(iconview_cavelist);
-	gd_save_caveset_as(editor_window);
+	gd_save_caveset_as(gd_editor_window);
 	select_cave_for_edit(edited);	/* go back to edited cave or recreate icon view */
 }
 
 static void
 save_caveset_cb(GtkWidget *widget, gpointer data)
 {
-	Cave *edited;
+	GdCave *edited;
 	
 	edited=edited_cave;
 	/* destroy icon view so it does not interfere with the cave order, and the order of caves is saved */
 	if (iconview_cavelist)
 		gtk_widget_destroy(iconview_cavelist);
-	gd_save_caveset(editor_window);
+	gd_save_caveset(gd_editor_window);
 	select_cave_for_edit(edited);	/* go back to edited cave or recreate icon view */
 }
 
@@ -4046,7 +4173,7 @@ new_caveset_cb(GtkWidget *widget, gpointer data)
 	/* destroy icon view so it does not interfere */
 	if (iconview_cavelist)
 		gtk_widget_destroy(iconview_cavelist);
-	if (gd_discard_changes(editor_window)) {
+	if (gd_discard_changes(gd_editor_window)) {
 		gd_caveset_clear();
 		g_hash_table_remove_all(cave_pixbufs);
 	}
@@ -4066,7 +4193,7 @@ new_caveset_cb(GtkWidget *widget, gpointer data)
 static void
 remove_all_unknown_tags_cb(GtkWidget *widget, gpointer data)
 {
-	Cave *edited;
+	GdCave *edited;
 	gboolean response;
 	
 	edited=edited_cave;
@@ -4080,7 +4207,7 @@ remove_all_unknown_tags_cb(GtkWidget *widget, gpointer data)
 		GList *iter;
 		
 		for(iter=gd_caveset; iter!=NULL; iter=iter->next) {
-			Cave *cave=(Cave *)iter->data;
+			GdCave *cave=(GdCave *)iter->data;
 			
 			g_hash_table_remove_all(cave->tags);
 		}
@@ -4101,7 +4228,7 @@ selectable_all_cb(GtkWidget *widget, gpointer data)
 
 	gtk_widget_destroy(iconview_cavelist);	/* to generate gd_caveset */
 	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
-		Cave *cave=(Cave *)iter->data;
+		GdCave *cave=(GdCave *)iter->data;
 		
 		if (!cave->selectable) {
 			cave->selectable=TRUE;
@@ -4119,7 +4246,7 @@ selectable_all_but_intermissions_cb(GtkWidget *widget, gpointer data)
 	
 	gtk_widget_destroy(iconview_cavelist);	/* to generate gd_caveset */
 	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
-		Cave *cave=(Cave *)iter->data;
+		GdCave *cave=(GdCave *)iter->data;
 		gboolean desired=!cave->intermission;
 		
 		if (cave->selectable!=desired) {
@@ -4140,7 +4267,7 @@ selectable_all_after_intermissions_cb(GtkWidget *widget, gpointer data)
 	
 	gtk_widget_destroy(iconview_cavelist);	/* to generate gd_caveset */
 	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
-		Cave *cave=(Cave *)iter->data;
+		GdCave *cave=(GdCave *)iter->data;
 		gboolean desired;
 		
 		desired=!cave->intermission && was_intermission;	/* selectable if this is a normal cave, and the previous one was an interm. */
@@ -4175,7 +4302,7 @@ level_scale_changed_cb(GtkWidget *widget, gpointer data)
 
 /* edit tool selected */
 static void
-action_objects_cb(GtkWidget *widget, gpointer data)
+action_select_tool_cb(GtkWidget *widget, gpointer data)
 {
 	action=gtk_radio_action_get_current_value (GTK_RADIO_ACTION (widget));
 	
@@ -4184,7 +4311,7 @@ action_objects_cb(GtkWidget *widget, gpointer data)
 		int number=action;	/* index in array */
 		
 		if (action==FREEHAND)	/* freehand tool places points, so we use the labels from the point */
-			number=POINT;
+			number=GD_POINT;
 		
 		/* first button - mainly for draw */
 		gtk_label_set_text(GTK_LABEL(label_first_element), _(gd_object_description[number].first_button));
@@ -4252,14 +4379,14 @@ toggle_test_label_cb(GtkWidget *widget, gpointer data)
 static void
 close_editor_cb(GtkWidget *widget, gpointer data)
 {
-	gtk_widget_destroy(editor_window);
+	gtk_widget_destroy(gd_editor_window);
 }
 
 
 
 
 static void
-highscore_cb(GtkWidget *widget, gpointer data)
+show_highscore_cb(GtkWidget *widget, gpointer data)
 {
 	/* if the iconview is active, we destroy it, as it interferes with GList *caveset.
 	   after highscore editing, we call editcave(null) to recreate */
@@ -4267,86 +4394,230 @@ highscore_cb(GtkWidget *widget, gpointer data)
 	
 	if (has_iconview)
 		gtk_widget_destroy(iconview_cavelist);
-	gd_show_highscore(editor_window, edited_cave, TRUE, NULL, -1);
+	gd_show_highscore(gd_editor_window, edited_cave, TRUE, NULL, -1);
 	if (has_iconview)
 		select_cave_for_edit(NULL);
 }
 
-
-
-
-
-
-/*******
- * SIGNALS which are used when the object list is reordered by drag and drop.
- *
- * non-trivial.
- * drag and drop emits the following signals: insert, changed, and delete.
- * so there is a moment when the reordered row has TWO copies in the model.
- * therefore we cannot use the changed signal to see the new order.
- *
- * we also cannot use the delete signal on its own, as it is also emitted when
- * rendering the cave.
- *
- * instead, we connect to the changed and the delete signal. we have a flag,
- * named "rowchangedbool", which is set to true by the changed signal, and
- * therefore we know that the next delete signal is emitted by a reordering.
- * at that point, we have the new order, and _AFTER_ resetting the flag,
- * we rerender the cave. */
-static gboolean rowchangedbool=FALSE;
-
 static void
-row_changed(GtkTreeModel *model, GtkTreePath *changed_path, GtkTreeIter *changed_iter, gpointer user_data)
+remove_bad_replays_cb(GtkWidget *widget, gpointer data)
 {
-	/* set the flag so we know that the next delete signal is emitted by a drag-and-drop */
-	rowchangedbool=TRUE;
+	/* if the iconview is active, we destroy it, as it interferes with GList *caveset.
+	   after highscore editing, we call editcave(null) to recreate */
+	gboolean has_iconview=iconview_cavelist!=NULL;
+	GList *citer;
+	GString *report;
+	int sum;
+	
+	if (has_iconview)
+		gtk_widget_destroy(iconview_cavelist);
+	
+	report=g_string_new(NULL);
+	sum=0;
+	for (citer=gd_caveset; citer!=NULL; citer=citer->next) {
+		GdCave *cave=(GdCave *)citer->data;
+		int removed;
+		
+		removed=gd_cave_check_replays(cave, FALSE, TRUE, FALSE);
+		sum+=removed;
+		if (removed>0)
+			g_string_append_printf(report, _("%s: removed %d replay(s)\n"), cave->name, removed);
+	}
+	
+	if (has_iconview)
+		select_cave_for_edit(NULL);
+	if (sum>0) {
+		gd_infomessage(_("Some replays were removed."), report->str);
+		gd_caveset_edited=TRUE;
+	}
+	g_string_free(report, TRUE);
 }
 
-static gboolean
-object_list_new_order_func(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
-{
-	GList **list=(GList **)data;
-	GdObject *object;
-	
-	gtk_tree_model_get(model, iter, POINTER_COLUMN, &object, -1);
-	*list=g_list_append(*list, object);
-	
-	return FALSE;	/* continue traversing */
-}
+
 
 static void
-row_delete(GtkTreeModel *model, GtkTreePath *changed_path, gpointer user_data)
+mark_all_replays_as_working_cb(GtkWidget *widget, gpointer data)
 {
-	if (rowchangedbool) {
-		GList *new_order=NULL;
-
-		/* reset the flag, as we handle the reordering here. */
-		rowchangedbool=FALSE;
+	/* if the iconview is active, we destroy it, as it interferes with GList *caveset.
+	   after highscore editing, we call editcave(null) to recreate */
+	gboolean has_iconview=iconview_cavelist!=NULL;
+	GList *citer;
+	GString *report;
+	int sum;
+	
+	if (has_iconview)
+		gtk_widget_destroy(iconview_cavelist);
+	
+	report=g_string_new(NULL);
+	sum=0;
+	for (citer=gd_caveset; citer!=NULL; citer=citer->next) {
+		GdCave *cave=(GdCave *)citer->data;
+		int changed;
 		
-		/* this will build the new object order to the list */
-		gtk_tree_model_foreach(model, object_list_new_order_func, &new_order);
-		
-		g_list_free(edited_cave->objects);
-		edited_cave->objects=new_order;
+		changed=gd_cave_check_replays(cave, FALSE, FALSE, TRUE);
+		sum+=changed;
+		if (changed>0)
+			g_string_append_printf(report, _("%s: marked %d replay(s) as working ones\n"), cave->name, changed);
+	}
+	
+	if (has_iconview)
+		select_cave_for_edit(NULL);
+	if (sum>0) {
+		gd_warningmessage(_("Some replay checksums were recalculated. This does not mean that those replays actually play correctly!"), report->str);
+		gd_caveset_edited=TRUE;
+	}
+	g_string_free(report, TRUE);
+}
 
-		render_cave();
+
+
+
+
+
+
+/* set image from gd_caveset_data title screen. */
+static void
+setup_caveset_title_image_load_image(GtkWidget *image)
+{
+	GdkPixbuf *bigone;
+
+	bigone=gd_create_title_image();
+	if (!bigone)
+		gtk_image_clear(GTK_IMAGE(image));
+	else {
+		gtk_image_set_from_pixbuf(GTK_IMAGE(image), bigone);
+		g_object_unref(bigone);
 	}
 }
 
-/* row activated - set properties of object */
+/* forgets caveset title image. */
 static void
-object_tree_view_row_activated(GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data)
+setup_caveset_title_image_clear_cb(GtkWidget *widget, gpointer data)
 {
-	GtkTreeModel *model=gtk_tree_view_get_model(tree_view);
-	GtkTreeIter iter;
-	GdObject *object;
+	GtkWidget *image=(GtkWidget *)data;
 	
-	gtk_tree_model_get_iter(model, &iter, path);
-	gtk_tree_model_get(model, &iter, POINTER_COLUMN, &object, -1);
-	object_properties(object);
-	/* render cave after changing object properties */
-	render_cave();
+	g_string_assign(gd_caveset_data->title_screen, "");
+	g_string_assign(gd_caveset_data->title_screen_scroll, "");
+	setup_caveset_title_image_load_image(image);
 }
+
+/* load image from disk */
+static void
+setup_caveset_title_image_load_image_into_string(const char *title, GtkWidget *parent, GtkWidget *image, GString *string, int maxwidth, int maxheight)
+{
+	char *filename;
+	GdkPixbuf *pixbuf;
+	GError *error=NULL;
+	gchar *buffer;
+	gsize bufsize;
+	gchar *base64;
+	int width, height;
+	
+	filename=gd_select_image_file(title, parent);
+	if (!filename)	/* no filename -> do nothing */
+		return;
+	
+	/* check image format and size */
+	if (!gdk_pixbuf_get_file_info(filename, &width, &height)) {
+		gd_errormessage(_("Error loading image file."), _("Cannot recognize file format."));
+		return;
+	}
+	/* check for maximum size */
+	if (height>maxheight || width>maxwidth) {
+		char *secondary;
+		
+		secondary=g_strdup_printf(_("Maximum sizes: %dx%d pixels"), maxwidth, maxheight);
+		gd_errormessage(_("The image selected is too big!"), secondary);
+		g_free(secondary);
+		return;
+	}
+	
+	/* load pixbuf */
+	pixbuf=gdk_pixbuf_new_from_file(filename, &error);
+	if (!pixbuf) {
+		/* cannot load image - do nothing */
+		gd_errormessage(_("Error loading image file."), error->message);
+		g_error_free(error);
+		return;
+	}
+	
+	/* now the image is loaded, "save" as png into a buffer */
+	gdk_pixbuf_save_to_buffer(pixbuf, &buffer, &bufsize, "png", &error, "compression", "9", NULL);
+	g_object_unref(pixbuf);	/* not needed anymore */
+	if (error) {
+		/* cannot load image - do nothing */
+		gd_errormessage("Internal error: %s", error->message);
+		g_error_free(error);
+		return;
+	}
+	base64=g_base64_encode((guchar *) buffer, bufsize);
+	g_free(buffer);	/* binary data can be freed */
+	g_string_assign(string, base64);
+	g_free(base64);	/* copied to string so can be freed */
+	setup_caveset_title_image_load_image(image);
+	gd_caveset_edited=TRUE;
+}
+
+static void
+setup_caveset_title_image_load_screen_cb(GtkWidget *widget, gpointer data)
+{
+	setup_caveset_title_image_load_image_into_string(_("Select Image File for Title Screen"), gtk_widget_get_toplevel(widget),
+		(GtkWidget *)data, gd_caveset_data->title_screen, GD_TITLE_SCREEN_MAX_WIDTH, GD_TITLE_SCREEN_MAX_HEIGHT);
+}
+
+static void
+setup_caveset_title_image_load_tile_cb(GtkWidget *widget, gpointer data)
+{
+	setup_caveset_title_image_load_image_into_string(_("Select Image File for Background Tile"), gtk_widget_get_toplevel(widget),
+		(GtkWidget *)data, gd_caveset_data->title_screen_scroll, GD_TITLE_SCROLL_MAX_WIDTH, GD_TITLE_SCROLL_MAX_HEIGHT);
+}
+
+/* load images for the caveset title screen */
+static void
+setup_caveset_title_image_cb(GtkWidget *widget, gpointer data)
+{
+	GtkWidget *dialog;
+	GtkWidget *frame, *align, *image, *bbox;
+	GtkWidget *setbutton, *settilebutton, *clearbutton;
+	int result;
+	char *hint;
+	
+	dialog=gtk_dialog_new_with_buttons(_("Set Title Image"), GTK_WINDOW(gd_editor_window), 0,
+		GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
+	
+	/* an align, so the image shrinks to its size, and not the vbox determines its width. */
+	align=gtk_alignment_new(0.5, 0.5, 0, 0);
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), align, TRUE, TRUE, 6);
+	/* a frame around the image */
+	frame=gtk_frame_new(NULL);
+	gtk_container_add(GTK_CONTAINER(align), frame);
+	image=gtk_image_new();
+	gtk_widget_set_size_request(image, GD_TITLE_SCREEN_MAX_WIDTH, GD_TITLE_SCREEN_MAX_HEIGHT);	/* max title image size */
+	gtk_container_add(GTK_CONTAINER(frame), image);
+	
+	setup_caveset_title_image_load_image(image);
+	bbox=gtk_hbutton_box_new();
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), bbox, FALSE, FALSE, 6);
+	gtk_container_add(GTK_CONTAINER(bbox), setbutton=gtk_button_new_with_mnemonic(_("Load _image")));
+	gtk_container_add(GTK_CONTAINER(bbox), settilebutton=gtk_button_new_with_mnemonic(_("Load _tile")));
+	gtk_container_add(GTK_CONTAINER(bbox), clearbutton=gtk_button_new_from_stock(GTK_STOCK_CLEAR));
+	g_signal_connect(clearbutton, "clicked", G_CALLBACK(setup_caveset_title_image_clear_cb), image);
+	g_signal_connect(setbutton, "clicked", G_CALLBACK(setup_caveset_title_image_load_screen_cb), image);
+	g_signal_connect(settilebutton, "clicked", G_CALLBACK(setup_caveset_title_image_load_tile_cb), image);
+	
+	hint=g_strdup_printf(_("Recommended image sizes are 320x176 pixels for title image and 8x8 pixels for the scrolling tile. Maximum sizes are %dx%d and %dx%d, respectively."), GD_TITLE_SCREEN_MAX_WIDTH, GD_TITLE_SCREEN_MAX_HEIGHT, GD_TITLE_SCROLL_MAX_WIDTH, GD_TITLE_SCROLL_MAX_HEIGHT);
+	gd_dialog_add_hint(GTK_DIALOG(dialog), hint);
+	g_free(hint);
+
+	gtk_widget_show_all(dialog);
+	result=gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
+	
+	/* main window update title image */
+	gd_main_window_set_title_animation();
+}
+
+
 
 
 
@@ -4378,17 +4649,18 @@ gd_open_cave_editor()
 		{"SaveAsFile", GTK_STOCK_SAVE_AS, NULL, NULL, N_("Save cave set as new file"), G_CALLBACK(save_caveset_as_cb)},
 		{"OpenFile", GTK_STOCK_OPEN, NULL, NULL, N_("Load cave set from file"), G_CALLBACK(open_caveset_cb)},
 		{"OpenInstalledFile", GTK_STOCK_CDROM, N_("O_pen shipped"), NULL, N_("Load shipped cave set from file"), G_CALLBACK(open_installed_caveset_cb)},
-		{"HighScore", GD_ICON_AWARD, N_("Hi_ghscores"), NULL, NULL, G_CALLBACK(highscore_cb)},
+		{"HighScore", GD_ICON_AWARD, N_("Hi_ghscores"), NULL, NULL, G_CALLBACK(show_highscore_cb)},
 		{"SelectAll", GTK_STOCK_SELECT_ALL, NULL, "<control>A", N_("Select all items"), G_CALLBACK(select_all_cb)},
 		{"CaveSetProps", GTK_STOCK_PROPERTIES, N_("Cave set _properties"), NULL, N_("Set properties of cave set"), G_CALLBACK(set_caveset_properties_cb)},
+		{"CaveSetTitleImage", GD_ICON_IMAGE, N_("Cave set _title image"), NULL, N_("Set caveset title image"), G_CALLBACK(setup_caveset_title_image_cb)},
 	};
 
 	/* cave_selector menu items */
 	static const GtkActionEntry action_entries_cave_selector[]={
-		{"EditCave", GD_ICON_CAVE_EDITOR, N_("_Edit cave"), NULL, N_("Edit selected cave"), G_CALLBACK(edit_cave_cb)},
-		{"RenameCave", NULL, N_("_Rename cave"), NULL, N_("Rename selected cave"), G_CALLBACK(rename_cave_cb)},
-		{"MakeSelectable", NULL, N_("Make cave _selectable"), NULL, N_("Make the cave selectable as game start"), G_CALLBACK(cave_make_selectable_cb)},
-		{"MakeUnselectable", NULL, N_("Make cave _unselectable"), NULL, N_("Make the cave unselectable as game start"), G_CALLBACK(cave_make_unselectable_cb)},
+		{"EditCave", GD_ICON_CAVE_EDITOR, N_("_Edit cave"), NULL, N_("Edit selected cave"), G_CALLBACK(icon_view_edit_cave_cb)},
+		{"RenameCave", NULL, N_("_Rename cave"), NULL, N_("Rename selected cave"), G_CALLBACK(icon_view_rename_cave_cb)},
+		{"MakeSelectable", NULL, N_("Make cave _selectable"), NULL, N_("Make the cave selectable as game start"), G_CALLBACK(icon_view_cave_make_selectable_cb)},
+		{"MakeUnselectable", NULL, N_("Make cave _unselectable"), NULL, N_("Make the cave unselectable as game start"), G_CALLBACK(icon_view_cave_make_unselectable_cb)},
 	};
 
 	/* caveset editing */
@@ -4401,6 +4673,8 @@ gd_open_cave_editor()
 		{"AllButIntermissionsSelectable", NULL, N_("All _but intermissions"), NULL, N_("Make all caves but intermissions selectable as game start"), G_CALLBACK(selectable_all_but_intermissions_cb)},
 		{"AllAfterIntermissionsSelectable", NULL, N_("All _after intermissions"), NULL, N_("Make all caves after intermissions selectable as game start"), G_CALLBACK(selectable_all_after_intermissions_cb)},
 		{"RemoveAllUnknownTags", NULL, N_("Remove all unknown tags"), NULL, N_("Removes all unknown tags found in the BDCFF file"), G_CALLBACK(remove_all_unknown_tags_cb)},
+		{"RemoveBadReplays", NULL, N_("Remove bad replays"), NULL, N_("Removes replays which won't play as they have their caves modified."), G_CALLBACK(remove_bad_replays_cb)},
+		{"MarkAllReplaysAsWorking", NULL, N_("Fix replay checksums"), NULL, N_("Treats all replays with wrong checksums as working ones."), G_CALLBACK(mark_all_replays_as_working_cb)},
 	};
 
 	/* cave editing menu items */
@@ -4555,6 +4829,7 @@ gd_open_cave_editor()
 				"<menuitem action='PreviousCave'/>"
 				"<menuitem action='NextCave'/>"
 				"<menuitem action='CaveSetProps'/>"
+				"<menuitem action='CaveSetTitleImage'/>"
 				"<menu action='SelectMenu'>"
 					"<menuitem action='AllCavesSelectable'/>"
 					"<menuitem action='AllButIntermissionsSelectable'/>"
@@ -4565,6 +4840,8 @@ gd_open_cave_editor()
 				"<menuitem action='ExportAsCrLiCave'/>"
 				"<menuitem action='SaveHTML'/>"
 				"<menuitem action='RemoveAllUnknownTags'/>"
+				"<menuitem action='RemoveBadReplays'/>"
+				"<menuitem action='MarkAllReplaysAsWorking'/>"
 				"<separator/>"
 				"<menuitem action='Close'/>"
 			"</menu>"
@@ -4676,27 +4953,27 @@ gd_open_cave_editor()
 	GtkWidget *menu;
 	int i;
 
-	if (editor_window) {
+	if (gd_editor_window) {
 		/* if exists, only show it to the user. */
-		gtk_window_present (GTK_WINDOW (editor_window));
+		gtk_window_present (GTK_WINDOW (gd_editor_window));
 		return;
 	}
 	
 	/* hash table which stores cave pointer -> pixbufs. deleting a pixbuf calls g_object_unref. */
 	cave_pixbufs=g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, g_object_unref);
 
-	editor_window=gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_default_size (GTK_WINDOW (editor_window), gd_editor_window_width, gd_editor_window_height);
-	g_signal_connect (G_OBJECT (editor_window), "destroy", G_CALLBACK(gtk_widget_destroyed), &editor_window);
-	g_signal_connect (G_OBJECT (editor_window), "destroy", G_CALLBACK(destroy_event), NULL);
+	gd_editor_window=gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_window_set_default_size (GTK_WINDOW (gd_editor_window), gd_editor_window_width, gd_editor_window_height);
+	g_signal_connect (G_OBJECT (gd_editor_window), "destroy", G_CALLBACK(gtk_widget_destroyed), &gd_editor_window);
+	g_signal_connect (G_OBJECT (gd_editor_window), "destroy", G_CALLBACK(editor_window_destroy_event), NULL);
 
 	vbox=gtk_vbox_new(FALSE, 0);
-	gtk_container_add (GTK_CONTAINER (editor_window), vbox);
+	gtk_container_add (GTK_CONTAINER (gd_editor_window), vbox);
 
 	/* menu and toolbar */
 	actions_edit_tools=gtk_action_group_new("edit_tools");
 	gtk_action_group_set_translation_domain (actions_edit_tools, PACKAGE);
-	gtk_action_group_add_radio_actions (actions_edit_tools, action_objects, G_N_ELEMENTS(action_objects), MOVE, G_CALLBACK(action_objects_cb), NULL);
+	gtk_action_group_add_radio_actions (actions_edit_tools, action_objects, G_N_ELEMENTS(action_objects), MOVE, G_CALLBACK(action_select_tool_cb), NULL);
 
 	actions=gtk_action_group_new("edit_normal");
 	gtk_action_group_set_translation_domain (actions, PACKAGE);
@@ -4788,15 +5065,15 @@ gd_open_cave_editor()
 	gtk_box_pack_start (GTK_BOX (toolbars), gtk_ui_manager_get_widget (ui, "/ToolBar"), FALSE, FALSE, 0);
 	gtk_toolbar_set_tooltips (GTK_TOOLBAR (gtk_ui_manager_get_widget (ui, "/ToolBar")), TRUE);
 	gtk_toolbar_set_style(GTK_TOOLBAR(gtk_ui_manager_get_widget (ui, "/ToolBar")), GTK_TOOLBAR_BOTH_HORIZ);
-	gtk_window_add_accel_group (GTK_WINDOW (editor_window), gtk_ui_manager_get_accel_group (ui));
+	gtk_window_add_accel_group (GTK_WINDOW (gd_editor_window), gtk_ui_manager_get_accel_group (ui));
 
 	/* get popups and attach them to the window, so they are not destroyed (the window holds the ref) */	
 	drawing_area_popup=gtk_ui_manager_get_widget (ui, "/DrawingAreaPopup");
-	gtk_menu_attach_to_widget(GTK_MENU(drawing_area_popup), editor_window, NULL);
+	gtk_menu_attach_to_widget(GTK_MENU(drawing_area_popup), gd_editor_window, NULL);
 	object_list_popup=gtk_ui_manager_get_widget (ui, "/ObjectListPopup");
-	gtk_menu_attach_to_widget(GTK_MENU(object_list_popup), editor_window, NULL);
+	gtk_menu_attach_to_widget(GTK_MENU(object_list_popup), gd_editor_window, NULL);
 	caveset_popup=gtk_ui_manager_get_widget (ui, "/CavesetPopup");
-	gtk_menu_attach_to_widget(GTK_MENU(caveset_popup), editor_window, NULL);
+	gtk_menu_attach_to_widget(GTK_MENU(caveset_popup), gd_editor_window, NULL);
 	
 	g_object_unref (actions);
 	g_object_unref (ui);
@@ -4838,19 +5115,19 @@ gd_open_cave_editor()
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll_window_objects), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
 	object_list=gtk_list_store_new(NUM_EDITOR_COLUMNS, G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_POINTER);
-	object_tree_view=gtk_tree_view_new_with_model (GTK_TREE_MODEL (object_list));
+	object_list_tree_view=gtk_tree_view_new_with_model (GTK_TREE_MODEL (object_list));
 	g_object_unref (object_list);
-	g_signal_connect (G_OBJECT (gtk_tree_view_get_selection (GTK_TREE_VIEW (object_tree_view))), "changed", G_CALLBACK(object_list_selection_changed_signal), NULL);
-	gtk_tree_selection_set_mode(gtk_tree_view_get_selection(GTK_TREE_VIEW(object_tree_view)), GTK_SELECTION_MULTIPLE);
-	gtk_tree_view_set_reorderable(GTK_TREE_VIEW(object_tree_view), TRUE);
-	gtk_container_add (GTK_CONTAINER (scroll_window_objects), object_tree_view);
+	g_signal_connect (G_OBJECT (gtk_tree_view_get_selection (GTK_TREE_VIEW (object_list_tree_view))), "changed", G_CALLBACK(object_list_selection_changed_signal), NULL);
+	gtk_tree_selection_set_mode(gtk_tree_view_get_selection(GTK_TREE_VIEW(object_list_tree_view)), GTK_SELECTION_MULTIPLE);
+	gtk_tree_view_set_reorderable(GTK_TREE_VIEW(object_list_tree_view), TRUE);
+	gtk_container_add (GTK_CONTAINER (scroll_window_objects), object_list_tree_view);
 	/* two signals which are required to handle cave object drag-and-drop reordering */
-	g_signal_connect(G_OBJECT(object_list), "row-changed", G_CALLBACK(row_changed), NULL);
-	g_signal_connect(G_OBJECT(object_list), "row-deleted", G_CALLBACK(row_delete), NULL);
+	g_signal_connect(G_OBJECT(object_list), "row-changed", G_CALLBACK(object_list_row_changed), NULL);
+	g_signal_connect(G_OBJECT(object_list), "row-deleted", G_CALLBACK(object_list_row_delete), NULL);
 	/* object double-click: */
-	g_signal_connect(G_OBJECT(object_tree_view), "row-activated", G_CALLBACK(object_tree_view_row_activated), NULL);
-	g_signal_connect(G_OBJECT(object_tree_view), "popup-menu", G_CALLBACK(object_tree_view_popup_menu), NULL);
-	g_signal_connect(G_OBJECT(object_tree_view), "button-press-event", G_CALLBACK(object_tree_view_button_press_event), NULL);
+	g_signal_connect(G_OBJECT(object_list_tree_view), "row-activated", G_CALLBACK(object_list_row_activated), NULL);
+	g_signal_connect(G_OBJECT(object_list_tree_view), "popup-menu", G_CALLBACK(object_list_show_popup_menu), NULL);
+	g_signal_connect(G_OBJECT(object_list_tree_view), "button-press-event", G_CALLBACK(object_list_button_press_event), NULL);
 
 	/* tree view column which holds all data */
 	/* we do not allow sorting, as it disables drag and drop */
@@ -4872,7 +5149,7 @@ gd_open_cave_editor()
 	renderer=gtk_cell_renderer_pixbuf_new();
 	gtk_tree_view_column_pack_end (column, renderer, FALSE);
 	gtk_tree_view_column_set_attributes (column, renderer, "pixbuf", FILL_PIXBUF_COLUMN, NULL);
-	gtk_tree_view_append_column (GTK_TREE_VIEW (object_tree_view), column);
+	gtk_tree_view_append_column (GTK_TREE_VIEW (object_list_tree_view), column);
 	
 	/* something like a statusbar, maybe that would be nicer */
 	hbox=gtk_hbox_new(FALSE, 6);
@@ -4884,14 +5161,14 @@ gd_open_cave_editor()
 
 	edit_level=0;		/* view: level 1 */
 	/* here we force selection and update, by calling the function twice */
-	select_tool(LINE);
+	select_tool(GD_LINE);
 	select_tool(MOVE);
-	g_timeout_add(40, drawcave_int, drawcave_int);
+	g_timeout_add(40, drawing_area_draw_timeout, drawing_area_draw_timeout);
 
-	gtk_widget_show_all(editor_window);
-	gtk_window_present(GTK_WINDOW(editor_window));
+	gtk_widget_show_all(gd_editor_window);
+	gtk_window_present(GTK_WINDOW(gd_editor_window));
 	/* to remember size; only attach signal after showing */
-	g_signal_connect (G_OBJECT (editor_window), "configure-event", G_CALLBACK(editor_window_configure_event), NULL);
+	g_signal_connect (G_OBJECT (gd_editor_window), "configure-event", G_CALLBACK(editor_window_configure_event), NULL);
 
 	select_cave_for_edit(NULL);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -51,10 +51,10 @@ typedef enum _gd_engine {
 extern const char *gd_engines[];
 
 
-GdCavefileFormat gd_caveset_imported_format(const guint8 *buf);
+GdCavefileFormat gd_caveset_imported_get_format(const guint8 *buf);
 GList* gd_caveset_import_from_buffer (const guint8 *buf, gsize length);
 
-void gd_cave_set_engine_defaults(Cave *cave, GdEngine engine);
+void gd_cave_set_engine_defaults(GdCave *cave, GdEngine engine);
 GdEngine gd_cave_get_engine_from_string(const char *param);
 GdPropertyDefault *gd_get_engine_default_array(GdEngine engine);
 

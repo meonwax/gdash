@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -26,7 +26,7 @@
 #include "c64import.h"
 #include "gtkgfx.h"
 
-static int steel=0x38;	/* magic value: the code of steel wall */
+static int crli_steel_code=0x38;	/* magic value: the code of steel wall in crli */
 
 
 static int element_to_crli(GdElement e, GHashTable *unknown)
@@ -57,25 +57,25 @@ static int element_to_crli(GdElement e, GHashTable *unknown)
 	}
 		
 	if (code==-1) {
-		g_assert(gd_crazylight_import_table[steel]==O_STEEL);
+		g_assert(gd_crazylight_import_table[crli_steel_code]==O_STEEL);
 
 		if (g_hash_table_lookup(unknown, GINT_TO_POINTER(code))==NULL) {
 			g_warning("the element '%s' can not be saved in crli, saving steel wall instead", gd_elements[e].name);
 			g_hash_table_insert(unknown, GINT_TO_POINTER(e), GINT_TO_POINTER(e));
 		}
 		
-		code=steel;
+		code=crli_steel_code;
 	}
 	
 	return code;
 }
 
 static int
-crli_export (Cave *to_convert, const int level, guint8 *compressed)
+crli_export (GdCave *to_convert, const int level, guint8 *compressed)
 {
 	guint8 output[0x3b0];
 	int x, y, i;
-	Cave *cave;
+	GdCave *cave;
 	/* for rle */
 	guint8 prev;
 	int count;
@@ -112,9 +112,9 @@ crli_export (Cave *to_convert, const int level, guint8 *compressed)
 		g_warning("crli only supports predictable slime");
 
 	/* fill data bytes with some defaults */
-	g_assert(gd_crazylight_import_table[steel]==O_STEEL);	/* check magic value */
+	g_assert(gd_crazylight_import_table[crli_steel_code]==O_STEEL);	/* check magic value */
 	for (i=0; i<40*22; i++)	/* fill map with steel wall */
-		output[i]=steel;
+		output[i]=crli_steel_code;
 	for (i=40*22; i<G_N_ELEMENTS(output); i++)	/* fill properties with zero */
 		output[i]=0;
 
@@ -315,7 +315,7 @@ crli_export (Cave *to_convert, const int level, guint8 *compressed)
 }
 
 void
-gd_export_cave_to_crli_cavefile(Cave *cave, int level, const char *filename)
+gd_export_cave_to_crli_cavefile(GdCave *cave, int level, const char *filename)
 {
 	guint8 data[1024];
 	int size;
@@ -367,7 +367,7 @@ gd_export_cave_list_to_crli_cavepack(GList *caveset, int level, const char *file
 	pos=0x70a2;	/* first available byte; before that we have space for the name */
 	
 	for (iter=caveset, i=0; iter!=NULL; iter=iter->next, i++) {
-		Cave *cave=iter->data;
+		GdCave *cave=iter->data;
 		int bytes;
 		int c;
 		gunichar ch;
@@ -488,16 +488,16 @@ gd_save_html(char *htmlname, GtkWidget *window)
 		g_string_append_printf (contents, _("Description: %s<BR>\n"), gd_caveset_data->description);
 	if (!g_str_equal(gd_caveset_data->www, ""))
 		g_string_append_printf (contents, _("WWW: %s<BR>\n"), gd_caveset_data->www);
-	if (!g_str_equal(gd_caveset_data->remark, ""))
-		g_string_append_printf (contents, _("Remark: %s<BR>\n"), gd_caveset_data->remark);
-	if (!g_str_equal(gd_caveset_data->notes->str, ""))
-		g_string_append_printf (contents, _("Notes:<BR>%s<BR>\n"), gd_caveset_data->notes->str);
+	if (!g_str_equal(gd_caveset_data->remark->str, ""))
+		g_string_append_printf (contents, _("Remark: %s<BR>\n"), gd_caveset_data->remark->str);
+	if (!g_str_equal(gd_caveset_data->story->str, ""))
+		g_string_append_printf (contents, _("Story:<BR>%s<BR>\n"), gd_caveset_data->story->str);
 
 	g_string_append_printf (contents, "<HR>\n");
 
 	for (i=0; i < gd_caveset_count (); i++) {
 		GdkPixbuf *pixbuf;
-		Cave *cave;
+		GdCave *cave;
 		char *pngname;
 		char *text;
 		gboolean has_amoeba=FALSE, has_magic=FALSE;
@@ -548,17 +548,26 @@ gd_save_html(char *htmlname, GtkWidget *window)
 			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Author"), cave->author);
 		if (!g_str_equal(cave->description, ""))
 			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Description"), cave->description);
-		if (!g_str_equal(cave->remark, ""))
-			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Remark"), cave->remark);
-		if (!g_str_equal(cave->notes->str, "")) {
-			/* we must split the notes into lines, and join them with html <br> */
+		if (!g_str_equal(cave->remark->str, "")) {
+			/* we must split the story into lines, and join them with html <br> */
 			char **spl;
 			char *join;
 			
-			spl=g_strsplit_set(cave->notes->str, "\n", -1);
+			spl=g_strsplit_set(cave->remark->str, "\n", -1);
 			join=g_strjoinv("<br>\n", spl);
 			g_strfreev(spl);
-			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Notes"), join);
+			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Remark"), join);
+			g_free(join);
+		}
+		if (!g_str_equal(cave->story->str, "")) {
+			/* we must split the story into lines, and join them with html <br> */
+			char **spl;
+			char *join;
+			
+			spl=g_strsplit_set(cave->story->str, "\n", -1);
+			join=g_strjoinv("<br>\n", spl);
+			g_strfreev(spl);
+			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Story"), join);
 			g_free(join);
 		}
 		g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Type"), cave->intermission ? _("Intermission") : _("Normal cave"));

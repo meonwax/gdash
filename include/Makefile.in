@@ -253,13 +253,8 @@ ICONS = \
 	object_not_on_all.png \
 	object_not_on_current.png \
 	replay.png \
-	keyboard.png
-
-TITLE = \
-	gdash_screen.png \
-	gdash_tile.png \
-	gdash.png \
-	gdash_32.png
+	keyboard.png \
+	image.png
 
 noinst_HEADERS = \
 	c64_png_colors.h \
@@ -283,6 +278,9 @@ EXTRA_DIST = $(ICONS) $(TITLE) $(icon_DATA) \
 	$(DTVPALETTES) dtvpal.h
 
 @GTK_FALSE@CELLS2C = 
+
+#title.h: $(TITLE) title.list
+#	gdk-pixbuf-csource --raw --build-list `cat title.list` > $@
 @GTK_TRUE@CELLS2C = cells2c
 
 # this one creates inlined original c64 graphics
@@ -295,6 +293,12 @@ cells2c_SOURCES = \
 # this utility creates an include file for any datafile
 file2c_SOURCES = \
 	file2c.c
+
+TITLE = \
+	gdash_screen.png \
+	gdash_tile.png \
+	gdash.png \
+	gdash_32.png
 
 all: all-am
 
@@ -596,19 +600,9 @@ icons.list: $(ICONS) Makefile.am
 			echo $$image >> $@; \
 		done )
 
-title.list: $(TITLE) Makefile.am
-	( rm -f $@; \
-		for image in $(TITLE); do \
-			echo $$image | sed s/\.png$$// >> $@; \
-			echo $$image >> $@; \
-		done )
-
 # the include files
 icons.h: $(ICONS) icons.list
 	gdk-pixbuf-csource --raw --build-list `cat icons.list` > $@
-
-title.h: $(TITLE) title.list
-	gdk-pixbuf-csource --raw --build-list `cat title.list` > $@
 
 @GTK_TRUE@c64_font.h: c64_font.png $(CELLS2C)
 @GTK_TRUE@	./cells2c c64_font.png >$@
@@ -630,6 +624,10 @@ ataripal.h: $(ATARIPALETTES) file2c Makefile.am
 
 dtvpal.h: $(DTVPALETTES) file2c Makefile.am
 	sh files2c.sh $@ c64dtv_palettes $(DTVPALETTES)
+
+# the empty string causes files2c.sh not to write the pointer arrays
+title.h: $(TITLE) file2c Makefile.am
+	sh files2c.sh $@ "" $(TITLE)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

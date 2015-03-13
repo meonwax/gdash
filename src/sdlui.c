@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,6 +14,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include <SDL.h>
+#include <SDL_image.h>
 #include <glib.h>
 #include <glib/gstdio.h>
 #include "cavedb.h"
@@ -371,18 +372,18 @@ gd_select_file(const char *title, const char *start_dir, const char *glob, gbool
  *
  */
 static gboolean
-is_image_ok_for_theme (const char *filename)
+is_image_ok_for_theme(const char *filename)
 {
 	SDL_Surface *surface;
 	gboolean result=FALSE;
 
-	surface=SDL_LoadBMP(filename);
+	surface=IMG_Load(filename);
 	if (!surface)
 		return FALSE;
-	/* if the bmp is loaded */
+	/* if the image is loaded */
 	if (surface) {
 		gd_error_set_context("%s", filename);
-		if (gd_is_surface_ok_for_theme(surface))			/* if bmp passes all checks, result is "OK" */
+		if (gd_is_surface_ok_for_theme(surface))			/* if image passes all checks, result is "OK" */
 			result=TRUE;
 		gd_error_set_context(NULL);
 		SDL_FreeSurface(surface);
@@ -426,8 +427,8 @@ add_dir_to_themes(GPtrArray *themes, const char *directory_name)
 		filename=g_build_filename(directory_name, name, NULL);
 		lower=g_ascii_strdown(filename, -1);
 
-		/* we can only open bmp files. converted to lowercase, to be able to check for .bmp */
-		if (g_str_has_suffix(lower, ".bmp") && g_file_test(filename, G_FILE_TEST_IS_REGULAR))
+		/* we only allow bmp and png files. converted to lowercase, to be able to check for .bmp */
+		if ((g_str_has_suffix(lower, ".bmp") || g_str_has_suffix(lower, ".png")) && g_file_test(filename, G_FILE_TEST_IS_REGULAR))
 			/* try to add the file. */
 			add_file_to_themes(themes, filename);
 
@@ -437,6 +438,7 @@ add_dir_to_themes(GPtrArray *themes, const char *directory_name)
 }
 
 /* this is in glib 2.16, but that is too new for some users. */
+/* also, this one treats NULL as the "lowest", so it will be at the start of the list */
 static int
 strcmp0(const char *str1, const char *str2)
 {
@@ -519,6 +521,8 @@ gd_settings_menu()
 		{ 1, TypeBoolean, "44kHz mixing", &gd_sdl_44khz_mixing },
 		{ 1, TypeBoolean, "Use BDCFF highscore", &gd_use_bdcff_highscore },
 		{ 1, TypeBoolean, "Show caveset name at uncover", &gd_show_name_of_game },
+		{ 1, TypeBoolean, "Show story", &gd_show_story },
+		{ 1, TypeStringv, "Status bar colors", &gd_status_bar_type, gd_status_bar_type_get_names() },
 		{ 1, TypeBoolean, "All caves selectable", &gd_all_caves_selectable },
 		{ 1, TypeBoolean, "Import as all selectable", &gd_import_as_all_caves_selectable },
 		{ 1, TypeBoolean, "No invisible outbox", &gd_no_invisible_outbox },
@@ -769,7 +773,7 @@ gd_install_theme()
 {
 	char *filename;
 
-	filename=gd_select_file("SELECT .BMP IMAGE FOR THEME", g_get_home_dir(), "*.bmp", FALSE);
+	filename=gd_select_file("SELECT IMAGE IMAGE FOR THEME", g_get_home_dir(), "*.bmp;*.png", FALSE);
 	if (filename) {
 		gd_clear_errors();
 		if (is_image_ok_for_theme(filename)) {
@@ -801,13 +805,16 @@ gd_install_theme()
 }
 
 void
-gd_show_highscore(Cave *highlight_cave, int highlight_line)
+gd_show_highscore(GdCave *highlight_cave, int highlight_line)
 {
-	Cave *cave;
+	GdCave *cave;
 	const int screen_height=gd_screen->h/gd_line_height();
 	int max=MIN(G_N_ELEMENTS(cave->highscore), screen_height-3);
 	gboolean finished;
-	GList *current=NULL;	/* current cave to view */
+	GList *current;	/* current cave to view */
+	
+	if (highlight_cave)
+		current=g_list_find(gd_caveset, highlight_cave);
 
 	gd_backup_and_dark_screen();
 	gd_title_line("THE HALL OF FAME");
@@ -818,6 +825,7 @@ gd_show_highscore(Cave *highlight_cave, int highlight_line)
 	while (!finished && !gd_quit) {
 		int i;
 		GdHighScore *scores;
+		SDL_Event event;
 
 		/* current cave or game */
 		if (current)
@@ -846,30 +854,193 @@ gd_show_highscore(Cave *highlight_cave, int highlight_line)
 		}
 		SDL_Flip(gd_screen);
 
-		/* do events; keys will be processed below */
-		gd_process_pending_events();
-
-		/* cursor movement */
-		if (gd_left() || gd_up()) {
-			/* if not showing game, step one cave back. if no previous cave, will be null, so we show game */
-			if (current!=NULL)
-				current=current->prev;
-		}
-		if (gd_right() || gd_down()) {
-			if (current!=NULL) {
-				/* if showing a cave, go to next cave (if any) */
-				if (current->next!=NULL)
-					current=current->next;
+		/* process events */
+		SDL_WaitEvent(NULL);
+		while (SDL_PollEvent(&event)) {
+			switch (event.type) {
+				case SDL_QUIT:
+					gd_quit=TRUE;
+					break;
+					
+				case SDL_KEYDOWN:
+					switch (event.key.keysym.sym) {
+						/* movements */
+						case SDLK_LEFT:
+						case SDLK_UP:
+						case SDLK_PAGEUP:
+							if (current!=NULL)
+								current=current->prev;
+							break;
+						case SDLK_RIGHT:
+						case SDLK_DOWN:
+						case SDLK_PAGEDOWN:
+							if (current!=NULL) {
+								/* if showing a cave, go to next cave (if any) */
+								if (current->next!=NULL)
+									current=current->next;
+							}
+							else {
+								/* if showing game, show first cave. */
+								current=gd_caveset;
+							}
+							break;
+						case SDLK_SPACE:
+						case SDLK_ESCAPE:
+						case SDLK_RETURN:
+							finished=TRUE;
+							break;
+						default:
+							/* other keys do nothing */
+							break;
+					}
+				default:
+					/* other events do nothing */
+					break;
 			}
-			else {
-				/* if showing game, show first cave. */
-				current=gd_caveset;
+		}
+	}
+
+	gd_restore_screen();
+}
+
+
+
+void
+gd_show_cave_info(GdCave *show_cave)
+{
+	GdCave *cave;
+	const int screen_height=gd_screen->h/gd_font_height();
+	gboolean finished;
+	GList *current=NULL;	/* current cave to view */
+
+	if (show_cave)
+		current=g_list_find(gd_caveset, show_cave);
+	gd_backup_and_dark_screen();
+	gd_title_line("CAVESET INFORMATION");
+	gd_status_line("LEFT, RIGHT: CAVE   SPACE: EXIT");
+
+	finished=FALSE;
+	while (!finished && !gd_quit) {
+		GString *text;
+		int i;
+		int y;
+		char *wrapped;
+		SDL_Event event;
+
+		/* current cave or game */
+		if (current)
+			cave=current->data;
+		else
+			cave=NULL;
+
+		for (i=1; i<screen_height-1; i++)
+			gd_clear_line(gd_screen, i*gd_font_height());
+
+		gd_blittext_n(gd_screen, -1, gd_font_height(), GD_GDASH_YELLOW, cave?cave->name:gd_caveset_data->name);
+		y=gd_font_height()+2*gd_line_height();
+
+		/* show data */
+		text=g_string_new(NULL);
+		if (!cave) {
+			/* ... FOR CAVESET */
+			/* ... FOR CAVE */
+			if (!g_str_equal(gd_caveset_data->author, "")) {
+				g_string_append_printf(text, "%s", gd_caveset_data->author);
+				if (!g_str_equal(gd_caveset_data->date, ""))
+					g_string_append_printf(text, ", %s", gd_caveset_data->date);
+				g_string_append_c(text, '\n');
+			}
+			
+			if (!g_str_equal(gd_caveset_data->description, ""))
+				g_string_append_printf(text, "%s\n", gd_caveset_data->description);
+				
+			if (gd_caveset_data->story->len>0) {
+				g_string_append(text, gd_caveset_data->story->str);
+				/* if the cave story has no enter on the end, add one. */
+				if (text->str[text->len-1]!='\n')
+					g_string_append_c(text, '\n');
+			}
+			if (gd_caveset_data->remark->len>0) {
+				g_string_append(text, gd_caveset_data->remark->str);
+				/* if the cave story has no enter on the end, add one. */
+				if (text->str[text->len-1]!='\n')
+					g_string_append_c(text, '\n');
+			}
+		} else {
+			/* ... FOR CAVE */
+			if (!g_str_equal(cave->author, "")) {
+				g_string_append_printf(text, "%s", cave->author);
+				if (!g_str_equal(cave->date, ""))
+					g_string_append_printf(text, ", %s", cave->date);
+				g_string_append_c(text, '\n');
+			}
+			
+			if (!g_str_equal(cave->description, ""))
+				g_string_append_printf(text, "%s\n", cave->description);
+				
+			if (cave->story->len>0) {
+				g_string_append(text, cave->story->str);
+				/* if the cave story has no enter on the end, add one. */
+				if (text->str[text->len-1]!='\n')
+					g_string_append_c(text, '\n');
+			}
+			if (cave->remark->len>0) {
+				g_string_append(text, cave->remark->str);
+				/* if the cave story has no enter on the end, add one. */
+				if (text->str[text->len-1]!='\n')
+					g_string_append_c(text, '\n');
 			}
 		}
-		if (gd_space_or_enter_or_fire() || gd_keystate[SDLK_ESCAPE])
-			finished=TRUE;
+		wrapped=gd_wrap_text(text->str, gd_screen->w/gd_font_width()-2);
+		gd_blittext_n(gd_screen, gd_font_width(), gd_line_height()*2, GD_GDASH_LIGHTBLUE, wrapped);
+		g_free(wrapped);
+		g_string_free(text, TRUE);
+		SDL_Flip(gd_screen);
 
-		SDL_Delay(150);
+		/* process events */
+		SDL_WaitEvent(NULL);
+		while (SDL_PollEvent(&event)) {
+			switch (event.type) {
+				case SDL_QUIT:
+					gd_quit=TRUE;
+					break;
+					
+				case SDL_KEYDOWN:
+					switch (event.key.keysym.sym) {
+						/* movements */
+						case SDLK_LEFT:
+						case SDLK_UP:
+						case SDLK_PAGEUP:
+							if (current!=NULL)
+								current=current->prev;
+							break;
+						case SDLK_RIGHT:
+						case SDLK_DOWN:
+						case SDLK_PAGEDOWN:
+							if (current!=NULL) {
+								/* if showing a cave, go to next cave (if any) */
+								if (current->next!=NULL)
+									current=current->next;
+							}
+							else {
+								/* if showing game, show first cave. */
+								current=gd_caveset;
+							}
+							break;
+						case SDLK_SPACE:
+						case SDLK_ESCAPE:
+						case SDLK_RETURN:
+							finished=TRUE;
+							break;
+						default:
+							/* other keys do nothing */
+							break;
+					}
+				default:
+					/* other events do nothing */
+					break;
+			}
+		}
 	}
 
 	gd_restore_screen();
@@ -948,29 +1119,74 @@ gd_help(const char **strings)
 	gd_restore_screen();
 }
 
-
-
-
-
-char *
-gd_input_string(const char *title, const char *current)
+static void
+draw_window(SDL_Rect *rect)
 {
+	rect->x-=2;
+	rect->y-=2;
+	rect->w+=4;
+	rect->h+=4;
+	SDL_FillRect(gd_screen, rect, SDL_MapRGB(gd_screen->format, 64, 64, 64));
+	rect->x++;
+	rect->y++;
+	rect->w-=2;
+	rect->h-=2;
+	SDL_FillRect(gd_screen, rect, SDL_MapRGB(gd_screen->format, 128, 128, 128));
+	rect->x++;
+	rect->y++;
+	rect->w-=2;
+	rect->h-=2;
+	SDL_FillRect(gd_screen, rect, SDL_MapRGB(gd_screen->format, 0, 0, 0));
+}
+
+
+void
+gd_message(const char *message)
+{
+	SDL_Rect rect;
 	const int height=5*gd_line_height();
 	int y1;
-	SDL_Rect rect;
-	gboolean enter, escape;
-	GString *text;
-	int n;
-	int width;
 
+	gd_backup_and_dark_screen();
+	gd_status_line("SPACE: EXIT");
+	
 	y1=(gd_screen->h-height)/2;
 	rect.x=gd_font_width();
 	rect.w=gd_screen->w-2*gd_font_width();
 	rect.y=y1;
 	rect.h=height;
-	gd_backup_and_black_screen();
+	draw_window(&rect);
 	SDL_SetClipRect(gd_screen, &rect);
-	SDL_FillRect(gd_screen, NULL, SDL_MapRGB(gd_screen->format, 0, 0, 0));
+
+	gd_blittext_n(gd_screen, -1, y1+2*gd_line_height(), GD_GDASH_WHITE, message);
+	SDL_Flip(gd_screen);
+	wait_for_keypress();
+
+	SDL_SetClipRect(gd_screen, NULL);
+	gd_restore_screen();
+}
+
+char *
+gd_input_string(const char *title, const char *current)
+{
+	int y1;
+	SDL_Rect rect;
+	gboolean enter, escape;
+	GString *text;
+	int n;
+	int height, width;
+
+	gd_backup_and_black_screen();
+
+	height=6*gd_line_height();
+	y1=(gd_screen->h-height)/2;	/* middle of the screen */
+	rect.x=8;
+	rect.y=y1;
+	rect.w=gd_screen->w-2*8;
+	rect.h=height;
+	draw_window(&rect);
+	SDL_SetClipRect(gd_screen, &rect);
+
 	width=rect.w/gd_font_width();
 
 	gd_blittext_n(gd_screen, -1, y1+gd_line_height(), GD_GDASH_WHITE, title);
@@ -1042,8 +1258,7 @@ gd_input_string(const char *title, const char *current)
 
 	if (enter)
 		return g_string_free(text, FALSE);
-
-	/* here must be escape=TRUE */
+	/* here must be escape=TRUE, we return NULL as no string is really entered */
 	g_string_free(text, TRUE);
 	return NULL;
 }
@@ -1064,7 +1279,7 @@ gd_select_key(const char *title)
 	rect.y=y1;
 	rect.h=height;
 	gd_backup_and_black_screen();
-	SDL_FillRect(gd_screen, &rect, SDL_MapRGB(gd_screen->format, 0, 0, 0));
+	draw_window(&rect);
 	gd_blittext_n(gd_screen, -1, y1+gd_line_height(), GD_GDASH_WHITE, title);
 	gd_blittext_n(gd_screen, -1, y1+3*gd_line_height(), GD_GDASH_GRAY2, "Press desired key for action!");
 	SDL_Flip(gd_screen);
@@ -1112,6 +1327,11 @@ gd_error_console()
 	gboolean exit, clear;
 	int sel;
 	gboolean redraw;
+	
+	if (!gd_errors) {
+		gd_message("No error messages.");
+		return;
+	}
 
 	err=g_ptr_array_new();
 	for (iter=gd_errors; iter!=NULL; iter=iter->next)
@@ -1201,19 +1421,21 @@ gd_error_console()
 gboolean
 gd_ask_yes_no(const char *question, const char *answer1, const char *answer2, gboolean *result)
 {
-	const int height=5*gd_line_height();
+	int height;
 	int y1;
 	SDL_Rect rect;
 	gboolean success, escape;
 	int n;
 
-	y1=(gd_screen->h-height)/2;
-	rect.x=0;
-	rect.w=gd_screen->w;
-	rect.y=y1;
-	rect.h=height;
 	gd_backup_and_black_screen();
-	SDL_FillRect(gd_screen, &rect, SDL_MapRGB(gd_screen->format, 0, 0, 0));
+	height=5*gd_line_height();
+	y1=(gd_screen->h-height)/2;	/* middle of the screen */
+	rect.x=8;
+	rect.y=y1;
+	rect.w=gd_screen->w-2*8;
+	rect.h=height;
+	draw_window(&rect);
+	SDL_SetClipRect(gd_screen, &rect);
 
 	gd_blittext_n(gd_screen, -1, y1+gd_line_height(), GD_GDASH_WHITE, question);
 	gd_blittext_printf_n(gd_screen, -1, y1+3*gd_line_height(), GD_GDASH_WHITE, "N: %s, Y: %s", answer1, answer2);
@@ -1255,6 +1477,8 @@ gd_ask_yes_no(const char *question, const char *answer1, const char *answer2, gb
 
 	gd_wait_for_key_releases();
 
+	SDL_SetClipRect(gd_screen, NULL);
+
 	/* this will return true, if y or n pressed. returns false, if escape, or quit event */
 	return success;
 }
@@ -1291,7 +1515,7 @@ gd_show_license()
 	gd_title_line("GDASH LICENSE");
 	gd_status_line("SPACE: EXIT");
 
-	wrapped=gd_wrap_text(gd_about_license, 40);
+	wrapped=gd_wrap_text(gd_about_license, gd_screen->w/gd_font_width());
 	gd_blittext_n(gd_screen, 0, gd_line_height(), GD_GDASH_LIGHTBLUE, wrapped);
 	g_free(wrapped);
 	SDL_Flip(gd_screen);

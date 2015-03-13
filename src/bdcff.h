@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,6 +16,6 @@
 #include <glib.h>
 
 gboolean gd_caveset_load_from_bdcff(const char *contents);
-void gd_caveset_save_to_bdcff(GPtrArray *out, gboolean caves_with_replay_only);
+void gd_caveset_save_to_bdcff(GPtrArray *out);
 
 

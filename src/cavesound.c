@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -218,7 +218,7 @@ gd_cave_sound_db_init()
 
 /* plays sound in a cave. returns true, if sound will be played */
 void
-gd_sound_play(Cave *cave, GdSound sound)
+gd_sound_play(GdCave *cave, GdSound sound)
 {
 #ifdef GD_SOUND
 	GdSound *s;

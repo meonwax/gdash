@@ -50,13 +50,8 @@ ICONS = \
 	object_not_on_all.png \
 	object_not_on_current.png \
 	replay.png \
-	keyboard.png
-
-TITLE = \
-	gdash_screen.png \
-	gdash_tile.png \
-	gdash.png \
-	gdash_32.png
+	keyboard.png \
+	image.png
 
 noinst_HEADERS = \
 	c64_png_colors.h \
@@ -90,19 +85,12 @@ icons.list: $(ICONS) Makefile.am
 			echo $$image >> $@; \
 		done )
 
-title.list: $(TITLE) Makefile.am
-	( rm -f $@; \
-		for image in $(TITLE); do \
-			echo $$image | sed s/\.png$$// >> $@; \
-			echo $$image >> $@; \
-		done )
-
 # the include files
 icons.h: $(ICONS) icons.list
 	gdk-pixbuf-csource --raw --build-list `cat icons.list` > $@
 
-title.h: $(TITLE) title.list
-	gdk-pixbuf-csource --raw --build-list `cat title.list` > $@
+#title.h: $(TITLE) title.list
+#	gdk-pixbuf-csource --raw --build-list `cat title.list` > $@
 
 if GTK
   CELLS2C = cells2c
@@ -143,6 +131,8 @@ c64_gfx.h: c64_gfx.png $(CELLS2C)
 endif
 
 
+
+
 # this utility creates an include file for any datafile
 file2c_SOURCES = \
 	file2c.c
@@ -155,3 +145,13 @@ ataripal.h: $(ATARIPALETTES) file2c Makefile.am
 
 dtvpal.h: $(DTVPALETTES) file2c Makefile.am
 	sh files2c.sh $@ c64dtv_palettes $(DTVPALETTES)
+
+TITLE = \
+	gdash_screen.png \
+	gdash_tile.png \
+	gdash.png \
+	gdash_32.png
+
+# the empty string causes files2c.sh not to write the pointer arrays
+title.h: $(TITLE) file2c Makefile.am
+	sh files2c.sh $@ "" $(TITLE)

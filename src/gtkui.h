@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -46,8 +46,9 @@
 #define GD_ICON_OBJECT_NOT_ON_CURRENT "icon-object-not-on-current"
 #define GD_ICON_REPLAY "icon-replay"
 #define GD_ICON_KEYBOARD "icon-keyboard"
+#define GD_ICON_IMAGE "icon-image"
 
-void gd_create_stock_icons();
+void gd_register_stock_icons();
 
 GdkPixbuf *gd_icon();
 GdkPixmap **gd_create_title_animation();
@@ -55,7 +56,7 @@ GdkPixmap **gd_create_title_animation();
 void gd_preferences(GtkWidget *parent);
 void gd_control_settings(GtkWidget *parent);
 
-void gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, Cave *highlight_cave, int highlight_rank);
+void gd_show_highscore(GtkWidget *parent, GdCave *cave, gboolean show_clear_button, GdCave *highlight_cave, int highlight_rank);
 
 gboolean gd_open_caveset_in_ui(const char *filename, gboolean highscore_load_from_bdcff);
 
@@ -85,6 +86,7 @@ void gd_show_last_error(GtkWidget *parent);
 GtkWidget *gd_keysim_button(const char *what_for, guint *keyval);
 
 void gd_dialog_add_hint(GtkDialog *dialog, const char *hint);
+char *gd_select_image_file(const char *title, GtkWidget *parent);
 
 #endif
 

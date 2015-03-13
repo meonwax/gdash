@@ -4,7 +4,7 @@ echo "# Automatically generated Makefile.am! Check $0" >Makefile.am
 echo >>Makefile.am
 
 for a in $SUBDIRS; do
-    CAVES=$(find $a -type f -name \*.gds)
+    CAVES=$(find $a -type f)
     echo ${a}dir = '$(pkgdatadir)'/caves/${a} >> Makefile.am
     echo ${a}_CAVES = $CAVES >>Makefile.am
     DIST=$DIST\ \$\(${a}_CAVES\)

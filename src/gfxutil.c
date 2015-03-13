@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -241,12 +241,12 @@ clamp(int value, int min, int max)
 
 
 void
-gd_pal_emu(gpointer pixels, int width, int height, int pitch, int rshift, int gshift, int bshift, int ashift)
+gd_pal_emulate_raw(gpointer pixels, int width, int height, int pitch, int rshift, int gshift, int bshift, int ashift)
 {
 	int y, x;
 	guint8* srcpix = (guint8*)pixels;
-	YUV **yuv, **work;
-
+	YUV **yuv, **alpha;	/* alpha is not really yuv, only y will be used. luma blur touches only y. */
+	YUV **work;
 
 	/* memory for yuv images */
 	yuv=g_new(YUV *, height);
@@ -255,6 +255,9 @@ gd_pal_emu(gpointer pixels, int width, int height, int pitch, int rshift, int gs
 	work=g_new(YUV *, height);
 	for (y=0; y<height; y++)
 		work[y]=g_new(YUV, width);
+	alpha=g_new(YUV *, height);
+	for (y=0; y<height; y++)
+		alpha[y]=g_new(YUV, width);
 
 	/* convert to yuv */
 	for (y=0; y<height; y++) {
@@ -271,13 +274,19 @@ gd_pal_emu(gpointer pixels, int width, int height, int pitch, int rshift, int gs
 			yuv[y][x].y= 77*r+150*g+ 29*b;
 			yuv[y][x].u=-37*r -74*g+111*b;
 			yuv[y][x].v=157*r-131*g -26*b;
+			
+			/* alpha is copied as is, and is not *256 */
+			alpha[y][x].y=(row[x]>>ashift)&0xff;
 		}
 	}
 	
+	/* we give them an array to "work" in, so that is not free()d and malloc() four times */
 	luma_blur(yuv, work, width, height);
 	chroma_blur(yuv, work, width, height);
 	chroma_crosstalk_to_luma(yuv, work, width, height);
 	scanline_shade(yuv, work, width, height);
+	
+	luma_blur(alpha, work, width, height);
 
 	/* convert back to rgb */
 	for (y=0; y<height; y++) {
@@ -291,8 +300,8 @@ gd_pal_emu(gpointer pixels, int width, int height, int pitch, int rshift, int gs
 			g=clamp((256*yuv[y][x].y-101*yuv[y][x].u-149*yuv[y][x].v+32768)/65536, 0, 255);
 			b=clamp((256*yuv[y][x].y+519*yuv[y][x].u                +32768)/65536, 0, 255);
 
-			/* alpha channel is presented, others are converted back from yuv */
-			row[x]=(((row[x]>>ashift)&0xff)<<ashift) | (r<<rshift) | (g<<gshift) | (b<<bshift);
+			/* alpha channel is preserved, others are converted back from yuv */
+			row[x]=(alpha[y][x].y<<ashift) | (r<<rshift) | (g<<gshift) | (b<<bshift);
 		}
 
 	}
@@ -301,6 +310,9 @@ gd_pal_emu(gpointer pixels, int width, int height, int pitch, int rshift, int gs
 	for (y=0; y<height; y++)
 		g_free(yuv[y]);
 	g_free(yuv);
+	for (y=0; y<height; y++)
+		g_free(alpha[y]);
+	g_free(alpha);
 	for (y=0; y<height; y++)
 		g_free(work[y]);
 	g_free(work);
@@ -314,7 +326,7 @@ gd_pal_emu(gpointer pixels, int width, int height, int pitch, int rshift, int gs
 /* somewhat optimized implementation of the Scale2x algorithm. */
 /* http://scale2x.sourceforge.net */
 void
-gd_scale2x(guint8 *srcpix, int width, int height, int srcpitch, guint8 *dstpix, int dstpitch)
+gd_scale2x_raw(guint8 *srcpix, int width, int height, int srcpitch, guint8 *dstpix, int dstpitch)
 {
    	guint32 E0, E1, E2, E3, B, D, E, F, H;
 	int y, x;
@@ -360,7 +372,7 @@ gd_scale2x(guint8 *srcpix, int width, int height, int srcpitch, guint8 *dstpix, 
 
 
 void
-gd_scale3x(guint8 *srcpix, int width, int height, int srcpitch, guint8 *dstpix, int dstpitch)
+gd_scale3x_raw(guint8 *srcpix, int width, int height, int srcpitch, guint8 *dstpix, int dstpitch)
 {
 	int y, x;
    	guint32 E0, E1, E2, E3, E4, E5, E6, E7, E8, A, B, C, D, E, F, G, H, I;

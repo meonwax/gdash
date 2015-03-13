@@ -1,0 +1,2405 @@
+[BDCFF]
+Version=0.5
+[game]
+Name=Sendydash 1
+Remark=As a child with one digit in my age, Boulderdash was one of the many wonders that filled my time. The release of the sequel Rockford's Revenge, and the Boulderdash Construction Kit were a huge revelation for me. As 'Revenge' was released it became apparent that the world of Boulderdash could be extended almost infinitely with different permutations of the few but well chosen game objects and the ways of arranging them to form playable and explorable spaces called 'caves'.\n\nThe Kit came and my imagination was bursting with ideas. All of the caves I made were eventually lost to the winds of  time, and I am sure many of them were quite crude compared to what I can achieve almost two decades later! I eventually forgot about Boulderdash after several years and moved onto the Amiga and then PC, where I purchased and played Diamond Caves II (and upgraded to it's sequel). This is a fancy extended version of Boulderdash with very good physics and loads of new enemies, but it lacks the 8-bit charm and different colours and moods of the C64 version.\n\nSo recently I began work on Sendydash... Originally I decided to call it \"Art of Boulderdash\" but that sounded a bit pompous, and  besides, some Windows implementations of Boulderdash have cave converters which scrape the contents of the cave designs but  don't have a space for the author, and I don't like the idea of losing credit for my hard work! So Sendydash it is, however  silly it may sound :)\n\nIn creating this game I realized there were a lot of untapped ideas and strategies - or at least ones that I have not seen  in any of the many Boulder-games I have so far played. I made it practically a religion to think about the game elements in  new ways and force the player to think laterally and out of the box, as well as balancing it with that chaotic 'cave'  atmosphere which makes the original Boulderdash levels so great. And of course I borrowed and expanded a good few ideas  from the original games and other authors I admire.\n\nAlso, I've taken a lot of care over the colour schemes and overall presentation and tweakable parameters. I am a firm believer that level design is  as much presentation as it is cleverness and versatility with using game elements. There are 46 caves and intermissions and  you can start on any cave - it seemed more fun that way since it can be quite challenging in places. I have also balanced  the hard caves with easy parts so the player doesn't get tired. The levels are supposed to make 'sense' when played in  sequence. The final level is a very unusual puzzle where you'll... well, actually I'm not telling ;)\n\nSendydash was made entirely with the original Construction Kit, but I have a sequel planned which will be out fairly  shortly, which incorporates Lord Diego's effect kit to add a few extra possibilities. I'm hoping to write the third  installment using the totally amazing Crazy Light Construction Kit but I'm waiting on a translation of parts of the program  before I can use it since I can only speak English. I'm amazed to see such a brilliant continuation and implementation of a Boulderdash engine/editor on the Commodore, and to see releases on the Breadbin in 2006! :)
+Levels=5
+
+[cave]
+Name=Cave 1 - Warmup
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black LightRed Gray2 White White White
+DiamondsRequired=50 50 50 50 50
+DiamondValue=5 15
+CaveTime=160 160 160 160 160
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=9 9 9 9 9
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Nothing too challenging here, though beginners may find the vertical passages and many boulders offputting. Experienced  Dashers will, well, Dash through this one.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W.r....rrwd.d.rr.r.r.dwrd..rr.r......rdW
+Wr.ddd..rw...rrrr..d.dwrr.r...........rW
+W...dd..dw.rr..rr.d.rdw...r....r.r.d...W
+W........w..r..r....rdwr...d...r.......W
+W.d.wrrrrw.....wd.....w..rd.d.wr.r.....W
+Wrr.w....w....rw......wr..d.d.wrd..r...W
+Wr..w.r..w.....w..rr..w..r....w..r.....W
+Wd..w..r.w....rw.....rwd..r.r.wr...r...W
+Wr..w....w.rd..w...r.rwr..r...w....r.rrW
+W..rwrrrrwr.d..w....r.w...r..rwr.....r.W
+W..dwrr.dwr..rrwd.rd..w.r.rdrrw.r.r....W
+W..rwdr.dwr.r.rwr..dr.w..r....wdd..r...W
+W...w.rrrw.....wr..drrw......rw.drrr..rW
+Wd..wd..rwrrr..w.....dw...dd..wrr.....dW
+Wd.dwr...wrd.r.w....rrwr.d....wr.r..r.rW
+Wdr.w.r.rw..r.dw......wd.d....w.......rW
+W...w.........dw...r...r..r...w..r.....W
+W...w..d.r.....w...d.....rr.r.w...r....W
+W.X.wr.d......rwr..........r.dw..r...P.W
+Wd.rwr....d.rr.w.....r...rd...wdr......W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 2 - Foundation
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Gray1 Orange Yellow Yellow Yellow
+DiamondsRequired=30 30 30 30 30
+DiamondValue=10 15
+CaveTime=160 160 160 160 160
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=9 9 9 9 9
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=20 20 20 20 20
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Some basic skills here including timing, boulder-pushing and use of magic walls. A nontrivial level but you don't need to  face all the challenges to pass to the next level.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W       d.r...r.. d w  .rr r.rddwrrrrrrW
+W P     r....rdr..  w ..w....rddwrrrrrrW
+W       . ....r...r w..wwwwwwwwwww....wW
+W      w.... r..... wr.rwd   .d.w....wdW
+W    rwww.. .  .wwwwww.www      ....wddW
+W     .w..... .rrr.rwrrrw     .....wdrrW
+W  ..r..  .... .rr.r....w    ...r.w...rW
+W......w  rww...rr.dw...w    r.....r..dW
+W r ..www .w    wwwwwwwwww   MMMMMMMM..W
+W..... wr..w rr ....wrrrw.......... ..rW
+W... .....ww ..  ...rrrrr.....d  .rr...W
+W      ...w  dd.Q.. w...wd ..r.  .d....W
+W wr.w ...w .dd  .. w...w..............W
+WQwr.w ....  .. ... w..Qw..r. .rd.....QW
+W wr.w    .. .  w.Q w.. w............  W
+W wr.wwww .. . ww..rw.. w....d......   W
+W wrdrr   ..   w.rrrw.. w rr....  ..  QW
+W wrdd.r  ..d.ww  rrw.rrwrrrr..        W
+W wwwwwww ........rrwrrrwrrr.        X W
+W         ..... .rr. r.rr...r.         W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 3 - Sonata for Butterfly and Boulder
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Purple LightBlue Cyan Cyan Cyan
+DiamondsRequired=90 90 90 90 90
+DiamondValue=2 4
+CaveTime=160 160 160 160 160
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=9 9 9 9 9
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=An easy little ditty involving tricks with butterflies being hit with boulders. Some timing and thinking is necessary, but not much. You need to backtrack for the exit so don't block your return route!
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+Wrr..r.........rrwwwwwwww  d rrrrr.....W
+Wr..rcr..r..rwwrrwwwwww  d wwrrrrr...W.W
+W....r..rcr..wrrwwwww  d wwwwrrrrr...W.W
+W..r.....r...wrwwww  d wwww  rrrrr...W.W
+W.rcr........w.w.  d wwww  drrrrrr...W.W
+W..r...r....ww.w.  wwww  d wwrrrrr...W.W
+Wr....rcr...w..w wwww  d wwwwrrrrr...W.W
+Wrr....r...ww..wcww  d wwwwwwrrrrr...W.W
+Wrrr......rw...w w   wwwwwwwwrrrrr...W.W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW.W
+Xrwrwrwrwrwrwrwrwrwr...    ...wrw....W.W
+W......................       wQw x..W.W
+W.wcw w w w w w w w....  c ...wrw....W.W
+W.w wcw w w w w w w....    ...wQw.r..W.W
+W.w w wcw w w w w w...r....r..wrw...rW.W
+W.w w w wcw w w w w......rr...wQw..r.W.W
+W.w w w w wcw w w w.r........rwrw....W.W
+W.w w w w w wcw w w...........wQw...rW.W
+W.w w w w w w wcw w...r.......wrw....W.W
+WPw w w w w w w wcw.......r.....wr.....W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 4 - Elementary Boulder Physics
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Gray3 Yellow White White White
+DiamondsRequired=80 80 80 80 80
+DiamondValue=2 75
+CaveTime=140 140 140 140 140
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=9 9 9 9 9
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Four masses of rocks and diamonds for you to weave your way through. Only an expert can fetch all the diamonds - Luckily you don't need them all to continue.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WX.....................................W
+W...w.rrr.r.drdr.w....w.rrrdddrrdd.w...W
+W...w.rrr.rdrrr..w....w.r..rdrrrdr.w...W
+W...w..ddrdr.rrd.w....w.rdrrdr.drr.w...W
+W...w..dd.rrd.r..w....w.rr.rrdrrrr.w...W
+W...w.r.rrd.rd.r.w....w.r.rdr.rr.d.w...W
+W...w..rrrr.drdr.w....w.rrdrddrrrr.w...W
+W...w.d.rr.drrr..w....w.rd.rr.dd.r.w...W
+W...w..rr.drrrrd.w....w............w...W
+W...w............w....w.wwwwwwwwww.w...W
+W...w.wwwwwwwwww.w....w............w...W
+W...w............w....w.rrdd.rrddd.w...W
+W...w.ddrrrdrrrd.w....w.d.rdd.drdr.w...W
+W...w...drrrrrdd.w....w.ddrrrdd.r..w...W
+W...w.rr.drrdrrr.w....w.drr.rddr.r.w...W
+W...w..d.rrrddrr.w....w.rr.rr.r.dr.w...W
+W...w.ddr.dddrdr.w....w...drrr.drd.w...W
+W...w.rdr.rr.rdr.w....w.rrrdrrrrrd.w...W
+W...w.r.drrrrrdr.w....w..d.rrrd.rr.w...W
+W.....................................PW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 5 - INTERMISSION 1
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 19 11
+Colors=Black Black Brown Red Green Green Green
+DiamondsRequired=12 12 12 12 12
+DiamondValue=10 75
+CaveTime=20 20 20 20 20
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=6 6 6 6 6
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=255 255 255 255 255
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WQ rar d.  Q ...r  WWWWWWWWWWWWWWWWWWWWW
+W.Qw.. .r.rr . . r WWWWWWWWWWWWWWWWWWWWW
+W.Qrrdr  d....  .rwWWWWWWWWWWWWWWWWWWWWW
+W.r .r a. .drd.QQ..WWWWWWWWWWWWWWWWWWWWW
+W   r..d..PW . d. .WWWWWWWWWWWWWWWWWWWWW
+WQ w.r..  WX.  .Q dWWWWWWWWWWWWWWWWWWWWW
+W .w rw. .a..d.a. rWWWWWWWWWWWWWWWWWWWWW
+W Qw ..Q..Qr. aw dwWWWWWWWWWWWWWWWWWWWWW
+WQdrwr.....dd.. rQwWWWWWWWWWWWWWWWWWWWWW
+Wdr a.. ad..a..a r WWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 6 - Sitting Ducks
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Gray2 Gray1 Blue Blue Blue
+DiamondsRequired=99 99 99 99 99
+DiamondValue=2 3
+CaveTime=190 190 190 190 190
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=252 252 252 252 252
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Once a boulder is in the middle of the blue Slime boxes, it's only a matter of time before the Butterfly meets it's doom. But what to do if there's no boulder available?
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W .r. .   r ..    r     r   .    r r   W
+W ..     sss      sss   .          .   W
+W r sss..s s      s s.sss   r      sss W
+W   s s .scs .  r scs s s   .      s s.W
+W   scsr sss      sss scs  sss   . scs W
+W   sss               sss  s s     sss W
+W                   . .    scs  .      W
+W r .   . P r..  .         sss.        W
+Wsss      . ..  sss          .         W
+Ws sr.    r     s s   .X     ..  sss   W
+Wscs..     .   .scs          .   s s. .W
+Wsss   sss sss  sss              scs  .W
+W      s s.s s        .    r .   sss.  W
+W      scs scs         sss.  .        .W
+W     .sss sss.rr   .  s s     .. .sss W
+W sss  rr    r   .  .  scs  r sssrrs s W
+W s s     .       sss .sss  . s s .scs W
+W scs.    .       s s .       scs  sss.W
+W sss    .     .  scs.      ..sss    r W
+W         .  .    sss ..   .        r. W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 7 - Drop Maze 1
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Green LightGreen Cyan Cyan Cyan
+DiamondsRequired=40 40 40 40 40
+DiamondValue=5 40
+CaveTime=150 150 150 150 150
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=9 9 9 9 9
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=A maze, where boulders will have to be dropped to open new passages. Just don't hem yourself in!
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+Wd...rdrrrrrrrrr.. w w w w   ..rrrr..rQW
+W.Q ..r..rddrrr..        r   ..rrrr...rW
+W. ..r.....rrrr...wwwwwwwww d..rrrr....W
+W...... .r...r..r. w w w w ....rrrr....W
+W....WWWWWWWWW....WWWWWWWWWWWWWrrrrW...W
+W.Q...d.. r.. .. .Wd....... . WrrrrWQ  W
+W. ....  ...rr..c.W.. ....r.r.WrrrrW...W
+W.   ...r....... .W..rrrrr...dWrrrrWdd.W
+Wd......dr....r...WQ ...W..d .WrrrrW...W
+WWWWWWWWWWWWWWWWWWW. ...Wr....WrrrrW...W
+Wd........d.... QQ......W.....WrrrrW  QW
+W.        .. d......  ..W..Q. WrrrrW...W
+W.        .....d.....Q..Wrrrrr........dW
+W.  ......d.... ........Wrrrrr.........W
+W.  ..WWWWWWWWWWWWW.....Wrrrrr. .... .dW
+W. Q. r.r.r . .   Wrr.. Wrrrrr....d....W
+W.  ...r.r.. .  P W r. QWrrrrrWWWWWWWWWW
+W.  . rdr.r . .   W ............rrrrrr.W
+W.  ...r.r.. .  X W  ...........dddddd.W
+Wd... r.r.r . .   W  .r....d....rdrrdr.W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 8 - Carry the One
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Red Gray2 White White White
+DiamondsRequired=65 65 65 65 65
+DiamondValue=5 0
+CaveTime=200 200 200 200 200
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=9 9 9 9 9
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=The first in a unique series of puzzles, this one being fairly easy. Each bolder must be pushed to give access to the next one. After a lot of pushing and thinking you will get your exit! Use closing walls and other objects (!) as bridges.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+Wrw.r ..........wr......rw  wc ..dwrwddW
+WPw...........w.wd... ...w  w ....wrwrrW
+W.w.....r.....w w...  ...w..w.....w.w..W
+W w.x.     w .w.x.   .w..w..w.....wrx..W
+Wdw.w     dwc.w w     w..w..w.....wd...W
+W.w.wd    rwr.w.w  r..w..wr w..r .w....W
+W...wr     w .w..  . cw..w.cw....rw....W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW.W
+W.rrrr  r...r..... r..r....rrrr...r....W
+W. .rr.r.r. .r .r.r.r ....r.rrrr....r .W
+W....r..r.r..r....r..r..rrr.rr........rW
+W..  r....r..r..r .r... r......r ..   .W
+W.WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+Wdxwrwrwrwrwrw w . wdddddw....dw wrwrw.W
+W.  . . . . .      wdddddw..  .w  . .c W
+W            www.. wdddddw..  .w.    w W
+Wr         wwwdw............. ...  www W
+W.       www.w.w.d..     ....w.x.  wXr W
+W      www ..wrw.r.       .drw.w   wr. W
+W r  www w.wdw.w..r        .dw..d  w.. W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 9 - Mish-Mash 1
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Orange Gray1 White White White
+DiamondsRequired=35 35 35 35 35
+DiamondValue=5 10
+CaveTime=100 100 100 100 100
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=A Whole Sort Of General Mish-Mash (pat yourself on the back if you know where that's from). A random, chaotic level with a  maze of walls, rocks and diamonds, of which you need most. Similar to cave C of the original BD, but just a microtad harder.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W ..d.r r. dr..wd..  rdrr. r..rdrwrd ..W
+WrP. ....dw ..rw..drw.r.....ww .w. w w.W
+W. w.rww. .r.rw. .w.wwww..w..r.d.wwr wwW
+W.r.r.r.w.........rw..r...dw.rrr ..r...W
+W..rr... rr.d..r.d...w..rrwd .r .w.... W
+W..wr.r.d..r.. .wr  ..rd.  .r.wr .w.w..W
+W..w...rr.w.  w. ....r wrrwr.... .r. w.W
+W.r.wr...rr  r.rw.drr wr..rww.r.w  r..rW
+W..drw.r..wr. r..rr....r r....rr. ..w..W
+W........rr.r r.rrw.d...w. rr  .dr . ..W
+W...wr..r... w.rd.r..rr ......wd...rw..W
+Wr.. w  ...w. d. .r.d .wr. dw.r r. ... W
+Wd.w...wrr .r.r.....w...rr. .r.... .r rW
+Wrww.w.rrr  w.r ...  .dww.r..r.rw..d.. W
+Wrw.wr.w.r.ww w......rrr. wr. .rw..rr. W
+W  r.d.. wr..r.w ww.w.w.d r .w. ww.r.d W
+Ww....rw.w...rrr . .d..wrw.wr w.. .wrdrW
+Wr. ....w....d.r.w..w.r. .r.wrw.r ....wW
+Wwrrw.d...rr.wwd.w ..r..rr....rwrd ..X.W
+W.rr..  ... ..r.r.......r.rw rrw.w.r.w.W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 10 - INTERMISSION 2
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 19 11
+Colors=Black Black Cyan Gray3 Green Green Green
+DiamondsRequired=8 8 8 8 8
+DiamondValue=15 0
+CaveTime=40 40 40 40 40
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=5 5 5 5 5
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+Wd..w..r....w...d..WWWWWWWWWWWWWWWWWWWWW
+W.x.w.x.w.d.w.xwwx.WWWWWWWWWWWWWWWWWWWWW
+W....rr.w...w.r....WWWWWWWWWWWWWWWWWWWWW
+Wrr.d...wrx.www.x.wWWWWWWWWWWWWWWWWWWWWW
+Wwwwwx.ww.P.w.....dWWWWWWWWWWWWWWWWWWWWW
+W.......w.X.wd..r..WWWWWWWWWWWWWWWWWWWWW
+W.x.w.x.w.x.ww.x.wwWWWWWWWWWWWWWWWWWWWWW
+Wrr.w..........r...WWWWWWWWWWWWWWWWWWWWW
+Wr..w.xwwwwwwwwwwx.WWWWWWWWWWWWWWWWWWWWW
+W.d.w......d.......WWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 11 - Precious!
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Purple Blue White White White
+DiamondsRequired=60 60 60 60 60
+DiamondValue=5 20
+CaveTime=180 180 180 180 180
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=9 9 9 9 9
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=15 15 15 15 15
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Every diamond counts here so get as many boulders through the magic wall in the short time it's activated as possible. Some  firefly dens obstruct the exit, but they are easily displaced.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W..r ..d.. .r...rrrr.r.r.. r.... ..d..PW
+WQ. . .Q. ........r..d..rd. ... .r ....W
+WQ.Q...... .. rr....r...dr......drQ. ..W
+WQr...r.r.. r.....d..dQ.r.rr. ..d. . .dW
+WQ .   ..r.r ...r.rr....... d..... r.d.W
+W. . r..r.  ..r...rr....r..  r.d.  ..r.W
+W.Q..d..rr. .......r.r. .....d...  .d .W
+W..r....rr....r..r......  ......d. d...W
+W....r......d........dr. .r.. .......d.W
+Wr..rr.r..rMMMMMMMMMMMMMMMMMMMM..  . .rW
+W...  ..  ... d.........r..d..      ...W
+W.........r......r.d......r.....r.r..r.W
+W.. . r..........r. .    ... rdr.. ....W
+Wr..r.d.  Q........ .. ....  d.........W
+Wrd..r..r  dd.. .r .. r.r.. r....r..rr.W
+W........  .....r..d . ...r  r.. ..r...W
+Wr.rWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W....r    r....  .d. r.Q. d. Qr.r.dr...W
+W.....    ....r  r..    ...r. .. .. r rX
+Wd.r..r.rQ..d.. Qr...Q.... Q  ....rQr..W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 12 - Doll Divide
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Orange Brown Yellow Yellow Yellow
+DiamondsRequired=35 35 35 35 35
+DiamondValue=10 20
+CaveTime=120 120 120 120 120
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Story=Two halves, both with diamonds and fireflies roaming around. To get from one to the other you pass through a mesh of  Rockford Dolls. If you suddenly explode for seemingly no reason, it's because a firefly touched a doll. Your job is to stop  this happening!
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W..................F........r.........dW
+W..  Q  ..r..........F......d.........rW
+W.  rdd   .........F..............   ..W
+W. ddddd. ...........F..........   dQ .W
+W. .dddd  ....   ..F.....r...... dddd .W
+W. ..... ....  ......F.......... .dd. .W
+W.   Q   .... .....F............  ... .W
+W.r.......... d.r....F....   .r..Q    .W
+W.........r.. .....F........ ..........W
+W............Q.......F...... Q.........W
+W............ .....F......... .d....XP.W
+Wd...r.......  ......F....... .........W
+W.............   ..F......... ........rW
+W...     .......r....F......  ..   Q ..W
+W..  ddd Q.........F.......  ..  ddd  .W
+W.. ddddd ...........F...   ... ddddd .W
+W..Q...d. .........F.........r. ..dd. .W
+W..    .  .r.........F.........   ... .W
+Wr....   ..........F.....r.......Q    .W
+W...........r........F.................W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 13 - Friend or Foe?
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Blue Purple Green Green Green
+DiamondsRequired=90 90 90 90 90
+DiamondValue=2 3
+CaveTime=250 250 250 250 250
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=9 9 9 9 9
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=198 198 198 198 198
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=The first puzzle involving Amoeba. You need to promote the growth of amoeba so you can use it to make diamonds, but you  also need to unclog the butterfly den (where many butterflies reside) from Amoeba. The solution will come to you in a flash  of inspiration. This is the first level to use a hidden exit, but AS ALWAYS there's a visual clue as to where it is (quite  honestly, you'd have to be blind to miss it!)
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WW..... ... ... ....r............WQQQQQW
+W....w..... .... .. ........... .WQQQQQW
+W...ww.......r ....r ..  . ......WQQQQQW
+H..wwwwwwww..r ... ........  .r.rWWWQWWW
+W...ww.......  wx xw......... .. ..WrW.W
+W....w.... . ......... ...... ......r..W
+W. ...... ......... ..r . ...  .....r..W
+W........... ... .... .. . ...  . .... W
+W.. ... .. ... .........r............. W
+W. . ..  wx.xw.. ..... . ........ ...  W
+Wr... r.   . ..r. ........... . ... ...W
+Wr.... .    ....   ..........  r wx.xw.W
+W .r.  r. ........ ........  .   ......W
+WP..... ..... .... .r.  ..      .. .. rW
+WWWWWWWWWWWWW............       r. ....W
+Wcccccccc   W.............  .r.....r...W
+WcccccWWWWWWW ....wx.xw..r..  .........W
+Wcccccdaa aa  ......r...r. .... . .  rrW
+WcccccWWWWWWW .r...........r. ......raWW
+Wcccccccc   W.................r.r...rWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 14 - Drop Maze 2
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black LightBlue Green Yellow Yellow Yellow
+DiamondsRequired=40 40 40 40 40
+DiamondValue=3 10
+CaveTime=200 200 200 200 200
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=9 9 9 9 9
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=40 40 40 40 40
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=224 224 224 224 224
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Story=Another Drop Maze, this time with slime and magic wall thrown into the bargain, making it much more of a puzzle.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+Wr r. .r. rdrr...r...r.r.r .r.rrrr r.  W
+WrXr.... rrr.rr...r..... .rrrrrr rr... W
+Wrrr....rdrrrrdr...... ...rrrrrrrrr ...W
+W.r....r.rrdrrrrr..........rrrrrrr.. ..W
+Wrr..wwwsssssssswwwww...rwwwsssssswssssW
+W....wrw... ..r.....w....... ....rwQ   W
+Wr.. wrw..r.........wr ....r......wd.  W
+W. . w........r. rr.wd .d....r..d.w.  rW
+W.. .wdwr..r....rrP.w .......r.rrrw  r.W
+Wrr r .w.....r.. r..w .... ......rw r..W
+W.  .wrw.. ...d.d...w....r........w ..rW
+Wr...wrw..r... .r..rw.. ....d... dw ...W
+Wdrwwwwwsssssssswwwwwwwwwwwwwwwwwwwwww.W
+W....r .r..d.  .....wrw. r.rdrrrwr.....W
+W. ..rr.............w.....rrrrdrw. .r.rW
+W......... ....r .....w.  rrrrrrw ...  W
+W..r....MMMMMMMM ...wwwwwwwwsssswQrr ..W
+W. .. ....r.r ..r...wrrd.rrw..r .r.....W
+Wr..r... ....r......w..r.d.w.r........dW
+W.r...........r... .  d.r.dw.. ..  r.rdW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 15 - INTERMISSION 3
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 19 11
+Colors=Black Black Blue LightGreen Cyan Cyan Cyan
+DiamondsRequired=1 1 1 1 1
+DiamondValue=25 25
+CaveTime=25 25 25 25 25
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=7 7 7 7 7
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+X     PWx....    Q WWWWWWWWWWWWWWWWWWWWW
+WWx..xWWx..xWQWWWW WWWWWWWWWWWWWWWWWWWWW
+WQ     W    W      WWWWWWWWWWWWWWWWWWWWW
+WWx..xWW WW WWx..xWWWWWWWWWWWWWWWWWWWWWW
+WWx..xWW Q  WWx..xWWWWWWWWWWWWWWWWWWWWWW
+W      Wx..xW      WWWWWWWWWWWWWWWWWWWWW
+W WWWW Wx..xW WWWW WWWWWWWWWWWWWWWWWWWWW
+W Q  Q W  Q W Q  Q WWWWWWWWWWWWWWWWWWWWW
+WWx..xWW WW WWx..xWWWWWWWWWWWWWWWWWWWWWW
+WWx.....    WddddddWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 16 - Cracker
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black LightBlue Red Yellow Yellow Yellow
+DiamondsRequired=18 18 18 18 18
+DiamondValue=15 0
+CaveTime=220 220 220 220 220
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=7 7 7 7 7
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=192 192 192 192 192
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=A combination lock prevents your progress in this cave. Viewing tunnels are provided for you to inspect the mechanism.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+Wdrr r  r  r  r  r  r  r  r  r  r   HWrW
+WrrrWsWWsWWsWWsWWsWWsWWsWWsWWsWWsWWWWWQW
+WrrrW.WW.WW.WW.WW.WW.WW.WW.WW.WW.WWWWW W
+WrrrW                               WW W
+WWWrW WWWWW WWWWW WWWWW WWWWW WWWWW WW W
+W..rW WrWrW WdWrW WrWrW WrWrW WrWrW WW W
+W.WsW WrWrW WrWrW WrWrW WdWrW WrWrW WW W
+W...W WrWdW WrWrW WrWdW WrWrW WdWrW WW W
+W.. W WdWrW WrWrW WrWrW WrWrW WrWdW WW W
+W.  WdWrWrWdWrWrWdWrWrWdWrWdWdWrWrW   rW
+W   WWWrWrWWWrWrWWWdWrWWWrWrWWWrWrWWWW W
+W  r   r r   r d   r r   r r   r r     W
+W WWWWWsWsWWWsWsWWWsWsWWWsWsWWWsWsWWWW W
+W WdWrWrW...WrW...WrW...WrW...WrW...WW W
+W WrWrWrW...WrW...WrW...WrW...WrW...WW W
+W WrWdWrW...WrW...WrW...WrW...WrW...   W
+W  r rWsWWW WsWWW WsWWW WsWWW WsWWWWWW W
+W WsWsW...W W...W W...W W...W W...     W
+W W...W...W W...W W...W W...W W...WWWW W
+W  ...W...   ...   ...   ...   ...WWWWPW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 17 - Mish-Mash 2
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Brown LightRed White White White
+DiamondsRequired=20 20 20 20 20
+DiamondValue=35 35
+CaveTime=100 100 100 100 100
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=More fun with the dice tool, only this time many fireflies and empty spaces for them to roam around in. Clearing dirt away  reduces their paths and therefore means of attacking you.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W...W . Q.    .  .   .w d   . W .. .wQ.W
+Wd.. .. d    ....   ... w.d..... w. w  W
+W. ......    Q .    . Qw..  .  w. .  .rW
+W ...w.  w wr.   d  ....w.ww   .....d..W
+W. ..w.r   rrw  . ..Q.w   .    . . .   W
+W......  .     .Qw.Q..d. r   .  Q.wQ.rwW
+W  .w  .. .  r    ..Q.w....  .... r ..rW
+WQ . w ..... .d. ..    .  . .r..    .. W
+Ww   wwwww.. Q   r d.      w... .    wWW
+W.r  . d....  .w .    ...Q .. .   ... .W
+WQ   r... w ....    .Pd.  ....d. .w    W
+W .. .Qw .  ...... ..   .. .. .. .   . W
+W r. w ..w. ...w ...     ..   .  . d ..W
+W .  .w......d.  ...w.  w .. . .Q w.   W
+W. ... w. . ...... d.. .....d. Q.. .   W
+W...   . .. .Q..... ..    w  .   rw  r W
+W..   .  w.  w...w  .w.      ..    d...W
+WX . ..w .    w... ....  .  d..  Qr    W
+Ww .Q..Q. ..w ..... .w .    . .     w .W
+Ww ..d. .    . ..Ww.d..Q  .  .    W . .W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 18 - Oubliette
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Red Brown Blue Blue Blue
+DiamondsRequired=6 6 6 6 6
+DiamondValue=15 35
+CaveTime=80 80 80 80 80
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=7 7 7 7 7
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=20 20 20 20 20
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=You find yourself locked in the Oubliette, a tiny cramped cave with the way out blocked by an impassable wall of fireflies. The way out is to be found in the walls.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWwMwWWWWWWWWWWWWWWWWWWWWWWW
+Wwwwwwwwwwwwwww wwwwwwwwwwwwwwwwwwwwwwwW
+Wwdr... Q   Q   ........rrr..rr.rr..rrwW
+Wwdr...   Q     X...  .r.rrrrrrrr..r. wW
+Wwdr...      Q  .......  r.rr   rr... wW
+Wwdr... Q       .r....rr rr.  rrr...  wW
+Wwdr...    Q    ...rr. ... ..r.......xwW
+Wwdr... Q    Q  ............r. .r   rxwW
+Wwdr...  Q      .........rr........rr.wW
+Wwdr...     Q   ....r..rrr....r.......wW
+Wwdr...  Q      P.....r.....r..rr ....wW
+Wwdr...         ..rr.....r.rr.....r  .wW
+Wwwwwwwwwwwwwww wwwwwwwwwwMMMMwwwwwwwwwW
+WWWWWWWWWWWWWWwMwWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 19 - Trouble In't Mill
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Blue LightRed White White White
+DiamondsRequired=50 50 50 50 50
+DiamondValue=5 10
+CaveTime=120 120 120 120 120
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=7 7 7 7 7
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=5 5 5 5 5
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=You're milling boulders into diamonds with the magic walls, but things are set up to sabotage your get-rich-quick attempts. Can you provide a quick fix before the short time limit runs out?
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W.......r...........r...  ..r..........W
+W....................r..Q ..r........r.W
+W...r................................P.W
+W......rrrrrrrrrrr.....................W
+W......rrrrrrrrrrr.........rrrrr.......W
+W......rrrrrrrrrrr.r...r...rrrrr...r..rW
+W.r....rrrrrrrrrrr.....................W
+W...r.............r....r...MMMMM.......W
+W.....r...r.........r....r.     .....r.W
+W.....r......r.............     r......W
+Wr..............r..........     .....  W
+W....r.....................MMMMM.....Q W
+W...................r......MMMMM...r...W
+W.......................r...rr.........W
+W  ....MMMMMMMMMMM.............r.......W
+WQ ....MMMMMMMMMMM.....................W
+W........r.................r.........r.W
+W..................r..r.....r.....r..r.W
+W...r.........................  .r...X.W
+Wr...........r...........r....Q ...r...W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 20 - INTERMISSION 4
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 19 11
+Colors=Black Black White LightBlue Cyan Cyan Cyan
+DiamondsRequired=6 6 6 6 6
+DiamondValue=40 40
+CaveTime=20 20 20 20 20
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=7 7 7 7 7
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+X...........w.....PWWWWWWWWWWWWWWWWWWWWW
+W...........w......WWWWWWWWWWWWWWWWWWWWW
+W.. c .. c .w. c ..WWWWWWWWWWWWWWWWWWWWW
+W..   ..   ...   ..WWWWWWWWWWWWWWWWWWWWW
+W.. d .. d ... d ..WWWWWWWWWWWWWWWWWWWWW
+Ww................wWWWWWWWWWWWWWWWWWWWWW
+W..   ...   ..   ..WWWWWWWWWWWWWWWWWWWWW
+W..   .w.   ..   ..WWWWWWWWWWWWWWWWWWWWW
+W.. dQ.w. dQ.. dQ..WWWWWWWWWWWWWWWWWWWWW
+W......w...........WWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 21 - Triathlon
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Gray1 Green Yellow Yellow Yellow
+DiamondsRequired=50 50 50 50 50
+DiamondValue=5 15
+CaveTime=150 150 150 150 150
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=6 6 6 6 6
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=70 70 70 70 70
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=252 252 252 252 252
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=In the Triathlon you will be competing in three classical Boulder-Dash cliches. First, a rain of rocks and diamonds filters  through slime, as in that famous cave E in BDII; then you must create a path for a firefly through some obstinate walls;  before finally getting the last firefly to move from it's favourite island, which it doesn't really want to leave.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W.............Wr.......r.Wrrdr rdrrdd  W
+W.............W....d....rWdrdddddrdrr dW
+W.. Q ...... rr.....r....WrrdrrrrdrrrdrW
+W.. w ........W.w.x.x.x.xWsssssssssssssW
+W   w   ......W..........W   rrrdr rdrdW
+W wwwww ......Wx.x.w.w.x.WddrrdrdrddrdrW
+W   w   ......W..........WdrdrrrdrrrdrrW
+W.. w ........W.x.w.w.x.xWsssssssssssssW
+W..   ........W..........W        r  d W
+W..........rr.Ww.w.x.x.x.W     r       W
+W........r....W..........W             W
+W....r..rr....W.x.x.w.w.xW             W
+W.rr......r...W..........W             W
+W.rr.d.......rWx.x.x.x.w.W             W
+W.......r.....W.........rW     r     d W
+X........d....Wrr...r.  rP    rrr      W
+WwwwwwwwwwwwwwW..r......rWsssssssssssssW
+WrdrdrdrdrdrdrWr....  r..W             W
+WdrddrddrddrddW.. Q  .rr.W             W
+WdddddddddddddW.  .r.....WMMMMMMMMMMMMMW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 22 - No Way Back
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Purple Orange White White White
+DiamondsRequired=35 35 35 35 35
+DiamondValue=5 50
+CaveTime=120 120 120 120 120
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=6 6 6 6 6
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=A random digital sneeze of closing walls was sprayed into this cave, then pruned and massaged by hand to create a pleasing  challenge. Don't brush past any walls you don't have to in this one.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WP.......x.x ..dx.d..d  dx.......x.x...W
+W...  xddx.......xdx....d...dx.... ..xdW
+W.x....xxx...x.x..x.x....   x..x.  .xdxW
+W......x.. x..x  ..x.x dx........  ....W
+W.dx...........x.......x.....x ..d. ...W
+W x...x ... ............. .....x.. ....W
+W.....x...........x.x.x...xxdx..x...x..W
+Wx    ..x..d..xx.x........d.........x .W
+Wdx  .x...  ....x ...x... xx..x..x.x...W
+Wdx.....   .x.x........ ........x......W
+Wdx.x.x..x..xd.x...x..x....d...........W
+Wdx.....x.. ......d...x.......x.x..x...W
+W..x.x.xd...... .x..x.xdx..d...........W
+W....x. x  .x....dx..x....x....x.. . xdW
+W.. x.......x.x..x ..x..d. x..x....   xW
+W.d.... x.....xd..xx...dx .d.x ..x...x.W
+W. .x..... .d.x...x..xdxdx.x....x..x..xW
+W...x..x......x....d..x..x..x....x.....W
+W...x..x..x.....x... ...xdx..x. .x.xx..W
+W...dxdxdxddx...xd....xdx..  . .x...dx.X
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 23 - Like Clockwork
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Gray2 LightGreen Green Green Green
+DiamondsRequired=22 22 22 22 22
+DiamondValue=7 30
+CaveTime=100 100 100 100 100
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=6 6 6 6 6
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=The almost tessalating firefly paths in this cave force you to adhere to an interesting movement pattern - and quickly. If  you're feeling frisky, go for the bonus jewels. This level gets easier with practice.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+Www   Q   wwwwwwwww   Q   wwwwwwwww    W
+W    dwd      w      dwd      w      P W
+W wwwwwwwww   Q   wwwwwwwww   Q        W
+W     w      dwd      w      dwd       W
+Www   Q   wwwwwwwww   Q   wwwwwwwww    W
+W    dwd      w      dwd      w        W
+W wwwwwwwww   Q   wwwwwwwww   Q        W
+W     w      dwd      w      dwd       W
+Www   Q   wwwwwwwww   Q   wwwwwwwww    W
+W    dwd      w      dwd      w        W
+W wwwwwwwww   Q   wwwwwwwww   Q        W
+W     w      dwd      w      dwd       W
+Www   Q   wwwwwwwww   Q   wwwwwwwww    W
+W    dwd      w      dwd      w        W
+W wwwwwwwww   Q   wwwwwwwww   Q        W
+W     w      dwd      w      dwd       W
+Www       wwwwwwwww       wwwwwwwww    W
+W             w               w        W
+W                                      W
+X                                      W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 24 - Voodoo Maze
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black LightBlue Orange Green Green Green
+DiamondsRequired=22 22 22 22 22
+DiamondValue=10 10
+CaveTime=200 200 200 200 200
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=3 3 3 3 3
+MagicWallTime=3 3 3 3 3
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Once past the Amoeba you face a maze where your moves in one part of the maze may give rise to a firefly in another part of the maze touching a Rockford Doll. Think mechanistically. Some quick moves are needed, too.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+H aaaaaaaaaaaaaaaaard WF r   r Q r  r WW
+Wwa a a a a a a a awW.xWWrWWWrWWWrWWw WW
+Ww                 wW....d...dW..d  r WW
+Ww                 wWWWWWWW.WWW.WWWWw WW
+Ww       ddd       wW W   W.....Wd..w WW
+Ww       dPd       wW   WWWWWWWWWWW.w WW
+Ww       ddd       wWxr r      r FW.w WW
+Ww                 wWWrWrW WWWWrWWW.WFWW
+Ww                 wdWd dW QW..d......WW
+Ww                 w.WW WWWWW.WWWWWWW.WW
+Ww               r w..........WQQr FW.WW
+Ww             r   w.WWW WWWW.WWWrWWW.WW
+Ww           r     w...WF   W....d....WW
+Ww         r       wWW.WWWW WWWWWWWWW.WW
+Ww       r         wF  r       d rQQ..WW
+Ww     r           wWWWWWWWW W dWrWWW.WW
+Ww   r             wWrFr Q W WWWWd....WW
+Wwwrw w w w w w w wwW... W WrWddW.WWW.WW
+Ww.................wW... W w.Wxd.rW...WW
+Ww.M.M.M.M.M.M.M.M.dr...   w........W.WW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 25 - INTERMISSION 5
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 19 11
+Colors=Black Black Purple LightRed Yellow Yellow Yellow
+DiamondsRequired=40 40 40 40 40
+DiamondValue=5 20
+CaveTime=20 20 20 20 20
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=6 6 6 6 6
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WddddddddrdddrddddrWWWWWWWWWWWWWWWWWWWWW
+XddrdddddddddrddrddWWWWWWWWWWWWWWWWWWWWW
+WddrdddddrrddddddddWWWWWWWWWWWWWWWWWWWWW
+WdrddrdddddrddddddrWWWWWWWWWWWWWWWWWWWWW
+WddrdddddddrrddddddWWWWWWWWWWWWWWWWWWWWW
+WdrddddrdddrdddrdddWWWWWWWWWWWWWWWWWWWWW
+Wdddrddrdrdddrrddr WWWWWWWWWWWWWWWWWWWWW
+Wrddrd ddddrdrdddddWWWWWWWWWWWWWWWWWWWWW
+Wdddddr ddd dddPd dWWWWWWWWWWWWWWWWWWWWW
+WMMMMMMMMMMMMMMMMMMWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 26 - Good Wall, Bad Wall
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Red LightBlue White White White
+DiamondsRequired=18 18 18 18 18
+DiamondValue=10 10
+CaveTime=150 150 150 150 150
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=224 224 224 224 224
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Some walls help you in this cave, while others merely stand in your (or something's) way.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWW..............r.WWWWWWWWWWWWWWWW
+WWWWW.............www...r.rWWWWWWWWWWWWW
+WWW....  ..r.......wr..rw...rrWWWWWWWWWW
+WW.....  ..........w... .r..r..r WWWWWWW
+W......  ..........wr....r r......... WW
+W.WsWW       ......w...... r....r.rxw QW
+W.w wW     WW......w.w r .ww.w....... WW
+W.wcwWWWWWWWw......w......r..r ..WWWWWWW
+W.wwwwwwwwwww......w... r.rr...rWWWWWWWW
+W..................w... . ...rr.WWWWWWWW
+W......  ..r....P..wr...wwrrw.r WWWWWWWW
+W......  .......X..w.. ...rr.r.  WWWWWWW
+W......  ..........wr......r.r.   ... WW
+W.WsWW       ......wr... r...r.  ..xw QW
+W.w wW     WW......w..ww. ww. ....... WW
+W.wcwWWWWWWWw......w...r.  .... .WWWWWWW
+W.wwwwwwwwwww......w...........WWWWWWWWW
+W..................w... .r...WWWWWWWWWWW
+WW................wwwr..w..WWWWWWWWWWWWW
+WWWWW.................r WWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 27 - Plinko!
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Orange Cyan Yellow Yellow Yellow
+DiamondsRequired=5 5 5 5 5
+DiamondValue=40 40
+CaveTime=120 120 120 120 120
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=107 107 107 107 107
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=255 255 255 255 255
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=You could just hope that the chips, sorry, I mean Boulders, fall down in the right place, but that's unlikely. Maybe it  would be better to offer them a guiding hand. In this level you'd do well to note that a boulder will always fall to the LEFT if it can, left unattended (double meaning of the latter two words is purely coincidental!)
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWrWWWrWWWrWrW.r.WrWWWrWWWrWWWWWWWW
+WWr.................w................rWW
+WW....                           r....WW
+WW....                            ....WW
+WW.... w       w   w M     w   w  ....WW
+WW....                            ....WW
+Wr....        w           w     w ....rW
+WW....  w           w             ....WW
+WW....       w M               w  ....WW
+WW....                   w M      ....WW
+WW.... M w  M w    M w        M w ....WW
+WW....                    w       ....WW
+WW....         w               w  ....WW
+Wr....  w M         w    M w      ....rW
+WW....        w                 w ....WW
+WP....                            ....XW
+WW....MMMMM MMMMM MMMMM MMMMM MMMM....WW
+WW....M MMM.MMM M.M MMM.M MMM.M MM....WW
+WWr..................................rWW
+WWWWWWWrWWWWWWWrWWWWWWWWrWWWWWWWrWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 28 - Puzzle-opolis
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Cyan Purple Yellow Yellow Yellow
+DiamondsRequired=40 40 40 40 40
+DiamondValue=8 50
+CaveTime=240 240 240 240 240
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=7 7 7 7 7
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=A huge interlocking puzzle which spans a whole cave. This is for all the thinkers out there. ENJOY!
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WdrQ .rWr. r .rrrQ   Wdr   Q wX.rrdw r W
+WWrWr.rWr.rW WrWrWWw  W. WdW  w....W W W
+WdrWr.rrr.rW WQWrWr.w  w  W.W .w  .W   W
+WWrWr.....rW WrWrWw..w  w     .dw rw  wW
+WdrWWWWWWWWW WrwQWww.dw Ww WWWWW.rw  wdW
+WW.W   ....WQWrWW  ..wW  W Wd .r.w  drdW
+Wdd       .WWwcWr ..w    W  wr.r.W wWrWW
+WWrW       WrWWWW..w  WWWWw WrWWsw..W..W
+WdrWxr     W......wW      W WQW.rrw..W.W
+WWrWWrWrr .W.     dWWWW W W Wrw.wrdw...W
+WdrdWrW....W    W .w      W WrWdWrWQw..W
+WWrWWrW..r.W.WW W w  w.WWWW WrrW.r.WQw.W
+WdrW.d....rW.W   w  w...rW   drW.W.WW  W
+WWrWWWWWWWWWsW w W w....dW WWWWW...W  wW
+W r Wdd......w W W WsWdWWw  ...WW.W  wrW
+W W W.rrrrrWsW W w W WdW.    W..W.W w..W
+W   W..dd..WQW c W WQWWW    rxr        W
+W   Wrrrrr.W WW.WWWWWw...WWWrWrWWWWddW.W
+W P W....dd.WcWr  W   W...WWrWrW...WW..W
+W r W.......WcccW   WdWdW...dWd..W....WW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 29 - Butterfly Track
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black White Yellow Cyan Cyan Cyan
+DiamondsRequired=90 90 90 90 90
+DiamondValue=2 5
+CaveTime=180 180 180 180 180
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Butterflies race peacefully and prettily around a track. That is, until some evil git or gitess comes along and smashes  them all to death with boulders. Boulderdash really has no morals, it's all \"get what you want, even if it means trampling  the local wildlife to get it\". SHAME ON YOU!
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+Wd.r.w.................rdw.r....r......W
+Wrrr.w....r.  c      ..wwwwww.........rW
+Wr...w.....  r...... ....w.r.r   ...r..W
+W..wrw....  ....d... c ..w..d. . c ....W
+W.wwwwwr.. d.rdd...... ..w.d..c...  rdrW
+Wr.wPw..r. ..dr.r..... r...... ...r ...W
+W..w.d.... ......d.r.. ..  c   r.r.c...W
+W..w....d.c..wrr....rw    r...w....  ..W
+W.rw.r..r. ..wd.r.r.wwwwwwwwwwww.... ..W
+W..w.....  ..w.......wF..rrrddw c  .Q..W
+Wr.w.d.   ..wwwwwwwwwww...rrrrw r. . ..W
+W..wr.. .rr..wX....rrw.r......w ..c.  .W
+W..rr.. .rr..........w...     w c. ..QdW
+W..wrr. rrrr    ....rw    .r. w. . .. .W
+Wwwwwr. .rr. d. ...... d..... w.   .d .W
+Wrrwr.c rrrr ..    ... .r.r.. ...d.r. .W
+W.dd.. .r... r.... c   .r....   ..... .W
+Wdrwr  r..  c....r..d..r....r..   .   .W
+W..w. ..   rr..........r...r.r... c ...W
+W.dwr    rrrd.r...........rdr...r....r.W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 30 - INTERMISSION 6
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 19 11
+Colors=Black Black Gray1 Brown Red Red Red
+DiamondsRequired=15 15 15 15 15
+DiamondValue=20 50
+CaveTime=40 40 40 40 40
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=7 7 7 7 7
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=2 2 2 2 2
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W   d..Q.rrrrrrrw.PWWWWWWWWWWWWWWWWWWWWW
+W d. .wQW...r...w.rWWWWWWWWWWWWWWWWWWWWW
+W..r..w WMMMrMMMw..WWWWWWWWWWWWWWWWWWWWW
+Wd...dw Wrrrrrrrwr.WWWWWWWWWWWWWWWWWWWWW
+W.ddd.wWW...r...w..WWWWWWWWWWWWWWWWWWWWW
+W.WWWWWWwwww.wrxw.rWWWWWWWWWWWWWWWWWWWWW
+W.r  d Ww d  r.rw..WWWWWWWWWWWWWWWWWWWWW
+WWWW W Ww w wwdrxrdWWWWWWWWWWWWWWWWWWWWW
+X      Ww wwww..r..WWWWWWWWWWWWWWWWWWWWW
+W WWWWWWw wrwwr...rWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 31 - All Change!
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Orange Purple Green Green Green
+DiamondsRequired=90 90 90 90 90
+DiamondValue=0 10
+CaveTime=160 160 160 160 160
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=53 53 53 53 53
+MagicWallTime=10 10 10 10 10
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Another Amoeba-based level. I leave the name as the only clue for you.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W..r........................r.... r    W
+W........................... ... ..w P W
+W..wwwwwww.... . .......r... ......w   X
+W..w.....w...........r.............wwwwW
+W .w.. r.w.................. ..........W
+W..w..a..w..... r ...............r....rW
+W..w.....w....................... ... .W
+W..wr....w..r...........  .......... ..W
+W..wwwwwww.. ..... .....  ....r ..r....W
+W.......r............ .................W
+W ........ .....r..  ....r.... ...r.r..W
+W...rr..r..r.......... ................W
+Wdddddddddddddddddddddddr...r.........rW
+WMMMMMMMMMMMMMMMMMMMMMMM .........r....W
+W  r             rr     ............ ..W
+W.....r.r.....r..................Q.    W
+W. ..r.....r..r.. r...............Q    W
+W......... .............wwwwwwwww..   QW
+W...........r.. .......w Q QQQQQQQQQ Q.W
+W....... ... .... ....w Q Q QQQQQQQ   .W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 32 - Revenge of the Funnel
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black LightRed White Green Green Green
+DiamondsRequired=60 60 60 60 60
+DiamondValue=4 20
+CaveTime=150 150 150 150 150
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=7 7 7 7 7
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=12 12 12 12 12
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=A funnel sandwiched between two puzzle sections. Get as many boulders through the magic wall funnel as possible, or you won't have enough when you come to the end of the cave.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W.r   .wdw.r...rd.r..r..r.rr.rw..dWHd..W
+W.xxw rwdwr..r...r.r..drr.r..rw.wddddw.W
+W.wrr  wrw......rr..r.r..r....w.xwwwwx.W
+W.w    w.w..w...rr.r...d...w..w.r...r..W
+W.w  . wrw..ww.....r.r....ww..wr.r.r.r.W
+W.. ..rwrw...wwd.........ww...w.d.r.d.rW
+W.w.rr.w.w.r..wwrr...r..ww.r..wd.r.d.r.W
+WPw..r  dwr....ww..r..rww... .w.r.r.r.rW
+Wxxxxw.w w .....ww....ww...  rwr.d.r.d.W
+Wrdrdwxw.w..d.. rww..ww....  .w.d.r.d.rW
+W.rdrwr..w.. .....wMMw... ....wr.r.r.r.W
+Wr.r.w..ww..r......r.....r..d.w.r...r..W
+W.r.rw...w..... .....  .......wrrrrrr..W
+W......w.w.. ........ r ...  .wxxxxxxx.W
+W.wxxxxxxwrr....r ..d....rrrr.w..r  .w.W
+W.rrdddw...r...........rrr.drrw.xw. .w.W
+W  .rrwx.w.rrrr.......rr.rr.r...w    w.W
+W .r.d.w.w.r..rrr.r.r.r...rrr.w.wr.r.w.W
+W r.r. w.w.r.rr.rrr.r.rr...rr.w.w.r.rw.W
+W .r.r...w...r..r.rd...r.r....w.w......W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 33 - Reflexology
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Brown Orange Purple Purple Purple
+DiamondsRequired=45 45 45 45 45
+DiamondValue=5 25
+CaveTime=130 130 130 130 130
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=7 7 7 7 7
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Timing is everything as you must run from a boulder and arrive at the butterfly den and cross it at the right time. Also, beware of being trapped by the many boulders which lie outside of the brick runs.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W.... . r    r.. ..r.wrw r ....r...... W
+W .. rwww.   ..r.r .. .w r .  ..  ..r..W
+W. ...wrw r  r     ..w w ..r.rwwwwwr  .W
+W.......w  r  www ...w.w . . wwrwXw.  .W
+W  ...w w .   wrw .  w.w.    r..wrwwr. W
+W.. ..w w..rr.w.r..r.w wwr. .ww w...rr.W
+Wr....w ww....w w....w.rww    wdw.wwrr W
+Wr .r.w.rww  .w.w.r..w ..w. r.w.wwwrr..W
+W .r. w ..w. ww w r..wwcwwrr..wdrw ...rW
+W  r.www ww.wwr.w. . .w w r r w..wr  ..W
+W    wrw w  w ..w  .. w w... .wwdwrr. .W
+W     Pw w .wwcww... .www .....w.w.w.. W
+W..wwwdwcw...w wr .  .  ...www wd dw ..W
+W..wrwwwww...w w . wwwww...wrw.www.wr .W
+W.ww.. wrw. .wrw...wrr.w. ...w.  www  .W
+W.w. w.w.. . w w.....wdww. wdw .r     rW
+Wrwwcw.w.w.  wwwr..w.w.dw .w.wwwwwww ..W
+W. w w   w . ..... wdwdww. wd.d.dr    .W
+W .wwwwwww  .r....rw.d.w...wwwwwwwww.  W
+W  .. ..r... . ... wwwwwr...r.   r.  r.W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 34 - Advanced Spelunking
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Green LightRed Cyan Cyan Cyan
+DiamondsRequired=40 40 40 40 40
+DiamondValue=10 95
+CaveTime=180 180 180 180 180
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=7 7 7 7 7
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=One of my absolute favourites from the collection! This started with the random tool throwing boulders everywhere, but I  made a lot of changes to create some (in my opinion) quite fascinating boulder-puzzles. Believe it or not, it's possible to  get ALL the diamonds, but I usually miss one, which is allowed in this cave for the sake of preservation of sanity. Tight  and cramped conditions prevail so don't be fooled by the pretty colour scheme.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+Wd.rrrd rrrr r rrrrrd .r.r... . r.r.rrdW
+Wr..rr.rrrr... .....r.. d..r.r  rr.r r W
+W .r.r... .r.r d.r...r.r. .r..rrdr.Pr..W
+Wr.....r  rr rr..r.r.rr. r r.r...r.rd.rW
+Wr   rr. ..rd.r... ...rrr.r..r.rrr...rrW
+W.. .rrr. rr. r rdr. ..d.. drrr.r .rr.rW
+W.r ...WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W r.rr...rrrrrrrr.r. rddr.dr..r.rr   r.W
+Wr. rd....d... rrd.rr.rr..r..rr rrr rr.W
+W.rrrr. r rr.d.r...rr.r..r...rrdr.. ..rW
+Wrr rr  ....rrrr.rdr ...r..drdr.r.d  .dW
+Wrr...rrrr...rrr..r r. r.. rrr. r...rrrW
+W.r.rr...d.r....d ..r..r.rrr.r.r...r...W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWr..rd.W
+Wrr.rrr.dd. rdrr rr.r.drrrr.r rr..r.rrrW
+W.drr.rr . ..rr r.rr.rrr r. r..r....rr.W
+Wr.drrrrrrrr.r.rr... ..rr. r. .r.drrrrrW
+WrrXrrrrrr.rr.rd. .   .r. rr..r.rr.r..rW
+W..drr.r.r.....r..rr  r. r..r.r...r.r..W
+W......... drrrr.r.rr drr.  .r.d  .. d.W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 35 - INTERMISSION 7
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 19 11
+Colors=Black Black LightBlue LightGreen White White White
+DiamondsRequired=10 10 10 10 10
+DiamondValue=10 20
+CaveTime=30 30 30 30 30
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=5 5 5 5 5
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WPr.   Q ...  .rrwXWWWWWWWWWWWWWWWWWWWWW
+W... .        ...wdWWWWWWWWWWWWWWWWWWWWW
+W..  w.rr .x.  ..wdWWWWWWWWWWWWWWWWWWWWW
+W.   w ..   w  . wdWWWWWWWWWWWWWWWWWWWWW
+W.   w      w    wdWWWWWWWWWWWWWWWWWWWWW
+W        .     d wdWWWWWWWWWWWWWWWWWWWWW
+W wwwwwsswc W.xMwwdWWWWWWWWWWWWWWWWWWWWW
+W           ... .wdWWWWWWWWWWWWWWWWWWWWW
+W  ...        ...wdWWWWWWWWWWWWWWWWWWWWW
+WFFFFFFFFFFFFFFFFwFWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 36 - The Art of Wall-Boxing
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Purple LightBlue Cyan Cyan Cyan
+DiamondsRequired=65 65 65 65 65
+DiamondValue=4 50
+CaveTime=170 170 170 170 170
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=All of the walls are caving in walls, as demonstrated in the opening seconds of the cave. So how exactly can you get through them if all they want to do is close in your face?
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WFFFFFFFFFFFFFFFFFF.....FFFFFFFFFFFFFFFW
+WF..................r.r...............FW
+WF.Wx   .   xW..W....X....W..Wxd..QxW.FW
+WF.W.........W..W. .....c.W..Wdrr Q W.FW
+WF.W....r....W..W. ..... .W..W rr  QW.FW
+WF.W   ...   W..WQ       xW..W      W.FW
+WF.W    c    W..W.r......rW..W      W.FW
+WF.W         W..W.....r..cW..Wx     W.FW
+WF.W         W..W .....r.rW...........FW
+WF.Wd.......dW..Wc .......WP..........FW
+WF.W.........W..W.........W..W.    xW.FW
+WF.Wx        W..Wx        W..W..rQr.W.FW
+WF...r.....r....W.......r.W..WrrdrdrW.FW
+WF..............W  .r.....W..WrdrdrdW.FW
+WF.WxsxxxxxsxW..W r.......W..WdddrdrW.FW
+WF.W. . Q .c.W..W  .......W..WrdrdrrW.FW
+WF.W.c. Q . .W..W ...... rW..Wr.....W.FW
+WF.WxxxxxxxxxW..W    Q   xW..Wx    .W.FW
+WF....................................FW
+WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 37 - Timers
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Orange Gray1 White White White
+DiamondsRequired=35 35 35 35 35
+DiamondValue=10 10
+CaveTime=120 120 120 120 120
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=240 240 240 240 240
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=You need to plan the shortest route to collect the diamonds and reach the top passages, once you set off the firefly and  boulder chain-reactions. In the last phase, beware of traps (you can test tunnels for trappiness without sacrificing a life if you know how). In the beginning, you are NOT trapped - don't be so impatient!
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WrrWd.wrw.....W d wrw.....W d w......wdW
+WsQW.dwQw.....WdWdwQw.....WdWdw.wdww.w.W
+WQwWd.wrw.....W.W.wrw.....W.W.w.wdww.wQW
+W wW..wQw.....W.W.wQw.....W.W.w.wdww.wQW
+WWrW.xwrwr       .wrw        .w.wwww.wrW
+Wd  ..wQw ..rd..W.wQw.rrd...W..........W
+W.w ..wrwr.rrrd.W.wrw...rrr.Wwxdw.wdxw.W
+W.  ..wQw...r..rW.wQwrr.rrrrWwwdw.wdww.W
+W. w..wrw.......W.wrw.rrr...Wwwdw.wdww.W
+Wr  .dwQw..rr rrW.wQwrr.....Wwwww.wwww.W
+Wrw ..wrwr...r..W.wrwr.. rrrW..........W
+W.  ..wQw .  ..dW.wQw.drr...W.wwdw.wdxwW
+W.r .rwrw..  r..W.wrw r..r..W.wwdw.wdwwW
+Wr .. wQw.rrrrr.W.wQwr.rrrr.W.wwdw.wdwwW
+Wr .  wrwr......W.wrw.r.r. .W.wwww.wwwwW
+W r. rwQw...rd..W.wQw.......W..........W
+W  .rrwrw....rd W.wrw...dr. Wwwdw.wdxw.W
+W  r .wQw.r.. ..W.wQw. d. rrWwwdw.wdww.W
+W  ...wrw..r....W.wrw.. ....Wwwdw.wdww.W
+WP  . ..w.. ...rW...w.. ....Wwwww.wwww.X
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 38 - Hem 1
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Cyan LightRed Green Green Green
+DiamondsRequired=99 99 99 99 99
+DiamondValue=1 3
+CaveTime=200 200 200 200 200
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=34 34 34 34 34
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Hem the Amoeba in to make lots of diamonds, just like the old-fashioned caves. There are several wide 'ports' which make  this easier said than done. Also, the Amoeba area is slightly too big. What are you going to do about that?
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WW     aa          xx          aa     WW
+W      aa          xx          aa      W
+W  WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW  W
+W  WwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwW  W
+W  Ww..r .. . dr.r.......Q r .....rwW  W
+W  Ww..rQ.....r....XP....... .r....wW  W
+W  .... .........d...r ....r.........  W
+W  ..r......r....r  .Q.....r .r.r....  W
+W  Ww.......... .Q.r.....r r... ...wW  W
+W  Ww.r...r. .... ..r.r... .d.r..r.wW  W
+W  Wwr....r...r.r..r..d.... .....r.wW  W
+W  Ww...........Q. ...   .r........wW  W
+W  .. ..r..........r. ......r...r....  W
+W  ..rr..  ...............rr....Q....  W
+W  Ww . . .Q..........   ... r.....wW  W
+W  Ww... .r.... .......Q .......r .wW  W
+W  Wwww..wwww..wwww..wwww..wwww..wwwW  W
+W  WWWW..WWWW..WWWW..WWWW..WWWW..WWWW  W
+W                                      W
+WW                                    WW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 39 - Peg Board Maze
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Red Orange Yellow Yellow Yellow
+DiamondsRequired=99 99 99 99 99
+DiamondValue=2 99
+CaveTime=255 255 255 255 255
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Inspired by Cave M of the wonderful BDII, but the idea is different and extended to fill the whole cavespace. Have fun! *chuckles*
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+Wdrr.d...r.d..rrW..rrr.rd..rdWWWWWXWWWWW
+WrWrWdW.WdWrW.WdW.WrdW.WrWrWrWr.dr..rrdW
+Wdrr.r..rrWr...rW.rdr..rdr..rWdWdW.WrWrW
+WrWrWdW.WdWdW.WdW.WrdW.WrW.WrWr.d...r.rW
+Wd.r.r...rWrr..rW..drr.rrr.rrWdWrW.WdWdW
+WrWrWdW.WrWdW.WrW.WrrW.WdW.WdWr.r...d.rW
+Wd.r.r...dWr..rrW..dr...r...rWdWrW.WdWrW
+WrWrWdW.WrWrW.WrW.WWWW.WWW.WrWr.d...r.rW
+Wd.r.r...dWrr..dW..dr...d..rrWrWdW.WrWrW
+WWW.WWWWWWWrW.WdW.WrdW.WrW.WdWd.d...r.dW
+Wrr..dr..rWrW.WrW.WrdW.WrW.WrWWWWWWW.WWW
+WdWrWdW.WdWr...drr.dr.rWr...rWrr.rd...dW
+Wrr..dr..dWrW.WWW.WWWW.WrW.WrWdW.WdW.WdW
+WdW.WrW.WrWdr.rd...rd..Wd..WrWrd..rr.rrW
+Wr...r...dWrW.WdW.WrrW.WrW.WrWrW.WrW.WrW
+WdW.WrW.WdWd...rr..dr..Wr...dWdr..dr.rdW
+Wr..rd...rWrW.WdW.WrrW.WrW.WrWrW.WrW.WrW
+WdW.WdWrWdWr..rr...rd..Wd...dWrd.rr...rW
+Wd..rd...dWrW.WrW.WrrW.WrW.WrWrW.WrW.WdW
+WWWWWPWWWWWd...dr..dr..Wd...d.d..rd...dW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 40 - INTERMISSION 8
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 19 11
+Colors=Black Black Yellow Green White White White
+DiamondsRequired=1 1 1 1 1
+DiamondValue=90 90
+CaveTime=10 10 10 10 10
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=6 6 6 6 6
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=1 1 1 1 1
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WPrrrrrrwrwrrrwrrrrWWWWWWWWWWWWWWWWWWWWW
+W.r....rrrwwrrr..d.WWWWWWWWWWWWWWWWWWWWW
+W r rr.rrwwrr.. rr WWWWWWWWWWWWWWWWWWWWW
+W ..rr .rrwr. rrr. WWWWWWWWWWWWWWWWWWWWW
+Wwwrrrr.rrww w... wWWWWWWWWWWWWWWWWWWWWW
+Wrrd..r .rwr w.rrrrWWWWWWWWWWWWWWWWWWWWW
+Wr..r rr.rwr.w r...WWWWWWWWWWWWWWWWWWWWW
+W. rr....rwr.w . r.WWWWWWWWWWWWWWWWWWWWW
+W rrwrrrrrwr wwrrw WWWWWWWWWWWWWWWWWWWWW
+W .. ..... . wX..  WWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 41 - Puzzle-opolis 2 (Slime Redux)
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Gray3 Orange Yellow Yellow Yellow
+DiamondsRequired=45 45 45 45 45
+DiamondValue=6 6
+CaveTime=200 200 200 200 200
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=7 7 7 7 7
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=5 5 5 5 5
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Another large-scale puzzle like cave 28, but this one is MUCH harder because there is slime everywhere, and there are lots of interconnecting puzzles to solve. I think this will drive the best of you mad, hehehe...
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+Wsrssssss   d.ssssssss .r. sssQr     r W
+Wsssr      wd.   sssss sss s s sssss sdW
+Ws...      w..     rQs srs   srs sss srW
+Ws         w      ssss srs s srs .   srW
+W          w     ss..r s.  sssrs s.sssrW
+W ssssss sssssssssssssssss.sdsrss Qs..rW
+W ..sssssssss....    .  ss.s.sssssss.ssW
+W s.ss.ddsdsd     w w w  s.rdsrsddddd..W
+W s    wwsss s    wwwww  sssdsssssss sdW
+W sdss   d.  ss           .sdsdrdrdsssdW
+W  rssssssss ssssrrrrrrrs.wssd.rdr.rssrW
+Wssss     ss srsssssssssssss...rdr...s W
+WssP       s ssssddddddds    ..rdr..   W
+Ws         s ..ss.......s ss  .WWW.  s W
+Ws    r      srss...... s sss   r   ss W
+Wss  rdr    rs.......   s ssssssssssss W
+X   rdrdr   ss ssMMMMMMMs sss       ss W
+Wsssssssss  .s ss       s sss   r      W
+Wss sssss  s s ssssssssss ssss rrr sssrW
+Wss sssss ss            dddxssssssssssrW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 42 - Hall of Mirrors
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Blue Red White White White
+DiamondsRequired=45 45 45 45 45
+DiamondValue=5 10
+CaveTime=250 250 250 250 250
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=9 9 9 9 9
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=255 255 255 255 255
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=So called because of the symmetrical layout, though sustaining this pattern completely would have been boring, so I didn't.  Note that before you access the second (lower) half, I've provided viewing tunnels like I did in Cave 16, so you can assess  the situation before going in.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WQwr..P..rwr..F..rwr....FFFFFxFF...d..FW
+W w... ...w... ...w......r.dFxF....d...W
+W.w .. ...w... ...w.......r.FFF.r.FF...W
+WWWQ.. ...w... ...w..........FF...F....W
+W.w .. ...w... ...w.....F.....F...F. ..W
+W w... ...w... ...w.....F....ddd..F. .FW
+Wcw...F...w... ...w.....FFFFd...dFF.Q.FW
+WWWWWWWWWWWWWWWWWWWrWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWx.xWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWx.xWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWx.xWWWWWWWWWWWWWWWWWWW
+W                  .                   W
+W WWWWWWWWWWWWWWWWxdxWWWWWWWWWWWWWWWWW W
+W wr..dr.rw...F..rr.rr.www..w.F....dwddW
+W w..d.d.Qw... ..rr.rr.. ...w. ....QwddW
+W wdxr.d.rw... ..rr.rr.. ...w. ....dwddW
+WWWdd.d...w... ..rr.rr.. ...w. ....QwWWW
+Wcwdxddd..w... ..rr.rr.. ...w. ....dwddW
+W w..d.r.dw r. ..rr.rr.. .r w. ....QwddX
+W w.d.d..dwQrwww........F.rQw.F....dwddW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 43 - Hem 2
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Brown Gray2 Green Green Green
+DiamondsRequired=99 99 99 99 99
+DiamondValue=2 3
+CaveTime=200 200 200 200 200
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=47 47 47 47 47
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Hem the Amoeba in again, only this time, you'd be forgiven for thinking it's impossible. It's not, though. Some ingenuity will get you through.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WX..rr.r.rrr.r.r..rr.rrrrrr.rrrrr...r.PW
+W..rrrrr..rrr.r..r....r.......rrrrr.r..W
+Wr.rrrr.r.rr......rrr...r.rrr..rrr..rrrW
+W.rrrr.r.rrrr.r.r....r....r..r.rrr.r...W
+Wrr...r.r.rr.....rr....r.r.rr.rr.....r.W
+W..r.r.......rr.....r..........r.rr..r.W
+Wrr.r...r.rr...rrr....r.r..r.rrr.rr.r..W
+Wr..r....rr.r......r..r......rr.r.r.r..W
+W.....r..rrrrr..r.........r..rr....r..rW
+W..r...rrrwwwwwwwww..wwwwwwwwwr...r....W
+W.r.rr.r..wr......w..wr......w...r..r.rW
+W..r.....rw................r.wr.rr.r...W
+Wrrrr.....w....r........r..r.w.r..r....W
+Wwwwwwwwwww.r........r.....r.wwwwwwwwwwW
+Wrrr...r.......................r.....aaW
+W.r........r............r........r..r.aW
+W....r..r......r.....................r.W
+W......rr..............................W
+War......r................r....r...r...W
+Waa..r.....r.....r.............r.....rrW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 44 - Blue Room
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Blue Blue Blue Blue Blue
+DiamondsRequired=50 50 50 50 50
+DiamondValue=5 50
+CaveTime=120 120 120 120 120
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=Everything is dark blue in this chaotic level, marring visibility ever so slightly. You'll need to release some fireflies so be careful with that.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WP.d...w.r.Qrr.....d... r....r.wr...Q.QW
+WX...w.r..d. .....r.......w.wr.......Q.W
+W........rw .d......d ....r..Q...d.r. .W
+W...d.Qwr...wr .Q. . ..d....r.r..Q...r.W
+Www..r.rdw.w..r..Q....r..rQdw.r...Q.. .W
+Wrr.......d.w.r.. ....Q.....ddr...... QW
+W.... ..Q....w. dr..rwQ..d.Q..r..d...rdW
+Wrr...w......rdr dQ..rQrr....rrr...rr..W
+Wrr.d....d... . r.r........r....rw..d.rW
+Wdd..d.....rr...d...r.d..d.d...dQ.....rW
+W.r.dw...ww..r..r....rr..dr. .....r...dW
+WrdQrr .dd.... .Q.d.rd ....rd. d .Q....W
+W..wrr.Q.Q.d..Q.............d......wd .W
+W.r. w .........Q.Qr  ww.......r.Qr..r.W
+Wd.....d...d.r..... d..Q.r.......r..d.rW
+W...Q .. ..Qw...........r......rd.r.r rW
+W..Q.d.rw.r.. .r.d...r..Q.Q.d.. ..r..wrW
+WQ .r...Qr......w.r...r ..d... .d ..  .W
+Ww.d...Q.. ..r..rr.r....r..d.rd.d.w .rrW
+W...w..wdQr.rdr.d....d.Qr.....Q d.drw.rW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 45 - INTERMISSION 9
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 19 11
+Colors=Black Black Red Purple Cyan Cyan Cyan
+DiamondsRequired=90 90 90 90 90
+DiamondValue=2 10
+CaveTime=25 25 25 25 25
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=5 5 5 5 5
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+XddQdddddddddddddrPWWWWWWWWWWWWWWWWWWWWW
+WddddddddddddddddddWWWWWWWWWWWWWWWWWWWWW
+WddQQdddQQdddQdrdddWWWWWWWWWWWWWWWWWWWWW
+WdrddQddddddddddddrWWWWWWWWWWWWWWWWWWWWW
+Wd.ddrdQdddddddd.ddWWWWWWWWWWWWWWWWWWWWW
+WddddddQrdd.dddddddWWWWWWWWWWWWWWWWWWWWW
+WQddddddddddQdrrddQWWWWWWWWWWWWWWWWWWWWW
+Wdddddd.dddddddddddWWWWWWWWWWWWWWWWWWWWW
+WddddQrddddddddQdd.WWWWWWWWWWWWWWWWWWWWW
+WrdQdddddddddddddddWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 46 - Recurring Nightmare
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black LightRed Purple White White White
+DiamondsRequired=30 30 30 30 30
+DiamondValue=8 30
+CaveTime=230 230 230 230 230
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=7 7 7 7 7
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=A nightmare version of cave B \"Rooms\" from BDI. Remember playing this cave on level 4 or 5? Imagine if the level could go up to 15, that is what I have tried to achieve here :)
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WQ.....dwd.r.rdrw.r. ...w...r..dw.d.r..W
+W..d.d..wr.rr...w... r..w...Q...w......W
+W  Qr   rr rrQ r                       W
+W.......w..rrr..wr.. ...wd..  ..wrr....W
+W.d.Q  rw......rw.r. ...w.Q....Qw..r...W
+Wwwwwwwwwwwwwwwwwwww wwwwwwwwwwwwwwwwwwW
+W..d..r.w Qr r..w..d .rrwd.....rwd. Q..W
+Wrrr....w.. ...dw .. ...w...  rrwr....dW
+W    r     r    r            rrrrrr    W
+W...rrrrw.d..r.rwrrr rrrw ..rrrrwrr.r.dW
+Wd.....dw... Q..wdrr rr.w...rrrrwr . ..W
+W...d...w    .d.w..r rr w..  ..rw d. .rW
+Wwwwwwwwwwwwwwwwwwww wwwwwwwwwwwwwwwwwwW
+Wr.  Q..w...d...wd.. ..rw  ....rwQ  .d.W
+W.......w..... .w... ...wr...r. w...rr.W
+W         r   Qrrr     r   Qr  r r     W
+Wd.. .r.w.. ...rw... ..dw .. Q..w... ..W
+W.....r.w...rrr.w... ...w.... .rw.Q r..W
+W.d... rw... r.dw.P. r. wd..... w....d.W
+W.r.... w ...d..w.X.d.rQw .  Q..wr.d. .W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+
+[cave]
+Name=Cave 47 - You Want Me To Do What?!
+Intermission=false
+IntermissionProperties.instantlife=true
+IntermissionProperties.rewardlife=false
+Size=40 22 0 0 39 21
+Colors=Black Black Black LightBlue Yellow Yellow Yellow
+DiamondsRequired=50 50 50 50 50
+DiamondValue=5 90
+CaveTime=250 250 250 250 250
+CaveScheduling=plck
+PALTiming=true
+CaveDelay=8 8 8 8 8
+FrameTime=200 200 200 200 200
+ActiveGuyIsFirst=false
+AmoebaProperties.immediately=false
+AmoebaTime=0 0 0 0 0
+MagicWallTime=15 15 15 15 15
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+BorderProperties.lineshift=true
+BorderProperties.objectwraparound=true
+BorderProperties.scan=false
+Remark=The final conundrum, with a solution miles away from anything I've seen before. You'll work out what you have to do pretty  soon, but that won't make it any easier. This cave is actually relatively easy if you know the trick.
+
+[map]
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W.d..r...r....r...c   W Q  Q   PXWWddddW
+W.......r...r.....WWWWW WWWW WWWWWWddddW
+W............r....WWWWW WWWW WWWWWWddddW
+W.....r........... c  W      WWWWWWddddW
+W.................WWWWWWx..xWWWWWWWddddW
+W.................WWWWWWx..xWWWWWWWddddW
+W.................  c W      WWWWWWddddW
+W..MMMMMMMMMMMMM..WWWWW WWWW W...rWddddW
+W.................WWWWW WWWW W.WW.WddddW
+W.................   cW Q  Q W..W..ddddW
+W.................WWWWWWx..xWWW.W.WddddW
+W.................WWWWWWx..xWWW.WWWddddW
+W.....................WWW.....r  .WddddW
+W......................WWWWWWWW.W.WWW.WW
+Wd..................................W.WW
+WWWWWWWWWWWWWWWWWWww   wwx.WW.x.WsWsW.WW
+WWWWWWWWWWWWWWWWWW       W.rW.r.. wQw.WW
+WWWWWWWWWWWWWWWWWW       W.rW.x.W w w.WW
+WWWWWWWWWWWWWWWWWWdddddddW.......dw w.WW
+WWWWWWWWWWWWWWWWQW.......WrrrrrrW.WrWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+[/map]
+[/cave]
+[/game]
+[/BDCFF]

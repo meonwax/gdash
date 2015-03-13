@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ * Copyright (c) 2007, 2008, 2009, Czirkos Zoltan <cirix@fw.hu>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -20,7 +20,7 @@
 #include <gtk/gtkwidget.h>
 #include "cave.h"
 
-void gd_export_cave_to_crli_cavefile(Cave *cave, int level, const char *filename);
+void gd_export_cave_to_crli_cavefile(GdCave *cave, int level, const char *filename);
 void gd_export_cave_list_to_crli_cavepack(GList *caveset, int level, const char *filename);
 
 void gd_save_html (char *htmlname, GtkWidget *window);
