@@ -116,6 +116,8 @@ struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const cha
 				int n;
 
 				switch (prop_desc[i].type) {
+				case GD_TYPE_DYNSTRING:
+					/* handled outside */
 				case GD_TYPE_STRING:
 					/* handled above */
 				case GD_TAB:
@@ -707,6 +709,32 @@ gd_caveset_load_from_bdcff(const char *contents)
 					}
 			}
 			else
+			if (g_ascii_strcasecmp(attrib, "Notes")==0) {
+				if (cave!=default_cave) {
+					/* reading attributes of a cave */
+					if (cave->notes==NULL)
+						cave->notes=g_strdup(param);
+					else {
+						char *newtext;
+						
+						newtext=g_strdup_printf("%s\n%s", cave->notes, param);
+						g_free(cave->notes);
+						cave->notes=newtext;
+					}
+				} else {
+					/* reading attributes of the caveset */
+					if (gd_caveset_data->notes==NULL)
+						gd_caveset_data->notes=g_strdup(param);
+					else {
+						char *newtext;
+						
+						newtext=g_strdup_printf("%s\n%s", gd_caveset_data->notes, param);
+						g_free(gd_caveset_data->notes);
+						gd_caveset_data->notes=newtext;
+					}
+				}
+			}
+			else
 			/* CHECK IF IT IS AN EFFECT */
 			if (g_ascii_strcasecmp(attrib, "Effect")==0) {
 				char **params;
@@ -917,11 +945,25 @@ save_properties(GPtrArray *out, gpointer str, gpointer str_def, const GdStructDe
 		/* write together with identifier, as one string per line. */
 		if (prop_desc[i].type==GD_TYPE_STRING) {
 			/* treat strings as special - do not even write identifier if no string. */
-			char *value=G_STRUCT_MEMBER_P (str, prop_desc[i].offset);
+			char *text=G_STRUCT_MEMBER_P(str, prop_desc[i].offset);
 
-			if (strlen (value)>0)
-				g_ptr_array_add(out, g_strdup_printf("%s=%s", prop_desc[i].identifier, value));
+			if (strlen(text)>0)
+				g_ptr_array_add(out, g_strdup_printf("%s=%s", prop_desc[i].identifier, text));
 			continue;
+		}
+		
+		/* dynamic string: split to lines */
+		if (prop_desc[i].type==GD_TYPE_DYNSTRING) {
+			char *text=G_STRUCT_MEMBER(char *, str, prop_desc[i].offset);
+			char **lines;
+			int j;
+			
+			if (!text || g_str_equal(text, ""))
+				continue;
+			lines=g_strsplit_set(text, "\n", -1);
+			for (j=0; lines[j]!=NULL; j++)
+				g_ptr_array_add(out, g_strdup_printf("%s=%s", prop_desc[i].identifier, lines[j]));
+			g_strfreev(lines);
 		}
 
 		/* if identifier differs from the previous, write out the line collected, and start a new one */
@@ -1007,6 +1049,7 @@ save_properties(GPtrArray *out, gpointer str, gpointer str_def, const GdStructDe
 			case GD_TAB:
 			case GD_LABEL:
 			case GD_TYPE_STRING:
+			case GD_TYPE_DYNSTRING:
 				break;
 			}
 		}

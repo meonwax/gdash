@@ -18,6 +18,22 @@ Levels=5
 Name=Voodoo
 Intermission=false
 Size=40 22 0 0 39 21
+Notes=Notes for the cave 'Voodoo'.
+Notes=
+Notes=		/* dynamic string: split to lines */
+Notes=		if (prop_desc[i].type==GD_TYPE_DYNSTRING) {
+Notes=			char *text=G_STRUCT_MEMBER(char *, str, prop_desc[i].offset);
+Notes=			char **lines;
+Notes=			int j;
+Notes=
+Notes=			if (!text || g_str_equal(text, ""))
+Notes=				continue;
+Notes=			lines=g_strsplit_set(text, "\n", -1);
+Notes=			for (j=0; lines[j]!=NULL; j++)
+Notes=				g_ptr_array_add(out, g_strdup_printf("%s=%s", prop_desc[i].identifier, lines[j]));
+Notes=			g_strfreev(lines);
+Notes=		}
+Notes=
 Colors=Black Black Orange Brown Gray3 Gray3 Yellow
 DiamondsRequired=15 15 15 15 15
 DiamondValue=0 0
@@ -163,10 +179,10 @@ ShortExplosions=false
 
 [objects]
 Maze=1 1 11 7 1 1 50 0 0 0 0 0 DIRT SPACE perfect
-RandomFillC64=28 1 38 7 0 0 0 0 0 DIRT BOULDER 128 WALL 20
+RandomFill=28 1 38 7 0 0 0 0 0 DIRT BOULDER 128 WALL 20
 Maze=12 1 18 7 1 1 50 0 0 0 0 0 DIRT SOKOBANBOX unicursal
 Maze=19 1 27 7 1 1 50 0 0 0 0 0 DIRT SLIME braid
-RandomFillC64=0 10 39 18 10 11 12 13 14 DIRT SPACE 60 BOULDER 50 DIAMOND 9
+RandomFill=0 10 39 18 10 11 12 13 14 DIRT SPACE 60 BOULDER 50 DIAMOND 9
 Rectangle=0 0 39 21 STEELWALLDESTRUCTABLE
 Point=1 1 FIREFLYl
 [/objects]
@@ -610,6 +626,43 @@ SlimePermeabilityC64=0 0 0 0 0
 
 [objects]
 Point=4 3 INBOX
+[/objects]
+[/cave]
+
+[cave]
+Name=Új pálya
+Author=Czirkos Zoltan
+Date=2008-10-18
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=Black Black Orange Cyan White White Orange
+DiamondsRequired=10 10 10 10 10
+DiamondValue=0 0
+CaveTime=999 999 999 999 999
+CaveScheduling=ms
+CaveDelay=0 0 0 0 0
+FrameTime=200 200 200 200 200
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+RandomFill=1 1 5 5 0 0 0 0 0 SPACE DIRT 32
+RandomFillC64=7 1 11 5 0 0 0 0 0 SPACE DIRT 32
+RandomFill=13 1 17 5 0 0 0 0 0 SPACE DIRT 32
+RandomFillC64=19 1 23 5 0 0 0 0 0 SPACE DIRT 32
+RandomFill=25 1 29 5 0 0 0 0 0 SPACE DIRT 32
+RandomFillC64=31 1 35 5 0 0 0 0 0 SPACE DIRT 32
+RandomFill=1 7 5 11 0 0 0 0 0 SPACE DIRT 32
+RandomFillC64=7 7 11 11 0 0 0 0 0 SPACE DIRT 32
+RandomFill=13 7 17 11 0 0 0 0 0 SPACE DIRT 32
+RandomFillC64=19 7 23 11 0 0 0 0 0 SPACE DIRT 32
+RandomFill=25 7 29 11 0 0 0 0 0 SPACE DIRT 32
+RandomFillC64=31 7 35 11 0 0 0 0 0 SPACE DIRT 32
+RandomFill=1 13 5 17 0 0 0 0 0 SPACE DIRT 32
+RandomFillC64=7 13 11 17 0 0 0 0 0 SPACE DIRT 32
+RandomFill=13 13 17 17 0 0 0 0 0 SPACE DIRT 32
+RandomFillC64=19 13 23 17 0 0 0 0 0 SPACE DIRT 32
+RandomFill=25 13 29 17 0 0 0 0 0 SPACE DIRT 32
+RandomFillC64=31 13 35 17 0 0 0 0 0 SPACE DIRT 32
 [/objects]
 [/cave]
 [/game]

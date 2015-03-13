@@ -80,18 +80,22 @@ showheader_uncover()
 	/* show name of game */
 	if (gd_show_name_of_game) {		/* if showing the name of the cave... */
 		len=g_utf8_strlen(gd_caveset_data->name, -1);
-		if (gd_screen->w/gd_font_width()>=len)	/* if have place for double-width font */
+		if (gd_screen->w/gd_font_width()/2>=len)	/* if have place for double-width font */
 			gd_blittext(gd_screen, -1, statusbar_y1, GD_C64_WHITE, gd_caveset_data->name);
 		else
 			gd_blittext_n(gd_screen, -1, statusbar_y1, GD_C64_WHITE, gd_caveset_data->name);
+	}
+	
+	/* y coordinates of "name of cave" depend on whether name of game is displayed or not */
+	if (gd_show_name_of_game)
 		cavename_y=statusbar_y2;	/* show cave name in the second line */
-	} else		/* otherwise, cave name in the middle. */
+	else		/* otherwise, cave name in the middle. */
 		cavename_y=statusbar_mid;
 
 	/* "xy players, cave ab/3" */
 	str=g_strdup_printf("%d%c, %s/%d", gd_gameplay.player_lives, GD_PLAYER_CHAR, gd_gameplay.cave->name, gd_gameplay.cave->rendered);
 	len=g_utf8_strlen(str, -1);
-	if (gd_screen->w/gd_font_width()>=len)	/* if have place for double-width font */
+	if (gd_screen->w/gd_font_width()/2>=len)	/* if have place for double-width font */
 		gd_blittext(gd_screen, -1, cavename_y, GD_C64_WHITE, str);
 	else
 		gd_blittext_n(gd_screen, -1, cavename_y, GD_C64_WHITE, str);

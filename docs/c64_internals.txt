@@ -4,13 +4,13 @@ some notes about the internal workings of the original games.
 
 atari internals
 ---------------
-
 Boulder dash 1 engine on atari:
 	first cave from 0x3528
 	second cave from 0x3559    delta=0x31
 	third from 35b2     delta=8a
 
 	CAVE POINTERS (relative to 0x3528) at 0x3500
+	There is no animaion switch table.
 	
 	cave data:
 		$16     amoeba color		(couldn't set in c64 - so there unused)

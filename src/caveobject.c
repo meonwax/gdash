@@ -262,6 +262,8 @@ gd_object_new_from_string(char *str)
 		object.type=RANDOM_FILL;
 		if (g_ascii_strcasecmp(name, "RandomFillC64")==0)	/* totally the same, but uses c64 random generator */
 			object.c64_random=TRUE;
+		else
+			object.c64_random=FALSE;
 		if (sscanf(param, "%d %d %d %d", &object.x1, &object.y1, &object.x2, &object.y2)!=4)
 			return NULL;
 		if (words)

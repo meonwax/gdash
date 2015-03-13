@@ -1,15 +1,28 @@
 DONE
 ----- 
-random fill object - to be the same as on c64?
-
+each level own notepad
+Anyway... the cave delay settings for Atari could be improved.
+atari bd2 scheduling
+biters order in element box
+randomfillc64 bug fixed
+autoselect small/big font
 
 TO DO
 -----
-last used directory between runs
+german translation capital nouns
 
+As there is an Amoeba 2 now, I think it would be nice to be able to set a different color for that then Amoeba 1!
+
+Either way, though, I think that the player should always be notified they're playing an intermission from the start (even if it means not using the opening status bar at all) It's not like you need to keep track of your lives during an intermission anyway.
+
+bdcff beolvasás miért hash table?
+  size és hasonló szarok miatt
+  de tobb értéket is kéne tárolni
+  "multimap"
+dynstring beolvasást jobban beépíteni
+
+Also, it doesn't correctly remember the path from where the file was loaded. It always goes back to /Gdash.
 last used directory kicsit atgondolni
-
-mentesnel is gobject unref failed windowson
 
 option to "fast scroll"
 2x scroll for lcd
@@ -17,6 +30,7 @@ option to "fast scroll"
 
 sound:
 	amoeba2
+	creature change dir
 	option to choose between C64 and Atari sound sets. 
 	Sound themes would make sense
 
@@ -24,8 +38,6 @@ atari color names??
 
 All drawing objects should wraparound, at least when lineshifted borders are activated.
 deluxe caves 1 - wraparound miatt néhány cucc?
-
-Also, it doesn't correctly remember the path from where the file was loaded. It always goes back to /Gdash.
 
 check plck caves
 
@@ -45,7 +57,7 @@ loading imported caves with the default struct?
 
 apply the current cave timing settings to all the caves at once
 
-Scheduling:	different settings for clck, 1stb? atari?
+Scheduling:	different settings for clck, 1stb?
 	
 sdash bd1 intermissions scroll. disable scrolling for these somehow?
 

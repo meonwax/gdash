@@ -17,7 +17,6 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 #include <string.h>
-#include <errno.h>
 #include "cave.h"
 #include "cavedb.h"
 #include "caveobject.h"
@@ -65,6 +64,8 @@ gd_caveset_properties[] = {
 	{"Lives", GD_TYPE_INT, 0, N_("Initial lives"), CAVESET_OFFSET(initial_lives), 1, N_("Number of lives you get at game start."), 3, 9},
 	{"Lives", GD_TYPE_INT, 0, N_("Maximum lives"), CAVESET_OFFSET(maximum_lives), 1, N_("Maximum number of lives you can have by collecting bonus points."), 3, 99},
 	{"BonusLife", GD_TYPE_INT, 0, N_("Bonus life score"), CAVESET_OFFSET(bonus_life_score), 1, N_("Number of points to collect for a bonus life."), 100, 5000},
+	
+	{"Notes", GD_TYPE_DYNSTRING, 0, N_("Notes"), CAVESET_OFFSET(notes), 1, N_("Long description of the game.")},
 	{NULL},
 };
 
@@ -93,6 +94,7 @@ gd_caveset_data_new()
 void
 gd_caveset_data_free(GdCavesetData *data)
 {
+	g_free(data->notes);
 	g_free(data);
 }
 

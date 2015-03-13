@@ -2285,12 +2285,20 @@ gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gbool
 			break;
 
 		case GD_SCHEDULING_BD1_ATARI:
-			/* about 20ms/frame faster than c64 version; also intermissions are same speed as normal caves */
-			cave->speed=(68+3.66*cave->c64_timing+(cave->ckdelay+cave->ckdelay_extra_for_animation)/1000);
+			/* about 20ms/frame faster than c64 version */
+			if (!cave->intermission)
+				cave->speed=(74+3.2*cave->c64_timing+(cave->ckdelay)/1000);			/* non-intermissions */
+			else
+				cave->speed=(65+2.88*cave->c64_timing+(cave->ckdelay)/1000);		/* for intermissions */
 			break;
 			
 		case GD_SCHEDULING_BD2:
 			cave->speed=(88+3.66*cave->c64_timing+(cave->ckdelay+cave->ckdelay_extra_for_animation)/1000);
+			break;
+
+		case GD_SCHEDULING_BD2_PLCK_ATARI:
+			/* a really fast engine; timing works like c64 plck. */
+			cave->speed=MAX(40+cave->ckdelay/1000, cave->c64_timing*20);
 			break;
 			
 		case GD_SCHEDULING_PLCK:

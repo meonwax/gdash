@@ -622,29 +622,26 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, GdCavefi
 	GdObject object;
 	int i;
 	GdElement (* import_func) (guint8 c, int i);
-	
-	g_assert(format==GD_FORMAT_BD1 || format==GD_FORMAT_DC1 || format==GD_FORMAT_BD1_ATARI);
-	
-	if (format==GD_FORMAT_DC1)
-		import_func=deluxecaves_1_import;
-	else
-		import_func=bd1_import;
-	
+
 	gd_error_set_context(cave->name);
 
+	/* some checks */	
+	g_assert(format==GD_FORMAT_BD1 || format==GD_FORMAT_DC1 || format==GD_FORMAT_BD1_ATARI);
+	/* cant be shorted than this: header + no objects + delimiter */
 	if (remaining_bytes<33) {
 		g_critical("truncated BD1 cave data, %d bytes", remaining_bytes);
 		return -1;
 	}
+
 	gd_cave_set_engine_defaults(cave, GD_ENGINE_BD1);
 	if (format==GD_FORMAT_BD1_ATARI)
 		cave->scheduling=GD_SCHEDULING_BD1_ATARI;
+	if (format==GD_FORMAT_DC1)
+		import_func=deluxecaves_1_import;
+	else
+		import_func=bd1_import;
 	/* set visible size for intermission */
 	if (cave->intermission) {
-		int i;
-		
-		for(i=0; i<5; i++)	/* intermissions are FAST */
-			cave->level_ckdelay[i]=0;
 		cave->x2=19;
 		cave->y2=11;
 	}
@@ -815,8 +812,14 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes, GdCavef
 		return -1;
 	}
 	gd_cave_set_engine_defaults(cave, GD_ENGINE_BD2);
-	if (format==GD_FORMAT_BD2_ATARI)
-		cave->scheduling=GD_SCHEDULING_BD1_ATARI;
+	if (format==GD_FORMAT_BD2_ATARI) {
+		cave->scheduling=GD_SCHEDULING_BD2_PLCK_ATARI;
+		cave->level_ckdelay[0]=9;	/* 180ms */
+		cave->level_ckdelay[1]=8;	/* 160ms */
+		cave->level_ckdelay[2]=7;	/* 140ms */
+		cave->level_ckdelay[3]=6;	/* 120ms */
+		cave->level_ckdelay[4]=6;	/* 120ms (!) */
+	}
 	/* set visible size for intermission */
 	if (cave->intermission) {
 		cave->x2=19;
@@ -1076,6 +1079,8 @@ cave_copy_from_plck (Cave *cave, const guint8 *data, int remaining_bytes, GdCave
 	}
 
 	gd_cave_set_engine_defaults(cave, GD_ENGINE_PLCK);
+	if (format==GD_FORMAT_PLC_ATARI)
+		cave->scheduling=GD_SCHEDULING_BD2_PLCK_ATARI;
 	cave->intermission=data[0x1da]!=0;
 	if (cave->intermission) {	/* set visible size for intermission */
 		cave->x2=19;

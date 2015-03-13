@@ -303,6 +303,8 @@ gd_cave_properties[] = {
 	{"Charset", GD_TYPE_STRING, 0, N_("Character set"), G_STRUCT_OFFSET(Cave, charset), 1, N_("Theme used for displaying the game. Not used by GDash.")},
 	{"Fontset", GD_TYPE_STRING, 0, N_("Font set"), G_STRUCT_OFFSET(Cave, fontset), 1, N_("Font used during the game. Not used by GDash.")},
 
+	/* notes - a tab on its own */
+	{"Notes", GD_TYPE_DYNSTRING, 0, N_("Notes"), G_STRUCT_OFFSET(Cave, notes), 1, N_("Long description of the cave.")},
 
 	/* difficulty */
 	{"", GD_TAB, 0, N_("Difficulty")},
@@ -769,10 +771,21 @@ gd_cave_db_init()
 				/* check if any of the properties are designated as string arrays. they are not supported in
 				 * file read/write and operations, also they do not even make any sense! */
 				if (gd_cave_properties[i].count!=1) {
-					g_critical ("string arrays not supported in cave properties: %s", gd_cave_properties[i].identifier);
+					g_critical ("string arrays have no sense in cave properties: %s", gd_cave_properties[i].identifier);
 					g_assert_not_reached();
 				}
 				break;
+
+			case GD_TYPE_DYNSTRING:
+				if (gd_cave_properties[i].count!=1) {
+					g_critical ("dynstring arrays have no sense cave properties: %s", gd_cave_properties[i].identifier);
+					g_assert_not_reached();
+				}
+				if (gd_cave_properties[i+1].identifier!=NULL && gd_cave_properties[i+1].type!=GD_TAB) {
+					g_critical ("every dynstring must be followed by a new tab (this is for the editor): %s", gd_cave_properties[i].identifier);
+					g_assert_not_reached();
+				}
+				break;	
 				
 			case GD_TYPE_EFFECT:
 				/* the same applies for effects. */

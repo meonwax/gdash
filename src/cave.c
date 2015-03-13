@@ -33,8 +33,8 @@ const int gd_dy[]={ 0, -1, -1, 0, 1, 1, 1, 0, -1, -2, -2, 0, 2, 2, 2, 0, -2 };
 
 const char* gd_direction_name[]={ NULL, N_("Up"), N_("Up+right"), N_("Right"), N_("Down+right"), N_("Down"), N_("Down+left"), N_("Left"), N_("Up+left") };
 const char* gd_direction_filename[]={ NULL, "up", "upright", "right", "downright", "down", "downleft", "left", "upleft" };
-const char* gd_scheduling_name[]={ N_("Milliseconds"), "BD1", "BD2", "Construction Kit", "Crazy Dream 7", "BD1 Atari" };
-const char* gd_scheduling_filename[]={ "ms", "bd1", "bd2", "plck", "crdr7", "bd1atari" };
+const char* gd_scheduling_name[]={ N_("Milliseconds"), "BD1", "BD2", "Construction Kit", "Crazy Dream 7", "Atari BD1", "Atari BD2/Construction Kit" };
+const char* gd_scheduling_filename[]={ "ms", "bd1", "bd2", "plck", "crdr7", "bd1atari", "bd2ckatari" };
 
 static GHashTable *name_to_element;
 GdElement gd_char_to_element[256];
@@ -230,6 +230,7 @@ gd_struct_set_defaults_from_array(gpointer str, const GdStructDescriptor *proper
 			case GD_LABEL:
 			/* no default value for strings */
 			case GD_TYPE_STRING:
+			case GD_TYPE_DYNSTRING:
 				g_assert_not_reached();
 				break;
 
@@ -559,6 +560,8 @@ gd_cave_free (Cave *cave)
 
 	if (cave->random)
 		g_rand_free(cave->random);
+		
+	g_free(cave->notes);
 
 	/* map */
 	gd_cave_map_free(cave->map);
@@ -569,7 +572,6 @@ gd_cave_free (Cave *cave)
 	/* free objects */
 	g_list_foreach (cave->objects, (GFunc) g_free, NULL);
 	g_list_free (cave->objects);
-
 
 	/* freeing main pointer */
 	g_free (cave);
@@ -593,6 +595,7 @@ gd_cave_copy(Cave *dest, const Cave *src)
 		g_hash_table_foreach(src->tags, (GHFunc) hash_copy_foreach, dest->tags);
 	dest->map=gd_cave_map_dup (src, map);
 	dest->hammered_reappear=gd_cave_map_dup(src, hammered_reappear);
+	dest->notes=g_strdup(src->notes);
 
 	/* no reason to copy this */
 	dest->objects_order=NULL;

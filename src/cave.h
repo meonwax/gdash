@@ -34,7 +34,8 @@ typedef enum _gd_type {
 	GD_LABEL,
 	
 	/* gd types */
-	GD_TYPE_STRING,
+	GD_TYPE_STRING,		/* static string, fixed array of characters */
+	GD_TYPE_DYNSTRING,	/* dynamic string which is a g_malloc'd pointer */
 	GD_TYPE_INT,
 	GD_TYPE_RATIO,
 	GD_TYPE_ELEMENT,
@@ -549,6 +550,7 @@ typedef enum _gd_scheduling {
 	GD_SCHEDULING_PLCK,
 	GD_SCHEDULING_CRDR,
 	GD_SCHEDULING_BD1_ATARI,
+	GD_SCHEDULING_BD2_PLCK_ATARI,
 	GD_SCHEDULING_MAX
 } GdScheduling;
 
@@ -570,6 +572,8 @@ typedef struct _cave {
 	GdString www;				/* link to author's webpage */
 	GdString date;				/* date of creation */
 	GdString remark;			/* some note */
+	
+	gchar *notes;				/* a long description */
 
 	GdString charset;			/* these are not used by gdash */
 	GdString fontset;

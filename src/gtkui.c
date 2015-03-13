@@ -707,14 +707,7 @@ gd_preferences (GtkWidget *parent)
 	gtk_table_attach(GTK_TABLE(table), gd_label_new_printf("<b>Game</b>"), 1, 2, 2, 3, GTK_EXPAND|GTK_FILL, 0, 0, 0);
 	info.sizecombo_game=gd_combo_box_new_from_stringv(gd_scaling_name);
 	gtk_combo_box_set_active(GTK_COMBO_BOX(info.sizecombo_game), gd_cell_scale_game);
-#if 0	
-	gtk_combo_box_new_text();
-	for (i=0; i<GD_SCALING_MAX; i++) {
-		gtk_combo_box_append_text(GTK_COMBO_BOX(info.sizecombo_game), gettext(gd_scaling_name[i]));
-		if (gd_cell_scale_game==i)
-			gtk_combo_box_set_active(GTK_COMBO_BOX(info.sizecombo_game), i);
-	}
-#endif
+
 	gtk_table_attach(GTK_TABLE(table), info.sizecombo_game, 1, 2, 3, 4, GTK_EXPAND|GTK_FILL, 0, 0, 0);
 	/* image for game */
 	align=gtk_alignment_new(0.5, 0.5, 0, 0);
@@ -1140,6 +1133,12 @@ gd_save_caveset_as (GtkWidget *parent)
 	}
 	g_free(filename);
 	gtk_widget_destroy (dialog);
+	/* WINDOWS GTK+ 20080926 HACK XXX XXX XXX XXX */
+	/* gtk bug - sometimes the above widget destroy creates an error message. */
+	/* so we delete the error flag here. */
+#ifdef G_OS_WIN32
+	gd_clear_error_flag();
+#endif
 }
 
 void

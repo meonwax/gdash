@@ -550,6 +550,7 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 	GList *widgets=NULL;
 	int i, j, row=0;
 	int result;
+	GtkTextBuffer *textbuffer=NULL;
 	
 	dialog=gtk_dialog_new_with_buttons (title, GTK_WINDOW (editor_window), GTK_DIALOG_DESTROY_WITH_PARENT, NULL);
 	if (show_cancel)
@@ -561,6 +562,8 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 
 	/* tabbed notebook */
 	notebook=gtk_notebook_new();
+	gtk_notebook_set_scrollable(GTK_NOTEBOOK(notebook), TRUE);
+	gtk_notebook_popup_enable(GTK_NOTEBOOK(notebook));
 	gtk_box_pack_start_defaults (GTK_BOX (GTK_DIALOG (dialog)->vbox), notebook);
 
 	/* create the entry widgets */
@@ -585,6 +588,32 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 			/* and to the notebook */
 			gtk_notebook_append_page (GTK_NOTEBOOK (notebook), align, gtk_label_new(gettext(prop_desc[i].name)));
 			row=0;
+			continue;
+		}
+
+		/* dynamic string: has its own notebook tab */		
+		if (prop_desc[i].type==GD_TYPE_DYNSTRING) {
+			GtkWidget *view;
+			GtkWidget *scroll;
+			
+			textbuffer=gtk_text_buffer_new(NULL);
+			view=gtk_text_view_new_with_buffer(textbuffer);
+			gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(view), GTK_WRAP_WORD);
+			
+			if (G_STRUCT_MEMBER(gchar *, str, prop_desc[i].offset)!=NULL)
+				gtk_text_buffer_insert_at_cursor(textbuffer, G_STRUCT_MEMBER(gchar *, str, prop_desc[i].offset), -1);
+
+			scroll=gtk_scrolled_window_new(NULL, NULL);
+			gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+			gtk_container_add(GTK_CONTAINER(scroll), view);
+			gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scroll), GTK_SHADOW_ETCHED_IN);
+			
+			/* has its own notebook tab */
+			gtk_notebook_append_page(GTK_NOTEBOOK(notebook), scroll, gtk_label_new(_(prop_desc[i].name)));
+
+			widgets=g_list_prepend (widgets, view);
+			g_object_set_data (G_OBJECT (view), GDASH_TYPE, GINT_TO_POINTER (prop_desc[i].type));
+			g_object_set_data (G_OBJECT (view), GDASH_VALUE, G_STRUCT_MEMBER_P(str, prop_desc[i].offset));
 			continue;
 		}
 
@@ -619,6 +648,7 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 			switch (prop_desc[i].type) {
 			case GD_TAB:
 			case GD_LABEL:
+			case GD_TYPE_DYNSTRING:
 				/* handled above */
 				g_assert_not_reached();
 				break;
@@ -659,25 +689,25 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 				value=((GdElement *) value) + j;
 				defpoint=((GdElement *) defpoint) + j;
 				widget=gd_element_button_new(*(GdElement *) value, FALSE, NULL);
-				defval=g_strdup_printf("%s", gettext (gd_elements[*(GdElement *) defpoint].name));
+				defval=g_strdup_printf("%s", _(gd_elements[*(GdElement *) defpoint].name));
 				break;
 			case GD_TYPE_COLOR:
 				value=((GdColor *) value) + j;
 				defpoint=((GdColor *) defpoint) + j;
 				widget=gd_color_combo_new(*(GdColor *) value);
-				defval=g_strdup_printf("%s", gd_color_get_string(*(GdColor *) defpoint));
+				defval=g_strdup_printf("%s", _(gd_color_get_string(*(GdColor *) defpoint)));
 				break;
 			case GD_TYPE_DIRECTION:
 				value=((GdDirection *) value)+j;
 				defpoint=((GdDirection *) defpoint) + j;
 				widget=gd_direction_combo_new(*(GdDirection *) value);
-				defval=g_strdup_printf("%s", gd_direction_name[*(GdDirection *)defpoint]);
+				defval=g_strdup_printf("%s", _(gd_direction_name[*(GdDirection *)defpoint]));
 				break;
 			case GD_TYPE_SCHEDULING:
 				value=((GdScheduling *) value)+j;
 				defpoint=((GdScheduling *) defpoint) + j;
 				widget=gd_scheduling_combo_new(*(GdScheduling *) value);
-				defval=g_strdup_printf("%s", gd_scheduling_name[*(GdScheduling *)defpoint]);
+				defval=g_strdup_printf("%s", _(gd_scheduling_name[*(GdScheduling *)defpoint]));
 				break;
 			}
 			/* put widget into list so values can be extracted later */
@@ -689,9 +719,9 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 			/* put widget to table */
 			gtk_table_attach(GTK_TABLE(table), widget, j+2, (prop_desc[i].count==1) ? 7 : j + 3, row, row+1, GTK_FILL|GTK_EXPAND, GTK_FILL|GTK_SHRINK, 3, 0);
 			if (prop_desc[i].tooltip)
-				tip=g_strdup_printf(_("%s\nDefault value: %s"), gettext (prop_desc[i].tooltip), defval ? defval : N_("empty"));
+				tip=g_strdup_printf(_("%s\nDefault value: %s"), gettext (prop_desc[i].tooltip), defval ? defval : _("empty"));
 			else
-				tip=g_strdup_printf("Default value: %s", defval ? defval : N_("empty"));
+				tip=g_strdup_printf(_("Default value: %s"), defval ? defval : _("empty"));
 			g_free (defval);
 			gtk_widget_set_tooltip_text(widget, tip);
 			g_free (tip);
@@ -740,7 +770,7 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 		}
 		g_list_free(hashkeys);
 	}
-
+	
 	/* running the dialog */
 	gtk_widget_show_all (dialog);
 	result=gtk_dialog_run (GTK_DIALOG (dialog));
@@ -752,6 +782,8 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 		/* read values from different spin buttons and ranges etc */
 		for (iter=widgets; iter; iter=g_list_next (iter)) {
 			gpointer value=g_object_get_data(G_OBJECT(iter->data), GDASH_VALUE);
+			GtkTextIter iter_start, iter_end;
+			GtkTextBuffer *buffer;
 
 			switch (GPOINTER_TO_INT (g_object_get_data (iter->data, GDASH_TYPE))) {
 			case -1:	/* from hash table */
@@ -761,6 +793,14 @@ edit_properties (const char *title, gpointer str, gpointer def_str, const GdStru
 					g_hash_table_insert(other_tags, g_strdup(value), g_strdup(gtk_entry_get_text(GTK_ENTRY(iter->data))));
 				else
 					g_hash_table_remove(other_tags, value);
+				break;
+			case GD_TYPE_DYNSTRING:
+				g_free(*(gpointer *)value);
+				/* the text_buffer_get_text needs a start and end iterator */
+				buffer=gtk_text_view_get_buffer(GTK_TEXT_VIEW(iter->data));
+				gtk_text_buffer_get_iter_at_offset(buffer, &iter_start, 0);
+				gtk_text_buffer_get_iter_at_offset(buffer, &iter_end, -1);
+				*(gpointer *)value=gtk_text_buffer_get_text(buffer, &iter_start, &iter_end, TRUE);
 				break;
 			case GD_TYPE_BOOLEAN:
 				*(gboolean *) value=gtk_toggle_button_get_active(iter->data);
