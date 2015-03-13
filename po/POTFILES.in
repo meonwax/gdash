@@ -1,0 +1,21 @@
+# List of source files which contain translatable strings.
+src/caveobject.c
+src/cave.c
+src/game.c
+src/help.c
+src/gtk_main.c
+src/c64import.c
+src/gtk_ui.c
+src/caveset.c
+src/editor-export.c
+src/editor-widgets.c
+src/util.c
+src/sdl_sound.c
+src/sdl_main.c
+src/sdl_ui.c
+src/caveengine.c
+src/gtk_gfx.c
+src/about.c
+src/sdl_gfx.c
+src/editor.c
+src/settings.c

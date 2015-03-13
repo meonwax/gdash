@@ -1,0 +1,26 @@
+GDash
+-----
+An Emerald Mine-like game for GTK+.
+Use the cursor keys and Ctrl to move.
+
+
+util/any2gdash
+--------------
+You can use the any2gdash tool to convert caves found in snapshot files.
+This tool extracts information, and creates a binary file,
+which is similar to the internal format of an engine found in the snapshot.
+
+Currently it loads BD1, BD2, PLCK, 1stB and CrLi snapshots.
+Using these internal formats is important for now, as the GDash
+engine is not completed yet. A later version can interpret some bytes
+from the file, which some older one did not; yet it is not necessary to
+import a game again for this.
+Also these internal formats are subject to change, as I'm going on with
+development, so converting all your games is somewhat discouraged for now.
+In turn, conversions are very useful to test the engine and compatibility.
+So treat the converted games as a way to test GDash and help me with
+describing any problem you may find.
+
+
+Send e-mail to: cirix <cirix@fw.hu>
+

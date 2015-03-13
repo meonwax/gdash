@@ -1,0 +1,1463 @@
+some notes about the internal workings of the original games.
+
+
+crazy dream object codes
+------------------------
+object code 6: copy x1 y1 width height
+object code 7: paste x1 y1
+
+
+bd2 animation bits
+------------------
+right after cave objects delimiter 0xff:
+not really important for any current engine, but
+1=firefly, 2=butterfly, 4=amoeba, 8=slime.
+
+explosions
+----------
+in bd1, explosions have four stages, for example, firefly hit
+by a boulder, graphics for each game cycles are:
+explosion 2, explosion 3, explosion 2, explosion 1, space.
+
+but in 1stb, the same:
+explosion 1, explosion 2, explosion 3, explosion 2, explosion 1, space.
+(or: explosion 1, 2, 3, 4, 5, diamond.)
+
+
+
+bd1 demo
+--------
+data from 5ea8
+
+
+random generator
+----------------
+As documented by Peter Broadribb:
+
+    7085      LDA RandSeed1
+    7087      ROR
+    7088      ROR
+    7089      AND #$80
+    708B      STA TempRand1
+    708E      LDA RandSeed2
+    7090      ROR
+    7091      AND #$7F
+    7093      STA TempRand2
+    7096      LDA RandSeed2
+    7098      ROR
+    7099      ROR
+    709A      AND #$80
+    709C      CLC
+    709D      ADC RandSeed2
+    709F      ADC #$13
+    70A1      STA RandSeed2
+    70A3      LDA RandSeed1
+    70A5      ADC TempRand1
+    70A8      ADC TempRand2
+    70AB      STA RandSeed1
+    70AD      RTS
+
+
+
+predictable slime in plck
+-------------------------
+This is taken from afl boulder dash:
+
+	 * .C:43dd   20 E6 41   JSR $41E6     ; predictable random
+	 * .C:43e0   25 93      AND $93       ; & slime_permeability
+	 * .C:43e2   D0 25      BNE $4409     ; slime works if result is 0
+
+and at the start of the game, predictable random generator is
+initialised as:
+    RandSeed1 = 0
+	RandSeed2 = 0x1e
+this is required for afl bd cave 15, for example.
+
+the following routine explicitly sets randseed1 and randseed2:
+.C:4b6f   A9 00      LDA #$00
+; ......
+.C:4b91   8D 42 3D   STA $3D42
+.C:4b94   8D 43 3D   STA $3D43
+.C:4b97   8D 44 3D   STA $3D44
+.C:4b9a   A9 1E      LDA #$1E
+.C:4b9c   8D 41 3D   STA $3D41
+
+so no worry about random values in memory.
+
+
+
+predictable slime in bd2
+------------------------
+randomseed1 and 2 are values left there after cave initialization.
+remember that during generating random elements, the upper and lower border ARE NOT
+filled.
+
+
+
+amoeba random
+-------------
+taken from a first boulder game:
+  jsr $2500			; unpredictable random
+  and $94			; bitwise and amoeba speed
+  cmp #$04			; compare to 4
+  bcs xxx			; branch if carry, eg. result was smaller than 4
+
+this is where the 4/128 and 32/128 spread probabilities come from. memory
+at $94 if set to 01111111 and 00001111, so a random number between 0..127 or
+0..15 is checked to see if it lower than 4.
+
+
+
+acid random
+-----------
+  jsr $2500
+  cmp $03a8
+  bcs $264e
+acid spreads, if random <= ratio.
+
+
+
+boulder dash 2 engine colors
+----------------------------
+not itself the colors, but memory pointers are stored from 89d8, 2 bytes
+each for all caves. the routine which processes them:
+.C:ab38   BD D8 89   LDA $89D8,X		; first byte of pointer (lsb)
+.C:ab3b   85 3C      STA $3C
+.C:ab3d   BD D9 89   LDA $89D9,X		; second byte (msb)
+.C:ab40   85 3D      STA $3D
+.C:ab42   A0 00      LDY #$00
+.C:ab44   B1 3C      LDA ($3C),Y		; copy 5 bytes from pointer
+.C:ab46   99 FA 24   STA $24FA,Y		; to $24fa
+.C:ab49   C8         INY
+.C:ab4a   C0 05      CPY #$05
+.C:ab4c   D0 F6      BNE $AB44			; ^^^^
+.C:ab4e   A6 5E      LDX $5E			; vvv dunno this part
+.C:ab50   BD 0D 24   LDA $240D,X
+.C:ab53   85 3E      STA $3E
+.C:ab55   85 40      STA $40
+.C:ab57   A9 00      LDA #$00
+.C:ab59   85 3F      STA $3F
+.C:ab5b   85 41      STA $41			; ^^^ dunno but not important now
+.C:ab5d   A9 00      LDA #$00			; border color 0
+.C:ab5f   8D 21 D0   STA $D021
+.C:ab62   AD FA 24   LDA $24FA			; foreground 1
+.C:ab65   8D 22 D0   STA $D022
+.C:ab68   AD FB 24   LDA $24FB			; foreground 2
+.C:ab6b   8D 23 D0   STA $D023
+.C:ab6e   A0 28      LDY #$28
+.C:ab70   AD FC 24   LDA $24FC			; foreground 3
+.C:ab73   20 73 9D   JSR $9D73			; fill vic color map
+.C:ab76   60         RTS
+
+so for importing, check pointer at 89d8+2*cavenumber, and read three bytes
+from the memory area specified by the pointer found there.
+
+
+internal character codes
+------------------------
+BD1: 0x18=acid, 0x19=acid delayed
+found in crazy dream 3.
+
+1stB: 0x29=clock, found in cool dash 1.
+
+
+
+number of diamonds required
+---------------------------
+take care of required diamonds values==0 or >100.
+in original bd, the counter was only two-digit. so bd3 cave f
+says 150 diamonds required, but you only had to collect 50.
+also, gate opening is triggered by incrementing diamond
+count and THEN checking if more required; so if required was
+0, you had to collect 100. also check crazy light 8 cave
+named "1000".
+ref: http://www.boulder-dash.nl/forum/viewtopic.php?t=88
+
+
+butterflies in 1stb, crli
+-------------------------
+$30=facing left, $31=up, ...  same order as fireflies in BD1,
+but spinning the other way. fireflies counterclockwise, butterflies
+clockwise.
+
+
+
+effect tables
+-------------
+plck effects
+01ea    0001   00-3F  A Bouncing Boulder converts to this element
+01eb    0001   00-3F  A Falling Diamonds converts to this element
+01ec    0001   00-3F  An Explosion converts to this element
+01ed    0001          Pointer to Dirt graphic
+01ee    0001          Pointer to Growing Wall graphic 
+
+afl boulder dash
+>C:3b00  00 01 02 03  04 05 06 07  08 09 0a 0b  08 09 0a 0b   ................
+>C:3b10  10 10 12 12  14 14 16 16  18 19 1a 1b  1c 1d 1e 1f   ................		-- 1e
+>C:3b20  20 21 22 23  24 25 26 27  28 29 2a 2a  2c 2d 2e 2f    !"#$%&'()**,-./
+>C:3b30  30 31 32 33  30 31 32 33  38 38 3a 3a  3c 3d 3e 3f   0123012388::<=>?
+>C:3b40  40 60 46 4e  22 2e 62 2e  4a 64 64 64  64 64 64 64   @`FN".b.Jddddddd
+>C:3b50  64 44 44 44  44 48 48 48  48 00 00 00  66 68 6a 68   dDDDDHHHH...fhjh
+>C:3b60  66 24 26 28  2a 2c 62 66  68 6a 00 4e  4e 00 00 00   f$&(*,bfhj.NN...
+>C:3b70  00 20 20 20  20 20 20 20  20 4c 4c 40  40 42 2e 40   .        LL@@B.@
+
+tutorial - crli
+>C:4280  00 01 02 03  04 05 06 07  08 09 0a 0b  08 09 0a 0b   ................
+>C:4290  10 10 12 12  14 14 16 16  19 19 1a 1b  1c 1d 1e 20   ............... 
+>C:42a0  20 21 22 23  24 25 26 27  28 29 2a 2a  2c 2d 2e 2f    !"#$%&'()**,-./
+>C:42b0  30 31 32 33  30 31 32 33  38 39 3a 3b  3d 3d 3e 3f   0123012389:;==>?
+>C:42c0  41 41 42 43  44 45 46 47  48 48 4b 4b  4c 4d 4e 4f   AABCDEFGHHKKLMNO
+>C:42d0  50 50 52 52  54 54 56 57  57 5a 5a 5b  5c 5d 5e 5f   PPRRTTVWWZZ[\]^_
+>C:42e0  61 61 62 63  64 64 66 67  67 69 6a 6b  6c 6d 6e 6f   aabcddfggijklmno
+>C:42f0  70 70 72 72  75 75 76 77  78 79 7a 7b  78 79 7a 7b   pprruuvwxyz{xyz{
+
+
+diego dash 11
+>C:3b00  00 01 02 03  04 05 06 07  08 09 0a 0b  08 09 0a 0b   ................
+>C:3b10  10 10 12 12  14 14 16 16  18 19 1a 1b  1c 1d 10 1f   ................	-- 1e - explosion
+>C:3b20  20 21 22 23  24 25 26 27  28 29 2a 2a  2c 2d 2e 2f    !"#$%&'()**,-./
+>C:3b30  30 31 32 33  30 31 32 33  38 38 3a 3a  3c 3d 3e 3f   0123012388::<=>?
+>C:3b40  40 60 46 4e  22 2e 62 2e  4a 64 64 64  64 64 64 64   @`FN".b.Jddddddd
+>C:3b50  64 44 44 44  44 48 48 48  48 00 00 00  66 68 6a 68   dDDDDHHHH...fhjh
+>C:3b60  66 24 26 28  2a 2c 62 66  68 6a 00 4e  4e 00 00 00   f$&(*,bfhj.NN...
+>C:3b70  00 20 20 20  20 20 20 20  20 4c 4c 40  40 42 2e 40   .        LL@@B.@
+
+
+diego dash 12
+>C:3b00  00 01 02 03  04 05 06 07  08 09 0a 0b  08 09 0a 0b   ................
+>C:3b10  10 10 12 12  14 14 16 16  18 19 1a 1b  1c 1d 1e 1f   ................
+>C:3b20  20 21 22 23  24 25 26 27  28 29 2a 2a  2c 2d 2e 2f    !"#$%&'()**,-./
+>C:3b30  30 31 32 33  30 31 32 33  38 38 3a 3a  3c 3d 3e 3f   0123012388::<=>?
+>C:3b40  40 60 46 4e  22 2e 62 2e  4a 64 64 64  64 64 64 64   @`FN".b.Jddddddd
+>C:3b50  64 44 44 44  44 48 48 48  48 00 00 00  66 68 6a 68   dDDDDHHHH...fhjh
+>C:3b60  66 24 26 28  2a 2c 62 66  68 6a 00 4e  4e 00 00 00   f$&(*,bfhj.NN...
+>C:3b70  00 20 20 20  20 20 20 20  20 4c 4c 40  40 42 2e 40   .        LL@@B.@
+
+
+bouldi dash 4, cave 19
+>C:3b00  00 01 02 03  04 05 06 07  08 09 0a 0b  08 09 0a 0b   ................
+>C:3b10  10 30 12 12  14 14 16 16  18 19 1a 1b  1c 1d 1e 1f   .0..............  -- bouncing stone: 11
+>C:3b20  20 21 22 23  24 25 26 27  28 29 2a 2a  2c 2d 2e 2f    !"#$%&'()**,-./
+>C:3b30  30 31 32 33  30 31 32 33  38 38 3a 3a  3c 3d 3e 3f   0123012388::<=>?
+>C:3b40  40 60 46 4e  22 2e 62 2e  4a 64 64 64  64 64 64 64   @`FN".b.Jddddddd
+>C:3b50  64 44 44 44  44 48 48 48  48 00 00 00  66 68 6a 68   dDDDDHHHH...fhjh
+>C:3b60  66 24 26 28  2a 2c 62 66  68 6a 00 4e  4e 00 00 00   f$&(*,bfhj.NN...
+>C:3b70  00 20 20 20  20 20 20 20  20 4c 4c 40  40 42 2e 40   .        LL@@B.@
+
+
+bouldi dash 4, cave 6
+>C:3b00  00 01 02 03  04 05 06 07  08 09 0a 0b  08 09 0a 0b   ................
+>C:3b10  10 1b 12 12  14 14 16 01  18 19 1a 1b  1c 1d 1e 1f   ................	-- 0x17: falling diamond
+>C:3b20  20 21 22 23  24 25 26 27  28 29 2a 2a  2c 2d 2e 2f    !"#$%&'()**,-./
+>C:3b30  30 31 32 33  30 31 32 33  38 38 3a 3a  3c 3d 3e 3f   0123012388::<=>?
+>C:3b40  40 60 22 4e  22 2e 62 2e  4a 64 64 64  64 64 64 64   @`"N".b.Jddddddd  -- 0x42: dirt looks like pointer
+>C:3b50  64 44 44 44  44 48 48 48  48 00 00 00  66 68 6a 68   dDDDDHHHH...fhjh
+>C:3b60  66 24 26 28  2a 2c 62 66  68 6a 00 4e  4e 00 00 00   f$&(*,bfhj.NN...
+>C:3b70  00 20 20 20  20 20 20 20  20 4c 4c 40  40 42 2e 40   .        LL@@B.@
+
+bouldi dash, cave 14
+>C:3b00  00 01 02 03  04 05 06 07  08 09 0a 0b  08 09 0a 0b   ................
+>C:3b10  10 08 12 12  14 14 16 02  18 19 1a 1b  1c 1d 10 1f   ................
+>C:3b20  20 21 22 23  24 25 26 27  28 29 2a 2a  2c 2d 2e 2f    !"#$%&'()**,-./
+>C:3b30  30 31 32 33  30 31 32 33  38 38 3a 3a  3c 3d 3e 3f   0123012388::<=>?
+>C:3b40  40 60 22 4e  22 2e 62 2e  4a 64 64 64  64 64 64 64   @`"N".b.Jddddddd
+>C:3b50  64 44 44 44  44 48 48 48  48 00 00 00  66 68 6a 68   dDDDDHHHH...fhjh
+>C:3b60  66 24 26 28  2a 2c 62 66  68 6a 00 2e  2e 00 00 00   f$&(*,bfhj......	.. 0x6b, 6c - expanding wall looks like
+>C:3b70  00 20 20 20  20 20 20 20  20 4c 4c 40  40 42 2e 40   .        LL@@B.@
+
+
+
+code bytes
+----------
+disassembly from: marek roth tutorial.
+for each element, code byte at 6a70+n and 6af0+n, hi and lo byte.
+for example, chasing stone at (6a70+72) and (6af0+72) -> 5710.
+(same in crazy dream: a800 and a900)
+
+chasing stone: 5710
+ghost: caad
+water in crazy dream: b964
+cow: b423
+
+from $aa00: something like an effect table; for elements which code
+byte needs only a translation. for example, bladder1->bladder2
+
+cave bytes:
+during processing, lda ($6d),y is used everywhere to read an element
+from the cave array. the "default" value of y is $29, 41 decimal.
+the cave is 40 bytes wide. so loading ($6d)+0 gives the element at
+(x-1,y-1). loading ($6d)+41 gives the element at (x,y).
+y coordinates for neighbouring elements:
+	00 01 02
+	28 29 2a
+	50 51 52
+
+
+code snippets:
+
+538a: check if element at given coordinate is rockford-like.
+returns x if no, x=0 if yes.
+
+4ae9: check if element at (x,y-1) or (x+1,y)... is rockford-like.
+returns z=0 or z=1.
+
+3d5f: place random element at ($6d),y, if there is no steel wall, voodoo
+or trapped diamond there.
+
+
+
+
+ghost
+-----
+			; check if ghost near rockford
+.C:caad   20 E9 4A   JSR $4AE9		; check if nearing a rockford
+.C:cab0   D0 25      BNE $CAD7		; if not, move somewhere
+			; ghost explodes
+.C:cab2   A9 67      LDA #$67		; ghost explosion, stage 2
+.C:cab4   85 83      STA $83
+.C:cab6   A0 00      LDY #$00		; x-1, y-1
+.C:cab8   20 5F 3D   JSR $3D5F
+.C:cabb   A0 02      LDY #$02		; x+1, y-1
+.C:cabd   20 5F 3D   JSR $3D5F
+.C:cac0   A0 29      LDY #$29		; x, y (the ghost itself)
+.C:cac2   20 5F 3D   JSR $3D5F
+.C:cac5   C6 83      DEC $83		; now it becomes ghost explosion, stage 1
+.C:cac7   A0 50      LDY #$50		; x-1, y+1
+.C:cac9   20 5F 3D   JSR $3D5F
+.C:cacc   A0 52      LDY #$52		; x+1, y+1
+.C:cace   20 5F 3D   JSR $3D5F
+.C:cad1   20 71 41   JSR $4171		; dunno
+.C:cad4   4C 82 46   JMP $4682		; finished
+			  ; ghost movement
+.C:cad7   A2 03      LDX #$03		; tries to move 4 times
+.C:cad9   20 00 25   JSR $2500		; unpredictable random
+.C:cadc   29 03      AND #$03		; random number between 0..3
+.C:cade   A8         TAY
+.C:cadf   B9 F5 CA   LDA $CAF5,Y	; pick a coordinate to move to
+									; coordinates: 01 28 2a 51,
+									; that is up left right down 
+.C:cae2   A8         TAY
+.C:cae3   B1 6D      LDA ($6D),Y	; what is there?
+.C:cae5   F0 06      BEQ $CAED		; if zero (space), move
+.C:cae7   CA         DEX
+.C:cae8   10 EF      BPL $CAD9		; branch if x still >=0
+.C:caea   4C 82 46   JMP $4682		; finished
+.C:caed   A9 65      LDA #$65		; ghost delayed
+.C:caef   20 69 43   JSR $4369		; store
+.C:caf2   4C 2F 25   JMP $252F
+.C:caf5   01 28 2A 51
+
+
+
+slime disassembly
+-----------------
+.C:4092   AD 42 3D   LDA $3D42		----- vvv predictable random
+.C:4095   6A         ROR A
+.C:4096   6A         ROR A
+.C:4097   29 80      AND #$80
+.C:4099   8D 43 3D   STA $3D43
+.C:409c   AD 41 3D   LDA $3D41
+.C:409f   6A         ROR A
+.C:40a0   29 7F      AND #$7F
+.C:40a2   8D 44 3D   STA $3D44
+.C:40a5   AD 41 3D   LDA $3D41
+.C:40a8   6A         ROR A
+.C:40a9   6A         ROR A
+.C:40aa   29 80      AND #$80
+.C:40ac   18         CLC
+.C:40ad   6D 41 3D   ADC $3D41
+.C:40b0   69 13      ADC #$13
+.C:40b2   8D 41 3D   STA $3D41
+.C:40b5   AD 42 3D   LDA $3D42
+.C:40b8   6D 43 3D   ADC $3D43
+.C:40bb   6D 44 3D   ADC $3D44
+.C:40be   8D 42 3D   STA $3D42		------ ^^^ predictable random
+.C:40c1   25 93      AND $93		; & slime permeability
+.C:40c3   D0 2F      BNE $40F4		; if nonzero, finish.
+.C:40c5   A0 51      LDY #$51
+.C:40c7   B1 6D      LDA ($6D),Y	; what is under the slime?
+.C:40c9   D0 2C      BNE $40F7		; if space, stay here. if nonspace, 40f7.
+.C:40cb   A0 01      LDY #$01
+.C:40cd   B1 6D      LDA ($6D),Y
+.C:40cf   C9 10      CMP #$10
+.C:40d1   F0 12      BEQ $40E5
+.C:40d3   C9 14      CMP #$14
+.C:40d5   F0 0E      BEQ $40E5
+.C:40d7   C9 70      CMP #$70
+.C:40d9   F0 04      BEQ $40DF
+.C:40db   C9 72      CMP #$72
+.C:40dd   D0 18      BNE $40F7
+.C:40df   18         CLC
+.C:40e0   69 01      ADC #$01
+.C:40e2   4C E8 40   JMP $40E8
+.C:40e5   18         CLC
+.C:40e6   69 03      ADC #$03
+.C:40e8   A0 51      LDY #$51
+.C:40ea   20 69 43   JSR $4369
+.C:40ed   A9 00      LDA #$00
+.C:40ef   A0 01      LDY #$01
+.C:40f1   20 69 43   JSR $4369
+.C:40f4   4C 82 46   JMP $4682
+.C:40f7   C9 40      CMP #$40		; is a bladder under the slime?
+.C:40f9   D0 12      BNE $410D		; if not, finish.
+.C:40fb   A0 01      LDY #$01		; yes, it is a bladder.
+.C:40fd   B1 6D      LDA ($6D),Y
+.C:40ff   D0 0C      BNE $410D		; space over slime?
+.C:4101   A9 41      LDA #$41		; place a bladder_waiting over slime.
+.C:4103   20 69 43   JSR $4369
+.C:4106   A0 51      LDY #$51
+.C:4108   A9 00      LDA #$00
+.C:410a   20 69 43   JSR $4369
+.C:410d   4C 82 46   JMP $4682
+
+
+
+
+chasing stone
+-------------
+the last 16 coordinates of the active player is stored at $10-$1f and $20-$2f, where
+the $1f,$2f are the most recent. the chasing stones try to go to these coordinates;
+if they can not go in a direction (for example, they should go x+1, but they can't), they
+try to change the other coordinate (y).
+whether x or y is checked first, is determined by a random number; if the check fails, the
+other coordinate is tried. (this is remembered by register x).
+the c code in cave.c reproduces this exactly.
+
+.C:5710   A2 03      LDX #$03
+.C:5712   20 00 25   JSR $2500
+.C:5715   29 01      AND #$01
+.C:5717   D0 6C      BNE $5785
+.C:5719   A5 8B      LDA $8B
+.C:571b   C5 10      CMP $10
+.C:571d   F0 14      BEQ $5733
+.C:571f   90 0E      BCC $572F
+.C:5721   A0 28      LDY #$28
+.C:5723   B1 6D      LDA ($6D),Y
+.C:5725   D0 18      BNE $573F
+.C:5727   A9 73      LDA #$73
+.C:5729   20 69 43   JSR $4369
+.C:572c   4C 2F 25   JMP $252F
+.C:572f   A0 2A      LDY #$2A
+.C:5731   D0 F0      BNE $5723
+.C:5733   CA         DEX
+.C:5734   E0 02      CPX #$02
+.C:5736   F0 4D      BEQ $5785
+.C:5738   E0 00      CPX #$00
+.C:573a   F0 7C      BEQ $57B8
+.C:573c   4C 82 46   JMP $4682
+.C:573f   CA         DEX
+.C:5740   CA         DEX
+.C:5741   E0 01      CPX #$01
+.C:5743   F0 40      BEQ $5785
+.C:5745   E0 00      CPX #$00
+.C:5747   D0 F3      BNE $573C
+.C:5749   A5 8B      LDA $8B
+.C:574b   C5 10      CMP $10
+.C:574d   B0 1B      BCS $576A
+.C:574f   A0 02      LDY #$02
+.C:5751   B1 6D      LDA ($6D),Y
+.C:5753   D0 06      BNE $575B
+.C:5755   A0 01      LDY #$01
+.C:5757   B1 6D      LDA ($6D),Y
+.C:5759   F0 CC      BEQ $5727
+.C:575b   A0 52      LDY #$52
+.C:575d   B1 6D      LDA ($6D),Y
+.C:575f   D0 06      BNE $5767
+.C:5761   A0 51      LDY #$51
+.C:5763   B1 6D      LDA ($6D),Y
+.C:5765   F0 C0      BEQ $5727
+.C:5767   4C 82 46   JMP $4682
+.C:576a   A0 00      LDY #$00
+.C:576c   B1 6D      LDA ($6D),Y
+.C:576e   D0 06      BNE $5776
+.C:5770   A0 01      LDY #$01
+.C:5772   B1 6D      LDA ($6D),Y
+.C:5774   F0 B1      BEQ $5727
+.C:5776   A0 50      LDY #$50
+.C:5778   B1 6D      LDA ($6D),Y
+.C:577a   D0 06      BNE $5782
+.C:577c   A0 51      LDY #$51
+.C:577e   B1 6D      LDA ($6D),Y
+.C:5780   F0 A5      BEQ $5727
+.C:5782   4C 82 46   JMP $4682
+.C:5785   A5 8C      LDA $8C
+.C:5787   C5 20      CMP $20
+.C:5789   F0 14      BEQ $579F
+.C:578b   90 0E      BCC $579B
+.C:578d   A0 01      LDY #$01
+.C:578f   B1 6D      LDA ($6D),Y
+.C:5791   D0 1B      BNE $57AE
+.C:5793   A9 73      LDA #$73
+.C:5795   20 69 43   JSR $4369
+.C:5798   4C 2F 25   JMP $252F
+.C:579b   A0 51      LDY #$51
+.C:579d   D0 F0      BNE $578F
+.C:579f   CA         DEX
+.C:57a0   E0 02      CPX #$02
+.C:57a2   D0 03      BNE $57A7
+.C:57a4   4C 19 57   JMP $5719
+.C:57a7   E0 00      CPX #$00
+.C:57a9   F0 9E      BEQ $5749
+.C:57ab   4C 82 46   JMP $4682
+.C:57ae   CA         DEX
+.C:57af   CA         DEX
+.C:57b0   E0 01      CPX #$01
+.C:57b2   F0 F0      BEQ $57A4
+.C:57b4   E0 00      CPX #$00
+.C:57b6   D0 F3      BNE $57AB
+.C:57b8   A5 8C      LDA $8C
+.C:57ba   C5 20      CMP $20
+.C:57bc   B0 1B      BCS $57D9
+.C:57be   A0 50      LDY #$50
+.C:57c0   B1 6D      LDA ($6D),Y
+.C:57c2   D0 06      BNE $57CA
+.C:57c4   A0 28      LDY #$28
+.C:57c6   B1 6D      LDA ($6D),Y
+.C:57c8   F0 C9      BEQ $5793
+.C:57ca   A0 52      LDY #$52
+.C:57cc   B1 6D      LDA ($6D),Y
+.C:57ce   D0 06      BNE $57D6
+.C:57d0   A0 2A      LDY #$2A
+.C:57d2   B1 6D      LDA ($6D),Y
+.C:57d4   F0 BD      BEQ $5793
+.C:57d6   4C 82 46   JMP $4682
+.C:57d9   A0 00      LDY #$00
+.C:57db   B1 6D      LDA ($6D),Y
+.C:57dd   D0 06      BNE $57E5
+.C:57df   A0 28      LDY #$28
+.C:57e1   B1 6D      LDA ($6D),Y
+.C:57e3   F0 AE      BEQ $5793
+.C:57e5   A0 02      LDY #$02
+.C:57e7   B1 6D      LDA ($6D),Y
+.C:57e9   D0 06      BNE $57F1
+.C:57eb   A0 2A      LDY #$2A
+.C:57ed   B1 6D      LDA ($6D),Y
+.C:57ef   F0 A2      BEQ $5793
+.C:57f1   4C 82 46   JMP $4682
+.C:57f4   A2 01      LDX #$01
+.C:57f6   8E 07 3D   STX $3D07
+.C:57f9   4C C1 56   JMP $56C1
+
+
+teleporter
+----------
+finds a teleporter, starting from the current player (px, py), and round the whole cave.
+if it founds one, which has a space near it, in the direction the player moves; that teleporter
+is changed to a $db.
+if not, goes on with searching.
+if it gets back to the current coordinates (the player which tried to use the teleporter), it quits.
+(6d)+y = the currently checked element
+
+.C:b2eb   98         TYA
+.C:b2ec   48         PHA			- push px, py
+.C:b2ed   A0 29      LDY #$29
+.C:b2ef   B1 6D      LDA ($6D),Y
+.C:b2f1   85 04      STA $04		- store actual rockford code (usually $50) to $04
+.C:b2f3   A5 6D      LDA $6D		- saves current coordinates to 1049 and 104a
+.C:b2f5   8D 49 10   STA $1049         |
+.C:b2f8   A5 6E      LDA $6E		   |
+.C:b2fa   8D 4A 10   STA $104A      ---+
+.C:b2fd   18         CLC			- does nothing
+.C:b2fe   A5 6D      LDA $6D
+.C:b300   69 00      ADC #$00
+.C:b302   85 6D      STA $6D
+.C:b304   A5 6E      LDA $6E
+.C:b306   69 00      ADC #$00
+.C:b308   85 6E      STA $6E
+.C:b30a   18         CLC			- c=0
+.C:b30b   A5 6D      LDA $6D		- (6d,6e) incremented by one
+.C:b30d   69 01      ADC #$01			|
+.C:b30f   85 6D      STA $6D			|
+.C:b311   A5 6E      LDA $6E			|
+.C:b313   69 00      ADC #$00			|
+.C:b315   85 6E      STA $6E		----+
+.C:b317   A5 6D      LDA $6D		- compared to original pointer
+.C:b319   CD 49 10   CMP $1049
+.C:b31c   D0 07      BNE $B325		- lsb does not match
+.C:b31e   A5 6E      LDA $6E		- check msb
+.C:b320   CD 4A 10   CMP $104A
+.C:b323   F0 30      BEQ $B355		- if both match, go to b355
+.C:b325   A9 70      LDA #$70		- if msb does not match, check if we reached the end of the cave - $0b70
+.C:b327   C5 6D      CMP $6D
+.C:b329   D0 06      BNE $B331
+.C:b32b   A9 0B      LDA #$0B
+.C:b32d   C5 6E      CMP $6E
+.C:b32f   F0 2A      BEQ $B35B		- if end of the cave, go to b35b; that sets coordinates to the beginning and comes back here
+.C:b331   A0 29      LDY #$29		- check what is in the current one
+.C:b333   B1 6D      LDA ($6D),Y
+.C:b335   C9 95      CMP #$95
+.C:b337   D0 D1      BNE $B30A		- if it is not a teleporter, go to b30a
+.C:b339   68         PLA			- we found a teleporter ---------------v
+.C:b33a   48         PHA
+.C:b33b   A8         TAY			- get the player move coordinate from the stack
+.C:b33c   B1 6D      LDA ($6D),Y	- what is near the teleporter, in the direction?
+.C:b33e   D0 CA      BNE $B30A		- if not a space, this will not do; go back to searching
+.C:b340   A5 04      LDA $04		- retain current player code (usually $50)
+.C:b342   8D 6A B3   STA $B36A		- store to 6369 (that is an lda instruction, self modifying code)
+.C:b345   A9 DB      LDA #$DB
+.C:b347   91 6D      STA ($6D),Y	- place a will-be-rockford there
+.C:b349   20 F4 B1   JSR $B1F4		- retain stored coordinates (to be able to continue cave scan)
+.C:b34c   68         PLA
+.C:b34d   20 73 B3   JSR $B373		- current player becomes a space (disappeared in the teleport)
+.C:b350   68         PLA			- throw away address from space
+.C:b351   68         PLA
+.C:b352   4C 90 C0   JMP $C090
+.C:b355   20 F4 B1   JSR $B1F4
+.C:b358   68         PLA
+.C:b359   A8         TAY
+.C:b35a   60         RTS			- es vege. vagyis ha korbeertunk, nem tortenik semmi
+.C:b35b   A9 50      LDA #$50		- set coordinates to start of cave data in memory: $0850
+.C:b35d   85 6D      STA $6D
+.C:b35f   A9 08      LDA #$08
+.C:b361   85 6E      STA $6E
+.C:b363   D0 CC      BNE $B331		- always jumps to b331
+.C:b365   4C 7A B3   JMP $B37A
+.C:b368   60         RTS
+.C:b369   A9 50      LDA #$50		- this changes "delayed" $db to some rockford.
+.C:b36b   A0 29      LDY #$29
+.C:b36d   20 69 43   JSR $4369
+.C:b370   4C 82 46   JMP $4682
+.C:b373   A0 29      LDY #$29
+.C:b375   A9 00      LDA #$00
+.C:b377   4C 69 43   JMP $4369
+
+
+
+amoeba
+------
+.C:4b9f   A5 87      LDA $87
+.C:4ba1   D0 1B      BNE $4BBE
+.C:4ba3   E6 31      INC $31		; $30,$31: amoeba count
+.C:4ba5   D0 02      BNE $4BA9
+.C:4ba7   E6 30      INC $30
+.C:4ba9   A5 32      LDA $32
+.C:4bab   C5 34      CMP $34
+.C:4bad   90 0B      BCC $4BBA
+.C:4baf   A5 33      LDA $33
+.C:4bb1   C5 35      CMP $35
+.C:4bb3   90 05      BCC $4BBA
+.C:4bb5   A9 3C      LDA #$3C
+.C:4bb7   4C 33 25   JMP $2533
+.C:4bba   A5 86      LDA $86
+.C:4bbc   D0 05      BNE $4BC3
+.C:4bbe   A9 1F      LDA #$1F
+.C:4bc0   4C 33 25   JMP $2533
+.C:4bc3   A5 79      LDA $79		; if found any amoeba which could grow (in this iteration), skip checking
+.C:4bc5   D0 15      BNE $4BDC
+.C:4bc7   A2 03      LDX #$03		; amoeba growing; 4 possibilities to check
+.C:4bc9   BC F7 4B   LDY $4BF7,X
+.C:4bcc   B1 6D      LDA ($6D),Y
+.C:4bce   C9 02      CMP #$02
+.C:4bd0   90 06      BCC $4BD8		; if we find a direction where there is space or dirt, this amoeba can grow
+.C:4bd2   CA         DEX			; decrement x
+.C:4bd3   10 F4      BPL $4BC9		; if not negative, try another direction (we try x=3..0)
+.C:4bd5   4C 82 46   JMP $4682		; finish
+
+.C:4bd8   A9 01      LDA #$01		; remember that there is an amoeba that can grow
+.C:4bda   85 79      STA $79
+.C:4bdc   20 00 25   JSR $2500		; unpredictable random
+.C:4bdf   25 94      AND $94		; binary and possibility_of_growing
+.C:4be1   C9 04      CMP #$04		; if bigger than 4, finish
+.C:4be3   B0 0F      BCS $4BF4
+.C:4be5   AA         TAX			; choose a random direction
+.C:4be6   BC F7 4B   LDY $4BF7,X
+.C:4be9   B1 6D      LDA ($6D),Y
+.C:4beb   C9 02      CMP #$02		; if there is space or dirt
+.C:4bed   B0 05      BCS $4BF4
+.C:4bef   A9 58      LDA #$58		; and put an amoeba_scanned there
+.C:4bf1   20 69 43   JSR $4369
+.C:4bf4   4C 82 46   JMP $4682
+>C:4bf7   01 28 2a 51 				; four direction bytes to load to register y
+
+
+rockford
+--------
+(from crazy dream)
+495b - rockford mozgas
+
+$8c - joystick adat
+$8b - aktualis x
+$8c - aktualis y
+$3f - novelve van - hanyat talalt eddig?
+$90 - ha 0, akkor tarolodik az aktualis x
+
+$f9 - suicide?, ha 0, akkor 4983, vagyis nem
+4142: robbanast csinal, $83ba eltarolt elemmel
+
+$af - valamifele jelzoflag, alapbol 0, aztan
+50f2-tol
+	ha adott helyen space, akkor noveli eggyel, es 3c6b-be #35	- hang lehet
+	ha dirt, akkor is noveli eggyel, es 3c6b-be #a5		- hang lehet
+	ha gyemant, 41d3
+	ha kijarat, akkor $91-be #02, $99-be #01, $af novel eggyel es vege
+	es igy tovabb.
+b192-tol crazy dream kiegeszitesek
+	b192 - skeleton ellenorzes, ha igen, ugrik 41d3
+
+4983- ...
+	joystick olvas, $85-be eltarol
+
+49fe - ugy erunk ide, hogy aksiban a joystick szarja
+
+4a02 - rockford balra
+4a1f - rockford folfele
+		stb
+		
+ba7e - rovid kiegeszites, ami a pneumatic hammer hangjat csinalja, vagy a rajzot vagy tokmindegy mit
+	4b02-nel folytatodik
+
+onmodosito, egyszer van megirva a rokford kod
+4b09 - adat, <- #$51		- rokford delayed
+4b41 - adat, <- #$51
+4b35 - adat, <- #$50		- rokford
+
+22f3 - player1 joystick beolvasas, akkuba megy & 0x0f
+22f9 - player2 joystick beolvasas
+
+
+
+cow
+---
+b0-b3 __IS__ the cow (not a9...)
+b4-b7 is cow delayed.
+a9-af are cow enclosed's.
+
+a9-af: b423
+b0-b3: b403
+b4-b7: 467a
+
+
+467a:
+.C:467a   B1 6D      LDA ($6D),Y
+.C:467c   AA         TAX
+.C:467d   BD 00 AA   LDA $AA00,X		; effect table
+.C:4680   91 6D      STA ($6D),Y
+.C:4682   E6 6D      INC $6D
+.C:4684   D0 02      BNE $4688
+
+for b4-b7, changes it to b0-b3.
+
+.C:b3b0   A0 29      LDY #$29			; simple effect table translation.
+.C:b3b2   B1 6D      LDA ($6D),Y
+.C:b3b4   AA         TAX
+.C:b3b5   BD 00 AA   LDA $AA00,X
+.C:b3b8   20 69 43   JSR $4369
+.C:b3bb   4C 82 46   JMP $4682
+.C:b3be   00         BRK
+.C:b3bf   00         BRK
+
+
+; THIS MOVES A COW. IT WORKS EXACTLY THE SAME WAY AS A GUARD.
+.C:b3c0   A0 29      LDY #$29			; current cow.
+.C:b3c2   B1 6D      LDA ($6D),Y
+.C:b3c4   EA         NOP
+.C:b3c5   EA         NOP
+.C:b3c6   EA         NOP
+.C:b3c7   EA         NOP
+.C:b3c8   EA         NOP
+.C:b3c9   EA         NOP
+.C:b3ca   EA         NOP
+.C:b3cb   29 03      AND #$03			; two lsb's are direction.
+.C:b3cd   AA         TAX
+.C:b3ce   BC A4 21   LDY $21A4,X		; 51 28 01 2a, down left up right
+.C:b3d1   B1 6D      LDA ($6D),Y
+.C:b3d3   D0 0E      BNE $B3E3			; space in that direction? if not, b3e3
+.C:b3d5   18         CLC				; there is a space in that direction.
+.C:b3d6   8A         TXA
+.C:b3d7   69 03      ADC #$03			; turn one back
+.C:b3d9   29 03      AND #$03			; (turn one back...)
+.C:b3db   69 B4      ADC #$B4			; add cow delayed to new direction lsbs.
+.C:b3dd   20 69 43   JSR $4369			; store and finish
+.C:b3e0   4C 2F 25   JMP $252F
+.C:b3e3   BC A5 21   LDY $21A5,X		; 28 01 2a 51 left up right down; we jumped here if no space
+.C:b3e6   B1 6D      LDA ($6D),Y
+.C:b3e8   D0 0A      BNE $B3F4			; space in another direction? if no, b3f4.
+.C:b3ea   18         CLC
+.C:b3eb   8A         TXA
+.C:b3ec   69 B4      ADC #$B4			; if space, store cow there with original bits.
+.C:b3ee   20 69 43   JSR $4369
+.C:b3f1   4C 2F 25   JMP $252F
+.C:b3f4   18         CLC
+.C:b3f5   A0 29      LDY #$29
+.C:b3f7   8A         TXA
+.C:b3f8   69 01      ADC #$01			; don't move in any direction, just store.
+.C:b3fa   29 03      AND #$03
+.C:b3fc   69 B0      ADC #$B0
+.C:b3fe   91 6D      STA ($6D),Y
+.C:b400   4C 82 46   JMP $4682			; finish
+
+b403:
+.C:b403   A0 01      LDY #$01			; over the cow... -------------- for b0-b3 - cows.
+.C:b405   B1 6D      LDA ($6D),Y
+.C:b407   F0 B7      BEQ $B3C0			; is a space? then b3c0.
+.C:b409   A0 28      LDY #$28			; left
+.C:b40b   B1 6D      LDA ($6D),Y
+.C:b40d   F0 B1      BEQ $B3C0
+.C:b40f   A0 2A      LDY #$2A			; right
+.C:b411   B1 6D      LDA ($6D),Y
+.C:b413   F0 AB      BEQ $B3C0
+.C:b415   A0 51      LDY #$51
+.C:b417   B1 6D      LDA ($6D),Y
+.C:b419   F0 A5      BEQ $B3C0
+.C:b41b   A9 A9      LDA #$A9			; no space, store a cow enclosed.
+.C:b41d   20 48 B4   JSR $B448
+.C:b420   4C 82 46   JMP $4682			; finish
+
+.C:b423   A0 01      LDY #$01			; b423: for a9-af - enclosed cows.
+.C:b425   B1 6D      LDA ($6D),Y		; space in any direction?
+.C:b427   F0 15      BEQ $B43E			; if space, b43e.
+.C:b429   A0 28      LDY #$28
+.C:b42b   B1 6D      LDA ($6D),Y
+.C:b42d   F0 0F      BEQ $B43E
+.C:b42f   A0 2A      LDY #$2A
+.C:b431   B1 6D      LDA ($6D),Y
+.C:b433   F0 09      BEQ $B43E
+.C:b435   A0 51      LDY #$51
+.C:b437   B1 6D      LDA ($6D),Y
+.C:b439   F0 03      BEQ $B43E
+.C:b43b   4C B0 B3   JMP $B3B0			; jump to a simple effect table translation, it will do: a9->aa, ab, ac, ad, ae, af, 97 (skeleton)
+.C:b43e   A0 29      LDY #$29			; we found at least one direction, where the enclosed cow could move.
+.C:b440   A9 B0      LDA #$B0			; store a cow_left there!
+.C:b442   20 69 43   JSR $4369
+.C:b445   4C 82 46   JMP $4682
+.C:b448   A0 29      LDY #$29
+.C:b44a   4C 69 43   JMP $4369
+
+
+
+
+crazy dream 9 title screen maze
+-------------------------------
+.C:c700   A0 50      LDY #$50
+.C:c702   A9 00      LDA #$00
+.C:c704   99 A0 07   STA $07A0,Y		; writes 80times 0 to 07a0
+.C:c707   88         DEY
+.C:c708   10 FA      BPL $C704
+.C:c70a   EA         NOP
+.C:c70b   EA         NOP
+.C:c70c   EA         NOP
+.C:c70d   EA         NOP
+.C:c70e   EA         NOP
+.C:c70f   EA         NOP
+.C:c710   EA         NOP
+.C:c711   EA         NOP
+.C:c712   EA         NOP
+.C:c713   EA         NOP
+.C:c714   EA         NOP
+.C:c715   EA         NOP
+.C:c716   EA         NOP
+.C:c717   EA         NOP
+.C:c718   EA         NOP
+.C:c719   A9 A8      LDA #$A8			; cave address to $6d-6e -> similiar to game (lda ($6d),y)
+.C:c71b   85 6D      STA $6D
+.C:c71d   A9 07      LDA #$07
+.C:c71f   85 6E      STA $6E
+.C:c721   A9 00      LDA #$00
+.C:c723   EA         NOP
+.C:c724   EA         NOP
+.C:c725   EA         NOP
+.C:c726   85 71      STA $71
+.C:c728   A0 80      LDY #$80
+.C:c72a   B1 6D      LDA ($6D),Y		; read element at current position
+.C:c72c   C9 80      CMP #$80			; is it a 0x80?
+.C:c72e   D0 5B      BNE $C78B			; if not, go to c78b
+.C:c730   20 00 25   JSR $2500
+.C:c733   29 03      AND #$03
+.C:c735   D0 12      BNE $C749
+.C:c737   A0 30      LDY #$30
+.C:c739   B1 6D      LDA ($6D),Y
+.C:c73b   C9 81      CMP #$81
+.C:c73d   D0 54      BNE $C793
+.C:c73f   A9 80      LDA #$80
+.C:c741   91 6D      STA ($6D),Y
+.C:c743   A0 58      LDY #$58
+.C:c745   91 6D      STA ($6D),Y
+.C:c747   D0 4A      BNE $C793
+.C:c749   C9 01      CMP #$01
+.C:c74b   D0 12      BNE $C75F
+.C:c74d   A0 82      LDY #$82
+.C:c74f   B1 6D      LDA ($6D),Y
+.C:c751   C9 81      CMP #$81
+.C:c753   D0 3E      BNE $C793
+.C:c755   A9 80      LDA #$80
+.C:c757   91 6D      STA ($6D),Y
+.C:c759   A0 81      LDY #$81
+.C:c75b   91 6D      STA ($6D),Y
+.C:c75d   D0 34      BNE $C793
+.C:c75f   C9 02      CMP #$02
+.C:c761   D0 12      BNE $C775
+.C:c763   A0 D0      LDY #$D0
+.C:c765   B1 6D      LDA ($6D),Y
+.C:c767   C9 81      CMP #$81
+.C:c769   D0 28      BNE $C793
+.C:c76b   A9 80      LDA #$80
+.C:c76d   91 6D      STA ($6D),Y
+.C:c76f   A0 A8      LDY #$A8
+.C:c771   91 6D      STA ($6D),Y
+.C:c773   D0 1E      BNE $C793
+.C:c775   C9 03      CMP #$03
+.C:c777   D0 12      BNE $C78B
+.C:c779   A0 7E      LDY #$7E
+.C:c77b   B1 6D      LDA ($6D),Y
+.C:c77d   C9 81      CMP #$81
+.C:c77f   D0 12      BNE $C793
+.C:c781   A9 80      LDA #$80
+.C:c783   91 6D      STA ($6D),Y
+.C:c785   A0 7F      LDY #$7F
+.C:c787   91 6D      STA ($6D),Y
+.C:c789   D0 08      BNE $C793
+.C:c78b   C9 81      CMP #$81			; here we arrive if no 0x80 at loaded address
+.C:c78d   D0 04      BNE $C793			; branch to c793 if no 0x81
+.C:c78f   A9 01      LDA #$01			; write 0x01 to $71
+.C:c791   85 71      STA $71
+.C:c793   18         CLC
+.C:c794   A5 6D      LDA $6D			; increment $6d address
+.C:c796   69 01      ADC #$01
+.C:c798   85 6D      STA $6D
+.C:c79a   90 02      BCC $C79E
+.C:c79c   E6 6E      INC $6E
+.C:c79e   18         CLC
+.C:c79f   EA         NOP
+.C:c7a0   A5 6E      LDA $6E
+.C:c7a2   C9 0B      CMP #$0B			; if higher part is not 0x0b, go to c728 - checking again
+.C:c7a4   90 82      BCC $C728
+.C:c7a6   A5 6D      LDA $6D
+.C:c7a8   C9 00      CMP #$00
+.C:c7aa   90 F8      BCC $C7A4			; if lower part is ??? - go to checking
+.C:c7ac   A5 71      LDA $71
+.C:c7ae   F0 03      BEQ $C7B3
+.C:c7b0   4C 19 C7   JMP $C719
+.C:c7b3   A9 28      LDA #$28
+.C:c7b5   85 6D      STA $6D
+.C:c7b7   A9 08      LDA #$08
+.C:c7b9   85 6E      STA $6E
+.C:c7bb   A0 01      LDY #$01
+.C:c7bd   B1 6D      LDA ($6D),Y
+.C:c7bf   C9 80      CMP #$80
+.C:c7c1   D0 06      BNE $C7C9
+.C:c7c3   A9 00      LDA #$00
+.C:c7c5   91 6D      STA ($6D),Y
+.C:c7c7   F0 10      BEQ $C7D9
+.C:c7c9   C9 03      CMP #$03
+.C:c7cb   D0 0C      BNE $C7D9
+.C:c7cd   88         DEY
+.C:c7ce   B1 6D      LDA ($6D),Y
+.C:c7d0   C8         INY
+.C:c7d1   C9 00      CMP #$00
+.C:c7d3   D0 04      BNE $C7D9
+.C:c7d5   A9 08      LDA #$08
+.C:c7d7   91 6D      STA ($6D),Y
+.C:c7d9   E6 6D      INC $6D
+.C:c7db   A5 6D      LDA $6D
+.C:c7dd   D0 DE      BNE $C7BD
+.C:c7df   E6 6E      INC $6E
+.C:c7e1   A5 6E      LDA $6E
+.C:c7e3   C9 0C      CMP #$0C
+.C:c7e5   D0 D6      BNE $C7BD
+.C:c7e7   60         RTS
+
+
+
+
+
+crazy dream 9 game cave extras
+------------------------------
+the number of the currently played cave is stored at $3d07.
+this is compared to 0x07, 0x17, ...
+and different cave setup routines are called.
+
+.C:c7f0   AD 07 3D   LDA $3D07		; cave number
+.C:c7f3   C9 07      CMP #$07
+.C:c7f5   D0 02      BNE $C7F9
+.C:c7f7   F0 20      BEQ $C819		; c819, if number=7 (random maze)	- solved
+.C:c7f9   C9 17      CMP #$17
+.C:c7fb   D0 06      BNE $C803
+.C:c7fd   4C 00 CB   JMP $CB00		; cb00, if number=23 (rockfall) - solved
+.C:c800   4C F0 C7   JMP $C7F0
+.C:c803   C9 13      CMP #$13
+.C:c805   D0 03      BNE $C80A
+.C:c807   4C 60 CA   JMP $CA60		; ca60, if number=19 (all the way)
+.C:c80a   C9 0E      CMP #$0E
+.C:c80c   D0 03      BNE $C811
+.C:c80e   4C 10 C9   JMP $C910		; c910, if number=14 (metamorphosis) - solved
+.C:c811   C9 15      CMP #$15
+.C:c813   D0 03      BNE $C818
+.C:c815   4C 20 CA   JMP $CA20		; ca20, if number=21 (roll dice now) - solved
+.C:c818   60         RTS			; exit
+
+cave named "RANDOM MAZE" setup
+------------------------------
+what this thing does, is that it looks for a bladder spender in the cave.
+if it found a bladder spender, it decides a random direction.
+	checks if there is an invisible outbox in that direction, if there is, it carves a path.
+and looks for the spender throughout the cave.
+if end of the cave, it starts over again; until there is are no more invisible outboxes.
+at that point, we have a carved path of bladder spenders; they are changed to dirt.
+
+.C:c819   A9 49      LDA #$49		; $6d -> 0849
+.C:c81b   85 6D      STA $6D
+.C:c81d   A9 08      LDA #$08
+.C:c81f   85 6E      STA $6E
+.C:c821   A9 00      LDA #$00
+.C:c823   EA         NOP
+.C:c824   EA         NOP
+.C:c825   EA         NOP
+.C:c826   85 71      STA $71		; $71=0
+.C:c828   A0 80      LDY #$80		; y=0x80							; THE ELEMENT WE CHECK IS AT $6d+0x80
+.C:c82a   B1 6D      LDA ($6D),Y	; load element from address
+.C:c82c   C9 1E      CMP #$1E		; is it a bladder spender?
+.C:c82e   D0 5B      BNE $C88B		; if not, c88b
+.C:c830   20 00 25   JSR $2500		; unpredictable random to acc
+.C:c833   29 03      AND #$03		; &0x03
+.C:c835   D0 12      BNE $C849		; if nonzero, c849
+
+.C:c837   A0 30      LDY #$30		; <- if random&3=0
+.C:c839   B1 6D      LDA ($6D),Y	; what is at $6d+0x30, (0x80-0x30)=0x50, that is, two rows UP (y-2)
+.C:c83b   C9 06      CMP #$06		; is it an invisible outbox there?
+.C:c83d   D0 54      BNE $C893		; if not, c893 - check next address
+.C:c83f   A9 1E      LDA #$1E		; if invisible outbox, store bladder spender to y-2
+.C:c841   91 6D      STA ($6D),Y
+.C:c843   A0 58      LDY #$58		; store bladder spender to $6d+0x58, (0x80-0x58), to y-1
+.C:c845   91 6D      STA ($6D),Y
+.C:c847   D0 4A      BNE $C893		; always branch to c893
+.C:c849   C9 01      CMP #$01		; is it 1?
+.C:c84b   D0 12      BNE $C85F		; if not one, c85f
+
+.C:c84d   A0 82      LDY #$82		; <- if random&3=1
+.C:c84f   B1 6D      LDA ($6D),Y	; what is at $6d+0x82, (0x82-0x80)=0x02, that is, two columns RIGHT (x+2)
+.C:c851   C9 06      CMP #$06
+.C:c853   D0 3E      BNE $C893
+.C:c855   A9 1E      LDA #$1E
+.C:c857   91 6D      STA ($6D),Y
+.C:c859   A0 81      LDY #$81
+.C:c85b   91 6D      STA ($6D),Y
+.C:c85d   D0 34      BNE $C893
+.C:c85f   C9 02      CMP #$02		; is it 2?
+.C:c861   D0 12      BNE $C875		; if not, c875
+
+.C:c863   A0 D0      LDY #$D0		; <- if random&3=2
+.C:c865   B1 6D      LDA ($6D),Y	;												two rows DOWN	(y+2)
+.C:c867   C9 06      CMP #$06
+.C:c869   D0 28      BNE $C893
+.C:c86b   A9 1E      LDA #$1E
+.C:c86d   91 6D      STA ($6D),Y
+.C:c86f   A0 A8      LDY #$A8
+.C:c871   91 6D      STA ($6D),Y
+.C:c873   D0 1E      BNE $C893
+.C:c875   C9 03      CMP #$03
+.C:c877   D0 12      BNE $C88B		; if not 3 (how is that possible?!), c88b - this can't happen.
+
+.C:c879   A0 7E      LDY #$7E		; <- if random&3=3
+.C:c87b   B1 6D      LDA ($6D),Y	;												two columns LEFT	(x-2)
+.C:c87d   C9 06      CMP #$06
+.C:c87f   D0 12      BNE $C893
+.C:c881   A9 1E      LDA #$1E
+.C:c883   91 6D      STA ($6D),Y
+.C:c885   A0 7F      LDY #$7F
+.C:c887   91 6D      STA ($6D),Y
+.C:c889   D0 08      BNE $C893		; always branch
+
+.C:c88b   C9 06      CMP #$06		; is the loaded element an invisible outbox?
+.C:c88d   D0 04      BNE $C893		; if not, c893	- just check next address.
+.C:c88f   A9 01      LDA #$01		; if invisible outbox, store 0x01 - that means, we still have parts to fill.
+.C:c891   85 71      STA $71		;     to $71
+
+.C:c893   18         CLC			; increment address
+.C:c894   A5 6D      LDA $6D
+.C:c896   69 02      ADC #$02		; add two bytes to address
+.C:c898   85 6D      STA $6D
+.C:c89a   90 02      BCC $C89E
+.C:c89c   E6 6E      INC $6E
+.C:c89e   18         CLC
+.C:c89f   EA         NOP
+.C:c8a0   A5 6E      LDA $6E
+.C:c8a2   C9 0B      CMP #$0B
+.C:c8a4   90 82      BCC $C828		; jump to c828 if still inside address range
+.C:c8a6   A5 6D      LDA $6D
+.C:c8a8   C9 00      CMP #$00
+.C:c8aa   90 F8      BCC $C8A4
+.C:c8ac   A5 71      LDA $71		; if $71 is...
+.C:c8ae   F0 03      BEQ $C8B3
+.C:c8b0   4C 19 C8   JMP $C819		; non zero, start all over
+
+
+									; if outside address range, and $71 is zero...
+									; this part checks the whole cave, and changes
+									; the bladder spender to a dirt.
+.C:c8b3   A9 00      LDA #$00
+.C:c8b5   85 6D      STA $6D		; now we have 0b00 at $6d
+.C:c8b7   A2 01      LDX #$01
+.C:c8b9   A0 00      LDY #$00
+.C:c8bb   B1 6D      LDA ($6D),Y	; load thing at address
+.C:c8bd   C9 1E      CMP #$1E		; is it a bladder spender?
+.C:c8bf   D0 04      BNE $C8C5
+.C:c8c1   A9 01      LDA #$01		; if it is, change to dirt
+.C:c8c3   91 6D      STA ($6D),Y
+.C:c8c5   88         DEY			; decrement y
+.C:c8c6   D0 F3      BNE $C8BB
+.C:c8c8   C6 6E      DEC $6E
+.C:c8ca   A5 6E      LDA $6E
+.C:c8cc   C9 07      CMP #$07		; go back until $6d is 0x700
+.C:c8ce   D0 EB      BNE $C8BB
+.C:c8d0   60         RTS			; and finish
+
+.C:c8d1   00         BRK
+.C:c8d2   18         CLC
+.C:c8d3   A5 6D      LDA $6D
+.C:c8d5   69 A0      ADC #$A0
+.C:c8d7   85 8B      STA $8B
+.C:c8d9   A5 6E      LDA $6E
+.C:c8db   69 00      ADC #$00
+.C:c8dd   85 8C      STA $8C
+.C:c8df   A0 80      LDY #$80
+.C:c8e1   B1 8B      LDA ($8B),Y
+.C:c8e3   C9 06      CMP #$06
+.C:c8e5   60         RTS
+
+
+cave random fill - for cave "roll dice"
+---------------------------------------
+.C:ca20   A9 00      LDA #$00
+.C:ca22   85 6D      STA $6D
+.C:ca24   A9 08      LDA #$08
+.C:ca26   85 6E      STA $6E
+.C:ca28   A0 00      LDY #$00
+.C:ca2a   B1 6D      LDA ($6D),Y
+.C:ca2c   C9 1E      CMP #$1E
+.C:ca2e   D0 17      BNE $CA47
+.C:ca30   20 00 25   JSR $2500
+.C:ca33   C9 08      CMP #$08
+.C:ca35   B0 04      BCS $CA3B
+.C:ca37   A9 30      LDA #$30		; $08, butterfly
+.C:ca39   D0 0A      BNE $CA45
+.C:ca3b   C9 18      CMP #$18		; $18, stone
+.C:ca3d   B0 04      BCS $CA43
+.C:ca3f   A9 10      LDA #$10
+.C:ca41   D0 02      BNE $CA45
+.C:ca43   A9 01      LDA #$01		; dirt
+.C:ca45   91 6D      STA ($6D),Y
+.C:ca47   C8         INY
+.C:ca48   D0 E0      BNE $CA2A
+.C:ca4a   E6 6E      INC $6E
+.C:ca4c   A5 6E      LDA $6E
+.C:ca4e   C9 0C      CMP #$0C
+.C:ca50   D0 D6      BNE $CA28
+.C:ca52   60         RTS
+
+
+cave random fill - for cave "rockfall"
+--------------------------------------
+.C:cb00   A9 00      LDA #$00			; starting address=0800
+.C:cb02   85 6D      STA $6D
+.C:cb04   A9 08      LDA #$08
+.C:cb06   85 6E      STA $6E
+.C:cb08   A0 00      LDY #$00
+.C:cb0a   B1 6D      LDA ($6D),Y		; load element at address
+.C:cb0c   C9 1E      CMP #$1E			; is it the bladder spender?
+.C:cb0e   D0 1F      BNE $CB2F			; if not, go to cb2f
+.C:cb10   20 00 25   JSR $2500			; unpredictable random to acc
+.C:cb13   C9 02      CMP #$02
+.C:cb15   B0 04      BCS $CB1B			; less than 0x02->cb1b
+.C:cb17   A9 64      LDA #$64			; load 0x64 (acid)
+.C:cb19   D0 12      BNE $CB2D			; always jump to store
+.C:cb1b   C9 20      CMP #$20
+.C:cb1d   B0 04      BCS $CB23			; less than 0x20->cb23
+.C:cb1f   A9 10      LDA #$10			; load 0x10 (stone)
+.C:cb21   D0 0A      BNE $CB2D			; always jump
+.C:cb23   C9 25      CMP #$25			; less than 0x25
+.C:cb25   B0 04      BCS $CB2B
+.C:cb27   A9 14      LDA #$14			; diamond
+.C:cb29   D0 02      BNE $CB2D
+.C:cb2b   A9 01      LDA #$01			; dirt.
+.C:cb2d   91 6D      STA ($6D),Y		; store acc to cave
+.C:cb2f   C8         INY
+.C:cb30   D0 D8      BNE $CB0A
+.C:cb32   E6 6E      INC $6E
+.C:cb34   A5 6E      LDA $6E
+.C:cb36   C9 0C      CMP #$0C
+.C:cb38   D0 CE      BNE $CB08
+.C:cb3a   60         RTS
+
+
+
+
+cave "metamorphosis" extra setup in crazy dream 9
+-------------------------------------------------
+same maze routine, but do the carving like x, x+2, x+4.
+later, the bladder spenders are replaced by 3x3 invisible outboxes;
+and the invisible outboxes are replaced with random elements.
+
+
+.C:c8d2   18         CLC			; load element at (x, y+4)
+.C:c8d3   A5 6D      LDA $6D
+.C:c8d5   69 A0      ADC #$A0
+.C:c8d7   85 8B      STA $8B
+.C:c8d9   A5 6E      LDA $6E
+.C:c8db   69 00      ADC #$00
+.C:c8dd   85 8C      STA $8C
+.C:c8df   A0 80      LDY #$80
+.C:c8e1   B1 8B      LDA ($8B),Y
+.C:c8e3   C9 06      CMP #$06		; and compare to invisible outbox
+.C:c8e5   60         RTS
+
+.C:c8e6   38         SEC			; load element at (x, y-4)
+.C:c8e7   A5 6D      LDA $6D
+.C:c8e9   E9 A0      SBC #$A0
+.C:c8eb   85 8B      STA $8B
+.C:c8ed   A5 6E      LDA $6E
+.C:c8ef   E9 00      SBC #$00
+.C:c8f1   85 8C      STA $8C
+.C:c8f3   A0 80      LDY #$80
+.C:c8f5   B1 8B      LDA ($8B),Y
+.C:c8f7   C9 06      CMP #$06		; compare to invisible outbox
+.C:c8f9   60         RTS
+
+.C:c900   A9 FD      LDA #$FD		; this changes the start address at the c919 routine to 07fd
+.C:c902   8D 1A C9   STA $C91A
+.C:c905   A9 07      LDA #$07
+.C:c907   8D 1E C9   STA $C91E
+.C:c90a   60         RTS
+
+.C:c910   20 00 C9   JSR $C900		;;;;;;;;;;;;;;;;;;;;;; we start here.
+.C:c913   20 19 C9   JSR $C919
+.C:c916   4C B4 C9   JMP $C9B4
+
+.C:c919   A9 FA      LDA #$FA		; this is 07fa or 07fd (it is also used by "all the way")
+.C:c91b   85 6D      STA $6D
+.C:c91d   A9 07      LDA #$07
+.C:c91f   85 6E      STA $6E
+.C:c921   A9 00      LDA #$00
+.C:c923   EA         NOP
+.C:c924   EA         NOP
+.C:c925   EA         NOP
+.C:c926   85 71      STA $71		; store zero to $71
+
+.C:c928   A0 80      LDY #$80		; load element at current position
+.C:c92a   B1 6D      LDA ($6D),Y
+.C:c92c   C9 1E      CMP #$1E
+.C:c92e   D0 5B      BNE $C98B
+.C:c930   20 00 25   JSR $2500		; if it is a bladder spender, create unpredictable random
+.C:c933   29 03      AND #$03		; &0x03
+.C:c935   D0 12      BNE $C949		; if not zero, c949
+
+.C:c937   20 E6 C8   JSR $C8E6		; if it is a zero, jsr c8e6
+.C:c93a   EA         NOP
+.C:c93b   EA         NOP
+.C:c93c   EA         NOP
+.C:c93d   D0 54      BNE $C993		; if it is not an invisible outbox, "finish"
+.C:c93f   A9 1E      LDA #$1E
+.C:c941   91 8B      STA ($8B),Y
+.C:c943   A0 30      LDY #$30
+.C:c945   91 6D      STA ($6D),Y
+.C:c947   D0 4A      BNE $C993		; always branch to c993 (increment address)
+
+.C:c949   C9 01      CMP #$01
+.C:c94b   D0 12      BNE $C95F
+.C:c94d   A0 84      LDY #$84		; if it is 1
+.C:c94f   B1 6D      LDA ($6D),Y	; what is at (x+4, y)
+.C:c951   C9 06      CMP #$06
+.C:c953   D0 3E      BNE $C993
+.C:c955   A9 1E      LDA #$1E
+.C:c957   91 6D      STA ($6D),Y	; store bladder spender to x+4,y
+.C:c959   A0 82      LDY #$82
+.C:c95b   91 6D      STA ($6D),Y	; store bladder spender to x+2,y
+.C:c95d   D0 34      BNE $C993
+
+.C:c95f   C9 02      CMP #$02
+.C:c961   D0 12      BNE $C975
+.C:c963   20 D2 C8   JSR $C8D2		; if it is 2, gosub c8d2
+.C:c966   EA         NOP
+.C:c967   EA         NOP
+.C:c968   D0 29      BNE $C993
+.C:c96a   EA         NOP
+.C:c96b   A9 1E      LDA #$1E
+.C:c96d   91 8B      STA ($8B),Y
+.C:c96f   A0 D0      LDY #$D0
+.C:c971   91 6D      STA ($6D),Y
+.C:c973   D0 1E      BNE $C993
+.C:c975   C9 03      CMP #$03
+.C:c977   D0 12      BNE $C98B
+.C:c979   A0 7C      LDY #$7C
+.C:c97b   B1 6D      LDA ($6D),Y
+.C:c97d   C9 06      CMP #$06
+.C:c97f   D0 12      BNE $C993
+.C:c981   A9 1E      LDA #$1E
+.C:c983   91 6D      STA ($6D),Y
+.C:c985   A0 7E      LDY #$7E
+.C:c987   91 6D      STA ($6D),Y
+.C:c989   D0 08      BNE $C993
+.C:c98b   C9 06      CMP #$06			; is it an invisible outbox?
+.C:c98d   D0 04      BNE $C993			; if no, jump to increment
+.C:c98f   A9 01      LDA #$01			; if yes, store 0x01 to 71 - so we will start again
+.C:c991   85 71      STA $71
+
+.C:c993   18         CLC				; increment address by 2
+.C:c994   A5 6D      LDA $6D
+.C:c996   69 02      ADC #$02
+.C:c998   85 6D      STA $6D
+.C:c99a   90 02      BCC $C99E
+.C:c99c   E6 6E      INC $6E
+.C:c99e   18         CLC
+.C:c99f   EA         NOP
+.C:c9a0   A5 6E      LDA $6E
+.C:c9a2   C9 0B      CMP #$0B
+.C:c9a4   90 82      BCC $C928
+.C:c9a6   A5 6D      LDA $6D
+.C:c9a8   C9 00      CMP #$00
+.C:c9aa   90 F8      BCC $C9A4
+.C:c9ac   A5 71      LDA $71
+.C:c9ae   F0 03      BEQ $C9B3
+.C:c9b0   4C 19 C9   JMP $C919
+.C:c9b3   60         RTS
+
+.C:c9b4   A9 E8      LDA #$E8			; cave setup finish routine
+.C:c9b6   85 6D      STA $6D
+.C:c9b8   A9 07      LDA #$07			; 07e8 to $6d
+.C:c9ba   85 6E      STA $6E
+.C:c9bc   A0 80      LDY #$80			; we check $6d+0x80
+.C:c9be   B1 6D      LDA ($6D),Y
+.C:c9c0   C9 1E      CMP #$1E			; is it a bladder spender?
+.C:c9c2   D0 20      BNE $C9E4
+.C:c9c4   A9 06      LDA #$06			; if it is a bladder spender; draw a 3x3 rectange of invisible outboxes
+.C:c9c6   A0 57      LDY #$57			; 
+.C:c9c8   91 6D      STA ($6D),Y		; outbox to (x-1,y-1)
+.C:c9ca   C8         INY
+.C:c9cb   91 6D      STA ($6D),Y		; outbox to (x,y-1)
+.C:c9cd   C8         INY
+.C:c9ce   91 6D      STA ($6D),Y		; outbox to (x+1,y-1)
+.C:c9d0   A0 7F      LDY #$7F
+.C:c9d2   91 6D      STA ($6D),Y		; outbox to (x-1,y)
+.C:c9d4   C8         INY
+.C:c9d5   91 6D      STA ($6D),Y		; outbox to (x,y)
+.C:c9d7   C8         INY
+.C:c9d8   91 6D      STA ($6D),Y		; outbox to (x+1,y)
+.C:c9da   A0 A7      LDY #$A7
+.C:c9dc   91 6D      STA ($6D),Y		; outbox to (x-1,y+1)
+.C:c9de   C8         INY
+.C:c9df   91 6D      STA ($6D),Y		; outbox to (x,y+1)
+.C:c9e1   C8         INY
+.C:c9e2   91 6D      STA ($6D),Y		; outbox to (x,y+1)
+.C:c9e4   E6 6D      INC $6D			; increment address
+.C:c9e6   A5 6D      LDA $6D
+.C:c9e8   D0 D2      BNE $C9BC			; if not finished, c9bc
+.C:c9ea   E6 6E      INC $6E
+.C:c9ec   A5 6E      LDA $6E
+.C:c9ee   C9 0B      CMP #$0B
+.C:c9f0   D0 CA      BNE $C9BC
+										; drawing 3x3 outboxes finished.
+.C:c9f2   A9 00      LDA #$00			; 0x0800 to $6d
+.C:c9f4   85 6D      STA $6D
+.C:c9f6   A9 08      LDA #$08
+.C:c9f8   85 6E      STA $6E
+.C:c9fa   A0 00      LDY #$00
+.C:c9fc   B1 6D      LDA ($6D),Y
+.C:c9fe   C9 06      CMP #$06
+.C:ca00   D0 0F      BNE $CA11
+.C:ca02   20 00 25   JSR $2500			; unpredictable random
+.C:ca05   C9 18      CMP #$18
+.C:ca07   90 04      BCC $CA0D
+.C:ca09   A9 01      LDA #$01			; dirt
+.C:ca0b   D0 02      BNE $CA0F
+.C:ca0d   A9 10      LDA #$10			; stone
+.C:ca0f   91 6D      STA ($6D),Y		; store chosen element.
+.C:ca11   C8         INY
+.C:ca12   D0 E8      BNE $C9FC
+.C:ca14   E6 6E      INC $6E
+.C:ca16   A5 6E      LDA $6E
+.C:ca18   C9 0C      CMP #$0C
+.C:ca1a   D0 DE      BNE $C9FA
+.C:ca1c   60         RTS
+
+
+
+
+crazy dream 9 - all the way
+---------------------------
+.C:ca60   A9 FA      LDA #$FA
+.C:ca62   8D 1A C9   STA $C91A
+.C:ca65   A9 07      LDA #$07
+.C:ca67   8D 1E C9   STA $C91E
+.C:ca6a   20 19 C9   JSR $C919			; create a x,x+2,x+4-like maze, like in metamorphosis
+
+.C:ca6d   A9 FA      LDA #$FA			; 07fa to $6d
+.C:ca6f   85 6D      STA $6D
+.C:ca71   A9 07      LDA #$07
+.C:ca73   85 6E      STA $6E
+
+.C:ca75   A0 80      LDY #$80			; 0x80 to y
+.C:ca77   A2 1F      LDX #$1F			; x=pre_diamond_1
+.C:ca79   B1 6D      LDA ($6D),Y		; what is at x,y?
+.C:ca7b   C9 1E      CMP #$1E			; is it a bladder spender?
+.C:ca7d   D0 45      BNE $CAC4
+										; if there is a bladder spender at x,y vvvvvvvvvv
+.C:ca7f   8A         TXA				; acc=pre_diamond_1
+.C:ca80   A0 57      LDY #$57
+.C:ca82   91 6D      STA ($6D),Y		; x-1,y-1=pre_dia_1
+.C:ca84   A0 59      LDY #$59
+.C:ca86   91 6D      STA ($6D),Y		; x+1,y-1=pre_dia_1
+.C:ca88   A0 A7      LDY #$A7
+.C:ca8a   91 6D      STA ($6D),Y		; x-1,y+1=pre_dia_1
+.C:ca8c   A0 A9      LDY #$A9
+.C:ca8e   91 6D      STA ($6D),Y		; x+1,y+1=pre_dia_1
+
+.C:ca90   A0 30      LDY #$30
+.C:ca92   B1 6D      LDA ($6D),Y		; what is at x,y-2
+.C:ca94   C9 1E      CMP #$1E			; is it a bladder spender?
+.C:ca96   F0 05      BEQ $CA9D			; if yes, branch
+.C:ca98   8A         TXA				; if not bladder spender
+.C:ca99   A0 58      LDY #$58
+.C:ca9b   91 6D      STA ($6D),Y		; store pre_dia to x,y-1
+
+.C:ca9d   A0 7E      LDY #$7E			; what is at x-2,y
+.C:ca9f   B1 6D      LDA ($6D),Y
+.C:caa1   C9 1E      CMP #$1E			; is it a bladder spender?
+.C:caa3   F0 05      BEQ $CAAA			; if yes, branch
+.C:caa5   8A         TXA				; if not, store pre_dia to x-1,y
+.C:caa6   A0 7F      LDY #$7F
+.C:caa8   91 6D      STA ($6D),Y
+
+.C:caaa   A0 D0      LDY #$D0			; what is at x,y+2
+.C:caac   B1 6D      LDA ($6D),Y
+.C:caae   C9 1E      CMP #$1E
+.C:cab0   F0 05      BEQ $CAB7
+.C:cab2   8A         TXA
+.C:cab3   A0 A8      LDY #$A8
+.C:cab5   91 6D      STA ($6D),Y
+
+.C:cab7   A0 82      LDY #$82			; what is at x+2,y
+.C:cab9   B1 6D      LDA ($6D),Y
+.C:cabb   C9 1E      CMP #$1E
+.C:cabd   F0 05      BEQ $CAC4
+.C:cabf   8A         TXA				; if bladder spender, store pre_dia_1 to x+1,y
+.C:cac0   A0 81      LDY #$81
+.C:cac2   91 6D      STA ($6D),Y
+
+.C:cac4   E6 6D      INC $6D		; increment address
+.C:cac6   A5 6D      LDA $6D
+.C:cac8   D0 AB      BNE $CA75
+.C:caca   E6 6E      INC $6E
+.C:cacc   A5 6E      LDA $6E
+.C:cace   C9 0C      CMP #$0C
+.C:cad0   D0 A3      BNE $CA75		; if still in cave memory, go up
+									; finished cave memory.
+
+.C:cad2   A2 02      LDX #$02		; replace remaining bladder spenders with brick wall
+.C:cad4   8E 1B 0B   STX $0B1B
+.C:cad7   A9 00      LDA #$00
+.C:cad9   85 6D      STA $6D
+.C:cadb   A9 08      LDA #$08
+.C:cadd   85 6E      STA $6E
+.C:cadf   A0 00      LDY #$00
+.C:cae1   B1 6D      LDA ($6D),Y
+.C:cae3   C9 1E      CMP #$1E
+.C:cae5   D0 03      BNE $CAEA
+.C:cae7   8A         TXA
+.C:cae8   91 6D      STA ($6D),Y
+.C:caea   C8         INY
+.C:caeb   D0 F4      BNE $CAE1
+.C:caed   E6 6E      INC $6E
+.C:caef   A5 6E      LDA $6E
+.C:caf1   C9 0C      CMP #$0C
+.C:caf3   D0 EC      BNE $CAE1
+.C:caf5   60         RTS
+

@@ -1,0 +1,106 @@
+## Process this file with automake to produce Makefile.in
+CAVES = \
+	No_One_01.gds \
+	No_One_02.gds \
+	No_One_03.gds \
+	No_One_04.gds \
+	No_One_05.gds \
+	No_One_06.gds \
+	No_One_07.gds \
+	No_One_08.gds \
+	No_One_09.gds \
+	No_One_10.gds
+
+ICONS = \
+	add_filled_rectangle.png \
+	add_freehand.png \
+	add_line.png \
+	add_join.png \
+	add_point.png \
+	add_raster.png \
+	add_rectangle.png \
+	add_fill_replace.png \
+	add_fill_border.png \
+	add_maze.png \
+	add_maze_uni.png \
+	add_maze_braid.png \
+	cave_editor.png \
+	move.png \
+	snapshot.png \
+	restart_level.png \
+	random_fill.png \
+	to_top.png \
+	to_bottom.png \
+	award.png
+
+TITLE = \
+	gdash_screen.png \
+	gdash.png \
+	gdash_32.png
+
+noinst_HEADERS = \
+	icons.h \
+	c64_gfx.h \
+	title.h \
+	levels.h \
+	chargen.h
+
+icondir = $(datadir)/pixmaps
+icon_DATA = gdash.png
+
+pkgdata_DATA = boulder_rush.png cells_c64.png
+
+EXTRA_DIST = $(ICONS) $(TITLE) $(icon_DATA) \
+	icons.list title.list \
+	$(pkgdata_DATA) \
+	$(CAVES) levels.h process.sh \
+	chargen
+
+
+# for included ICONS
+icons.list: $(ICONS) Makefile.am
+	( rm -f $@; \
+		for image in $(ICONS); do \
+			echo $$image | sed s/\.png$$// >> $@; \
+			echo $$image >> $@; \
+		done )
+
+title.list: $(TITLE) Makefile.am
+	( rm -f $@; \
+		for image in $(TITLE); do \
+			echo $$image | sed s/\.png$$// >> $@; \
+			echo $$image >> $@; \
+		done )
+
+# the include files
+icons.h: $(ICONS) icons.list
+	gdk-pixbuf-csource --raw --build-list `cat icons.list` > $@
+
+title.h: $(TITLE) title.list
+	gdk-pixbuf-csource --raw --build-list `cat title.list` > $@
+
+# own programs which generate include files
+AM_CFLAGS=@GTK_CFLAGS@
+
+noinst_PROGRAMS = \
+	cells_c64_to_c \
+	file2c
+
+# this one creates inlined original c64 graphics
+cells_c64_to_c_LDADD =  @GTK_LIBS@
+cells_c64_to_c_SOURCES = \
+	cells_c64_to_c.c
+
+c64_gfx.h: cells_c64.png cells_c64_to_c
+	./cells_c64_to_c >c64_gfx.h
+
+# this utility creates an include file for any datafile
+file2c_SOURCES = \
+	file2c.c
+
+levels.h: $(CAVES) file2c Makefile.am
+	sh process.sh $(CAVES)
+
+
+chargen.h: chargen file2c
+	./file2c chargen "guint8 chargen[] = {" "};"  >$@

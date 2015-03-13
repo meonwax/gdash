@@ -1,0 +1,4120 @@
+# Hungarian translation of gdash.
+# Copyright (C) 2006 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gdash package.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gdash 0.1\n"
+"Report-Msgid-Bugs-To: cirix@fw.hu\n"
+"POT-Creation-Date: 2008-07-16 18:31+0200\n"
+"PO-Revision-Date: 2008-06-21 17:58+0200\n"
+"Last-Translator:  <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+
+#: src/caveobject.c:28 src/help.c:132
+msgid "Point"
+msgstr "Pont"
+
+#: src/caveobject.c:28
+msgid "Coordinates"
+msgstr "Koordináták"
+
+#: src/caveobject.c:28 src/caveobject.c:29 src/caveobject.c:30
+#: src/caveobject.c:32
+msgid "Element"
+msgstr "Elem"
+
+#: src/caveobject.c:28 src/caveobject.c:29 src/caveobject.c:30
+#: src/caveobject.c:31 src/caveobject.c:32 src/caveobject.c:33
+msgid "Draw"
+msgstr "Rajz"
+
+#: src/caveobject.c:29 src/help.c:134
+msgid "Line"
+msgstr "Vonal"
+
+#: src/caveobject.c:29 src/caveobject.c:30 src/caveobject.c:31
+#: src/caveobject.c:32 src/caveobject.c:34 src/caveobject.c:35
+#: src/caveobject.c:36 src/caveobject.c:37 src/caveobject.c:38
+#: src/caveobject.c:39
+msgid "Starting coordinates"
+msgstr "Kezdőpont"
+
+#: src/caveobject.c:29 src/caveobject.c:30 src/caveobject.c:31
+#: src/caveobject.c:32 src/caveobject.c:36 src/caveobject.c:37
+#: src/caveobject.c:38 src/caveobject.c:39
+msgid "Ending coordinates"
+msgstr "Végpont"
+
+#: src/caveobject.c:30 src/help.c:135
+msgid "Outline"
+msgstr "Keret"
+
+#: src/caveobject.c:31 src/help.c:136
+msgid "Rectangle"
+msgstr "Téglalap"
+
+#: src/caveobject.c:31 src/caveobject.c:35
+msgid "Border element"
+msgstr "Keret karakter"
+
+#: src/caveobject.c:31 src/caveobject.c:34 src/caveobject.c:35
+msgid "Fill element"
+msgstr "Kitöltő elem"
+
+#: src/caveobject.c:31 src/caveobject.c:35
+msgid "Fill"
+msgstr "Kitöltés"
+
+#: src/caveobject.c:32 src/help.c:137
+msgid "Raster"
+msgstr "Raszter"
+
+#: src/caveobject.c:32 src/caveobject.c:33
+msgid "Distance"
+msgstr "Távolság"
+
+#: src/caveobject.c:33 src/help.c:138
+msgid "Join"
+msgstr "Kötés"
+
+#: src/caveobject.c:33 src/caveobject.c:34
+msgid "Search element"
+msgstr "Keresett elem"
+
+#: src/caveobject.c:33
+msgid "Add element"
+msgstr "Hozzáadott elem"
+
+#: src/caveobject.c:33
+msgid "Find"
+msgstr "Keres"
+
+#: src/caveobject.c:34
+msgid "Replace fill"
+msgstr "Kitöltés cserével"
+
+#: src/caveobject.c:34
+msgid "Replace"
+msgstr "Csere"
+
+#: src/caveobject.c:35 src/help.c:139
+msgid "Fill to border"
+msgstr "Kitöltés keretig"
+
+#: src/caveobject.c:35
+msgid "Border"
+msgstr "Keret"
+
+#: src/caveobject.c:36 src/help.c:143
+msgid "Maze"
+msgstr "Labirintus"
+
+#: src/caveobject.c:36 src/caveobject.c:37 src/caveobject.c:38
+msgid "Wall and path"
+msgstr "Fal és járat"
+
+#: src/caveobject.c:36 src/caveobject.c:37 src/caveobject.c:38
+#: src/caveobject.c:39 src/editor.c:1315
+#, c-format
+msgid "Random seed %d"
+msgstr "%d. véletlenszám kezdet"
+
+#: src/caveobject.c:36 src/caveobject.c:37 src/caveobject.c:38
+msgid "Wall element"
+msgstr "Fal karakter"
+
+#: src/caveobject.c:36 src/caveobject.c:37 src/caveobject.c:38
+msgid "Path element"
+msgstr "Járat karakter"
+
+#: src/caveobject.c:36 src/caveobject.c:37 src/caveobject.c:38
+msgid "Wall"
+msgstr "Fal"
+
+#: src/caveobject.c:36 src/caveobject.c:37 src/caveobject.c:38
+msgid "Path"
+msgstr "Járat"
+
+#: src/caveobject.c:36 src/caveobject.c:37 src/caveobject.c:38
+msgid "Horizontal (%)"
+msgstr "Vízszintes (%)"
+
+#: src/caveobject.c:37 src/help.c:144
+msgid "Unicursal maze"
+msgstr "Kígyózó labirintus"
+
+#: src/caveobject.c:38 src/help.c:145
+#, fuzzy
+msgid "Braid maze"
+msgstr "Raszter rajzolása"
+
+#: src/caveobject.c:39
+msgid "Random fill"
+msgstr "Véletlen kitöltés"
+
+#: src/caveobject.c:39
+msgid "Replace only this element"
+msgstr "Csak ezt cseréli ki"
+
+#: src/caveobject.c:39
+msgid "Random 1"
+msgstr "1. véletlen"
+
+#: src/caveobject.c:39
+msgid "Initial"
+msgstr "Kezdeti"
+
+#: src/caveobject.c:302
+#, c-format
+msgid "Point of <b>%s</b> at %d,%d"
+msgstr "<b>%s</b> karakter %d,%d pontban"
+
+#: src/caveobject.c:305
+#, c-format
+msgid "Line from %d,%d to %d,%d of <b>%s</b>"
+msgstr "Vonal %d,%d pontból %d,%d pontba, <b>%s</b> karakter"
+
+#: src/caveobject.c:308
+#, c-format
+msgid "Rectangle from %d,%d to %d,%d of <b>%s</b>"
+msgstr "Téglalap %d,%d és %d,%d sarkokkal, <b>%s</b> karakter"
+
+#: src/caveobject.c:311
+#, c-format
+msgid "Rectangle from %d,%d to %d,%d of <b>%s</b>, filled with <b>%s</b>"
+msgstr ""
+"Téglalap %d,%d és %d,%d sarkokkal, keret <b>%s</b>, kitöltés <b>%s</b> "
+"karakter"
+
+#: src/caveobject.c:314
+#, c-format
+msgid "Raster from %d,%d to %d,%d of <b>%s</b>, distance %+d,%+d"
+msgstr ""
+"Raszter %d,%d ponttól %d,%d pontig <b>%s</b> karakterrel, távolság %+d,%+d"
+
+#: src/caveobject.c:317
+#, c-format
+msgid "Join <b>%s</b> to every <b>%s</b>, distance %+d,%+d"
+msgstr "Kötés: <b>%s</b> karakter minden <b>%s</b> mellé, %+d,%+d távolságban"
+
+#: src/caveobject.c:320
+#, c-format
+msgid "Floodfill from %d,%d of <b>%s</b>, border <b>%s</b>"
+msgstr "Kitöltés %d,%d pontból <b>%s</b> karakterre, keret <b>%s</b>"
+
+#: src/caveobject.c:323
+#, c-format
+msgid "Floodfill from %d,%d of <b>%s</b>, replacing <b>%s</b>"
+msgstr ""
+"Kitöltés %d,%d pontból <b>%s</b> karakterrel, <b>%s</b> karaktert cserélve"
+
+#: src/caveobject.c:326
+#, c-format
+msgid "Maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"
+msgstr ""
+"Labirintus %d,%d és %d,%d sarkokkal, fal <b>%s</b>, járat <b>%s</b> karakter"
+
+#: src/caveobject.c:329
+#, c-format
+msgid "Unicursal maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"
+msgstr ""
+"Kígyózó labirintus %d,%d és %d,%d sarkokkal, fal <b>%s</b>, járat <b>%s</b> "
+"karakter"
+
+#: src/caveobject.c:332
+#, fuzzy, c-format
+msgid "Braid maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"
+msgstr ""
+"Téglalap %d,%d és %d,%d sarkokkal, keret <b>%s</b>, kitöltés <b>%s</b> "
+"karakter"
+
+#: src/caveobject.c:335
+#, c-format
+msgid "Random fill from %d,%d to %d,%d, replacing %s"
+msgstr "Véletlen Kitöltés %d,%d-%d,%d téglalapban, %s karaktert cserélve"
+
+#: src/cave.c:29
+msgid "None"
+msgstr "Nincs"
+
+#: src/cave.c:29
+msgid "Up"
+msgstr "Fel"
+
+#: src/cave.c:29
+msgid "Up+right"
+msgstr "Fel+jobbra"
+
+#: src/cave.c:29
+msgid "Right"
+msgstr "Jobbra"
+
+#: src/cave.c:29
+msgid "Down+right"
+msgstr "Le+jobbra"
+
+#: src/cave.c:29
+msgid "Down"
+msgstr "Le"
+
+#: src/cave.c:29
+msgid "Down+left"
+msgstr "Le+balra"
+
+#: src/cave.c:29
+msgid "Left"
+msgstr "Balra"
+
+#: src/cave.c:29
+msgid "Up+left"
+msgstr "Fel+balra"
+
+#: src/cave.c:82
+msgid "Space"
+msgstr "Üres"
+
+#: src/cave.c:83
+msgid "Dirt"
+msgstr "Föld"
+
+#: src/cave.c:84
+msgid "Dirt 2"
+msgstr "Föld 2"
+
+#: src/cave.c:85
+msgid "Brick wall"
+msgstr "Téglafal"
+
+#: src/cave.c:86
+msgid "Magic wall"
+msgstr "Varázsfal"
+
+#: src/cave.c:87
+msgid "Outbox"
+msgstr "Kijárat"
+
+#: src/cave.c:88
+msgid "Outbox (open)"
+msgstr "Kijárat (nyitva)"
+
+#: src/cave.c:89
+msgid "Invisible outbox"
+msgstr "Láthatatlan kijárat"
+
+#: src/cave.c:90
+msgid "Invisible outbox (open)"
+msgstr "Láthatatlan kijárat (nyitva)"
+
+#: src/cave.c:91
+msgid "Steel wall"
+msgstr "Törhetetlen fal"
+
+#: src/cave.c:92
+msgid "Explodable steel wall"
+msgstr "Törhető fal"
+
+#: src/cave.c:93
+msgid "Eatable steel wall"
+msgstr "Átjárható fal"
+
+#: src/cave.c:94
+msgid "Eatable brick wall"
+msgstr "Átjárható téglafal"
+
+#: src/cave.c:95
+msgid "Stone"
+msgstr "Kő"
+
+#: src/cave.c:96
+msgid "Stone, falling"
+msgstr "Kő (zuhanó)"
+
+#: src/cave.c:97
+msgid "Diamond"
+msgstr "Gyémánt"
+
+#: src/cave.c:98
+msgid "Diamond, falling"
+msgstr "Gyémánt (zuhanó)"
+
+#: src/cave.c:99
+msgid "Bladder Spender"
+msgstr "Buborék csapda"
+
+#: src/cave.c:100
+msgid "Inbox"
+msgstr "Bejárat"
+
+#: src/cave.c:101
+msgid "Expanding wall, horizontal"
+msgstr "Épülő fal (vízszintes)"
+
+#: src/cave.c:102
+msgid "Expanding wall, vertical"
+msgstr "Épülő fal (függőleges)"
+
+#: src/cave.c:103
+msgid "Expanding wall"
+msgstr "Épülő fal"
+
+#: src/cave.c:104
+msgid "Expanding wall switch"
+msgstr "Épülő fal irányváltó"
+
+#: src/cave.c:105
+msgid "Creature direction switch"
+msgstr "Lény irányváltó"
+
+#: src/cave.c:106
+msgid "Biter switch"
+msgstr "Zabáló kapcsoló"
+
+#: src/cave.c:107
+msgid "Acid"
+msgstr "Sav"
+
+#: src/cave.c:108
+msgid "Falling wall"
+msgstr "Zuhanó fal"
+
+#: src/cave.c:109
+msgid "Falling wall, falling"
+msgstr "Zuhanó fal (zuhanó)"
+
+#: src/cave.c:110
+msgid "Box"
+msgstr "Doboz"
+
+#: src/cave.c:111
+msgid "Time penalty"
+msgstr "Idő levonás"
+
+#: src/cave.c:112
+msgid "Gravestone"
+msgstr "Sírkő"
+
+#: src/cave.c:113
+msgid "Glued stone"
+msgstr "Ragasztott kő"
+
+#: src/cave.c:114
+msgid "Glued diamond"
+msgstr "Ragasztott gyémánt"
+
+#: src/cave.c:115
+msgid "Diamond key"
+msgstr "Gyémánt kulcs"
+
+#: src/cave.c:116
+msgid "Trapped diamond"
+msgstr "Bezárt gyémánt"
+
+#: src/cave.c:117
+msgid "Clock"
+msgstr "Óra"
+
+#: src/cave.c:118
+msgid "Glued dirt"
+msgstr "Ragasztott föld"
+
+#: src/cave.c:119
+msgid "Key 1"
+msgstr "1. kulcs"
+
+#: src/cave.c:120
+msgid "Key 2"
+msgstr "2. kulcs"
+
+#: src/cave.c:121
+msgid "Key 3"
+msgstr "3. kulcs"
+
+#: src/cave.c:122
+msgid "Door 1"
+msgstr "1. ajtó"
+
+#: src/cave.c:123
+msgid "Door 2"
+msgstr "2. ajtó"
+
+#: src/cave.c:124
+msgid "Door 3"
+msgstr "3. ajtó"
+
+#: src/cave.c:126
+msgid "Pot"
+msgstr "Üst"
+
+#: src/cave.c:127
+msgid "Gravity switch"
+msgstr "Gravitáció kapcsoló"
+
+#: src/cave.c:128
+msgid "Pneumatic hammer"
+msgstr "Légkalapács"
+
+#: src/cave.c:129
+msgid "Teleporter"
+msgstr "Teleport"
+
+#: src/cave.c:130
+msgid "Skeleton"
+msgstr "Csontváz"
+
+#: src/cave.c:131
+msgid "Water"
+msgstr "Víz"
+
+#: src/cave.c:132
+msgid "Water (1)"
+msgstr "Víz (1)"
+
+#: src/cave.c:133
+msgid "Water (2)"
+msgstr "VĂ­zÂˇ(2)"
+
+#: src/cave.c:134
+msgid "Water (3)"
+msgstr "Víz (3)"
+
+#: src/cave.c:135
+msgid "Water (4)"
+msgstr "Víz (4)"
+
+#: src/cave.c:136
+msgid "Water (5)"
+msgstr "Víz (5)"
+
+#: src/cave.c:137
+msgid "Water (6)"
+msgstr "Víz (6)"
+
+#: src/cave.c:138
+msgid "Water (7)"
+msgstr "Víz (7)"
+
+#: src/cave.c:139
+msgid "Water (8)"
+msgstr "Víz (8)"
+
+#: src/cave.c:140
+msgid "Water (9)"
+msgstr "Víz (9)"
+
+#: src/cave.c:141
+msgid "Water (10)"
+msgstr "Víz (10)"
+
+#: src/cave.c:142
+msgid "Water (11)"
+msgstr "Víz (11)"
+
+#: src/cave.c:143
+msgid "Water (12)"
+msgstr "Víz (12)"
+
+#: src/cave.c:144
+msgid "Water (13)"
+msgstr "Víz (13)"
+
+#: src/cave.c:145
+msgid "Water (14)"
+msgstr "Víz (14)"
+
+#: src/cave.c:146
+msgid "Water (15)"
+msgstr "Víz (15)"
+
+#: src/cave.c:147
+msgid "Water (16)"
+msgstr "Víz (16)"
+
+#: src/cave.c:148
+msgid "Cow (left)"
+msgstr "Tehén (bal)"
+
+#: src/cave.c:149
+msgid "Cow (up)"
+msgstr "Tehén (fel)"
+
+#: src/cave.c:150
+msgid "Cow (right)"
+msgstr "Tehén (jobb)"
+
+#: src/cave.c:151
+msgid "Cow (down)"
+msgstr "Tehén (le)"
+
+#: src/cave.c:152
+msgid "Cow (enclosed, 1)"
+msgstr "Tehén (bezárt, 1)"
+
+#: src/cave.c:153
+msgid "Cow (enclosed, 2)"
+msgstr "Tehén·(bezárt,·2)"
+
+#: src/cave.c:154
+msgid "Cow (enclosed, 3)"
+msgstr "Tehén·(bezárt,·3)"
+
+#: src/cave.c:155
+msgid "Cow (enclosed, 4)"
+msgstr "Tehén·(bezárt,·4)"
+
+#: src/cave.c:156
+msgid "Cow (enclosed, 5)"
+msgstr "Tehén·(bezárt,·5)"
+
+#: src/cave.c:157
+msgid "Cow (enclosed, 6)"
+msgstr "Tehén·(bezárt,·6)"
+
+#: src/cave.c:158
+msgid "Cow (enclosed, 7)"
+msgstr "Tehén·(bezárt,·7)"
+
+#: src/cave.c:159
+msgid "Walled diamond"
+msgstr "Befalazott gyémánt"
+
+#: src/cave.c:160
+msgid "Walled key 1"
+msgstr "Befalazott 1. kulcs"
+
+#: src/cave.c:161
+msgid "Walled key 2"
+msgstr "Befalazott 2. kulcs"
+
+#: src/cave.c:162
+msgid "Walled key 3"
+msgstr "Befalazott 3. kulcs"
+
+#: src/cave.c:164
+msgid "Amoeba"
+msgstr "Amőba"
+
+#: src/cave.c:165
+msgid "Sweet"
+msgstr "Cukorka"
+
+#: src/cave.c:166
+msgid "Voodoo doll"
+msgstr "Voodoo"
+
+#: src/cave.c:167
+msgid "Slime"
+msgstr "Iszap"
+
+#: src/cave.c:168
+msgid "Bladder"
+msgstr "Buborék"
+
+#: src/cave.c:169
+msgid "Bladder (1)"
+msgstr "Buborék (1)"
+
+#: src/cave.c:170
+msgid "Bladder (2)"
+msgstr "Buborék (2)"
+
+#: src/cave.c:171
+msgid "Bladder (3)"
+msgstr "Buborék (3)"
+
+#: src/cave.c:172
+msgid "Bladder (4)"
+msgstr "Buborék (4)"
+
+#: src/cave.c:173
+msgid "Bladder (5)"
+msgstr "Buborék (5)"
+
+#: src/cave.c:174
+msgid "Bladder (6)"
+msgstr "Buborék (6)"
+
+#: src/cave.c:175
+msgid "Bladder (7)"
+msgstr "Buborék (7)"
+
+#: src/cave.c:176
+msgid "Bladder (8)"
+msgstr "Buborék (8)"
+
+#: src/cave.c:177
+msgid "Bladder (9)"
+msgstr "Buborék (9)"
+
+#: src/cave.c:179
+msgid "Waiting stone"
+msgstr "Alvó kő"
+
+#: src/cave.c:180
+msgid "Chasing stone"
+msgstr "Üldöző kő"
+
+#: src/cave.c:181
+msgid "Ghost"
+msgstr "Szellem"
+
+#: src/cave.c:182
+msgid "Guard, left"
+msgstr "Szörny (balra)"
+
+#: src/cave.c:183
+msgid "Guard, up"
+msgstr "Szörny (fel)"
+
+#: src/cave.c:184
+msgid "Guard, right"
+msgstr "Szörny (jobbra)"
+
+#: src/cave.c:185
+msgid "Guard, down"
+msgstr "Szörny (le)"
+
+#: src/cave.c:186
+msgid "Alternative guard, left"
+msgstr "Alternatív·szörny, balra"
+
+#: src/cave.c:187
+msgid "Alternative guard, up"
+msgstr "Alternatív·szörny, jobbra"
+
+#: src/cave.c:188
+msgid "Alternative guard, right"
+msgstr "Alternatív szörny (jobbra)"
+
+#: src/cave.c:189
+msgid "Alternative guard, down"
+msgstr "Alternatív szörny, le"
+
+#: src/cave.c:190
+msgid "Butterfly, left"
+msgstr "Pillangó (balra)"
+
+#: src/cave.c:191
+msgid "Butterfly, up"
+msgstr "Pillangó (fel)"
+
+#: src/cave.c:192
+msgid "Butterfly, right"
+msgstr "Pillangó (jobbra)"
+
+#: src/cave.c:193
+msgid "Butterfly, down"
+msgstr "Pillangó (le)"
+
+#: src/cave.c:194
+msgid "Alternative butterfly, left"
+msgstr "Alternatív pillangó (balra)"
+
+#: src/cave.c:195
+msgid "Alternative butterfly, up"
+msgstr "Alternatív pillangó (fel)"
+
+#: src/cave.c:196
+msgid "Alternative butterfly, right"
+msgstr "Alternatív pillangó (jobbra)"
+
+#: src/cave.c:197
+msgid "Alternative butterfly, down"
+msgstr "Alternatív pillangó (le)"
+
+#: src/cave.c:198
+msgid "Stonefly, left"
+msgstr "Molylepke (balra)"
+
+#: src/cave.c:199
+msgid "Stonefly, up"
+msgstr "Molylepke (fel)"
+
+#: src/cave.c:200
+msgid "Stonefly, right"
+msgstr "Molylepke (jobbra)"
+
+#: src/cave.c:201
+msgid "Stonefly, down"
+msgstr "Molylepke (le)"
+
+#: src/cave.c:202
+msgid "Biter, up"
+msgstr "Zabáló (fel)"
+
+#: src/cave.c:203
+msgid "Biter, right"
+msgstr "Zabáló (jobbra)"
+
+#: src/cave.c:204
+msgid "Biter, down"
+msgstr "Zabáló (le)"
+
+#: src/cave.c:205
+msgid "Biter, left"
+msgstr "Zabáló (balra)"
+
+#: src/cave.c:207
+msgid "Player birth (1)"
+msgstr "Játékos születés (1)"
+
+#: src/cave.c:208
+msgid "Player birth (2)"
+msgstr "Játékos születés (2)"
+
+#: src/cave.c:209
+msgid "Player birth (3)"
+msgstr "Játékos születés (3)"
+
+#: src/cave.c:210 src/cave.c:362
+msgid "Player"
+msgstr "Játékos"
+
+#: src/cave.c:211
+msgid "Player with bomb"
+msgstr "Játékos bombával"
+
+#: src/cave.c:212
+msgid "Glued player"
+msgstr "Ragasztott játékos"
+
+#: src/cave.c:213
+msgid "Player stirring"
+msgstr ""
+
+#: src/cave.c:215
+msgid "Bomb"
+msgstr "Bomba"
+
+#: src/cave.c:216
+msgid "Ticking bomb (1)"
+msgstr "Robbanó bomba (1)"
+
+#: src/cave.c:217
+msgid "Ticking bomb (2)"
+msgstr "Robbanó bomba (2)"
+
+#: src/cave.c:218
+msgid "Ticking bomb (3)"
+msgstr "Robbanó bomba (3)"
+
+#: src/cave.c:219
+msgid "Ticking bomb (4)"
+msgstr "Robbanó bomba (4)"
+
+#: src/cave.c:220
+msgid "Ticking bomb (5)"
+msgstr "Robbanó bomba (5)"
+
+#: src/cave.c:221
+msgid "Ticking bomb (6)"
+msgstr "Robbanó bomba (6)"
+
+#: src/cave.c:222
+msgid "Ticking bomb (7)"
+msgstr "Robbanó bomba (7)"
+
+#: src/cave.c:224
+msgid "Clock birth (1)"
+msgstr "Óra születés (1)"
+
+#: src/cave.c:225
+msgid "Clock birth (2)"
+msgstr "Óra születés (2)"
+
+#: src/cave.c:226
+msgid "Clock birth (3)"
+msgstr "Óra születés (3)"
+
+#: src/cave.c:227
+msgid "Clock birth (4)"
+msgstr "Óra születés (4)"
+
+#: src/cave.c:228
+msgid "Diamond birth (1)"
+msgstr "Gyémánt születés (1)"
+
+#: src/cave.c:229
+msgid "Diamond birth (2)"
+msgstr "Gyémánt születés (2)"
+
+#: src/cave.c:230
+msgid "Diamond birth (3)"
+msgstr "Gyémánt születés (3)"
+
+#: src/cave.c:231
+msgid "Diamond birth (4)"
+msgstr "Gyémánt születés (4)"
+
+#: src/cave.c:232
+msgid "Diamond birth (5)"
+msgstr "Gyémánt születés (5)"
+
+#: src/cave.c:233
+msgid "Explosion (1)"
+msgstr "Robbanás (1)"
+
+#: src/cave.c:234
+msgid "Explosion (2)"
+msgstr "Robbanás (2)"
+
+#: src/cave.c:235
+msgid "Explosion (3)"
+msgstr "Robbanás (3)"
+
+#: src/cave.c:236
+msgid "Explosion (4)"
+msgstr "Robbanás (4)"
+
+#: src/cave.c:237
+msgid "Explosion (5)"
+msgstr "Robbanás (5)"
+
+#: src/cave.c:238
+msgid "Stone birth (1)"
+msgstr "Kő születés (1)"
+
+#: src/cave.c:239
+msgid "Stone birth (2)"
+msgstr "Kő születés (2)"
+
+#: src/cave.c:240
+msgid "Stone birth (3)"
+msgstr "Kő születés (3)"
+
+#: src/cave.c:241
+msgid "Stone birth (4)"
+msgstr "Kő születés (4)"
+
+#: src/cave.c:242
+msgid "Steel birth (1)"
+msgstr "Törhetetlen fal születés (1)"
+
+#: src/cave.c:243
+msgid "Steel birth (2)"
+msgstr "Törhetetlen fal születés (2)"
+
+#: src/cave.c:244
+msgid "Steel birth (3)"
+msgstr "Törhetetlen fal születés (3)"
+
+#: src/cave.c:245
+msgid "Steel birth (4)"
+msgstr "Törhetetlen fal születés (4)"
+
+#: src/cave.c:246
+msgid "Ghost explosion (1)"
+msgstr "Szellem robbanás (1)"
+
+#: src/cave.c:247
+msgid "Ghost explosion (2)"
+msgstr "Szellem robbanás (2)"
+
+#: src/cave.c:248
+msgid "Ghost explosion (3)"
+msgstr "Szellem robbanás (3)"
+
+#: src/cave.c:249
+msgid "Ghost explosion (4)"
+msgstr "Szellem robbanás (4)"
+
+#: src/cave.c:250
+msgid "Bomb explosion (1)"
+msgstr "Bomba robbanás (1)"
+
+#: src/cave.c:251
+msgid "Bomb explosion (2)"
+msgstr "Bomba robbanás (2)"
+
+#: src/cave.c:252
+msgid "Bomb explosion (3)"
+msgstr "Bomba robbanás (3)"
+
+#: src/cave.c:253
+msgid "Bomb explosion (4)"
+msgstr "Bomba robbanás (4)"
+
+#: src/cave.c:260
+msgid "Unknown element"
+msgstr "Ismeretlen elem"
+
+#: src/cave.c:261
+msgid "No element"
+msgstr "Nincs elem"
+
+#: src/cave.c:301
+msgid "Cave data"
+msgstr "Pálya adatai"
+
+#: src/cave.c:302 src/gtk_ui.c:574
+msgid "Name"
+msgstr "Név"
+
+#: src/cave.c:302
+msgid "Name of game"
+msgstr "Játék neve"
+
+#: src/cave.c:303 src/editor-export.c:526
+msgid "Description"
+msgstr "Leírás"
+
+#: src/cave.c:303
+msgid "Some words about the game"
+msgstr "Néhány szó a játékról"
+
+#: src/cave.c:304 src/editor-export.c:524
+msgid "Author"
+msgstr "Szerző"
+
+#: src/cave.c:304
+msgid "Name of author"
+msgstr "Szerző neve"
+
+#: src/cave.c:305
+msgid "Date"
+msgstr "Dátum"
+
+#: src/cave.c:305
+msgid "Date of creation"
+msgstr "Létrehozás időpontja"
+
+#: src/cave.c:306
+msgid "WWW"
+msgstr "WWW"
+
+#: src/cave.c:306
+msgid "Web page or e-mail address"
+msgstr "Honlap vagy e-mail cím"
+
+#: src/cave.c:307 src/cave.c:330
+msgid "Difficulty"
+msgstr "Nehézség"
+
+#: src/cave.c:307
+msgid "Difficulty (informative)"
+msgstr "Nehézség (informatív)"
+
+#: src/cave.c:308
+msgid "Remark"
+msgstr "Megjegyzés"
+
+#: src/cave.c:308
+msgid "Remark (informative)"
+msgstr "Megjegyzés (informatív)"
+
+#: src/cave.c:309 src/editor-export.c:528
+msgid "Selectable as start"
+msgstr "Kezdéskor kiválasztható"
+
+#: src/cave.c:309
+msgid "This sets whether the game can be started at this cave."
+msgstr "Azt jelzi, hogy a játékot lehet-e ezen a pályán kezdeni."
+
+#: src/cave.c:310 src/editor-export.c:527
+msgid "Intermission"
+msgstr "Jutalom pálya"
+
+#: src/cave.c:311
+msgid "   Instant life"
+msgstr "   Automatikus plusz élet"
+
+#: src/cave.c:311
+msgid ""
+"If true, an extra life is given to the player, when the intermission cave is "
+"reached."
+msgstr "Ha igaz, egy jutalom életet kap a játékos, amikor a pályát eléri."
+
+#: src/cave.c:312
+msgid "   Reward life"
+msgstr "   Jutalom élet, ha sikerül"
+
+#: src/cave.c:312
+msgid ""
+"If true, an extra life is given to the player, when the intermission cave is "
+"successfully finished."
+msgstr ""
+"Ha igaz, egy jutalom életet kap a játékos, ha sikeresen teljesíti a pályát."
+
+#: src/cave.c:313
+msgid "Width"
+msgstr "Szélesség"
+
+#: src/cave.c:313 src/cave.c:314
+msgid "Width and height of cave."
+msgstr "A pálya szélessége és magassága."
+
+#: src/cave.c:314
+msgid "Height"
+msgstr "Magasság"
+
+#: src/cave.c:315
+msgid "Visible, left"
+msgstr "Láthatóság, bal"
+
+#: src/cave.c:315 src/cave.c:316 src/cave.c:317 src/cave.c:318
+msgid "Visible parts of the cave, upper left and lower right corner."
+msgstr "A pálya látható része, bal felső és jobb alsó sarok."
+
+#: src/cave.c:316
+msgid "Visible, upper"
+msgstr "Láthatóság, felső"
+
+#: src/cave.c:317
+msgid "Visible, right"
+msgstr "Láthatóság, jobb"
+
+#: src/cave.c:318
+msgid "Visible, lower"
+msgstr "Láthatóság, alsó"
+
+#: src/cave.c:319
+msgid "Border color"
+msgstr "Háttérszín"
+
+#: src/cave.c:319
+msgid ""
+"Border color for C64 graphics. Only for compatibility, not used by GDash."
+msgstr ""
+"C64 színek esetén a keret színe. Csak kompatibilitási okokból; a GDash nem "
+"használja."
+
+#: src/cave.c:320
+msgid "Background color"
+msgstr "Háttérszín"
+
+#: src/cave.c:320
+msgid "Background color for C64 graphics"
+msgstr "C64 színek esetén a háttér színe"
+
+#: src/cave.c:321
+msgid "Color 1 (dirt)"
+msgstr "1. szín (föld)"
+
+#: src/cave.c:321
+msgid "Foreground color 1 for C64 graphics"
+msgstr "C64 színek esetén az 1-es előtérszín"
+
+#: src/cave.c:322
+msgid "Color 2 (steel wall)"
+msgstr "2. szín (törhetetlen fal)"
+
+#: src/cave.c:322
+msgid "Foreground color 2 for C64 graphics"
+msgstr "C64 színek esetén a 2-es előtérszín"
+
+#: src/cave.c:323
+msgid "Color 3 (brick wall)"
+msgstr "3. szín (téglafal)"
+
+#: src/cave.c:323
+msgid "Foreground color 3 for C64 graphics"
+msgstr "C64 színek esetén a 3-as előtérszín"
+
+#: src/cave.c:324
+msgid "Amoeba color"
+msgstr "Amőba szín"
+
+#: src/cave.c:324
+msgid "Amoeba color for C64 graphics"
+msgstr "C64 színek esetén az amőba színe"
+
+#: src/cave.c:325
+msgid "Slime color"
+msgstr "Iszap színe"
+
+#: src/cave.c:325
+msgid "Slime color for C64 graphics"
+msgstr "C64 színek esetén az iszap színe"
+
+#: src/cave.c:326
+msgid "Character set"
+msgstr "Rajzkészlet"
+
+#: src/cave.c:326
+msgid "Theme used for displaying the game. Not used by GDash."
+msgstr "A pálya kirajzolásához használt téma; a GDash nem figyeli."
+
+#: src/cave.c:327
+msgid "Font set"
+msgstr "Betűkészlet"
+
+#: src/cave.c:327
+msgid "Font used during the game. Not used by GDash."
+msgstr "A játék közben használt betűkészlet. Nem használja a GDash."
+
+#: src/cave.c:332
+msgid "<b>Diamonds</b>"
+msgstr "<b>Gyémántok</b>"
+
+#: src/cave.c:333 src/editor-export.c:529
+msgid "Diamonds needed"
+msgstr "Gyűjtendő gyémántok"
+
+#: src/cave.c:333
+msgid ""
+"Here zero means automatically count diamonds before level start. If "
+"negative, the value is subtracted from that. This is useful for totally "
+"random caves."
+msgstr ""
+"Ha ez a szám nulla, a program automatikusan megszámolja a gyémántokat "
+"indulás előtt. Ha negatív, az értékét kivonja az összes gyémántok számából. "
+"Ez a teljesen véletlenszerű pályáknál használható."
+
+#: src/cave.c:334
+msgid "Score for diamonds"
+msgstr "Pont a gyémántokért"
+
+#: src/cave.c:334
+msgid "Number of points per diamond collected, before opening the exit."
+msgstr "Ennyi pont jár gyémántonként, a kapu nyitása előtt."
+
+#: src/cave.c:335
+msgid "Score for extra diamonds"
+msgstr "Pont a plusz gyémántokért"
+
+#: src/cave.c:335
+msgid "Number of points per diamond collected, after opening the exit."
+msgstr "Ennyi pont jár gyémántonként, a kapu nyitása után."
+
+#: src/cave.c:336
+msgid "<b>Time</b>"
+msgstr "<b>Idő</b>"
+
+#: src/cave.c:337 src/editor-export.c:532
+msgid "Time (s)"
+msgstr "Idő (mp)"
+
+#: src/cave.c:337
+msgid "Time available to solve cave, in seconds."
+msgstr "A pálya megoldásához rendelkezésre álló idő, másodpercben."
+
+#: src/cave.c:338
+msgid "   PAL timing (slower seconds)"
+msgstr "   PAL időzítés (lassabb másodpercek)"
+
+#: src/cave.c:338
+msgid ""
+"On the PAL version of the C64 computer, the timer was actually slower than "
+"normal seconds. This flag is used to compensate for this. Most original "
+"games are authored for the PAL version."
+msgstr ""
+"A C64 számítógép PAL verziójánál az időzítő lassabb volt, mint az igazi "
+"másodpercek. Ez a beállítás használható, hogy ezt kompenzálja. A legtöbb "
+"eredeti pályát PAL rendszerű számítógéphez rajzolták."
+
+#: src/cave.c:340
+msgid "Score for time"
+msgstr "Pont az időért"
+
+#: src/cave.c:340
+msgid "Points for each seconds remaining, when the player exits the level."
+msgstr ""
+"Ennyi pont jár minden megmaradó másodpercért, amikor a játékos eléri a "
+"kijáratot."
+
+#: src/cave.c:341
+msgid "C64 scheduling"
+msgstr "C64 időzítés"
+
+#: src/cave.c:341
+msgid ""
+"This flag sets whether the game uses an emulation of the original timing "
+"(c64-style), or a more modern milliseconds-based timing."
+msgstr ""
+"Ez a változó azt állítja, hogy az eredeti, C64-es játékok ütemezését "
+"utánozza-e a program, vagy egy modernebb, pontos, ezredmásodperces ütemezést."
+
+#: src/cave.c:342
+msgid "   BD1 scheduling"
+msgstr "   BD1 ütemezés"
+
+#: src/cave.c:342
+msgid ""
+"The original game used a delay (empty loop) based timing of caves; this is "
+"selected by enabling this check box. The timing of the construction kit and "
+"later versions were more exact; emulation of that mode is selected by "
+"unchecking the box. This flag is ignored, when milliseconds-based timing is "
+"used for a cave."
+msgstr ""
+"Az eredeti játék egy egyszerű késleltetéssel (üres ciklussal) időzítette a "
+"pályákat; ez az üzemmód választható ki ezzel a beállítással. A régről ismert "
+"pályaszerkesztő és a későbbi változatok pontosabbak voltak; ez pedig a "
+"beállítás kikapcsolásával választható. Ha ezredmásodperc alapú késleltetést "
+"használ a pálya, akkor ezt a beállítást figyelmen kívül hagyja."
+
+#: src/cave.c:343
+msgid "Delay (c64-style)"
+msgstr "Sebesség (C64-szerű)"
+
+#: src/cave.c:343
+msgid ""
+"The length of the delay loop between game frames. Used when milliseconds-"
+"based timing is inactive, ie. C64 scheduling is on."
+msgstr ""
+
+#: src/cave.c:344
+msgid "Speed (ms)"
+msgstr "Sebesség (ezred mp)"
+
+#: src/cave.c:344
+msgid ""
+"Number of milliseconds between game frames. Used when milliseconds-based "
+"timing is active, ie. C64 scheduling is off."
+msgstr ""
+"Ennyi ezredmásodpercet vár a képkockák között. Akkor használja a program, ha "
+"az ezredmásodperc alapú időzítés aktív, vagyis a C64 időzítés ki van "
+"kapcsolva."
+
+#: src/cave.c:345
+msgid "Hatching delay"
+msgstr "Születés késleltetése"
+
+#: src/cave.c:345
+msgid ""
+"This value sets how much the cave will move until the player enters the "
+"cave. If C64 scheduling is used, then this is in seconds; if not, then it is "
+"in frames."
+msgstr ""
+"A kezdeti pálya mozgások száma, mielőtt a játékos megszületik. Ha C64 "
+"ütemezés van beállítva, ez másodperceket jelent; ha nem, akkor képkockákat."
+
+#: src/cave.c:346
+msgid "<b>Elements</b>"
+msgstr "<b>Karakterek</b>"
+
+#: src/cave.c:347
+msgid "Random seed value"
+msgstr "Véletlenszám kezdet"
+
+#: src/cave.c:347
+msgid ""
+"Random seed value controls the predictable random number generator, which "
+"fills the cave initially. If set to -1, cave is totally random every time it "
+"is played."
+msgstr ""
+"A véletlenszám kezdeti értéke a pálya kezdeti kitöltését szabályozza. Ha -1-"
+"re állítod, a pálya minden egyes játszás alkalmával teljesen máshogy néz ki."
+
+#: src/cave.c:364
+msgid "<b>Player movements</b>"
+msgstr "<b>Játékos mozgása</b>"
+
+#: src/cave.c:365
+msgid "Diagonal movements"
+msgstr "Átlós mozgások"
+
+#: src/cave.c:365
+msgid "Controls if the player can move diagonally."
+msgstr "Beállítja, hogy a játékos mozogat-e átlós (mind a nyolc) irányban."
+
+#: src/cave.c:366
+msgid "Uppermost player active"
+msgstr "Bal felső játékos aktív"
+
+#: src/cave.c:366
+msgid ""
+"In 1stB, cave is scrolled to the uppermost and leftmost player found, "
+"whereas in the original game to the last one. Chasing stones also follow the "
+"active player."
+msgstr ""
+"Az 1stB-ben a pálya képernyőn látható része a bal felső játékoshoz gördült, "
+"míg az eredeti játékban a legutolsó megtalálthoz. Az üldöző kövek is az "
+"aktív játékos után rohannak."
+
+#: src/cave.c:367
+msgid "Snap explosions"
+msgstr "Tűzgombbal robbanások"
+
+#: src/cave.c:367
+msgid "If this is set to true, snapping dirt will create small explosions."
+msgstr ""
+"Ha ez igazra van állítva, a föld tűzgombbal történő elcsenése kis "
+"robbanásokat hagy maga után."
+
+#: src/cave.c:368
+msgid "Probability of pushing stone (%)"
+msgstr "A kő eltolás valószínűsége (%)"
+
+#: src/cave.c:368
+msgid ""
+"Chance of player managing to push a stone, every game cycle he tries. This "
+"is the normal probability."
+msgstr ""
+"Annak esélye játék ciklusonként, hogy a játékos el tudja tolni a követ. Ez a "
+"normál valószínűség."
+
+#: src/cave.c:369
+msgid "Probability of pushing with sweet (%)"
+msgstr "A kő eltolás valószínűsége, cukorkával (%)"
+
+#: src/cave.c:369
+msgid ""
+"Chance of player managing to push a stone, every game cycle he tries. This "
+"is used after eating sweet."
+msgstr ""
+"Annak esélye játék ciklusonként, hogy a játékos el tudja tolni a követ. Ez a "
+"cukorka evés utáni valószínűség."
+
+#: src/cave.c:370
+msgid "<b>Clock</b>"
+msgstr "<b>Óra</b>"
+
+#: src/cave.c:371
+msgid "Time bonus for clock (s)"
+msgstr "Plusz idő az óráért (mp)"
+
+#: src/cave.c:371
+msgid "Bonus time when a clock is collected."
+msgstr "Az óra összegyűjtésekor járó plusz idő."
+
+#: src/cave.c:372
+msgid "<b>Pneumatic hammer</b>"
+msgstr "<b>Légkalapács</b>"
+
+#: src/cave.c:373
+msgid "Time for hammer (frames)"
+msgstr "Idő a kalapácshoz (képkocka)"
+
+#: src/cave.c:373
+msgid ""
+"This is the number of game frames, a pneumatic hammer is required to break a "
+"wall."
+msgstr ""
+"A játékbeli képkockák száma, amennyi idő szükséges a légkalapácsnak egy fal "
+"széttöréséhez."
+
+#: src/cave.c:374
+msgid "Hammered walls reappear"
+msgstr "Szétrombolt falak megjelennek"
+
+#: src/cave.c:374
+msgid ""
+"If this is set to true, walls broken with a pneumatic hammer will reappear "
+"later."
+msgstr ""
+"Ha ez igazra van állítva, a légkalapáccsal széttört falak újra meg fognak "
+"jelenni."
+
+#: src/cave.c:375
+msgid "   Timer for reappear (frames)"
+msgstr "   Újra megjelenés ideje (képkocka)"
+
+#: src/cave.c:375
+msgid ""
+"This sets the number of game frames, after hammered walls reappear, when the "
+"above setting is true."
+msgstr ""
+"Ez a képkockák számát állítja be, amennyi idő után a légkalapáccsal feltört "
+"falak újra megjelennek, ha a fenti beállítás engedélyezve van."
+
+#: src/cave.c:377
+msgid "<b>Voodoo Doll</b>"
+msgstr "<b>Voodoo</b>"
+
+#: src/cave.c:378
+msgid "Can collect diamonds"
+msgstr "Gyémántokat gyűjt"
+
+#: src/cave.c:378
+msgid "Controls if a voodoo doll can collect diamonds for the player."
+msgstr ""
+"Azt állítja, hogy a voodoo össze tudja-e gyűjteni a feje fölé eső "
+"gyémántokat."
+
+#: src/cave.c:379
+msgid "Dies if hit by a stone"
+msgstr "Kővel fejbevágható"
+
+#: src/cave.c:379
+msgid ""
+"Controls if the voodoo doll dies if it is hit by a stone. Then the player "
+"gets a time penalty."
+msgstr ""
+"Azt állítja, hogy a voodoo felrobban-e, ha fejbe vágja egy kő. Ha igen, idő "
+"levonás jár."
+
+#: src/cave.c:380
+msgid "Can be destroyed"
+msgstr "Elpusztítható"
+
+#: src/cave.c:380
+msgid ""
+"Controls if the voodoo can be destroyed by an explosion nearby. If not, it "
+"is converted to a gravestone, and you get a time penalty."
+msgstr ""
+"Azt állítja, hogy a voodoo eltűnik-e egy szomszédos robbanás hatására. Ha "
+"igen, akkor sírkő lesz belőle, és idő levonás jár."
+
+#: src/cave.c:381
+msgid "Time penalty (s)"
+msgstr "Idő levonás (mp)"
+
+#: src/cave.c:381
+msgid "Penalty time when the voodoo is destroyed by a stone."
+msgstr "Idő levonás, ha a voodoo figurát eltalálja egy kő."
+
+#: src/cave.c:384
+msgid "Active elements"
+msgstr "Aktív elemek"
+
+#: src/cave.c:386
+msgid "<b>Magic Wall</b>"
+msgstr "<b>Varázsfal</b>"
+
+#: src/cave.c:387
+msgid "Milling time (s)"
+msgstr "Idő (mp)"
+
+#: src/cave.c:387
+msgid "Magic wall will stop after this time, and it cannot be activated again."
+msgstr "A varázsfal ennyi idő után megáll, és nem lehet újra elindítani azt."
+
+#: src/cave.c:388
+msgid "Converts diamond to"
+msgstr "A gyémántokat ezzé változtatja"
+
+#: src/cave.c:388
+msgid ""
+"As a special effect, magic walls can convert diamonds to any other element."
+msgstr ""
+"Speciális hatásként a varázsfal a gyémántokat más elemmé is alakíthatja."
+
+#: src/cave.c:389
+msgid "Converts stone to"
+msgstr "A köveket ezzé változtatja"
+
+#: src/cave.c:389
+msgid ""
+"As a special effect, magic walls can convert stones to any other element."
+msgstr "Speciális hatásként a varázsfal a követket más elemmé is alakíthatja."
+
+#: src/cave.c:390
+msgid "Stops amoeba"
+msgstr "Az amőbát gyémánttá változtatja"
+
+#: src/cave.c:390
+msgid "When the magic wall is activated, it can convert amoeba into diamonds."
+msgstr "Amikor a varázsfal elindul, az amőbát gyémánttá változtathatja."
+
+#: src/cave.c:391 src/cave.c:398
+msgid "Timer waits for hatching"
+msgstr "Az időzítő megvárja a játékos születését"
+
+#: src/cave.c:391
+msgid ""
+"This determines if the magic wall timer starts before the player appearing. "
+"Magic can always be activated before that; but if this is set to true, the "
+"timer will not start."
+msgstr ""
+"Ez azt állítja, hogy a varázsfal időzítője elindul-e, mielőtt a játékos "
+"megszületik. Aktiválni bármelyik esetben lehet az előtt is; de ha ez igazra "
+"van állítva, az időzítő nem fog elindulni."
+
+#: src/cave.c:392
+msgid "Has sound"
+msgstr ""
+
+#: src/cave.c:392
+msgid "If true, the activated magic wall will have sound."
+msgstr ""
+
+#: src/cave.c:394
+msgid "<b>Amoeba</b>"
+msgstr "<b>Amőba</b>"
+
+#: src/cave.c:395
+msgid "Threshold (cells)"
+msgstr "Határ (cella)"
+
+#: src/cave.c:395
+msgid ""
+"If the amoeba grows more than this fraction of the cave, it is considered "
+"too big."
+msgstr ""
+"Ha az amőba nagyobbra nőtt, mint a pályának ekkora darabja, akkor túl "
+"nagynak számít."
+
+#: src/cave.c:396
+msgid "Slow growth time (s)"
+msgstr "Lassú növekedés (mp)"
+
+#: src/cave.c:396
+msgid "After this time, amoeba will grow very quick."
+msgstr "Ennyi idő után az amőba nagyon gyorsan fog nőni."
+
+#: src/cave.c:397
+msgid "Timer started immediately"
+msgstr "Időzítő rögtön indul"
+
+#: src/cave.c:397
+msgid ""
+"If this flag is enabled, the amoeba slow growth timer will start at the "
+"beginning of the cave, regardless of the amoeba being let free or not."
+msgstr ""
+"Ha ez a változó engedélyezve van, az amőba lassú növekedés időzítője a pálya "
+"elején elindul, függetlenül attól, hogy az amőba épp tud-e nőni vagy nem."
+
+#: src/cave.c:398
+msgid ""
+"This determines if the amoeba timer starts before the player appearing. "
+"Amoeba can always be activated before that; but if this is set to true, the "
+"timer will not start."
+msgstr ""
+"Ez azt állítja, hogy az amőba időzítő elindul-e, mielőtt a játékos "
+"megjelenik. Az amőba bármikor aktiválható az előtt is; de ha ez az érték "
+"igaz, a számláló nem indul el."
+
+#: src/cave.c:399
+msgid "Growth ratio, slow (%)"
+msgstr "Növekedési ráta, lassú (%)"
+
+#: src/cave.c:399
+msgid "This sets the speed at which a slow amoeba grows."
+msgstr "Ez a szám a lassú és a gyors amőba növekedési sebességét állítják."
+
+#: src/cave.c:400
+msgid "Growth ratio, fast (%)"
+msgstr "Növekedési ráta, gyors (%)"
+
+#: src/cave.c:400
+msgid "This sets the speed at which a fast amoeba grows."
+msgstr "Ez a számok gyors amőba növekedési sebességét állítja."
+
+#: src/cave.c:401
+msgid "If too big, converts to"
+msgstr "Túl nagyra nőve ezzé válik"
+
+#: src/cave.c:401
+msgid "Controls which element an overgrown amoeba converts to."
+msgstr "Beállítja, hogy milyen elemmé változik az amőba, ha túl nagyra nőtt."
+
+#: src/cave.c:402
+msgid "If enclosed, converts to"
+msgstr "Bezárva ezzé változik"
+
+#: src/cave.c:402
+msgid "Controls which element an enclosed amoeba converts to."
+msgstr ""
+"Beállítja, hogy milyen elemmé változzon az amőba, ha nem tud tovább nőni."
+
+#: src/cave.c:405
+msgid "More elements"
+msgstr "További elemek"
+
+#: src/cave.c:407
+msgid "<b>Slime</b>"
+msgstr "<b>Iszap</b>"
+
+#: src/cave.c:408
+msgid "Predictable"
+msgstr "Előre megjósolható"
+
+#: src/cave.c:408
+msgid ""
+"Controls if the predictable random generator is used for slime. It is "
+"required for compatibility with some older caves."
+msgstr ""
+"Azt állítja be, hogy az iszapon az elemek előre megjósolhatóan jutnak-e át. "
+"Régi pályákkal való kompatibilitás miatt szerepel ez az opció."
+
+#: src/cave.c:409
+msgid "Permeability (predictable, bit pattern)"
+msgstr "Viszkozitás (megjósolható, bitminta)"
+
+#: src/cave.c:409
+msgid ""
+"This controls the rate at which elements go through the slime. This one is "
+"for predictable slime, and the value is used for a bitwise AND function."
+msgstr ""
+"Ez azt állítja be, hogy az elemek milyen gyorsan jutnak át az iszapon. Ez a "
+"megjósolható iszaphoz tartozik, és az értéke egy bitenkénti ÉS művelet egyik "
+"operandusa lesz."
+
+#: src/cave.c:410
+msgid "Permeability (unpredictable, %)"
+msgstr "Viszkozitás (megjósolhatatlan, %)"
+
+#: src/cave.c:410
+msgid ""
+"This controls the rate at which elements go through the slime. Higher values "
+"represent higher probability of passing. This one is for unpredictable slime."
+msgstr ""
+"Ez azt állítja be, hogy az elemek milyen gyorsan jutnak át az iszapon. A "
+"nagyobb értékek az átjutás kisebb valószínűségét jelentik. Ez az érték a "
+"megjósolhatatlan iszaphoz való."
+
+#: src/cave.c:411 src/cave.c:412 src/cave.c:413 src/cave.c:414
+msgid "Eats this and converts to"
+msgstr "Ezt ezzé változtatja"
+
+#: src/cave.c:411 src/cave.c:412 src/cave.c:413 src/cave.c:414
+msgid ""
+"Slime can let other elements than stone and diamond go through. It always "
+"lets a waiting or a chasing stone pass, though."
+msgstr ""
+"Az iszapon a kövön és a gyémánton kívül más elem is átmehet. (Az alvó és az "
+"üldöző kövek egyébként bármikor átjuthatnak rajta.)"
+
+#: src/cave.c:416
+msgid "<b>Acid</b>"
+msgstr "<b>Sav</b>"
+
+#: src/cave.c:417
+msgid "Eats this element"
+msgstr "Ezt eszi"
+
+#: src/cave.c:417
+msgid ""
+"The element which acid eats. If it cannot find any, it simply disappears."
+msgstr "Az elem, amelyre a sav terjed. Ha nem talál ilyet, akkor eltűnik."
+
+#: src/cave.c:418
+msgid "Spread ratio (%)"
+msgstr "Terjedés sebessége (%)"
+
+#: src/cave.c:418
+msgid ""
+"The probability at which an acid will explode and eat neighbouring elements."
+msgstr "A sav robbanásának és terjedésének valószínűsége."
+
+#: src/cave.c:419
+msgid "Turns to this when spreading"
+msgstr "Terjedés közben ilyenné változik"
+
+#: src/cave.c:419
+msgid "If acid converts to explosion on spreading or not."
+msgstr "Ez azt állítja, hogy a sav robbanássá változik-e terjedéskor."
+
+#: src/cave.c:421
+msgid "<b>Biter</b>"
+msgstr "<b>Zabáló</b>"
+
+#: src/cave.c:422
+msgid "Delay (frame)"
+msgstr "Késleltetés (képkocka)"
+
+#: src/cave.c:422
+msgid "Number of frames biters wait between movements."
+msgstr "A képkockák száma, amennyit a zabálók várnak mozdulataik között."
+
+#: src/cave.c:423
+msgid "Eat this"
+msgstr "Ezt eszi"
+
+#: src/cave.c:423
+msgid "Biters eat this element. (They always eat dirt.)"
+msgstr "A zabálók ezt eszik. (A földet mindig megkajálják.)"
+
+#: src/cave.c:425
+msgid "<b>Bladder</b>"
+msgstr "<b>Buborék</b>"
+
+#: src/cave.c:426
+msgid "Bladders convert to clock by touching"
+msgstr "A buborékok ezáltal változnak órává"
+
+#: src/cave.c:428
+msgid "<b>Water</b>"
+msgstr "<b>Víz</b>"
+
+#: src/cave.c:429
+msgid "Water does not flow downwards"
+msgstr "Víz nem folyik lefelé"
+
+#: src/cave.c:429
+msgid ""
+"In CrDr, the water element had the odd property that it did not flow "
+"downwards, only in other directions. This flag emulates this behaviour."
+msgstr ""
+"A CrDr-ben a víz karakter azzal a furcsa tulajdonsággal rendelkezett, hogy "
+"lefelé nem folyt, csak más irányokba. A beállítás ezt a viselkedést emulálja."
+
+#: src/cave.c:432
+msgid "Effects"
+msgstr "Hatások"
+
+#: src/cave.c:434
+msgid "<b>Creature effects</b>"
+msgstr "<b>Lények beállításai</b>"
+
+#: src/cave.c:435
+msgid "Start backwards"
+msgstr "Hátrafelé indulnak"
+
+#: src/cave.c:436
+msgid "Automatically turn (s)"
+msgstr "Automatikus fordulás (s)"
+
+#: src/cave.c:436
+msgid ""
+"If this is greater than zero, creatures will automatically change direction "
+"in every x seconds."
+msgstr ""
+"Ha ez a szám nagyobb, mint nulla, akkor a lények ennyi másodpercenként "
+"automatikusan irányt fognak váltani."
+
+#: src/cave.c:437
+msgid "Automatically turn on start"
+msgstr "Automatikusan fordulnak a pálya elején"
+
+#: src/cave.c:437
+msgid ""
+"If this is set to true, creatures also turn at the start signal. If false, "
+"the first change in direction occurs only later."
+msgstr ""
+"Ha ez be van állítva, a szörnyek a pálya legelején is irányt váltanak. Ha "
+"nincs, akkor az első fordulás csak később történik."
+
+#: src/cave.c:439
+msgid "<b>Cave effects</b>"
+msgstr "<b>Pálya hatások</b>"
+
+#: src/cave.c:440
+msgid "Explosions convert to"
+msgstr "A robbanásokból ez lesz"
+
+#: src/cave.c:440
+msgid "This element appears in places where an explosion happens."
+msgstr "Ez a karakter jelenik meg ott, ahol egy robbanás történik."
+
+#: src/cave.c:441
+msgid "Diamond births convert to"
+msgstr "A gyémánt születésekből ez lesz"
+
+#: src/cave.c:442
+msgid "Bombs explode to"
+msgstr "A bombák robbanásából ez lesz"
+
+#: src/cave.c:443
+msgid "Falling stones convert to"
+msgstr "A zuhanó kövek ezzé változnak"
+
+#: src/cave.c:443
+msgid "When a stone begins falling, it converts to this element."
+msgstr "Amikor egy kő zuhanni kezd, ezzé változik."
+
+#: src/cave.c:444
+msgid "Bouncing stones convert to"
+msgstr "A leérkező kövek ezzé változnak"
+
+#: src/cave.c:444
+msgid "When a stone stops falling and rolling, it converts to this element."
+msgstr "Amikor egy kő nem tud tovább zuhanni vagy gurulni, ezzé változik."
+
+#: src/cave.c:445
+msgid "Falling diamonds convert to"
+msgstr "A zuhanó gyémántok ezzé változnak"
+
+#: src/cave.c:445
+msgid "When a diamond begins falling, it converts to this element."
+msgstr "Amikor egy gyémánt zuhanni kezd, ezzé az elemmé változik."
+
+#: src/cave.c:446
+msgid "Bouncing diamonds convert to"
+msgstr "A leérkező gyémántok ezzé változnak"
+
+#: src/cave.c:446
+msgid "When a diamond stops falling and rolling, it converts to this element."
+msgstr ""
+"Amikor egy gyémánt nem tud tovább zuhanni vagy gurulni, ilyen elemmé "
+"változik."
+
+#: src/cave.c:448
+msgid "<b>Visual effects</b>"
+msgstr "<b>Látvány hatások</b>"
+
+#: src/cave.c:449
+msgid "Expanding wall looks like"
+msgstr "Épülő fal így néz ki"
+
+#: src/cave.c:450
+msgid "Dirt looks like"
+msgstr "A föld így néz ki"
+
+#: src/cave.c:452
+msgid "<b>Gravitation effects</b>"
+msgstr "<b>Pálya hatások</b>"
+
+#: src/cave.c:453
+msgid "Gravitation"
+msgstr "Gravitáció"
+
+#: src/cave.c:453
+msgid "The direction where stones and diamonds fall."
+msgstr "A kövek és gyémántok esésének iránya."
+
+#: src/cave.c:454
+msgid "Skeletons needed for pot"
+msgstr "Csontvázak az üsthöz"
+
+#: src/cave.c:454
+msgid "The number of skeletons to be collected to be able to use a pot."
+msgstr "A csontvázak száma, amennyit gyűjteni kell az üst használatához."
+
+#: src/cave.c:455
+msgid "Gravitation switch delay"
+msgstr "Gravitáció kapcsoló késleltetés"
+
+#: src/cave.c:455
+msgid ""
+"The gravitation changes after a while using the gravitation switch. This "
+"option sets the number of seconds to wait."
+msgstr ""
+"A gravitáció kis idővel azután, hogy a gravitáció kapcsolót használtad. Ez a "
+"beállítás az időtartamot adja meg, másodpercben."
+
+#: src/cave.c:458
+msgid "Compatibility"
+msgstr "Kompatibilitás"
+
+#: src/cave.c:459
+msgid "Line shifting border"
+msgstr "Sor eltoló keret"
+
+#: src/cave.c:459
+msgid ""
+"If this is set to true, the player exiting on either side will appear one "
+"row lower or upper on the other side."
+msgstr ""
+"Ha ez az opció be van kapcsolva, a pálya egyik szélén kisétáló játékos egy "
+"sorral lejjebb vagy feljebb fog megjelenni a másik oldalon."
+
+#: src/cave.c:460
+msgid "Short explosions"
+msgstr "Rövid robbanások"
+
+#: src/cave.c:460
+msgid ""
+"In 1stB, explosions were longer, took five cave frames to complete, as "
+"opposed to four in the original."
+msgstr ""
+"A 1stB-ben a robbanások öt képkockán keresztül tartottak, a régebbi "
+"játékokban pedig csak négyen keresztül."
+
+#: src/cave.c:461
+msgid "Skeletons worth diamonds"
+msgstr "Csontvázak ennyi gyémántot érnek"
+
+#: src/cave.c:461
+msgid "The number of diamonds each skeleton is worth."
+msgstr "A gyémántok száma, amennyit egy csontváz ér."
+
+#: src/game.c:149
+#, c-format
+msgid "Snapshot of %s"
+msgstr "Pillanatfelvétel %s pályáról"
+
+#: src/help.c:37
+msgid ""
+"The primary objective of this game is to collect required number of diamonds "
+"in defined time and exit the cave. You control your player's movement to "
+"solve given cave."
+msgstr ""
+"Ennek a játéknak az a lényege, hogy valahány gyémántot összegyűjts a "
+"megadott idő alatt, és megkeresd a kijáratot. A játékos figurát te irányítod "
+"az adott feladvány megoldásához."
+
+#: src/help.c:39
+msgid "Caves"
+msgstr "A pályák"
+
+#: src/help.c:40
+msgid ""
+"The game comes with many built-in and pre-installed cave sets, and you can "
+"also make up your own levels. Just use the options in the File menu. You can "
+"load caves stored in the BDCFF format, and import from other older file "
+"formats, like the No One's Final Boulder, the Construction Kit file format, "
+"No One's Delight Boulder, an Atari game format, and many more."
+msgstr ""
+"A játék sok beépített és telepített pályagyűjteménnyel rendelkezik, és te is "
+"tervezhetsz pályákat. Használd a Fájl menű opcióit. A játék képes betölteni "
+"a BDCFF formátumban elmentett pályákat, és régebbi formátumúakat is, mint "
+"például a No One's Final Boulder, a régi pályaszerkesztő, a No One's Delight "
+"Boulder. egy régi Atari formátumot, és másokat."
+
+#: src/help.c:45
+msgid "Playing the game"
+msgstr "A játék"
+
+#: src/help.c:46
+msgid ""
+"To play the game, press the New Game button. You can select which level you "
+"start playing at. During the game, you can control your player with the "
+"cursor keys. The Ctrl key has a special meaning: you can snap items, ie. "
+"pick up things without moving. If you get stuck, press Escape to restart the "
+"level. If there are too many players in the cave and you cannot move, "
+"pressing F2 causes the active one to explode. With F11, you can switch to "
+"full screen mode.\n"
+"These are the game elements:"
+msgstr ""
+"A játék indításához kattints az Új játék gombra. A felugró ablakban "
+"kiválaszthatod, melyik pályán kezded a játékot. A figurát a kurzor "
+"billentyűkkel irányíthatod. A Ctrl billentyű segítségével el tudsz csenni "
+"elemeket, vagyis fölveheted őket anélkül, hogy mozognál. Ha beragadtál, az "
+"Escape billentyűvel kezdheted újra a pályát. Az F11 billentyűvel pedig "
+"teljes képernyős módba válthatsz.\n"
+"A játék elemei a következőek:"
+
+#: src/help.c:47
+msgid ""
+"This is the player. He can move through space and dirt. He can pick up "
+"diamonds and push stones, but he should avoid flies."
+msgstr ""
+"Ez a játékos. Üres helyen, és földön keresztül tud mozogni. Gyémántokat tud "
+"gyűjteni, és köveket tolni; de más lényektől távol kell tartsa magát."
+
+#: src/help.c:48
+msgid "Stones and diamonds fall down in space, creatures can freely move here."
+msgstr ""
+"A kövek és a gyémántok leesnek az üres helyen, és különböző lények is tudnak "
+"itt mozogni."
+
+#: src/help.c:49
+msgid "You can move through dirt leaving empty space behind. Amoeba eats it."
+msgstr ""
+"A földön keresztül mozoghatsz, üres helyet hagyva magad után. Az amőba is "
+"áthatol rajta."
+
+#: src/help.c:50
+msgid ""
+"This is also dirt, but has a different colour. In any other sense, it is "
+"identical to the above one."
+msgstr "Ez is föld, de más színű. Minden szempontból megegyezik az előzővel."
+
+#: src/help.c:51
+msgid "The main object of the game is to collect required number of diamonds."
+msgstr ""
+"A játék lényege, hogy egy megadott számú gyémántot össze kell gyűjteni."
+
+#: src/help.c:52
+msgid ""
+"Stones can be pushed by the player, and he can drop them on flies to make an "
+"explosion."
+msgstr ""
+"A köveket el tudja tolni a játékos, és a legyek fejére tudja dobni, hogy egy "
+"robbanás keletkezzen."
+
+#: src/help.c:53
+msgid ""
+"The wall can't be moved but an explosion destroys it. You can't pass through "
+"the wall - instead try to blow it up."
+msgstr ""
+"Ez a fal nem mozdítható, de egy robbanás lerombolja. Nem tudsz "
+"keresztülmenni rajta."
+
+#: src/help.c:54
+msgid "This is rock stable wall. It's impossible to move or blow it up."
+msgstr "Ez a fal törhetetlen. Lehetetlen megmozdítani vagy felrobbantani."
+
+#: src/help.c:55
+msgid ""
+"After collecting the required number of diamonds, look for a flashing out "
+"box to exit the cave. Closed out box looks like steel wall, but beware of "
+"explosions near the out box: you could accidentally destroy an exit. This "
+"prevents you from successfully finishing the cave."
+msgstr ""
+"A megfelelő számú gyémánt összegyűjtése után keresd a villogó kijáratot, "
+"hogy a következő pályára juss. A bezárt kijárat törhetetlen falnak néz ki, "
+"de vigyázz a robbantgatással: ha véletlenül felrobbanthatod ezt is, nem "
+"tudod befejezni a pályát."
+
+#: src/help.c:58
+msgid ""
+"This is also an exit, but it remains non-flashing and thus is difficult to "
+"find."
+msgstr ""
+"Ez is egy kijárat, de nem villog, ha nyitva van, és így nehéz megtalálni."
+
+#: src/help.c:59
+msgid "Guard"
+msgstr "Szörny"
+
+#: src/help.c:59
+msgid ""
+"Guards move through the space. They can fly in the entire cave. Guards blow "
+"up when hit by falling stone or diamond. Amoeba is also deadly for them. "
+"They explode into space, producing 3x3 square of empty space. Guards are "
+"left spinning - they prefer turning left, usually counter clockwise."
+msgstr ""
+"A legyek az üres járatokon keresztül mozognak, mindenfelé az egész pályán. "
+"Ha egy kővel vagy gyémánttal fejbe vágod őket, felrobbannak. Az amőba "
+"úgyszint halálos számukra. Robbanás után egy 3x3-as üres négyzet marad "
+"utánuk. Balra pörögnek, vagyis általában az óramutató járásával ellentétes "
+"irányba szeretnek fordulni."
+
+#: src/help.c:60
+msgid "Alternative guard"
+msgstr "Alternatív szörny"
+
+#: src/help.c:60
+msgid "Just like a normal guard, but it is right spinning."
+msgstr "Mint egy rendes szörny, csak jobbra fordul."
+
+#: src/help.c:61
+msgid "Butterfly"
+msgstr "Pillangó"
+
+#: src/help.c:61
+msgid ""
+"Butterflies are similar to guards. In contrast to guards they explode into "
+"diamonds, producing 3x3 square of diamonds. Butterflies are right spinning, "
+"they usually fly clockwise."
+msgstr ""
+"A pillangók a legyekhez hasonlóak, de azokkal ellentétben gyémántokká "
+"lesznek. A pillangók jobbra szeretnek fordulni, az óramutató járásával "
+"egyező irányba pörögnek."
+
+#: src/help.c:62
+msgid "Alternative butterfly"
+msgstr "Alternatív·pillangó"
+
+#: src/help.c:62
+msgid "Just like a normal butterfly, but it is left spinning."
+msgstr "Mint egy rendes pillangó, csak balra fordul."
+
+#: src/help.c:63
+msgid "Stonefly"
+msgstr "Molylepke"
+
+#: src/help.c:63
+msgid ""
+"This flying moth behaves just like a butterfly, except that it explodes into "
+"stones instead of diamonds."
+msgstr ""
+"Ez a repkedő moly pontosan úgy viselkedik, mint egy lepke, csak robbanáskor "
+"kövek keletkeznek gyémánt helyett."
+
+#: src/help.c:64
+msgid "Cow"
+msgstr "Tehén"
+
+#: src/help.c:64
+msgid ""
+"This creature wanders around the cave like a guard, but you can touch it. If "
+"it is enclosed, it turns into a skeleton."
+msgstr ""
+"Ez a lény a pályán egy szörnyhöz hasonlóan kering, viszont meg szabad "
+"érinteni. Ha be van zárva, csontvázzá változik."
+
+#: src/help.c:65
+msgid ""
+"This is ghost which wanders aimlessly. If it touches you, it will explode in "
+"an x-shape to many different elements."
+msgstr ""
+"Ez egy céltalanul bolyongó szellem. Ha hozzád ér, egy x-alakú robbanás "
+"kíséretében különböző elemekké alakul."
+
+#: src/help.c:66
+msgid "Biter"
+msgstr "Zabáló"
+
+#: src/help.c:66
+msgid ""
+"Biters will eat all the dirt they can reach. They move in a predictable way. "
+"They also can eat diamonds, so better don't let them be taken away. They "
+"will move through stones throwing them behind if there is no space for "
+"turning. That way, you can get rid of stones blocking your way."
+msgstr ""
+"A zabálók minden földet megesznek, amit elérnek. Megjósolható úton haladnak. "
+"Megeszik a gyémántokat is, úgyhogy ne hagyd, hogy elvesszenek azok. A "
+"köveket maguk mögé dobva is képesek tovább haladni, ha nincs helyük a "
+"forduláshoz. Így néha meg tudsz szabadulni az utadat elálló kövektől."
+
+#: src/help.c:67
+msgid ""
+"A chasing stone looks like an ordinary stone, it can even pass slime. It is "
+"lightweight, you can push it at once, as long as it is sleeping. Once it "
+"begins to fall, it wakes up and begins chasing you. You can also push "
+"awakened stones, if you have eaten the sweet."
+msgstr ""
+"Az üldöző kő teljesen úgy néz ki, mint egy normális, még az iszapon "
+"keresztül is átjut. Elég könnyű, egyből el tudod tolni, amíg alszik. Ha "
+"zuhanni kezd, felébred, és üldözni kezd téged. A felébredt köveket is "
+"eltolhatod, ha ettél cukorkát."
+
+#: src/help.c:68
+msgid ""
+"Amoeba grows randomly through space and dirt. When it is closed, stops "
+"growing and transforms into diamonds. When it is grown too big, it suddenly "
+"transforms into stones. At the beginning it can grow slowly, but after some "
+"time it starts growing very rapidly."
+msgstr ""
+"Az amőba véletlenszerűen terjeszkedik az üres helyen és a földön keresztül. "
+"Ha nem tud tovább növekedni, megáll és gyémántokká változik. Ha túl nagyra "
+"nő, akkor hirtelen kvek lesznek belőle. A pálya elején általában lassan kezd "
+"nőni, de egy idő után hirtelen felgyorsul."
+
+#: src/help.c:69
+msgid ""
+"Slime is permeable. It means that stones and diamonds laying on the slime "
+"can randomly pass on."
+msgstr ""
+"Az iszap áthatolható: a kövek és a gyémántok véletlenszerűen az "
+"átkerülhetnek az aljára."
+
+#: src/help.c:70
+msgid ""
+"Acid eats dirt. Sometimes it spreads in all four directions, leaving a small "
+"explosion behind. If there is no dirt to swallow, it just disappears."
+msgstr ""
+"A sav a földön keresztül halad. Néha mind a négy irányban terjed, egy kis "
+"robbanást hagyva maga után. Ha nincs széna körülötte, simán csak eltűnik."
+
+#: src/help.c:71
+msgid "Water, which floods all empty space slowly."
+msgstr "Víz, amely szép lassan az összes üres részt elárasztja."
+
+#: src/help.c:72
+msgid ""
+"This very special wall converts stones into diamonds and vice versa. Note "
+"that a magic wall can only be activated for some limited time."
+msgstr ""
+"Ez a speciális fal a köveket gyémánttá változtatja, és fordítva. Fontos, "
+"hogy a varázsfal csak egyszer indítható el, akkor is csak egy rövid ideig."
+
+#: src/help.c:73
+msgid ""
+"Expanding wall expands in horizontal or vertical (or both) direction, if "
+"there is an empty space to fill up. You should be very careful not to be "
+"catched by the expanding wall."
+msgstr ""
+"Az épülő fal vízszintes vagy függőleges (vagy mindkét) irányba terjeszkedik, "
+"ha üres hely van mellette. Vigyáznod kell, hogy be ne szorítson valahova."
+
+#: src/help.c:74
+msgid ""
+"Whenever there is a falling wall above the player merely separated by empty "
+"space, it starts falling. It does so at any distance. If it hits the player, "
+"it explodes. If hit on anything else, it just stops."
+msgstr ""
+"Ha egy zuhanó fal van a játékos feje felett, és köztük csak üres hely, akkor "
+"elkezd lefelé esni; bármilyen távolságból. Ha fejen találja a játékost, az "
+"felrobban. Ha bármi mással ütközik, simán csak megáll."
+
+#: src/help.c:75
+msgid ""
+"You can pick up this bomb like a diamond. To use it, press control and a "
+"direction... and then quickly run away! You can hold only one bomb at a time."
+msgstr ""
+"A bombát fölveheted, mint egy gyémántot. A használathoz nyomd meg a Ctrl "
+"billentyűt és egy irányt... aztán gyorsan fuss el! Egyszerre csak egy bomba "
+"lehet nálad."
+
+#: src/help.c:76
+msgid ""
+"Eat this sweet and you will become strong. You will be able to push stones "
+"at once. You will also be able to push chasing stones."
+msgstr ""
+"Edd meg ezt a cukorkát, és erős leszel. Egyből el tudod majd tolni a "
+"köveket, még a felébredt üldözőket is."
+
+#: src/help.c:78
+msgid "This is an indestructible door with a diamond."
+msgstr "Ez egy felrobbanthatatlan ajtó, amely egy gyémánt rejt."
+
+#: src/help.c:79
+msgid ""
+"If you get this key, all doors will convert into diamonds you can collect."
+msgstr ""
+"Ha megszerzed a kulcsot, az összes ajtó kinyílik, és gyémánt lesz a helyükön."
+
+#: src/help.c:80
+msgid "Keys"
+msgstr "Kulcsok"
+
+#: src/help.c:80
+msgid ""
+"There are three types of keys, which open three different coloured doors. "
+"You can collect more from these; and for every door, always one key is used."
+msgstr ""
+"Három fajta kulcs van, amelyek három különböző színű ajtót nyitnak. Többet "
+"is össze lehet gyűjteni, és minden ajtóhoz egy kulcs lesz felhasználva."
+
+#: src/help.c:81
+msgid "Doors"
+msgstr "Ajtók"
+
+#: src/help.c:81
+msgid "This is a door which can only be opened by the key of the same colour."
+msgstr "Ez egy ajtó, amelyet csak az ugyanilyen színű kulcs tud kinyitni."
+
+#: src/help.c:82
+msgid ""
+"Sometimes you have to block a passage, for example to protect a voodoo. This "
+"is when a box like this comes handy. You can push it in every direction "
+"using the Ctrl key."
+msgstr ""
+"Néha el kell zárnod egy utat. például hogy egy voodoo figurát megvédj. Erre "
+"jó egy ilyen doboz, ugyanis bármilyen irányba tolhatod a Ctrl billentyű "
+"segítségével."
+
+#: src/help.c:83
+msgid ""
+"Sometimes diamonds or keys are buried in brick walls. You can use a "
+"pneumatic hammer to break these walls, or simple brick walls which contain "
+"nothing. Stand on something, and press fire and left or right to use the "
+"hammer on a wall which is near the player, next to the element you stand on."
+msgstr ""
+"Néha gyémántok vagy kulcsok vannak befalazva téglával. A légkalapáccsal "
+"lehet kibontani ezeket a falakat, vagy bármilyen egyéb téglafalat, amely nem "
+"rejt semmit. Áll rá valamire, nyomd meg a tűzgombot és a balra vagy a jobbra "
+"gombot a légkalapács használatához, hogy feltörd a melletted lévő falat."
+
+#: src/help.c:84
+msgid "Collect this to get extra time."
+msgstr "Gyűjtsd ezt össze, hogy plusz időhöz juss."
+
+#: src/help.c:85
+msgid ""
+"Bladders can be pushed around easily. They slowly climb up; if they touch a "
+"voodoo, they convert into clocks. They can also pass slime."
+msgstr ""
+"A buborékokat könnyen tologathatod ide-oda. Lassan felfelé másznak; ha egy "
+"voodoo figurához társadhoz érnek, órává alakulnak. Az iszapon is át tudnak "
+"menni."
+
+#: src/help.c:86
+msgid "If there is space above it, the bladder spender turns to a bladder."
+msgstr ""
+
+#: src/help.c:87
+msgid ""
+"This is your player's look-alike. You must protect him against flies. If a "
+"voodoo dies by one of them, your player dies immediately too. This doll can "
+"have different properties: sometimes it can collect diamonds for you. "
+"Sometimes it must be also protected from falling stones, as if hit by a "
+"stone, it turns into a gravestone surrounded by steel walls. Also, it may or "
+"may not turn into a gravestone by nearby explosions."
+msgstr ""
+"Ez a játékos hasonmása. Védened kell a lényektől. Ha bármikor is hozzáér "
+"egy, a játékos is meghal vele együtt. Ez a figura különböző tulajdonságokkal "
+"rendelkezhet, például gyűjtheti a gyémántokat neked. Néha a zuhanó kövektől "
+"is meg kell védeni, mert fejbe vágva felrobban és egy sírkővé változik, "
+"fallal körülvéve. Esetleg egy szomszédos robbanástól is sírkővé változhat."
+
+#: src/help.c:88
+msgid ""
+"The teleporter will move you from one place to another, if you step into it. "
+"The destination teleporter depends on which direction you step the current "
+"one into."
+msgstr ""
+
+#: src/help.c:89
+msgid ""
+"Stir the pot, and then you will be able to use the gravitation switch. While "
+"you are stirring the pot, there is no gravitation at all. Press fire after "
+"using the pot."
+msgstr ""
+
+#: src/help.c:90
+msgid ""
+"Sometimes you have to collect skeletons before you can use the pot. In some "
+"other caves, they must be collected like diamonds to open the exit."
+msgstr ""
+"Néha csontvázakat kell gyűjteni, mielőtt használni tudod az üstöt. Más "
+"pályákon, a gyémántokhoz hasonlóan a kijáratot nyitják."
+
+#: src/help.c:91
+msgid ""
+"When this switch is active, you can use it to change the gravitation. The "
+"direction from which you use it will determine the direction the gravitation "
+"will change to."
+msgstr ""
+"Amikor a kapcsoló aktív, a gravitáció irányát lehet megváltoztatni vele. "
+"Amelyik oldalról meglököd, az választja ki a gravitáció következő irányát."
+
+#: src/help.c:92
+msgid "With this switch you can controll the direction of the expanding wall."
+msgstr "Ezzel a kapcsolóval az épülő falak iránya változtatható."
+
+#: src/help.c:93
+msgid ""
+"With this you can change the direction of creatures, like guards and "
+"butterflies. Sometimes it works automatically."
+msgstr ""
+"Ezzel a kapcsolóval a legyek, a pillangók, és más lények iránya "
+"változtatható. Néha automatikusan működik."
+
+#: src/help.c:94
+msgid "This switch controls the speed of biters."
+msgstr "Ez a kapcsoló a zabálók sebességét állítja."
+
+#: src/help.c:95
+msgid "Strange elements"
+msgstr "Furcsa elemek"
+
+#: src/help.c:95
+msgid ""
+"Some caves contain strange elements, for example, diamonds which cannot be "
+"collected, a player that cannot move... Don't be surprised!"
+msgstr ""
+"Némelyik pálya furcsa elemeket tartalmaz, például összegyűjthetetlen "
+"gyémántokat, mozdulatlan játékosokat... Ne lepődj meg!"
+
+#: src/help.c:97
+msgid "Snapshots"
+msgstr "Pillanatfelvételek"
+
+#: src/help.c:97
+msgid ""
+"You can experiment with levels by saving and reloading snapshots. However, "
+"if you are playing a reloaded cave, you will not get score or extra lives."
+msgstr ""
+"A pályákkal kísérletezhetsz, pillanatfelvételek mentésével. Viszont ha "
+"visszatöltesz egy ilyet, akkor már nem kapsz pontokat, és nem szerezhetsz "
+"további életeket."
+
+#: src/help.c:98
+msgid "Themes"
+msgstr "Témák"
+
+#: src/help.c:98
+msgid ""
+"The game also supports themes. You can use the installed png file as a "
+"template. Cells can have any arbitrary size, not necessarily 16x16 pixels. "
+"However, they must be squares. If the image has only a small number of "
+"colours (fully saturated red for foreground colour 1, fully saturated green "
+"for amoeba...), the game will use original C64 colours, different ones for "
+"every cave. Whether the png file is interpreted as a true colour image or "
+"one with C64 colours, depends on the colour values used, and is "
+"autodetected. An image file with only #000000, #00FF00 and the like is taken "
+"as a C64 theme.\n"
+"For C64 themes, the meaning of colors are these:\n"
+"- Transparent: you should use it everywhere where there is no drawing.\n"
+"- Black 0x000000: background color.\n"
+"- Red 0xff0000: foreground color 1.\n"
+"- Purple 0xff00ff: foreground color 2.\n"
+"- Yellow 0xffff00: foreground color 3.\n"
+"- Green 0x00ff00: amoeba.\n"
+"- Blue 0x0000ff: slime.\n"
+"- Cyan 0x00ffff: used internally for the editor, will be converted to black "
+"pixels around arrows.\n"
+"- White 0xffffff: for the editor; will the color of arrows.\n"
+msgstr ""
+"Ez a játék a témákat is támogatja. A telepítő által bemásolt png fájlt "
+"használhatod sablonként. A cellák tetszőleges méretűek lehetnek, nem "
+"feltétlenül 16x16 képpontosak. A lényeg viszont, hogy négyzet alakúak "
+"legyenek. Ha a kép csak néhány színt tartalmaz (teljesen telített pirosat az "
+"első előtér színhez, teljesen telített zöldet az amőbához...), akkor a GDash "
+"eredeti C64 színeket fog használni, minden pályához különbözőt. Hogy a png "
+"fájlt egy valós színű témaként vagy C64 témaként értelmezi a program, a "
+"benne lévő színektől függ, és automatikusan érzékelt. Egy olyan kép, amely "
+"csak #000000, #00FF00 és hasonló színeket használ, C64 témaként kerül a "
+"programba.\n"
+"A C64 témáknál az egyes színek jelentése a következő:\n"
+"- Átlátszó: ezt kell használni mindenhol, ahol nincs rajz.\n"
+"- Fekete 0x000000: háttérszín.\n"
+"- Vörös 0xff0000: 1. előtérszín.\n"
+"- Lila 0xff00ff: 2. előtérszín.\n"
+"- Sárga 0xffff00: 3. előtérszín.\n"
+"- Zöld 0x00ff00: amőba.\n"
+"- Kék 0x0000ff: iszap.\n"
+"- Türkiz 0x00ffff: a szerkesztő használja, és fekete színné lesz alakítva a "
+"nyilak körül.\n"
+"- Fehér 0xffffff: a szerkesztőhöz; a nyilak színe.\n"
+
+#: src/help.c:113
+msgid "Some words of warning"
+msgstr "Néhány megjegyzés"
+
+#: src/help.c:114
+msgid ""
+"- Importing may not be complete and correct for all games and engines. There "
+"may be some unplayable caves, as older games had no precise timing.\n"
+"- As the game is sometimes changed, highscores may be lost due to the "
+"changing checksums generated.\n"
+"- Default values for cave properties are sometimes changed, as the file "
+"format evolves. Some properties might change if a caveset is loaded, which "
+"was saved with an older version.\n"
+msgstr ""
+
+#: src/help.c:127
+msgid ""
+"This editor lets you create your own levels and cave sets. It can operate in "
+"two modes, a game editor mode, and a cave edit mode.\n"
+msgstr ""
+"A pályaszerkesztő segítségével létrehozhatod a saját pályáidat és "
+"játékaidat. Két különböző üzemmódban működik, ezek a játékszerkesztő és a "
+"pályaszerkesztő. \n"
+
+#: src/help.c:128
+msgid "Game editor"
+msgstr "Játékszerkesztő"
+
+#: src/help.c:128
+msgid ""
+"In this one, you are presented with an overview of your game. You can click "
+"on any cave to select it. Then you can select File|Edit Cave to view or "
+"modify the particular cave. You can also use the standard clipboard actions "
+"like cut and paste, also between different games. You can reorder the caves "
+"with your mouse, simply by using drag and drop. To create a new cave, select "
+"File|New Cave."
+msgstr ""
+"Ebben a módban a játékod áttekintését látod. A pályákra kattintva "
+"kijelölheted azokat, azután pedig a Fájl|Szerkesztés gombbal nézheted vagy "
+"szerkesztheted a kiválasztottat. A szokásos vágólap műveletek, mint a "
+"kivágás és beillesztés, itt is használhatóak, illetve különböző játékok "
+"között. A pályák átrendezéséhez a megszokott fogd-és-vidd módszert használd! "
+"Új pálya létrehozásához kattints a Fájl|Új pálya menüpontra."
+
+#: src/help.c:129
+msgid "Cave editor"
+msgstr "Pályaszerkesztő"
+
+#: src/help.c:129
+msgid "In this mode, you can edit a cave."
+msgstr "Ebben a módban a pályákat szerkesztheted."
+
+#: src/help.c:130
+msgid "How a cave is generated"
+msgstr "Hogyan jön létre egy pálya?"
+
+#: src/help.c:130
+msgid ""
+"A cave is built up of different objects. First, it is filled with random "
+"elements, of which there can be five. The probabilities of each can be set. "
+"(This random data can be substituted by a cave map, which was required for "
+"the ability to import different file formats, used by other games.)"
+msgstr ""
+"Egy pálya különböző objektumokból áll. Először, véletlenszerűen kitölti a "
+"program véletlenszerű elemekkel; ezekből öt lehet. Az egyes elemek "
+"valószínűségét be lehet állítani. (A véletlen elemeket bizonyos esetekben "
+"egy térkép helyettesíti. Erre régebbi játékok és fájl formátumok importálása "
+"miatt van szükség.)"
+
+#: src/help.c:131
+msgid ""
+"After this step, series of cave objects are rendered over the random data, "
+"which can be of various types: points, lines, rectangles and so. These are "
+"the following:"
+msgstr ""
+"Ezután, különböző pálya objektumokat rajzol a program a véletlen kitöltés "
+"fölé. Ezek többfélék lehetnek: pontok, vonalak, téglalapok stb. Az elérhető "
+"objektumok a következőek:"
+
+#: src/help.c:132
+msgid "This is a single element. Click anywhere on the cave map to create one."
+msgstr ""
+"Egyetlen elem, egy pont. A térképre bárhova kattintva lehet lérehozni egyet."
+
+#: src/help.c:133
+msgid "Freehand"
+msgstr "Szabadkézi"
+
+#: src/help.c:133
+msgid ""
+"This is a freehand editing tool, which places many points as you click and "
+"drag the mouse. Use it wisely; lines and other drawing elements are more "
+"simple and the resulting cave is easier to edit."
+msgstr ""
+"Ez egy szabadkézi rajzeszköz, amelyik sok pontot helyez a pályára, ahogy az "
+"egérrel kattintasz, és húzod. Óvatosan használd; a vonalak és egyéb "
+"rajzelemek sokkal egyszerűbbek, és az azokkal készített pályákat könnyebb "
+"szerkeszteni."
+
+#: src/help.c:134
+msgid ""
+"Click on the map to select the start point, then drag the mouse and finally "
+"release the button, to set the end point."
+msgstr ""
+"Vonal létrehozásához kattints a térképre, és az egérgombot nyomva tartva, "
+"húzással jelöld ki az vonal végpontját."
+
+#: src/help.c:135
+msgid ""
+"Click on the map and then drag the mouse, to define the two corners of the "
+"rectangle."
+msgstr ""
+"Téglalap létrehozásához kattints a térképre, és az egérgombot nyomva tartva, "
+"húzással jelöld ki a két sarkát."
+
+#: src/help.c:136
+msgid "Similar to the above, but this is filled with a second element."
+msgstr ""
+"Ez az előzőhöz hasonló, csak ennek a belseje is ki van töltve valamilyen "
+"elemmel."
+
+#: src/help.c:137
+msgid ""
+"This one is like a filled rectangle, but the horizontal and vertical "
+"distance of the elements can be changed. Use the object properties dialog to "
+"set the distances after creating the raster."
+msgstr ""
+"Ez hasonló egy kitöltött téglalaphoz, de az egyes elemek távolsága, mind "
+"vízszintes, mind függőleges irányban, beállítható. Az objektum tulajdonságai "
+"ablakban állíthatóak be a távolságok a létrehozás után."
+
+#: src/help.c:138
+msgid ""
+"This one is tricky. A join object scans the map, from top to bottom, "
+"searching for a specific element. If it finds one, it draws the second "
+"element, in the given distance. This can be used, for example, if you create "
+"a cave, where every diamond is guarded by a creature. To create one, select "
+"the two elements from the combo boxes above the cave map. Click anywhere on "
+"the map, and then drag the mouse to set the distance. Note that if the join "
+"object finds nothing during its scan, it still exists, and by reordering the "
+"elements it can be made visible. Also keep in mind that by connecting the "
+"same element (for example connecting a diamond to every diamond), elements "
+"may multiply. This effect was used by many older caves to create identical "
+"cave parts."
+msgstr ""
+"Ez trükkös rajzelem. A kötés végigvizsgálja a térképet felülről lefelé, egy "
+"adott elemet keresve. Ha talál egyet, egy második elemet rajzol, a megadott "
+"távolságban. Ez arra jó, ha azt szeretnéd, hogy a pályádon minden gyémántot "
+"egy szörny őrizzen. A létrehozáshoz válaszd ki a keresendő és a rajzolandó "
+"elemet a térkép feletti menükből. Kattints bárhová a térképre, aztán húzd az "
+"egeret a távolság beállításához. Fontos megjegyezni, ha a kötés objektum nem "
+"talál semmit a pályán, attól még létezik, és esetleg az objektumok "
+"sorrendjének megváltoztatásával láthatóvá tehető. Lényeges az is, hogy ha "
+"ugyanazt az elemet rajzolja, mint a keresett elem (például minden gyémánt "
+"mellé rajzol egy másikat), akkor azok többszöröződhetnek. Ezt a hatást "
+"régebbi pályáknál gyakran alkalmazták, hogy azonos pályarészleteket hozzanak "
+"létre."
+
+#: src/help.c:139
+msgid ""
+"This tool places a flood fill object. The object will fill an area of any "
+"shape in the cave with a specific element. The border of the area is set by "
+"another element in the cave. Use this tool, for example, if you want to fill "
+"an irregular shaped box of brick wall with space. Make sure that the "
+"boundary of the area to be filled is set by objects, not random data; "
+"otherwise it might fill the whole cave for different random seed values."
+msgstr ""
+"Ez az eszköz egy kitöltés rajzelemet helyez el a pályán. Az elem tetszőleges "
+"alakú területet ki tud tölteni egy adott karakterrel. A terület alakját egy "
+"másik karakter határozza meg. Ez az elem használható például, ha egy "
+"szabálytalan alakú, téglafallal határolt területet kell üresen kitölteni. "
+"Figyelj arra, hogy a terület határát rajzelemek határozzák meg, ne a "
+"véletlen kitöltés; ellenkező esetben némely véletlenszám kiindulásnál a "
+"kitöltés az egész pályát átrajzolhatja."
+
+#: src/help.c:140
+msgid "Fill by replacement"
+msgstr "Kitöltés cserével"
+
+#: src/help.c:140
+msgid ""
+"This tool places another kind of fill object. This one will replace an "
+"element with another one; the area in which this replacement takes place "
+"must be continuous. Use this tool, for example, if you want to replace a "
+"continuous area of dirt with diamonds. You only have to set the new element; "
+"the one to be found is selected automatically when you click on the map to "
+"place the object."
+msgstr ""
+"Ez az eszköz egy másik fajta kitöltés objektumot helyez el a pályán. Ez egy "
+"adott karaktert egy másikra cserél; a kitöltendő területnek összefüggőnek "
+"kell lennie. Használd ezt az eszközt, ha például egy összefüggő földből álló "
+"területet kell gyémántokra cserélni. Csak egy karaktert kell kiválasztani; a "
+"másik, amelyet keresni fogja a program, automatikusan jelölődik ki, amikor a "
+"térképre kattintasz."
+
+#: src/help.c:143
+msgid ""
+"You can use random generated mazes in cave designs. The walls and paths of "
+"the maze can be made from any freely chosen element. Also you can select 'No "
+"element' to skip drawing; this way, you can have randomly placed diamonds in "
+"a maze, for example. The random seed value determines the shape of the maze. "
+"For positive values, the same maze is generated every time the cave is "
+"played. If the seed value is -1, the maze is always different."
+msgstr ""
+
+#: src/help.c:144
+msgid "The unicursal maze is a long and curvy path."
+msgstr "A kígyózó labirintus egy hosszú, kanyargós útvonal."
+
+#: src/help.c:145
+msgid "The maze like that in PacMan: there are no dead ends."
+msgstr "A labirintus, mint amilyen a PacMan-ben van: nincsenek zsákutcák."
+
+#: src/help.c:146
+msgid "Random Fill"
+msgstr "Véletlen kitöltés"
+
+#: src/help.c:146
+msgid ""
+"This tool can be used to fill a part of a cave with random elements. It is "
+"similar to the random cave setup. At most five elements can be specified. "
+"You can also set a replace element; in that case, only that one will be "
+"changed to the randomly chosen ones. This can be used to fill the paths of a "
+"maze or the border of the cave with random elements. If you are statisfied "
+"with the size and position of the randomly filled area after placing, click "
+"the 'Object Properties' button to setup its elements. The random seed values "
+"can be specified independently for each level. You can also set them to -1, "
+"so the cave will be different every time you play."
+msgstr ""
+
+#: src/help.c:147
+msgid ""
+"To select an element, you can middle-click any time on the cave map to pick "
+"one you already use. Use Ctrl together with middle-click to pick a fill "
+"element. With Shift and middle-click you can pick an object type from the "
+"cave."
+msgstr ""
+"Egy karakter kiválasztásához bármikor a pályára kattinthatsz a középső "
+"gombbal. Ha a Ctrl billentyűt is nyomva tartod, akkor kitöltő elemet "
+"választasz. A Shift gomb nyomva tartásával pedig egy rajzelem típust "
+"választhatsz ki."
+
+#: src/help.c:148
+msgid "Managing cave objects"
+msgstr "Pálya rajzelemeinek kezelése"
+
+#: src/help.c:148
+msgid "Use this tool to modify already existing cave objects."
+msgstr "Ezzel az eszközzel már meglévő pálya objektumokat lehet módosítani."
+
+#: src/help.c:149
+msgid ""
+"By looking at the cave, you can see that every object is drawn with a slight "
+"yellowish colour to distinguish them from random data. Click on any object "
+"to select it."
+msgstr ""
+"Ha ránézel a térképre, látni fogod, minden objektum egy halvány sárgás "
+"színnel van kirajzolva, hogy meg lehessen őket az alap véletlen kitöltéstől "
+"különböztetni. Kattints bármelyik objektumra a kiválasztáshoz."
+
+#: src/help.c:151
+msgid ""
+"A selected object can be repositioned with the mouse by clicking and "
+"dragging. You can resize lines and rectangles by moving them by their end "
+"points or corners. Dragging any other part of these objects moves the whole "
+"thing. For joins, you can set the distance of the added elements this way. "
+"The origin of the flood fill objects is marked with an X, if you select them "
+"to edit. "
+msgstr ""
+"A kiválasztott objektum áthelyezhető, ha kattintasz az egérrel, és arrébb "
+"húzod. A vonalak és a téglalapok átméretezhetőek a végeiknél, sarkaiknál "
+"fogva. Bármely más résznél húzva az egész objektum elmozdul. A kötések "
+"húzásakor a kötött elemek távolsága változik. A kitöltő rajzelemek "
+"kiindulási pontját egy X mutatja, ha az adott kitöltés épp ki van választva."
+
+#: src/help.c:154
+msgid ""
+"By double-clicking on an object, or selecting object properties from the "
+"menu, a dialog pops up, which shows its parameters that you can modify."
+msgstr ""
+"Kettőt kattintva egy rajzelemre, vagy a rajzelem tulajdonságait kiválasztva "
+"a menüből, egy párbeszédablak jelenik meg, amelyben az összes tulajdonsága "
+"beállítható."
+
+#: src/help.c:155
+msgid ""
+"The order these objects are drawn also affects the cave. To reorder them, "
+"you can click on the To top and To bottom menu items. The object list on the "
+"right hand side can also be used to change the order cave objects are drawn. "
+"You can also delete them, or use the standard cut, copy and paste operations."
+msgstr ""
+"A pálya objektumainak rajzolási sorrendjétől függ annak végső formája. Az "
+"átrendezéshez kattints a Felülre vagy az Alulra gombra. A jobb oldalon lévő "
+"rajzelem lista is használható az objektumok átrendezéséhez. Az objektumok ki "
+"is törölhetőek, illetve a megszokott vágólap műveletek is használhatóak."
+
+#: src/help.c:156
+msgid "Cave properties"
+msgstr "Pálya tulajdonságai"
+
+#: src/help.c:156
+msgid ""
+"To view cave properties, select Edit|Cave properties from the menu. A dialog "
+"will pop up with many different options. Those are not explained here; most "
+"of the settings also have a long explanation, which shows up if you point to "
+"them with your mouse."
+msgstr ""
+"A pálya tulajdonságainak megtekintéséhez a menü Szerkesztés|Pálya "
+"tulajdonságai pontjára kattints. A megjelenő párbeszédablak rengeteg opciót "
+"tartalmaz. Ezek nincsenek itt részletezve; a legtöbb beállítás egy hosszú "
+"magyarázattal is rendelkezik, amely megjelenik, ha az egérmutatót felette "
+"tartod."
+
+#: src/help.c:157
+msgid ""
+"If you want to restart editing, all cave objects can be deleted at once. A "
+"cave map can also be deleted by selecting Remove map from the menu."
+msgstr ""
+"Ha újrakezded a szerkesztést, az összes objektum kitörölhető egyszerre. A "
+"pálya térképe is kitörölhető, ha van."
+
+#: src/help.c:159
+msgid ""
+"Cave objects can be merged into a single map. If you designed a new cave, "
+"this has no particular use; but for editing an imported, map-based cave, it "
+"might be useful. If you need this behaviour, choose Convert to map from the "
+"menu. (It might be useful if you want to load your cave in another "
+"application, which does not support BDCFF cave objects.)"
+msgstr ""
+"A pálya elemei egy szimpla térképpé lapíthatóak. Egy teljesen új pályához "
+"ennek nincs értelme; de egy régebbi, térkép alapú pálya szerkesztése után "
+"hasznos lehet. Ha szükség van erre a működésre, válaszd a térképpé lapítás "
+"menüpontot. (Akkor lehet hasznos, ha a pályákat egy másik programba "
+"szeretnéd betölteni, amelyik nem támogatja a BDCFF objektumokat.)"
+
+#: src/help.c:160
+msgid "More on random cave data"
+msgstr "A véletlen pályák előállítása"
+
+#: src/help.c:161
+msgid ""
+"The elements which fill the cave initially are not really random. They are "
+"generated using a predictable random number generator, which can come up "
+"with the same series of number every time. Therefore the cave looks the same "
+"every time. The generator is configured by a seed number, which can be set "
+"in the cave properties dialog. Note that in this way, five different levels "
+"for each cave can easily be created! Each of the levels will be a bit "
+"different, because they are filled with different random data. But the main "
+"challenge will be the same, as it is defined by the drawing object in "
+"essence. The level at which the cave is shown can be changed by the scale on "
+"the top right corner of the editor window."
+msgstr ""
+"Az elemek, amelyek kezdetben kitöltik a pályát, igazából nem "
+"véletlenszerűek. Egy kvázi-véletlenszám sorozatot előállítva generálja a "
+"program. Ez a számsorozat minden alkalommal ugyanaz, és egy kiindulásiszám "
+"határozza meg, amely a pálya tulajdonságai ablakban állítható be. Figyeld "
+"meg, hogy így milyen könnyű minden pályából öt különböző szintet csinálni! "
+"Minden szint egy kicsit más lesz, mert más véletlen elemekkel van kitöltve. "
+"De a fő feladat mindig ugyanaz lesz, mert azt igazából a pálya objektumok "
+"határozzák meg. A szerkesztés közben beállítható, hogy hányadik szintet "
+"látod; csak mozgasd a csúszkát a térkép jobb felső sarkában."
+
+#: src/help.c:169
+msgid ""
+"A cave can be made totally random, by entering -1 in the random seed entry. "
+"Remember that you cannot test every cave that is generated this way, and "
+"there may be for example some diamonds which cannot be collected. If you "
+"enter a negative number to the diamonds needed field, at the start of the "
+"game they are counted, and the number you specify is subtracted."
+msgstr ""
+"A pálya teljesen véletlenszerűvé tehető, -1-et írva a véletlenszám kiindulás "
+"mezőbe. Emlékezz rá, hogy nem lehet az összes lehetséges generált pályát "
+"tesztelni; lehet, hogy lesz néhány gyémánt, amit nem lehet összegyűjteni. Ha "
+"negatív értéket írsz a gyűjtendő gyémántok mezőbe, akkor a pálya létrehozása "
+"után a program megszámolja a gyémántokat, és a megadott értéket kivonva "
+"állítja be a gyűjtendő gyémántok számát."
+
+#: src/help.c:173
+msgid ""
+"The Edit menu contains a random elements setup tool, which can be used to "
+"setup the random number generator for the cave. It is able to edit all five "
+"levels, and updates the cave at every change."
+msgstr ""
+
+#: src/help.c:175
+msgid "Visible size of a cave"
+msgstr "A pálya látható része"
+
+#: src/help.c:176
+msgid ""
+"Every cave can have a rectangular area, which may be smaller then the cave "
+"itself, and will be visible during the game. Cave elements outside this "
+"visible area, for example stones or creatures, also move. You can also use "
+"the Auto shrink tool to set this size automatically by checking steel walls "
+"and inbox/outbox elements."
+msgstr ""
+"Minden pályán van egy téglalap alakú részlet, amely egyébként kisebb lehet, "
+"mint a pálya maga, és látszik játék közben. A pálya ezen kívül eső részei, "
+"például kövek vagy szörnyek, ugyanúgy mozognak, mint a láthatóak. Az "
+"automatikus zsugorítás menüpont használható ennek automatikus beállítására, "
+"a törhetetlen falak és kijárat/bejárat figyelembe vételével."
+
+#: src/help.c:180
+msgid "Shift cave map"
+msgstr "Pálya térkép léptetése"
+
+#: src/help.c:181
+msgid ""
+"If the cave is map-based, you can use the shift tools to move the map. This "
+"might be useful if you want to enlarge it and otherwise there would be no "
+"place to do this. Remember to check the visible size of the cave after "
+"shifting it in any direction! For object-based caves, you can select all "
+"object at once and move them together!"
+msgstr ""
+"Ha a pálya térkép alapú, a léptető eszközöket használhatod a térkép "
+"mozgatásához. Ez akkor lehet hasznos, ha ki akarod bővíteni, de nincs hely "
+"valamelyik oldalon. Ne felejtsd el a látható területet ellenőrizni bármilyen "
+"irányú léptetés után! Objektum alapú pályák esetén az összes objektum "
+"egyszerre kiválasztható és mozgatható!"
+
+#: src/help.c:185 src/gtk_ui.c:564
+msgid "Highscores"
+msgstr "Pontok"
+
+#: src/help.c:185
+msgid ""
+"The editor can also be used to delete highscore files of a game or any of "
+"the caves."
+msgstr ""
+"A pályaszerkesztőben a játékhoz, illetve az egyes pályákhoz tartozó "
+"dicsőséglisták is törölhetőek."
+
+#: src/help.c:186
+msgid ""
+"GDash uses two mechanisms to store highscores: it can save them in a "
+"separate file (this is done automatically), and it can also save them in the "
+"BDCFF file. Separate files are always used for imported cavesets. When you "
+"load a BDCFF file, you have the option to use the highscore list from the "
+"file or the one saved automatically in the configuration directory of GDash."
+msgstr ""
+
+#: src/help.c:190 src/editor.c:3665
+msgid "Test cave"
+msgstr "Pálya tesztelése"
+
+#: src/help.c:190
+msgid "If you are finished with drawing, use this button to test the cave."
+msgstr "Ha készen vagy a tervezéssel, ezzel a gombbal próbálhatod ki a pályát."
+
+#: src/help.c:191
+msgid "Loading and saving"
+msgstr "Betöltés és mentés"
+
+#: src/help.c:191
+msgid ""
+"To save your work, use the File|Save button from the main window. You can "
+"save games in a BDCFF file, which is a text format used widely on the "
+"Internet."
+msgstr ""
+"A munkád mentéséhez a fő ablak Fájl|Mentés opcióját használd. A pályákat "
+"BDCFF formátumban lehet menteni, amely elterjedten használd az Interneten."
+
+#: src/help.c:192
+msgid "HTML Galleries"
+msgstr "HTML galériák"
+
+#: src/help.c:192
+msgid ""
+"This program is able to save cave sets in a HTML gallery, which you can put "
+"on a web server, so other ones can preview them online. To do this, select "
+"File|Save HTML gallery, and select a file name for the HTML file. The .PNG "
+"files will be put in the same directory and with a similar name."
+msgstr ""
+"Ezzel a programmal lehetséges a pályagyűjteményekhez egy HTML galériát "
+"generálni, amelyet egy web kiszolgálóra feltölthetsz, hogy mások láthassák "
+"azokat. Ehhez a Fájl menü HTML galéria pontját válaszd, és írj be egy nevet "
+"a HTML fájlnak. A .PNG képek hasonló néven lesznek elmentve, ugyanabba a "
+"könyvtárba."
+
+#: src/help.c:195
+msgid "Converting to a cavepack"
+msgstr "Pálya gyűjteménnyé konvertálás"
+
+#: src/help.c:195
+msgid ""
+"You can convert your individual caves or the complete caveset to a cavepack, "
+"which is a file format readable by the Crazy Light Construction Kit, written "
+"by LogicDeLuxe. The conversion can be reached from the File menu. The "
+"cavepack format is map-based, so there will only be one level (the currently "
+"selected one) exported. Be aware, that many elements and effects GDash uses "
+"cannot be converted back to the C64 engine. GDash tries to detect these, and "
+"after the conversion, it pops up a windows which describes possible "
+"mistakes. You do not have to transfer the files to a C64 disk image; "
+"emulators (like VICE) are able to load it directly. To create a self-running "
+"game on a C64, you can use the 'Link Game' utility from Crazy Light "
+"Construction Kit. For further information, refer to the documentation of "
+"these applications."
+msgstr ""
+"A játékot vagy az egyes pályákat CavePack formátumra konvertálhatod, amely a "
+"LogicDeLuxe által írt Crazy Light Construction Kit saját formátuma. A "
+"konverzió a Fájl menüből érhető el. A CavePack formátum térkép alapú, vagyis "
+"csak egyetlen szint lesz (az aktuálisan kiválasztott) konvertálva. Vedd "
+"figyelembe, hogy a GDash sok karaktere nem használható a C64-es játékban. A "
+"program igyekszik megtalálni ezeket, és a konverzió végén listát mutat a "
+"lehetséges hibákról. A kész fájlt nem szükséges egy C64 lemez képmásba "
+"átmásolni; az emulátorok (mint pl. a VICE) közvetlenül is be tudják tölteni. "
+"Egy önálló C64 játék létrehozásához a 'Link Game' programot használhatod a "
+"Crazy Light Construction Kitből. További információ a fenti alkalmazások "
+"dokumentációjában!"
+
+#: src/help.c:241
+msgid "GDash Help"
+msgstr "GDash Súgó"
+
+#: src/gtk_main.c:140
+#, c-format
+msgid "You have %d points, and achieved a highscore."
+msgstr "%d pontod van, és felkerültél a dicsőség listára."
+
+#: src/gtk_main.c:141 src/gtk_main.c:158
+msgid "Game over!"
+msgstr "Játék vége!"
+
+#: src/gtk_main.c:157
+#, c-format
+msgid "You have %d points."
+msgstr "%d pontod van."
+
+#: src/gtk_main.c:405
+#, c-format
+msgid "Time: <b>%02d:%02d</b>"
+msgstr "Idő: <b>%02d:%02d</b>"
+
+#: src/gtk_main.c:407
+#, c-format
+msgid "Time: <b>%03d</b>"
+msgstr "Idő: <b>%03d</b>"
+
+#: src/gtk_main.c:410
+#, c-format
+msgid "Score: <b>%d</b>"
+msgstr "Pont: <b>%d</b>"
+
+#: src/gtk_main.c:413
+#, c-format
+msgid "Value: <b>%d</b>"
+msgstr "Érték: <b>%d</b>"
+
+#: src/gtk_main.c:416
+#, c-format
+msgid "Diamonds: <b>%d</b>"
+msgstr "Gyémántok: <b>%d</b>"
+
+#: src/gtk_main.c:419
+#, c-format
+msgid "Skeletons: <b>%d</b>"
+msgstr "Csontváz: <b>%d</b>"
+
+#: src/gtk_main.c:422
+#, c-format
+msgid "Key 1: <b>%d</b>"
+msgstr "1. kulcs: <b>%d</b>"
+
+#: src/gtk_main.c:423
+#, c-format
+msgid "Key 2: <b>%d</b>"
+msgstr "2. kulcs: <b>%d</b>"
+
+#: src/gtk_main.c:424
+#, c-format
+msgid "Key 3: <b>%d</b>"
+msgstr "3. kulcs: <b>%d</b>"
+
+#: src/gtk_main.c:427
+#, c-format
+msgid "Gravity changes: <b>%d</b>"
+msgstr "Gravitáció változik: <b>%d</b>"
+
+#: src/gtk_main.c:431
+#, c-format
+msgid "Lives: <b>%d</b>"
+msgstr "Élet: <b>%d</b>"
+
+#: src/gtk_main.c:500
+#, fuzzy, c-format
+msgid "<b>%s</b>, level %d"
+msgstr "%s, %d. szint"
+
+#: src/gtk_main.c:779
+msgid "There are no caves in this cave set!"
+msgstr "Nincs még pálya ebben a játékban!"
+
+#: src/gtk_main.c:786
+msgid "Select cave to play"
+msgstr "Pálya kiválasztása"
+
+#: src/gtk_main.c:797
+msgid "Name:"
+msgstr "Név:"
+
+#: src/gtk_main.c:808
+msgid "Cave:"
+msgstr "Pálya:"
+
+#: src/gtk_main.c:828
+msgid "Level:"
+msgstr "Szint:"
+
+#: src/gtk_main.c:839
+msgid "Preview"
+msgstr "Előnézet"
+
+#: src/gtk_main.c:1006
+msgid "_Play"
+msgstr "_Játék"
+
+#: src/gtk_main.c:1007 src/editor.c:3631
+msgid "_File"
+msgstr "_Fájl"
+
+#: src/gtk_main.c:1008
+msgid "_Settings"
+msgstr "_Beállítások"
+
+#: src/gtk_main.c:1009 src/editor.c:3636
+msgid "_Help"
+msgstr "_Súgó"
+
+#: src/gtk_main.c:1012
+msgid "_Error console"
+msgstr ""
+
+#: src/gtk_main.c:1018
+msgid "_New game"
+msgstr "Új _játék"
+
+#: src/gtk_main.c:1018
+msgid "Start new game"
+msgstr "Új játék indítása"
+
+#: src/gtk_main.c:1019
+msgid "Cave _editor"
+msgstr "Pálya_szerkesztő"
+
+#: src/gtk_main.c:1021
+msgid "Load _internal game"
+msgstr "Beé_pített játék betöltése"
+
+#: src/gtk_main.c:1022
+msgid "O_pen shipped"
+msgstr "_Telepített játék megnyitása"
+
+#: src/gtk_main.c:1025 src/editor.c:3643
+msgid "Hi_ghscores"
+msgstr "P_ontok"
+
+#: src/gtk_main.c:1029
+msgid "_Take snapshot"
+msgstr "_Pillanatfelvétel"
+
+#: src/gtk_main.c:1030
+msgid "Re_start level"
+msgstr "Pálya új_rakezdése"
+
+#: src/gtk_main.c:1030
+msgid "Restart current level"
+msgstr "Pálya újrakezdése"
+
+#: src/gtk_main.c:1031
+msgid "_End game"
+msgstr "Játék vég_e"
+
+#: src/gtk_main.c:1031
+msgid "End current game"
+msgstr "Aktuális játék befejezése"
+
+#: src/gtk_main.c:1035
+msgid "_Revert to snapshot"
+msgstr "_Pillanatfelvétel visszatöltése"
+
+#: src/gtk_main.c:1039
+msgid "Pause game"
+msgstr "Játék szünet"
+
+#: src/gtk_main.c:1040
+msgid "Fullscreen mode during play"
+msgstr "Teljes képernyős mód a játék közben"
+
+#: src/gtk_main.c:1041
+msgid "Fast for_ward"
+msgstr "Gyor_sított játék"
+
+#: src/gtk_main.c:1041
+msgid "Fast forward (5x speed)"
+msgstr "Gyorsított játék (5x sebesség)"
+
+#: src/gtk_main.c:1221
+msgid "Start editor"
+msgstr "Pályaszerkesztő elindítása"
+
+#: src/gtk_main.c:1222
+msgid "Save caveset in a HTML gallery"
+msgstr "Játék pályáinak mentése egy HTML galériában"
+
+#: src/gtk_main.c:1223
+msgid ""
+"Save cave C, level L in a PNG image. If no cave selected, uses a random one"
+msgstr ""
+"C. pálya, L. szint mentése PNG képben. Ha nincs pálya kijelölve, "
+"véletlenszerűen választ"
+
+#: src/gtk_main.c:1224
+msgid "Set PNG image size. Default is 128x96, set to 0x0 for unscaled"
+msgstr "PNG kép méretének állítása. Alap 128x96, az eredeti mérethez 0x0"
+
+#: src/gtk_main.c:1225
+msgid "Save caveset in a BDCFF file"
+msgstr "Játék pályáinak mentése egy BDCFF fájlban"
+
+#: src/gtk_main.c:1226
+msgid "Batch mode: quit after specified tasks"
+msgstr "Kötegelt üzemmód: a megadott műveletek után kilépés"
+
+#: src/gtk_main.c:1266 src/sdl_main.c:583
+#, fuzzy, c-format
+msgid "Errors during loading caveset from file %s"
+msgstr "Nem lehetett betölteni a játékot a %s fájlból"
+
+#: src/gtk_main.c:1271 src/sdl_main.c:588
+#, c-format
+msgid "%d: no such internal caveset"
+msgstr "%d: nincs ilyen számú beépített játék!"
+
+#: src/gtk_main.c:1300 src/sdl_main.c:598
+msgid "Invalid cave or level number!\n"
+msgstr "Hibás számú pálya vagy szint!\n"
+
+#: src/gtk_main.c:1313
+#, c-format
+msgid "Invalid image size: %s"
+msgstr "%s: hibás képméret"
+
+#: src/c64import.c:1995 src/c64import.c:2032 src/c64import.c:2126
+#, c-format
+msgid "Intermission %d"
+msgstr "%d. jutalom pálya"
+
+#: src/c64import.c:1997 src/c64import.c:2034 src/c64import.c:2131
+#, c-format
+msgid "Cave %c"
+msgstr "%c. pálya"
+
+#: src/c64import.c:2124
+#, c-format
+msgid "Intermission %02d"
+msgstr "%02d. jutalom pálya"
+
+#: src/c64import.c:2129
+#, c-format
+msgid "Cave %02d"
+msgstr "%02d. pálya"
+
+#: src/gtk_ui.c:194
+msgid "Default C64 theme"
+msgstr "Eredeti C64 téma"
+
+#: src/gtk_ui.c:214
+msgid "Original"
+msgstr "Eredeti"
+
+#: src/gtk_ui.c:215
+msgid "Double"
+msgstr "Dupla"
+
+#: src/gtk_ui.c:216
+msgid "Triple"
+msgstr "Tripla"
+
+#: src/gtk_ui.c:267
+msgid "Add Theme from PNG Image"
+msgstr "Téma hozzáadása PNG képből"
+
+#: src/gtk_ui.c:271 src/editor.c:2466
+msgid "PNG files"
+msgstr "PNG képek"
+
+#: src/gtk_ui.c:311
+msgid "The PNG image cannot be used as a GDash theme."
+msgstr "A PNG kép nem használható GDash témaként."
+
+#: src/gtk_ui.c:325
+msgid "<b>Cave options</b>"
+msgstr "<b>Pálya hatások</b>"
+
+#: src/gtk_ui.c:326
+msgid "Ease levels"
+msgstr "Könnyített pályák"
+
+#: src/gtk_ui.c:326
+msgid ""
+"Make caves easier to play. Only one diamonds to collect, more time "
+"available, no expanding walls... This might render some caves unplayable!"
+msgstr ""
+"Pályák könnyítése. Kevesebb gyémántot kell gyűjteni, több idő van, nincsenek "
+"épülő falak... Viszont ez játszhatatlanná tehet néhány pályát!"
+
+#: src/gtk_ui.c:327
+msgid "All caves selectable"
+msgstr "Összes pálya kiválasztható"
+
+#: src/gtk_ui.c:327
+msgid "All caves can be selected at game start."
+msgstr "Összes pálya kiválasztható kezdőpályának."
+
+#: src/gtk_ui.c:328
+msgid "Mouse play (experimental!)"
+msgstr "Játék egérrel (kísérleti!)"
+
+#: src/gtk_ui.c:328
+msgid "Use the mouse to play. The player will follow the cursor!"
+msgstr "Játék az egérrel. A játékos követni fogja a mutatót!"
+
+#: src/gtk_ui.c:329
+msgid "Use BDCFF highscore"
+msgstr "BDCFF dicsőséglista használata"
+
+#: src/gtk_ui.c:329
+msgid ""
+"Use BDCFF highscores. GDash rather stores highscores in its own "
+"configuration directory, instead of saving them in  the *.bd file."
+msgstr ""
+"BDCFF dicsőséglista hasznáata. A GDash a dicsőség listát inkább a saját "
+"konfigurációs fájljai között tárolja, nem a *.bd fájlba menti."
+
+#: src/gtk_ui.c:331
+msgid "<b>Display options</b>"
+msgstr "<b>Megjelenítés</b>"
+
+#: src/gtk_ui.c:332
+msgid "Time as min:sec"
+msgstr "Idő óra:perc formában"
+
+#: src/gtk_ui.c:332
+msgid "Show times in minutes and seconds, instead of seconds only."
+msgstr "Az idő mutatása perc:másodperc alakban, csupán másodpercek helyett."
+
+#: src/gtk_ui.c:333
+msgid "Random colors"
+msgstr "Véletlen színek"
+
+#: src/gtk_ui.c:333
+msgid "Use randomly selected colors for C64 graphics."
+msgstr "Véletlenszerűen kiválasztott színek használata C64 grafikához"
+
+#: src/gtk_ui.c:338
+msgid "TV emulation"
+msgstr "TV emuláció"
+
+#: src/gtk_ui.c:338
+msgid "Use TV emulated graphics, ie. lines are striped."
+msgstr "TV emulált grafika, vagyis a rajzok csíkosak."
+
+#: src/gtk_ui.c:339
+msgid "Interpolation"
+msgstr "Interpoláció"
+
+#: src/gtk_ui.c:339
+msgid "Use interpolation for scaling of graphics."
+msgstr "Interpoláció használata a grafikai elemek átméretezésekor."
+
+#: src/gtk_ui.c:353
+msgid "GDash Preferences"
+msgstr "A GDash beállításai"
+
+#: src/gtk_ui.c:355
+msgid "_Add theme"
+msgstr "_Téma hozzáadása"
+
+#: src/gtk_ui.c:405
+#, c-format
+msgid ""
+"This is the list of available themes. You can put .png files into the "
+"directory %s to see more."
+msgstr ""
+"Ez a rendelkezésre álló témák listája. A(z) %s és könyvtárakba .png fájlt "
+"másolva használhatók továbbiak."
+
+#: src/gtk_ui.c:427
+msgid "<b>Theme</b>"
+msgstr "<b>Téma</b>"
+
+#: src/gtk_ui.c:570
+msgid "Rank"
+msgstr "Rang"
+
+#: src/gtk_ui.c:579
+msgid "Score"
+msgstr "Pont"
+
+#: src/gtk_ui.c:682
+msgid "Cave set is edited. Discard changes?"
+msgstr "A pályák megváltoztak. Dobjam el a változtatásokat?"
+
+#: src/gtk_ui.c:687
+msgid "_Discard"
+msgstr "El_dob"
+
+#: src/gtk_ui.c:705
+msgid "The file already exists. Do you want to overwrite it?"
+msgstr "A fájl már létezik. Felülírjam?"
+
+#: src/gtk_ui.c:706
+#, c-format
+msgid "The file (%s) already exists, and will be overwritten."
+msgstr "A fájl (%s) már létezik, és felül lesz írva."
+
+#: src/gtk_ui.c:743
+msgid "Save File As"
+msgstr "Játék mentése másként"
+
+#: src/gtk_ui.c:747
+msgid "BDCFF cave sets (*.bd)"
+msgstr "BDCFF pályák (*.bd)"
+
+#: src/gtk_ui.c:752
+msgid "All files (*)"
+msgstr "Összes fájl (*)"
+
+#: src/gtk_ui.c:819
+msgid "Open File"
+msgstr "Fájl megnyitása"
+
+#: src/gtk_ui.c:821
+msgid "Load _highscores from BDCFF file"
+msgstr "_Dicsőséglista betöltése a BDCFF fájlból"
+
+#: src/gtk_ui.c:828
+msgid "GDash cave sets"
+msgstr "GDash pályák"
+
+#: src/gtk_ui.c:882
+msgid "Loaded game:"
+msgstr "Betöltött játék:"
+
+#: src/gtk_ui.c:956
+#, fuzzy
+msgid "GDash Errors"
+msgstr "A GDash beállításai"
+
+#: src/gtk_ui.c:1024
+msgid "_Show all"
+msgstr ""
+
+#: src/caveset.c:279
+msgid "New caveset"
+msgstr "Új játék"
+
+#: src/caveset.c:351 src/caveset.c:485
+#, c-format
+msgid "invalid parameter \"%s\" for attribute %s"
+msgstr "\"%s\": hibás paraméter %s attribútumhoz."
+
+#: src/caveset.c:786
+msgid "highscore format incorrect"
+msgstr "Dicsőséglista formátum hiba"
+
+#: src/caveset.c:824
+msgid "Only one-character map codes are currently supported!"
+msgstr "Jelenleg csak egy karakteres pályakódokat támogat a program!"
+
+#: src/caveset.c:914
+#, c-format
+msgid "invalid effect name \"%s\""
+msgstr "hibás pálya hatás név: \"%s\""
+
+#: src/caveset.c:917
+#, c-format
+msgid "Invalid effect specification \"%s\""
+msgstr "hibás pálya hatás specifikáció: \"%s\""
+
+#: src/caveset.c:943
+msgid "Invalid BDCFF: [game] section has a map"
+msgstr "Hibás BDCFF: a [game] részben térkép van"
+
+#: src/caveset.c:948
+msgid "Invalid BDCFF: [game] section has drawing objects defined"
+msgstr "Hibás·BDCFF:·a·[game]·részben·objektumok·vannak"
+
+#: src/caveset.c:1041
+#, fuzzy
+msgid "could not determine file format from filename extension"
+msgstr "Nem lehetett meghatározni a fájl formátumát a kiterjesztésből"
+
+#: src/editor-export.c:443
+msgid "Saving HTML gallery"
+msgstr "HTML galéria mentése"
+
+#: src/editor-export.c:465
+#, c-format
+msgid "Caves: %d<BR>\n"
+msgstr "Pályák: %d<BR>\n"
+
+#: src/editor-export.c:467
+#, c-format
+msgid "Author: %s<BR>\n"
+msgstr "Szerző: %s<BR>\n"
+
+#: src/editor-export.c:469
+#, c-format
+msgid "Description: %s<BR>\n"
+msgstr "Leírás: %s<BR>\n"
+
+#: src/editor-export.c:471
+#, c-format
+msgid "WWW: %s<BR>\n"
+msgstr "WWW: %s<BR>\n"
+
+#: src/editor-export.c:527
+msgid "Type"
+msgstr "Típus"
+
+#: src/editor-export.c:527
+msgid "Normal cave"
+msgstr "Normál pálya"
+
+#: src/editor-export.c:528 src/editor.c:597
+msgid "Yes"
+msgstr "Igen"
+
+#: src/editor-export.c:528 src/editor.c:597
+msgid "No"
+msgstr "Nem"
+
+#: src/editor-export.c:530
+msgid "Diamond value"
+msgstr "Gyémánt értéke"
+
+#: src/editor-export.c:531
+msgid "Extra diamond value"
+msgstr "Plusz gyémánt értéke"
+
+#: src/editor-export.c:534
+msgid "Amoeba threshold and time (s)"
+msgstr "Amőba határ és idő (mp)"
+
+#: src/editor-export.c:536
+msgid "Magic wall milling time (s)"
+msgstr "Idő (mp)"
+
+#: src/editor-widgets.c:107
+msgid "Select Color"
+msgstr "Szín kiválasztása"
+
+#: src/editor-widgets.c:366
+msgid "Elements"
+msgstr "Elemek"
+
+#: src/editor-widgets.c:373
+msgid "Normal elements"
+msgstr "Normál karakterek"
+
+#: src/editor-widgets.c:380
+msgid "For effects"
+msgstr "Hatásokhoz"
+
+#: src/about.c:36
+msgid ""
+"Classic game similar to Emerald Mines.\n"
+"Collect diamonds and find exit!"
+msgstr ""
+"Emerald Mine-szerű klasszikus játék. Gyűjtsd össze a gyémántokat és keresd a "
+"kijáratot!"
+
+#: src/about.c:37
+msgid "translator-credits"
+msgstr "cirix <cirix@fw.hu>"
+
+#: src/editor.c:98
+msgid "_Move"
+msgstr "_Mozgat"
+
+#: src/editor.c:98
+msgid "Move object"
+msgstr "Rajzelem mozgatása"
+
+#: src/editor.c:101
+msgid "_Point"
+msgstr "_Pont"
+
+#: src/editor.c:101
+msgid "Draw single element"
+msgstr "Egyetlen karakter rajzolása"
+
+#: src/editor.c:102
+msgid "_Line"
+msgstr "_Vonal"
+
+#: src/editor.c:102
+msgid "Draw line of elements"
+msgstr "Vonal rajzolása"
+
+#: src/editor.c:103
+msgid "_Outline"
+msgstr "_Keret"
+
+#: src/editor.c:103
+msgid "Draw rectangle outline"
+msgstr "Téglalap rajzolása"
+
+#: src/editor.c:104
+msgid "R_ectangle"
+msgstr "Té_glalap"
+
+#: src/editor.c:104
+msgid "Draw filled rectangle"
+msgstr "Kitöltött téglalap rajzolása"
+
+#: src/editor.c:105
+msgid "Ra_ster"
+msgstr "R_aszter"
+
+#: src/editor.c:105
+msgid "Draw raster"
+msgstr "Raszter rajzolása"
+
+#: src/editor.c:106
+msgid "_Join"
+msgstr "Kö_tés"
+
+#: src/editor.c:106
+msgid "Draw join"
+msgstr "Kötés rajzolása"
+
+#: src/editor.c:107
+msgid "_Flood fill"
+msgstr "_Kitöltés"
+
+#: src/editor.c:107
+msgid "Fill by replacing elements"
+msgstr "Kitöltés elemek cseréjével"
+
+#: src/editor.c:108
+msgid "_Boundary fill"
+msgstr "K_itöltés keretig"
+
+#: src/editor.c:108
+msgid "Fill a closed area"
+msgstr "Zárt terület kitöltése"
+
+#: src/editor.c:109
+msgid "Ma_ze"
+msgstr "La_birintus"
+
+#: src/editor.c:109
+msgid "Draw maze"
+msgstr "Labirintus rajzolása"
+
+#: src/editor.c:110
+msgid "U_nicursal maze"
+msgstr "Kí_gyózó labirintus"
+
+#: src/editor.c:110
+msgid "Draw unicursal maze"
+msgstr "Kígyózó labirintus rajzolása"
+
+#: src/editor.c:111
+#, fuzzy
+msgid "Bra_id maze"
+msgstr "Raszter rajzolása"
+
+#: src/editor.c:111
+#, fuzzy
+msgid "Draw braid maze"
+msgstr "Raszter rajzolása"
+
+#: src/editor.c:112
+msgid "R_andom fill"
+msgstr "Vé_letlen kitöltés"
+
+#: src/editor.c:112
+msgid "Draw random elements"
+msgstr "Véletlen karakterek rajzolása"
+
+#: src/editor.c:115
+msgid "F_reehand"
+msgstr "S_zabadkézi"
+
+#: src/editor.c:115
+msgid "Draw freely"
+msgstr "Szabad rajz"
+
+#: src/editor.c:116
+msgid "Set _visible size"
+msgstr "Látható rész_let"
+
+#: src/editor.c:116
+msgid "Select visible part of cave during play"
+msgstr "A pálya játék közben látható részeinek beállítása"
+
+#: src/editor.c:288
+#, c-format
+msgid "%d objects selected"
+msgstr "%d rajzelem kiválasztva"
+
+#: src/editor.c:523
+msgid "Cave Set Properties"
+msgstr "Játék tulajdonságai"
+
+#: src/editor.c:523
+msgid "Cave Properties"
+msgstr "Pálya tulajdonságai"
+
+#: src/editor.c:569
+#, c-format
+msgid "Level %d"
+msgstr "%d. szint"
+
+#: src/editor.c:653
+#, c-format
+msgid ""
+"%s\n"
+"Default value: %s"
+msgstr ""
+"%s\n"
+"Alapérték: %s"
+
+#: src/editor.c:653 src/editor.c:655
+msgid "empty"
+msgstr "üres"
+
+#: src/editor.c:664
+msgid "Set to default value"
+msgstr "Alapérték visszaállítása"
+
+#: src/editor.c:1306
+msgid "Level shown"
+msgstr "Szint"
+
+#: src/editor.c:1327
+msgid "Initial border"
+msgstr "Kezdő keret"
+
+#: src/editor.c:1348
+msgid "Initial fill"
+msgstr "Kezdő kitöltés"
+
+#: src/editor.c:1350
+#, c-format
+msgid "Random fill %d"
+msgstr "%d. véletlen kitöltés"
+
+#: src/editor.c:1478
+#, c-format
+msgid "%s Properties"
+msgstr "%s tulajdonságai"
+
+#: src/editor.c:1496
+msgid "Level currently shown"
+msgstr "Aktuális szint nézet"
+
+#: src/editor.c:1502
+msgid "Enabled on levels"
+msgstr "Engedélyezett szintek"
+
+#: src/editor.c:1598
+msgid "The object should be visible on at least one level."
+msgstr ""
+
+#: src/editor.c:1598
+msgid "Enabled this object on all levels."
+msgstr "Az összes szinten engedélyeztem az objektumot."
+
+#: src/editor.c:2152
+msgid "Cave Name"
+msgstr "Pálya neve"
+
+#: src/editor.c:2187
+#, fuzzy, c-format
+msgid "<b>%s</b>, %s, %dx%d, time %d:%02d, diamonds %d"
+msgstr "<b>%s</b>, %dx%d, idő: %d:%02d, gyémántok: %d"
+
+#: src/editor.c:2187
+#, fuzzy
+msgid "selectable"
+msgstr "Előre megjósolható"
+
+#: src/editor.c:2187
+#, fuzzy
+msgid "not selectable"
+msgstr "Összes pálya kiválasztható"
+
+#: src/editor.c:2307 src/editor.c:2358
+#, c-format
+msgid "GDash Cave Editor - %s"
+msgstr "GDash Pályaszerkesztő - %s"
+
+#: src/editor.c:2424
+msgid "Cave Initial Random Fill"
+msgstr "Pálya kezdő kitöltése"
+
+#: src/editor.c:2459
+msgid "Save Cave as PNG Image"
+msgstr "Pálya mentése PNG képként"
+
+#: src/editor.c:2542
+msgid "Cave Overview"
+msgstr "Áttekintés"
+
+#: src/editor.c:2543
+msgid "Save as _PNG"
+msgstr "Mentése _PNG-ként"
+
+#: src/editor.c:2664
+msgid "Cave Colors"
+msgstr "Pálya színei"
+
+#: src/editor.c:2668
+msgid "_Random"
+msgstr "_Véletlen"
+
+#: src/editor.c:2728
+msgid "Do you really want to delete cave(s)?"
+msgstr "Biztos ki akarod törölni a pályá(ka)t?"
+
+#: src/editor.c:3011
+msgid "Do you really want to clear cave objects?"
+msgstr "Biztos ki akarod törölni a pálya rajzelemeit?"
+
+#: src/editor.c:3033
+msgid "Do you really want to remove cave map?"
+msgstr "Biztos törölni szeretnéd a pálya térképét?"
+
+#: src/editor.c:3034
+msgid "This operation destroys all cave objects."
+msgstr "Ez a művelet a pálya minden elemét törli."
+
+#: src/editor.c:3056
+msgid "This cave has no objects."
+msgstr "Nincsenek ezen a pĂÂĂÂlyĂÂĂÂn rajzelemek."
+
+#: src/editor.c:3060
+msgid "Do you really want to flatten cave?"
+msgstr "Biztos össze szeretnéd vonni a pályát egyetlen térképpé?"
+
+#: src/editor.c:3061
+msgid ""
+"This operation merges all cave objects currently seen in a single map. "
+"Further objects may later be added, but the ones already seen will behave "
+"like the random fill elements; they will not be editable."
+msgstr ""
+"Ez a művelet az összes pálya objektumot egy térképpé vonja össze. További "
+"objektumok később is hozzáadhatóak, de az eddigiek a kezdeti véletlen "
+"kitöltéshez hasonlóan fognak viselkedni, és nem maradnak szerkeszthetőek."
+
+#: src/editor.c:3087
+msgid "Save Cave Set in HTML"
+msgstr "HTML galéria mentése"
+
+#: src/editor.c:3095
+msgid "HTML files"
+msgstr "HTML fájlok"
+
+#: src/editor.c:3131
+msgid "Export Cave as CrLi Cave File"
+msgstr "CrLi pálya fájl exportálása"
+
+#: src/editor.c:3170
+msgid "Export Cave as CrLi Cave Pack"
+msgstr "CrLi pálya gyűjtemény exportálása"
+
+#: src/editor.c:3209
+#, c-format
+msgid "Testing %s"
+msgstr "%s kipróbálása"
+
+#: src/editor.c:3263
+msgid "New cave"
+msgstr "Új pálya"
+
+#: src/editor.c:3632
+msgid "_Cave"
+msgstr "_Pálya"
+
+#: src/editor.c:3633
+msgid "_Edit"
+msgstr "S_zerkesztés"
+
+#: src/editor.c:3634
+msgid "_View"
+msgstr "_Nézet"
+
+#: src/editor.c:3635
+msgid "_Tools"
+msgstr "_Eszközök"
+
+#: src/editor.c:3637
+msgid "Close cave editor"
+msgstr "Pályaszerkesztő bezárása"
+
+#: src/editor.c:3638
+msgid "New _cave"
+msgstr "Új _pálya"
+
+#: src/editor.c:3638
+msgid "Create new cave"
+msgstr "Új pálya létrehozása"
+
+#: src/editor.c:3640
+msgid "Save cave set to file"
+msgstr "Játék pályáinak mentése új néven"
+
+#: src/editor.c:3641
+msgid "Save cave set as new file"
+msgstr "Játék pályáinak mentése új néven"
+
+#: src/editor.c:3642
+msgid "Load cave set from file"
+msgstr "Játék betöltése fájlból"
+
+#: src/editor.c:3644
+msgid "Select all items"
+msgstr "Összes elem kiválasztása"
+
+#: src/editor.c:3645
+msgid "Cave set _properties"
+msgstr "Játék _tulajdonságai"
+
+#: src/editor.c:3645
+msgid "Set properties of cave set"
+msgstr "Játék tulajdonságainak beállítása"
+
+#: src/editor.c:3650
+msgid "_Edit cave"
+msgstr "Pálya s_zerkesztése"
+
+#: src/editor.c:3650
+msgid "Edit selected cave"
+msgstr "Kiválasztott pálya szerkesztése"
+
+#: src/editor.c:3651
+msgid "_Rename cave"
+msgstr "_Pálya átnevezése"
+
+#: src/editor.c:3651
+msgid "Rename selected cave"
+msgstr "Kiválasztott pálya átnevezése"
+
+#: src/editor.c:3656
+msgid "_New cave set"
+msgstr "Ú_j játék"
+
+#: src/editor.c:3656
+msgid "Create new cave set with no caves"
+msgstr "Új, üres játék létrehozása"
+
+#: src/editor.c:3657
+msgid "Save _HTML gallery"
+msgstr "_HTML galéria mentése"
+
+#: src/editor.c:3657
+msgid "Save game in a HTML gallery"
+msgstr "Játék mentése egy HTML galériaába"
+
+#: src/editor.c:3658
+msgid "Export _CrLi cave pack"
+msgstr "_CrLi játék exportálása"
+
+#: src/editor.c:3663
+msgid "_Export as CrLi cave file"
+msgstr "CrLi pálya _exportálása"
+
+#: src/editor.c:3664
+msgid "Open cave selector"
+msgstr "Pályaválasztó megnyitása"
+
+#: src/editor.c:3665
+msgid "_Test"
+msgstr "T_esztelés"
+
+#: src/editor.c:3666
+msgid "Ca_ve properties"
+msgstr "Pá_lya tulajdonságai"
+
+#: src/editor.c:3666
+msgid "Cave settings"
+msgstr "Pálya beállításai"
+
+#: src/editor.c:3667
+msgid "Select cave colors"
+msgstr "Pálya színeinek kiválasztása"
+
+#: src/editor.c:3668
+msgid "Remove objects"
+msgstr "Rajzelemek törlése"
+
+#: src/editor.c:3668
+msgid "Clear cave objects"
+msgstr "Pálya rajzelemeinek törlése"
+
+#: src/editor.c:3669
+msgid "Convert to map"
+msgstr "Térképpé alakítás"
+
+#: src/editor.c:3669
+msgid "Flatten cave to a single cave map without objects"
+msgstr "A pálya lapítása egyetlen térképpé"
+
+#: src/editor.c:3670
+msgid "O_verview"
+msgstr "Át_tekintés"
+
+#: src/editor.c:3670
+msgid "Full screen overview of cave"
+msgstr "A teljes pálya áttekintése"
+
+#: src/editor.c:3671
+msgid "O_verview (game)"
+msgstr "Át_tekintés (játék nézet)"
+
+#: src/editor.c:3671
+msgid "Full screen overview of cave as in game"
+msgstr "A teljes pálya áttekintése (játék nézet)"
+
+#: src/editor.c:3672
+msgid "_Auto shrink"
+msgstr "_Automatikus zsugorítás"
+
+#: src/editor.c:3672
+msgid "Automatically set the visible part of the cave"
+msgstr "A pálya látható részének automatikus beállítása"
+
+#: src/editor.c:3677
+msgid "To _bottom"
+msgstr "_Alulra"
+
+#: src/editor.c:3677
+msgid "Push object to bottom"
+msgstr "Rajzelem alulra küldése"
+
+#: src/editor.c:3678
+msgid "To t_op"
+msgstr "_Felülre"
+
+#: src/editor.c:3678
+msgid "Bring object to top"
+msgstr "Rajzelem felülre hozása"
+
+#: src/editor.c:3682
+msgid "Ob_ject properties"
+msgstr "Rajz_elem tulajdonságai"
+
+#: src/editor.c:3682
+msgid "Set object properties"
+msgstr "Elem tulajdonságainak szerkesztése"
+
+#: src/editor.c:3687
+msgid "Map"
+msgstr "Térkép"
+
+#: src/editor.c:3688
+msgid "Shift _left"
+msgstr "Léptetés _balra"
+
+#: src/editor.c:3689
+msgid "Shift _right"
+msgstr "Léptretés _jobbra"
+
+#: src/editor.c:3690
+msgid "Shift _up"
+msgstr "Léptetés _fel"
+
+#: src/editor.c:3691
+msgid "Shift _down"
+msgstr "Léptetés _le"
+
+#: src/editor.c:3692
+msgid "Remove m_ap"
+msgstr "Térkép tö_rlése"
+
+#: src/editor.c:3692
+msgid "Remove cave map, if it has one"
+msgstr "A pálya térkép törlése"
+
+#: src/editor.c:3697
+msgid "Setup cave _random fill"
+msgstr "Véletlenszerű _elemek beállítása"
+
+#: src/editor.c:3697
+msgid "Setup initial fill random elements for the cave"
+msgstr "A véletlenszerű kezdeti kitöltés beállítása a pályához"
+
+#: src/editor.c:3702
+msgid "Cut to clipboard"
+msgstr "Kivágás a vágólapra"
+
+#: src/editor.c:3703
+msgid "Copy to clipboard"
+msgstr "Másolás a vágólapra"
+
+#: src/editor.c:3704
+msgid "Delete"
+msgstr "Törlés"
+
+#: src/editor.c:3709
+msgid "Paste object from clipboard"
+msgstr "Rajzelem beillesztése a vágólapról"
+
+#: src/editor.c:3714
+msgid "Undo last action"
+msgstr "Előző művelet visszavonása"
+
+#: src/editor.c:3719
+msgid "Redo last action"
+msgstr "Visszavont művelet ismétlése"
+
+#: src/editor.c:3727
+msgid "_Animated view"
+msgstr "_Animált nézet"
+
+#: src/editor.c:3727
+msgid "Animated view"
+msgstr "Animált nézet"
+
+#: src/editor.c:3728
+msgid "_Colored objects"
+msgstr "_Színes rajzelemek"
+
+#: src/editor.c:3728
+msgid "Cave objects are coloured"
+msgstr "A rajzelemek kiemelése színnel"
+
+#: src/editor.c:3729
+msgid "_Object list"
+msgstr "Ra_jzelem lista"
+
+#: src/editor.c:3729
+msgid "Object list sidebar"
+msgstr "Objektumok oldalsáv"
+
+#: src/editor.c:3730
+msgid "_Show variables in test"
+msgstr "_Belső változók mutatása tesztnél"
+
+#: src/editor.c:3730
+msgid "Show a label during tests with some cave parameters"
+msgstr "A pálya teszt közben néhány belső változó értékét mutatja"
+
+#: src/editor.c:4014
+msgid "Level shown:"
+msgstr "Szint:"
+
+#: src/editor.c:4018
+msgid ""
+"Element used to draw points, lines, and rectangles. You can use middle-click "
+"to pick one from the cave."
+msgstr ""
+"A pontok, vonalak és téglalapok rajzolásához használt elem. A pályára a "
+"középső egérgombbal kattintva is kiválasztható."
+
+#: src/editor.c:4023
+msgid ""
+"Element used to fill rectangles, and second element of joins. You can use "
+"Ctrl + middle-click to pick one from the cave."
+msgstr ""
+"A téglalapok kitöltéséhez és a kötésekhez használt második elem. A Ctrl "
+"billentyű megnyomásával és a középső gombbal kattintva a pályára is "
+"beállítható."
+
+#: src/editor.c:4060
+msgid "_Objects"
+msgstr "_Objektumok"
+
+#: src/settings.c:255
+msgid "Select cave number C"
+msgstr "C. pálya kiválasztása"
+
+#: src/settings.c:256
+msgid "Select level number L"
+msgstr "A játék indítása az L. szinten"
+
+#: src/settings.c:257
+msgid "Load internal caveset number I"
+msgstr "I. beépített játék betöltése"
+
+#: src/settings.c:258
+msgid "Show license and quit"
+msgstr ""
+
+#: src/settings.c:259
+msgid "Cave names"
+msgstr "Pálya nevek"
+
+#: src/settings.c:264
+msgid "[FILE NAME]"
+msgstr "[fájlnév]"
+
+#~ msgid "_Show errors"
+#~ msgstr "_Hibák mutatása"
+
+#~ msgid "Half"
+#~ msgstr "Fél"

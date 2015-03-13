@@ -1,0 +1,15 @@
+## Process this file with automake to produce Makefile.in
+
+SUBDIRS = po include src caves util docs sound
+
+ACLOCAL_AMFLAGS = -I m4
+
+
+desktopdir = $(datadir)/applications
+desktop_DATA = gdash.desktop
+
+gdash.nsi: gdash.nsi.in
+	sed s/GDASH-VERSION/$(PACKAGE_VERSION)/ <gdash.nsi.in >gdash.nsi
+
+EXTRA_DIST = config.rpath mkinstalldirs m4/ChangeLog gdash.ico gdash.nsi.in $(desktop_DATA) gdk-pixbuf.loaders
+

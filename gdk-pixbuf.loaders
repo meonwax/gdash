@@ -1,0 +1,11 @@
+# GdkPixbuf Image Loader Modules file
+#
+#
+
+"libpixbufloader-png.dll"
+"png" 5 "gtk20" "The PNG image format"
+"image/png" ""
+"png" ""
+"\211PNG\r\n\032\n" "" 100
+
+

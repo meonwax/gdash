@@ -1,0 +1,46 @@
+/*
+ * Copyright (c) 2007, 2008 Czirkos Zoltan <cirix@fw.hu>
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+#ifndef _GD_GFX_H
+#define _GD_GFX_H
+
+#include <gtk/gtkwidget.h>
+#include <gtk/gtkliststore.h>
+#include "cave.h"
+
+extern int cell_size;
+extern GdkPixmap *cells[NUM_OF_CELLS*3];
+extern GdkPixbuf *cells_pb[NUM_OF_CELLS];
+extern GdkPixbuf *gd_pixbuf_for_builtin;
+
+/* tv stripes for a pixbuf. exported for the settings window */
+void gd_tv_pixbuf(GdkPixbuf *pixbuf);
+
+/* png graphics loading */
+gboolean gd_is_png_ok_for_theme(const char *filename);
+void gd_loadcells_default();
+gboolean gd_loadcells_file(const char *filename);
+
+/* set scaling */
+void gd_create_pixmaps();
+void gd_select_pixbuf_colors (GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5);
+
+GdkPixbuf *gd_get_element_pixbuf_with_border (GdElement element);
+GdkPixbuf *gd_get_element_pixbuf_simple_with_border (GdElement element);
+GdkPixbuf *gd_drawcave_to_pixbuf(const Cave * cave, const int width, const int height, const gboolean game_view);
+
+
+#endif
+

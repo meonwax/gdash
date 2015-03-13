@@ -1,0 +1,21 @@
+WILLNOT
+-------
+When opening the "cave settings" dialog while the editor window is rather small, it opens higher than the editor window, which can be off screen.
+	the problem is in gtk+; bug reported. http://bugzilla.gnome.org/show_bug.cgi?id=314084
+
+
+
+TO DO
+-----
+two types of hatching delay?
+
+crdr timing
+
+cow not perfect
+
+window parents
+
+record and playback of games
+
+option "More than 1 bomb" in the cave settings
+

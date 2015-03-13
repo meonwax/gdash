@@ -1,0 +1,174 @@
+; GDash.nsi
+;
+
+;--------------------------------
+
+; The name of the installer
+Name "GDash"
+
+!define VERSION GDASH-VERSION
+!define MINGWDIR c:\mingw
+
+; The file to write
+OutFile "gdash-${VERSION}-installer.exe"
+
+; The default installation directory
+InstallDir $PROGRAMFILES\GDash
+
+; Registry key to check for directory (so if you install again, it will 
+; overwrite the old one automatically)
+InstallDirRegKey HKLM "Software\GDash" "Install_Dir"
+
+;--------------------------------
+
+; Pages
+Page components
+Page directory
+Page instfiles
+
+UninstPage uninstConfirm
+UninstPage instfiles
+
+;--------------------------------
+
+; The stuff to install
+Section "GDash (required)"
+
+  SectionIn RO
+  
+  ; Program files
+  SetOutPath $INSTDIR
+  File "src\gdash.exe"
+  File "src\sdash.exe"
+  File "include\boulder_rush.png"
+  File "include\cells_c64.png"
+  File "gdash.ico"
+
+  ; Program files, GTK+
+  SetOutPath $INSTDIR
+  File ${MINGWDIR}\bin\intl.dll
+  File ${MINGWDIR}\bin\jpeg62.dll 
+  File ${MINGWDIR}\bin\libatk-1.0-0.dll
+  File ${MINGWDIR}\bin\libcairo-2.dll
+  File ${MINGWDIR}\bin\libgdk_pixbuf-2.0-0.dll
+  File ${MINGWDIR}\bin\libgdk-win32-2.0-0.dll
+  File ${MINGWDIR}\bin\libglib-2.0-0.dll
+  File ${MINGWDIR}\bin\libgmodule-2.0-0.dll
+  File ${MINGWDIR}\bin\libgobject-2.0-0.dll
+  File ${MINGWDIR}\bin\libgtk-win32-2.0-0.dll
+  File ${MINGWDIR}\bin\libpango-1.0-0.dll
+  File ${MINGWDIR}\bin\libpangocairo-1.0-0.dll
+  File ${MINGWDIR}\bin\libpangowin32-1.0-0.dll
+  File ${MINGWDIR}\bin\libpng13.dll
+  File ${MINGWDIR}\bin\libtiff3.dll
+  File ${MINGWDIR}\bin\zlib1.dll
+  File ${MINGWDIR}\lib\gtk-2.0\2.10.0\loaders\libpixbufloader-png.dll
+  SetOutPath $INSTDIR\etc\gtk-2.0
+  File gdk-pixbuf.loaders
+  
+  ; Program files, SDL
+  SetOutPath $INSTDIR
+  File ${MINGWDIR}\bin\SDL.dll
+  File ${MINGWDIR}\bin\SDL_mixer.dll
+  
+  ; Translations
+  SetOutPath $INSTDIR\hu\LC_MESSAGES
+  File /r ${MINGWDIR}\share\locale\hu\LC_MESSAGES\gtk20.mo
+  File /r ${MINGWDIR}\share\locale\hu\LC_MESSAGES\glib20.mo
+  SetOutPath $INSTDIR\de\LC_MESSAGES
+  File /r ${MINGWDIR}\share\locale\de\LC_MESSAGES\gtk20.mo
+  File /r ${MINGWDIR}\share\locale\de\LC_MESSAGES\glib20.mo
+
+  SetOutPath $INSTDIR\hu\LC_MESSAGES
+  File /oname=gdash.mo "po\hu.gmo"
+  SetOutPath $INSTDIR\de\LC_MESSAGES
+  File /oname=gdash.mo "po\de.gmo"
+
+  ; Write the installation path into the registry
+  WriteRegStr HKLM SOFTWARE\GDash "Install_Dir" "$INSTDIR"
+  
+  ; Write the uninstall keys for Windows
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\GDash" "DisplayName" "GDash"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\GDash" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\GDash" "NoModify" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\GDash" "NoRepair" 1
+  WriteUninstaller "uninstall.exe"
+  
+SectionEnd
+
+; Optional section (can be disabled by the user)
+; The stuff to install
+Section "Cave sets"
+
+  ; Set output path to the installation directory.
+  SetOutPath $INSTDIR\caves
+  
+  ; Put files there
+  File /r /x Makefile* /x create_makefile.sh "caves\*"
+
+SectionEnd
+
+
+
+; Optional section (can be disabled by the user)
+Section "Start Menu Shortcuts"
+
+  SetOutPath $INSTDIR
+  CreateDirectory "$SMPROGRAMS\GDash"
+  CreateShortCut "$SMPROGRAMS\GDash\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+  CreateShortCut "$SMPROGRAMS\GDash\GDash (with editor).lnk" "$INSTDIR\gdash.exe" "" "$INSTDIR\gdash.ico" 0
+  CreateShortCut "$SMPROGRAMS\GDash\GDash.lnk" "$INSTDIR\sdash.exe" "" "$INSTDIR\gdash.ico" 0
+  
+SectionEnd
+
+
+
+; Optional section (can be disabled by the user)
+Section "Register *.bd and *.gds files"
+
+  WriteRegStr HKCR ".bd" "" "GDash.Caveset"
+  WriteRegStr HKCR ".gds" "" "GDash.Caveset"
+
+  WriteRegStr HKCR "GDash.Caveset" "" "GDash Caveset"
+  WriteRegStr HKCR "GDash.Caveset\DefaultIcon" "" "$INSTDIR\gdash.ico,0"
+
+  WriteRegStr HKCR "GDash.Caveset\shell\open\command" "" '"$INSTDIR\gdash.exe" "%1"'
+  WriteRegStr HKCR "GDash.Caveset\shell\edit\command" "" '"$INSTDIR\gdash.exe" -e "%1"'
+  
+SectionEnd
+
+
+
+; Optional section (can be disabled by the user)
+Section "any2gdash conversion utility"
+
+  SetOutPath $INSTDIR
+  File "util\any2gdash.exe"
+  
+SectionEnd
+
+
+
+
+
+;--------------------------------
+; Uninstaller
+
+Section "Uninstall"
+  
+  ; Remove registry keys
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\GDash"
+  DeleteRegKey HKLM SOFTWARE\GDash
+  DeleteRegKey HKCR ".bd"
+  DeleteRegKey HKCR ".gds"
+  DeleteRegKey HKCR "GDash.Caveset"
+
+  ; Remove shortcuts, if any
+  Delete "$SMPROGRAMS\GDash\*.*"
+  RMDir "$SMPROGRAMS\GDash"
+
+  ; Remove directories used
+  RMDir /r "$INSTDIR"
+
+SectionEnd
+
