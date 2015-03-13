@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GDash 20080605\n"
 "Report-Msgid-Bugs-To: cirix@fw.hu\n"
-"POT-Creation-Date: 2008-12-13 22:41+0100\n"
+"POT-Creation-Date: 2008-12-17 10:40+0100\n"
 "PO-Revision-Date: 2008-06-13 11:40+0200\n"
 "Last-Translator: Czirkos Zoltan <cirix@fw.hu>\n"
 "Language-Team: German\n"
@@ -978,7 +978,7 @@ msgstr "Kein Element"
 msgid "Cave data"
 msgstr "Höhlen-Daten"
 
-#: src/cavedb.c:278 src/caveset.c:56 src/gtkmain.c:1431 src/gtkui.c:877
+#: src/cavedb.c:278 src/caveset.c:56 src/gtkmain.c:1412 src/gtkui.c:877
 msgid "Name"
 msgstr "Name"
 
@@ -1002,7 +1002,7 @@ msgstr "Author"
 msgid "Name of author"
 msgstr "Name des Authors"
 
-#: src/cavedb.c:281 src/caveset.c:59 src/gtkmain.c:1435
+#: src/cavedb.c:281 src/caveset.c:59 src/gtkmain.c:1416
 msgid "Date"
 msgstr "Datum"
 
@@ -1044,7 +1044,7 @@ msgstr ""
 "Hier wird eingestellt, ob das Spiel von dieser Höhle an gestartet werden "
 "kann."
 
-#: src/cavedb.c:287 src/editorexport.c:564 src/gtkmain.c:1533
+#: src/cavedb.c:287 src/editorexport.c:564 src/gtkmain.c:1514
 msgid "Intermission"
 msgstr "Zwischenspiel"
 
@@ -2989,7 +2989,7 @@ msgstr "Zeichen-Element"
 msgid "Fill Element"
 msgstr "Füll-Element"
 
-#: src/editor.c:4370 src/gtkmain.c:1649
+#: src/editor.c:4370 src/gtkmain.c:1630
 msgid "_File"
 msgstr "_Datei"
 
@@ -3009,7 +3009,7 @@ msgstr "_Anzeige"
 msgid "_Tools"
 msgstr "_Werkzeuge"
 
-#: src/editor.c:4375 src/gtkmain.c:1651
+#: src/editor.c:4375 src/gtkmain.c:1632
 msgid "_Help"
 msgstr "_Hilfe"
 
@@ -3037,7 +3037,7 @@ msgstr "Speichere Höhlensatz as neue Datei"
 msgid "Load cave set from file"
 msgstr "Lade Höhlensatz von der Datei"
 
-#: src/editor.c:4382 src/gtkmain.c:1666
+#: src/editor.c:4382 src/gtkmain.c:1647
 msgid "O_pen shipped"
 msgstr "_Öffne mitgelieferte Spiele"
 
@@ -3045,7 +3045,7 @@ msgstr "_Öffne mitgelieferte Spiele"
 msgid "Load shipped cave set from file"
 msgstr "Lade mitgelieferten Höhlensatz von der Datei"
 
-#: src/editor.c:4383 src/gtkmain.c:1669
+#: src/editor.c:4383 src/gtkmain.c:1650
 msgid "Hi_ghscores"
 msgstr "Hi_ghscores"
 
@@ -3457,7 +3457,7 @@ msgstr ""
 msgid "<TR><TD>%s</TD><TD>%s</TD></TR>\n"
 msgstr ""
 
-#: src/editorexport.c:564 src/gtkmain.c:1533
+#: src/editorexport.c:564 src/gtkmain.c:1514
 msgid "Normal cave"
 msgstr "Normale Höhle"
 
@@ -3578,9 +3578,9 @@ msgid "Score: <b>%d</b>"
 msgstr "Punkte: <b>%d</b>"
 
 #: src/gtkmain.c:558
-#, fuzzy, c-format
-msgid "Diamond value: <b>%d</b>"
-msgstr "Diamanten: <b>%d</b>"
+#, c-format
+msgid "Value: <b>%d</b>"
+msgstr "Wert: <b>%d</b>"
 
 #: src/gtkmain.c:562
 #, c-format
@@ -3641,214 +3641,214 @@ msgstr "Level:"
 msgid "Preview"
 msgstr "Vorschau"
 
-#: src/gtkmain.c:1222
+#: src/gtkmain.c:1203
 msgid "Cannot load file from network link."
 msgstr "Die Datei kann nicht über das Netzwerk geladen werden."
 
-#: src/gtkmain.c:1241
+#: src/gtkmain.c:1222
 msgid "Loaded caveset from file:"
 msgstr "Geladener Höhlensatz von Datei:"
 
-#: src/gtkmain.c:1381 src/help.c:102
+#: src/gtkmain.c:1362 src/help.c:102
 #, fuzzy
 msgid "Replays"
 msgstr "Ersetze"
 
-#: src/gtkmain.c:1392
+#: src/gtkmain.c:1373
 msgid ""
 "<i>Hint: When watching a replay, you can use the usual movement keys (left, "
 "right...) to stop the replay and immediately continue the playing of the "
 "cave yourself.</i>"
 msgstr ""
 
-#: src/gtkmain.c:1442 src/gtkui.c:882
+#: src/gtkmain.c:1423 src/gtkui.c:882
 msgid "Score"
 msgstr "Punkte"
 
-#: src/gtkmain.c:1447
+#: src/gtkmain.c:1428
 msgid "Comment"
 msgstr ""
 
-#: src/gtkmain.c:1454
+#: src/gtkmain.c:1435
 #, fuzzy
 msgid "Saved"
 msgstr "Leerfeld"
 
-#: src/gtkmain.c:1495 src/gtkmain.c:1538
+#: src/gtkmain.c:1476 src/gtkmain.c:1519
 #, fuzzy
 msgid "Description: "
 msgstr "Beschreibung:"
 
-#: src/gtkmain.c:1500 src/gtkmain.c:1543
+#: src/gtkmain.c:1481 src/gtkmain.c:1524
 #, fuzzy
 msgid "Author: "
 msgstr "Author"
 
-#: src/gtkmain.c:1505 src/gtkmain.c:1548
+#: src/gtkmain.c:1486 src/gtkmain.c:1529
 #, fuzzy
 msgid "Date: "
 msgstr "Datum"
 
-#: src/gtkmain.c:1510
+#: src/gtkmain.c:1491
 #, fuzzy
 msgid "Diffuculty: "
 msgstr "Schwierigkeitsgrad"
 
-#: src/gtkmain.c:1515 src/gtkmain.c:1558
+#: src/gtkmain.c:1496 src/gtkmain.c:1539
 #, fuzzy
 msgid "Remark: "
 msgstr "Anmerkung"
 
-#: src/gtkmain.c:1520 src/gtkmain.c:1563
+#: src/gtkmain.c:1501 src/gtkmain.c:1544
 #, fuzzy
 msgid "Notes:\n"
 msgstr "Notizen"
 
-#: src/gtkmain.c:1532
+#: src/gtkmain.c:1513
 #, fuzzy
 msgid "Type: "
 msgstr "Art"
 
-#: src/gtkmain.c:1553
+#: src/gtkmain.c:1534
 #, fuzzy
 msgid "Difficulty: "
 msgstr "Schwierigkeitsgrad"
 
-#: src/gtkmain.c:1583
+#: src/gtkmain.c:1564
 #, fuzzy
 msgid "Caveset information"
 msgstr "Höhlensatz-Daten"
 
-#: src/gtkmain.c:1648
+#: src/gtkmain.c:1629
 msgid "_Play"
 msgstr "_Spiel"
 
-#: src/gtkmain.c:1650
+#: src/gtkmain.c:1631
 msgid "_Settings"
 msgstr "_Einstellungen"
 
-#: src/gtkmain.c:1654
+#: src/gtkmain.c:1635
 msgid "_Error console"
 msgstr "_Fehler-Konsole"
 
-#: src/gtkmain.c:1656
+#: src/gtkmain.c:1637
 #, fuzzy
 msgid "Caveset _information"
 msgstr "Höhlensatz-_Eigenschaften"
 
-#: src/gtkmain.c:1656
+#: src/gtkmain.c:1637
 msgid "Show information about the and its caves"
 msgstr ""
 
-#: src/gtkmain.c:1661
+#: src/gtkmain.c:1642
 msgid "_New game"
 msgstr "_Neues Spiel"
 
-#: src/gtkmain.c:1661
+#: src/gtkmain.c:1642
 msgid "Start new game"
 msgstr "Starte neues Spiel"
 
-#: src/gtkmain.c:1662
+#: src/gtkmain.c:1643
 msgid "Cave _editor"
 msgstr "Höhlen _Editor"
 
-#: src/gtkmain.c:1664
+#: src/gtkmain.c:1645
 msgid "Load _internal game"
 msgstr "Lade _internes Spiel"
 
-#: src/gtkmain.c:1665
+#: src/gtkmain.c:1646
 msgid "Open _recent"
 msgstr "Öffne _letzte Dateien"
 
-#: src/gtkmain.c:1670
+#: src/gtkmain.c:1651
 msgid "Show _replays"
 msgstr ""
 
-#: src/gtkmain.c:1674
+#: src/gtkmain.c:1655
 msgid "_Take snapshot"
 msgstr "Schnappschuss _erstellen"
 
-#: src/gtkmain.c:1675
+#: src/gtkmain.c:1656
 msgid "Re_start level"
 msgstr "Level _wiederholen"
 
-#: src/gtkmain.c:1675
+#: src/gtkmain.c:1656
 msgid "Restart current level"
 msgstr "Aktuellen Level neu starten"
 
-#: src/gtkmain.c:1676
+#: src/gtkmain.c:1657
 msgid "_End game"
 msgstr "Spiel _beenden"
 
-#: src/gtkmain.c:1676
+#: src/gtkmain.c:1657
 msgid "End current game"
 msgstr "Aktuelles Spiel beenden"
 
-#: src/gtkmain.c:1680
+#: src/gtkmain.c:1661
 msgid "_Revert to snapshot"
 msgstr "_Zurück zum Schnappschuss"
 
-#: src/gtkmain.c:1684
+#: src/gtkmain.c:1665
 msgid "Pause game"
 msgstr "Spiel anhalten"
 
-#: src/gtkmain.c:1685
+#: src/gtkmain.c:1666
 msgid "Fullscreen mode during play"
 msgstr "Vollbildmodus während des Spiels"
 
-#: src/gtkmain.c:1686
+#: src/gtkmain.c:1667
 msgid "Fast for_ward"
 msgstr "Schnell vor_wärts"
 
-#: src/gtkmain.c:1686
+#: src/gtkmain.c:1667
 #, fuzzy
 msgid "Fast forward"
 msgstr "Schnell vor_wärts"
 
-#: src/gtkmain.c:1898
+#: src/gtkmain.c:1879
 msgid "Start editor"
 msgstr "Starte Editor"
 
-#: src/gtkmain.c:1899
+#: src/gtkmain.c:1880
 msgid "Save caveset in a HTML gallery"
 msgstr "Speichere Höhlensatz in einer HTML Gallerie"
 
-#: src/gtkmain.c:1900
+#: src/gtkmain.c:1881
 msgid ""
 "Save cave C, level L in a PNG image. If no cave selected, uses a random one"
 msgstr ""
 "Speichere Höhle C, Level L in ein PNG-Bild. Wenn keine Höhle ausgewählt "
 "wurde, wird eine zufällig ausgewählte Höhle verwendet."
 
-#: src/gtkmain.c:1901
+#: src/gtkmain.c:1882
 msgid "Set PNG image size. Default is 128x96, set to 0x0 for unscaled"
 msgstr ""
 "Definiere PNG-Bildgröße. Voreingestellt ist 128x96, verwende 0x0 für keine "
 "Skalierung"
 
-#: src/gtkmain.c:1902
+#: src/gtkmain.c:1883
 msgid "Save caveset in a BDCFF file"
 msgstr "Speichere Höhlensatz in eine BDCFF-Datei"
 
-#: src/gtkmain.c:1903
+#: src/gtkmain.c:1884
 msgid "Batch mode: quit after specified tasks"
 msgstr "Stapelmodus: Beende das Spiel nach angegebenen Tätigkeiten"
 
-#: src/gtkmain.c:1954 src/sdlmain.c:1042
+#: src/gtkmain.c:1935 src/sdlmain.c:1007
 #, c-format
 msgid "Errors during loading caveset from file '%s'"
 msgstr "Fehler während des Ladens des Höhlensatzes von der Datei '%s'"
 
-#: src/gtkmain.c:1959 src/sdlmain.c:1049
+#: src/gtkmain.c:1940 src/sdlmain.c:1014
 #, c-format
 msgid "%d: no such internal caveset"
 msgstr "%d: keinen solchen internen Höhlensatz gefunden"
 
-#: src/gtkmain.c:1988 src/sdlmain.c:1059
+#: src/gtkmain.c:1969 src/sdlmain.c:1024
 msgid "Invalid cave or level number!\n"
 msgstr "Ungültige Höhlen- oder Level-Nummer!\n"
 
-#: src/gtkmain.c:2001
+#: src/gtkmain.c:1982
 #, c-format
 msgid "Invalid image size: %s"
 msgstr "Ungültige Bildgröße: %s"
@@ -4045,7 +4045,8 @@ msgid "Fine scroll - 50 frames per second."
 msgstr ""
 
 #: src/gtkui.c:579
-msgid "PAL scanline shade (%)"
+#, fuzzy, c-format
+msgid "PAL scanline shade (%%)"
 msgstr "PAL-Scanline-Schatten (%)"
 
 #: src/gtkui.c:579
@@ -5458,6 +5459,10 @@ msgstr "Höhlen-Namen"
 msgid "[FILE NAME]"
 msgstr "[DATEINAME]"
 
+#, fuzzy
+#~ msgid "Diamond value: <b>%d</b>"
+#~ msgstr "Diamanten: <b>%d</b>"
+
 #~ msgid "_Random"
 #~ msgstr "_Zufällig"
 
@@ -5469,9 +5474,6 @@ msgstr "[DATEINAME]"
 
 #~ msgid "Snapshot of %s"
 #~ msgstr "Schnappschuss von %s"
-
-#~ msgid "Value: <b>%d</b>"
-#~ msgstr "Wert: <b>%d</b>"
 
 #~ msgid ""
 #~ "The colour palette for games imported from C64 files. Also affects BDCFF "

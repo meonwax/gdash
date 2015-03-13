@@ -215,7 +215,8 @@ load_cave()
 			gd_gameplay.gfx_buffer[y][x]=-1;	/* fill with "invalid" */
 
 	gd_gameplay.state_counter=GAME_INT_LOAD_CAVE;
-	gd_gameplay.milliseconds=0;
+	gd_gameplay.milliseconds_anim=0;
+	gd_gameplay.milliseconds_game=0;		/* set game timer to zero, too */
 }
 
 
@@ -273,6 +274,7 @@ gd_new_game_test(Cave *cave, int level)
 
 	gd_gameplay.cave=NULL;
 	gd_gameplay.original_cave=cave;
+	gd_gameplay.level_num=level;
 	gd_gameplay.replay_from=NULL;
 
 	gd_gameplay.type=GD_GAMETYPE_TEST;
@@ -320,7 +322,7 @@ next_level()
 
 
 void
-iterate_cave(GdDirection player_move, gboolean fire, gboolean key_suicide, gboolean key_restart)
+iterate_cave(GdDirection player_move, gboolean fire, gboolean suicide, gboolean restart)
 {
 	/* if we are playing a replay, but the user intervents, continue as a snapshot. */
 	/* do not trigger this for fire, as it would not be too intuitive. */
@@ -337,7 +339,7 @@ iterate_cave(GdDirection player_move, gboolean fire, gboolean key_suicide, gbool
 			gboolean result;
 			
 			/* if the user does touch the keyboard, we immediately exit replay, and he can continue playing */
-			result=gd_replay_get_next_movement(gd_gameplay.replay_from, &player_move, &fire, &key_suicide);
+			result=gd_replay_get_next_movement(gd_gameplay.replay_from, &player_move, &fire, &suicide);
 			/* if could not get move from snapshot, continue from keyboard input. */
 			if (!result)
 				gd_gameplay.replay_no_more_movements++;
@@ -347,9 +349,9 @@ iterate_cave(GdDirection player_move, gboolean fire, gboolean key_suicide, gbool
 		}
 
 		/* iterate cave */
-		gd_cave_iterate(gd_gameplay.cave, player_move, fire, key_suicide);
+		gd_cave_iterate(gd_gameplay.cave, player_move, fire, suicide);
 		if (gd_gameplay.replay_record)
-			gd_replay_store_next(gd_gameplay.replay_record, player_move, fire, key_suicide);
+			gd_replay_store_next(gd_gameplay.replay_record, player_move, fire, suicide);
 		if (gd_gameplay.cave->score)
 			increment_score(gd_gameplay.cave->score);
 
@@ -371,7 +373,7 @@ iterate_cave(GdDirection player_move, gboolean fire, gboolean key_suicide, gbool
 		next_level();
 	}
 
-	if (((gd_gameplay.cave->player_state==GD_PL_DIED || gd_gameplay.cave->player_state==GD_PL_TIMEOUT) && fire) || key_restart) {
+	if (((gd_gameplay.cave->player_state==GD_PL_DIED || gd_gameplay.cave->player_state==GD_PL_TIMEOUT) && fire) || restart) {
 		/* player died, and user presses fire -> try again */
 		/* time out -> try again */
 		if (!gd_gameplay.cave->intermission && gd_gameplay.player_lives>0)
@@ -396,14 +398,21 @@ iterate_cave(GdDirection player_move, gboolean fire, gboolean key_suicide, gbool
 }
 
 GdGameState
-gd_game_main_int(GdDirection player_move, gboolean fire, gboolean key_suicide, gboolean key_restart, gboolean allow_iterate, gboolean yellowish_draw, gboolean fast_forward)
+gd_game_main_int(int millisecs_elapsed, GdDirection player_move, gboolean fire, gboolean suicide, gboolean restart, gboolean allow_iterate, gboolean yellowish_draw, gboolean fast_forward)
 {
+	gboolean frame;	/* set to true, if this will be an animation frame */
 	int x, y;
 	GdGameState return_state;
 	int counter_next;
 
 	counter_next=GAME_INT_INVALID;
 	return_state=GD_GAME_INVALID_STATE;
+	gd_gameplay.milliseconds_anim+=millisecs_elapsed;	/* keep track of time */
+	frame=FALSE;	/* set to true, if this will be an animation frame */
+	if (gd_gameplay.milliseconds_anim>=40) {
+		frame=TRUE;
+		gd_gameplay.milliseconds_anim-=40;
+	}
 
 	/* cannot be less than uncover start. */
 	if (gd_gameplay.state_counter<GAME_INT_LOAD_CAVE) {
@@ -433,14 +442,18 @@ gd_game_main_int(GdDirection player_move, gboolean fire, gboolean key_suicide, g
 	else
 	/* uncover animation */
 	if (gd_gameplay.state_counter<GAME_INT_UNCOVER_ALL) {
-		int j;
-		/* original game uncovered one cell per line each frame.
-		 * we have different cave sizes, so uncover w*h/40 random cells each frame. (original was w=40).
-		 * this way the uncovering is the same speed also for intermissions. */
-		for (j=0; j<gd_gameplay.cave->w*gd_gameplay.cave->h/40; j++)
-			gd_gameplay.cave->map[g_random_int_range(0, gd_gameplay.cave->h)][g_random_int_range(0, gd_gameplay.cave->w)] &= ~COVERED;
+		counter_next=gd_gameplay.state_counter;
+		if (frame) {
+			int j;
+			
+			/* original game uncovered one cell per line each frame.
+			 * we have different cave sizes, so uncover width*height/40 random cells each frame. (original was width=40).
+			 * this way the uncovering is the same speed also for intermissions. */
+			for (j=0; j<gd_gameplay.cave->w*gd_gameplay.cave->h/40; j++)
+				gd_gameplay.cave->map[g_random_int_range(0, gd_gameplay.cave->h)][g_random_int_range(0, gd_gameplay.cave->w)] &= ~COVERED;
 
-		counter_next=gd_gameplay.state_counter+1;
+			counter_next++;	/* as we did something, advance the counter. */
+		}
 		return_state=GD_GAME_NOTHING;
 	}
 	else
@@ -454,7 +467,7 @@ gd_game_main_int(GdDirection player_move, gboolean fire, gboolean key_suicide, g
 		gd_cave_clear_sounds(gd_gameplay.cave);
 		gd_cave_play_sounds(gd_gameplay.cave);
 
-		counter_next=gd_gameplay.state_counter+1;
+		counter_next=GAME_INT_CAVE_RUNNING;
 		return_state=GD_GAME_NOTHING;
 	}
 	else
@@ -469,53 +482,60 @@ gd_game_main_int(GdDirection player_move, gboolean fire, gboolean key_suicide, g
 
 		/* ITERATION - cave is running. */
 		return_state=GD_GAME_NOTHING;	/* normally nothing happes. but if we iterate, this might change. */
-		if (allow_iterate)
-			gd_gameplay.milliseconds+=40;
-		if (gd_gameplay.milliseconds>=cavespeed) {
+		if (allow_iterate)	/* if allowing cave movements, add elapsed time to timer. and then we can check what to do. */
+			gd_gameplay.milliseconds_game+=millisecs_elapsed;
+		if (gd_gameplay.milliseconds_game>=cavespeed) {
 			GdPlayerState pl;
-
-			gd_gameplay.milliseconds-=cavespeed;
+			
+			gd_gameplay.milliseconds_game-=cavespeed;
 			pl=gd_gameplay.cave->player_state;
-			iterate_cave(player_move, fire, key_suicide, key_restart);
+			iterate_cave(player_move, fire, suicide, restart);
 			return_state=GD_GAME_LABELS_CHANGED;	/* as we iterated, the score and the like could have been changed. */
 			if (pl!=GD_PL_TIMEOUT && gd_gameplay.cave->player_state==GD_PL_TIMEOUT)
 				return_state=GD_GAME_TIMEOUT_NOW;	/* and if the cave timeouted at this moment, that is a special case. */
 		}
 
-		counter_next=gd_gameplay.state_counter;	/* do not change state, as it is set by iterate_cave() */
+		counter_next=gd_gameplay.state_counter;	/* do not change counter state, as it is set by iterate_cave() */
 	}
 	/* before covering, we check for time bonus score */
 	else
 	if (gd_gameplay.state_counter==GAME_INT_CHECK_BONUS_TIME) {
-		/* if time remaining, bonus points are added. do not start animation yet. */
-		if (gd_gameplay.cave->time>0) {
-			gd_gameplay.cave->time-=gd_gameplay.cave->timing_factor;		/* subtract number of "milliseconds" */
-			increment_score(gd_gameplay.cave->timevalue);			/* higher levels get more bonus points per second remained */
-			if (gd_gameplay.cave->time>60*gd_gameplay.cave->timing_factor) {	/* if much time (>60s) remained, fast counter :) */
-				gd_gameplay.cave->time-=8*gd_gameplay.cave->timing_factor;	/* decrement by nine each frame, so it also looks like a fast counter. 9 is 8+1! */
-				increment_score(gd_gameplay.cave->timevalue*8);
+		if (frame) {
+			/* if time remaining, bonus points are added. do not start animation yet. */
+			if (gd_gameplay.cave->time>0) {
+				gd_gameplay.cave->time-=gd_gameplay.cave->timing_factor;		/* subtract number of "milliseconds" - nothing to do with gd_gameplay.millisecs! */
+				increment_score(gd_gameplay.cave->timevalue);			/* higher levels get more bonus points per second remained */
+				if (gd_gameplay.cave->time>60*gd_gameplay.cave->timing_factor) {	/* if much time (>60s) remained, fast counter :) */
+					gd_gameplay.cave->time-=8*gd_gameplay.cave->timing_factor;	/* decrement by nine each frame, so it also looks like a fast counter. 9 is 8+1! */
+					increment_score(gd_gameplay.cave->timevalue*8);
+				}
+
+				/* just to be neat */
+				if (gd_gameplay.cave->time<0)
+					gd_gameplay.cave->time=0;
+				counter_next=gd_gameplay.state_counter;	/* do not change yet */
 			}
+			else
+			/* if no more points, start waiting a bit, and later start covering. */
+				counter_next=GAME_INT_WAIT_BEFORE_COVER;
 
-			/* just to be neat */
-			if (gd_gameplay.cave->time<0)
-				gd_gameplay.cave->time=0;
-			counter_next=gd_gameplay.state_counter;	/* do not change yet */
+			/* play bonus sound */
+			gd_cave_set_seconds_sound(gd_gameplay.cave);
+			gd_cave_play_sounds(gd_gameplay.cave);
+			return_state=GD_GAME_LABELS_CHANGED;
 		}
-		else
-		/* if no more points, start waiting a bit, and later start covering. */
-			counter_next=GAME_INT_WAIT_BEFORE_COVER;
-
-		/* play bonus sound */
-		gd_cave_set_seconds_sound(gd_gameplay.cave);
-		gd_cave_play_sounds(gd_gameplay.cave);
-
-		return_state=GD_GAME_LABELS_CHANGED;
+		else {
+			return_state=GD_GAME_NOTHING;
+			counter_next=gd_gameplay.state_counter;	/* do not change counter state, as it is set by iterate_cave() */
+		}
 	}
 	else
-	/* after adding bonus points, we wait some time before starting to cover. this is the first frame... */
+	/* after adding bonus points, we wait some time before starting to cover. this is the FIRST frame... so we check for game over and maybe jump there */
 	/* if no more lives, game is over. */
 	if (gd_gameplay.state_counter==GAME_INT_WAIT_BEFORE_COVER) {
-		counter_next=gd_gameplay.state_counter+1;
+		counter_next=gd_gameplay.state_counter;
+		if (frame)
+			counter_next++;	/* 40ms elapsed, advance counter */
 		if (gd_gameplay.type==GD_GAMETYPE_NORMAL && gd_gameplay.player_lives==0)
 			return_state=GD_GAME_NO_MORE_LIVES;
 		else
@@ -524,7 +544,9 @@ gd_game_main_int(GdDirection player_move, gboolean fire, gboolean key_suicide, g
 	else
 	/* after adding bonus points, we wait some time before starting to cover. ... and the other frames. */
 	if (gd_gameplay.state_counter>GAME_INT_WAIT_BEFORE_COVER && gd_gameplay.state_counter<GAME_INT_COVER_START) {
-		counter_next=gd_gameplay.state_counter+1;
+		counter_next=gd_gameplay.state_counter;
+		if (frame)
+			counter_next++;	/* 40ms elapsed, advance counter */
 		return_state=GD_GAME_NOTHING;
 	}
 	else
@@ -542,20 +564,23 @@ gd_game_main_int(GdDirection player_move, gboolean fire, gboolean key_suicide, g
 	else
 	/* covering. */
 	if (gd_gameplay.state_counter>GAME_INT_COVER_START && gd_gameplay.state_counter<GAME_INT_COVER_ALL) {
-		int j;
+		counter_next=gd_gameplay.state_counter;
+		if (frame) {
+			int j;
 
-		/* covering eight times faster than uncovering. */
-		for (j=0; j < gd_gameplay.cave->w*gd_gameplay.cave->h*8/40; j++)
-			gd_gameplay.cave->map[g_random_int_range (0, gd_gameplay.cave->h)][g_random_int_range (0, gd_gameplay.cave->w)] |= COVERED;
-
-		counter_next=gd_gameplay.state_counter+1;
+			counter_next++;	/* 40ms elapsed, doing cover: advance counter */
+			/* covering eight times faster than uncovering. */
+			for (j=0; j < gd_gameplay.cave->w*gd_gameplay.cave->h*8/40; j++)
+				gd_gameplay.cave->map[g_random_int_range (0, gd_gameplay.cave->h)][g_random_int_range (0, gd_gameplay.cave->w)] |= COVERED;
+		}
+		
 		return_state=GD_GAME_NOTHING;
 	}
 	else
 	if (gd_gameplay.state_counter==GAME_INT_COVER_ALL) {
 		/* cover all */
-		for (y=0; y < gd_gameplay.cave->h; y++)
-			for (x=0; x < gd_gameplay.cave->w; x++)
+		for (y=0; y<gd_gameplay.cave->h; y++)
+			for (x=0; x<gd_gameplay.cave->w; x++)
 				gd_gameplay.cave->map[y][x] |= COVERED;
 
 		counter_next=gd_gameplay.state_counter+1;
@@ -584,9 +609,12 @@ gd_game_main_int(GdDirection player_move, gboolean fire, gboolean key_suicide, g
 	g_assert(return_state!=GD_GAME_INVALID_STATE);
 
 	/* draw the cave */
-	if (gd_gameplay.bonus_life_flash)	/* bonus life - frames */
-		gd_gameplay.bonus_life_flash--;
-	gd_gameplay.animcycle=(gd_gameplay.animcycle+1)%8;
+	if (frame) {
+		if (gd_gameplay.bonus_life_flash)	/* bonus life - frames */
+			gd_gameplay.bonus_life_flash--;
+		gd_gameplay.animcycle=(gd_gameplay.animcycle+1)%8;
+	}
+	/* always render the cave to the gfx buffer; however it may do nothing if animcycle was not changed. */
 	gd_drawcave_game(gd_gameplay.cave, gd_gameplay.gfx_buffer, gd_gameplay.bonus_life_flash!=0, yellowish_draw, gd_gameplay.animcycle, gd_no_invisible_outbox);
 
 	gd_gameplay.state_counter=counter_next;

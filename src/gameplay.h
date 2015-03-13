@@ -53,7 +53,8 @@ typedef struct _gd_gameplay {
 	int state_counter;	   /* counter used to control the game flow, rendering of caves */
 	int **gfx_buffer;		/* contains the indexes to the cells; created by *start_level, deleted by *stop_game */
 	int animcycle;
-	int milliseconds;
+	int milliseconds_game;
+	int milliseconds_anim;
 	
 	int replay_no_more_movements;
 } GdGameplay;
@@ -81,7 +82,7 @@ void gd_new_game_snapshot(Cave *snapshot);
 void gd_new_game_test(Cave *cave, int level);
 void gd_new_game_replay(Cave *cave, GdReplay *replay);
 
-GdGameState gd_game_main_int(GdDirection player_move, gboolean fire, gboolean key_suicide, gboolean key_restart, gboolean allow_iterate, gboolean yellowish_draw, gboolean fast_forward);
+GdGameState gd_game_main_int(int millisecs_elapsed, GdDirection player_move, gboolean fire, gboolean suicide, gboolean restart, gboolean allow_iterate, gboolean yellowish_draw, gboolean fast_forward);
 
 
 #endif

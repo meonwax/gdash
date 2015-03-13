@@ -576,7 +576,7 @@ gd_preferences (GtkWidget *parent)
 		{TypeBoolean, N_("PAL emulation for editor"), N_("Use PAL emulated graphics, ie. lines are striped."), &gd_pal_emulation_editor, TRUE},
 //		{TypeBoolean, N_("Even lines vertical scroll"), N_("Even lines vertical scroll. Scrolls to every second scanline vertically. If you use PAL emulation and PAL scanline shade, scrolling might look better with this turned on."), &gd_even_line_pal_emu_vertical_scroll, FALSE},
 		{TypeBoolean, N_("Fine scroll"), N_("Fine scroll - 50 frames per second."), &gd_fine_scroll, FALSE},
-		{TypePercent,    N_("PAL scanline shade (%)"), N_("Darker rows for PAL emulation."), &gd_pal_emu_scanline_shade, TRUE},
+		{TypePercent,    N_("PAL scanline shade (%%)"), N_("Darker rows for PAL emulation."), &gd_pal_emu_scanline_shade, TRUE},
 		{TypeLabel, N_("<b>C64 palette</b>"), NULL, NULL},
 		{TypeStringv, NULL, N_("The color palette for games imported from C64 files."), &gd_c64_palette, FALSE, gd_color_get_c64_palette_names()},
 		{TypeLabel, N_("<b>C64 DTV palette</b>"), NULL, NULL},

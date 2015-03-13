@@ -16,7 +16,7 @@
 #ifndef _GD_SDL_UI_H
 #define _GD_SDL_UI_H
 
-char *gd_select_file(const char *title, const char *start_dir, const char *glob, gboolean allow_new);
+char *gd_select_file(const char *title, const char *start_dir, const char *glob, gboolean for_save);
 void gd_settings_menu();
 void gd_show_highscore(Cave *highlight_cave, int highlight_line);
 void gd_help(const char **strings);

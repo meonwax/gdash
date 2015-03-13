@@ -1,45 +1,14 @@
 DONE
 ----- 
-enhanced timing for both sdash and gdash
-I noted a wrong explanatation concerning the scheduling tyres.
-Another thing: In cave properties can you move the tab "Notes" to the most right?
-invisible outbox do not like; csak grafikailag.
-The 3x nearest scaler looks distorted in sdash, ie. the top row and leftmost column of each element have 4 pixels and the bottom row and rightmost column have only 2. This issue is sdash only.
-And better handling for unknown color names would be very nice too.
-small bugfixes
-random atari colors, also for new caves (selectable)
-warning message for cave size change
-fine scroll mentes
-cave colors dialog escape
-I see you read Atari## colors from BDCFF files now. That's nice. If we could select them in the color picker as well, that would be perfect.
-random atari colors
-kolor szelekcio idejere kikapcsolni
-theme váltás után (de ugyanaz a szín) nem töltötte be újra a szarokat!
-a randomcolor nem mindig allitja at valahogy a gdash_colort?
-scroll speed for 50hz
-cave seed max 1<<30
-crazy dream copy object import
-copy&paste objects
-c64dtv colors: look like the same as atari colors. BUT SHOW ME AT LEAST ONE GAME WHICH USES IT
-brc amoeba probability import
-random rgb colors
-slower explosion tags now affect all. i know this is not the same as the original, but seemed much nicer.
-sdashban ez könnyű, bónús lífé felirat
-html-be notes
-paletted colors in sdash - tesztelni, állítgatni?
-preferred colors helyett - gdash title screenről választott?
-gdashnál egy infó gomb?	- name	- author	- date	- difficulty *	- remark *	- notes *
-replay help
-bonus sound nem tűnt el lol
-Either way, though, I think that the player should always be notified they're playing an intermission from the start (even if it means not using the opening status bar at all) It's not like you need to keep track of your lives during an intermission anyway.
-reowrked gdash status bar
-- Pushing probability of 4 mistranslates to 50%. It should be 25%. 
-	- sdash replay save
-changed saving of "notes" - sorry if some lines are lost
+Hi, there seems to be a problem with level testing at the new version. No matter which level is actually shown, when I want to test my cave, it always goes to level 1...
+timings
+labels
+20-40 ms időzítés további feladatok  midnenhol 20ms?
+sdash 20ms miatt a statusbar_since
+
 
 REFUSED
 -------
-They should be chosen like with the Random button in gdash's color picker, which produces quite useful colors. Same for BDCFF files with no colors specified at all. 
 
 
 TO DO
@@ -52,6 +21,8 @@ brc slime permeability
 if (random(slime*4)<4) and (tab[x,y+2]=0) then
       Begin tab[x,y]:=0;col[x,y+2]:=col[x,y];tab[x,y+2]:=27;mat[x,y+2]:=9;Voice4:=2;end;
 - Time bonus of -100 really seems odd.
+
+control keys
 
 - teszt
 - replay checksumon gondolkozni
@@ -69,8 +40,6 @@ gtk verzióba		{TypeBoolean, N_("Even lines vertical scroll"), N_("Even lines ve
 bdcff beolvasás miért hash table?
   size és hasonló szarok miatt
   de tobb értéket is kéne tárolni esetleg, a hash table ezt akadályozza
-
-dynstring beolvasást jobban beépíteni - mindenhol gstring?
 
 As there is an Amoeba 2 now, I think it would be nice to be able to set a different color for that then Amoeba 1!
 

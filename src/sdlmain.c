@@ -156,7 +156,7 @@ showheader_game(int timeout_since)
 	/* y position of status bar */
 	y=first_line?statusbar_y2:statusbar_mid;
 
-	if (gd_gameplay.cave->player_state==GD_PL_TIMEOUT && timeout_since/25%4==0) {
+	if (gd_gameplay.cave->player_state==GD_PL_TIMEOUT && timeout_since/50%4==0) {
 		clear_header();
 		gd_blittext(gd_screen, -1, y, GD_GDASH_WHITE, "OUT OF TIME");
 		return;
@@ -242,41 +242,13 @@ game_help()
 
 
 
-/* if normal scrolling is active, will install a 25hz (40ms) timer. */
-/* if fine scrolling, install a 50hz (20ms) timer. */
-#define FINE_SCROLL_INTERVAL 20
-#define NORMAL_SCROLL_INTERVAL 40
-/* timer will send an sdl event, and tell the function to  a) scroll  b) move cave, draw, ... and scroll */
-#define ONLY_SCROLL 1
-#define DRAW_AND_SCROLL 2
-
-/* this function might be called at a 1/40ms rate or 1/20ms rate. */
-/* detect this, and act accordingly. */
-/* 40ms is a normal draw and scroll. */
-/* if 20ms, one of the "interrupts" is a draw and scroll, the other is for scrolling only (fine scrolling). */
+/* generate an user event */
 static Uint32
 timer_callback(Uint32 interval, void *param)
 {
 	SDL_Event ev;
-	static gboolean toggle=FALSE;	/* actual value does not matter */
 	
 	ev.type=SDL_USEREVENT;
-	/* detect which timer is installed. */
-	switch (interval) {
-		case FINE_SCROLL_INTERVAL:
-			toggle=!toggle;
-			if (toggle)
-				ev.user.code=DRAW_AND_SCROLL;
-			else
-				ev.user.code=ONLY_SCROLL;
-			break;
-		case NORMAL_SCROLL_INTERVAL:
-			ev.user.code=DRAW_AND_SCROLL;
-			break;
-		default:
-			g_assert_not_reached();	/* should not call other functions, but... */
-			break;
-	}
 	SDL_PushEvent(&ev);
 	
 	return interval;
@@ -288,6 +260,7 @@ timer_callback(Uint32 interval, void *param)
 static void
 play_game_func()
 {
+	static gboolean toggle=FALSE;	/* this is used to divide the rate of the user interrupt by 2, if no fine scrolling requested */
 	gboolean exit_game;
 	gboolean show_highscore;
 	int statusbar_since=0;	/* count number of frames from when the outoftime or paused event happened. */
@@ -295,13 +268,14 @@ play_game_func()
 	SDL_TimerID tim;
 	SDL_Event event;
 	gboolean restart, suicide;	/* for sdl key_downs */
+	int interval;
 
 	exit_game=FALSE;
 	show_highscore=FALSE;
 	paused=FALSE;
 	
-	/* install the sdl timer which will generate events to control the speed of the game and drawing */
-	tim=SDL_AddTimer(gd_fine_scroll?FINE_SCROLL_INTERVAL:NORMAL_SCROLL_INTERVAL, timer_callback, NULL);
+	/* install the sdl timer which will generate events to control the speed of the game and drawing, at an 50hz rate; 1/50hz=20ms */
+	tim=SDL_AddTimer(20, timer_callback, NULL);
 
 	suicide=FALSE;	/* detected suicide and restart level keys */
 	restart=FALSE;		
@@ -351,74 +325,75 @@ play_game_func()
 				break;
 			
 			case SDL_USEREVENT:
-				if (event.user.code==DRAW_AND_SCROLL) {
-					/* get movement */
-					player_move=gd_direction_from_keypress(gd_up(), gd_down(), gd_left(), gd_right());
-					state=gd_game_main_int(player_move, gd_fire(), suicide, restart, !paused && !gd_gameplay.out_of_window, FALSE, gd_keystate[SDLK_f]);
-					if (paused) {
-						if (statusbar_since/25%4==0)
-							showheader_pause();
-						else
-							showheader_game(statusbar_since);
-					}
+				/* get movement */
+				player_move=gd_direction_from_keypress(gd_up(), gd_down(), gd_left(), gd_right());
+				/* tell the interrupt "20ms has passed" */
+				state=gd_game_main_int(20, player_move, gd_fire(), suicide, restart, !paused && !gd_gameplay.out_of_window, FALSE, gd_keystate[SDLK_f]);
+				if (paused) {
+					if (statusbar_since/50%4==0)
+						showheader_pause();
+					else
+						showheader_game(statusbar_since);
+				}
 
-					/* state of game, returned by gd_game_main_int */
-					switch (state) {
-						case GD_GAME_INVALID_STATE:
-							g_assert_not_reached();
-							break;
-							
-						case GD_GAME_CAVE_LOADED:
-							gd_select_pixbuf_colors(gd_gameplay.cave->color0, gd_gameplay.cave->color1, gd_gameplay.cave->color2, gd_gameplay.cave->color3, gd_gameplay.cave->color4, gd_gameplay.cave->color5);
-							gd_scroll_to_origin();
-							SDL_FillRect(gd_screen, NULL, SDL_MapRGB(gd_screen->format, 0, 0, 0));	/* fill whole gd_screen with black */
-							showheader_uncover();
-							suicide=FALSE;	/* clear detected keypresses, so we do not "remember" them from previous cave runs */
-							restart=FALSE;		
-							break;
-
-						case GD_GAME_NOTHING:
-							/* normally continue. */
-							break;
-
-						case GD_GAME_LABELS_CHANGED:
-							showheader_game(statusbar_since);
-							suicide=FALSE;	/* clear detected keypresses, as cave was iterated and they were processed */
-							restart=FALSE;		
-							break;
-
-						case GD_GAME_TIMEOUT_NOW:
-							statusbar_since=0;
-							showheader_game(statusbar_since);	/* also update the status bar here. */
-							suicide=FALSE;	/* clear detected keypresses, as cave was iterated and they were processed */
-							restart=FALSE;		
-							break;
+				/* state of game, returned by gd_game_main_int */
+				switch (state) {
+					case GD_GAME_INVALID_STATE:
+						g_assert_not_reached();
+						break;
 						
-						case GD_GAME_NO_MORE_LIVES:
-							showheader_gameover();
-							break;
+					case GD_GAME_CAVE_LOADED:
+						gd_select_pixbuf_colors(gd_gameplay.cave->color0, gd_gameplay.cave->color1, gd_gameplay.cave->color2, gd_gameplay.cave->color3, gd_gameplay.cave->color4, gd_gameplay.cave->color5);
+						gd_scroll_to_origin();
+						SDL_FillRect(gd_screen, NULL, SDL_MapRGB(gd_screen->format, 0, 0, 0));	/* fill whole gd_screen with black */
+						showheader_uncover();
+						suicide=FALSE;	/* clear detected keypresses, so we do not "remember" them from previous cave runs */
+						restart=FALSE;		
+						break;
 
-						case GD_GAME_STOP:
-							exit_game=TRUE;	/* game stopped, this could be a replay or a snapshot */ 
-							break;
+					case GD_GAME_NOTHING:
+						/* normally continue. */
+						break;
 
-						case GD_GAME_GAME_OVER:
-							exit_game=TRUE;
-							show_highscore=TRUE;	/* normal game stopped, may jump to highscore later. */
-							break;
-					}
+					case GD_GAME_LABELS_CHANGED:
+						showheader_game(statusbar_since);
+						suicide=FALSE;	/* clear detected keypresses, as cave was iterated and they were processed */
+						restart=FALSE;		
+						break;
 
-					statusbar_since++;
-				}	/* if draw_and_scroll */
+					case GD_GAME_TIMEOUT_NOW:
+						statusbar_since=0;
+						showheader_game(statusbar_since);	/* also update the status bar here. */
+						suicide=FALSE;	/* clear detected keypresses, as cave was iterated and they were processed */
+						restart=FALSE;		
+						break;
+					
+					case GD_GAME_NO_MORE_LIVES:
+						showheader_gameover();
+						break;
+
+					case GD_GAME_STOP:
+						exit_game=TRUE;	/* game stopped, this could be a replay or a snapshot */ 
+						break;
+
+					case GD_GAME_GAME_OVER:
+						exit_game=TRUE;
+						show_highscore=TRUE;	/* normal game stopped, may jump to highscore later. */
+						break;
+				}
+
+				statusbar_since++;
 
 				/* for the sdl version, it seems nicer if we first scroll, and then draw. */
 				/* scrolling for the sdl version will merely invalidate the whole gfx buffer. */
 				/* if drawcave was before scrolling, it would draw, scroll would invalidate, and then it should be drawn again */
 				/* only do the drawing if the cave already exists. */
-				if (gd_gameplay.cave) {
+				toggle=!toggle;
+				/* if fine scrolling, scroll at 50hz. if not, only scroll at every second call, so 25hz. */
+				if (gd_gameplay.cave && (toggle || gd_fine_scroll))
 					gd_gameplay.out_of_window=gd_scroll(gd_gameplay.cave, gd_gameplay.cave->player_state==GD_PL_NOT_YET);	/* do the scrolling. scroll exactly, if player is not yet alive */
-					gd_drawcave(gd_screen, gd_gameplay.cave, gd_gameplay.gfx_buffer);	/* draw the cave. */
-				}
+
+				gd_drawcave(gd_screen, gd_gameplay.cave, gd_gameplay.gfx_buffer);	/* draw the cave. */
 				SDL_Flip(gd_screen);	/* can always be called, as it keeps track of dirty regions of the screen */
 				break;
 			}
@@ -559,7 +534,7 @@ replays_menu()
 	gd_backup_and_dark_screen();
 	gd_status_line("CRSR:MOVE  FIRE:PLAY  S:SAVED  ESC:EXIT");
 	
-	current=0;
+	current=1;
 	finished=FALSE;
 	while (!finished && !gd_quit) {
 		page=current/lines_per_page;	/* show 18 lines per page */
@@ -625,11 +600,6 @@ replays_menu()
 		}
 		SDL_Flip(gd_screen);	/* draw to usere's screen */
 
-		/* we don't leave text on the screen after us. */
-		/* so next iteration will have a nice empty screen to draw on :) */
-		for (n=0; n<lines_per_page; n++)
-			gd_clear_line(gd_screen, (n+2)*gd_font_height());
-
 		SDL_Delay(160);
 		
 		/* do events; keys will be processed below */
@@ -637,9 +607,13 @@ replays_menu()
 
 		/* cursor movement */
 		if (gd_up())
-			current=gd_clamp(current-1, 0, items->len-1);
+			do {
+				current=gd_clamp(current-1, 1, items->len-1);
+			} while (((Item *)g_ptr_array_index(items, current))->replay==NULL && current>=1);
 		if (gd_down())
-			current=gd_clamp(current+1, 0, items->len-1);
+			do {
+				current=gd_clamp(current+1, 1, items->len-1);
+			} while (((Item *)g_ptr_array_index(items, current))->replay==NULL && current<items->len);
 		if (gd_keystate[SDLK_s]) {
 			Item *i=(Item *)g_ptr_array_index(items, current);
 			
@@ -930,6 +904,7 @@ load_file(const char *directory)
 
 
 /* save caveset to specified directory, and pop up error message if failed */
+/* if not, call function to remember file name. */
 static void
 caveset_save(const gchar *filename)
 {
@@ -942,6 +917,7 @@ caveset_save(const gchar *filename)
 		caveset_file_operation_successful(filename);
 }
 
+/* ask for new filename to save file to. then do the save. */
 static void
 save_file_as(const char *directory)
 {
@@ -954,19 +930,6 @@ save_file_as(const char *directory)
 	filter=g_strjoinv(";", gd_caveset_extensions);
 	filename=gd_select_file("SAVE CAVESET AS", directory?directory:last_folder, filter, TRUE);
 	g_free(filter);
-	
-	/* file exists? ask if to overwrite */
-	if (filename && g_file_test(filename, G_FILE_TEST_EXISTS)) {
-		gboolean result, answer;
-		
-		answer=gd_ask_yes_no("File exists. Overwrite?", "No", "Yes", &result);
-		
-		/* if did not answer or answered no, forget filename. we do not overwrite */
-		if (!result || !answer) {
-			g_free(filename);
-			filename=NULL;
-		}
-	}
 
 	/* if file selected */	
 	if (filename) {
@@ -980,6 +943,7 @@ save_file_as(const char *directory)
 	g_free(filename);
 }
 
+/* if the caveset has a valid bdcff file name, save caves into that. if not, call the "save file as" function */
 static void
 save_file()
 {
@@ -992,7 +956,8 @@ save_file()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	State s;
 	GOptionContext *context;
@@ -1133,8 +1098,7 @@ int main(int argc, char *argv[])
 				
 			case M_HIGHSCORE:
 				gd_show_highscore(NULL, 0);
-				break;
-			
+				break;			
 
 			/* FILES */				
 			case M_LOAD:

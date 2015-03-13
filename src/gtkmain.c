@@ -555,7 +555,7 @@ showheader()
 	gd_label_set_markup_printf(GTK_LABEL(main_window.label_score), _("Score: <b>%d</b>"), gd_gameplay.player_score);
 
 	/* diamond value */
-	gd_label_set_markup_printf(GTK_LABEL(main_window.label_value), _("Diamond value: <b>%d</b>"), cave->diamond_value);
+	gd_label_set_markup_printf(GTK_LABEL(main_window.label_value), _("Value: <b>%d</b>"), cave->diamond_value);
 
 	/* diamonds needed */
 	if (cave->diamonds_needed>0)
@@ -1059,7 +1059,10 @@ new_game_cb (const GtkWidget * widget, const gpointer data)
 /* for the gtk version, it seems nicer if we first draw, then scroll. */
 /* this is because there is an expose event; scrolling the "old" drawing would draw the old, and then the new. */
 /* (this is not true for the sdl version) */
+#if 0
 static GTimer *timer=NULL;
+static int called=0;
+#endif
 
 static gboolean
 main_int(gpointer data)
@@ -1069,100 +1072,81 @@ main_int(gpointer data)
 	GdDirection player_move;
 	gboolean fire;
 	GdGameState state;
-	int intended_delay, real_delay, new_delay;
-	
+
 	if (gd_gameplay.type==GD_GAMETYPE_REPLAY)
 		gtk_widget_show(main_window.replay_image_align);
 	else
 		gtk_widget_hide(main_window.replay_image_align);
 	
-	/* if fine scrolling, this is called at a 50hz rate. */
-	/* but the game needs to be updated at 25hz. this variable divides the rate, if needed. */
-	toggle=!toggle;
-	
-	/* if not using fine scrolling, we are called at 25hz, so no need to use toggle. */
-	/* if 50hz, toggle divides the frequency by two. */
-	if (!gd_fine_scroll || toggle) {
-		up=key_up;
-		down=key_down;
-		left=key_left;
-		right=key_right;
-		fire=key_lctrl || key_rctrl;
+	up=key_up;
+	down=key_down;
+	left=key_left;
+	right=key_right;
+	fire=key_lctrl || key_rctrl;
 
-		/* compare mouse coordinates to player coordinates, and make up movements */
-		if (gd_mouse_play && mouse_cell_x>=0) {
-			down=down || (gd_gameplay.cave->player_y<mouse_cell_y);
-			up=up || (gd_gameplay.cave->player_y>mouse_cell_y);
-			left=left || (gd_gameplay.cave->player_x>mouse_cell_x);
-			right=right || (gd_gameplay.cave->player_x<mouse_cell_x);
-			fire=fire || mouse_cell_click;
-		}
-
-		/* call the game "interrupt" to do all things. */
-		player_move=gd_direction_from_keypress(up, down, left, right);
-		state=gd_game_main_int(player_move, fire, key_suicide, restart, !paused && !gd_gameplay.out_of_window, paused, fast_forward);
-		restart=FALSE;
-
-		/* the game "interrupt" gives signals to us, which we act upon: update status bar, resize the drawing area... */
-		switch (state) {
-			case GD_GAME_INVALID_STATE:
-				g_assert_not_reached();
-				break;
-				
-			case GD_GAME_CAVE_LOADED:
-				gd_select_pixbuf_colors(gd_gameplay.cave->color0, gd_gameplay.cave->color1, gd_gameplay.cave->color2, gd_gameplay.cave->color3, gd_gameplay.cave->color4, gd_gameplay.cave->color5);
-				init_mainwindow(gd_gameplay.cave);
-				showheader();
-				break;
-
-			case GD_GAME_NO_MORE_LIVES:	/* <- only used by sdl version */
-			case GD_GAME_NOTHING:
-				/* normally continue. */
-				break;
-
-			case GD_GAME_LABELS_CHANGED:
-			case GD_GAME_TIMEOUT_NOW:	/* <- maybe we should do something else for this */
-				/* normal, but we are told that the labels (score, ...) might have changed. */
-				showheader();
-				break;
-
-			case GD_GAME_STOP:
-				gd_main_stop_game();
-				return FALSE;	/* remove timeout */
-
-			case GD_GAME_GAME_OVER:
-				gd_main_stop_game();
-				if (gd_is_highscore(gd_caveset_data->highscore, gd_gameplay.player_score))
-					game_over_highscore();			/* achieved a high score! */
-				else
-					game_over_without_highscore();			/* no high score */
-				return FALSE;	/* remove timeout */
-		}
+	/* compare mouse coordinates to player coordinates, and make up movements */
+	if (gd_mouse_play && mouse_cell_x>=0) {
+		down=down || (gd_gameplay.cave->player_y<mouse_cell_y);
+		up=up || (gd_gameplay.cave->player_y>mouse_cell_y);
+		left=left || (gd_gameplay.cave->player_x>mouse_cell_x);
+		right=right || (gd_gameplay.cave->player_x<mouse_cell_x);
+		fire=fire || mouse_cell_click;
 	}
 
-	/* always do the drawing and the scrolling, as either we are doing 1/40ms, or 1/20ms, but scrolling and drawing is to be done for all calls. */
+	/* call the game "interrupt" to do all things. */
+	player_move=gd_direction_from_keypress(up, down, left, right);
+	/* tell the interrupt that 20ms has passed. */
+	state=gd_game_main_int(20, player_move, fire, key_suicide, restart, !paused && !gd_gameplay.out_of_window, paused, fast_forward);
+	restart=FALSE;
+
+	/* the game "interrupt" gives signals to us, which we act upon: update status bar, resize the drawing area... */
+	switch (state) {
+		case GD_GAME_INVALID_STATE:
+			g_assert_not_reached();
+			break;
+			
+		case GD_GAME_CAVE_LOADED:
+			gd_select_pixbuf_colors(gd_gameplay.cave->color0, gd_gameplay.cave->color1, gd_gameplay.cave->color2, gd_gameplay.cave->color3, gd_gameplay.cave->color4, gd_gameplay.cave->color5);
+			init_mainwindow(gd_gameplay.cave);
+			showheader();
+			break;
+
+		case GD_GAME_NO_MORE_LIVES:	/* <- only used by sdl version */
+		case GD_GAME_NOTHING:
+			/* normally continue. */
+			break;
+
+		case GD_GAME_LABELS_CHANGED:
+		case GD_GAME_TIMEOUT_NOW:	/* <- maybe we should do something else for this */
+			/* normal, but we are told that the labels (score, ...) might have changed. */
+			showheader();
+			break;
+
+		case GD_GAME_STOP:
+			gd_main_stop_game();
+			return FALSE;	/* remove timeout */
+
+		case GD_GAME_GAME_OVER:
+			gd_main_stop_game();
+			if (gd_is_highscore(gd_caveset_data->highscore, gd_gameplay.player_score))
+				game_over_highscore();			/* achieved a high score! */
+			else
+				game_over_without_highscore();			/* no high score */
+			return FALSE;	/* remove timeout */
+	}
+
+	/* if fine scrolling, drawing is called at a 50hz rate. */
+	/* if not, only at a 25hz rate */
+	toggle=!toggle;
+
+	/* do the scrolling at the given interval. */
 	/* but only if the drawing area already exists. */
-	if (main_window.drawing_area) {
+	if (main_window.drawing_area && (gd_fine_scroll || toggle)) {
 		drawcave();
 		scroll();
 	}
 
-	/* now get elapsed time. so we measured sleeping time (after g_timeout_add and before we got called) and drawing time. */
-	intended_delay=gd_fine_scroll?20:40;
-	real_delay=g_timer_elapsed(timer, NULL)*1000;	/* elapsed time in milliseconds */
-		
-	/* add new timeout, and return false, so remove old one */
-	/* check difference between real and measured time. */
-	if (ABS(intended_delay-real_delay)>10)
-		/* if difference is too big, do not trust the measured value. */
-		new_delay=intended_delay;
-	else
-		/* calculate new value. */
-		/* example: should be 40, measured 43. so intended-real=40-43=-3, now we will try 37ms */
-		new_delay=intended_delay+(intended_delay-real_delay);
-	g_timeout_add(new_delay, main_int, main_window.window);
-	g_timer_start(timer);	/* start timer from zero, to measure new delay. */
-	return FALSE; /* old timeout should not be called again */
+	return TRUE; /* call again */
 }
 
 static void
@@ -1180,13 +1164,10 @@ install_game_timer()
 	if (!paused)
 		gtk_window_present(GTK_WINDOW(main_window.window));
 
-	/* install timeout which handles the game */
-	/* the exact interval is set to 40 here, but does not matter at all. */
-	/* the function will handle it; it calculates sets the timeout on each and every call. */
-	g_timeout_add(40, main_int, main_window.window);
-	if (!timer)
-		timer=g_timer_new();
-	g_timer_start(timer);
+	/* we request a "sleep" time which is somewhat shorter than what we need (17 instead of 20).
+	   glib tends to be a bit slower than requested. */
+	/* the intended - 3ms seems to work well on linux and windows as well. */
+	g_timeout_add(17, main_int, main_window.window);
 }
 
 

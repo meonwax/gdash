@@ -63,7 +63,7 @@ gd_status_line(const char *text)
 /* returns new, full-path filename (to be freed later by the caller) */
 /* glob: semicolon separated list of globs */
 char *
-gd_select_file(const char *title, const char *start_dir, const char *glob, gboolean allow_new)
+gd_select_file(const char *title, const char *start_dir, const char *glob, gboolean for_save)
 {
 	enum {
 		GD_NOT_YET,
@@ -94,7 +94,7 @@ gd_select_file(const char *title, const char *start_dir, const char *glob, gbool
 	
 	gd_backup_and_dark_screen();
 	gd_title_line(title);
-	if (allow_new)
+	if (for_save)
 		/* for saving, we allow the user to select a new filename. */
 		gd_status_line("CRSR:SELECT  N:NEW  J:JUMP  ESC:CANCEL");
 	else
@@ -219,7 +219,7 @@ gd_select_file(const char *title, const char *start_dir, const char *glob, gbool
 			if (gd_keystate[SDLK_j])
 				state=GD_JUMP;
 				
-			if (gd_keystate[SDLK_n] && allow_new)
+			if (gd_keystate[SDLK_n] && for_save)
 				state=GD_NEW;
 
 			if (gd_space_or_enter_or_fire())
@@ -255,7 +255,8 @@ gd_select_file(const char *title, const char *start_dir, const char *glob, gbool
 			if (new_name) {
 				result=new_name;
 				filestate=GD_YES;
-			}
+			} else
+				g_free(new_name);
 		}
 		/* user requested to ask for another directory name to jump to */
 		if (state==GD_JUMP) {
@@ -308,6 +309,17 @@ gd_select_file(const char *title, const char *start_dir, const char *glob, gbool
 			
 		g_ptr_array_foreach(files, (GFunc) g_free, NULL);
 		g_ptr_array_free(files, TRUE);
+	}
+
+	/* if selecting a file to write to, check if overwrite */
+	if (filestate==GD_YES && result && for_save && g_file_test(result, G_FILE_TEST_EXISTS)) {
+		gboolean said_yes, answer;
+		
+		answer=gd_ask_yes_no("File exists. Overwrite?", "No", "Yes", &said_yes);
+		if (!answer || !said_yes) {		/* if did not answer or answered no, forget filename. we do not overwrite */
+			g_free(result);
+			result=FALSE;
+		}
 	}
 	
 	g_strfreev(globs);
