@@ -423,7 +423,6 @@ void App::redraw_event(bool full) {
     if (topmost != NULL) {
         topmost->redraw_event(full);
         topmost->redraw_queued = false;
-        process_commands();
     }
 }
 

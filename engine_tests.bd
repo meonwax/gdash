@@ -9,9 +9,29 @@ Lives=4 9
 Remark=caveset\n  data\nbla\nbla.\n
 Levels=5
 
-[highscore]
-21312 asd
-[/highscore]
+[cave]
+Name=New scrolling
+Author=Czirkos Zoltan
+Date=2013-04-26
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #b2ae39 #4c996c #8c95cc #4c9951 #393fb2
+DiamondsRequired=10 10 10 10 10
+CaveTime=999 999 999 999 999
+CaveScheduling=bd1
+FrameTime=180 160 140 120 120
+CaveDelay=12 0 0 0 0
+DiamondValue=0 0
+InitialFill=SPACE
+SlimePermeabilityC64=0 0 0 0 0
+ReplicatorDelayFrame=12
+
+[objects]
+Line=3 3 38 3 REPLICATOR
+Line=3 2 38 2 DIAMOND
+Point=1 1 INBOX
+[/objects]
+[/cave]
 
 [cave]
 Name=Voodoo
@@ -19,7 +39,7 @@ Intermission=false
 Remark=Notes for the cave 'Voodoo'. Bla bla bla.\nBla on new line bla.\n\nblablabla.\n\nGreater than >, less than <. \303\251kezet, hossz\303\272 \305\221. tenisz\303\274t\305\221.
 Size=40 22 0 0 39 21
 Colors=Black Black Orange Brown Gray3 Gray3 Yellow
-DiamondsRequired=15 15 15 15 15
+DiamondsRequired=5 5 5 5 5
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 PALTiming=true
@@ -73,11 +93,10 @@ Point=11 3 DIAMOND
 Point=12 7 DIAMOND
 Point=10 6 DIAMOND
 Point=13 1 DIAMOND
+Point=0 1 OUTBOX
+Point=14 2 DIAMOND
+Point=15 1 DIAMOND
 [/objects]
-
-[highscore]
-21312 caveasd
-[/highscore]
 [/cave]
 
 [cave]
@@ -267,10 +286,6 @@ Line=19 8 28 8 MAGICWALL
 Point=27 6 BOULDER
 Point=25 6 DIAMOND
 [/objects]
-
-[highscore]
-1566 Czirkos Zoltan
-[/highscore]
 [/cave]
 
 [cave]
@@ -992,10 +1007,6 @@ FillRect=9 1 5 4 WALL DIAMOND
 FillRect=13 1 9 4 WALL DIAMOND
 FillRect=18 1 13 4 WALL DIAMOND
 [/objects]
-
-[highscore]
-4 Czirkos Zoltan
-[/highscore]
 
 [replay]
 Level=1

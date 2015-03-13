@@ -114,6 +114,8 @@ private:
     void move(int x, int y, GdDirectionEnum dir, GdElementEnum element);
     void next(int x, int y);
     void unscan(int x, int y);
+    
+    void update_scheduling();
 
 public:
     CaveRendered(CaveStored const &cave, int level, int seed);

@@ -40,6 +40,7 @@
 #include "cave/caveset.hpp"
 #include "misc/logger.hpp"
 #include "misc/helptext.hpp"
+#include "misc/autogfreeptr.hpp"
 
 
 class GdMainWindow {
@@ -310,7 +311,7 @@ void GdMainWindow::about_cb(GtkWidget *widget, gpointer data) {
 
 void GdMainWindow::open_caveset_cb(GtkWidget *widget, gpointer data) {
     GdMainWindow *main_window = static_cast<GdMainWindow *>(data);
-    main_window->app->enqueue_command(new SelectFileToLoadIfDiscardableCommand(main_window->app, ""));
+    main_window->app->enqueue_command(new SelectFileToLoadIfDiscardableCommand(main_window->app, gd_last_folder));
 }
 
 
@@ -353,24 +354,18 @@ void GdMainWindow::show_errors_cb(GtkWidget *widget, gpointer data) {
 /* called from the menu when a recent file is activated. */
 void GdMainWindow::recent_chooser_activated_cb(GtkRecentChooser *chooser, gpointer data) {
     GdMainWindow *main_window = static_cast<GdMainWindow *>(data);
-    GtkRecentInfo *current;
-    char *filename_utf8, *filename;
 
-    current = gtk_recent_chooser_get_current_item(chooser);
+    GtkRecentInfo *current = gtk_recent_chooser_get_current_item(chooser);
     /* we do not support non-local files */
     if (!gtk_recent_info_is_local(current)) {
-        char *display_name = gtk_recent_info_get_uri_display(current);
+        AutoGFreePtr<char> display_name(gtk_recent_info_get_uri_display(current));
         gd_errormessage(_("GDash cannot load file from a network link."), display_name);
-        g_free(display_name);
-        return;
+    } else {
+        AutoGFreePtr<char> filename_utf8(gtk_recent_info_get_uri_display(current));
+        AutoGFreePtr<char> filename(g_filename_from_utf8(filename_utf8, -1, NULL, NULL, NULL));
+        main_window->app->enqueue_command(new AskIfChangesDiscardedCommand(main_window->app, new OpenFileCommand(main_window->app, (char*) filename)));
     }
-
-    filename_utf8 = gtk_recent_info_get_uri_display(current);
-    filename = g_filename_from_utf8(filename_utf8, -1, NULL, NULL, NULL);
-    main_window->app->enqueue_command(new AskIfChangesDiscardedCommand(main_window->app, new OpenFileCommand(main_window->app, filename)));
     gtk_recent_info_unref(current);
-    g_free(filename);
-    g_free(filename_utf8);
 }
 
 

@@ -38,11 +38,13 @@
 #include "gtk/gtkui.hpp"
 #include "misc/about.hpp"
 #include "misc/helptext.hpp"
+#include "misc/autogfreeptr.hpp"
+#include "misc/util.hpp"
 
 /* pixbufs of icons and the like */
 #include "icons.cpp"
 
-static char *last_folder = NULL;
+static std::string last_folder;
 
 void gd_register_stock_icons() {
     /* a table of icon data (guint8*, static arrays included from icons.h) and stock id. */
@@ -121,20 +123,13 @@ static GList *image_load_filters() {
         GdkPixbufFormat *frm = (GdkPixbufFormat *)iter->data;
 
         if (!gdk_pixbuf_format_is_disabled(frm)) {
-            GtkFileFilter *filter;
-            char **extensions;
-            int i;
-
-            filter = gtk_file_filter_new();
+            GtkFileFilter *filter = gtk_file_filter_new();
             gtk_file_filter_set_name(filter, gdk_pixbuf_format_get_description(frm));
-            extensions = gdk_pixbuf_format_get_extensions(frm);
-            for (i = 0; extensions[i] != NULL; i++) {
-                char *pattern;
-
-                pattern = g_strdup_printf("*.%s", extensions[i]);
-                gtk_file_filter_add_pattern(filter, pattern);
-                gtk_file_filter_add_pattern(all_filter, pattern);
-                g_free(pattern);
+            char **extensions = gdk_pixbuf_format_get_extensions(frm);
+            for (int i = 0; extensions[i] != NULL; i++) {
+                std::string pattern = SPrintf("*.%s") % extensions[i];
+                gtk_file_filter_add_pattern(filter, pattern.c_str());
+                gtk_file_filter_add_pattern(all_filter, pattern.c_str());
             }
             g_strfreev(extensions);
 
@@ -254,7 +249,7 @@ void gd_infomessage(const char *primary, const char *secondary) {
  */
 bool gd_discard_changes(CaveSet const &caveset) {
     /* save highscore on every ocassion when the caveset is to be removed from memory */
-    save_highscore(caveset, gd_user_config_dir);
+    save_highscore(caveset);
 
     /* caveset is not edited, so pretend user confirmed */
     if (!caveset.edited)
@@ -280,9 +275,8 @@ bool gd_discard_changes(CaveSet const &caveset) {
 
 /* file operation was successful, put it into the recent manager */
 static void caveset_file_operation_successful(const char *filename) {
-    char *uri = g_filename_to_uri(filename, NULL, NULL);
+    AutoGFreePtr<char> uri(g_filename_to_uri(filename, NULL, NULL));
     gtk_recent_manager_add_item(gtk_recent_manager_get_default(), uri);
-    g_free(uri);
 }
 
 
@@ -315,7 +309,6 @@ void gd_save_caveset_as(CaveSet &caveset) {
     gtk_file_filter_set_name(filter, _("BDCFF cave sets (*.bd)"));
     gtk_file_filter_add_pattern(filter, "*.bd");
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
-
     filter = gtk_file_filter_new();
     gtk_file_filter_set_name(filter, _("All files (*)"));
     gtk_file_filter_add_pattern(filter, "*");
@@ -323,22 +316,18 @@ void gd_save_caveset_as(CaveSet &caveset) {
 
     gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), CPrintf("%s.bd") % caveset.name);
 
-    char *filename = NULL;
+    std::string filename;
     if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
-        filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+        filename = gd_tostring_free(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog)));
+    gtk_widget_destroy(dialog);
 
     /* if we have a filename, do the save */
-    if (filename != NULL) {
+    if (filename != "") {
         /* if it has no .bd extension, add one */
-        if (!g_str_has_suffix(filename, ".bd")) {
-            char *suffixed = g_strdup_printf("%s.bd", filename);
-            g_free(filename);
-            filename = suffixed;
-        }
-        caveset_save(filename, caveset);
+        if (!g_str_has_suffix(filename.c_str(), ".bd"))
+            filename = SPrintf("%s.bd") % filename;
+        caveset_save(filename.c_str(), caveset);
     }
-    g_free(filename);
-    gtk_widget_destroy(dialog);
 }
 
 
@@ -365,8 +354,6 @@ void gd_save_caveset(CaveSet &caveset) {
  * If it is edited and not saved, this function will do nothing.
  */
 void gd_open_caveset(const char *directory, CaveSet &caveset) {
-    char *filename = NULL;
-
     /* if caveset is edited, and user does not want to discard changes */
     if (!gd_discard_changes(caveset))
         return;
@@ -383,18 +370,18 @@ void gd_open_caveset(const char *directory, CaveSet &caveset) {
     /* if callback shipped with a directory name, show that directory by default */
     if (directory)
         gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), directory);
-    else if (last_folder)
+    else if (last_folder != "")
         /* if we previously had an open command, the directory was remembered */
-        gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), last_folder);
+        gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), last_folder.c_str());
     else
         /* otherwise user home */
         gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), g_get_home_dir());
 
     int result = gtk_dialog_run(GTK_DIALOG(dialog));
+    std::string filename;
     if (result == GTK_RESPONSE_ACCEPT) {
-        filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-        g_free(last_folder);
-        last_folder = gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(dialog));
+        filename = gd_tostring_free(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog)));
+        last_folder = gd_tostring_free(gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(dialog)));
     }
 
     /* WINDOWS GTK+ 20080926 HACK */
@@ -412,13 +399,12 @@ void gd_open_caveset(const char *directory, CaveSet &caveset) {
     }
 
     /* if got a filename, load the file */
-    if (filename != NULL) {
+    if (filename != "") {
         try {
-            caveset = load_caveset_from_file(filename);
+            caveset = load_caveset_from_file(filename.c_str());
         } catch (std::exception &e) {
             gd_errormessage(_("Error loading caveset."), e.what());
         }
-        g_free(filename);
     }
 }
 

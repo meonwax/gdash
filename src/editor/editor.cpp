@@ -1040,17 +1040,18 @@ static gboolean drawing_area_draw_timeout(gpointer data) {
     bool drawn = false;
     for (int y = 0; y < rendered_cave->h; y++) {
         for (int x = 0; x < rendered_cave->w; x++) {
+            GdElementEnum elem = rendered_cave->map(x, y);
             int draw;
 
             if (gd_game_view)
-                draw = gd_element_properties[rendered_cave->map(x, y)].image_simple;
+                draw = gd_element_properties[elem].image_simple;
             else
-                draw = gd_element_properties[rendered_cave->map(x, y)].image;
+                draw = gd_element_properties[elem].image;
             /* special case is player - sometimes blinking :) */
-            if (player_blinking && (rendered_cave->map(x, y) == O_INBOX))
+            if (player_blinking && elem == O_INBOX)
                 draw = gd_element_properties[O_PLAYER_BLINK].image_simple;
             /* the biter switch also shows its state */
-            if (rendered_cave->map(x, y) == O_BITER_SWITCH)
+            if (elem == O_BITER_SWITCH)
                 draw = gd_element_properties[O_BITER_SWITCH].image_simple + rendered_cave->biter_delay_frame;
 
             /* negative value means animation */
@@ -1086,15 +1087,8 @@ static gboolean drawing_area_draw_timeout(gpointer data) {
             }
         }
     }
-    if (drawn) {
-        screen->drawing_finished();
-        screen->do_the_flip();
-    }
-
-    /* if the editor window has toplevel focus, draw mark for mouse pointer, etc. */
-    /* only do this drawing if the screen was flipped. */
     if (drawn && editor_window_is_focus) {
-        cairo_t *cr = gdk_cairo_create(drawing_area->window);
+        cairo_t *cr = screen->get_cairo_t();
         cairo_set_source_rgb(cr, 1, 1, 1);  /* white */
         cairo_set_line_width(cr, 1.0);
         cairo_set_line_cap(cr, CAIRO_LINE_CAP_SQUARE);
@@ -1103,6 +1097,7 @@ static gboolean drawing_area_draw_timeout(gpointer data) {
         if (mouse_x >= 0 && mouse_y >= 0) {
             /* this is the cell the mouse is over */
             cairo_rectangle(cr, mouse_x * cs + 0.5, mouse_y * cs + 0.5, cs - 1, cs - 1);
+            gfx_buffer(mouse_x, mouse_y) = -1;
         }
 
         /* draw a mark for fill objects */
@@ -1120,6 +1115,7 @@ static gboolean drawing_area_draw_timeout(gpointer data) {
                         cairo_line_to(cr, (x + 1)*cs - 0.5, (y + 1)*cs - 0.5);
                         cairo_move_to(cr, (x + 1)*cs - 0.5, y * cs + 0.5);
                         cairo_line_to(cr, x * cs + 0.5, (y + 1)*cs - 0.5);
+                        gfx_buffer(x, y) = -1;
                     }
                 }
             }
@@ -1127,8 +1123,15 @@ static gboolean drawing_area_draw_timeout(gpointer data) {
 
         /* draw the lines */
         cairo_stroke(cr);
-        cairo_destroy(cr);
+    }
+    if (drawn) {
+        screen->drawing_finished();
+        screen->do_the_flip();
+    }
 
+    /* if the editor window has toplevel focus, draw mark for mouse pointer, etc. */
+    /* only do this drawing if the screen was flipped. */
+    if (drawn && editor_window_is_focus) {
         /* automatic scrolling */
         if (mouse_x >= 0 && mouse_y >= 0 && button1_clicked)
             drawcave_timeout_scroll(mouse_x, mouse_y);
@@ -1600,7 +1603,7 @@ icon_view_update_pixbufs_timeout(gpointer data) {
             pixbuf = gd_drawcave_to_pixbuf(rendered, *editor_cell_renderer, 128, 128, true, true); /* draw 128x128 icons at max */
             delete rendered;
             if (!cave->selectable) {
-                GdkPixbuf *colored = gdk_pixbuf_composite_color_simple(pixbuf, gdk_pixbuf_get_width(pixbuf), gdk_pixbuf_get_height(pixbuf), GDK_INTERP_NEAREST, 160, 1, gd_flash_color.get_uint(), gd_flash_color.get_uint());
+                GdkPixbuf *colored = gdk_pixbuf_composite_color_simple(pixbuf, gdk_pixbuf_get_width(pixbuf), gdk_pixbuf_get_height(pixbuf), GDK_INTERP_NEAREST, 160, 1, gd_flash_color.get_uint_0rgb(), gd_flash_color.get_uint_0rgb());
                 g_object_unref(pixbuf); /* forget original */
                 pixbuf = colored;
             }
@@ -3070,7 +3073,7 @@ open_installed_caveset_cb(GtkWidget *widget, gpointer data) {
     if (iconview_cavelist)
         gtk_widget_destroy(iconview_cavelist);
     g_hash_table_remove_all(cave_pixbufs);
-    gd_open_caveset(gd_system_caves_dir, *caveset);
+    gd_open_caveset(gd_system_caves_dir.c_str(), *caveset);
     select_cave_for_edit(NULL);
 }
 

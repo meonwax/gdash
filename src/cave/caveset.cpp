@@ -29,6 +29,7 @@
 #include <fstream>
 #include "cave/caveset.hpp"
 #include "misc/logger.hpp"
+#include "misc/autogfreeptr.hpp"
 #include "cave/caverendered.hpp"
 #include "fileops/bdcffsave.hpp"
 
@@ -106,18 +107,15 @@ int CaveSet::first_selectable_cave_index() const {
 
 
 void CaveSet::set_name_from_filename(const char *filename) {
-
     /* make up a caveset name from the filename. */
-    char *name_str = g_path_get_basename(filename);
+    AutoGFreePtr<char> name_str(g_path_get_basename(filename));
     /* convert underscores to spaces, remove extension */
     char *c;
     while ((c = strchr(name_str, '_')) != NULL)
         * c = ' ';
     if ((c = strrchr(name_str, '.')) != NULL)
         * c = 0;
-
     name = name_str;
-    g_free(name_str);
 }
 
 

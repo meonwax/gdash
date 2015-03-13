@@ -31,7 +31,23 @@
 #include "sdl/sdlpixbuf.hpp"
 #include "sdl/sdlscreen.hpp"
 #include "cave/particle.hpp"
+#include "mainwindow.hpp"
 #include "settings.hpp"
+
+
+SDLPixmap::~SDLPixmap() {
+    SDL_FreeSurface(surface);
+}
+
+
+int SDLPixmap::get_width() const {
+    return surface->w;
+}
+
+
+int SDLPixmap::get_height() const {
+    return surface->h;
+}
 
 
 void SDLAbstractScreen::fill_rect(int x, int y, int w, int h, const GdColor &c) {
@@ -40,7 +56,9 @@ void SDLAbstractScreen::fill_rect(int x, int y, int w, int h, const GdColor &c) 
     dst.y = y;
     dst.w = w;
     dst.h = h;
-    SDL_FillRect(surface, &dst, SDL_MapRGB(surface->format, c.get_r(), c.get_g(), c.get_b()));
+    unsigned char r, g, b;
+    c.get_rgb(r, g, b);
+    SDL_FillRect(surface, &dst, SDL_MapRGB(surface->format, r, g, b));
 }
 
 
@@ -79,7 +97,7 @@ void SDLAbstractScreen::remove_clip_rect() {
  * \param y Y coordinate of the line.
  * \param color The color value of the line to draw (0xRRGGBBAA).
 */
-static void hlineColor(SDL_Surface *dst, Sint16 x1, Sint16 x2, Sint16 y, Uint32 color) {
+static void hlineColor(SDL_Surface *dst, Sint16 x1, Sint16 x2, Sint16 y, Uint32 color, bool pal_emu) {
     {
         /* Get clipping boundary and check visibility of hline */
         Sint16 left = dst->clip_rect.x;
@@ -101,7 +119,8 @@ static void hlineColor(SDL_Surface *dst, Sint16 x1, Sint16 x2, Sint16 y, Uint32 
           cG = (color >> 16) & 0xFF,
           cB = (color >> 8) & 0xFF,
           cA = (color >> 0) & 0xFF;
-    if (gd_pal_emulation_game && y % 2 == 1)
+    /* if we are doing software pal emu, here shade the particles as well */
+    if (pal_emu && y % 2 == 1)
         cA = cA * gd_pal_emu_scanline_shade / 100;
 
     Uint32 Rmask = format->Rmask;
@@ -198,76 +217,9 @@ static void hlineColor(SDL_Surface *dst, Sint16 x1, Sint16 x2, Sint16 y, Uint32 
 }
 
 
-//~ static int filledCircleColor(SDL_Surface *dst, Sint16 xc, Sint16 yc, Sint16 r, Uint32 color) {
-//~ if ((dst->clip_rect.w==0) || (dst->clip_rect.h==0)) {
-//~ return 0;
-//~ }
-//~
-//~ if (r < 0) {
-//~ return -1;
-//~ }
-//~
-//~ Sint16 x2 = xc + r;
-//~ Sint16 left = dst->clip_rect.x;
-//~ if (x2<left) {
-//~ return 0;
-//~ }
-//~ Sint16 x1 = xc - r;
-//~ Sint16 right = dst->clip_rect.x + dst->clip_rect.w - 1;
-//~ if (x1>right) {
-//~ return 0;
-//~ }
-//~ Sint16 y2 = yc + r;
-//~ Sint16 top = dst->clip_rect.y;
-//~ if (y2<top) {
-//~ return 0;
-//~ }
-//~ Sint16 y1 = yc - r;
-//~ Sint16 bottom = dst->clip_rect.y + dst->clip_rect.h - 1;
-//~ if (y1>bottom) {
-//~ return 0;
-//~ }
-//~
-//~ /* Lock the surface */
-//~ if (SDL_MUSTLOCK(dst)) {
-//~ if (SDL_LockSurface(dst) < 0) {
-//~ return -1;
-//~ }
-//~ }
-//~
-//~ /* Draw */
-//~ Sint16 x = 0, y = r;
-//~ Sint16 kd = 1-r;
-//~ while (x <= y) {
-//~ hlineColor(dst, xc-y, xc+y, yc-x, color);
-//~ if (x != 0)
-//~ hlineColor(dst, xc-y, xc+y, yc+x, color);
-//~ if (kd >= 0) {
-//~ if (y != x) {
-//~ hlineColor(dst, xc-x, xc+x, yc-y, color);
-//~ hlineColor(dst, xc-x, xc+x, yc+y, color);
-//~ }
-//~ y = y-1;
-//~ kd = kd + 2*(x-y) + 5;
-//~ } else {
-//~ kd = kd + 2*x + 3;
-//~ }
-//~ x = x+1;
-//~ }
-//~
-//~ /* Unlock the surface */
-//~ if (SDL_MUSTLOCK(dst)) {
-//~ SDL_UnlockSurface(dst);
-//~ }
-//~
-//~ return 0;
-//~ }
-//~
-//~
-
-/** draw a diamond with the specified color, 0xRRGGBBAA.
- * the surface must be already locked. */
-static void filledDiamondColor(SDL_Surface *dst, Sint16 xc, Sint16 yc, Sint16 r, Uint32 color) {
+/** Draw a diamond with the specified color, 0xRRGGBBAA.
+ * The surface must be already locked if needed. */
+static void filledDiamondColor(SDL_Surface *dst, Sint16 xc, Sint16 yc, Sint16 r, Uint32 color, bool software_pal_emulation) {
     if ((dst->clip_rect.w == 0) || (dst->clip_rect.h == 0))
         return;
     if (r < 0)
@@ -291,26 +243,26 @@ static void filledDiamondColor(SDL_Surface *dst, Sint16 xc, Sint16 yc, Sint16 r,
         return;
 
     /* Draw */
-    hlineColor(dst, xc - r, xc + r, yc, color);
+    hlineColor(dst, xc - r, xc + r, yc, color, software_pal_emulation);
     for (Sint16 f = 0; f < r; ++f) {
-        hlineColor(dst, xc - f, xc + f, yc - (r - f), color);
-        hlineColor(dst, xc - f, xc + f, yc + (r - f), color);
+        hlineColor(dst, xc - f, xc + f, yc - (r - f), color, software_pal_emulation);
+        hlineColor(dst, xc - f, xc + f, yc + (r - f), color, software_pal_emulation);
     }
 }
 
 
 void SDLAbstractScreen::draw_particle_set(int dx, int dy, ParticleSet const &ps) {
-    Uint8 r = ps.color.get_r();
-    Uint8 g = ps.color.get_g();
-    Uint8 b = ps.color.get_b();
+    unsigned char r, g, b;
+    ps.color.get_rgb(r, g, b);
     Uint8 a = ps.life / 1000.0 * ps.opacity * 255;
     Uint32 color = r << 24 | g << 16 | b << 8 | a << 0;
     int size = ceil(ps.size);
     if (SDL_MUSTLOCK(surface))
         if (SDL_LockSurface(surface) < 0)
             return;
+    bool software_pal_emulation = get_pal_emulation();
     for (ParticleSet::const_iterator it = ps.begin(); it != ps.end(); ++it) {
-        filledDiamondColor(surface, dx + it->px, dy + it->py, size, color);
+        filledDiamondColor(surface, dx + it->px, dy + it->py, size, color, software_pal_emulation);
     }
     if (SDL_MUSTLOCK(surface))
         SDL_UnlockSurface(surface);

@@ -174,7 +174,7 @@ int shader_pal_chroma_x_blur = 75;
 int shader_pal_chroma_y_blur = 75;
 int shader_pal_chroma_to_luma_strength = 25;
 int shader_pal_luma_to_chroma_strength = 15;
-int shader_pal_random_y = 10;
+int shader_pal_random_y = 5;
 int shader_pal_random_uv = 10;
 int shader_pal_scanline_shade_luma = 90;
 int shader_pal_phosphor_shade = 85;
@@ -193,10 +193,10 @@ int gd_sound_music_volume_percent = 50;
 
 
 /* some directories the game uses */
-const char *gd_user_config_dir;
-const char *gd_system_data_dir;
-const char *gd_system_caves_dir;
-const char *gd_system_music_dir;
+std::string gd_user_config_dir;
+std::string gd_system_data_dir;
+std::string gd_system_caves_dir;
+std::string gd_system_music_dir;
 
 std::vector<std::string> gd_sound_dirs, gd_themes_dirs, gd_fonts_dirs, gd_shaders_dirs;
 
@@ -241,7 +241,7 @@ Setting *gd_get_game_settings_array() {
         // TRANSLATORS: here "engine" = "graphics engine"
         { TypeStringv, N_("Engine"), &gd_graphics_engine, true, gd_graphics_engine_names, N_("Graphics engine which used for drawing.") },
         { TypeInteger, N_("Scaling factor"), &gd_cell_scale_factor_game, true, NULL, N_("Scaling size."), 1, 4 },
-        { TypeStringv, N_("  Scaling type"), &gd_cell_scale_type_game, true, gd_scaling_names, N_("Software scaling method used. Only effective for the GTK+ and the SDL engines.") },
+        { TypeStringv, N_("  Scaling type"), &gd_cell_scale_type_game, true, gd_scaling_names, N_("Software scaling method used. This setting is only effective for the GTK+ and the SDL engines. If you use the OpenGL engine, you can configure its scaling method by selecting a shader.") },
         { TypeBoolean, N_("  Software PAL emu"), &gd_pal_emulation_game, true, NULL, N_("Use PAL emulated graphics, i.e. lines are striped, and colors are distorted like on a TV. Only effective for the GTK+ and the SDL engines.") },
         { TypePercent, N_("  PAL scanline shade"), &gd_pal_emu_scanline_shade, true, NULL, N_("Darker rows for PAL emulation. Only effective for the GTK+ and the SDL engines.") },
         { TypeBoolean, N_("Fine scrolling"), &gd_fine_scroll, true, NULL, N_("If fine scrolling is turned off, scrolling and cave animation is limited to a lower frame rate, and consumes much less CPU. On some hardware, it might actually look better than fine scrolling. Not all graphics engines support fine scrolling.") },
@@ -266,8 +266,8 @@ Setting *gd_get_game_settings_array() {
 #ifdef HAVE_GTK
         { TypePage, N_("Editor settings") },
         { TypeInteger, N_("Scaling factor"), &gd_cell_scale_factor_editor, true, NULL, N_("Scaling size."), 1, 4 },
-        { TypeStringv, N_("Scaling type"), &gd_cell_scale_type_editor, true, gd_scaling_names, N_("Scaling method.") },
-        { TypeBoolean, N_("PAL emulation"), &gd_pal_emulation_editor, true, NULL, N_("Use PAL emulated graphics, i.e. lines are striped, and colors are distorted like on a TV.") },
+        { TypeStringv, N_("  Scaling type"), &gd_cell_scale_type_editor, true, gd_scaling_names, N_("Scaling method.") },
+        { TypeBoolean, N_("  Software PAL emu"), &gd_pal_emulation_editor, true, NULL, N_("Use PAL emulated graphics, i.e. lines are striped, and colors are distorted like on a TV.") },
         { TypeBoolean, N_("Animated view"), &gd_game_view, true, NULL, N_("Show simplified view of cave in the editor.") },
         { TypeBoolean, N_("Colored objects"), &gd_colored_objects, true, NULL, N_("Cave objects are colored, to make them different from random cave elements.") },
         { TypeBoolean, N_("Object list"), &gd_show_object_list, true, NULL, N_("Show objects list sidebar in the editor.") },
@@ -382,12 +382,9 @@ static std::string keyfile_get_string(GKeyFile *keyfile, const char *group, cons
         return "";
 
     GError *error = NULL;
-    char *result = g_key_file_get_string(keyfile, group, key, &error);
-    if (result) {
-        std::string ret(result);
-        g_free(result);
-        return ret;
-    }
+    AutoGFreePtr<char> result(g_key_file_get_string(keyfile, group, key, &error));
+    if (result != NULL)
+        return std::string(result);
     gd_debug(error->message);
     g_error_free(error);
     return "";
@@ -429,7 +426,6 @@ void gd_settings_init() {
     settings_integers["cell_scale_type_game"] = &gd_cell_scale_type_game;
     settings_integers["cell_scale_factor_editor"] = &gd_cell_scale_factor_editor;
     settings_integers["cell_scale_type_editor"] = &gd_cell_scale_type_editor;
-
 
 #ifdef HAVE_GTK
     settings_integers["gtk_key_left"] = &gd_gtk_key_left;
@@ -484,11 +480,11 @@ void gd_settings_init() {
 
 static void add_dirs(std::vector<std::string>& dirs, const char *specific) {
     // user's own config
-    dirs.push_back(gd_tostring_free(g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir, specific, NULL)));
-    dirs.push_back(gd_tostring_free(g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir, NULL)));
+    dirs.push_back(gd_tostring_free(g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir.c_str(), specific, NULL)));
+    dirs.push_back(gd_tostring_free(g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir.c_str(), NULL)));
     // system-wide gdash config
-    dirs.push_back(gd_tostring_free(g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, specific, NULL)));
-    dirs.push_back(gd_tostring_free(g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, NULL)));
+    dirs.push_back(gd_tostring_free(g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir.c_str(), specific, NULL)));
+    dirs.push_back(gd_tostring_free(g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir.c_str(), NULL)));
     // for testing: actual directory
     dirs.push_back(gd_tostring_free(g_build_path(G_DIR_SEPARATOR_S, ".", specific, NULL)));
     dirs.push_back(gd_tostring_free(g_build_path(G_DIR_SEPARATOR_S, ".", NULL)));
@@ -503,9 +499,9 @@ void gd_settings_init_dirs() {
     /* on linux, this is a defined, built-in string, $perfix/share/locale */
     gd_system_data_dir = PKGDATADIR;
 #endif
-    gd_system_caves_dir = g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "caves", NULL);
-    gd_system_music_dir = g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir, "music", NULL);
-    gd_user_config_dir = g_build_path(G_DIR_SEPARATOR_S, g_get_user_config_dir(), PACKAGE, NULL);
+    gd_system_caves_dir = gd_tostring_free(g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir.c_str(), "caves", NULL));
+    gd_system_music_dir = gd_tostring_free(g_build_path(G_DIR_SEPARATOR_S, gd_system_data_dir.c_str(), "music", NULL));
+    gd_user_config_dir = gd_tostring_free(g_build_path(G_DIR_SEPARATOR_S, g_get_user_config_dir(), PACKAGE, NULL));
 
     add_dirs(gd_sound_dirs, "sound");
     add_dirs(gd_themes_dirs, "themes");
@@ -549,13 +545,13 @@ void gd_settings_init_translation() {
     /* different directories storing the translation files on unix and win32. */
     /* gdash (and gtk) always uses utf8, so convert translated strings to utf8 if needed. */
 #ifdef G_OS_WIN32
-    bindtextdomain("gtk20-properties", gd_system_data_dir);
+    bindtextdomain("gtk20-properties", gd_system_data_dir.c_str());
     bind_textdomain_codeset("gtk20-properties", "UTF-8");
-    bindtextdomain("gtk20", gd_system_data_dir);
+    bindtextdomain("gtk20", gd_system_data_dir.c_str());
     bind_textdomain_codeset("gtk20", "UTF-8");
-    bindtextdomain("glib20", gd_system_data_dir);
+    bindtextdomain("glib20", gd_system_data_dir.c_str());
     bind_textdomain_codeset("glib20", "UTF-8");
-    bindtextdomain(PACKAGE, gd_system_data_dir);        /* gdash */
+    bindtextdomain(PACKAGE, gd_system_data_dir.c_str());        /* gdash */
     bind_textdomain_codeset(PACKAGE, "UTF-8");
 #else
     bindtextdomain(PACKAGE, LOCALEDIR);                 /* gdash */
@@ -571,7 +567,7 @@ void gd_load_settings() {
     gchar *data;
     gsize length;
 
-    AutoGFreePtr<char> filename(g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir, SETTINGS_INI_FILE, NULL));
+    AutoGFreePtr<char> filename(g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir.c_str(), SETTINGS_INI_FILE, NULL));
     if (!g_file_get_contents(filename, &data, &length, &error)) {
         /* no ini file found */
         gd_debug(error->message);
@@ -645,28 +641,24 @@ void gd_save_settings() {
 
     GError *error = NULL;
     /* convert to string and free */
-    gchar *data = g_key_file_to_data(ini, NULL, &error);
+    AutoGFreePtr<gchar> data(g_key_file_to_data(ini, NULL, &error));
     g_key_file_free(ini);
     if (error) {
         /* this is highly unlikely - why would g_key_file_to_data report error? docs do not mention. */
         gd_warning(CPrintf("Unable to save settings: %s") % error->message);
         g_error_free(error);
-        g_free(data);
         return;
     }
 
-    char *filename = g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir, SETTINGS_INI_FILE, NULL);
-    g_mkdir_with_parents(gd_user_config_dir, 0700);
+    AutoGFreePtr<gchar> filename(g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir.c_str(), SETTINGS_INI_FILE, NULL));
+    g_mkdir_with_parents(gd_user_config_dir.c_str(), 0700);
     g_file_set_contents(filename, data, -1, &error);
-    g_free(filename);
     if (error) {
         /* error saving the file */
         gd_warning(CPrintf("Unable to save settings: %s") % error->message);
         g_error_free(error);
-        g_free(data);
         return;
     }
-    g_free(data);
 }
 
 GOptionContext *gd_option_context_new() {

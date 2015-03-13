@@ -31,24 +31,6 @@
 class PixbufFactory;
 
 
-class SDLPixmap: public Pixmap {
-protected:
-    SDL_Surface *surface;
-
-    SDLPixmap(const SDLPixmap &);               // copy ctor not implemented
-    SDLPixmap &operator=(const SDLPixmap &);    // operator= not implemented
-    SDLPixmap(SDL_Surface *surface_) : surface(surface_) {}
-
-public:
-    friend class SDLAbstractScreen;
-    friend class SDLScreen;
-    ~SDLPixmap();
-
-    virtual int get_width() const;
-    virtual int get_height() const;
-};
-
-
 class SDLScreen: public SDLAbstractScreen {
 private:
     SDLScreen(const SDLScreen &);       // not impl

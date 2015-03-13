@@ -134,6 +134,7 @@ public:
     bool save_snapshot() const;
     bool load_snapshot();
     State main_int(GameInputHandler *inputhandler, bool allow_iterate);
+    bool is_uncovering() const;
 
     /* public variables */
     Type type;

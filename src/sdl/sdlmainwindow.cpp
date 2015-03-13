@@ -138,7 +138,7 @@ static void run_the_app(App &the_app, NextAction &na) {
     bool timer_installed = false;
     /* for the screen based timing */
     Uint32 ticks_now = SDL_GetTicks(), ticks_last = SDL_GetTicks();
-    enum { average_time_frame = 10 };
+    enum { average_time_frame = 25 };
     Uint32 moved[average_time_frame];
     unsigned move_index = 0;
 
@@ -202,13 +202,6 @@ static void run_the_app(App &the_app, NextAction &na) {
         } // while pollevent
 
         if (use_screen_timing) {
-            /* calculate average milliseconds / refresh. if seems to be too fast, switch to timer based stuff */
-            ticks_now = SDL_GetTicks();
-            Uint32 ms = ticks_now - ticks_last;
-            if (ms <= 40) {
-                moved[move_index] = ms;
-                move_index = (move_index + 1) % average_time_frame;
-            }
             int average_ms = std::accumulate(moved, moved + average_time_frame, 0) / average_time_frame;
             if (average_ms < 7) {
                 use_screen_timing = false;
@@ -216,14 +209,27 @@ static void run_the_app(App &the_app, NextAction &na) {
                 timer_id = SDL_AddTimer(timer_ms, timer_callback, NULL);
                 timer_installed = true;
             }
-            /* feed the timer with the current value. */
-            if (ms > 40)
-                ms = 40;
-            the_app.timer_event(ms);
-            if (the_app.screen->must_redraw_all_before_flip()) {
-                the_app.redraw_event(true);
-            } else if (the_app.redraw_queued()) {
-                the_app.redraw_event(false);
+            /* feed the timer with the average value. */
+            the_app.timer_event(average_ms);
+            if (the_app.redraw_queued()) {
+                the_app.redraw_event(the_app.screen->must_redraw_all_before_flip());
+            }
+            /*
+            // writing the ms delays to the screen
+            std::string s;
+            for (int i = 0; i < average_time_frame; ++i) {
+                s += SPrintf("%d ") % moved[i];
+            }
+            the_app.set_color(GD_GDASH_WHITE);
+            the_app.blittext_n(0, the_app.screen->get_height()-20, s.c_str());
+            */
+
+            /* calculate average milliseconds / refresh. if seems to be too fast, switch to timer based stuff */
+            ticks_now = SDL_GetTicks();
+            Uint32 ms = ticks_now - ticks_last;
+            if (ms <= 60) {
+                moved[move_index] = ms;
+                move_index = (move_index + 1) % average_time_frame;
             }
             /* always flip, because we need the time it waits! */
             the_app.screen->do_the_flip();

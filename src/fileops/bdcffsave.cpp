@@ -30,6 +30,7 @@
 #include "cave/caveset.hpp"
 #include "fileops/bdcffhelper.hpp"
 #include "cave/elementproperties.hpp"
+#include "misc/autogfreeptr.hpp"
 
 
 /// @file fileops/bdcffsave.cpp
@@ -75,9 +76,8 @@ void save_properties(std::list<std::string> &out, Reflective &str, Reflective &s
         // long string - also as one line. escape newlines.
         if (prop_desc[i].type == GD_TYPE_LONGSTRING) {
             if (str.get<GdString>(prop) != "") {
-                char *escaped = g_strescape(str.get<GdString>(prop).c_str(), NULL);
+                AutoGFreePtr<char> escaped(g_strescape(str.get<GdString>(prop).c_str(), NULL));
                 out.push_back(BdcffFormat(prop_desc[i].identifier) << escaped);
-                g_free(escaped);
             }
             continue;
         }

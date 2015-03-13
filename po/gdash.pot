@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: gdash 20130420unstable\n"
+"Project-Id-Version: gdash 20130427unstable\n"
 "Report-Msgid-Bugs-To: http://code.google.com/p/gdash/\n"
-"POT-Creation-Date: 2013-04-20 18:48+0200\n"
+"POT-Creation-Date: 2013-04-27 14:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,207 +18,207 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: src/gtk/gtkuisettings.cpp:60 src/gtk/gtkui.cpp:117
+#: src/gtk/gtkuisettings.cpp:59 src/gtk/gtkui.cpp:119
 msgid "All image files"
 msgstr ""
 
-#: src/gtk/gtkuisettings.cpp:119
+#: src/gtk/gtkuisettings.cpp:117
 msgid "Add Theme from Image File"
 msgstr ""
 
-#: src/gtk/gtkuisettings.cpp:132
+#: src/gtk/gtkuisettings.cpp:130
 msgid "Overwrite file?"
 msgstr ""
 
-#: src/gtk/gtkuisettings.cpp:148
+#: src/gtk/gtkuisettings.cpp:146
 msgid "The new theme is installed."
 msgstr ""
 
-#: src/gtk/gtkuisettings.cpp:159
+#: src/gtk/gtkuisettings.cpp:154
 msgid "The selected image cannot be used as a GDash theme."
 msgstr ""
 
 #. TRANSLATORS: Title text capitalization in English
-#: src/gtk/gtkuisettings.cpp:177
+#: src/gtk/gtkuisettings.cpp:172
 msgid "Select Key"
 msgstr ""
 
-#: src/gtk/gtkuisettings.cpp:185
+#: src/gtk/gtkuisettings.cpp:180
 msgid "Press key for action:"
 msgstr ""
 
-#: src/gtk/gtkuisettings.cpp:210
+#: src/gtk/gtkuisettings.cpp:205
 #, c-format
 msgid "Click here to set the key for action: %s"
 msgstr ""
 
 #. TRANSLATORS: Default (builtin) theme, shader, etc.
-#: src/gtk/gtkuisettings.cpp:275 src/settings.cpp:323
+#: src/gtk/gtkuisettings.cpp:270 src/settings.cpp:323
 msgid "[Default]"
 msgstr ""
 
 #. TRANSLATORS: Title text capitalization in English
-#: src/gtk/gtkuisettings.cpp:296
+#: src/gtk/gtkuisettings.cpp:290
 msgid "GDash Preferences"
 msgstr ""
 
-#: src/gtk/gtkuisettings.cpp:385
+#: src/gtk/gtkuisettings.cpp:379
 msgid "_Add theme"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:109
+#: src/gtk/gtkmainwindow.cpp:110
 msgid "Play"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:110
+#: src/gtk/gtkmainwindow.cpp:111
 msgid "File"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:111 src/misc/helptext.cpp:208
+#: src/gtk/gtkmainwindow.cpp:112 src/misc/helptext.cpp:208
 msgid "Help"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:113
+#: src/gtk/gtkmainwindow.cpp:114
 msgid "_Error console"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:116
+#: src/gtk/gtkmainwindow.cpp:117
 msgid "Game help"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:117
+#: src/gtk/gtkmainwindow.cpp:118
 msgid "Caveset _information"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:117
+#: src/gtk/gtkmainwindow.cpp:118
 msgid "Show information about the game and its caves"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:119
+#: src/gtk/gtkmainwindow.cpp:120
 msgid "Keyboard settings"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:119
+#: src/gtk/gtkmainwindow.cpp:120
 msgid "Set keyboard settings"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:121
+#: src/gtk/gtkmainwindow.cpp:122
 msgid "_Sound volume"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:123
+#: src/gtk/gtkmainwindow.cpp:124
 msgid "Cave _editor"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:125
+#: src/gtk/gtkmainwindow.cpp:126
 msgid "Open _recent"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:126 src/editor/editor.cpp:3499
+#: src/gtk/gtkmainwindow.cpp:127 src/editor/editor.cpp:3502
 msgid "O_pen shipped"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:129
+#: src/gtk/gtkmainwindow.cpp:130
 msgid "Hi_ghscores"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:130
+#: src/gtk/gtkmainwindow.cpp:131
 msgid "Game play statistics"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:130
+#: src/gtk/gtkmainwindow.cpp:131
 msgid ""
 "Shows statistics of playing caves: times played, times played successfully "
 "etc."
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:131
+#: src/gtk/gtkmainwindow.cpp:132
 msgid "Show _replays"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:131
+#: src/gtk/gtkmainwindow.cpp:132
 msgid "List replays which are recorded for caves in this caveset"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:132
+#: src/gtk/gtkmainwindow.cpp:133
 msgid "Fullscreen mode"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:136
+#: src/gtk/gtkmainwindow.cpp:137
 msgid "_Take snapshot"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:137
+#: src/gtk/gtkmainwindow.cpp:138
 msgid "_Revert to snapshot"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:138
+#: src/gtk/gtkmainwindow.cpp:139
 msgid "Random _colors"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:139
+#: src/gtk/gtkmainwindow.cpp:140
 msgid "Re_start level"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:139 src/gtk/gtkmainwindow.cpp:140
+#: src/gtk/gtkmainwindow.cpp:140 src/gtk/gtkmainwindow.cpp:141
 msgid "Restart current level"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:140
+#: src/gtk/gtkmainwindow.cpp:141
 msgid "_Pause game"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:141
+#: src/gtk/gtkmainwindow.cpp:142
 msgid "_End game"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:141
+#: src/gtk/gtkmainwindow.cpp:142
 msgid "End current game"
 msgstr ""
 
-#: src/gtk/gtkmainwindow.cpp:363
+#: src/gtk/gtkmainwindow.cpp:362
 msgid "GDash cannot load file from a network link."
 msgstr ""
 
-#: src/gtk/gtkui.cpp:263
+#: src/gtk/gtkui.cpp:258
 #, c-format
 msgid "Caveset \"%s\" is edited or new replays are added. Discard changes?"
 msgstr ""
 
-#: src/gtk/gtkui.cpp:264
+#: src/gtk/gtkui.cpp:259
 msgid "If you discard the caveset, all changes and new replays will be lost."
 msgstr ""
 
-#: src/gtk/gtkui.cpp:268
+#: src/gtk/gtkui.cpp:263
 msgid "_Discard"
 msgstr ""
 
-#: src/gtk/gtkui.cpp:310
+#: src/gtk/gtkui.cpp:304
 msgid "Save File As"
 msgstr ""
 
-#: src/gtk/gtkui.cpp:315
+#: src/gtk/gtkui.cpp:309
 msgid "BDCFF cave sets (*.bd)"
 msgstr ""
 
-#: src/gtk/gtkui.cpp:320
+#: src/gtk/gtkui.cpp:313
 msgid "All files (*)"
 msgstr ""
 
-#: src/gtk/gtkui.cpp:374
+#: src/gtk/gtkui.cpp:361
 msgid "Open File"
 msgstr ""
 
-#: src/gtk/gtkui.cpp:378
+#: src/gtk/gtkui.cpp:365
 msgid "GDash cave sets"
 msgstr ""
 
-#: src/gtk/gtkui.cpp:419
+#: src/gtk/gtkui.cpp:406
 msgid "Error loading caveset."
 msgstr ""
 
 #. TRANSLATORS: Title text capitalization in English
-#: src/gtk/gtkui.cpp:614
+#: src/gtk/gtkui.cpp:600
 msgid "GDash Help"
 msgstr ""
 
@@ -1577,7 +1577,7 @@ msgid ""
 "cave is played. This story can connect the caves to each other."
 msgstr ""
 
-#: src/misc/helptext.cpp:496 src/cave/caveset.cpp:61
+#: src/misc/helptext.cpp:496 src/cave/caveset.cpp:62
 msgid "Title screen"
 msgstr ""
 
@@ -1590,7 +1590,7 @@ msgid ""
 "beneath the big one."
 msgstr ""
 
-#: src/misc/helptext.cpp:501 src/editor/editor.cpp:3536
+#: src/misc/helptext.cpp:501 src/editor/editor.cpp:3539
 msgid "Test cave"
 msgstr ""
 
@@ -1673,49 +1673,49 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 
-#: src/gtkmain.cpp:86
+#: src/main.cpp:86
 msgid "Start editor"
 msgstr ""
 
-#: src/gtkmain.cpp:87
+#: src/main.cpp:87
 msgid "Save caveset in a HTML gallery"
 msgstr ""
 
-#: src/gtkmain.cpp:88
+#: src/main.cpp:88
 msgid "Link stylesheet from file to a HTML gallery, eg. \"../style.css\""
 msgstr ""
 
-#: src/gtkmain.cpp:89
+#: src/main.cpp:89
 msgid "Link shortcut icon to a HTML gallery, eg. \"../favicon.ico\""
 msgstr ""
 
-#: src/gtkmain.cpp:90
+#: src/main.cpp:90
 msgid "Save image of first cave to PNG"
 msgstr ""
 
-#: src/gtkmain.cpp:91
+#: src/main.cpp:91
 msgid "Set PNG image size. Default is 128x96, set to 0x0 for unscaled"
 msgstr ""
 
-#: src/gtkmain.cpp:93
+#: src/main.cpp:93
 msgid "Save caveset in a BDCFF file"
 msgstr ""
 
-#: src/gtkmain.cpp:94
+#: src/main.cpp:94
 msgid ""
 "Save imported binary data to a GDS file. An input file name is required."
 msgstr ""
 
-#: src/gtkmain.cpp:96
+#: src/main.cpp:96
 msgid ""
 "Save documentation in HTML, in the given language identified by an integer."
 msgstr ""
 
-#: src/gtkmain.cpp:98
+#: src/main.cpp:98
 msgid "Batch mode: quit after specified tasks"
 msgstr ""
 
-#: src/gtkmain.cpp:192
+#: src/main.cpp:192
 #, c-format
 msgid "Invalid image size: %s"
 msgstr ""
@@ -1800,7 +1800,7 @@ msgstr ""
 msgid "Atari colors"
 msgstr ""
 
-#: src/cave/colors.cpp:519
+#: src/cave/colors.cpp:449
 msgid "Invalid"
 msgstr ""
 
@@ -1808,7 +1808,7 @@ msgstr ""
 msgid "Cave data"
 msgstr ""
 
-#: src/cave/cavestored.cpp:41 src/cave/caveset.cpp:42
+#: src/cave/cavestored.cpp:41 src/cave/caveset.cpp:43
 msgid "Name"
 msgstr ""
 
@@ -1816,8 +1816,8 @@ msgstr ""
 msgid "Name of cave"
 msgstr ""
 
-#: src/cave/cavestored.cpp:42 src/cave/caveset.cpp:43
-#: src/framework/commands.cpp:186 src/editor/exporthtml.cpp:117
+#: src/cave/cavestored.cpp:42 src/cave/caveset.cpp:44
+#: src/framework/commands.cpp:187 src/editor/exporthtml.cpp:117
 #: src/editor/exporthtml.cpp:184
 msgid "Description"
 msgstr ""
@@ -1826,41 +1826,41 @@ msgstr ""
 msgid "Some words about the cave"
 msgstr ""
 
-#: src/cave/cavestored.cpp:43 src/cave/caveset.cpp:44
-#: src/framework/commands.cpp:182 src/framework/commands.cpp:202
+#: src/cave/cavestored.cpp:43 src/cave/caveset.cpp:45
+#: src/framework/commands.cpp:183 src/framework/commands.cpp:203
 #: src/editor/exporthtml.cpp:115 src/editor/exporthtml.cpp:182
 msgid "Author"
 msgstr ""
 
-#: src/cave/cavestored.cpp:43 src/cave/caveset.cpp:44
+#: src/cave/cavestored.cpp:43 src/cave/caveset.cpp:45
 msgid "Name of author"
 msgstr ""
 
-#: src/cave/cavestored.cpp:44 src/cave/caveset.cpp:45
-#: src/framework/commands.cpp:184 src/framework/commands.cpp:204
+#: src/cave/cavestored.cpp:44 src/cave/caveset.cpp:46
+#: src/framework/commands.cpp:185 src/framework/commands.cpp:205
 #: src/framework/replaymenuactivity.cpp:203
 msgid "Date"
 msgstr ""
 
-#: src/cave/cavestored.cpp:44 src/cave/caveset.cpp:45
+#: src/cave/cavestored.cpp:44 src/cave/caveset.cpp:46
 msgid "Date of creation"
 msgstr ""
 
-#: src/cave/cavestored.cpp:45 src/cave/caveset.cpp:46
+#: src/cave/cavestored.cpp:45 src/cave/caveset.cpp:47
 #: src/editor/exporthtml.cpp:119
 msgid "WWW"
 msgstr ""
 
-#: src/cave/cavestored.cpp:45 src/cave/caveset.cpp:46
+#: src/cave/cavestored.cpp:45 src/cave/caveset.cpp:47
 msgid "Web page or e-mail address"
 msgstr ""
 
 #: src/cave/cavestored.cpp:46 src/cave/cavestored.cpp:80
-#: src/cave/cavestored.cpp:81 src/cave/caveset.cpp:47
+#: src/cave/cavestored.cpp:81 src/cave/caveset.cpp:48
 msgid "Difficulty"
 msgstr ""
 
-#: src/cave/cavestored.cpp:46 src/cave/caveset.cpp:47
+#: src/cave/cavestored.cpp:46 src/cave/caveset.cpp:48
 msgid "Difficulty (informative)"
 msgstr ""
 
@@ -1944,7 +1944,7 @@ msgstr ""
 msgid "Visible, lower"
 msgstr ""
 
-#: src/cave/cavestored.cpp:59 src/cave/caveset.cpp:49
+#: src/cave/cavestored.cpp:59 src/cave/caveset.cpp:50
 msgid "Character set"
 msgstr ""
 
@@ -1952,7 +1952,7 @@ msgstr ""
 msgid "Theme used for displaying the game. Informative, not used by GDash."
 msgstr ""
 
-#: src/cave/cavestored.cpp:60 src/cave/caveset.cpp:50
+#: src/cave/cavestored.cpp:60 src/cave/caveset.cpp:51
 msgid "Font set"
 msgstr ""
 
@@ -1960,8 +1960,8 @@ msgstr ""
 msgid "Font used during the game. Informative, not used by GDash."
 msgstr ""
 
-#: src/cave/cavestored.cpp:63 src/cave/caveset.cpp:56
-#: src/framework/commands.cpp:188 src/editor/exporthtml.cpp:123
+#: src/cave/cavestored.cpp:63 src/cave/caveset.cpp:57
+#: src/framework/commands.cpp:189 src/editor/exporthtml.cpp:123
 #: src/editor/exporthtml.cpp:188
 msgid "Story"
 msgstr ""
@@ -1970,8 +1970,8 @@ msgstr ""
 msgid "Story for the cave. It will be shown when the cave is played."
 msgstr ""
 
-#: src/cave/cavestored.cpp:67 src/cave/caveset.cpp:58
-#: src/framework/commands.cpp:190 src/editor/exporthtml.cpp:121
+#: src/cave/cavestored.cpp:67 src/cave/caveset.cpp:59
+#: src/framework/commands.cpp:191 src/editor/exporthtml.cpp:121
 #: src/editor/exporthtml.cpp:186
 msgid "Remark"
 msgstr ""
@@ -3377,48 +3377,48 @@ msgid "Score"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long
-#: src/cave/gamerender.cpp:319
+#: src/cave/gamerender.cpp:388
 msgid "PLAYING REPLAY"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long
-#: src/cave/gamerender.cpp:334
+#: src/cave/gamerender.cpp:403
 msgid "CONTINUING REPLAY"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long
-#: src/cave/gamerender.cpp:341
+#: src/cave/gamerender.cpp:410
 msgid "PLAYING SNAPSHOT"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long
-#: src/cave/gamerender.cpp:348
+#: src/cave/gamerender.cpp:417
 msgid "TESTING CAVE"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long
-#: src/cave/gamerender.cpp:358
+#: src/cave/gamerender.cpp:427
 msgid "ONE LIFE EXTRA"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long
-#: src/cave/gamerender.cpp:420
+#: src/cave/gamerender.cpp:489
 msgid "OUT OF TIME"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long
-#: src/cave/gamerender.cpp:499
+#: src/cave/gamerender.cpp:568
 msgid "SPACEBAR TO RESUME"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 20 characters long.
 #. the c64 original had these spaces - you are allowed to do so.
-#: src/cave/gamerender.cpp:516
+#: src/cave/gamerender.cpp:585
 msgid "G A M E   O V E R"
 msgstr ""
 
 #. TRANSLATORS: the translated string must be at most 40 characters long
-#: src/cave/gamerender.cpp:627
+#: src/cave/gamerender.cpp:696
 msgid "UP, DOWN: MOVE    FIRE: CONTINUE"
 msgstr ""
 
@@ -4918,75 +4918,75 @@ msgstr ""
 msgid "No element"
 msgstr ""
 
-#: src/cave/caveset.cpp:41
+#: src/cave/caveset.cpp:42
 msgid "Caveset data"
 msgstr ""
 
-#: src/cave/caveset.cpp:42
+#: src/cave/caveset.cpp:43
 msgid "Name of the game"
 msgstr ""
 
-#: src/cave/caveset.cpp:43
+#: src/cave/caveset.cpp:44
 msgid "Some words about the game"
 msgstr ""
 
-#: src/cave/caveset.cpp:49
+#: src/cave/caveset.cpp:50
 msgid "Theme used for displaying the game."
 msgstr ""
 
-#: src/cave/caveset.cpp:50
+#: src/cave/caveset.cpp:51
 msgid "Font used during the game."
 msgstr ""
 
-#: src/cave/caveset.cpp:52
+#: src/cave/caveset.cpp:53
 msgid "Initial lives"
 msgstr ""
 
-#: src/cave/caveset.cpp:52
+#: src/cave/caveset.cpp:53
 msgid "Number of lives you get at game start."
 msgstr ""
 
-#: src/cave/caveset.cpp:53
+#: src/cave/caveset.cpp:54
 msgid "Maximum lives"
 msgstr ""
 
-#: src/cave/caveset.cpp:53
+#: src/cave/caveset.cpp:54
 msgid "Maximum number of lives you can have by collecting bonus points."
 msgstr ""
 
-#: src/cave/caveset.cpp:54
+#: src/cave/caveset.cpp:55
 msgid "Bonus life score"
 msgstr ""
 
-#: src/cave/caveset.cpp:54
+#: src/cave/caveset.cpp:55
 msgid "Number of points to collect for a bonus life."
 msgstr ""
 
-#: src/cave/caveset.cpp:57
+#: src/cave/caveset.cpp:58
 msgid "Long description of the game."
 msgstr ""
 
-#: src/cave/caveset.cpp:59
+#: src/cave/caveset.cpp:60
 msgid "Remark (informative)."
 msgstr ""
 
-#: src/cave/caveset.cpp:61
+#: src/cave/caveset.cpp:62
 msgid "Title screen image"
 msgstr ""
 
-#: src/cave/caveset.cpp:62
+#: src/cave/caveset.cpp:63
 msgid "Title screen, scrolling"
 msgstr ""
 
-#: src/cave/caveset.cpp:62
+#: src/cave/caveset.cpp:63
 msgid "Scrolling background for title screen image"
 msgstr ""
 
-#: src/cave/caveset.cpp:131
+#: src/cave/caveset.cpp:129
 msgid "Could not open file for writing."
 msgstr ""
 
-#: src/cave/caveset.cpp:138
+#: src/cave/caveset.cpp:136
 msgid "Error writing to file."
 msgstr ""
 
@@ -5031,12 +5031,12 @@ msgstr ""
 msgid "Milliseconds"
 msgstr ""
 
-#: src/cave/cavetypes.cpp:128 src/framework/commands.cpp:229
+#: src/cave/cavetypes.cpp:128 src/framework/commands.cpp:230
 #: src/editor/exporthtml.cpp:190
 msgid "Yes"
 msgstr ""
 
-#: src/cave/cavetypes.cpp:128 src/framework/commands.cpp:229
+#: src/cave/cavetypes.cpp:128 src/framework/commands.cpp:230
 #: src/editor/exporthtml.cpp:190
 msgid "No"
 msgstr ""
@@ -5079,11 +5079,11 @@ msgstr ""
 msgid "Cave %02d"
 msgstr ""
 
-#: src/fileops/loadfile.cpp:48
+#: src/fileops/loadfile.cpp:50
 msgid "Error loading GDS file."
 msgstr ""
 
-#: src/fileops/loadfile.cpp:61
+#: src/fileops/loadfile.cpp:63
 msgid "BRC files must be 96000 bytes long."
 msgstr ""
 
@@ -5152,18 +5152,18 @@ msgid "Enter your name"
 msgstr ""
 
 #. TRANSLATORS: Game means the application here.
-#: src/framework/titlescreenactivity.cpp:345
+#: src/framework/titlescreenactivity.cpp:343
 msgid "Quit game?"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:345 src/framework/gameactivity.cpp:90
+#: src/framework/titlescreenactivity.cpp:343 src/framework/gameactivity.cpp:90
 #: src/framework/gameactivity.cpp:91 src/framework/gameactivity.cpp:92
 #: src/framework/replaymenuactivity.cpp:193
 #: src/framework/settingsactivity.cpp:315
 msgid "yes"
 msgstr ""
 
-#: src/framework/titlescreenactivity.cpp:345 src/framework/gameactivity.cpp:90
+#: src/framework/titlescreenactivity.cpp:343 src/framework/gameactivity.cpp:90
 #: src/framework/gameactivity.cpp:91 src/framework/gameactivity.cpp:92
 #: src/framework/replaymenuactivity.cpp:193
 #: src/framework/settingsactivity.cpp:315
@@ -5264,7 +5264,7 @@ msgid "No snapshot saved."
 msgstr ""
 
 #. TRANSLATORS: should be 40 chars max. Title of the caveset info window/activity. Title capitalization (I) in English.
-#: src/framework/gameactivity.cpp:167 src/framework/commands.cpp:219
+#: src/framework/gameactivity.cpp:167 src/framework/commands.cpp:220
 msgid "Cave Information"
 msgstr ""
 
@@ -5307,56 +5307,56 @@ msgid "Please wait"
 msgstr ""
 
 #. TRANSLATORS: showing highscore, categories
-#: src/framework/commands.cpp:104 src/framework/commands.cpp:200
+#: src/framework/commands.cpp:105 src/framework/commands.cpp:201
 msgid "Caveset"
 msgstr ""
 
-#: src/framework/commands.cpp:116 src/framework/commands.cpp:156
-#: src/framework/commands.cpp:180 src/framework/replaymenuactivity.cpp:188
+#: src/framework/commands.cpp:117 src/framework/commands.cpp:157
+#: src/framework/commands.cpp:181 src/framework/replaymenuactivity.cpp:188
 msgid "Cave"
 msgstr ""
 
 #. TRANSLATORS: should be 40 chars max. Title of the highscore window/activity. (That's why F is capitalized in English)
-#: src/framework/commands.cpp:125
+#: src/framework/commands.cpp:126
 msgid "Hall of Fame"
 msgstr ""
 
 #. TRANSLATORS: Stands for level. Should be exactly 5 chars, pad with spaces at the end if necessary
-#: src/framework/commands.cpp:136
+#: src/framework/commands.cpp:137
 msgid "Lev. "
 msgstr ""
 
 #. TRANSLATORS: should be 40 chars max. Title of the caveset info window/activity. This is a window title, so it is capitalized in English.
-#: src/framework/commands.cpp:173
+#: src/framework/commands.cpp:174
 msgid "Caveset Playing Statistics"
 msgstr ""
 
-#: src/framework/commands.cpp:219
+#: src/framework/commands.cpp:220
 msgid "Caveset Information"
 msgstr ""
 
 #. TRANSLATORS: 35 characters max.
-#: src/framework/commands.cpp:229
+#: src/framework/commands.cpp:230
 msgid "Caveset changed. Discard changes?"
 msgstr ""
 
 #. TRANSLATORS: title of the "file open fail" error message window.
-#: src/framework/commands.cpp:245
+#: src/framework/commands.cpp:246
 msgid "Caveset Load Error"
 msgstr ""
 
 #. TRANSLATORS: title of the "file save fail" error window.
-#: src/framework/commands.cpp:257
+#: src/framework/commands.cpp:258
 msgid "Cave Save Error"
 msgstr ""
 
 #. TRANSLATORS: 40 characters max. Title of the "save caveset as new file" window.
-#: src/framework/commands.cpp:277
+#: src/framework/commands.cpp:278
 msgid "Save Caveset As New File"
 msgstr ""
 
 #. TRANSLATORS: 40 characters max. Title of the "open file" window.
-#: src/framework/commands.cpp:290
+#: src/framework/commands.cpp:291
 msgid "Select Caveset to Load"
 msgstr ""
 
@@ -5442,33 +5442,33 @@ msgstr ""
 msgid "Press T to install a new theme."
 msgstr ""
 
-#: src/framework/selectfileactivity.cpp:152
-#: src/framework/selectfileactivity.cpp:156
+#: src/framework/selectfileactivity.cpp:150
+#: src/framework/selectfileactivity.cpp:154
 #, c-format
 msgid "Cannot change to directory: %s."
 msgstr ""
 
-#: src/framework/selectfileactivity.cpp:241
+#: src/framework/selectfileactivity.cpp:238
 msgid "File exists. Overwrite?"
 msgstr ""
 
 #. TRANSLATORS: 35 chars max
-#: src/framework/selectfileactivity.cpp:296
+#: src/framework/selectfileactivity.cpp:293
 msgid "Jump to directory"
 msgstr ""
 
 #. TRANSLATORS: 35 chars max
-#: src/framework/selectfileactivity.cpp:303
+#: src/framework/selectfileactivity.cpp:300
 msgid "Enter new file name"
 msgstr ""
 
 #. TRANSLATORS: 40 chars max
-#: src/framework/selectfileactivity.cpp:327
+#: src/framework/selectfileactivity.cpp:324
 msgid "Crsr:select  N:new  J:jump  Esc:cancel"
 msgstr ""
 
 #. TRANSLATORS: 40 chars max
-#: src/framework/selectfileactivity.cpp:330
+#: src/framework/selectfileactivity.cpp:327
 msgid "Crsr: select   J: jump   Esc: cancel"
 msgstr ""
 
@@ -5616,17 +5616,18 @@ msgstr ""
 msgid "Scaling size."
 msgstr ""
 
-#: src/settings.cpp:244
+#: src/settings.cpp:244 src/settings.cpp:269
 msgid "  Scaling type"
 msgstr ""
 
 #: src/settings.cpp:244
 msgid ""
-"Software scaling method used. Only effective for the GTK+ and the SDL "
-"engines."
+"Software scaling method used. This setting is only effective for the GTK+ "
+"and the SDL engines. If you use the OpenGL engine, you can configure its "
+"scaling method by selecting a shader."
 msgstr ""
 
-#: src/settings.cpp:245
+#: src/settings.cpp:245 src/settings.cpp:270
 msgid "  Software PAL emu"
 msgstr ""
 
@@ -5778,15 +5779,7 @@ msgid "Editor settings"
 msgstr ""
 
 #: src/settings.cpp:269
-msgid "Scaling type"
-msgstr ""
-
-#: src/settings.cpp:269
 msgid "Scaling method."
-msgstr ""
-
-#: src/settings.cpp:270
-msgid "PAL emulation"
 msgstr ""
 
 #: src/settings.cpp:270
@@ -5795,7 +5788,7 @@ msgid ""
 "like on a TV."
 msgstr ""
 
-#: src/settings.cpp:271 src/editor/editor.cpp:3604
+#: src/settings.cpp:271 src/editor/editor.cpp:3607
 msgid "Animated view"
 msgstr ""
 
@@ -5914,23 +5907,23 @@ msgstr ""
 msgid "Key restart level"
 msgstr ""
 
-#: src/settings.cpp:674
+#: src/settings.cpp:666
 msgid "Show license and quit"
 msgstr ""
 
-#: src/settings.cpp:675
+#: src/settings.cpp:667
 msgid "Show some debug messages"
 msgstr ""
 
-#: src/settings.cpp:676
+#: src/settings.cpp:668
 msgid "Load default settings"
 msgstr ""
 
-#: src/settings.cpp:677
+#: src/settings.cpp:669
 msgid "Cave names"
 msgstr ""
 
-#: src/settings.cpp:680
+#: src/settings.cpp:672
 msgid "[FILE NAME]"
 msgstr ""
 
@@ -6217,22 +6210,22 @@ msgid "Enabled this object on all levels."
 msgstr ""
 
 #. TRANSLATORS: Title text capitalization in English
-#: src/editor/editor.cpp:1670
+#: src/editor/editor.cpp:1673
 msgid "Cave Name"
 msgstr ""
 
-#: src/editor/editor.cpp:1756
+#: src/editor/editor.cpp:1759
 #, c-format
 msgid "%d cave selected"
 msgid_plural "%d caves selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/editor/editor.cpp:1969
+#: src/editor/editor.cpp:1972
 msgid "Cave Random Fill"
 msgstr ""
 
-#: src/editor/editor.cpp:1975
+#: src/editor/editor.cpp:1978
 msgid ""
 "Hint: The random fill works by generating a random number between 0 and 255, "
 "then choosing an element from the list above. If the number generated is "
@@ -6242,144 +6235,144 @@ msgid ""
 "descending order."
 msgstr ""
 
-#: src/editor/editor.cpp:2009
+#: src/editor/editor.cpp:2012
 msgid "Save Cave as PNG Image"
 msgstr ""
 
-#: src/editor/editor.cpp:2016
+#: src/editor/editor.cpp:2019
 msgid "PNG files"
 msgstr ""
 
 #. TRANSLATORS: Title text capitalization in English
-#: src/editor/editor.cpp:2078
+#: src/editor/editor.cpp:2081
 msgid "Cave Overview"
 msgstr ""
 
-#: src/editor/editor.cpp:2079
+#: src/editor/editor.cpp:2082
 msgid "Save as _PNG"
 msgstr ""
 
 #. TRANSLATORS: Title text capitalization in English
-#: src/editor/editor.cpp:2146
+#: src/editor/editor.cpp:2149
 msgid "Element Statistics"
 msgstr ""
 
-#: src/editor/editor.cpp:2153
+#: src/editor/editor.cpp:2156
 msgid "<b>Size of visible area</b>"
 msgstr ""
 
 #. TRANSLATORS: like "visible size: 880 cells" in the cave statistics
-#: src/editor/editor.cpp:2155
+#: src/editor/editor.cpp:2158
 #, c-format
 msgid "%d cells"
 msgstr ""
 
-#: src/editor/editor.cpp:2370
+#: src/editor/editor.cpp:2373
 msgid "Cave Colors"
 msgstr ""
 
-#: src/editor/editor.cpp:2380
+#: src/editor/editor.cpp:2383
 msgid "Set random..."
 msgstr ""
 
-#: src/editor/editor.cpp:2387
+#: src/editor/editor.cpp:2390
 msgid ""
 "Hint: As the palette can be changed for C64 and Atari colors, it is not "
 "recommended to use different types together (for example, RGB color for "
 "background, Atari color for Slime.)"
 msgstr ""
 
-#: src/editor/editor.cpp:2421
+#: src/editor/editor.cpp:2424
 msgid "Do you really want to delete cave(s)?"
 msgstr ""
 
-#: src/editor/editor.cpp:2421
+#: src/editor/editor.cpp:2424
 msgid "This operation cannot be undone."
 msgstr ""
 
-#: src/editor/editor.cpp:2554
+#: src/editor/editor.cpp:2557
 msgid ""
 "At least one object would have been totally hidden (not visible on any of "
 "the levels)."
 msgstr ""
 
-#: src/editor/editor.cpp:2554
+#: src/editor/editor.cpp:2557
 msgid "Enabled those objects on the current level."
 msgstr ""
 
-#: src/editor/editor.cpp:2715
+#: src/editor/editor.cpp:2718
 msgid "Do you really want to remove cave map?"
 msgstr ""
 
-#: src/editor/editor.cpp:2715
+#: src/editor/editor.cpp:2718
 msgid "This operation destroys all cave objects."
 msgstr ""
 
-#: src/editor/editor.cpp:2735
+#: src/editor/editor.cpp:2738
 msgid "This cave has no objects."
 msgstr ""
 
-#: src/editor/editor.cpp:2739
+#: src/editor/editor.cpp:2742
 msgid "Do you really want to flatten cave?"
 msgstr ""
 
-#: src/editor/editor.cpp:2739
+#: src/editor/editor.cpp:2742
 msgid ""
 "This operation merges all cave objects currently seen in a single map. "
 "Further objects may later be added, but the ones already seen will behave "
 "like the random fill elements; they will not be editable."
 msgstr ""
 
-#: src/editor/editor.cpp:2816
+#: src/editor/editor.cpp:2819
 msgid "Save Cave Set in HTML"
 msgstr ""
 
-#: src/editor/editor.cpp:2824
+#: src/editor/editor.cpp:2827
 msgid "HTML files"
 msgstr ""
 
-#: src/editor/editor.cpp:2840
+#: src/editor/editor.cpp:2843
 msgid "Errors - Saving Gallery to File"
 msgstr ""
 
-#: src/editor/editor.cpp:2855
+#: src/editor/editor.cpp:2858
 msgid "Export Cave as CrLi Cave File"
 msgstr ""
 
-#: src/editor/editor.cpp:2873
+#: src/editor/editor.cpp:2876
 msgid "Errors - Exporting Cave to CrLi Format"
 msgstr ""
 
-#: src/editor/editor.cpp:2891
+#: src/editor/editor.cpp:2894
 msgid "Export Cave as CrLi Cave Pack"
 msgstr ""
 
-#: src/editor/editor.cpp:2912
+#: src/editor/editor.cpp:2915
 msgid "Errors - Exporting Caves to File"
 msgstr ""
 
 #. TRANSLATORS: Title text capitalization in English
-#: src/editor/editor.cpp:2995
+#: src/editor/editor.cpp:2998
 msgid "Create New Cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3006
+#: src/editor/editor.cpp:3009
 msgid "Name:"
 msgstr ""
 
-#: src/editor/editor.cpp:3009
+#: src/editor/editor.cpp:3012
 msgid "New cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3013
+#: src/editor/editor.cpp:3016
 msgid "Description:"
 msgstr ""
 
-#: src/editor/editor.cpp:3019
+#: src/editor/editor.cpp:3022
 msgid "Intermission:"
 msgstr ""
 
-#: src/editor/editor.cpp:3021
+#: src/editor/editor.cpp:3024
 msgid ""
 "Intermission caves are usually small and fast caves, which are not required "
 "to be solved. The player will not lose a life if he is not successful. The "
@@ -6388,11 +6381,11 @@ msgid ""
 "intermissions."
 msgstr ""
 
-#: src/editor/editor.cpp:3135
+#: src/editor/editor.cpp:3138
 msgid "Do you really want to remove unknown cave tags?"
 msgstr ""
 
-#: src/editor/editor.cpp:3135
+#: src/editor/editor.cpp:3138
 msgid ""
 "This operation removes all unknown tags associated with all caves. Unknown "
 "tags might come from another BDCFF-compatible game or an older version of "
@@ -6400,566 +6393,568 @@ msgid ""
 "you use this caveset in this application, they are of no use."
 msgstr ""
 
-#: src/editor/editor.cpp:3229 src/editor/editor.cpp:3240
+#: src/editor/editor.cpp:3232 src/editor/editor.cpp:3243
 #, c-format
 msgid "%s Element"
 msgstr ""
 
-#: src/editor/editor.cpp:3233
+#: src/editor/editor.cpp:3236
 msgid "Draw Element"
 msgstr ""
 
-#: src/editor/editor.cpp:3244
+#: src/editor/editor.cpp:3247
 msgid "Fill Element"
 msgstr ""
 
-#: src/editor/editor.cpp:3293
+#: src/editor/editor.cpp:3296
 #, c-format
 msgid "%s: removed %d replay(s)\n"
 msgstr ""
 
-#: src/editor/editor.cpp:3299
+#: src/editor/editor.cpp:3302
 msgid "Some replays were removed."
 msgstr ""
 
-#: src/editor/editor.cpp:3325
+#: src/editor/editor.cpp:3328
 #, c-format
 msgid "%s: marked %d replay(s) as working ones\n"
 msgstr ""
 
-#: src/editor/editor.cpp:3331
+#: src/editor/editor.cpp:3334
 msgid ""
 "Some replay checksums were recalculated. This does not mean that those "
 "replays actually play correctly!"
 msgstr ""
 
-#: src/editor/editor.cpp:3383 src/editor/editor.cpp:3396
+#: src/editor/editor.cpp:3386 src/editor/editor.cpp:3399
 msgid "Error loading image file."
 msgstr ""
 
-#: src/editor/editor.cpp:3383
+#: src/editor/editor.cpp:3386
 msgid "Cannot recognize file format."
 msgstr ""
 
-#: src/editor/editor.cpp:3388
+#: src/editor/editor.cpp:3391
 msgid "The image selected is too big!"
 msgstr ""
 
-#: src/editor/editor.cpp:3388
+#: src/editor/editor.cpp:3391
 #, c-format
 msgid "Maximum sizes: %dx%d pixels"
 msgstr ""
 
-#: src/editor/editor.cpp:3420
+#: src/editor/editor.cpp:3423
 msgid "Select Image File for Title Screen"
 msgstr ""
 
-#: src/editor/editor.cpp:3426
+#: src/editor/editor.cpp:3429
 msgid "Select Image File for Background Tile"
 msgstr ""
 
 #. TRANSLATORS: Title text capitalization in English
-#: src/editor/editor.cpp:3438
+#: src/editor/editor.cpp:3441
 msgid "Set Title Image"
 msgstr ""
 
-#: src/editor/editor.cpp:3454
+#: src/editor/editor.cpp:3457
 msgid "Load _image"
 msgstr ""
 
-#: src/editor/editor.cpp:3455
+#: src/editor/editor.cpp:3458
 msgid "Load _tile"
 msgstr ""
 
-#: src/editor/editor.cpp:3462
+#: src/editor/editor.cpp:3465
 #, c-format
 msgid ""
 "Recommended image sizes are 320x176 pixels for title image and 8x8 pixels "
 "for the scrolling tile. Maximum sizes are %dx%d and %dx%d, respectively."
 msgstr ""
 
-#: src/editor/editor.cpp:3484
+#: src/editor/editor.cpp:3487
 msgid "_File"
 msgstr ""
 
-#: src/editor/editor.cpp:3485
+#: src/editor/editor.cpp:3488
 msgid "_Edit"
 msgstr ""
 
-#: src/editor/editor.cpp:3486
+#: src/editor/editor.cpp:3489
 msgid "_View"
 msgstr ""
 
-#: src/editor/editor.cpp:3487
+#: src/editor/editor.cpp:3490
 msgid "_Tools"
 msgstr ""
 
-#: src/editor/editor.cpp:3488
+#: src/editor/editor.cpp:3491
 msgid "_Help"
 msgstr ""
 
-#: src/editor/editor.cpp:3489
+#: src/editor/editor.cpp:3492
 msgid "_Object"
 msgstr ""
 
-#: src/editor/editor.cpp:3490
+#: src/editor/editor.cpp:3493
 msgid "_Cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3491
+#: src/editor/editor.cpp:3494
 msgid "Cave_set"
 msgstr ""
 
-#: src/editor/editor.cpp:3492
+#: src/editor/editor.cpp:3495
 msgid "Close cave editor"
 msgstr ""
 
-#: src/editor/editor.cpp:3493
+#: src/editor/editor.cpp:3496
 msgid "New _cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3493
+#: src/editor/editor.cpp:3496
 msgid "Create new cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3495
+#: src/editor/editor.cpp:3498
 msgid "_Editor help"
 msgstr ""
 
-#: src/editor/editor.cpp:3496
+#: src/editor/editor.cpp:3499
 msgid "Save cave set to file"
 msgstr ""
 
-#: src/editor/editor.cpp:3497
+#: src/editor/editor.cpp:3500
 msgid "Save cave set as new file"
 msgstr ""
 
-#: src/editor/editor.cpp:3498
+#: src/editor/editor.cpp:3501
 msgid "Load cave set from file"
 msgstr ""
 
-#: src/editor/editor.cpp:3499
+#: src/editor/editor.cpp:3502
 msgid "Load shipped cave set from file"
 msgstr ""
 
-#: src/editor/editor.cpp:3500
+#: src/editor/editor.cpp:3503
 msgid "Select all items"
 msgstr ""
 
-#: src/editor/editor.cpp:3501
+#: src/editor/editor.cpp:3504
 msgid "Cave set _properties"
 msgstr ""
 
-#: src/editor/editor.cpp:3501
+#: src/editor/editor.cpp:3504
 msgid "Set properties of cave set"
 msgstr ""
 
-#: src/editor/editor.cpp:3502
+#: src/editor/editor.cpp:3505
 msgid "Cave set _title image"
 msgstr ""
 
-#: src/editor/editor.cpp:3502
+#: src/editor/editor.cpp:3505
 msgid "Set caveset title image"
 msgstr ""
 
-#: src/editor/editor.cpp:3508
+#: src/editor/editor.cpp:3511
 msgid "_Role in caveset"
 msgstr ""
 
-#: src/editor/editor.cpp:3509
+#: src/editor/editor.cpp:3512
 msgid "_Edit cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3509
+#: src/editor/editor.cpp:3512
 msgid "Edit selected cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3510
+#: src/editor/editor.cpp:3513
 msgid "_Rename cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3510
+#: src/editor/editor.cpp:3513
 msgid "Rename selected cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3511
+#: src/editor/editor.cpp:3514
 msgid "Make cave _selectable"
 msgstr ""
 
-#: src/editor/editor.cpp:3511
+#: src/editor/editor.cpp:3514
 msgid "Make the cave selectable as game start"
 msgstr ""
 
-#: src/editor/editor.cpp:3512
+#: src/editor/editor.cpp:3515
 msgid "Make cave _unselectable"
 msgstr ""
 
-#: src/editor/editor.cpp:3512
+#: src/editor/editor.cpp:3515
 msgid "Make the cave unselectable as game start"
 msgstr ""
 
-#: src/editor/editor.cpp:3517
+#: src/editor/editor.cpp:3520
 msgid "_New cave set"
 msgstr ""
 
-#: src/editor/editor.cpp:3517
+#: src/editor/editor.cpp:3520
 msgid "Create new cave set with no caves"
 msgstr ""
 
-#: src/editor/editor.cpp:3518
+#: src/editor/editor.cpp:3521
 msgid "Save _HTML gallery"
 msgstr ""
 
-#: src/editor/editor.cpp:3518
+#: src/editor/editor.cpp:3521
 msgid "Save game in a HTML gallery"
 msgstr ""
 
-#: src/editor/editor.cpp:3519
+#: src/editor/editor.cpp:3522
 msgid "Export _CrLi cave pack"
 msgstr ""
 
-#: src/editor/editor.cpp:3520
+#: src/editor/editor.cpp:3523
 msgid "_Selectable caves"
 msgstr ""
 
-#: src/editor/editor.cpp:3521
+#: src/editor/editor.cpp:3524
 msgid "All _caves"
 msgstr ""
 
-#: src/editor/editor.cpp:3521
+#: src/editor/editor.cpp:3524
 msgid "Make all caves selectable as game start"
 msgstr ""
 
-#: src/editor/editor.cpp:3522
+#: src/editor/editor.cpp:3525
 msgid "All _but intermissions"
 msgstr ""
 
-#: src/editor/editor.cpp:3522
+#: src/editor/editor.cpp:3525
 msgid "Make all caves but intermissions selectable as game start"
 msgstr ""
 
-#: src/editor/editor.cpp:3523
+#: src/editor/editor.cpp:3526
 msgid "All _after intermissions"
 msgstr ""
 
-#: src/editor/editor.cpp:3523
+#: src/editor/editor.cpp:3526
 msgid "Make all caves after intermissions selectable as game start"
 msgstr ""
 
-#: src/editor/editor.cpp:3524
+#: src/editor/editor.cpp:3527
 msgid "Remove all unknown tags"
 msgstr ""
 
-#: src/editor/editor.cpp:3524
+#: src/editor/editor.cpp:3527
 msgid "Removes all unknown tags found in the BDCFF file"
 msgstr ""
 
-#: src/editor/editor.cpp:3525
+#: src/editor/editor.cpp:3528
 msgid "Remove bad replays"
 msgstr ""
 
-#: src/editor/editor.cpp:3525
+#: src/editor/editor.cpp:3528
 msgid "Removes replays which won't play as they have their caves modified."
 msgstr ""
 
-#: src/editor/editor.cpp:3526
+#: src/editor/editor.cpp:3529
 msgid "Fix replay checksums"
 msgstr ""
 
-#: src/editor/editor.cpp:3526
+#: src/editor/editor.cpp:3529
 msgid "Treats all replays with wrong checksums as working ones."
 msgstr ""
 
-#: src/editor/editor.cpp:3531
+#: src/editor/editor.cpp:3534
 msgid "_Map"
 msgstr ""
 
-#: src/editor/editor.cpp:3532
+#: src/editor/editor.cpp:3535
 msgid "_Export as CrLi cave file"
 msgstr ""
 
-#: src/editor/editor.cpp:3533
+#: src/editor/editor.cpp:3536
 msgid "Open cave selector"
 msgstr ""
 
-#: src/editor/editor.cpp:3534
+#: src/editor/editor.cpp:3537
 msgid "_Next cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3534
+#: src/editor/editor.cpp:3537
 msgid "Next cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3535
+#: src/editor/editor.cpp:3538
 msgid "_Previous cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3535
+#: src/editor/editor.cpp:3538
 msgid "Previous cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3536
+#: src/editor/editor.cpp:3539
 msgid "_Test"
 msgstr ""
 
-#: src/editor/editor.cpp:3537
+#: src/editor/editor.cpp:3540
 msgid "Ca_ve properties"
 msgstr ""
 
-#: src/editor/editor.cpp:3537
+#: src/editor/editor.cpp:3540
 msgid "Cave settings"
 msgstr ""
 
-#: src/editor/editor.cpp:3538
+#: src/editor/editor.cpp:3541
 msgid "_Element statistics"
 msgstr ""
 
-#: src/editor/editor.cpp:3538
+#: src/editor/editor.cpp:3541
 msgid "Element statistics: number and ratio of elements"
 msgstr ""
 
-#: src/editor/editor.cpp:3539
+#: src/editor/editor.cpp:3542
 msgid "Set engine defaults"
 msgstr ""
 
-#: src/editor/editor.cpp:3540
+#: src/editor/editor.cpp:3543
 msgid "Cave co_lors"
 msgstr ""
 
-#: src/editor/editor.cpp:3540
+#: src/editor/editor.cpp:3543
 msgid "Select cave colors"
 msgstr ""
 
-#: src/editor/editor.cpp:3541
+#: src/editor/editor.cpp:3544
 msgid "Convert to map"
 msgstr ""
 
-#: src/editor/editor.cpp:3541
+#: src/editor/editor.cpp:3544
 msgid "Flatten cave to a single cave map without objects"
 msgstr ""
 
-#: src/editor/editor.cpp:3542
+#: src/editor/editor.cpp:3545
 msgid "O_verview"
 msgstr ""
 
-#: src/editor/editor.cpp:3542
+#: src/editor/editor.cpp:3545
 msgid "Full screen overview of cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3543
+#: src/editor/editor.cpp:3546
 msgid "O_verview (simple)"
 msgstr ""
 
-#: src/editor/editor.cpp:3543
+#: src/editor/editor.cpp:3546
 msgid "Full screen overview of cave almost as in game"
 msgstr ""
 
-#: src/editor/editor.cpp:3544
+#: src/editor/editor.cpp:3547
 msgid "_Auto shrink"
 msgstr ""
 
-#: src/editor/editor.cpp:3544
+#: src/editor/editor.cpp:3547
 msgid "Automatically set the visible region of the cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3549
+#: src/editor/editor.cpp:3552
 msgid "Send to _back"
 msgstr ""
 
-#: src/editor/editor.cpp:3549
+#: src/editor/editor.cpp:3552
 msgid "Send object to bottom of object list (draw first)"
 msgstr ""
 
-#: src/editor/editor.cpp:3550
+#: src/editor/editor.cpp:3553
 msgid "Bring to _front"
 msgstr ""
 
-#: src/editor/editor.cpp:3550
+#: src/editor/editor.cpp:3553
 msgid "Bring object to front of object list (drawn last)"
 msgstr ""
 
-#: src/editor/editor.cpp:3551
+#: src/editor/editor.cpp:3554
 msgid "Show on this level"
 msgstr ""
 
-#: src/editor/editor.cpp:3551
+#: src/editor/editor.cpp:3554
 msgid "Enable object on currently visible level"
 msgstr ""
 
-#: src/editor/editor.cpp:3552
+#: src/editor/editor.cpp:3555
 msgid "Hide on this level"
 msgstr ""
 
-#: src/editor/editor.cpp:3552
+#: src/editor/editor.cpp:3555
 msgid "Disable object on currently visible level"
 msgstr ""
 
-#: src/editor/editor.cpp:3553
+#: src/editor/editor.cpp:3556
 msgid "Only on this level"
 msgstr ""
 
-#: src/editor/editor.cpp:3553
+#: src/editor/editor.cpp:3556
 msgid "Enable object only on the currently visible level"
 msgstr ""
 
-#: src/editor/editor.cpp:3554
+#: src/editor/editor.cpp:3557
 msgid "Show on all levels"
 msgstr ""
 
-#: src/editor/editor.cpp:3554
+#: src/editor/editor.cpp:3557
 msgid "Enable object on all levels"
 msgstr ""
 
-#: src/editor/editor.cpp:3558
+#: src/editor/editor.cpp:3561
 msgid "Ob_ject properties"
 msgstr ""
 
-#: src/editor/editor.cpp:3558
+#: src/editor/editor.cpp:3561
 msgid "Set object properties"
 msgstr ""
 
-#: src/editor/editor.cpp:3563
+#: src/editor/editor.cpp:3566
 msgid "Shift _left"
 msgstr ""
 
-#: src/editor/editor.cpp:3564
+#: src/editor/editor.cpp:3567
 msgid "Shift _right"
 msgstr ""
 
-#: src/editor/editor.cpp:3565
+#: src/editor/editor.cpp:3568
 msgid "Shift _up"
 msgstr ""
 
-#: src/editor/editor.cpp:3566
+#: src/editor/editor.cpp:3569
 msgid "Shift _down"
 msgstr ""
 
-#: src/editor/editor.cpp:3567
+#: src/editor/editor.cpp:3570
 msgid "Remove m_ap"
 msgstr ""
 
-#: src/editor/editor.cpp:3567
+#: src/editor/editor.cpp:3570
 msgid "Remove cave map, if it has one"
 msgstr ""
 
-#: src/editor/editor.cpp:3572
+#: src/editor/editor.cpp:3575
 msgid "Setup cave _random fill"
 msgstr ""
 
-#: src/editor/editor.cpp:3572
+#: src/editor/editor.cpp:3575
 msgid "Setup initial fill random elements for the cave"
 msgstr ""
 
-#: src/editor/editor.cpp:3577
+#: src/editor/editor.cpp:3580
 msgid "Cut to clipboard"
 msgstr ""
 
-#: src/editor/editor.cpp:3578
+#: src/editor/editor.cpp:3581
 msgid "Copy to clipboard"
 msgstr ""
 
-#: src/editor/editor.cpp:3579
+#: src/editor/editor.cpp:3582
 msgid "Delete"
 msgstr ""
 
-#: src/editor/editor.cpp:3584
+#: src/editor/editor.cpp:3587
 msgid "Paste object from clipboard"
 msgstr ""
 
-#: src/editor/editor.cpp:3589
+#: src/editor/editor.cpp:3592
 msgid "Undo last action"
 msgstr ""
 
-#: src/editor/editor.cpp:3594
+#: src/editor/editor.cpp:3597
 msgid "Redo last action"
 msgstr ""
 
-#: src/editor/editor.cpp:3604
+#: src/editor/editor.cpp:3607
 msgid "_Animated view"
 msgstr ""
 
-#: src/editor/editor.cpp:3605
+#: src/editor/editor.cpp:3608
 msgid "_Colored objects"
 msgstr ""
 
-#: src/editor/editor.cpp:3605
+#: src/editor/editor.cpp:3608
 msgid "Cave objects are colored"
 msgstr ""
 
-#: src/editor/editor.cpp:3606
+#: src/editor/editor.cpp:3609
 msgid "_Object list"
 msgstr ""
 
-#: src/editor/editor.cpp:3606
+#: src/editor/editor.cpp:3609
 msgid "Object list sidebar"
 msgstr ""
 
-#: src/editor/editor.cpp:3954
+#: src/editor/editor.cpp:3957
 msgid "Level shown:"
 msgstr ""
 
-#: src/editor/editor.cpp:3963
+#: src/editor/editor.cpp:3966
 msgid "Draw on:"
 msgstr ""
 
-#: src/editor/editor.cpp:3968
+#: src/editor/editor.cpp:3971
 msgid ""
 "Element used to draw points, lines, and rectangles. You can use middle-click "
 "to pick one from the cave."
 msgstr ""
 
-#: src/editor/editor.cpp:3973
+#: src/editor/editor.cpp:3976
 msgid ""
 "Element used to fill rectangles, and second element of joins. You can use "
 "Ctrl + middle-click to pick one from the cave."
 msgstr ""
 
-#: src/editor/editor.cpp:4010
+#: src/editor/editor.cpp:4013
 msgid "_Objects"
 msgstr ""
 
-#: src/editor/editorwidgets.cpp:142
+#: src/editor/editorwidgets.cpp:144
 msgid "Select Color"
 msgstr ""
 
 #. TRANSLATORS: Title text capitalization in English
-#: src/editor/editorwidgets.cpp:181
+#: src/editor/editorwidgets.cpp:185
 msgid "Select Atari Color"
 msgstr ""
 
 #. TRANSLATORS: Title text capitalization in English
-#: src/editor/editorwidgets.cpp:186
+#: src/editor/editorwidgets.cpp:190
 msgid "Select C64 DTV Color"
 msgstr ""
 
-#: src/editor/editorwidgets.cpp:284
+#: src/editor/editorwidgets.cpp:288
 msgid "C64 Colors"
 msgstr ""
 
-#: src/editor/editorwidgets.cpp:297
+#: src/editor/editorwidgets.cpp:301
 msgid "Atari color..."
 msgstr ""
 
-#: src/editor/editorwidgets.cpp:299
+#: src/editor/editorwidgets.cpp:303
 msgid "C64DTV color..."
 msgstr ""
 
-#: src/editor/editorwidgets.cpp:301
+#: src/editor/editorwidgets.cpp:305
 msgid "RGB color..."
 msgstr ""
 
-#: src/editor/editorwidgets.cpp:524
+#: src/editor/editorwidgets.cpp:528
 msgid "Normal elements"
 msgstr ""
 
-#: src/editor/editorwidgets.cpp:531
+#: src/editor/editorwidgets.cpp:535
 msgid "For effects"
 msgstr ""
 
-#: src/editor/editorwidgets.cpp:624
+#: src/editor/editorwidgets.cpp:630
 msgid "Elements"
 msgstr ""
 
-#: src/gfx/pixbuffactory.cpp:34
+#. TRANSLATORS: you can translate "nearest neighbor" to "nearest" if the resulting
+#. string would be too long otherwise.
+#: src/gfx/pixbuffactory.cpp:36
 msgid "Nearest neighbor"
 msgstr ""

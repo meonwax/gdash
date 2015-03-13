@@ -23,8 +23,8 @@
 #include "config.h"
 
 #ifdef HAVE_SDL
-#include <SDL/SDL.h>
-#include <SDL/SDL_mixer.h>
+    #include <SDL/SDL.h>
+    #include <SDL/SDL_mixer.h>
 #endif
 
 #include <glib.h>
@@ -49,7 +49,7 @@
 
     - Channel 1: Small sounds, ie. diamonds falling, boulders rolling.
 
-    - Channel 2: Walking, diamond collecting and explosion; also time running out sound.
+    - Channel 2: Walking; also time running out sound.
 
     - Channel 3: amoeba sound, magic wall sound,
         cave cover & uncover sound, and the crack sound (gate open)
@@ -278,9 +278,8 @@ void gd_sound_play_sounds(SoundWithPos const &sound1, SoundWithPos const &sound2
 
     /* CHANNEL 1 is for small sounds */
     if (sound1.sound != GD_S_NONE) {
-        /* start new sound if higher or same precedence than the one currently playing */
-        if (gd_sound_get_precedence(sound1.sound) >= gd_sound_get_precedence(sound_playing(1)))
-            play_sound(1, sound1);
+        /* start new sound */
+        play_sound(1, sound1);
     } else {
         /* only interrupt looped sounds. non-looped sounds will go away automatically. */
         if (gd_sound_is_looped(sound_playing(1)))
@@ -290,17 +289,12 @@ void gd_sound_play_sounds(SoundWithPos const &sound1, SoundWithPos const &sound2
     /* CHANNEL 2 is for walking, explosions */
     /* if no sound requested, do nothing. */
     if (sound2.sound != GD_S_NONE) {
-        gboolean play = FALSE;
-
         /* always start if not currently playing a sound. */
+        /* always start if forced. */
+        /* otherwise, start if higher precedence than previous. */
         if (sound_playing(2) == GD_S_NONE
-                || gd_sound_force_start(sound2.sound)
-                || gd_sound_get_precedence(sound2.sound) > gd_sound_get_precedence(sound_playing(2)))
-            play = TRUE;
-
-        /* if figured out to play: do it. */
-        /* if the requested sound is looped, and already playing, forget the request. */
-        if (play && !(gd_sound_is_looped(sound2.sound) && sound2.sound == sound_playing(2)))
+            || gd_sound_force_start(sound2.sound)
+            || gd_sound_get_precedence(sound2.sound) > gd_sound_get_precedence(sound_playing(2)))
             play_sound(2, sound2);
     } else {
         /* only interrupt looped sounds. non-looped sounds will go away automatically. */
@@ -352,12 +346,12 @@ void gd_music_play_random() {
 
     if (!music_dir_read) {
         const char *name;    /* name of file */
-        const char *opened;        /* directory we use */
+        const char *opened;  /* directory we use */
         GDir *musicdir;
 
         music_dir_read = true;
 
-        opened = gd_system_music_dir;
+        opened = gd_system_music_dir.c_str();
         musicdir = g_dir_open(opened, 0, NULL);
         if (!musicdir) {
             /* for testing: open "music" dir in current directory. */

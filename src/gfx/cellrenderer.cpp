@@ -296,17 +296,28 @@ void CellRenderer::create_colorized_cells() {
     if (cells_all)
         delete cells_all;
 
-    GdColor cols[9];    /* holds rgba for color indexes internally used */
+    GdColor colshsv[9], colsrgb[9];
 
-    cols[0] = color0.to_hsv(); /* c64 background */
-    cols[1] = color1.to_hsv(); /* foreg1 */
-    cols[2] = color2.to_hsv(); /* foreg2 */
-    cols[3] = color3.to_hsv(); /* foreg3 */
-    cols[4] = color4.to_hsv(); /* amoeba */
-    cols[5] = color5.to_hsv(); /* slime */
-    cols[6] = GdColor::from_hsv(0, 0, 0);    /* black, opaque */
-    cols[7] = GdColor::from_hsv(0, 0, 100);  /* white, opaque */
-    cols[8] = GdColor::from_hsv(0, 0, 0);    /* for the transparent */
+    /* colors used, in hsv */
+    colshsv[0] = color0.to_hsv(); /* c64 background */
+    colshsv[1] = color1.to_hsv(); /* foreg1 */
+    colshsv[2] = color2.to_hsv(); /* foreg2 */
+    colshsv[3] = color3.to_hsv(); /* foreg3 */
+    colshsv[4] = color4.to_hsv(); /* amoeba */
+    colshsv[5] = color5.to_hsv(); /* slime */
+    colshsv[6] = GdColor::from_hsv(0, 0, 0);    /* black, opaque */
+    colshsv[7] = GdColor::from_hsv(0, 0, 100);  /* white, opaque */
+    colshsv[8] = GdColor::from_hsv(0, 0, 0);    /* for the transparent */
+    /* the same with rgb values */
+    colsrgb[0] = color0.to_rgb(); /* c64 background */
+    colsrgb[1] = color1.to_rgb(); /* foreg1 */
+    colsrgb[2] = color2.to_rgb(); /* foreg2 */
+    colsrgb[3] = color3.to_rgb(); /* foreg3 */
+    colsrgb[4] = color4.to_rgb(); /* amoeba */
+    colsrgb[5] = color5.to_rgb(); /* slime */
+    colsrgb[6] = colshsv[6].to_rgb();  /* black, opaque */
+    colsrgb[7] = colshsv[7].to_rgb();  /* white, opaque */
+    colsrgb[8] = colshsv[8].to_rgb();  /* for the transparent */
 
     int w = loaded->get_width(), h = loaded->get_height();
     cells_all = screen.pixbuf_factory.create(w, h);
@@ -320,32 +331,28 @@ void CellRenderer::create_colorized_cells() {
             unsigned g = (p[x] & loaded->gmask) >> loaded->gshift;
             unsigned b = (p[x] & loaded->bmask) >> loaded->bshift;
             unsigned a = (p[x] & loaded->amask) >> loaded->ashift;
-            GdColor in = GdColor::from_rgb(r, g, b).to_hsv();
-            unsigned h = in.get_h();
-            unsigned s = in.get_s();
-            unsigned v = in.get_v();
+            unsigned short inh;
+            unsigned char ins, inv;
+            GdColor::from_rgb(r, g, b).get_hsv(inh, ins, inv);
 
             /* the color code from the original image (essentially the hue) will select the color index */
-            unsigned index = c64_color_index(h, s, v, a);
-            GdColor newcol;
+            unsigned index = c64_color_index(inh, ins, inv, a);
+
+            /* and then shade it, and convert to rgb */
+            unsigned char resr, resg, resb;
             if (index == 0 || index >= 6) {
                 /* for the background and the editor colors, no shading is used */
-                newcol = cols[index];
+                colsrgb[index].get_rgb(resr, resg, resb);
             } else {
                 /* otherwise the saturation and value from the original image will modify it */
-                unsigned s_multiplier = s;
-                unsigned v_multiplier = v;
-                newcol = GdColor::from_hsv(
-                             cols[index].get_h(),
-                             cols[index].get_s() * s_multiplier / 100,
-                             cols[index].get_v() * v_multiplier / 100).to_rgb();
+                unsigned short pixh;
+                unsigned char pixs, pixv;
+                colshsv[index].get_hsv(pixh, pixs, pixv);
+                GdColor::from_hsv(pixh, pixs * ins / 100, pixv * inv / 100).get_rgb(resr, resg, resb);
             }
 
             guint32 newcolword =
-                newcol.get_r() << cells_all->rshift |
-                newcol.get_g() << cells_all->gshift |
-                newcol.get_b() << cells_all->bshift |
-                a << cells_all->ashift;
+                resr << cells_all->rshift | resg << cells_all->gshift | resb << cells_all->bshift | a << cells_all->ashift;
 
             to[x] = newcolword;
         }

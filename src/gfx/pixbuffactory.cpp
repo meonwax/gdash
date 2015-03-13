@@ -31,6 +31,8 @@
 #include "gfx/pixbufmanip.hpp"
 
 /* scale2x is not translated: the license says that we should call it in its original name. */
+// TRANSLATORS: you can translate "nearest neighbor" to "nearest" if the resulting
+// string would be too long otherwise.
 const char *gd_scaling_names[] = {N_("Nearest neighbor"), "Scale2x", "HQX", NULL};
 
 

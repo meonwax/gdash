@@ -36,6 +36,7 @@
 #include "misc/util.hpp"
 #include "misc/logger.hpp"
 #include "misc/printf.hpp"
+#include "misc/autogfreeptr.hpp"
 #include "settings.hpp"
 
 /// @todo MOVE THESE TO THE SETTINGS CPP
@@ -233,11 +234,11 @@ void AskIfChangesDiscardedCommand::execute() {
 
 void OpenFileCommand::execute() {
     gd_last_folder = gd_tostring_free(g_path_get_dirname(filename.c_str()));
-    save_highscore(*app->caveset, gd_user_config_dir);
+    save_highscore(*app->caveset);
 
     try {
         *app->caveset = load_caveset_from_file(filename.c_str());
-        load_highscore(*app->caveset, gd_user_config_dir);
+        load_highscore(*app->caveset);
         /* start a new title screen */
         app->enqueue_command(new RestartWithTitleScreenCommand(app));
     } catch (std::exception &e) {
@@ -285,10 +286,9 @@ public:
 private:
     std::string start_dir;
     virtual void execute() {
-        char *filter = g_strjoinv(";", (char **) gd_caveset_extensions);
+        AutoGFreePtr<char> filter(g_strjoinv(";", (char **) gd_caveset_extensions));
         // TRANSLATORS: 40 characters max. Title of the "open file" window.
         app->select_file_and_do_command(_("Select Caveset to Load"), start_dir.c_str(), filter, false, "", new OpenFileCommand(app));
-        g_free(filter);
     }
 };
 

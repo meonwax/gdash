@@ -50,6 +50,10 @@ sound_flags[] = {
     // channel 1 sounds.
     // diamond collect sound has precedence over everything.
     // CHANNEL 1 SOUNDS ARE ALWAYS RESTARTED, so no need for GD_SP_FORCE flag.
+    // Also, the precedence will only tell the selection of sound to be played in
+    // a cave iteration cycle; and AFTER iterating the whole cave, the selected
+    // sound will be played regardless of its precedence over the sound from the
+    // previous iteration. As if channel 1 sounds were all GD_SP_FORCE-d.
     { GD_S_STONE, "stone.ogg", GD_SP_CLASSIC, 1, 10},
     { GD_S_DIRT_BALL, "dirt_ball.ogg", 0, 1, 8},    // sligthly lower precedence, as stones and diamonds should be "louder"
     { GD_S_NITRO, "nitro.ogg", 0, 1, 10},
@@ -81,10 +85,12 @@ sound_flags[] = {
     { GD_S_BLADDER_CONVERT, "bladder_convert.ogg", 0, 1, 8, GD_S_NONE},
     { GD_S_BLADDER_SPENDER, "bladder_spender.ogg", 0, 1, 8, GD_S_NONE},
     { GD_S_BITER_EAT, "biter_eat.ogg", 0, 1, 3, GD_S_NONE},     // very low precedence. biters tend to produce too much sound.
-    { GD_S_NUT, "nut.ogg", 0, 1, 8},    // nut falling is relatively silent, so low precedence.
-    { GD_S_NUT_CRACK, "nut_crack.ogg", 0, 1, 12},   // higher precedence than a stone bouncing.
+    { GD_S_NUT, "nut.ogg", 0, 1, 8, GD_S_NONE},    // nut falling is relatively silent, so low precedence.
+    { GD_S_NUT_CRACK, "nut_crack.ogg", 0, 1, 12, GD_S_NONE},   // higher precedence than a stone bouncing.
 
     // channel2 sounds.
+    // Selection rule: will be played if higher precedence than the previously
+    // played sound - or maybe if forced.
     { GD_S_DOOR_OPEN, "door_open.ogg", GD_SP_CLASSIC, 2, 10},
     { GD_S_WALK_EARTH, "walk_earth.ogg", GD_SP_CLASSIC, 2, 10},
     { GD_S_WALK_EMPTY, "walk_empty.ogg", GD_SP_CLASSIC, 2, 10},
@@ -107,7 +113,9 @@ sound_flags[] = {
     { GD_S_VOODOO_EXPLOSION, "voodoo_explosion.ogg", GD_SP_FORCE, 2, 100, GD_S_EXPLOSION},
     { GD_S_NITRO_EXPLOSION, "nitro_explosion.ogg", GD_SP_FORCE, 2, 100, GD_S_EXPLOSION},
     { GD_S_BOMB_PLACE, "bomb_place.ogg", 0, 2, 10, GD_S_NONE},
-    { GD_S_FINISHED, "finished.ogg", GD_SP_CLASSIC | GD_SP_FORCE | GD_SP_LOOPED, 2, 15}, // precedence larger than normal, but smaller than timeout sounds
+    // precedence lower than timeout sounds, because the timeout sounds will be played
+    // again very fast when the time counter goes down to zero.
+    { GD_S_FINISHED, "finished.ogg", GD_SP_CLASSIC, 2, 15},
     { GD_S_SWITCH_BITER, "switch_biter.ogg", 0, 2, 10, GD_S_NONE},
     { GD_S_SWITCH_CREATURES, "switch_creatures.ogg", 0, 2, 10, GD_S_NONE},
     { GD_S_SWITCH_GRAVITY, "switch_gravity.ogg", 0, 2, 10, GD_S_NONE},
@@ -160,6 +168,8 @@ bool gd_sound_is_classic(GdSound sound) {
 }
 
 /// Returns true, if the sound is always restarted, when playing "again".
+/// Forcing also means that the sound is to be started instead of the
+/// one currently playing, even if it has a lower precedence.
 bool gd_sound_force_start(GdSound sound) {
     return (sound_flags[sound].flags & GD_SP_FORCE) != 0;
 }

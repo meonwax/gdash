@@ -229,27 +229,6 @@ GdColor GdColor::from_c64dtv_huesat(unsigned hue, unsigned sat) {
     return GdColor(TypeC64DTV, 16 * hue + sat);
 }
 
-/// Create a color from a given r, g, b value.
-/// @param r Red value 0..255.
-/// @param g Green value 0..255.
-/// @param b Blue value 0..255.
-GdColor GdColor::from_rgb(unsigned r, unsigned g, unsigned b) {
-    return GdColor(r, g, b);
-}
-
-/// Make up GdColor from h,s,v values.
-/// @param h Hue, 0..360
-/// @param s Saturation, 0..100
-/// @param v Value, 0..100
-GdColor GdColor::from_hsv(unsigned short h, unsigned char s, unsigned char v) {
-    GdColor n;
-    n.type = TypeHSV;
-    n.hsv.h = h;
-    n.hsv.s = s;
-    n.hsv.v = v;
-    return n;
-}
-
 
 /// Create a color from a BDCFF description.
 /// @param color The string which contains the BDCFF representation.
@@ -300,32 +279,31 @@ bool read_from_string(std::string const &str, GdColor &c) {
 /// only used on-screen.
 /// @param color The color to convert.
 GdColor GdColor::to_rgb() const {
-    const guint8 *atari_pal;
-    const guint8 *c64dtv_pal;
-    const guint32 *c64_pal;
-
     switch (type) {
         case TypeRGB:
             /* is already rgb */
             return *this;
 
-        case TypeC64:
+        case TypeC64: {
             if (gd_c64_palette < 0 || gd_c64_palette >= (int)G_N_ELEMENTS(c64_palette_pointers) - 1)
                 gd_c64_palette = 0;  /* silently switch to default, if invalid value */
-            c64_pal = c64_palette_pointers[gd_c64_palette];
+            const guint32 *c64_pal = c64_palette_pointers[gd_c64_palette];
             return GdColor(c64_pal[index]);
+        }
 
-        case TypeC64DTV:
+        case TypeC64DTV: {
             if (gd_c64dtv_palette < 0 || gd_c64dtv_palette >= (int)G_N_ELEMENTS(c64dtv_palettes_pointers) - 1)
                 gd_c64dtv_palette = 0;
-            c64dtv_pal = c64dtv_palettes_pointers[gd_c64dtv_palette];
+            const guint8 *c64dtv_pal = c64dtv_palettes_pointers[gd_c64dtv_palette];
             return from_rgb(c64dtv_pal[index * 3], c64dtv_pal[index * 3 + 1], c64dtv_pal[index * 3 + 2]);
+        }
 
-        case TypeAtari:
+        case TypeAtari: {
             if (gd_atari_palette < 0 || gd_atari_palette >= (int)G_N_ELEMENTS(atari_palettes_pointers) - 1)
                 gd_atari_palette = 0;
-            atari_pal = atari_palettes_pointers[gd_atari_palette];
+            const guint8 *atari_pal = atari_palettes_pointers[gd_atari_palette];
             return from_rgb(atari_pal[index * 3], atari_pal[index * 3 + 1], atari_pal[index * 3 + 2]);
+        }
 
         case TypeHSV: {
             double h = hsv.h, s = hsv.s / 100.0, v = hsv.v / 100.0;
@@ -358,7 +336,7 @@ GdColor GdColor::to_rgb() const {
             g_assert_not_reached();
             return GdColor::from_rgb(0, 0, 0);
         }
-        break;
+        
         case TypeInvalid:
             g_assert_not_reached();
             break;
@@ -372,7 +350,9 @@ GdColor GdColor::to_hsv() const {
     if (type == TypeHSV)
         return *this;
 
-    double R = get_r() / 255.0, G = get_g() / 255.0, B = get_b() / 255.0;
+    unsigned char r, g, b;
+    get_rgb(r, g, b);
+    double R = r / 255.0, G = g / 255.0, B = b / 255.0;
     double M = std::max(std::max(R, G), B);
     double m = std::min(std::min(R, G), B);
     double C = M - m;
@@ -393,68 +373,10 @@ GdColor GdColor::to_hsv() const {
 }
 
 
-/// Get red component of color.
-/// Uses the current user palette, if needed.
-unsigned int GdColor::get_r() const {
-    if (type == TypeRGB)
-        return rgb.r;
-    else
-        return to_rgb().rgb.r;
-}
-
-/// Get green component of color.
-/// Uses the current user palette, if needed.
-unsigned int GdColor::get_g() const {
-    if (type == TypeRGB)
-        return rgb.g;
-    else
-        return to_rgb().rgb.g;
-}
-
-/// Get blue component of color.
-/// Uses the current user palette, if needed.
-unsigned int GdColor::get_b() const {
-    if (type == TypeRGB)
-        return rgb.b;
-    else
-        return to_rgb().rgb.b;
-}
-
-
-/// Get red component of color.
-/// Uses the current user palette, if needed.
-unsigned int GdColor::get_h() const {
-    if (type == TypeHSV)
-        return hsv.h;
-    else
-        return to_hsv().hsv.h;
-}
-
-/// Get green component of color.
-/// Uses the current user palette, if needed.
-unsigned int GdColor::get_s() const {
-    if (type == TypeHSV)
-        return hsv.s;
-    else
-        return to_hsv().hsv.s;
-}
-
-/// Get blue component of color.
-/// Uses the current user palette, if needed.
-unsigned int GdColor::get_v() const {
-    if (type == TypeHSV)
-        return hsv.v;
-    else
-        return to_hsv().hsv.v;
-}
-
-
 /// Get RGB components of color as an unsigned int 0x00RRGGBB
-unsigned int GdColor::get_uint() const {
-    unsigned r = get_r();
-    unsigned g = get_g();
-    unsigned b = get_b();
-
+unsigned int GdColor::get_uint_0rgb() const {
+    unsigned char r, g, b;
+    get_rgb(r, g, b);
     return (r << 16) + (g << 8) + b;
 }
 
@@ -478,7 +400,11 @@ std::ostream &operator<<(std::ostream &os, const GdColor &c) {
 
         case GdColor::TypeRGB:
         case GdColor::TypeHSV:
-            sprintf(text, "#%02x%02x%02x", c.get_r(), c.get_g(), c.get_b());
+            {
+                unsigned char r, g, b;
+                c.get_rgb(r, g, b);
+                sprintf(text, "#%02x%02x%02x", r, g, b);
+            }
             break;
         case GdColor::TypeInvalid:
             g_assert_not_reached();
@@ -509,7 +435,11 @@ std::string visible_name(const GdColor &c) {
 
         case GdColor::TypeRGB:
         case GdColor::TypeHSV:
-            sprintf(text, "RGB #%02X%02X%02X", c.get_r(), c.get_g(), c.get_b());
+            {
+                unsigned char r, g, b;
+                c.get_rgb(r, g, b);
+                sprintf(text, "RGB #%02X%02X%02X", r, g, b);
+            }
             return text;
         case GdColor::TypeInvalid:
             g_assert_not_reached();

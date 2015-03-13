@@ -30,7 +30,7 @@ src/misc/smartptr.hpp
 src/misc/helptext.hpp
 src/sound/sound.hpp
 src/sound/sound.cpp
-src/gtkmain.cpp
+src/main.cpp
 src/sdl/sdlmainwindow.hpp
 src/sdl/ogl.hpp
 src/sdl/sdlpixbuf.cpp

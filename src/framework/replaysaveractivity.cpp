@@ -317,9 +317,7 @@ void ReplaySaverActivity::timer2_event() {
     }
 
     /* before incrementing frame number, check if to save the frame to disk. */
-    char *filename = g_strdup_printf("%s_%08d.png", filename_prefix.c_str(), frame);
-    pm.save(filename);
-    g_free(filename);
+    pm.save(CPrintf("%s_%08d.png") % filename_prefix.c_str() % frame);
 
     queue_redraw();
     frame++;

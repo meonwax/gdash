@@ -94,7 +94,11 @@ class GameRenderer : public PixmapStorage {
 
     double scroll_x, scroll_y;
     double scroll_speed_x, scroll_speed_y;
+    std::vector<double> scroll_speeds_during_uncover;
+    double scroll_speed_normal;
+    int scroll_ms;
     int scroll_desired_x, scroll_desired_y;
+
     int millisecs_game;
     int animcycle;              ///< animation frames, from 0 to 7, and then again 0
 
@@ -102,6 +106,7 @@ class GameRenderer : public PixmapStorage {
 
     // the last set status bar in the game
     bool status_bar_fast, status_bar_alternate, status_bar_paused;
+
 
     // for showing the story
     struct StoryStuff {
@@ -111,7 +116,7 @@ class GameRenderer : public PixmapStorage {
         std::auto_ptr<Pixmap> background;
     } mutable story;
 
-    static bool cave_scroll(int logical_size, int physical_size, int center, bool exact, int start, int to, double &current, int &desired, double maxspeed, double & currspeed, int cell_size);
+    bool cave_scroll(int logical_size, int physical_size, int center, bool exact, double &current, int &desired, double & currspeed);
     bool scroll(int ms, bool exact_scroll);
     void scroll_to_origin();
 

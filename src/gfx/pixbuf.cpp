@@ -35,7 +35,9 @@ Pixbuf::~Pixbuf() {
 
 /// Creates a guint32 value, which can be raw-written to a pixbuf memory area.
 guint32 Pixbuf::rgba_pixel_from_color(const GdColor &col, unsigned a) {
-    return (col.get_r() << rshift) | (col.get_g() << gshift) | (col.get_b() << bshift) | (a << ashift);
+    unsigned char r, g, b;
+    col.get_rgb(r, g, b);
+    return (guint32(r) << rshift) | (guint32(g) << gshift) | (guint32(b) << bshift) | (a << ashift);
 }
 
 

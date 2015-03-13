@@ -323,7 +323,7 @@ void SettingsActivity::redraw_event(bool full) const {
                 case TypeTheme:
                 case TypeShader:
                 case TypeStringv:
-                    value = settings[n].stringv[*(int *)settings[n].var];
+                    value = _(settings[n].stringv[*(int *)settings[n].var]);
                     break;
                 case TypeKey:
                     value = app->gameinput->get_key_name_from_keycode(*(guint *)settings[n].var);

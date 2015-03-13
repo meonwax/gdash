@@ -26,6 +26,7 @@
 #include <glib/gi18n.h>
 #include <cassert>
 #include <cmath>
+#include <numeric>
 
 #include "cave/gamerender.hpp"
 
@@ -94,24 +95,29 @@ void GameRenderer::scroll_to_origin() {
     scroll_y = 0;
     scroll_speed_x = 0;
     scroll_speed_y = 0;
+    scroll_speed_normal = -1.0;
+    scroll_speeds_during_uncover.clear();
 }
 
 /**
  * Function which can do the x or the y scrolling for the cave.
  *
- * @param logical_size logical pixel size of playfield, usually larger than the screen.
- * @param physical_size visible part. (remember: player_x-x1!)
+ * @param logical_size Logical pixel size of cave, usually larger than the screen.
+ * @param physical_size Visible part of cave in pixels. (remember: player_x-x1!)
  * @param center the coordinates to scroll to.
  * @param exact scroll exactly (no hystheresis)
- * @param start start scrolling if difference is larger than this
- * @param to scroll to, if started, until difference is smaller than this
  * @param current the variable to be changed
  * @param desired the function stores its data here.
- * @param speed max pixels to scroll at once
- * @param cell_size size of one cell. used to determine if the play field is only a slightly larger than the screen, in that case no scrolling is desirable
+ * @param currspeed variable to store the speed
 */
-bool GameRenderer::cave_scroll(int logical_size, int physical_size, int center, bool exact, int start, int to, double &current, int &desired, double maxspeed, double & currspeed, int cell_size) {
+bool GameRenderer::cave_scroll(int logical_size, int physical_size, int center, bool exact, double &current, int &desired, double & currspeed) {
     bool changed = false;
+    
+    int const cell_size = cells.get_cell_size();
+    /* start the scrolling when reaches 3 cells at the screen edge */
+    int const start = physical_size / 2 - cell_size * 3;
+    /* scroll so that the player is at the center; the allowed difference is this */
+    int const to = cell_size;
 
     /* if cave size smaller than the screen, no scrolling req'd */
     if (logical_size < physical_size) {
@@ -135,9 +141,9 @@ bool GameRenderer::cave_scroll(int logical_size, int physical_size, int center, 
             /* hystheresis function.
              * when scrolling left, always go a bit less left than player being at the middle.
              * when scrolling right, always go a bit less to the right. */
-            if (current + start < center)
+            if (current < center - start)
                 desired = center - to;
-            if (current - start > center)
+            if (current > center + start)
                 desired = center + to;
         } else {
             /* if exact scrolling, just go exactly to the center. */
@@ -145,7 +151,17 @@ bool GameRenderer::cave_scroll(int logical_size, int physical_size, int center, 
         }
     }
     desired = CLAMP(desired, 0, max);
-    currspeed = maxspeed;
+    
+    double const round_to = gd_fine_scroll ? 0.5 : 1;
+    /* if no speed is selected, or speed is somehow zero, set to normal speed */
+    if (currspeed <= 0)
+        currspeed = scroll_speed_normal;
+    /* if lagging to much, speed up. with hystheresis. */
+    /* if closer to the scroll destination, slow down again. with hystheresis. */
+    if (ABS(current - center) > physical_size / 2 - cell_size)
+        currspeed = scroll_speed_normal + round_to;
+    if (ABS(current - center) <= to + 2 * cell_size)
+        currspeed = scroll_speed_normal;
 
     /* do the scroll */
     if (current < desired) {
@@ -166,6 +182,34 @@ bool GameRenderer::cave_scroll(int logical_size, int physical_size, int center, 
 
 
 /** Scrolls to the player during game play.
+
+* scrolling is a bit complicated. different caves have different speeds, and
+* also the game rendering can be run at different speeds (depending on the
+* refresh rate of the user's display, if the opengl driver is selected). so
+* first a pixel/frame scrolling speed is calculated using the measured delay
+* and the cave speed.
+* 
+* then this pixel speed is rounded to an integer or a half value. this is needed
+* because values like 1.57 pixel/frame cause jerky scrolling (the pixel value
+* of the pixmaps blitted must be rounded to an integer, of course). so when
+* not using fine scrolling (slow refresh rate), it is rounded to an integer.
+* for high refresh rates (fine scrolling), rounding to 0.5 is also acceptable.
+* 
+* this rounding goes downwards, with the floor() function. scrolling must be slower
+* than the calculated ideal value, or it would be faster than the speed of
+* player running. and if the scrolling were faster, sometimes it would stop and
+* then start over again.
+* 
+* however, when using scrolling that is slower than the player running, it is
+* possible that it will lag, and then the player will run out of the screen. to
+* handle this, the cave_scroll() function has a hystheresis function. when the
+* player approaches the edge of the screen, scrolling switches to a faster speed
+* (so in that case, the rounding is done upwards).
+* 
+* the cave speed can also change (it can slow down, when an amoeba grows, or speed
+* up, when the player eats many diamonds). when this happens, the scrolling speed
+* is not immediately changed, but also through a hystheresis function.
+
  * @param ms The number of milliseconds elapsed
  * @param exact_scroll Whether to scroll to the exact position, or allow hystheresis.
  * @return true, if player is not visible, ie. it is out of the visible size in the drawing area.
@@ -181,20 +225,36 @@ bool GameRenderer::scroll(int ms, bool exact_scroll) {
     int visible_x = (game.played_cave->x2 - game.played_cave->x1 + 1) * cell_size; /* pixel size of visible part of the cave (may be smaller in intermissions) */
     int visible_y = (game.played_cave->y2 - game.played_cave->y1 + 1) * cell_size;
 
-    /* max scrolling speed depends on the speed of the cave. */
-    /* game moves cell_size_game* 1s/cave time pixels in a second. */
-    /* scrolling moves scroll speed * 1s/scroll_time in a second. */
-    /* these should be almost equal; scrolling speed a little slower. */
-    /* that way, the player might reach the border with a small probability, */
-    /* but the scrolling will not "oscillate", ie. turn on for little intervals as it has */
-    /* caught up with the desired position. smaller is better. */
-    double maxspeed = (double) cell_size * ms / game.played_cave->speed;
+    /* calculate speed for current frame */
+    double current_speed_calculated = (double)cell_size * ms / game.played_cave->speed;
+    /* if uncovering, save to the array, and select the average instead. */
+    if (game.is_uncovering()) {
+        scroll_speeds_during_uncover.push_back(current_speed_calculated);
+        current_speed_calculated =
+            std::accumulate(scroll_speeds_during_uncover.begin(), scroll_speeds_during_uncover.end(), 0.0)
+            / scroll_speeds_during_uncover.size();
+    }
+    /* round to the nearest feasible value, which may be an even number, or maybe a half for fine scrolling */
+    double const round_to = gd_fine_scroll ? 0.5 : 1;
+    double current_speed_rounded = floor(current_speed_calculated / round_to) * round_to;
+    /* if not yet calculated, now use it. */
+    if (scroll_speed_normal < 0)
+        scroll_speed_normal = current_speed_rounded;
+    /* change the speed only if differs too much from the previous value (need the next step).
+     * this does the hystheresis for the cave speed change. */
+    if (current_speed_calculated >= scroll_speed_normal + round_to || current_speed_calculated <= scroll_speed_normal)
+        scroll_speed_normal = current_speed_rounded;
+    /* if so slow that it seems to be zero, select the lowest possible value */
+    if (scroll_speed_normal == 0)
+        scroll_speed_normal = round_to;
+    
+    /* and now scroll. */
     bool scrolled = false;
     if (cave_scroll(visible_x, play_area_w, player_x * cell_size + cell_size / 2 - play_area_w / 2,
-        exact_scroll, play_area_w / 4, play_area_w / 8, scroll_x, scroll_desired_x, maxspeed, scroll_speed_x, cell_size))
+        exact_scroll, scroll_x, scroll_desired_x, scroll_speed_x))
         scrolled = true;
     if (cave_scroll(visible_y, play_area_h, player_y * cell_size + cell_size / 2 - play_area_h / 2,
-        exact_scroll, play_area_h / 5, play_area_h / 10, scroll_y, scroll_desired_y, maxspeed, scroll_speed_y, cell_size))
+        exact_scroll, scroll_y, scroll_desired_y, scroll_speed_y))
         scrolled = true;
 
     /* if scrolling, we should update entire screen. */
@@ -218,6 +278,8 @@ bool GameRenderer::scroll(int ms, bool exact_scroll) {
             if (game.played_cave->player_y >= game.played_cave->y1 && game.played_cave->player_y <= game.played_cave->y2)
                 out_of_window = true;
     }
+    
+    scroll_ms = ms;
 
     /* if not yet born, we treat as visible. so cave will run. the user is unable to control an unborn player, so this is the right behaviour. */
     if (game.played_cave->player_state == GD_PL_NOT_YET)
@@ -293,6 +355,13 @@ void GameRenderer::drawcave() const {
             for (int x = game.played_cave->x1; x <= game.played_cave->x2; x++)
                 game.gfx_buffer(x, y) |= GD_REDRAW;
     }
+
+    /* writing the scrolling parameters to the screen */
+    /*
+    std::string s = SPrintf("ms=%2d fps=%2d sm=%4.2f sx=%4.2f sy=%4.2f") % scroll_ms % (1000/scroll_ms) % scroll_speed_normal % scroll_speed_x % scroll_speed_y;
+    font_manager.blittext_n(1, screen.get_height()-font_manager.get_line_height()+1, GD_GDASH_BLACK, s.c_str());
+    font_manager.blittext_n(0, screen.get_height()-font_manager.get_line_height(), GD_GDASH_WHITE, s.c_str());
+    */
 
     /* restore clipping to whole screen */
     screen.remove_clip_rect();

@@ -145,10 +145,10 @@ extern gboolean gd_param_debug;
 extern gboolean gd_param_load_default_settings;
 
 /* gdash directories */
-extern const char *gd_user_config_dir;
-extern const char *gd_system_data_dir;
-extern const char *gd_system_caves_dir;
-extern const char *gd_system_music_dir;
+extern std::string gd_user_config_dir;
+extern std::string gd_system_data_dir;
+extern std::string gd_system_caves_dir;
+extern std::string gd_system_music_dir;
 
 extern std::vector<std::string> gd_sound_dirs, gd_themes_dirs, gd_fonts_dirs, gd_shaders_dirs;
 

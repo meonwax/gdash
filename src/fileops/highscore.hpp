@@ -27,7 +27,7 @@
 
 class CaveSet;
 
-void save_highscore(CaveSet const & caveset, char const *directory);
-bool load_highscore(CaveSet & caveset, char const *directory);
+void save_highscore(CaveSet const & caveset);
+bool load_highscore(CaveSet & caveset);
 
 #endif

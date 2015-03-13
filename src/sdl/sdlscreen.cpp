@@ -35,22 +35,6 @@
 #include "settings.hpp"
 
 
-SDLPixmap::~SDLPixmap() {
-    SDL_FreeSurface(surface);
-}
-
-
-int SDLPixmap::get_width() const {
-    return surface->w;
-}
-
-
-int SDLPixmap::get_height() const {
-    return surface->h;
-}
-
-
-
 SDLScreen::SDLScreen(PixbufFactory &pixbuf_factory)
     : SDLAbstractScreen(pixbuf_factory) {
     surface = NULL;

@@ -70,13 +70,9 @@ public:
         return !(*this == rhs);
     }
 
-    unsigned int get_r() const;
-    unsigned int get_g() const;
-    unsigned int get_b() const;
-    unsigned int get_h() const;
-    unsigned int get_s() const;
-    unsigned int get_v() const;
-    unsigned int get_uint() const;
+    void get_rgb(unsigned char & r, unsigned char & g, unsigned char & b) const;
+    void get_hsv(unsigned short & h, unsigned char & s, unsigned char & v) const;
+    unsigned int get_uint_0rgb() const;
     GdColor to_rgb() const;
     GdColor to_hsv() const;
 
@@ -120,6 +116,59 @@ private:
     friend std::string visible_name(const GdColor &c);
     friend std::ostream &operator<<(std::ostream &os, const GdColor &c);
 };
+
+
+/// Get red, green, blue (0..255) component of color.
+/// Uses the current user palette, if needed.
+/// Inlined, because it is used millions of times when creating a colorized game theme.
+inline void GdColor::get_rgb(unsigned char & r, unsigned char & g, unsigned char & b) const {
+    if (type != TypeRGB)
+        to_rgb().get_rgb(r, g, b);
+    else {
+        r = rgb.r;
+        g = rgb.g;
+        b = rgb.b;
+    }
+}
+
+
+/// Get h, s, v (0..359, 0..99, 0..99) component of color.
+/// Inlined, because it is used millions of times when creating a colorized game theme.
+inline void GdColor::get_hsv(unsigned short & h, unsigned char & s, unsigned char & v) const {
+    if (type != TypeHSV)
+        to_hsv().get_hsv(h, s, v);
+    else {
+        h = hsv.h;
+        s = hsv.s;
+        v = hsv.v;
+    }
+}
+
+
+/// Create a color from a given r, g, b value.
+/// Inlined, because it is used millions of times when creating a colorized game theme.
+/// @param r Red value 0..255.
+/// @param g Green value 0..255.
+/// @param b Blue value 0..255.
+inline GdColor GdColor::from_rgb(unsigned r, unsigned g, unsigned b) {
+    return GdColor(r, g, b);
+}
+
+
+/// Make up GdColor from h,s,v values.
+/// Inlined, because it is used millions of times when creating a colorized game theme.
+/// @param h Hue, 0..360
+/// @param s Saturation, 0..100
+/// @param v Value, 0..100
+inline GdColor GdColor::from_hsv(unsigned short h, unsigned char s, unsigned char v) {
+    GdColor n;
+    n.type = TypeHSV;
+    n.hsv.h = h;
+    n.hsv.s = s;
+    n.hsv.v = v;
+    return n;
+}
+
 
 /* i/o operators and functions like for all other cave types */
 std::ostream &operator<<(std::ostream &os, const GdColor &c);

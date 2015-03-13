@@ -86,7 +86,9 @@ void GTKPixbuf::copy_full(int x, int y, int w, int h, Pixbuf &dest, int dx, int 
 
 void GTKPixbuf::fill_rect(int x, int y, int w, int h, const GdColor &c) {
     GdkPixbuf *sub = gdk_pixbuf_new_subpixbuf(pixbuf, x, y, w, h);
-    gdk_pixbuf_fill(sub, (c.get_r() << 24) | (c.get_g() << 16) | (c.get_b() << 8) | (0xff << 0));
+    unsigned char r, g, b;
+    c.get_rgb(r, g, b);
+    gdk_pixbuf_fill(sub, (guint32(r) << 24) | (guint32(g) << 16) | (guint32(b) << 8) | (0xff << 0));
     g_object_unref(sub);
 }
 

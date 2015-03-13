@@ -35,6 +35,7 @@
 #include "gfx/fontmanager.hpp"
 #include "misc/printf.hpp"
 #include "misc/logger.hpp"
+#include "misc/autogfreeptr.hpp"
 
 #include "c64_font.cpp"
 
@@ -65,7 +66,7 @@ public:
     /// @param j The ASCII (or GDash) code of the character
     Pixmap const &get_character(int j) const;
 
-    /// GdColor::get_uint() code of color, for easy searching in a font manager.
+    /// GdColor::get_uint_0rgb() code of color, for easy searching in a font manager.
     guint32 uint;
 
 protected:
@@ -121,7 +122,7 @@ RenderedFont::~RenderedFont() {
 
 
 RenderedFont::RenderedFont(std::vector<unsigned char> const &bitmap_, unsigned font_size_, GdColor const &color, Screen &screen)
-    :   uint(color.get_uint()),
+    :   uint(color.get_uint_0rgb()),
         bitmap(bitmap_),
         font_size(font_size_),
         screen(screen),
@@ -267,7 +268,7 @@ struct FindRenderedFont {
 
 RenderedFont *FontManager::narrow(const GdColor &c) {
     // find font in list
-    container::iterator it = find_if(_narrow.begin(), _narrow.end(), FindRenderedFont(c.get_uint()));
+    container::iterator it = find_if(_narrow.begin(), _narrow.end(), FindRenderedFont(c.get_uint_0rgb()));
     if (it == _narrow.end()) {
         // if not found, create it
         RenderedFont *newfont = new RenderedFontNarrow(font, font_size, c, screen);
@@ -286,7 +287,7 @@ RenderedFont *FontManager::narrow(const GdColor &c) {
 
 RenderedFont *FontManager::wide(const GdColor &c) {
     // find font in list
-    container::iterator it = find_if(_wide.begin(), _wide.end(), FindRenderedFont(c.get_uint()));
+    container::iterator it = find_if(_wide.begin(), _wide.end(), FindRenderedFont(c.get_uint_0rgb()));
     if (it == _wide.end()) {
         // if not found, create it
         RenderedFont *newfont = new RenderedFontWide(font, font_size, c, screen);
@@ -306,9 +307,8 @@ RenderedFont *FontManager::wide(const GdColor &c) {
 /* function which draws characters on the screen. used internally. */
 /* x=-1 -> center horizontally */
 int FontManager::blittext_internal(int x, int y, char const *text, bool widefont) {
-    char *normalized = g_utf8_normalize(text, -1, G_NORMALIZE_ALL);
-    gunichar *ucs = g_utf8_to_ucs4(normalized, -1, NULL, NULL, NULL);
-    g_free(normalized);
+    AutoGFreePtr<char> normalized(g_utf8_normalize(text, -1, G_NORMALIZE_ALL));
+    AutoGFreePtr<gunichar> ucs(g_utf8_to_ucs4(normalized, -1, NULL, NULL, NULL));
 
     RenderedFont const *font = widefont ? wide(current_color) : narrow(current_color);
     int w = font->get_character(' ').get_width();
@@ -455,7 +455,6 @@ int FontManager::blittext_internal(int x, int y, char const *text, bool widefont
         }
     }
 
-    g_free(ucs);
     return xc;
 }
 

@@ -35,6 +35,7 @@
 #include "cave/caverendered.hpp"
 #include "misc/printf.hpp"
 #include "misc/util.hpp"
+#include "misc/autogfreeptr.hpp"
 #include "cave/elementproperties.hpp"
 #include "settings.hpp"
 
@@ -67,9 +68,8 @@ bool struct_set_property(Reflective &str, const std::string &attrib, const std::
             }
 
             if (prop_desc[i].type == GD_TYPE_LONGSTRING) {
-                char *compressed = g_strcompress(param.c_str());
+                AutoGFreePtr<char> compressed(g_strcompress(param.c_str()));
                 str.get<GdString>(prop) = compressed;
-                g_free(compressed);
                 was_string = true;  /* remember this to skip checking the number of parameters at the end of the function */
                 continue;
             }

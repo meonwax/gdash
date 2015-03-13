@@ -279,6 +279,10 @@ bool GameControl::load_snapshot() {
 }
 
 
+bool GameControl::is_uncovering() const {
+    return state_counter > GAME_INT_START_UNCOVER && state_counter < GAME_INT_UNCOVER_ALL;
+}
+
 /// For games, calculate the next cave number and level number.
 /// Called from main_int(), in a normal game, when the cave
 /// is successfully finished (or not successfully, but it is an
@@ -564,9 +568,9 @@ void GameControl::unload_cave() {
                 || time < original_cave->stat_level_best_time[level_num])
                 original_cave->stat_level_best_time[level_num] = time;
         }
+        original_cave = NULL;
     }
 
-    original_cave = NULL;
     played_cave.reset();
 }
 

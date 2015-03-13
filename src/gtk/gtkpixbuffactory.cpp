@@ -33,7 +33,7 @@
 
 Pixbuf *GTKPixbufFactory::create_composite_color(const Pixbuf &src, const GdColor &c, unsigned char alpha) const {
     GTKPixbuf const &srcgtk = static_cast<GTKPixbuf const &>(src);
-    guint32 color = (c.get_r() << 16) | (c.get_g() << 8) | (c.get_b() << 0);
+    guint32 color = c.get_uint_0rgb();
     GdkPixbuf *pb = gdk_pixbuf_composite_color_simple(srcgtk.get_gdk_pixbuf(), src.get_width(), src.get_height(), GDK_INTERP_NEAREST, 255 - alpha, 1, color, color);
     return new GTKPixbuf(pb);
 }

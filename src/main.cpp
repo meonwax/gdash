@@ -166,12 +166,12 @@ int main(int argc, char *argv[]) {
     try {
         if (gd_param_cavenames && gd_param_cavenames[0]) {
             caveset = load_caveset_from_file(gd_param_cavenames[0]);
-            load_highscore(caveset, gd_user_config_dir);
+            load_highscore(caveset);
         } else {
             /* if nothing requested, load default */
             caveset = create_from_buffer(level_pointers[0], -1);
             caveset.name = level_names[0];
-            load_highscore(caveset, gd_user_config_dir);
+            load_highscore(caveset);
         }
     } catch (std::exception &e) {
         /// @todo show error to the screen
@@ -298,7 +298,7 @@ restart_from_here:
         goto restart_from_here;
     }
 
-    save_highscore(caveset, gd_user_config_dir);
+    save_highscore(caveset);
 
     gd_save_settings();
 

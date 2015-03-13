@@ -62,7 +62,9 @@ Pixbuf *SDLPixbufFactory::create_composite_color(Pixbuf const &src, const GdColo
     SDL_Surface *rect = SDL_CreateRGBSurface(0, srcsdl.get_surface()->w, srcsdl.get_surface()->h, 32, srcsdl.rmask, srcsdl.gmask, srcsdl.bmask, 0); /* no amask, as we set overall alpha! */
     if (!rect)
         throw std::runtime_error(std::string("could not create surface: ") + SDL_GetError());
-    SDL_FillRect(rect, NULL, SDL_MapRGB(rect->format, c.get_r(), c.get_g(), c.get_b()));
+    unsigned char r, g, b;
+    c.get_rgb(r, g, b);
+    SDL_FillRect(rect, NULL, SDL_MapRGB(rect->format, r, g, b));
     SDL_SetAlpha(rect, SDL_SRCALPHA, a);
 
     SDL_Surface *ret = SDL_CreateRGBSurface(0, srcsdl.get_surface()->w, srcsdl.get_surface()->h, 32, srcsdl.rmask, srcsdl.gmask, srcsdl.bmask, srcsdl.amask);

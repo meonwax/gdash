@@ -107,7 +107,6 @@ bool install_theme(const char *from, const char *to) {
     gsize length;
     gboolean result = g_file_get_contents(from, &contents, &length, &error) && g_file_set_contents(to, contents, length, &error);
     if (error) {
-        g_free(contents);
         gd_critical(error->message);
         g_error_free(error);
     }

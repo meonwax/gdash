@@ -33,6 +33,7 @@
 #include <algorithm>
 #include "gfx/screen.hpp"
 #include "misc/util.hpp"
+#include "misc/autogfreeptr.hpp"
 
 // TODO utf8-filename charset audit
 
@@ -49,9 +50,8 @@ private:
     std::string &directory;
     SelectFileActivity *activity;
     virtual void execute() {
-        char *filename_in_locale_charset = g_filename_from_utf8(directory.c_str(), -1, NULL, NULL, NULL);
+        AutoGFreePtr<char> filename_in_locale_charset(g_filename_from_utf8(directory.c_str(), -1, NULL, NULL, NULL));
         activity->jump_to_directory(filename_in_locale_charset);
-        g_free(filename_in_locale_charset);
     }
 };
 
@@ -76,14 +76,12 @@ private:
 /* returns a string which contains the utf8 representation of the filename originally in system encoding */
 static std::string filename_to_utf8(const char *filename) {
     GError *error = NULL;
-    char *utf8 = g_filename_to_utf8(filename, -1,  NULL, NULL, &error);
+    AutoGFreePtr<char> utf8(g_filename_to_utf8(filename, -1,  NULL, NULL, &error));
     if (error) {
         g_error_free(error);
         return filename;        // return with filename without conversion
     }
-    std::string s = utf8;       // copy to std::string (return value)
-    g_free(utf8);
-    return s;
+    return std::string(utf8);
 }
 
 
@@ -227,9 +225,8 @@ private:
 
 void SelectFileActivity::file_selected(char const *filename) {
     /* ok so set the filename in the pending command object. */
-    char *result_filename = g_build_path(G_DIR_SEPARATOR_S, directory, filename, NULL);
-    command_when_successful->set_param1(result_filename);
-    g_free(result_filename);
+    AutoGFreePtr<char> result_filename(g_build_path(G_DIR_SEPARATOR_S, directory, filename, NULL));
+    command_when_successful->set_param1(std::string(result_filename));
 
     /* a file is selected, so enqueue the command. */
     /* but first - check if it is an overwrite! if the user does not allow the overwriting, we

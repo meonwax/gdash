@@ -99,8 +99,8 @@ public:
         return scaling_factor;
     }
 
-    /// @brief Returns true, if the factory uses pal emulation.
-    bool get_pal_emulation() {
+    /// @brief Returns true, if the screen uses software pal emulation.
+    bool get_pal_emulation() const {
         return pal_emulation;
     }
 

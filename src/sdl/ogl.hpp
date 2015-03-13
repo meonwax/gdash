@@ -47,6 +47,7 @@ private:
     
     void set_uniform_float(char const *name, GLfloat value);
     void set_uniform_2float(char const *name, GLfloat value1, GLfloat value2);
+    void set_texture_bilinear(bool bilinear);
 
 public:
     SDLNewOGLScreen(PixbufFactory &pixbuf_factory);

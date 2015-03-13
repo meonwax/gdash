@@ -33,22 +33,23 @@
 #include "fileops/bdcffsave.hpp"
 #include "fileops/bdcffload.hpp"
 #include "fileops/bdcffhelper.hpp"
+#include "settings.hpp"
 
 
 /* make up a filename for the current caveset, to save highscores in. */
 /* returns the file name; owned by the function (no need to free()) */
-static std::string filename_for_cave_highscores(CaveSet const & caveset, char const *directory) {
+static std::string filename_for_cave_highscores(CaveSet const & caveset) {
     AutoGFreePtr<char> canon(g_strdup(caveset.name == "" ? "highscore-" : caveset.name.c_str()));
     /* allowed chars in the highscore file name; others are replaced with _ */
     g_strcanon(canon, "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", '_');
     AutoGFreePtr<char> fname(g_strdup_printf("%08x-%s.stat", caveset.checksum(), (char*) canon));
-    AutoGFreePtr<char> outfile(g_build_path(G_DIR_SEPARATOR_S, directory, (char*) fname, NULL));
+    AutoGFreePtr<char> outfile(g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir.c_str(), (char*) fname, NULL));
     return (char*) outfile;
 }
 
 
 /** Save highscores and playing stat of the current caveset to the configuration directory. */
-void save_highscore(CaveSet const & caveset, const char *directory) {
+void save_highscore(CaveSet const & caveset) {
     std::list<std::string> out;
     CaveStored defaultcave;     /* for the reflective comparison */
 
@@ -72,7 +73,7 @@ void save_highscore(CaveSet const & caveset, const char *directory) {
 
     /* write to file */
     std::ofstream outfile;
-    outfile.open(filename_for_cave_highscores(caveset, directory).c_str());
+    outfile.open(filename_for_cave_highscores(caveset).c_str());
     for (std::list<std::string>::const_iterator it = out.begin(); it != out.end(); ++it)
         outfile << *it << std::endl;
     outfile.close();
@@ -80,10 +81,10 @@ void save_highscore(CaveSet const & caveset, const char *directory) {
 
 
 /** Load highscores from a file saved in the configuration directory. */
-bool load_highscore(CaveSet & caveset, const char *directory) {
+bool load_highscore(CaveSet & caveset) {
     /* try to open file. */
     std::ifstream infile;
-    infile.open(filename_for_cave_highscores(caveset, directory).c_str());
+    infile.open(filename_for_cave_highscores(caveset).c_str());
     if (!infile.is_open())
         return false;
     

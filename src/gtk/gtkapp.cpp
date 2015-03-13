@@ -35,6 +35,7 @@
 #include "gtk/gtkui.hpp"
 #include "gtk/gtkuisettings.hpp"
 #include "gfx/fontmanager.hpp"
+#include "misc/autogfreeptr.hpp"
 
 
 GTKApp::GTKApp(GTKScreen &screenref, GtkWidget *toplevel, GtkActionGroup *actions_game)
@@ -75,9 +76,8 @@ void GTKApp::select_file_and_do_command(const char *title, const char *start_dir
     int result = gtk_dialog_run(GTK_DIALOG(dialog));
     if (result == GTK_RESPONSE_ACCEPT) {
         /* give the filename to the command */
-        char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-        command_when_successful->set_param1(filename);
-        g_free(filename);
+        AutoGFreePtr<char> filename(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog)));
+        command_when_successful->set_param1(std::string(filename));
         enqueue_command(command_when_successful);
     }
     gtk_widget_destroy(dialog);

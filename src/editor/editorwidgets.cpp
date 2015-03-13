@@ -74,7 +74,9 @@ color_combo_pixbuf_for_gd_color(const GdColor &col) {
     gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &x, &y);
 
     pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, x, y);
-    pixel = (col.get_r() << 24) + (col.get_g() << 16) + (col.get_b() << 8);
+    unsigned char r, g, b;
+    col.get_rgb(r, g, b);
+    pixel = (guint32(r) << 24) + (guint32(g) << 16) + (guint32(b) << 8);
     gdk_pixbuf_fill(pixbuf, pixel);
 
     return pixbuf;
@@ -142,9 +144,11 @@ color_combo_changed(GtkWidget *combo, gpointer data) {
             dialog = gtk_color_selection_dialog_new(_("Select Color"));
             gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(gtk_widget_get_toplevel(combo)));
             colorsel = GTK_COLOR_SELECTION(GTK_COLOR_SELECTION_DIALOG(dialog)->colorsel);
-            gc.red = prevcol.get_r() * 257;     // yes, 257: 255*257=65535
-            gc.green = prevcol.get_g() * 257;
-            gc.blue = prevcol.get_b() * 257;
+            unsigned char r, g, b;
+            prevcol.get_rgb(r, g, b);
+            gc.red = r * 257;     // yes, 257: 255*257=65535
+            gc.green = g * 257;
+            gc.blue = b * 257;
             gtk_color_selection_set_previous_color(colorsel, &gc);
             gtk_color_selection_set_current_color(colorsel, &gc);
             gtk_color_selection_set_has_palette(colorsel, TRUE);
@@ -193,19 +197,19 @@ color_combo_changed(GtkWidget *combo, gpointer data) {
             dialog = gtk_dialog_new_with_buttons(title, GTK_WINDOW(gtk_widget_get_toplevel(combo)), GTK_DIALOG_NO_SEPARATOR, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
             table = gtk_table_new(16, 16, TRUE);
             for (i = 0; i < 256; i++) {
-                GtkWidget *da;
                 GdkColor color;
-                GdColor c;
 
-                da = gtk_drawing_area_new();
-                c = colorfunc(i);
+                GtkWidget *da = gtk_drawing_area_new();
+                GdColor c = colorfunc(i);
                 g_object_set_data(G_OBJECT(da), GDASH_COLOR_INDEX, GUINT_TO_POINTER(i));    /* attach the color index as data */
                 gtk_widget_add_events(da, GDK_BUTTON_PRESS_MASK);
                 gtk_widget_set_tooltip_text(da, visible_name(c).c_str());
                 g_signal_connect(G_OBJECT(da), "button_press_event", G_CALLBACK(color_combo_drawing_area_button_press_event), dialog);    /* mouse click */
-                color.red = c.get_r() * 256; /* 256 as gdk expect 16-bit/component */
-                color.green = c.get_g() * 256;
-                color.blue = c.get_b() * 256;
+                unsigned char r, g, b;
+                c.get_rgb(r, g, b);
+                color.red = r * 256; /* 256 as gdk expect 16-bit/component */
+                color.green = g * 256;
+                color.blue = b * 256;
                 gtk_widget_modify_bg(da, GTK_STATE_NORMAL, &color);
                 gtk_widget_set_size_request(da, 16, 16);
                 gtk_table_attach_defaults(GTK_TABLE(table), da, i % 16, i % 16 + 1, i / 16, i / 16 + 1);
@@ -537,9 +541,11 @@ static void element_button_clicked_func(GtkWidget *button, gboolean stay_open) {
     /* color for background around elements. */
     /* gdkcolors are 16bit, we should *256, but instead *200 so a bit darker. */
     GdkColor c;
-    c.red = editor_cell_renderer->background_color().get_r() * 200;
-    c.green = editor_cell_renderer->background_color().get_g() * 200;
-    c.blue = editor_cell_renderer->background_color().get_b() * 200;
+    unsigned char r, g, b;
+    editor_cell_renderer->background_color().get_rgb(r, g, b);
+    c.red = r * 200;
+    c.green = g * 200;
+    c.blue = b * 200;
     /* create drawing areas */
     int pcs = editor_cell_renderer->get_cell_size();
     int into_second = 0;

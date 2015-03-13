@@ -30,22 +30,8 @@
 #include "misc/printf.hpp"
 #include "misc/logger.hpp"
 
-
-class SDLNewOGLPixmap: public Pixmap {
-protected:
-    SDL_Surface *surface;
-
-    SDLNewOGLPixmap(const SDLNewOGLPixmap &);               // copy ctor not implemented
-    SDLNewOGLPixmap &operator=(const SDLNewOGLPixmap &);    // operator= not implemented
-
-public:
-    SDLNewOGLPixmap(SDL_Surface *surface_) : surface(surface_) {}
-    ~SDLNewOGLPixmap() { SDL_FreeSurface(surface); }
-    virtual int get_width() const { return surface->w; }
-    virtual int get_height() const { return surface->h; }
-};
-
-
+/* we define our own version of these function pointers, as the sdl headers
+ * might not define it (for example, on the mac) depending on their version. */
 /* apientryp comes from sdl, sets the calling convention for the function */
 typedef GLuint (APIENTRYP MY_PFNGLCREATEPROGRAMPROC) (void);
 typedef GLuint (APIENTRYP MY_PFNGLCREATESHADERPROC) (GLenum type);
@@ -60,7 +46,11 @@ typedef void (APIENTRYP MY_PFNGLATTACHSHADERPROC) (GLuint program, GLuint shader
 typedef GLint (APIENTRYP MY_PFNGLGETUNIFORMLOCATIONPROC) (GLuint program, const GLchar *name);
 typedef void (APIENTRYP MY_PFNGLUNIFORM1FPROC) (GLint location, GLfloat v0);
 typedef void (APIENTRYP MY_PFNGLUNIFORM2FPROC) (GLint location, GLfloat v0, GLfloat v1);
+typedef void (APIENTRYP MY_PFNGETSHADERINFOLOGPROC) (GLuint shader, GLsizei maxLength, GLsizei *length, GLchar *infoLog);
+#define MY_GL_SHADING_LANGUAGE_VERSION       0x8B8C
 
+/* the function pointers as got from opengl. all are prefixed with my_,
+ * to avoid collision with global function names (would cause problem on the mac). */
 static MY_PFNGLCREATEPROGRAMPROC my_glCreateProgram = 0;
 static MY_PFNGLLINKPROGRAMPROC my_glLinkProgram = 0;
 static MY_PFNGLUSEPROGRAMPROC my_glUseProgram = 0;
@@ -74,9 +64,10 @@ static MY_PFNGLDETACHSHADERPROC my_glDetachShader = 0;
 static MY_PFNGLGETUNIFORMLOCATIONPROC my_glGetUniformLocation = 0;
 static MY_PFNGLUNIFORM1FPROC my_glUniform1f = 0;
 static MY_PFNGLUNIFORM2FPROC my_glUniform2f = 0;
+static MY_PFNGETSHADERINFOLOGPROC my_glGetShaderInfoLog = 0;
 
 
-void * glGetProcAddress(char const *name) {
+void * my_glGetProcAddress(char const *name) {
     void *ptr = SDL_GL_GetProcAddress(name);
     if (ptr)
         return ptr;
@@ -97,6 +88,11 @@ SDLNewOGLScreen::SDLNewOGLScreen(PixbufFactory &pixbuf_factory)
 }
 
 
+SDLNewOGLScreen::~SDLNewOGLScreen() {
+    uninit();
+}
+
+
 void SDLNewOGLScreen::set_properties(int scaling_factor_, GdScalingType scaling_type_, bool pal_emulation_) {
     oglscaling = scaling_factor_;
     /* the other two are not used by this screen implementation */
@@ -109,7 +105,7 @@ Pixmap *SDLNewOGLScreen::create_pixmap_from_pixbuf(Pixbuf const &pb, bool keep_a
                               surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
     SDL_SetAlpha(to_copy, 0, SDL_ALPHA_OPAQUE);
     SDL_BlitSurface(to_copy, NULL, newsurface, NULL);
-    return new SDLNewOGLPixmap(newsurface);
+    return new SDLPixmap(newsurface);
 }
 
 
@@ -123,20 +119,46 @@ bool SDLNewOGLScreen::has_timed_flips() const {
 }
  
  
+void SDLNewOGLScreen::set_texture_bilinear(bool bilinear) {
+    if (bilinear) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    } else {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
+}
+
+ 
 void SDLNewOGLScreen::start_element(GMarkupParseContext *context, const gchar *element_name, const gchar **attribute_names, const gchar **attribute_values, gpointer user_data, GError **error) {
     SDLNewOGLScreen *dis = static_cast<SDLNewOGLScreen *>(user_data);
     dis->shadertext = "";
     
     for (unsigned i = 0; attribute_names[i] != NULL; ++i) {
         if (g_str_equal(attribute_names[i], "filter")) {
-            if (g_str_equal(attribute_values[i], "nearest")) {
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            }
-            if (g_str_equal(attribute_values[i], "linear")) {
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            }
+            if (g_str_equal(attribute_values[i], "nearest"))
+                dis->set_texture_bilinear(false);
+            if (g_str_equal(attribute_values[i], "linear"))
+                dis->set_texture_bilinear(true);
+        }
+    }
+}
+
+
+/**
+ * Checks if there was an error when compiling the shader.
+ * Logs the error message with gd_debug() if an error occured.
+ * @param shd The shader object. */
+static void log_shader_log(GLuint shd) {
+    /* if we have the getinfo proc, try to retrieve info about compiling */
+    if (my_glGetShaderInfoLog) {
+        GLchar buf[8192];
+        GLsizei length;
+        my_glGetShaderInfoLog(shd, sizeof(buf)/sizeof(buf[0]), &length, buf);
+        /* maybe :D */
+        if (sizeof(GLchar) == sizeof(char)) {
+            if (!g_str_equal(buf, ""))
+                gd_warning((char *) buf);
         }
     }
 }
@@ -146,10 +168,11 @@ void SDLNewOGLScreen::end_element(GMarkupParseContext *context, const gchar *ele
     SDLNewOGLScreen *dis = static_cast<SDLNewOGLScreen *>(user_data);
     
     if (g_str_equal(element_name, "vertex")) {
-        int shd = my_glCreateShader(GL_VERTEX_SHADER);
+        GLuint shd = my_glCreateShader(GL_VERTEX_SHADER);
         char const *source = dis->shadertext.c_str();
         my_glShaderSource(shd, 1, &source, 0);
         my_glCompileShader(shd);
+        log_shader_log(shd);
         if (glGetError() != 0)
             throw std::runtime_error("vertex shader cannot be compiled");
         my_glAttachShader(dis->glprogram, shd);
@@ -157,10 +180,12 @@ void SDLNewOGLScreen::end_element(GMarkupParseContext *context, const gchar *ele
     }
 
     if (g_str_equal(element_name, "fragment")) {
-        int shd = my_glCreateShader(GL_FRAGMENT_SHADER);
+        GLuint shd = my_glCreateShader(GL_FRAGMENT_SHADER);
         char const *source = dis->shadertext.c_str();
         my_glShaderSource(shd, 1, &source, 0);
         my_glCompileShader(shd);
+        /* if we have the getinfo proc, try to retrieve info about compiling */
+        log_shader_log(shd);
         if (glGetError() != 0)
             throw std::runtime_error("fragment shader cannot be compiled");
         my_glAttachShader(dis->glprogram, shd);
@@ -173,24 +198,6 @@ void SDLNewOGLScreen::end_element(GMarkupParseContext *context, const gchar *ele
 void SDLNewOGLScreen::text(GMarkupParseContext *context, const gchar *text, gsize text_len, gpointer user_data, GError **error) {
     SDLNewOGLScreen *dis = static_cast<SDLNewOGLScreen *>(user_data);
     dis->shadertext += std::string(text, text+text_len);
-}
-
-
-void SDLNewOGLScreen::set_uniform_float(char const *name, GLfloat value) {
-    if (glprogram == 0)
-        return;
-    GLint location = my_glGetUniformLocation(glprogram, name);
-    if (location != -1)  /* if such variable exists */
-        my_glUniform1f(location, value);
-}
-
-
-void SDLNewOGLScreen::set_uniform_2float(char const *name, GLfloat value1, GLfloat value2) {
-    if (glprogram == 0)
-        return;
-    GLint location = my_glGetUniformLocation(glprogram, name);
-    if (location != -1)  /* if such variable exists */
-        my_glUniform2f(location, value1, value2);
 }
 
 
@@ -268,25 +275,26 @@ void SDLNewOGLScreen::configure_size() {
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    set_texture_bilinear(false);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
     /* configure shaders */
-    my_glCreateProgram = (MY_PFNGLCREATEPROGRAMPROC) glGetProcAddress("glCreateProgram");
-    my_glUseProgram = (MY_PFNGLUSEPROGRAMPROC) glGetProcAddress("glUseProgram");
-    my_glDeleteProgram = (MY_PFNGLDELETEPROGRAMPROC) glGetProcAddress("glDeleteProgram");
-    my_glCreateShader = (MY_PFNGLCREATESHADERPROC) glGetProcAddress("glCreateShader");
-    my_glDeleteShader = (MY_PFNGLDELETESHADERPROC) glGetProcAddress("glDeleteShader");
-    my_glShaderSource = (MY_PFNGLSHADERSOURCEPROC) glGetProcAddress("glShaderSource");
-    my_glCompileShader = (MY_PFNGLCOMPILESHADERPROC) glGetProcAddress("glCompileShader");
-    my_glAttachShader = (MY_PFNGLATTACHSHADERPROC) glGetProcAddress("glAttachShader");
-    my_glDetachShader = (MY_PFNGLDETACHSHADERPROC) glGetProcAddress("glDetachShader");
-    my_glLinkProgram = (MY_PFNGLLINKPROGRAMPROC) glGetProcAddress("glLinkProgram");
-    my_glGetUniformLocation = (MY_PFNGLGETUNIFORMLOCATIONPROC) glGetProcAddress("glGetUniformLocation");
-    my_glUniform1f = (MY_PFNGLUNIFORM1FPROC) glGetProcAddress("glUniform1f");
-    my_glUniform2f = (MY_PFNGLUNIFORM2FPROC) glGetProcAddress("glUniform2f");
+    my_glCreateProgram = (MY_PFNGLCREATEPROGRAMPROC) my_glGetProcAddress("glCreateProgram");
+    my_glUseProgram = (MY_PFNGLUSEPROGRAMPROC) my_glGetProcAddress("glUseProgram");
+    my_glDeleteProgram = (MY_PFNGLDELETEPROGRAMPROC) my_glGetProcAddress("glDeleteProgram");
+    my_glCreateShader = (MY_PFNGLCREATESHADERPROC) my_glGetProcAddress("glCreateShader");
+    my_glDeleteShader = (MY_PFNGLDELETESHADERPROC) my_glGetProcAddress("glDeleteShader");
+    my_glShaderSource = (MY_PFNGLSHADERSOURCEPROC) my_glGetProcAddress("glShaderSource");
+    my_glCompileShader = (MY_PFNGLCOMPILESHADERPROC) my_glGetProcAddress("glCompileShader");
+    my_glAttachShader = (MY_PFNGLATTACHSHADERPROC) my_glGetProcAddress("glAttachShader");
+    my_glDetachShader = (MY_PFNGLDETACHSHADERPROC) my_glGetProcAddress("glDetachShader");
+    my_glLinkProgram = (MY_PFNGLLINKPROGRAMPROC) my_glGetProcAddress("glLinkProgram");
+    my_glGetUniformLocation = (MY_PFNGLGETUNIFORMLOCATIONPROC) my_glGetProcAddress("glGetUniformLocation");
+    my_glUniform1f = (MY_PFNGLUNIFORM1FPROC) my_glGetProcAddress("glUniform1f");
+    my_glUniform2f = (MY_PFNGLUNIFORM2FPROC) my_glGetProcAddress("glUniform2f");
+    /* this function is not really important, no problem if it is null, so do not test below */
+    my_glGetShaderInfoLog = (MY_PFNGETSHADERINFOLOGPROC) my_glGetProcAddress("glGetShaderInfoLog");
 
     shader_support = my_glCreateProgram && my_glUseProgram && my_glCreateShader
         && my_glDeleteShader && my_glShaderSource && my_glCompileShader && my_glAttachShader
@@ -294,9 +302,16 @@ void SDLNewOGLScreen::configure_size() {
         && my_glUniform1f && my_glUniform2f;
 
     glprogram = 0;
+    if (shader_support) {
+        gd_debug("have shader support");
+        const GLubyte *glsl_version = glGetString(MY_GL_SHADING_LANGUAGE_VERSION);
+        if (glsl_version) {
+            gd_debug(CPrintf("shader language version %s") % (char*) glsl_version);
+        }
+    }
     if (shader_support && gd_shader != "") {
         try {
-            gd_debug("have shader support, loading shader");
+            gd_debug(CPrintf("loading shader %s") % gd_shader);
             glprogram = my_glCreateProgram();
 
             /* load file */
@@ -329,15 +344,43 @@ void SDLNewOGLScreen::configure_size() {
             my_glUseProgram(glprogram);
             if (glGetError() != 0)
                 throw std::runtime_error("shader program cannot be used");
-
-            /* now configure the shader with some sizes and coordinates */
+            /* configure the program with sizes */
             set_uniform_2float("rubyInputSize", w, h);
             set_uniform_2float("rubyTextureSize", w, h);
             set_uniform_2float("rubyOutputSize", w*oglscaling, h*oglscaling);
         } catch (std::exception const & e) {
+            set_texture_bilinear(false);
             gd_warning(e.what());
         }
     }
+}
+
+
+/**
+ * Set the value of an uniform float in the shader program.
+ * @param name The name of the variable.
+ * @param value The new value of the variable.
+ */
+void SDLNewOGLScreen::set_uniform_float(char const *name, GLfloat value) {
+    if (glprogram == 0)
+        return;
+    GLint location = my_glGetUniformLocation(glprogram, name);
+    if (location != -1)  /* if such variable exists */
+        my_glUniform1f(location, value);
+}
+
+
+/**
+ * Set the value of an uniform vec2 in the shader program.
+ * @param name The name of the variable.
+ * @param value The new value of the variable.
+ */
+void SDLNewOGLScreen::set_uniform_2float(char const *name, GLfloat value1, GLfloat value2) {
+    if (glprogram == 0)
+        return;
+    GLint location = my_glGetUniformLocation(glprogram, name);
+    if (location != -1)  /* if such variable exists */
+        my_glUniform2f(location, value1, value2);
 }
 
 
@@ -345,6 +388,7 @@ void SDLNewOGLScreen::uninit() {
     if (texture != 0)
         glDeleteTextures(1, &texture);
     texture = 0;
+    /* delete shaders and program */
     while (!shaders.empty()) {
         my_glDeleteShader(shaders.back());
         shaders.pop_back();
@@ -352,6 +396,7 @@ void SDLNewOGLScreen::uninit() {
     if (glprogram != 0)
         my_glDeleteProgram(glprogram);
     glprogram = 0;
+    /* delete sdl stuff */
     if (surface != NULL)
         SDL_FreeSurface(surface);
     surface = NULL;
@@ -364,10 +409,18 @@ void SDLNewOGLScreen::flip() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     /* copy the surface to the video card as the texture (one and only texture we use) */
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+    /* here the texture format on the video card is rgba. it could be rgb, but our internal
+     * sdl back buffer is rgba, and if they are not the same format (rgb<->rgba), a swizzle
+     * copy must occur inside the opengl driver. and that would cost a lot of cpu.
+     * the sdl back buffer must be rgba, as the pixmaps drawn are also rgba (they have transparency
+     * info). if the back buffer were rgb and the pixmaps rgba, the sdl blit would be slow.
+     * so better make everything rgba. */
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
     /* seed the rng */
     if (glprogram != 0) {
+        /* now configure the shader with some sizes and coordinates */
         set_uniform_float("randomSeed", g_random_double());
+        
         set_uniform_float("RADIAL_DISTORTION", shader_pal_radial_distortion / 100.0);
         set_uniform_float("CHROMA_TO_LUMA_STRENGTH", shader_pal_chroma_to_luma_strength / 100.0);
         set_uniform_float("LUMA_TO_CHROMA_STRENGTH", shader_pal_luma_to_chroma_strength / 100.0);
@@ -392,8 +445,4 @@ void SDLNewOGLScreen::flip() {
     SDL_GL_SwapBuffers();
 }
 
-
-SDLNewOGLScreen::~SDLNewOGLScreen() {
-    uninit();
-}
 

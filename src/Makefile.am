@@ -161,7 +161,7 @@ basesources = \
 	input/gameinputhandler.cpp \
 	sound/sound.cpp \
 	mainwindow.cpp \
-	gtkmain.cpp
+	main.cpp
 
 # gtk sources and headers:
 #   the gdash gtk ui, with editor.

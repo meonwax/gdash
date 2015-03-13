@@ -89,6 +89,7 @@ public:
     virtual void set_title(char const *title);
 
     void set_drawing_area(GtkWidget *drawing_area);
+    cairo_t *get_cairo_t() { return cr; }
 
     virtual Pixmap *create_pixmap_from_pixbuf(const Pixbuf &pb, bool keep_alpha) const;
 

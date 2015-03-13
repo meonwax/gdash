@@ -148,7 +148,9 @@ void GTKScreen::flip() {
 
 
 void GTKScreen::fill_rect(int x, int y, int w, int h, const GdColor &c) {
-    cairo_set_source_rgb(cr, c.get_r() / 255.0, c.get_g() / 255.0, c.get_b() / 255.0);
+    unsigned char r, g, b;
+    c.get_rgb(r, g, b);
+    cairo_set_source_rgb(cr, r / 255.0, g / 255.0, b / 255.0);
     cairo_rectangle(cr, x, y, w, h);
     cairo_fill(cr);
 }
@@ -186,8 +188,9 @@ Pixmap *GTKScreen::create_pixmap_from_pixbuf(const Pixbuf &pb, bool keep_alpha) 
 
 
 void GTKScreen::draw_particle_set(int dx, int dy, ParticleSet const &ps) {
-    cairo_set_source_rgba(cr, ps.color.get_r() / 255.0, ps.color.get_g() / 255.0, ps.color.get_b() / 255.0,
-                          ps.life / 1000.0 * ps.opacity);
+    unsigned char r, g, b;
+    ps.color.get_rgb(r, g, b);
+    cairo_set_source_rgba(cr, r / 255.0, g / 255.0, b / 255.0, ps.life / 1000.0 * ps.opacity);
     int size = ceil(ps.size);
     /* cairo gets the center of the pixel, like opengl. because it works with
      * float coordinates, not integers.

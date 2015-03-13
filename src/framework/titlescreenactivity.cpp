@@ -331,11 +331,9 @@ void TitleScreenActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
             app->caveset->last_selected_level = levelnum;
             app->input_text_and_do_command(_("Enter your name"), gd_username.c_str(), new NewGameCommand(app, cavenum, levelnum));
             break;
+        case App::Escape:
         case 'q':
         case 'Q':
-            app->quit_event();
-            break;
-        case App::Escape:
             /* if edited, do as if a quit is requested. then the user will be asked if discards edit. */
             /* otherwise, simply ask if he wants to quit. */
             if (app->caveset->edited)

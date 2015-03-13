@@ -41,7 +41,8 @@ int SDLPixbuf::get_height() const {
 
 
 SDLPixbuf::SDLPixbuf(int w, int h) {
-    surface = SDL_CreateRGBSurface(SDL_SRCALPHA, w, h, 32, rmask, gmask, bmask, amask);
+    surface = SDL_CreateRGBSurface(0, w, h, 32, rmask, gmask, bmask, amask);
+    SDL_SetAlpha(surface, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
     if (!surface)
         throw std::runtime_error(std::string("could not create surface: ") + SDL_GetError());
 }
@@ -52,7 +53,7 @@ SDLPixbuf::SDLPixbuf(SDL_Surface *surface_)
     /* if the r/g/b/masks do not match our preset values, the image is not stored in R,G,B,[A] byte order
      * in memory. so convert it. */
     if (surface->format->BytesPerPixel != 4 || surface->format->Rmask != rmask || surface->format->Gmask != gmask || surface->format->Bmask != bmask) {
-        SDL_Surface *newsurface = SDL_CreateRGBSurface(SDL_SRCALPHA, surface->w, surface->h, 32, rmask, gmask, bmask, surface->format->Amask != 0 ? amask : 0);
+        SDL_Surface *newsurface = SDL_CreateRGBSurface(SDL_SRCALPHA, surface->w, surface->h, 32, rmask, gmask, bmask, amask);
         SDL_SetAlpha(surface, 0, SDL_ALPHA_OPAQUE);
         SDL_BlitSurface(surface, NULL, newsurface, NULL);
         SDL_FreeSurface(surface);
@@ -72,7 +73,9 @@ void SDLPixbuf::fill_rect(int x, int y, int w, int h, const GdColor &c) {
     dst.y = y;
     dst.w = w;
     dst.h = h;
-    SDL_FillRect(surface, &dst, SDL_MapRGB(surface->format, c.get_r(), c.get_g(), c.get_b()));
+    unsigned char r, g, b;
+    c.get_rgb(r, g, b);
+    SDL_FillRect(surface, &dst, SDL_MapRGB(surface->format, r, g, b));
 }
 
 

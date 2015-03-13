@@ -32,15 +32,21 @@
 #include "misc/logger.hpp"
 
 /// Add extra ckdelay to cave by checking the existence some animated elements.
-/// bd1 and similar engines had animation bits in cave data, to set which elements to animate (firefly, butterfly, amoeba).
+/// BD1 and similar engines had animation bits in cave data, to set which elements to animate (firefly, butterfly, amoeba).
 /// animating an element also caused some delay each frame; according to my measurements, around 2.6 ms/element.
+/// Also calculate the per iteration ckdelay value, as if we were iterating the cave.
+/// So when setting up a cave for the first time, update_scheduling() can be called right after calling
+/// this function, and it will immediately calculate the correct speed of the cave, even without
+/// iterating it.
 void CaveRendered::set_ckdelay_extra_for_animation() {
     g_assert(!map.empty());
 
     bool has_amoeba = false, has_firefly = false, has_butterfly = false;
 
+    ckdelay_current = 0;
     for (int y = 0; y < height(); y++)
         for (int x = 0; x < width(); x++) {
+            ckdelay_current += gd_element_properties[map(x, y)].ckdelay;
             switch (map(x, y)) {
                 case O_FIREFLY_1:
                 case O_FIREFLY_2:
@@ -78,8 +84,6 @@ void CaveRendered::set_ckdelay_extra_for_animation() {
 /// Put in a different function, so things which are not
 /// important for the editor are not done when constructing the cave.
 void CaveRendered::setup_for_game() {
-    set_ckdelay_extra_for_animation();
-
     /* find the player which will be the one to scroll to at the beginning of the game (before the player's birth) */
     if (active_is_first_found) {
         /* uppermost player is active */
@@ -120,6 +124,10 @@ void CaveRendered::setup_for_game() {
         map.set_wrap_type(CaveMapFuncs::LineShift);
     else
         map.set_wrap_type(CaveMapFuncs::Perfect);
+
+    /* set speed */
+    set_ckdelay_extra_for_animation();
+    update_scheduling();
 }
 
 /// Count diamonds in a cave, and set diamonds_needed accordingly.
@@ -511,4 +519,65 @@ CaveRendered::CaveRendered(CaveStored const &data, int level, int seed)
 
     last_direction = MV_STILL;
     last_horizontal_direction = MV_STILL;
+}
+
+
+void CaveRendered::update_scheduling() {
+    /* SCHEDULING */
+
+    /* update timing calculated by iterating and counting elements which
+     * were slow to process on c64.
+     * some caves were delay loop based.
+     * some had proper timing routine - but if the cave was too complex,
+     * it ran slower than the time requested.
+     * this is were std::max is used, to select the slower. */
+    switch (GdSchedulingEnum(scheduling)) {
+        case GD_SCHEDULING_MILLISECONDS:
+            /* speed already contains the milliseconds value, do not touch it */
+            break;
+
+        case GD_SCHEDULING_BD1:
+            if (!intermission)
+                /* non-intermissions */
+                speed = (88 + 3.66 * ckdelay + (ckdelay_current + ckdelay_extra_for_animation) / 1000);
+            else
+                /* intermissions were quicker, as only lines 1-12 were processed by the engine. */
+                speed = (60 + 3.66 * ckdelay + (ckdelay_current + ckdelay_extra_for_animation) / 1000);
+            break;
+
+        case GD_SCHEDULING_BD1_ATARI:
+            /* about 20ms/frame faster than c64 version */
+            if (!intermission)
+                speed = (74 + 3.2 * ckdelay + ckdelay_current / 1000); /* non-intermissions */
+            else
+                speed = (65 + 2.88 * ckdelay + ckdelay_current / 1000); /* for intermissions */
+            break;
+
+        case GD_SCHEDULING_BD2:
+            /* 60 is a guess. */
+            speed = std::max(60 + (ckdelay_current + ckdelay_extra_for_animation) / 1000, ckdelay * 20);
+            break;
+
+        case GD_SCHEDULING_PLCK:
+            /* 65 is totally empty cave in construction kit, with delay=0) */
+            speed = std::max(65 + ckdelay_current / 1000, ckdelay * 20);
+            break;
+
+        case GD_SCHEDULING_BD2_PLCK_ATARI:
+            /* a really fast engine; timing works like c64 plck. */
+            /* 40 ms was measured in the construction kit, with delay=0 */
+            speed = std::max(40 + ckdelay_current / 1000, ckdelay * 20);
+            break;
+
+        case GD_SCHEDULING_CRDR:
+            if (hammered_walls_reappear)        /* this made the engine very slow. */
+                ckdelay_current += 60000;
+            speed = std::max(130 + ckdelay_current / 1000, ckdelay * 20);
+            break;
+
+        case GD_SCHEDULING_MAX:
+            /* to avoid compiler warning */
+            g_assert_not_reached();
+            break;
+    }
 }

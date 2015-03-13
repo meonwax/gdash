@@ -3002,62 +3002,8 @@ GdDirectionEnum CaveRendered::iterate(GdDirectionEnum player_move, bool player_f
     player_y_mem[PlayerMemSize - 1] = player_y;
 
     /* SCHEDULING */
-
-    /* update timing calculated by iterating and counting elements which
-     * were slow to process on c64.
-     * some caves were delay loop based.
-     * some had proper timing routine - but if the cave was too complex,
-     * it ran slower than the time requested.
-     * this is were std::max is used, to select the slower. */
-    switch (GdSchedulingEnum(scheduling)) {
-        case GD_SCHEDULING_MILLISECONDS:
-            /* speed already contains the milliseconds value, do not touch it */
-            break;
-
-        case GD_SCHEDULING_BD1:
-            if (!intermission)
-                /* non-intermissions */
-                speed = (88 + 3.66 * ckdelay + (ckdelay_current + ckdelay_extra_for_animation) / 1000);
-            else
-                /* intermissions were quicker, as only lines 1-12 were processed by the engine. */
-                speed = (60 + 3.66 * ckdelay + (ckdelay_current + ckdelay_extra_for_animation) / 1000);
-            break;
-
-        case GD_SCHEDULING_BD1_ATARI:
-            /* about 20ms/frame faster than c64 version */
-            if (!intermission)
-                speed = (74 + 3.2 * ckdelay + (ckdelay_current) / 1000); /* non-intermissions */
-            else
-                speed = (65 + 2.88 * ckdelay + (ckdelay_current) / 1000); /* for intermissions */
-            break;
-
-        case GD_SCHEDULING_BD2:
-            /* 60 is a guess. */
-            speed = std::max(60 + (ckdelay_current + ckdelay_extra_for_animation) / 1000, ckdelay * 20);
-            break;
-
-        case GD_SCHEDULING_PLCK:
-            /* 65 is totally empty cave in construction kit, with delay=0) */
-            speed = std::max(65 + ckdelay_current / 1000, ckdelay * 20);
-            break;
-
-        case GD_SCHEDULING_BD2_PLCK_ATARI:
-            /* a really fast engine; timing works like c64 plck. */
-            /* 40 ms was measured in the construction kit, with delay=0 */
-            speed = std::max(40 + ckdelay_current / 1000, ckdelay * 20);
-            break;
-
-        case GD_SCHEDULING_CRDR:
-            if (hammered_walls_reappear)        /* this made the engine very slow. */
-                ckdelay_current += 60000;
-            speed = std::max(130 + ckdelay_current / 1000, ckdelay * 20);
-            break;
-
-        case GD_SCHEDULING_MAX:
-            /* to avoid compiler warning */
-            g_assert_not_reached();
-            break;
-    }
+    /* updates based on the calculated explosions and per element ckdelays. */
+    update_scheduling();
 
     /* CAVE VARIABLES */
 

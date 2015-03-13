@@ -109,7 +109,7 @@ am__gdash_SOURCES_DIST = misc/printf.cpp cave/colors.cpp \
 	framework/replaymenuactivity.cpp \
 	framework/replaysaveractivity.cpp framework/commands.cpp \
 	input/joystick.cpp input/gameinputhandler.cpp sound/sound.cpp \
-	mainwindow.cpp gtkmain.cpp gtk/gtkpixbuf.cpp \
+	mainwindow.cpp main.cpp gtk/gtkpixbuf.cpp \
 	gtk/gtkpixbuffactory.cpp gtk/gtkscreen.cpp gtk/gtkui.cpp \
 	gtk/gtkuisettings.cpp gtk/gtkgameinputhandler.cpp \
 	misc/helphtml.cpp editor/editorwidgets.cpp \
@@ -164,7 +164,7 @@ am__objects_1 = gdash-printf.$(OBJEXT) gdash-colors.$(OBJEXT) \
 	gdash-replaysaveractivity.$(OBJEXT) gdash-commands.$(OBJEXT) \
 	gdash-joystick.$(OBJEXT) gdash-gameinputhandler.$(OBJEXT) \
 	gdash-sound.$(OBJEXT) gdash-mainwindow.$(OBJEXT) \
-	gdash-gtkmain.$(OBJEXT)
+	gdash-main.$(OBJEXT)
 am__objects_2 = gdash-gtkpixbuf.$(OBJEXT) \
 	gdash-gtkpixbuffactory.$(OBJEXT) gdash-gtkscreen.$(OBJEXT) \
 	gdash-gtkui.$(OBJEXT) gdash-gtkuisettings.$(OBJEXT) \
@@ -521,7 +521,7 @@ basesources = \
 	input/gameinputhandler.cpp \
 	sound/sound.cpp \
 	mainwindow.cpp \
-	gtkmain.cpp
+	main.cpp
 
 
 # gtk sources and headers:
@@ -735,7 +735,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gamerender.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkapp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkgameinputhandler.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkmain.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkmainwindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkpixbuf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkpixbuffactory.Po@am__quote@
@@ -749,6 +748,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-joystick.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-loadfile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-logger.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-mainwindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-messageactivity.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-ogl.Po@am__quote@
@@ -1817,19 +1817,19 @@ gdash-mainwindow.obj: mainwindow.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-mainwindow.obj `if test -f 'mainwindow.cpp'; then $(CYGPATH_W) 'mainwindow.cpp'; else $(CYGPATH_W) '$(srcdir)/mainwindow.cpp'; fi`
 
-gdash-gtkmain.o: gtkmain.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gtkmain.o -MD -MP -MF $(DEPDIR)/gdash-gtkmain.Tpo -c -o gdash-gtkmain.o `test -f 'gtkmain.cpp' || echo '$(srcdir)/'`gtkmain.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-gtkmain.Tpo $(DEPDIR)/gdash-gtkmain.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gtkmain.cpp' object='gdash-gtkmain.o' libtool=no @AMDEPBACKSLASH@
+gdash-main.o: main.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-main.o -MD -MP -MF $(DEPDIR)/gdash-main.Tpo -c -o gdash-main.o `test -f 'main.cpp' || echo '$(srcdir)/'`main.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-main.Tpo $(DEPDIR)/gdash-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='main.cpp' object='gdash-main.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-gtkmain.o `test -f 'gtkmain.cpp' || echo '$(srcdir)/'`gtkmain.cpp
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-main.o `test -f 'main.cpp' || echo '$(srcdir)/'`main.cpp
 
-gdash-gtkmain.obj: gtkmain.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gtkmain.obj -MD -MP -MF $(DEPDIR)/gdash-gtkmain.Tpo -c -o gdash-gtkmain.obj `if test -f 'gtkmain.cpp'; then $(CYGPATH_W) 'gtkmain.cpp'; else $(CYGPATH_W) '$(srcdir)/gtkmain.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-gtkmain.Tpo $(DEPDIR)/gdash-gtkmain.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gtkmain.cpp' object='gdash-gtkmain.obj' libtool=no @AMDEPBACKSLASH@
+gdash-main.obj: main.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-main.obj -MD -MP -MF $(DEPDIR)/gdash-main.Tpo -c -o gdash-main.obj `if test -f 'main.cpp'; then $(CYGPATH_W) 'main.cpp'; else $(CYGPATH_W) '$(srcdir)/main.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-main.Tpo $(DEPDIR)/gdash-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='main.cpp' object='gdash-main.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-gtkmain.obj `if test -f 'gtkmain.cpp'; then $(CYGPATH_W) 'gtkmain.cpp'; else $(CYGPATH_W) '$(srcdir)/gtkmain.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-main.obj `if test -f 'main.cpp'; then $(CYGPATH_W) 'main.cpp'; else $(CYGPATH_W) '$(srcdir)/main.cpp'; fi`
 
 gdash-gtkpixbuf.o: gtk/gtkpixbuf.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gtkpixbuf.o -MD -MP -MF $(DEPDIR)/gdash-gtkpixbuf.Tpo -c -o gdash-gtkpixbuf.o `test -f 'gtk/gtkpixbuf.cpp' || echo '$(srcdir)/'`gtk/gtkpixbuf.cpp

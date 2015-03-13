@@ -1,21 +1,23 @@
 DONE
 ----
-
+- sound handling fixes
+- pal emulation fix
+- translation fixes
+- windows xp/vista file open dialog fix
+- pre-calculate cave speed before cover to have the scrolling speed correct
+- new scrolling: gufst (gdash ultra fine scrolling thechnology)
 
 TO DO
 -----
+editor render lassú - visszahozni a régi változatot?
+
+Another small bug: When creating a new cave, leaving the editor 
+without saving, quitting GDash with ESC - it does not ask if I would 
+like to save the game!
 
 sdl stdout.txt fájlba írását megszüntetni
 
 kicsit csúnya a címképernyő beállítója az editorban. a dialog hint adja a méretet, és kimegy koppanásig.
-
-Just an idea: Now as the scrolling works THAT fine with OpenGL I 
-wonder if you can modernize the way scrolling works a little bit on 
-a trial basis. It the moment scrolling begins just at the moment the 
-player reaches a certain area. But scrolling beginns immediately at 
-full speed. What if scrolling would begin just a little bit slower, 
-gets faster (to regular speed) and slows down as soon as scrolling 
-is finished. So scrolling would be not that abrupt.
 
 settings.cpp - all settings to a static class
 all parameters to another static class - to know what's happening

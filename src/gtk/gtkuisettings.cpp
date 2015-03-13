@@ -31,6 +31,7 @@
 #include "gtk/gtkpixbuffactory.hpp"
 #include "settings.hpp"
 #include "misc/printf.hpp"
+#include "misc/autogfreeptr.hpp"
 #include "framework/thememanager.hpp"
 #ifdef HAVE_SDL
     #include "framework/shadermanager.hpp"
@@ -51,16 +52,14 @@ struct ThemeStuff {
 /* the list is to be freed by the caller. */
 static GList *image_load_filters()
 {
-    GSList *formats=gdk_pixbuf_get_formats();
-    GSList *iter;
-    GtkFileFilter *all_filter;
-    GList *filters=NULL;    /* new list of filters */
+    GSList *formats = gdk_pixbuf_get_formats();
+    GList *filters = NULL;    /* new list of filters */
 
-    all_filter=gtk_file_filter_new();
+    GtkFileFilter *all_filter = gtk_file_filter_new();
     gtk_file_filter_set_name(all_filter, _("All image files"));
 
     /* iterate the list of formats given by gdk. create file filters for each. */
-    for (iter=formats; iter!=NULL; iter=iter->next) {
+    for (GSList *iter = formats; iter!=NULL; iter=iter->next) {
         GdkPixbufFormat *frm = (GdkPixbufFormat *) iter->data;
         if (gdk_pixbuf_format_is_disabled(frm))
             continue;
@@ -68,10 +67,9 @@ static GList *image_load_filters()
         gtk_file_filter_set_name(filter, gdk_pixbuf_format_get_description(frm));
         char **extensions=gdk_pixbuf_format_get_extensions(frm);
         for (int i=0; extensions[i]!=NULL; i++) {
-            char *pattern=g_strdup_printf("*.%s", extensions[i]);
-            gtk_file_filter_add_pattern(filter, pattern);
-            gtk_file_filter_add_pattern(all_filter, pattern);
-            g_free(pattern);
+            std::string pattern = SPrintf("*.%s") % extensions[i];
+            gtk_file_filter_add_pattern(filter, pattern.c_str());
+            gtk_file_filter_add_pattern(all_filter, pattern.c_str());
         }
         g_strfreev(extensions);
         filters = g_list_append(filters, filter);
@@ -79,7 +77,7 @@ static GList *image_load_filters()
     g_slist_free(formats);
 
     /* add "all image files" filter */
-    filters=g_list_prepend(filters, all_filter);
+    filters = g_list_prepend(filters, all_filter);
 
     return filters;
 }
@@ -125,8 +123,8 @@ static void add_theme_cb(GtkWidget *widget, gpointer data) {
     bool ok = CellRenderer::is_image_ok_for_theme(gpf, filename);
     if (ok) {
         /* make up new filename */
-        char *basename=g_path_get_basename(filename);
-        char *new_filename=g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir, basename, NULL);
+        AutoGFreePtr<char> basename(g_path_get_basename(filename));
+        AutoGFreePtr<char> new_filename(g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir.c_str(), (char*) basename, NULL));
 
         /* if file not exists, or exists BUT overwrite allowed */
         if (!g_file_test(new_filename, G_FILE_TEST_EXISTS) || gd_question_yesno(_("Overwrite file?"), new_filename)) {
@@ -140,20 +138,17 @@ static void add_theme_cb(GtkWidget *widget, gpointer data) {
                 if (error)
                     throw error;
                 g_object_unref(pixbuf);
-                char *thm = g_filename_display_basename(new_filename);
+                AutoGFreePtr<char> thm(g_filename_display_basename(new_filename));
                 if (strrchr(thm, '.'))    /* remove extension */
                     *strrchr(thm, '.') = '\0';
                 gtk_combo_box_append_text(GTK_COMBO_BOX(themestuff->themecombo), thm);
-                themestuff->themes.push_back(new_filename);
+                themestuff->themes.push_back(std::string(new_filename));
                 gd_infomessage(_("The new theme is installed."), thm);
-                g_free(thm);
             } catch (GError *error) {
                 gd_errormessage(error->message, NULL);
                 g_error_free(error);
             }
         }
-        g_free(new_filename);
-        g_free(basename);
     }
     else
         gd_errormessage(_("The selected image cannot be used as a GDash theme."), NULL);
@@ -274,11 +269,10 @@ GtkWidget *SettingsWindow::combo_box_new_from_themelist(std::vector<std::string>
         if (strings[i] == "")
             gtk_combo_box_append_text(GTK_COMBO_BOX(combo), _("[Default]"));
         else {
-            char *thm = g_filename_display_basename(strings[i].c_str());
+            AutoGFreePtr<char> thm(g_filename_display_basename(strings[i].c_str()));
             if (strrchr(thm, '.'))    /* remove extension */
                 *strrchr(thm, '.') = '\0';
             gtk_combo_box_append_text(GTK_COMBO_BOX(combo), thm);
-            g_free(thm);
         }
     }
     return combo;

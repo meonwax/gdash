@@ -33,7 +33,7 @@
 
 
 static void add_dir_to_shaders(std::vector<std::string> &shaders, const char *directory_name) {
-    Logger l(true);       /* do not report error messages */
+    gd_debug(CPrintf("checking dir %s for shaders") % directory_name);
 
     GDir *dir = g_dir_open(directory_name, 0, NULL);
     /* silently ignore unable-to-open directories */
@@ -43,8 +43,8 @@ static void add_dir_to_shaders(std::vector<std::string> &shaders, const char *di
     while ((name = g_dir_read_name(dir)) != NULL) {
         AutoGFreePtr<char> filename(g_build_filename(directory_name, name, NULL));
         AutoGFreePtr<char> lower(g_ascii_strdown(filename, -1));
-        /* we only allow bmp and png files. converted to lowercase. */
         if ((g_str_has_suffix(lower, ".shader") && g_file_test(filename, G_FILE_TEST_IS_REGULAR))) {
+            gd_debug(CPrintf("found shader %s") % filename);
             shaders.push_back((char*) filename);
         }
     }

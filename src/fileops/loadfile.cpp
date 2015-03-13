@@ -33,6 +33,8 @@
 #include "fileops/bdcffload.hpp"
 #include "misc/logger.hpp"
 #include "misc/util.hpp"
+#include "misc/autogfreeptr.hpp"
+
 
 /** load some caveset from the binary data in the buffer.
  * the length may be -1, if the caller is pretty sure of what he's doing. */
@@ -76,11 +78,9 @@ CaveSet create_from_buffer(const unsigned char *buffer, int length, char const *
             newcaves.filename = filename;
         } else {
             /* make an absolute filename if needed */
-            char *currentdir = g_get_current_dir();
-            char *absolute = g_build_path(G_DIR_SEPARATOR_S, currentdir, filename, NULL);
+            AutoGFreePtr<char> currentdir(g_get_current_dir());
+            AutoGFreePtr<char> absolute(g_build_path(G_DIR_SEPARATOR_S, (char*) currentdir, filename, NULL));
             newcaves.filename = absolute;
-            g_free(currentdir);
-            g_free(absolute);
         }
         return newcaves;
     }
