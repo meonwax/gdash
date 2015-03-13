@@ -3,15 +3,19 @@ Program:
 
   Scale2x algorithm:
     Andrea Mazzoleni
-  The SDL version of the game includes the SDL_gfx rotozoom:
-	A. Schiffler.
+
+  Hqx algorithm:
+    Copyright (C) 2003 Maxim Stepin ( maxst@hiend3d.com )
+    Copyright (C) 2010 Cameron Zemek ( grom@zeminvaders.net)
+
+    SDL: Sam Lantinga <slouken@libsdl.org>
+    SDL png saver: Philip D. Bober <wildfire1138@mchsi.com>
 
 Artists:
   CWS
-  
+
 Documentation:
   LogicDeLuxe - thanks for the BD-Inside-FAQ.
 
 Caves:
   Various designers.
-																				  

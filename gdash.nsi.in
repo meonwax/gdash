@@ -39,10 +39,9 @@ Section "GDash (required)"
   ; Program files
   SetOutPath $INSTDIR
   File "src\gdash.exe"
-  File "src\sdash.exe"
-  File "src\sreplay.exe"
   File "include\boulder_rush.png"
   File "include\c64_gfx.png"
+  File "include\c64_gfx_bd2.png"
   File "include\gdash_screen.png"
   File "include\gdash_tile.png"
   File "gdash.ico"
@@ -52,12 +51,16 @@ Section "GDash (required)"
   File /oname=COPYING_SDL.txt "COPYING.SDL"
   File /oname=COPYING_GTK.txt "COPYING.GTK"
   File README-SDL.txt
-
-  ; Program files, Glib dlls
+  
+  ; Program files, dlls
   SetOutPath $INSTDIR
+  File ${MINGWDIR}\bin\libgcc_s_dw2-1.dll
+  File ${MINGWDIR}\bin\libstdc++-6.dll
+  
+  ; Program files, Glib dlls
   File ${MINGWDIR}\bin\intl.dll
-  File ${MINGWDIR}\bin\libgio-2.0-0.dll
   File ${MINGWDIR}\bin\libglib-2.0-0.dll
+  File ${MINGWDIR}\bin\libgio-2.0-0.dll
   File ${MINGWDIR}\bin\libgmodule-2.0-0.dll
   File ${MINGWDIR}\bin\libgobject-2.0-0.dll
   File ${MINGWDIR}\bin\libgthread-2.0-0.dll
@@ -69,37 +72,36 @@ Section "GDash (required)"
   File ${MINGWDIR}\bin\libcairo-2.dll
   File ${MINGWDIR}\bin\libexpat-1.dll
   File ${MINGWDIR}\bin\libfontconfig-1.dll
-  File ${MINGWDIR}\bin\libgdk-win32-2.0-0.dll
   File ${MINGWDIR}\bin\libgdk_pixbuf-2.0-0.dll
+  File ${MINGWDIR}\bin\libgdk-win32-2.0-0.dll
   File ${MINGWDIR}\bin\libgtk-win32-2.0-0.dll
   File ${MINGWDIR}\bin\libpango-1.0-0.dll
   File ${MINGWDIR}\bin\libpangocairo-1.0-0.dll
   File ${MINGWDIR}\bin\libpangoft2-1.0-0.dll
   File ${MINGWDIR}\bin\libpangowin32-1.0-0.dll
-  File ${MINGWDIR}\bin\libpng12-0.dll
+  File ${MINGWDIR}\bin\libpng14-14.dll
+  File ${MINGWDIR}\bin\libpng15-15.dll
   File ${MINGWDIR}\bin\zlib1.dll
-  File ${MINGWDIR}\lib\gtk-2.0\2.10.0\loaders\libpixbufloader-png.dll
-  File ${MINGWDIR}\lib\gtk-2.0\2.10.0\loaders\libpixbufloader-jpeg.dll
-  File ${MINGWDIR}\lib\gtk-2.0\2.10.0\loaders\libpixbufloader-bmp.dll
-  File ${MINGWDIR}\lib\gtk-2.0\2.10.0\loaders\libpixbufloader-gif.dll
-  SetOutPath $INSTDIR\etc\gtk-2.0
-  File gdk-pixbuf.loaders
   
   ; Program files, SDL dlls
   SetOutPath $INSTDIR
   File ${MINGWDIR}\bin\SDL.dll
   File ${MINGWDIR}\bin\SDL_mixer.dll
   File ${MINGWDIR}\bin\SDL_image.dll
-  File ${MINGWDIR}\bin\jpeg.dll
   File ${MINGWDIR}\bin\libvorbis-0.dll
   File ${MINGWDIR}\bin\libvorbisfile-3.dll
   File ${MINGWDIR}\bin\libogg-0.dll
+  ; the currently used sdl_img required a different version of libpng.
+  ; also requires zlib1, but that is also shipped with gtk+
+  ; also ship jpeg, so the game can load jpegs - just in case.
+  File ${MINGWDIR}\bin\libpng14-14.dll
+  File ${MINGWDIR}\bin\libjpeg-8.dll
 
 
   ; Documentation
   SetOutPath $INSTDIR
   File docs\replay_to_avi.html
-  File docs\style.css  
+  File docs\style.css
   File docs\background.png
   File docs\gdash.png
   File docs\avidemux_codec.png
@@ -160,10 +162,8 @@ Section "Start Menu Shortcuts"
   SetOutPath $INSTDIR
   CreateDirectory "$SMPROGRAMS\GDash"
   CreateShortCut "$SMPROGRAMS\GDash\GDash.lnk" "$INSTDIR\gdash.exe" "" "$INSTDIR\gdash.ico" 0
-  CreateShortCut "$SMPROGRAMS\GDash\GDash (C64-like).lnk" "$INSTDIR\sdash.exe" "" "$INSTDIR\gdash.ico" 0
-  CreateShortCut "$SMPROGRAMS\GDash\Replay converter.lnk" "$INSTDIR\sreplay.exe" "" "" 0
   CreateShortCut "$SMPROGRAMS\GDash\README.lnk" "$INSTDIR\README.txt" "" "" 0
-  CreateShortCut "$SMPROGRAMS\GDash\Replay to AVI.lnk" "$INSTDIR\replay_to_avi.html" "" "" 0
+  CreateShortCut "$SMPROGRAMS\GDash\Replay to AVI HOWTO.lnk" "$INSTDIR\replay_to_avi.html" "" "" 0
   CreateShortCut "$SMPROGRAMS\GDash\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   
 SectionEnd

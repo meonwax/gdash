@@ -1,48 +1,171 @@
 DONE
------
-integer values everywhere in cave engine
-accented characters in sdash
-replay long comment
+----
+Whwn I testet my game "RockFort 3" with the new version, I noted that the very first cave (an 
+intermission) will reload when you press Esc (and not, as it should be in intermissions, the 
+next cave). At least in some of my games this is a big problem because some of my ints are 
+actually unsolvable Very Happy so the game can't continue. I also checked BD1 intermissions- no 
+problems there. Perhaps the problem occurs only if an int is selectable at the start? after 
+further checking, I think that the problem occurs only in intermissions which are selectable at 
+the start. The new engine somehow doesn't count these as ints but as normal caves...
 
-element buttonon túlmegy a szöveg, ha túl hosszú az element neve.
-- ellipsize?
-- mégiscsak nekem kéne összerakni gtkimage+label? akkor van ellipsize,
-és megszűnik a gtkrc hack is
-long story for caves in sdash
+lowercase_name std::string legyen
+
+cave object prototipusok auto_ptr-be
+
+attrib=param cucc megbolondul az üres attribútumon (pl. hiányzó juzernév)
+
+replaysaver lefagyott
+
+mac byte order sdlpixbuf fix ("random" colors in caves)
+
+implement a "small message dialog" activity like gd_warning in gtk version
+
+replaysaver stereo?
+
+misc/util.cpp:174: error: ‘class std::vector<gunichar, std::allocator<gunichar> >’ has no member named ‘data’
+
+when holding fire at hatcing, cave restarts - ??? AFL POSOCOPI 3 HAS THIS STUFF
+
+eredeti játékban amikor spacet snappelt, volt hangja? a széna/üres helye megevése adja a hangot!
+
+player_get_element visszatérési értéke legyen O_NONE?
+
+By the way - does GDash not automatically use /usr/local/share/gdash/caves (and the other directories)?
+
+*) In "Boulder Dash 6 Padajici Balvany" in D1.CAV time seems to be incorrect as it is 00:00. 
+All other "zero time" caves corrected.
+
+lots of new caves imported from arno's boulder dash game base
+
+any2gdash importer integrated into gdash. gdash can now load vice snapshots and memory saves.
+
+a pálya importálást áttenni egy külön fájlba, kicsit a caveset.cpp tele van vele szemetelve. felesleges
+statikus függvény.
+
+When loading "Boulderdash-ux.bd" the line "Game: boulderdash-ux" right under the title screen is cut off.
+
+
+
+IMPORTANT
+---------
+gtk verzió preferences - keyboard cuccot rendbe tenni
+editorban is jelenjen meg az ablak, de ott ne lehessen állítani a billentyűket.
+hiányzik most belőle az editorban használható felbontás.
+
+./caves/various/Metsemakers_Dash_1.brc - szín beolvasás nyűg?
+
+c64import :: static void crazy_dream_9_add_specials(CaveStored &cave, const guint8 *buf, const int length);
+felesleges külön függvény?
+vagy inkább mindegyik hekkeltnek legyen saját ilyen függvénye valamilyen módon, esetleg
+külön fájlban?
+ezt a crazydream9-et is idetenni ehhez a részhez:
+    // check for hacks.
+    ImportHack hack = None;
+    guint cs=checksum(buf, length);
+    //~ g_debug("%d %x\n", length, cs);
+
+az objectek create-from-bdcff-je és a clone-from-bdcff-je miért különbözik? mi a két
+függvény között a különbség?
+
+The crash quits the program. But only with "Boulder Dash 2.bd". It's only with the .bd file - the .gds works!
+convert all loaded images to "have alpha channel"?
+
+
+Can you please remove the particle-effects within the Rockford sprite? I noticed on some backgrounds the particle-effects colors Rockford in a very strange color! Try cave A from "Boulderdash-ux" - rockford is getting blueish when digging through earth! In a cave with brown earth this looks totally weird! I think if you except Rockford from the particle-effects this should not happen.
+
+ha a cave kisebb mint az ablak, particle effectek kilógnak és ottmaradnak!
+
+
 
 
 TO DO
 -----
-In "Boulder Dash 6 Padajici Balvany" in D1.CAV time seems to be incorrect as it is 00:00. 
+
 
 NEW ELEMENTS
     fragile diamonds
     How about a gate that shuts after a certain amount of diamonds have been collected? Just put the gate in front of the exit and have a number somewhere that counts down the diamonds until it closes. 
     portable conveyor belts?	destructible, convey each other.
+    - rockford with gun
+    - rockford with rocket launcher
+    - option "More than 1 bomb" in the cave settings
+
+    
+compat
+    *) Rockford's revenge cave 9 scrolling
+    itt az a kérdés, melyik legyen az active player. az, akit először/utoljára megtalál a cave scan,
+    vagy az, akit először/utoljára megtalál ÉS tudott mozogni?
+    a születő rockford is számítson aktívnak!
+
+compat:
+	*) frustidash
+	*) magicwall breakscan; De Luxe Caves 1 Cave L, De Luxe Caves 2 Cave A ????, Deluxe Caves 3 Cave A
+    *) The second issue is not so important. In bd1-games, the magicwall stops the amoeba even if the 
+    amoeba is located above the magicwall. For the moment, I implemented it this way: When an 
+    element passes the magicwall I set all the following amoebas to the delayed state. This causes a 
+    conversion, if no amoeba was able to grow before the scan of this element. Of course, this is 
+    not how it works. Ok, I have to adjust my implementation. I remarked that the conversion takes 
+    place in the same scan, not in the next. So it's much easier to implement: When a stone drops 
+    into the magicwall, you only have to set the variable that indicates if the amoeba is "enclosed" 
+    and have to convert in this scan to "True". All the falling amoebas will be converted.
+    
+One little thing I noticed is that when clicking on "test" in the editor the window that opens for testing the cave is not active. I have to click into the window with the mouse cursor to activate it. Wouldn't it be best to make the most front window the active one?
+
+replay menu, settings lapozásnál legyen szép
+
+Did you do something with the fine scrolling? It seems to be better now but it could also be the result because I'm using 4xscale for my full screen resolution 1920x1080. I do not know if this is possible at all but an adaptive frame rate corresponding with the monitor refresh rate would be nice but I do not know if the influence on the game speed would be negative.
+
+gtk version settings - do a restart when required
+
+gtk version settings - install theme button
+
+bdcff beolvasás miért hash table?
+  size és hasonló szarok miatt
+  de tobb értéket is kéne tárolni esetleg, a hash table ezt akadályozza
+  multimap nem oldja meg?
+  c++98 multimap insert: There are no guarantees on the relative order of equivalent elements.
+
+cave play statistics:
+                        1   2   3   4   5
+        played
+        finished
+        best time
+        most diamonds
+        most score
+something missing in GDash - now you can immediately see which caves you've played, and which 
+ones you should try again, also, high score, best time, most collected diamonds. delete 
+highscore stuff from cave, caveset & bdcff
+
+editor cave statistics:
+    - size
+    - number of Boulders
+    - number of Diamonds
+    - number of dirt
+    - number of Fireflies
+
+
+- beolvasás/kiírás scanned bit
+    - bdcff import/export
+
+- double <-> int
+
+- pályákat keresni
+
+- brc import explosion effect
+
+- settingst szétdobni
+
+replay hogy minden keypresst elmentsen?
+keypress->mov az iteratebe
+de ez mire lenne jo?
 
 Amoeba2 sound
 new slime sound
 replicator sound
 
-amikor bezárja az editor ablakot, akkor kéne egy replay checksum update?
-vagy a delete event, és akkor rákérdez
-
-STATUS BAR
-	As for the status bar in GDash: Maybe a little bit larger font would do the thing. There is enough space to use a larger font.
-
-Maybe game notes can be displayed under the title screen as soon as the game is loaded. Optionally at least if someone does not like to show it automatically.
-
-bdcff beolvasás miért hash table?
-  size és hasonló szarok miatt
-  de tobb értéket is kéne tárolni esetleg, a hash table ezt akadályozza
+mi legyen a replay checksumokkal
 
 design tips?
 
 cow not perfect
-
-option "More than 1 bomb" in the cave settings
-
-compat:
-	*) magicwall breakscan; De Luxe Caves 1 Cave L, De Luxe Caves 2 Cave A, Deluxe Caves 3 Cave A
-	*) frustidash
 

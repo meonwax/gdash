@@ -1,8 +1,7 @@
 GDash
 -----
 An Emerald Mine-like game for GTK+.
-Use the cursor keys and Ctrl to move.
-
+See http://code.google.com/p/gdash/ .
 
 Compiling
 ---------
@@ -29,11 +28,7 @@ The switches to control the libraries are:
 	
 	--with-sdl and --without-sdl, to control the build of the sdl
 	version. 
-	
-	--enable-sound and --disable-sound, to use sounds or not. For sounds,
-	SDL is needed, so --enable-sound --without-sdl is an invalid
-	combination.
-	
+
 For example, if you do not have GTK+, and plan to build only the C64-like
 sdash, you can use:
 
@@ -87,7 +82,7 @@ checksums generated.
 
 
 Themes
-------						  
+------
 The game also supports themes. You can use the installed png file as a
 template. Cells can have any arbitrary size, not necessarily 16x16 pixels.
 However, they must be squares, and the image must have an alpha channel.
@@ -109,9 +104,3 @@ For C64 themes, the meaning of colors are these:
 - Cyan 0x00ffff: used internally for the editor, will be converted to black
   pixels around arrows.
 - White 0xffffff: for the editor; will the color of arrows.
-
-Beware that the SDL version is only able to load .BMP files.
-
-
-
-Send e-mail to: cirix <cirix@fw.hu>

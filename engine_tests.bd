@@ -1,162 +1,49 @@
 [BDCFF]
 Version=0.5
+
 [game]
-[highscore]
-21312 asd
-1231 qweq
-[/highscore]
 Name=Engine tests
 Description=Caves which test some element
+Charset=bd2_big
 Lives=4 9
 Remark=caveset\n  data\nbla\nbla.\n
 Levels=5
 
-[cave]
-Name=Lorem Ipsum
-Description=cave to test scrolling a long story in sdash
-Author=Czirkos Zoltan
-Date=2010-01-29
-Intermission=false
-Story=Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam enim urna, sodales in laoreet id, hendrerit et ante. Fusce semper, augue sagittis vehicula porttitor, sapien eros aliquam massa, non suscipit mauris erat a risus. Proin sagittis eros a arcu varius pulvinar. Morbi at tortor ipsum. Pellentesque nec erat vel augue pretium elementum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nunc pellentesque est in massa porta sit amet feugiat augue tempor. Vestibulum vehicula rutrum tristique. Curabitur at pulvinar ipsum. In eleifend auctor condimentum. Nunc imperdiet, ipsum ac tempus posuere, felis odio dapibus purus, et mollis eros orci eu lorem. Duis elementum blandit tortor, vitae mollis ante ultricies vel. Donec consectetur sodales laoreet. Mauris malesuada blandit bibendum. Sed vel eleifend erat.\n\nMaecenas cursus, tellus sit amet fringilla tincidunt, dolor arcu porta felis, vel interdum lectus dolor sit amet sapien. Vivamus ac nisl eu lacus cursus ultrices. Mauris eu purus et erat tincidunt gravida et nec elit. Vivamus facilisis purus risus. Vestibulum a nisi felis. Maecenas congue tellus vitae nunc feugiat pretium. Vestibulum volutpat adipiscing velit nec blandit. Suspendisse vestibulum fringilla eros, ac porta nisl adipiscing id. Quisque sollicitudin, nibh sed tincidunt vehicula, lorem augue pellentesque arcu, vel consequat velit elit eget odio. Phasellus sit amet risus id mauris feugiat auctor. Sed vulputate diam ultrices justo interdum mollis. Fusce arcu sem, tempus eu pellentesque non, accumsan ac mauris. Quisque ligula orci, gravida ac lobortis eu, interdum ut massa. Nam in libero diam, sit amet vehicula odio. Nam egestas nisi vitae sem posuere malesuada.\n\nInteger interdum tempus sem in tincidunt. In sit amet felis vel orci laoreet imperdiet vel ac quam. Sed in diam metus. Nulla ut risus sit amet augue porta venenatis. Aliquam id turpis odio. Mauris libero tellus, ultrices sit amet volutpat a, placerat eu erat. Quisque viverra mi eget nisl malesuada a tincidunt erat adipiscing. Ut neque urna, consequat vitae ullamcorper ut, fringilla non est. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla dolor nisl, cursus id pulvinar vel, porttitor cursus lacus. Sed imperdiet tortor ac purus bibendum congue. Aenean vel nisi tempus lacus accumsan sollicitudin. In eget purus sit amet nunc interdum interdum sed in velit. Morbi interdum massa ut tellus vestibulum ut ultricies elit vulputate. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris imperdiet felis ut eros elementum vitae ultrices enim varius.\n\n\342\200\230 \342\200\231 \342\200\232 \342\200\233 \342\200\234 \342\200\235 \342\200\236 \342\200\237\n\342\200\262 \342\200\263 \342\200\264 \342\200\265 \342\200\266 \342\200\267 \342\200\271 \342\200\272\nlast line (without enter)
-Size=40 22 0 0 39 21
-Colors=#000000 #000000 #0c5b7f #6621a8 #3ed151 #23a821 #0c107f
-DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
-CaveTime=999 999 999 999 999
-CaveScheduling=ms
-FrameTime=180 160 140 120 120
-CaveDelay=0 0 0 0 0
-SlimePermeabilityC64=0 0 0 0 0
-
-[objects]
-Point=5 14 INBOX
-Point=4 3 DIAMOND
-Point=4 4 DIAMOND
-Point=4 5 DIAMOND
-Point=4 6 DIAMOND
-Point=5 6 DIAMOND
-Point=6 6 DIAMOND
-Point=8 5 DIAMOND
-Point=9 6 DIAMOND
-Point=10 5 DIAMOND
-Point=9 2 DIAMOND
-Point=12 4 DIAMOND
-Point=12 6 DIAMOND
-Point=12 5 DIAMOND
-Point=13 2 DIAMOND
-Point=15 5 DIAMOND
-Point=16 6 DIAMOND
-Point=17 6 DIAMOND
-Point=15 4 DIAMOND
-Point=16 4 DIAMOND
-Point=17 4 DIAMOND
-Point=17 3 DIAMOND
-Point=16 2 DIAMOND
-Point=15 3 DIAMOND
-Point=8 4 DIAMOND
-Point=10 4 DIAMOND
-Point=12 3 DIAMOND
-Point=4 2 DIAMOND
-Point=4 1 DIAMOND
-Point=19 2 DIAMOND
-Point=19 3 DIAMOND
-Point=19 5 DIAMOND
-Point=19 4 DIAMOND
-Point=19 6 DIAMOND
-Point=20 3 DIAMOND
-Point=21 2 DIAMOND
-Point=22 3 DIAMOND
-Point=22 4 DIAMOND
-Point=22 5 DIAMOND
-Point=22 6 DIAMOND
-Point=23 2 DIAMOND
-Point=24 3 DIAMOND
-Point=24 4 DIAMOND
-Point=24 5 DIAMOND
-Point=24 6 DIAMOND
-Point=12 2 DIAMOND
-Point=8 3 DIAMOND
-Point=10 3 DIAMOND
-Point=12 9 DIAMOND
-Point=12 11 DIAMOND
-Point=12 12 DIAMOND
-Point=13 13 DIAMOND
-Point=15 11 DIAMOND
-Point=15 10 DIAMOND
-Point=15 12 DIAMOND
-Point=15 13 DIAMOND
-Point=15 14 DIAMOND
-Point=16 10 DIAMOND
-Point=17 11 DIAMOND
-Point=16 13 DIAMOND
-Point=17 12 DIAMOND
-Point=19 10 DIAMOND
-Point=21 12 DIAMOND
-Point=19 13 DIAMOND
-Point=20 13 DIAMOND
-Point=20 9 DIAMOND
-Point=20 11 DIAMOND
-Point=23 10 DIAMOND
-Point=23 12 DIAMOND
-Point=23 11 DIAMOND
-Point=24 13 DIAMOND
-Point=25 13 DIAMOND
-Point=25 12 DIAMOND
-Point=25 11 DIAMOND
-Point=25 10 DIAMOND
-Point=27 9 DIAMOND
-Point=27 10 DIAMOND
-Point=27 12 DIAMOND
-Point=27 11 DIAMOND
-Point=27 13 DIAMOND
-Point=28 10 DIAMOND
-Point=29 9 DIAMOND
-Point=30 10 DIAMOND
-Point=30 11 DIAMOND
-Point=30 12 DIAMOND
-Point=30 13 DIAMOND
-Point=31 9 DIAMOND
-Point=32 10 DIAMOND
-Point=32 11 DIAMOND
-Point=32 12 DIAMOND
-Point=32 13 DIAMOND
-Point=12 16 OUTBOX
-[/objects]
-[/cave]
-
-[cave]
 [highscore]
-21312 caveasd
-1231 caveqweq
+21312 asd
 [/highscore]
+
+[cave]
 Name=Voodoo
 Intermission=false
-Remark=Notes for the cave 'Voodoo'. Bla bla bla.\nBla on new line bla.\n\nblablabla.\n\nGreater than >, less than <.
+Remark=Notes for the cave 'Voodoo'. Bla bla bla.\nBla on new line bla.\n\nblablabla.\n\nGreater than >, less than <. \303\251kezet, hossz\303\272 \305\221. tenisz\303\274t\305\221.
 Size=40 22 0 0 39 21
 Colors=Black Black Orange Brown Gray3 Gray3 Yellow
 DiamondsRequired=15 15 15 15 15
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 PALTiming=true
-FrameTime=150 120 120 120 120
+FrameTime=200 120 120 120 120
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
 DummyProperties.destructable=false
 AmoebaProperties.immediately=false
 AmoebaProperties.waitforhatching=true
 AmoebaTime=600 600 600 600 600
-AmoebaGrowthProb=0.17000 0.25000
 Effect=AMOEBADIAMONDeffect DIAMONDBIRTH1
+AmoebaGrowthProb=0.1700 0.2500
 MagicWallTime=600 600 600 600 600
 MagicWallProperties.waitforhatching=true
 MagicWallProperties.convertamoeba=false
-SlimePermeability=0.00000 0.00000 0.00000 0.00000 0.00000
-AcidProperties=DIRT 0.10000
+SlimePermeability=0.0000 0.0000 0.0000 0.0000 0.0000
+AcidProperties=DIRT 0.1000
 EnemyDirectionProperties.changeathatching=true
 BorderProperties.lineshift=true
 ShortExplosions=false
+Unknown_tag=asd
+
 
 [objects]
 Point=3 4 INBOX
@@ -166,7 +53,7 @@ Point=15 10 DUMMY
 Point=19 10 DUMMY
 Point=23 10 DUMMY
 Point=23 6 DUMMY
-Point=7 6 DUMMY
+Point=10 10 DUMMY
 Point=15 4 BOULDER
 Point=19 4 DIAMOND
 Point=15 13 FIREFLYl
@@ -182,6 +69,10 @@ Point=8 9 FIREFLYl
 Point=8 3 BOULDER
 Line=7 18 28 18 BLADDERSPENDER
 [/objects]
+
+[highscore]
+21312 caveasd
+[/highscore]
 [/cave]
 
 [cave]
@@ -190,12 +81,12 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=Black Black Red LightRed White White Red
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=plck
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
 DummyProperties.destructable=false
@@ -221,12 +112,12 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=Black Black Red Brown White White Red
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 PALTiming=true
 FrameTime=180 160 140 120 120
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
 DummyProperties.destructable=false
@@ -265,12 +156,12 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=Black Black Orange Gray1 White Green Blue
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=plck
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
 DummyProperties.destructable=false
@@ -302,12 +193,12 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=Black Black Red Gray3 Cyan Cyan Red
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 InitialFill=SPACE
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
@@ -332,23 +223,17 @@ Line=7 9 10 9 DIRT
 [/cave]
 
 [cave]
-[highscore]
-1566 Czirkos Zoltan
-1561 Czirkos Zoltan
-1392 Czirkos Zoltan
-1291 Czirkos Zoltan
-[/highscore]
 Name=Amoeba and bonus
 Intermission=false
 Size=40 22 0 0 39 21
 Colors=Black Black Gray1 LightRed Yellow Green Brown
 DiamondsRequired=10 10 10 10 10
-DiamondValue=10 20
 CaveTime=999 999 999 999 999
 CaveScheduling=plck
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
+DiamondValue=10 20
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
 DummyProperties.destructable=false
@@ -357,9 +242,8 @@ AmoebaProperties.waitforhatching=true
 AmoebaTime=600 600 600 600 600
 Effect=AMOEBABOULDEReffect MEGABOULDER
 Effect=AMOEBADIAMONDeffect DIAMONDBIRTH1
-Amoeba2Threshold=0.03409 0.03409 0.03409 0.03409 0.03409
+Amoeba2Threshold=0.0341 0.0341 0.0341 0.0341 0.0341
 Amoeba2Time=10 10 10 10 10
-Amoeba2GrowthProb=0.03125 0.25000
 MagicWallTime=600 600 600 600 600
 MagicWallProperties.waitforhatching=true
 MagicWallProperties.convertamoeba=false
@@ -378,6 +262,10 @@ Line=19 8 28 8 MAGICWALL
 Point=27 6 BOULDER
 Point=25 6 DIAMOND
 [/objects]
+
+[highscore]
+1566 Czirkos Zoltan
+[/highscore]
 [/cave]
 
 [cave]
@@ -386,12 +274,12 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=#000000 #000000 #998b6e #b23170 #75cc66 #46b231 #776e99
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=crdr7
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 RandomFill=DIAMOND 32 NITRO 24 MEGABOULDER 16 BOULDER 8
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
@@ -421,12 +309,12 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=Black Black Gray1 LightBlue White White Gray1
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 RandomFill=BOULDER 18 DIRT 0 DIRT 0 DIRT 0
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
@@ -440,7 +328,6 @@ MagicWallProperties.waitforhatching=true
 MagicWallProperties.convertamoeba=false
 SlimePermeabilityC64=0 0 0 0 0
 EnemyDirectionProperties.changeathatching=true
-Gravitation=up
 SkeletonsForPot=0
 GravitationChangeDelay=3
 BorderProperties.lineshift=true
@@ -463,12 +350,12 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=Black Black Brown Purple Cyan Cyan Brown
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
 DummyProperties.destructable=false
@@ -503,12 +390,12 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=Black Black Blue Orange White White Orange
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 RandomFill=DIAMOND 32 BOULDER 16 DIRT 0 DIRT 0
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
@@ -546,13 +433,13 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=Black Black Blue Purple Yellow Yellow Blue
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
-RandomFill=BOULDER 20 SOKOBANBOX 7 MEGABOULDER 4 BLADDER 2
+DiamondValue=0 0
+RandomFill=BOULDER 20 SOKOBANBOX 5 MEGABOULDER 2 DIRT 0
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
 DummyProperties.destructable=false
@@ -582,12 +469,12 @@ Remark=Filled with falling diamonds - so many of them kill creatures.
 Size=40 22 0 0 39 21
 Colors=Black Black Orange Gray3 Yellow Yellow Orange
 DiamondsRequired=0 0 0 0 0
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 PALTiming=true
 FrameTime=160 160 160 160 160
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 RandomFill=FIREFLYl 20 DIAMONDf 10 DIRT 0 DIRT 0
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
@@ -618,11 +505,11 @@ Remark=The boxes are there to test pushing.
 Size=40 22 0 0 39 21
 Colors=#000000 #000000 #4c9993 #9675b2 #a3cc46 #75b275 #624c99
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 RandomFill=SOKOBANBOX 10 DIRT 0 DIRT 0 DIRT 0
 SnapEffect=BOULDER
 AmoebaTime=600 600 600 600 600
@@ -646,13 +533,14 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=Black Black Blue Gray2 White White Blue
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 RandomFill=BOULDER 32 NITRO 16 DIRT 0 DIRT 0
 SlimePermeabilityC64=0 0 0 0 0
+Effect=NITROEXPLOSIONeffect NITRO
 
 [objects]
 Point=5 4 INBOX
@@ -667,11 +555,11 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=Black Black Red Brown Cyan Cyan Red
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 RandomFill=BLADDER 64 WALL 48 BOULDER 32 DIAMOND 16
 SlimePermeabilityC64=0 0 0 0 0
 
@@ -688,11 +576,11 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=#000000 #000000 #1e993a #b2a659 #b5cca2 #62b259 #2b1e99
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 FrameTime=180 160 140 120 120
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 RandomFill=DIRT 4 DIRT 0 DIRT 0 DIRT 0
 SlimePermeabilityC64=0 0 0 0 0
 BiterProperties=3 DIAMOND
@@ -714,11 +602,11 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=#000000 #000000 #ad3b22 #197f55 #97da2b #197f34 #2245ad
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 FrameTime=180 160 140 120 120
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 RandomFill=BOULDER 32 MEGABOULDER 24 DIAMOND 16 DIRTBALL 8
 SlimePermeabilityC64=0 0 0 0 0
 
@@ -742,11 +630,11 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=#000000 #000000 #26617f #8910a2 #40c527 #3ea210 #3c267f
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 FrameTime=180 160 140 120 120
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 RandomFill=DIAMOND 32 BOULDER 16 DIRT 0 DIRT 0
 SlimePermeabilityC64=0 0 0 0 0
 
@@ -768,11 +656,11 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=#000000 #000000 #6e4c99 #2c75b2 #99ccb0 #35b22c #504c99
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 FrameTime=180 160 140 120 120
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 RandomFill=FLYINGBOULDER 32 FLYINGDIAMOND 24 DIAMOND 16 BOULDER 8
 SlimePermeabilityC64=0 0 0 0 0
 SkeletonsForPot=0
@@ -797,11 +685,11 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=#000000 #000000 #99605f #5842b2 #75cc66 #46b242 #655f99
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 FrameTime=180 160 140 120 120
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 RandomFill=SPACE 128 DIAMOND 16 BOULDER 8 DRAGONFLYl 4
 SlimePermeabilityC64=0 0 0 0 0
 
@@ -821,11 +709,11 @@ Remark=The different interval the dragonflies appear is due to their spinning. T
 Size=40 22 1 3 39 21
 Colors=#000000 #000000 #994c52 #b27c24 #cca2c2 #24b235 #4c6299
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 FrameTime=180 160 140 120 120
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 InitialFill=SPACE
 SlimePermeabilityC64=0 0 0 0 0
 ReplicatorProperties.sound=false
@@ -860,11 +748,11 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=#000000 #000000 #99347f #b2a559 #869ecc #76b259 #413499
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 FrameTime=180 160 140 120 120
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 SlimePermeabilityC64=0 0 0 0 0
 
 [objects]
@@ -885,12 +773,12 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=#000000 #000000 #b23872 #68997b #ccc766 #699968 #3856b2
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 RandomFill=FLYINGBOULDER 32 FLYINGDIAMOND 16 FIREFLYl 4 BUTTERFLYl 2
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
@@ -901,6 +789,8 @@ AmoebaTime=600 600 600 600 600
 MagicWallTime=600 600 600 600 600
 MagicWallProperties.waitforhatching=true
 MagicWallProperties.convertamoeba=false
+MagicWallProperties.flyingstoneto=FLYINGBOULDERf
+MagicWallProperties.flyingdiamondto=FLYINGDIAMONDf
 SlimePermeabilityC64=0 0 0 0 0
 EnemyDirectionProperties.changeathatching=true
 SkeletonsForPot=0
@@ -934,11 +824,11 @@ Intermission=false
 Size=40 22 0 0 39 21
 Colors=#000000 #000000 #22ae52 #7f5e26 #7dde16 #267f26 #2251ae
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 FrameTime=180 160 140 120 120
 CaveDelay=0 0 0 0 0
+DiamondValue=0 0
 RandomFill=FLYINGBOULDER 32 FLYINGDIAMOND 24 BOULDER 16 DIAMOND 8
 SlimePermeabilityC64=0 0 0 0 0
 SkeletonsForPot=0
@@ -958,39 +848,77 @@ Point=15 9 WAITINGBOULDER
 [/cave]
 
 [cave]
-Name=Nut
+Name=Fillers
+Author=Czirkos Zoltan
+Date=2010-04-24
 Intermission=false
 Size=40 22 0 0 39 21
-Colors=Black Black Blue Purple Yellow Yellow Blue
+Colors=#000000 #000000 #6fb259 #1b993d #c3cca7 #21991b #7459b2
 DiamondsRequired=10 10 10 10 10
-DiamondValue=0 0
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
-PALTiming=true
-FrameTime=200 200 200 200 200
+FrameTime=180 160 140 120 120
 CaveDelay=0 0 0 0 0
-RandomFill=BOULDER 60 NUT 30 MEGABOULDER 2 DIRT 0
-DummyProperties.diamondcollector=true
-DummyProperties.penalty=true
-DummyProperties.destructable=false
-AmoebaProperties.immediately=false
-AmoebaProperties.waitforhatching=true
-AmoebaTime=600 600 600 600 600
-Effect=AMOEBADIAMONDeffect DIAMONDBIRTH1
-MagicWallTime=600 600 600 600 600
-MagicWallProperties.waitforhatching=true
-MagicWallProperties.convertamoeba=false
-MagicWallProperties.nutto=MEGABOULDERf
+DiamondValue=0 0
+RandomFill=BOULDER 16 DIRT 0 DIRT 0 DIRT 0
 SlimePermeabilityC64=0 0 0 0 0
-EnemyDirectionProperties.changeathatching=true
-BorderProperties.lineshift=true
-ShortExplosions=false
 
 [objects]
-Point=10 9 INBOX
-Point=12 9 SWEET
-Line=5 10 9 10 MAGICWALL
-Line=15 10 21 10 SLIME
+Line=5 6 8 14 WALL
+Line=8 14 15 11 WALL
+Line=15 11 9 8 WALL
+Line=9 8 20 7 WALL
+Line=20 7 14 1 WALL
+Line=14 1 5 6 WALL
+BoundaryFill=10 5 SPACE WALL
+Line=32 1 32 20 STEELWALL
+FloodFill=34 4 DIAMOND DIRT
+Point=24 2 INBOX
+[/objects]
+[/cave]
+
+[cave]
+Name=Small Cave
+Author=Czirkos Zoltan
+Date=2013-02-26
+Intermission=false
+Size=40 22 15 8 22 13
+Colors=#000000 #000000 #59b278 #997821 #b3cc9e #21992f #595ab2
+DiamondsRequired=1 1 1 1 1
+CaveTime=999 999 999 999 999
+CaveScheduling=ms
+FrameTime=180 160 140 120 120
+CaveDelay=0 0 0 0 0
+DiamondValue=0 0
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+FillRect=1 1 38 20 STEELWALL
+FillRect=15 8 22 13 STEELWALL SPACE
+Point=16 12 INBOX
+Point=22 12 OUTBOX
+Point=18 9 DIAMOND
+[/objects]
+[/cave]
+
+[cave]
+Name=Sound
+Author=Czirkos Zoltan
+Date=2013-02-26
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #0c7f35 #203ea4 #c83caf #3da420 #0c187f
+DiamondsRequired=10 10 10 10 10
+CaveTime=999 999 999 999 999
+CaveScheduling=ms
+FrameTime=180 160 140 120 120
+CaveDelay=0 0 0 0 0
+DiamondValue=0 0
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+Point=14 8 INBOX
+Point=20 11 AMOEBA
 [/objects]
 [/cave]
 [/game]

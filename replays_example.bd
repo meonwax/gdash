@@ -1,36 +1,33 @@
 [BDCFF]
 Version=0.5
+
 [game]
 Name=Boulder Dash 1
 Description=... with example replays.
 Levels=5
 
 [cave]
-[highscore]
-414 Czirkos Zoltan
-338 Czirkos Zoltan
-[/highscore]
 Name=Cave A
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Orange Gray1 White White White
 DiamondsRequired=12 12 12 12 12
-DiamondValue=10 15
 CaveTime=150 110 70 40 30
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=10 15
 RandSeed=10 11 12 13 14
 RandomFill=SPACE 60 BOULDER 50 DIAMOND 9 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=DUMMY 0.83140
 Effect=ACIDEffect ACID
+AcidProperties=DUMMY 0.8314
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -41,55 +38,46 @@ Point=3 2 INBOX
 Point=38 16 OUTBOX
 [/objects]
 
-[replay]
-Player=Czirkos Zoltan
-Date=2008-12-13
-Comment=bdcff beolvas\303\241s mi\303\251rt hash table?\n  size \303\251s hasonl\303\263 szarok miatt\n  de tobb \303\251rt\303\251ket is k\303\251ne t\303\241rolni esetleg, a hash table ezt akad\303\241lyozza
-RandomSeed=669174884
-Score=338
-Success=true
-Checksum=-62587680
-Movements=.22 u r7 d r10 u2 l2 r4 d r2 u ur r7 d10 r3 d2 l3 ul u4 l3 u2 l5 d4 dl l2 u3 l9 u ul l3 d dl l5 d4 r d2 r4 d5 dl l3 u2 r ur u3 r16 d r4 d r4 d2 r6 d dr r u4 r2
-[/replay]
+[highscore]
+335 Czirkos Zoltan
+337 Czirkos Zoltan
+338 Czirkos Zoltan
+[/highscore]
 
 [replay]
 Level=1
 Player=Czirkos Zoltan
-Date=2009-11-26
-RecordedWith=GDash 20091108
-RandomSeed=685155401
-Score=414
+Date=2008-12-13
+RandomSeed=669174884
+Score=338
 Success=true
-Checksum=1399382995
-Movements=.9 d18 r4 u5 ul r5 dr d2 dl l . d2 r d3 r5 ur u r2 d r5 u3 ur r2 .2 l u ur r2 u2 r d r ur u r2 d5 dl l d2 dr r5 d r dr d3 l11 u3 ul l9 u ul l6 . d5 l u ul l6 d6 r d2 r6 ur u3 r7 d dr r2 d2 dl d3 r2 u .3 d l r10 u3 r2 dr d3 dl ul u5 ur r5 dr .4 d
+CheckSum=-625876803
+Movements=.22 u r7 d r10 u2 l2 r4 d r2 u ur r7 d10 r3 d2 l3 ul u4 l3 u2 l5 d4 dl l2 u3 l9 u ul l3 d dl l5 d4 r d2 r4 d5 dl l3 u2 r ur u3 r16 d r4 d r4 d2 r6 d dr r u4 r2
 [/replay]
 [/cave]
 
 [cave]
-[highscore]
-370 Czirkos Zoltan
-[/highscore]
 Name=Cave B
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black LightRed Purple White White White
 DiamondsRequired=10 12 9 13 10
-DiamondValue=20 50
 CaveTime=150 110 70 70 70
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=20 50
 RandSeed=3 0 1 87 88
 RandomFill=SPACE 60 BOULDER 50 DIAMOND 9 FIREFLYl 2
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=DUMMY 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=DUMMY 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -108,43 +96,44 @@ Point=18 19 INBOX
 Point=18 20 OUTBOX
 [/objects]
 
+[highscore]
+370 Czirkos Zoltan
+[/highscore]
+
 [replay]
+Level=1
 Player=Czirkos Zoltan
 Date=2008-12-13
-Comment=fds
 RandomSeed=973311529
 Score=370
 Success=true
-Checksum=-785848484
+CheckSum=-785848484
 Movements=.22 ur u3 l4 d2 l5 u2 .3 l5 d3 l4 u3 r26 u2 r dr d5 l4 u3 l5 u7 ur r4 d r6 u2 l4 d dl l6 u6 r7 u r3 d2 dr r l2 d dl l2 u3 l2 d dl l2 dl d dl l2 d r2 ur u .2 l5 r u l5 u2 l2 dl d dl l3 d dl l7 d2 r4 u2 r4 u2 r6 d2 r5 d12 l2 d2 dl d4 r
 [/replay]
 [/cave]
 
 [cave]
-[highscore]
-464 Czirkos Zoltan
-[/highscore]
 Name=Cave C
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Brown Orange White White White
 DiamondsRequired=24 23 24 23 21
-DiamondValue=15 0
 CaveTime=150 100 90 80 70
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=15 0
 RandSeed=0 50 54 52 55
 RandomFill=WALL 100 BOULDER 50 DIAMOND 9 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=0 0 0 0 0
 MagicWallTime=0 0 0 0 0
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=DIAMONDBIRTH5 0.01570
 Effect=ACIDEffect ACID
+AcidProperties=DIAMONDBIRTH5 0.0157
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -153,43 +142,44 @@ Point=3 2 INBOX
 Point=39 18 OUTBOX
 [/objects]
 
+[highscore]
+464 Czirkos Zoltan
+[/highscore]
+
 [replay]
+Level=1
 Player=Czirkos Zoltan
 Date=2008-12-13
 RandomSeed=26219668
 Score=464
 Success=true
-Checksum=-651690448
+CheckSum=-651690448
 Movements=.21 d l2 d r u2 r2 dr r d r2 d5 r3 d3 r2 d2 r2 d2 dr r d3 r2 . u r2 d4 r2 u2 l2 u2 l3 u2 l3 d3 r2 dr d3 l4 u ul2 u3 l3 r5 u3 ul u3 r3 u ul2 u2 r u2 r u2 l2 u2 r .2 l2 .5 d3 r5 dr d l2 r u3 l2 u2 l2 r2 .5 u .4 l5 u2 r2 dr d dr r3 d2 r dr d6 r3 d2 dr r d3 l r .2 r . d2 r2 dr d2 r4 d3 r3 l3 u3 ul l4 u2 ul u3 ur u2 .2 u3 l2 u3 l2 u2 r2 u2 . d5 r3 d3 r3 u2 l u2 ur u3 r u3 r4 d3 r u2 ur r u3 r l2 d6 r dr d3 l dl d2 dl .3 d3 dl l . d3 r3 d3 l2 u r3 ur u4 r d3 l d2 r .2 r
 [/replay]
 [/cave]
 
 [cave]
-[highscore]
-267 Czirkos Zoltan
-262 Czirkos Zoltan
-[/highscore]
 Name=Cave D
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Purple Orange White White White
 DiamondsRequired=36 36 36 36 36
-DiamondValue=5 20
 CaveTime=120 100 80 60 50
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=5 20
 RandSeed=0 110 112 115 119
 RandomFill=BOULDER 20 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=DIAMOND 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=DIAMOND 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -206,13 +196,20 @@ FillRect=32 8 35 11 DIRT SPACE
 Point=34 9 BUTTERFLYd
 [/objects]
 
+[highscore]
+262 Czirkos Zoltan
+267 Czirkos Zoltan
+273 Czirkos Zoltan
+[/highscore]
+
 [replay]
+Level=1
 Player=Czirkos Zoltan
 Date=2008-12-13
 RandomSeed=106709948
 Score=267
 Success=true
-Checksum=1577631445
+CheckSum=1577631445
 Movements=.21 d2 r6 dr d r d2 r2 dr dl l .2 r2 d l3 r .3 d .7 l3 .4 r2 .2 d3 r2 .4 l4 r7 u5 r3 d r .2 r .2 u r3 l7 L3 l d .2 d .6 l4 . r2 .3 d3 r3 .3 l4 r7 u6 ur r d2 . r .2 u5 r4 l4 L9 l L4 d6 .2 l4 .4 r .2 d3 r3 .3 l4 r6 u4 r5 .2 d .8 l3 .5 d3 r4 .3 l4 r4 d4 r4 d5
 [/replay]
 [/cave]
@@ -220,26 +217,26 @@ Movements=.21 d2 r6 dr d r d2 r2 dr dl l .2 r2 d l3 r .3 d .7 l3 .4 r2 .2 d3 r2 
 [cave]
 Name=Intermission 1
 Selectable=false
-Intermission=true
 IntermissionProperties.instantlife=true
+Intermission=true
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 19 11
 Colors=Black Black LightBlue Red White White White
 DiamondsRequired=6 6 6 6 6
-DiamondValue=30 0
 CaveTime=10 10 10 10 10
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=30 0
 RandSeed=10 11 12 13 14
 RandomFill=SPACE 255 DIAMOND 9 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=UNKNOWN 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=UNKNOWN 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -254,41 +251,39 @@ Point=18 10 OUTBOX
 [/objects]
 
 [replay]
+Level=1
 Player=Czirkos Zoltan
 Date=2008-12-13
 RandomSeed=1001905126
 Score=186
 Success=true
-Checksum=53675390
+CheckSum=53675390
 Movements=.25 r8 .3 r .12 l .6 d8 dr r3 l3 r8
 [/replay]
 [/cave]
 
 [cave]
-[highscore]
-671 Czirkos Zoltan
-[/highscore]
 Name=Cave E
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Brown LightRed White White White
 DiamondsRequired=4 5 6 7 8
-DiamondValue=50 90
 CaveTime=150 120 90 60 30
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=50 90
 RandSeed=0 0 0 0 0
 RandomFill=SPACE 0 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=SPACE 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=SPACE 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -321,39 +316,45 @@ Point=33 16 DIAMOND
 Point=34 14 FIREFLYl
 [/objects]
 
+[highscore]
+671 Czirkos Zoltan
+682 Czirkos Zoltan
+[/highscore]
+
 [replay]
+Level=1
 Player=Czirkos Zoltan
 Date=2008-12-13
 RandomSeed=461428931
 Score=671
 Success=true
-Checksum=686993716
+CheckSum=686993716
 Movements=.22 d12 r2 . r5 .8 r .2 u .15 dr r2 d dl l2 r8 .2 u .12 l4 .7 u3 r5 dr d4 . l .2 L . r6 .6 r .9 u .12 l3 . d .2 r11 .7 u .6 l3 . d .2 r6 d6 l3 .2 u .7 l3 d . r3 l8 .2 u .13 l3 d .2 r3 l8 .2 u .12 l3 d .2 r3 l8 .2 u .12 l3 d . r5 dr d2 r27
 [/replay]
 [/cave]
 
 [cave]
 Name=Cave F
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black LightBlue LightRed White White White
 DiamondsRequired=4 6 7 8 8
-DiamondValue=40 60
 CaveTime=150 120 100 90 80
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=40 60
 RandSeed=0 20 21 22 23
 RandomFill=BOULDER 50 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=BUTTERFLYu 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=BUTTERFLYu 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -389,41 +390,39 @@ Point=38 18 OUTBOX
 [/objects]
 
 [replay]
+Level=1
 Player=Czirkos Zoltan
 Date=2008-12-13
 RandomSeed=411626192
 Score=234
 Success=true
-Checksum=567011095
+CheckSum=567011095
 Movements=.18 r6 d r4 u4 l u r .7 u2 . d2 . r2 .2 u2 .15 l9 r7 .6 u3 . d2 r2 . u3 .13 l8 dl d r7 .5 u3 . d dr r .2 u2 .15 l9 d r7 .5 u3 . d3 r3 .4 u . r .2 u2 .3 u .9 l10 dl d r10 d4 r5 dr d5 r3 dr d4 dr r2 d2 r5 ur u2 r6 dr d2
 [/replay]
 [/cave]
 
 [cave]
-[highscore]
-517 Czirkos Zoltan
-[/highscore]
 Name=Cave G
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Brown LightRed Green Green Green
 DiamondsRequired=15 20 25 25 25
-DiamondValue=10 20
 CaveTime=120 120 120 120 120
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=10 20
 RandSeed=2 7 8 10 9
 RandomFill=SPACE 100 BOULDER 40 FIREFLYl 2 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=75 75 75 75 75
 MagicWallTime=75 75 75 75 75
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=DIAMONDBIRTH5 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=DIAMONDBIRTH5 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -440,33 +439,34 @@ Point=34 20 DIAMOND
 Point=20 1 INBOX
 Point=39 5 OUTBOX
 [/objects]
+
+[highscore]
+517 Czirkos Zoltan
+[/highscore]
 [/cave]
 
 [cave]
-[highscore]
-345 Czirkos Zoltan
-[/highscore]
 Name=Cave H
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Red LightBlue White White White
 DiamondsRequired=10 15 20 20 20
-DiamondValue=10 20
 CaveTime=120 110 100 90 80
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=10 20
 RandSeed=1 3 4 5 6
 RandomFill=SPACE 90 BOULDER 50 FIREFLYl 2 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=EXPLOSION1 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=EXPLOSION1 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -487,13 +487,18 @@ Point=19 16 DIAMOND
 Line=14 13 21 13 DIRT
 [/objects]
 
+[highscore]
+345 Czirkos Zoltan
+[/highscore]
+
 [replay]
+Level=1
 Player=Czirkos Zoltan
 Date=2008-12-13
 RandomSeed=498431887
 Score=345
 Success=true
-Checksum=521788410
+CheckSum=521788410
 Movements=. d14 .5 d9 D L8 l5 . r . d3 dr r2 dr d r d4 l3 u ul l4 d l d3 l2 ul u r2 ur ul l2 u r5 d2 . u ur r ur u r2 d2 r5 u ul l2 u r2 l2 ul u l3 r4 l9 u4 r3 u2 r dr d r d2 r3 u r2 . D2 . l4 d2 l ul2 l ul l . u2 .2 u .2 R .2 u .4 R l2 . d .2 r u3 r u2 . r2 dr d6 l u5 r2 d . u3 ul2 l3 d2 . u3 r u r dr d r4 . r2 .2 d2 dl l u ur r dr d l7 L3 d7 .2 r3 d3 dl l2 d3 l5 u l5 d2 . u r3 u r4 d2 r2 u2 ur r ur u r2 u ur r4 u r3 . d3 u3 ul l6 u3 ul u2 .2 l ul u2 r2 u2 r3 dr d3 r4 u2 ul l2 u4 l4 ul u3 r3 d r5 u ul l10 d3 l9 u3 ul l6 d3 l u2 . l d2 dl d l3 u ul
 [/replay]
 [/cave]
@@ -501,26 +506,26 @@ Movements=. d14 .5 d9 D L8 l5 . r . d3 dr r2 dr d r d4 l3 u ul l4 d l d3 l2 ul u
 [cave]
 Name=Intermission 2
 Selectable=false
-Intermission=true
 IntermissionProperties.instantlife=true
+Intermission=true
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 19 11
 Colors=Black Black Blue Gray3 White White White
 DiamondsRequired=16 16 16 16 16
-DiamondValue=10 0
 CaveTime=15 15 15 15 15
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=10 0
 RandSeed=10 11 12 13 14
 RandomFill=SPACE 0 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=SPACE 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=SPACE 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -540,30 +545,27 @@ Point=18 2 OUTBOX
 [/cave]
 
 [cave]
-[highscore]
-616 Czirkos Zoltan
-[/highscore]
 Name=Cave I
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Orange Purple White White White
 DiamondsRequired=75 75 80 85 90
-DiamondValue=5 10
 CaveTime=150 150 130 130 120
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=5 10
 RandSeed=100 137 140 251 51
 RandomFill=BOULDER 240 DIAMOND 120 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=BUTTERFLYd 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=BUTTERFLYd 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -578,39 +580,44 @@ Point=7 10 INBOX
 Point=8 10 OUTBOX
 [/objects]
 
+[highscore]
+616 Czirkos Zoltan
+[/highscore]
+
 [replay]
+Level=1
 Player=Czirkos Zoltan
 Date=2008-12-13
 RandomSeed=107900927
 Score=616
 Success=true
-Checksum=403184925
+CheckSum=403184925
 Movements=.21 u r2 dr d7 r3 d2 r2 u r3 d r ur u r d2 r d . L3 l2 d . u ur r u r2 d3 l2 .2 r u3 r8 u9 d8 dl l2 d dl l6 r l9 u3 ul u7 .2 L4 R . d4 dr r2 dr d5 dl l . d .3 d l . L4 r2 . u2 .4 l d .3 L .2 l . L r4 l2 .3 d . L u r2 l r12 u r u r5 d2 r d2 r u4 ul l4 u4 r u ul u3 r5 R .4 u l2 .5 r l3 u ul l2 u l2 D .7 u3 l2 d2 l2 u2 ul l3 r .3 d5 l2 . D . u2 ul l d . u l2 d2 R l3 d l2 u UL L r2 u6 ul l9 d2 R u3 r3 D r2 d2 .5 D . r5 l2 u ul l3 d2 .2 D . u2 r9 u r4 d3 R u2 r2 d2 r2 l u2 r2 .3 r2 dr .2 d2 l d2 . D . u2 r3 u r2 d3 l L r4 u2 r4 d dl u ul l d2 D l3 d7 dl l d3 . d2 l2 d l11 u l3 u L . u2 l2 d2 l d l2 d2 l u7 R
 [/replay]
 [/cave]
 
 [cave]
 Name=Cave J
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Blue Orange White White White
 DiamondsRequired=12 12 12 12 12
-DiamondValue=25 60
 CaveTime=150 130 120 110 100
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=25 60
 RandSeed=0 0 0 0 0
 RandomFill=SPACE 0 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=SPACE 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=SPACE 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -635,30 +642,27 @@ Line=4 14 4 17 DIAMOND
 [/cave]
 
 [cave]
-[highscore]
-341 Czirkos Zoltan
-[/highscore]
 Name=Cave K
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Gray1 Orange White White White
 DiamondsRequired=6 6 6 6 6
-DiamondValue=50 0
 CaveTime=120 120 150 150 240
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=50 0
 RandSeed=0 4 102 151 100
 RandomFill=SPACE 100 BOULDER 80 FIREFLYl 2 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=DIAMONDBIRTH5 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=DIAMONDBIRTH5 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -682,43 +686,45 @@ Point=20 18 INBOX
 Point=38 15 OUTBOX
 [/objects]
 
+[highscore]
+341 Czirkos Zoltan
+[/highscore]
+
 [replay]
+Level=1
 Player=Czirkos Zoltan
 Date=2009-01-19
 RecordedWith=GDash 20090117
 RandomSeed=160849407
 Score=341
 Success=true
-Checksum=-169147911
+CheckSum=-169147911
 Movements=.16 d5 dr u ul l d dl l u . u2 l2 .10 dl l2 r . u r2 .2 d .2 D u2 ul l u2 r2 . d4 l2 d2 . u2 l2 d2 l u r ur u2 l r2 u ul u2 r u ul u2 ul u ul l d5 dl l d4 l3 u ul u7 . d2 r u2 ul .2 d2 l u2 r u2 ul u ur r2 u8 . d8 r10 u3 . l . r u2 . r .4 l2 u4 r l dl d3 r d2 r d4 r d2 r u2 l r3 d3 r3 u l u2 r3 d2 r2 u ul l3 . r4 ur u r2 d2 .3 u2 l4 .10 l .2 r7 . l3 L2 . r2 u9 . d10 l6 r2 l9 d5 dr r4 d5 . u2 r2 d u2 r5 d2 dr ur u d l d D L u3 r3 u3 .2 r2 . R2 l2 . d2 .2 l3 . u r6 . u2 .3 r .3 d r u ul l u r2 . r3 u l2 .2 r2 .4 r2 . u . r2 . r3 .4 u3 l u3 l u2 r l d5 r . d r d3 l d l23 d5 r8 d r4 dr d2 dr r .6 dr r .5 d .14 R17 . u r ur u2 r5 . d3 .2 u2 r2 u2 r
 [/replay]
 [/cave]
 
 [cave]
-[highscore]
-473 Czirkos Zoltan
-[/highscore]
 Name=Cave L
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Gray2 LightRed White White White
 DiamondsRequired=19 19 14 16 21
-DiamondValue=20 0
 CaveTime=180 170 160 160 160
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=20 0
 RandSeed=0 60 2 59 102
 RandomFill=SPACE 60 BOULDER 50 DIAMOND 9 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=DUMMY 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=DUMMY 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -741,14 +747,19 @@ Point=3 18 INBOX
 Point=39 20 OUTBOX
 [/objects]
 
+[highscore]
+473 Czirkos Zoltan
+[/highscore]
+
 [replay]
+Level=1
 Player=Czirkos Zoltan
 Date=2009-01-19
 RecordedWith=GDash 20090117
 RandomSeed=526353176
 Score=473
 Success=true
-Checksum=-699797712
+CheckSum=-699797712
 Movements=.18 l5 d l r u2 l u8 .4 dr r2 d r2 . l3 . u4 . d3 r .5 l2 d6 . u13 r5 u2 . d3 r u3 ul u2 r3 d2 . u2 r4 d r2 u r3 d r dr d3 l ul u2 ul u2 ul ur2 u ul l u ul l d8 l ul u3 r2 u5 ur r7 d4 r d3 r .5 d3 . u2 l .2 d dl .2 d2 u ul l2 . D2 r2 d2 . L6 . u2 r4 d5 r . d .2 r .2 r .7 r2 d3 r ur u5 l .5 l d2 l2 d2 dl d2 dl l3 u l2 d l u7 .25 r .8 l . d7 .3 l4 .2 u ur r2 .5 r2 .2 r6 u2 r3 .2 u6 r u .3 u .5 l d7 dl l dl d2 dl l4 d l7 u6 .38 r2 .3 d5 dr r . l2 r7 ur u4 r9 u2 l4 ul u4 .2 u3 .6 u .6 U d14 u ul l4 d2 l4 u2 r2 l3 d2 l2 u2 l3 d2 l d2 l2 u7 .28 r .7 d3 l3 u2 l r d3 dr r7 d r4 u2 r5 u3 ur r4 ur u2 l2 u4 r2 u7 r2 l d10 l dl d6 l2 .3 u ur r3 d4 dr r
 [/replay]
 [/cave]
@@ -756,26 +767,26 @@ Movements=.18 l5 d l r u2 l u8 .4 dr r2 d r2 . l3 . u4 . d3 r .5 l2 d6 . u13 r5 
 [cave]
 Name=Intermission 3
 Selectable=false
-Intermission=true
 IntermissionProperties.instantlife=true
+Intermission=true
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 19 11
 Colors=Black Black Blue Orange White White White
 DiamondsRequired=14 14 14 14 14
-DiamondValue=10 0
 CaveTime=20 20 20 20 20
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=10 0
 RandSeed=10 11 12 13 14
 RandomFill=SPACE 0 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=4 4 4 4 4
 MagicWallTime=4 4 4 4 4
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=SPACE 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=SPACE 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -790,29 +801,26 @@ Point=18 5 OUTBOX
 [/cave]
 
 [cave]
-[highscore]
-543 Czirkos Zoltan
-[/highscore]
 Name=Cave M
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Blue Orange Green Green Green
 DiamondsRequired=50 55 60 70 80
-DiamondValue=5 8
 CaveTime=160 155 150 145 140
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=5 8
 RandomFill=BOULDER 40 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=140 140 140 140 140
 MagicWallTime=140 140 140 140 140
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=GUYBIRTH3 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=GUYBIRTH3 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -826,39 +834,44 @@ Line=5 18 34 18 BOULDER
 Rectangle=5 19 34 20 DIRT
 [/objects]
 
+[highscore]
+543 Czirkos Zoltan
+[/highscore]
+
 [replay]
+Level=1
 Player=Czirkos Zoltan
 Date=2008-12-13
 RandomSeed=379777564
 Score=543
 Success=true
-Checksum=568386068
+CheckSum=568386068
 Movements=.15 r .2 d12 dl l d3 l3 u r3 u4 l d4 l3 .5 l2 d l3 u r6 u ul l6 d l d l2 u2 ur u2 r6 l9 dl d5 r d2 dl l D . r2 d r4 u l5 ul u8 r11 d r u3 r4 u3 r u2 . u .3 u .2 u l d l .2 l .31 u r2 d3 r2 . d4 dl l d3 r2 .60 L16 .30 L27 .31 L17 .61 L9 .4 u l5 .4 l5 . d3 r5 .19 l7 .2 r6 u r3 .2 L17 .5 u2 r3 u4 r . u r l2 d l3 d dl l . dl l d l3 u2 .3 l2 .23 u5 l
 [/replay]
 [/cave]
 
 [cave]
 Name=Cave N
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Gray2 Orange White White White
 DiamondsRequired=30 35 40 42 45
-DiamondValue=10 20
 CaveTime=150 145 140 135 130
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=10 20
 RandSeed=0 0 0 0 0
 RandomFill=BOULDER 0 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=SPACE 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=SPACE 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -880,26 +893,26 @@ Point=39 18 OUTBOX
 
 [cave]
 Name=Cave O
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Orange LightBlue White White White
 DiamondsRequired=15 20 20 25 30
-DiamondValue=10 20
 CaveTime=120 120 120 120 140
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=10 20
 RandSeed=1 29 30 31 32
 RandomFill=SPACE 100 BOULDER 80 FIREFLYl 2 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=8 8 8 8 8
 MagicWallTime=8 8 8 8 8
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=DIAMONDBIRTH5 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=DIAMONDBIRTH5 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -915,26 +928,26 @@ Point=20 1 INBOX
 
 [cave]
 Name=Cave P
-Intermission=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Brown LightRed White White White
 DiamondsRequired=12 15 15 15 12
-DiamondValue=10 20
 CaveTime=150 150 150 150 150
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=10 20
 RandSeed=1 120 129 126 123
 RandomFill=BOULDER 50 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=BUTTERFLYu 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=BUTTERFLYu 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -959,26 +972,26 @@ Point=34 18 FIREFLYl
 [cave]
 Name=Intermission 4
 Selectable=false
-Intermission=true
 IntermissionProperties.instantlife=true
+Intermission=true
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 19 11
 Colors=Black Black Blue Orange White White White
 DiamondsRequired=6 6 6 6 6
-DiamondValue=30 0
 CaveTime=20 20 20 20 20
 CaveScheduling=bd1
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=12 6 3 1 0
+DiamondValue=30 0
 RandSeed=0 0 0 0 0
 RandomFill=SPACE 0 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=3 3 3 3 3
 MagicWallTime=3 3 3 3 3
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=SPACE 0.00000
 Effect=ACIDEffect ACID
+AcidProperties=SPACE 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 

@@ -1,0 +1,121 @@
+/*
+ * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+#include "fileops/loadfile.hpp"
+
+#include <glib/gi18n.h>
+#include <stdexcept>
+#include <fstream>
+#include "cave/caveset.hpp"
+#include "fileops/binaryimport.hpp"
+#include "fileops/brcimport.hpp"
+#include "fileops/c64import.hpp"
+#include "fileops/bdcffload.hpp"
+#include "misc/logger.hpp"
+#include "misc/util.hpp"
+
+/** load some caveset from the binary data in the buffer.
+ * the length may be -1, if the caller is pretty sure of what he's doing. */
+CaveSet create_from_buffer(const unsigned char *buffer, int length, char const *filename) {
+    /* set logging context to filename */
+    SetLoggerContextForFunction finally(gd_tostring_free(g_filename_display_basename(filename)));
+    
+    /* try to load as a .GDS file */
+    if ((length >= 12 || length == -1) && C64Import::imported_get_format(buffer) != C64Import::GD_FORMAT_UNKNOWN) {
+        std::vector<CaveStored *> new_caveset = C64Import::caves_import_from_buffer(buffer, length);
+        /* if unable to load, exit here. error was reported by import_from_buffer() */
+        if (new_caveset.empty())
+            throw std::runtime_error(_("Error loading GDS file."));
+        /* no serious error :) */
+        CaveSet newcaves;
+        for (std::vector<CaveStored *>::iterator it=new_caveset.begin(); it!=new_caveset.end(); ++it)
+            newcaves.caves.push_back_adopt(*it);
+        newcaves.last_selected_cave=newcaves.first_selectable_cave_index();
+        newcaves.set_name_from_filename(filename);
+        return newcaves;
+    }
+    
+    /* try to load as a BRC file (boulder remake) */
+    if (g_str_has_suffix(filename, ".brc") || g_str_has_suffix(filename, "*.BRC")) {
+        if (length != 96000) {
+            throw std::runtime_error(_("BRC files must be 96000 bytes long."));
+        }
+        CaveSet newcaves;
+        brc_import(newcaves, (guint8*) buffer);
+        newcaves.last_selected_cave = newcaves.first_selectable_cave_index();
+        newcaves.set_name_from_filename(filename);
+        return newcaves;
+    }
+    
+    /* try to load as BDCFF */
+    if (g_str_has_suffix(filename, ".bd") || g_str_has_suffix(filename, ".BD")) {
+        CaveSet newcaves = load_from_bdcff((char const *) buffer);
+        newcaves.last_selected_cave = newcaves.first_selectable_cave_index();
+        /* remember filename, as the input is a bdcff file */
+        newcaves.filename = filename;
+        return newcaves;
+    }
+    
+    /* if could not determine file format so far, try to load as a snapshot file */
+    if (g_str_has_suffix(filename, ".vsf") || g_str_has_suffix(filename, ".VSF")
+        || length == 65536 || length == 65538) {
+        std::vector<unsigned char> memory = load_memory_dump(buffer, length);
+        std::vector<unsigned char> imported = gdash_binary_import(memory);
+        return create_from_buffer(&imported[0], imported.size(), filename);
+    }
+    
+    throw std::runtime_error(_("Cannot determine file format."));
+}
+
+
+/**
+ * Create a caveset by loading it from a file.
+ * @param filename The name of the file, which can be BDCFF or other binary formats.
+ * @return The caveset loaded. If impossible to load, throws an exception.
+ */
+CaveSet create_from_file(const char *filename) throw (std::runtime_error) {
+    std::vector<unsigned char> contents = load_file_to_vector(filename);
+    /* -1 because the loader adds a terminating zero */
+    return create_from_buffer(&contents[0], contents.size()-1, filename);
+}
+
+
+/**
+ * Load a file to an array of bytes.
+ * @param filename The name of the file.
+ * @return The file loaded. If impossible to load, throws an exception.
+ */
+std::vector<unsigned char> load_file_to_vector(char const *filename) {
+    /* open file */
+    std::ifstream is;
+    is.open(filename, std::ios::in | std::ios::binary);
+    if (!is)
+        throw std::runtime_error(_("Unable to open file."));
+    /* check size */
+    is.seekg(0, is.end);
+    int filesize = is.tellg();
+    is.seekg(0, is.beg);
+    if (filesize > (2 * 1<<20))
+        throw std::runtime_error(_("File bigger than 2MiB, refusing to load."));
+    /* read file. the vector will be one bytes bigger, so it can be added a terminating zero char. */
+    std::vector<unsigned char> contents(filesize+1);
+    if (!is.read((char *) &contents[0], filesize))
+        throw std::runtime_error(_("Unable to read file."));
+    is.close();
+    contents[filesize] = '\0';
+    
+    return contents;
+}

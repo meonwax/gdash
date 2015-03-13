@@ -160,7 +160,7 @@ This is taken from afl boulder dash:
 and at the start of the game, predictable random generator is
 initialised as:
     RandSeed1 = 0
-	RandSeed2 = 0x1e
+    RandSeed2 = 0x1e
 this is required for afl bd cave 15, for example.
 
 the following routine explicitly sets randseed1 and randseed2:
@@ -176,6 +176,51 @@ so no worry about random values in memory.
 
 
 
+
+
+slime permeability in plck
+--------------------------
+
+slime permeability is stored in $93, which is set at $4f59 in plck.
+
+.C:4f59   AD 0B 41   LDA $410B
+.C:4f5c   85 93      STA $93        ; store slime permeability
+
+the code which creates 410b is
+.C:7721   AE B5 77   LDX $77B5
+.C:7724   BD 5A 77   LDA $775A,X
+.C:7727   8D 0B 41   STA $410B
+
+so slime permeability values are stored at 775a, which are
+>C:775a  00 10 18 38  3c 7c 7e fe  ff
+
+
+slime permeability in bd2
+-------------------------
+
+stored at $99, used at a059:
+.C:a059   20 81 9E   JSR $9E81
+.C:a05c   25 99      AND $99
+.C:a05e   D0 25      BNE $A085
+.C:a060   A0 51      LDY #$51
+.C:a062   B1 32      LDA ($32),Y
+.C:a064   D0 1F      BNE $A085
+
+
+set at 4e65
+.C:4e64   60         RTS
+.C:4e65   A5 DA      LDA $DA
+.C:4e67   85 99      STA $99
+.C:4e69   60         RTS
+
+which is set at
+
+
+
+
+
+
+
 predictable slime in bd2
 ------------------------
 randomseed1 and 2 are values left there after cave initialization.
@@ -188,13 +233,28 @@ amoeba random
 -------------
 taken from a first boulder game:
   jsr $2500			; unpredictable random
-  and $94			; bitwise and amoeba speed
+  and $94			; bitwise AND to amoeba speed
   cmp #$04			; compare to 4
   bcs xxx			; branch if carry, eg. result was smaller than 4
 
 this is where the 4/128 and 32/128 spread probabilities come from. memory
 at $94 if set to 01111111 and 00001111, so a random number between 0..127 or
 0..15 is checked to see if it lower than 4.
+
+So the probability is used as a bit pattern. The lower 2 bits do not really
+count. For the result to be >=4, any of the upper 6 bits must be non-zero.
+The number of non-zero bits is important, not their order.
+
+Probability values that could be exactly expressed using
+the c64 6-bit scheme:
+1000000  -> 0x03
+ 500000  -> 0x07
+ 250000  -> 0x0f
+ 125000  -> 0x1f
+  62500  -> 0x3f
+  31250  -> 0x7f
+  15625  -> 0xff
+
 
 
 
@@ -1842,4 +1902,49 @@ same code in crazy light tutorial prg:
 .C:3df8   A9 11      LDA #$11
 .C:3dfa   20 69 43   JSR $4369
 .C:3dfd   4C C1 41   JMP $41C1
+
+
+
+the lost caves 3
+----------------
+ROUTINE TO ENABLE HIDDEN CAVE.
+runs when a cave is finished successfully
+
+.C:c028   AD 07 3D   LDA $3D07      ; cave number played actually
+.C:c02b   C9 10      CMP #$10       ; is $10? (->cave M)
+.C:c02d   D0 2B      BNE $C05A      ; if not, exit
+
+; checks if $0b4a->0b6f (36 elements) are either boulder or diamond
+; if everywhere, c041
+; if not, finish
+.C:c02f   A2 25      LDX #$25       ; loop variable, x=37 (to x=0)
+.C:c031   BD 49 0B   LDA $0B49,X    ; load 0b49+x
+                                    ; 0b49 is inside cave data during game
+                                    ; 0b49-0800=349, 841 decimally
+                                    ; 841/40=row21 (0th is first), col1 (0th is first)
+                                    
+                                    ; so this routine checks, if in cell (1,21)-(25,21)
+                                    ; is everywhere boulder or rock
+                                    ;
+.C:c034   C9 10      CMP #$10       ; is boulder?
+.C:c036   F0 06      BEQ $C03E      ; if yes, c03e
+.C:c038   C9 14      CMP #$14       ; is diamond?
+.C:c03a   F0 02      BEQ $C03E      ; if yes, c03e
+.C:c03c   D0 1C      BNE $C05A      ; otherwise finish
+.C:c03e   CA         DEX            ; decrement loop var
+.C:c03f   10 F0      BPL $C031      ; if still not zero, 031
+
+.C:c041   A9 00      LDA #$00       ; dunno
+.C:c043   85 8E      STA $8E
+
+.C:c045   A2 27      LDX #$27       ; for x=39 downto 1
+.C:c047   A9 05      LDA #$05
+.C:c049   9D 00 D8   STA $D800,X    ; ($d800+x)=5 (green color)
+.C:c04c   BD 00 C0   LDA $C000,X    ; ($0c00+x)=($c000+x)  (HIDDEN CAVE UNVEILED text)
+.C:c04f   9D 00 0C   STA $0C00,X
+.C:c052   CA         DEX
+.C:c053   10 F2      BPL $C047      ; next
+.C:c055   A9 00      LDA #$00       ; make cave 26 selectable
+.C:c057   8D 79 70   STA $7079
+.C:c05a   4C 6D 3B   JMP $3B6D      ; finish
 

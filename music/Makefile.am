@@ -1,10 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 musicdata = \
 	bd1.ogg \
-	bd2.ogg \
-	afl.ogg
+	bd2.ogg
 
-if SOUND
+if SDL
   musicdir = $(pkgdatadir)/music
   music_DATA = $(musicdata)
 endif

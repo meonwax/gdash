@@ -71,7 +71,7 @@ sounddata = \
 	wall_reappear.ogg \
 	water.ogg
 
-if SOUND
+if SDL
   sounddir = $(pkgdatadir)/sound
   sound_DATA = $(sounddata)
 endif

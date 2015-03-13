@@ -1,15 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 CAVES = \
-	No_One_01.gds \
-	No_One_02.gds \
-	No_One_03.gds \
-	No_One_04.gds \
-	No_One_05.gds \
-	No_One_06.gds \
-	No_One_07.gds \
-	No_One_08.gds \
-	No_One_09.gds \
-	No_One_10.gds
+	Afl_Posocopi.gds
 
 ATARIPALETTES = \
 	BuiltIn.act \
@@ -53,30 +44,45 @@ ICONS = \
 	keyboard.png \
 	image.png
 
+TITLE = \
+	gdash_screen.png \
+	gdash_tile.png
+
+BACKGROUND = \
+	background.png
+
+GDASH_ICON_32 = \
+	gdash_icon_32.png
+
+GDASH_ICON_48 = \
+	gdash_icon_48.png
+
+
 noinst_HEADERS = \
-	c64_png_colors.h \
-	icons.h \
-	c64_gfx.h \
-	c64_font.h \
-	title.h \
-	levels.h \
-	ataripal.h \
-	dtvpal.h
+	icons.cpp \
+	c64_gfx.cpp \
+	c64_font.cpp \
+	title.cpp \
+	background.cpp \
+	gdash_icon_32.cpp \
+	gdash_icon_48.cpp \
+	levels.cpp \
+	ataripal.cpp \
+	dtvpal.cpp
 
-icondir = $(datadir)/pixmaps
-icon_DATA = gdash.png
+pkgdata_DATA = boulder_rush.png c64_gfx.png c64_gfx_bd2.png
 
-pkgdata_DATA = boulder_rush.png c64_gfx.png
-
-EXTRA_DIST = $(ICONS) $(TITLE) $(icon_DATA) \
-	icons.list title.list \
+EXTRA_DIST = $(ICONS) $(TITLE) $(BACKGROUND) \
+	icons.list \
 	files2c.sh \
 	c64_font.png \
-	c64_gfx_bd2.png \
+	palettetoact.c palette2c.c \
+	$(GDASH_ICON_32) \
+	$(GDASH_ICON_48) \
 	$(pkgdata_DATA) \
-	$(CAVES) levels.h \
-	$(ATARIPALETTES) ataripal.h \
-	$(DTVPALETTES) dtvpal.h
+	$(CAVES) \
+	$(ATARIPALETTES) \
+	$(DTVPALETTES)
 
 
 # for included ICONS
@@ -88,72 +94,46 @@ icons.list: $(ICONS) Makefile.am
 		done )
 
 # the include files
-icons.h: $(ICONS) icons.list
-	gdk-pixbuf-csource --raw --build-list `cat icons.list` > $@
-
-#title.h: $(TITLE) title.list
-#	gdk-pixbuf-csource --raw --build-list `cat title.list` > $@
-
-if GTK
-  CELLS2C = cells2c
-else
-  CELLS2C = 
-endif
+icons.cpp: $(ICONS) icons.list
+	gdk-pixbuf-csource --rle --build-list `cat icons.list` > $@
 
 # own programs which generate include files
 noinst_PROGRAMS = \
-	$(CELLS2C) \
 	file2c
-
-# this one creates inlined original c64 graphics
-cells2c_CFLAGS = @GTK_CFLAGS@
-cells2c_LDADD =  @GTK_LIBS@
-cells2c_SOURCES = \
-	cells2c.c
-
-
-
-if GTK
-c64_font.h: c64_font.png $(CELLS2C)
-	./cells2c c64_font.png >$@
-else
-c64_font.h: c64_font.png $(CELLS2C)
-	echo; echo; echo "*** GTK+ is needed to regenerate $@"
-	false
-endif
-
-
-if GTK
-c64_gfx.h: c64_gfx.png $(CELLS2C)
-	./cells2c c64_gfx.png >$@
-else
-c64_gfx.h: c64_gfx.png $(CELLS2C)
-	echo; echo; echo "*** GTK+ is needed to regenerate $@"
-	false
-endif
-
-
-
 
 # this utility creates an include file for any datafile
 file2c_SOURCES = \
-	file2c.c
+	file2c.cpp
 
-levels.h: $(CAVES) file2c Makefile.am
-	sh files2c.sh $@ level $(CAVES)
+levels.cpp: $(CAVES) file2c Makefile.am
+	sh ./files2c.sh $@ level $(CAVES)
 
-ataripal.h: $(ATARIPALETTES) file2c Makefile.am
-	sh files2c.sh $@ atari_palettes $(ATARIPALETTES)
+ataripal.cpp: $(ATARIPALETTES) file2c Makefile.am
+	sh ./files2c.sh $@ atari_palettes $(ATARIPALETTES)
 
-dtvpal.h: $(DTVPALETTES) file2c Makefile.am
-	sh files2c.sh $@ c64dtv_palettes $(DTVPALETTES)
-
-TITLE = \
-	gdash_screen.png \
-	gdash_tile.png \
-	gdash.png \
-	gdash_32.png
+dtvpal.cpp: $(DTVPALETTES) file2c Makefile.am
+	sh ./files2c.sh $@ c64dtv_palettes $(DTVPALETTES)
 
 # the empty string causes files2c.sh not to write the pointer arrays
-title.h: $(TITLE) file2c Makefile.am
-	sh files2c.sh $@ "" $(TITLE)
+title.cpp: $(TITLE) file2c Makefile.am
+	sh ./files2c.sh $@ "" $(TITLE)
+
+# the empty string causes files2c.sh not to write the pointer arrays
+background.cpp: $(BACKGROUND) file2c Makefile.am
+	sh ./files2c.sh $@ "" $(BACKGROUND)
+
+# the empty string causes files2c.sh not to write the pointer arrays
+gdash_icon_32.cpp: $(GDASH_ICON_32) file2c Makefile.am
+	sh ./files2c.sh $@ "" $(GDASH_ICON_32)
+
+# the empty string causes files2c.sh not to write the pointer arrays
+gdash_icon_48.cpp: $(GDASH_ICON_48) file2c Makefile.am
+	sh ./files2c.sh $@ "" $(GDASH_ICON_48)
+
+# the empty string causes files2c.sh not to write the pointer arrays
+c64_gfx.cpp: c64_gfx.png file2c Makefile.am
+	sh ./files2c.sh $@ "" c64_gfx.png
+
+# the empty string causes files2c.sh not to write the pointer arrays
+c64_font.cpp: c64_font.png file2c Makefile.am
+	sh ./files2c.sh $@ "" c64_font.png
