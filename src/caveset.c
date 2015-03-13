@@ -246,7 +246,7 @@ write_highscore_func(Cave *cave, GString *fout)
 	hs=0;
 	for (i=0; i<G_N_ELEMENTS(cave->highscore); i++)
 		if (cave->highscore[i].score>0) {	/* only save, if score is not zero */
-			g_string_append_printf(fout, "%d %s %d\n", hs+1, cave->highscore[i].name, cave->highscore[i].score);
+			g_string_append_printf(fout, "%d %s\n", cave->highscore[i].score, cave->highscore[i].name);
 			hs++;
 		}
 	g_string_append(fout, "[/highscore]\n\n");
@@ -571,10 +571,16 @@ cave_process_tags(Cave *cave, GHashTable *tags, GList *maplines)
 		cave->slime_predictable=FALSE;
 	if (g_hash_table_lookup(tags, "SlimePermeabilityC64"))
 		cave->slime_predictable=TRUE;
-	/* these set scheduling type. framedelay takes precedence, if there are both, so we check it later. */
-	if (g_hash_table_lookup(tags, "CaveDelay"))
-		cave->scheduling=GD_SCHEDULING_PLCK;
+	/* these set scheduling type. framedelay takes precedence, if there are both; so we check it later. */
+	if (g_hash_table_lookup(tags, "CaveDelay")) {
+		/* only set scheduling type, when it is not the gdash-default. */
+		/* this allows settings cavescheduling=bd1 in the [game] section, for example. */
+		/* in that case, this one will not overwrite it. */
+		if (cave->scheduling==GD_SCHEDULING_MILLISECONDS)
+			cave->scheduling=GD_SCHEDULING_PLCK;
+	}
 	if (g_hash_table_lookup(tags, "FrameTime"))
+		/* but if the cave has a frametime setting, always switch to milliseconds. */
 		cave->scheduling=GD_SCHEDULING_MILLISECONDS;
 	
 	/* process all tags */
@@ -780,24 +786,14 @@ caveset_load_from_bdcff (const char *contents)
 		g_strstrip(line);
 		
 		if (reading_highscore) {
-			gchar **split;
 			GdHighScore hs;
-			int words;
-			int i;
 			
-			split=g_strsplit_set(line, " ", -1);
-			words=g_strv_length(split);
-			if (sscanf(split[words-1], "%d", &hs.score)!=1) {
-				g_warning (_("highscore format incorrect"));
+			if (sscanf(line, "%d", &hs.score)!=1 || strchr(line, ' ')==NULL) {	/* first word is the score */
+				g_warning ("highscore format incorrect");
+			} else {
+				g_strlcpy(hs.name, strchr(line, ' ')+1, sizeof(GdString));	/* from first space: the name */
+				gd_cave_add_highscore(cave, hs);
 			}
-			g_strlcpy(hs.name, split[1], sizeof(GdString));	/* first word */
-			for (i=2; i<words-1; i++) {
-				g_strlcat(hs.name, " ", sizeof(GdString));	/* space and... */
-				g_strlcat(hs.name, split[i], sizeof(GdString)); /* ... next word */
-			}
-			
-			gd_cave_add_highscore(cave, hs);
-			
 			continue;
 		}
 		

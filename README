@@ -70,5 +70,48 @@ So treat the converted games as a way to test GDash and help me with
 describing any problem you may find.
 
 
-Send e-mail to: cirix <cirix@fw.hu>
+BDCFF files
+-----------
+Default values for cave properties are sometimes changed, as the file format
+evolves. Some properties might change if a caveset is loaded,
+which was saved with an older version. You can use the 'Remove all unknown
+tags' option in the editor menu to get rid of older or unknown options.
 
+Importing may not be complete and correct for all games and engines.
+There may be some unplayable caves, as older games had no precise timing.
+
+As the game is sometimes changed, highscores may be lost due to the changing
+checksums generated.
+
+
+
+
+Themes
+------						  
+The game also supports themes. You can use the installed png file as a
+template. Cells can have any arbitrary size, not necessarily 16x16 pixels.
+However, they must be squares, and the image must have an alpha channel.
+If the image has only a small number of colours (fully saturated red for
+foreground colour 1, fully saturated green for amoeba...), the game will use
+original C64 colours, different ones for every cave. Whether the png file is
+interpreted as a true colour image or one with C64 colours, depends on the
+colour values used, and is autodetected. An image file with only #000000,
+#00FF00 and the like is taken as a C64 theme.
+
+For C64 themes, the meaning of colors are these:
+- Transparent: you should use it everywhere where there is no drawing.
+- Black 0x000000: background color.
+- Red 0xff0000: foreground color 1.
+- Purple 0xff00ff: foreground color 2.
+- Yellow 0xffff00: foreground color 3.
+- Green 0x00ff00: amoeba.
+- Blue 0x0000ff: slime.
+- Cyan 0x00ffff: used internally for the editor, will be converted to black
+  pixels around arrows.
+- White 0xffffff: for the editor; will the color of arrows.
+
+Beware that the SDL version is only able to load .BMP files.
+
+
+
+Send e-mail to: cirix <cirix@fw.hu>

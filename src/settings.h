@@ -17,34 +17,57 @@
 #define _GD_SETTINGS_H
 #include <glib.h>
 
+typedef enum _scaling_type {
+	GD_SCALING_ORIGINAL,
+	GD_SCALING_2X,
+	GD_SCALING_2X_BILINEAR,	/* 2x with interpolation */
+	GD_SCALING_2X_SCALE2X,	/* 2x with scale2x algorithm */
+	GD_SCALING_3X,
+	GD_SCALING_3X_BILINEAR,	/* 3x with interpolation */
+	GD_SCALING_3X_SCALE3X,	/* 3x with scale3x */
+	GD_SCALING_MAX,
+} GdScalingType;
+
+extern const gchar *gd_scaling_name[];
+extern const int gd_scaling_scale[];
+
 /* command line parameters */
 extern int gd_param_cave, gd_param_level, gd_param_internal;
 extern int gd_param_license;
 extern char **gd_param_cavenames;
 
 /* editor settings */
-extern gboolean gd_game_view;	/**< show animated cells instead of arrows & ... */
-extern gboolean gd_colored_objects;	/**< show objects with different color */
-extern gboolean gd_show_object_list;	/**< show object list in editor */
-extern gboolean gd_show_test_label;	/**< label with cave variables in tests */
+extern gboolean gd_game_view;	/* show animated cells instead of arrows & ... */
+extern gboolean gd_colored_objects;	/* show objects with different color */
+extern gboolean gd_show_object_list;	/* show object list in editor */
+extern gboolean gd_show_test_label;	/* label with cave variables in tests */
 
 /* settings */
 extern gboolean gd_easy_play;
 extern gboolean gd_time_min_sec;
 extern gboolean gd_all_caves_selectable;
+extern gboolean gd_import_as_all_caves_selectable;
 extern gboolean gd_mouse_play;
 extern gboolean gd_random_colors;
-extern gboolean gd_tv_emulation;
-extern gboolean gd_gfx_interpolation;
 extern gboolean gd_show_preview;
 extern gboolean gd_allow_dirt_mod;
 extern gboolean gd_use_bdcff_highscore;
+extern gboolean gd_show_name_of_game;
+extern GdScalingType gd_cell_scale_game;
+extern gboolean gd_tv_emulation_game;
+extern GdScalingType gd_cell_scale_editor;
+extern gboolean gd_tv_emulation_editor;
+extern char *gd_theme;
+
 extern gboolean gd_sdl_fullscreen;
+extern GdScalingType gd_sdl_scale;
+extern char *gd_sdl_theme;
+extern gboolean gd_sdl_tv_emulation;
+
 extern gboolean gd_sdl_sound;
 extern gboolean gd_sdl_16bit_mixing;
 extern gboolean gd_sdl_44khz_mixing;
-extern int gd_cell_scale;
-extern char *gd_theme;
+
 
 /* gdash directories */
 extern char *gd_user_config_dir;

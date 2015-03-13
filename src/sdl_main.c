@@ -37,6 +37,7 @@ typedef enum _state {
 	M_LICENSE,
 	M_PLAY,
 	M_OPTIONS,
+	M_INSTALL_THEME,
 	M_HIGHSCORE,
 	M_LOAD,
 	M_LOAD_FROM_INSTALLED,
@@ -68,9 +69,16 @@ showheader_new()
 static void
 showheader_uncover()
 {
+	int cavename_y;
 	showheader_new();
-	gd_blittext_n(gd_screen, -1, statusbar_y1, GD_C64_WHITE, gd_default_cave->name);
-	gd_blittext_printf_n(gd_screen, -1, statusbar_y2, GD_C64_WHITE, "%d%c, %s/%d", game.player_lives, GD_PLAYER_CHAR, game.cave->name, game.cave->rendered);
+	if (gd_show_name_of_game) {
+		/* if showing the name of the cave... */
+		gd_blittext_n(gd_screen, -1, statusbar_y1, GD_C64_WHITE, gd_default_cave->name);
+		cavename_y=statusbar_y2;	/* show cave name in the second line */
+	} else
+		/* otherwise, cave name in the middle. */
+		cavename_y=statusbar_mid;
+	gd_blittext_printf_n(gd_screen, -1, cavename_y, GD_C64_WHITE, "%d%c, %s/%d", game.player_lives, GD_PLAYER_CHAR, game.cave->name, game.cave->rendered);
 }
 
 static void
@@ -109,17 +117,18 @@ showheader_game()
 
 	if (gd_keystate[SDLK_LSHIFT] || gd_keystate[SDLK_RSHIFT]) {
 		/* ALTERNATIVE STATUS BAR BY PRESSING SHIFT */
-		x=14;
+		x=14*gd_scale;
 		
 		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%c%02d", GD_PLAYER_CHAR, game.player_lives);
-		x+=24;
+		x+=24*gd_scale;
 		/* color numbers are not the same as key numbers! c3->k1, c2->k2, c1->k3 */
+		/* this is how it was implemented in crdr7. */
 		x=gd_blittext_printf(gd_screen, x, statusbar_mid, game.cave->color3, "%c%02d", GD_KEY_CHAR, game.cave->key1);
-		x+=10;
+		x+=10*gd_scale;
 		x=gd_blittext_printf(gd_screen, x, statusbar_mid, game.cave->color2, "%c%02d", GD_KEY_CHAR, game.cave->key2);
-		x+=10;
+		x+=10*gd_scale;
 		x=gd_blittext_printf(gd_screen, x, statusbar_mid, game.cave->color1, "%c%02d", GD_KEY_CHAR, game.cave->key3);
-		x+=24;
+		x+=24*gd_scale;
 		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%02d", game.cave->gravity_will_change/game.cave->timing_factor);
 	} else {
 		/* NORMAL STATUS BAR */
@@ -130,17 +139,22 @@ showheader_game()
 			x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_YELLOW, "%cFAST%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
 		} else {
 			/* normal speed mode - show diamonds needed and value */
-			if (game.cave->diamonds_needed>game.cave->diamonds_collected)	
-				x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_RED, "%03d", game.cave->diamonds_needed);
+			if (game.cave->diamonds_needed>game.cave->diamonds_collected) {
+				if (game.cave->diamonds_needed>0)
+					x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_RED, "%03d", game.cave->diamonds_needed);
+				else
+					/* did not already count diamonds needed */
+					x=gd_blittext(gd_screen, x, statusbar_mid, GD_C64_RED, "???");
+			}
 			else
 				x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, " %c%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
 			x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%c%02d", GD_DIAMOND_CHAR, game.cave->diamond_value);
 		}
-		x+=10;
+		x+=10*gd_scale;
 		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_GREEN, "%03d", game.cave->diamonds_collected);
-		x+=10;
+		x+=10*gd_scale;
 		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%03d", game.cave->time/game.cave->timing_factor);
-		x+=10;
+		x+=10*gd_scale;
 		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%06d", game.player_score);
 	}
 }
@@ -154,9 +168,9 @@ game_help()
 		"F2", "SUICIDE",
 		"F", "FASH FORWARD (HOLD)",
 		"SHIFT", "STATUS BAR (HOLD)",
-		"ESC", "RESTART LEVEL",
 		"", "",
 		"SPACE", "PAUSE",
+		"ESC", "RESTART LEVEL",
 		"", "",
 		"F1", "MAIN MENU",
 		"CTRL-Q", "QUIT PROGRAM",
@@ -235,6 +249,7 @@ play_game(int start_cave, int start_level)
 								break;
 							case SDLK_q:
 								if (gd_keystate[SDLK_LCTRL]||gd_keystate[SDLK_RCTRL]) {
+									gd_quit=TRUE;
 									exit_game=TRUE;
 									caveloop=FALSE;
 								}
@@ -421,38 +436,51 @@ next_selectable_cave(int cavenum)
 static State
 main_menu()
 {
-	SDL_Surface *image;
+	SDL_Surface **animation;
+	int animcycle;
+	int count;
 	State s;
-	int x;
+	int x, y;
+	int waitcycle=0;
 	
 	SDL_FillRect(gd_screen, NULL, SDL_MapRGB(gd_screen->format, 0, 0, 0));	/* fill whole gd_screen with black */
-	image=gd_get_titleimage();
-	SDL_BlitSurface(image, NULL, gd_screen, NULL);
-	SDL_FreeSurface(image);
+	animation=gd_get_title_animation();
+	animcycle=0;
+	/* count number of frames */
+	count=0;
+	while(animation[count]!=NULL)
+		count++;
 
-	x=gd_blittext_n(gd_screen, 0, 172, GD_C64_WHITE, "GAME: ");
-	x=gd_blittext_n(gd_screen, x, 172, GD_C64_YELLOW, gd_default_cave->name);
+	y=gd_screen->h-3*gd_line_height();
+	x=gd_blittext_n(gd_screen, 0, y, GD_C64_WHITE, "GAME: ");
+	x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, gd_default_cave->name);
 
-	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "CRSR: SELECT   SPACE: PLAY   H: KEYS");	/* FIXME 8 */
+	gd_status_line("CRSR: SELECT   RETURN: PLAY   H: HELP");
 	
 	if (gd_has_new_error())
 		/* show error flag */
-		gd_blittext_n(gd_screen, gd_screen->w-8, gd_screen->h-8, GD_C64_RED, "E");	/* FIXME 8 */
+		gd_blittext_n(gd_screen, gd_screen->w-gd_font_width(), gd_screen->h-gd_font_height(), GD_C64_RED, "E");
 
 	s=M_NONE;
 	cavenum=gd_caveset_first_selectable();
 	if (gd_all_caves_selectable)
 		cavenum=0;
 	levelnum=0;
+
 	while(!gd_quit && s==M_NONE) {
 		SDL_Event event;
 		static int i=0;	/* used to slow down cave selection */
+		int y=gd_screen->h-2*gd_line_height();
 
-		gd_clear_line(gd_screen, 180);
-		x=gd_blittext_n(gd_screen, 0, 180, GD_C64_WHITE, "CAVE: ");
-		x=gd_blittext_n(gd_screen, x, 180, GD_C64_YELLOW, gd_return_nth_cave(cavenum)->name);
-		x=gd_blittext_n(gd_screen, x, 180, GD_C64_WHITE, "/");
-		x=gd_blittext_printf_n(gd_screen, x, 180, GD_C64_YELLOW, "%d", levelnum+1);
+		gd_clear_line(gd_screen, y);
+		x=gd_blittext_n(gd_screen, 0, y, GD_C64_WHITE, "CAVE: ");
+		x=gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, gd_return_nth_cave(cavenum)->name);
+		x=gd_blittext_n(gd_screen, x, y, GD_C64_WHITE, "/");
+		x=gd_blittext_printf_n(gd_screen, x, y, GD_C64_YELLOW, "%d", levelnum+1);
+
+		/* play animation */		
+		animcycle=(animcycle+1)%count;
+		SDL_BlitSurface(animation[animcycle], 0, gd_screen, 0);
 		SDL_Flip(gd_screen);
 		
 		i=(i+1)%3;
@@ -493,6 +521,10 @@ main_menu()
 						case SDLK_o:	/* s: settings */
 							s=M_OPTIONS;
 							break;
+
+						case SDLK_t:	/* t: install theme */
+							s=M_INSTALL_THEME;
+							break;
 						
 						case SDLK_e:	/* show error console */
 							s=M_ERRORS;
@@ -514,34 +546,44 @@ main_menu()
 					break;
 			}
 		}
-
-		/* joystick or keyboard up */		
-		if (gd_up() && i==0) {
-			levelnum++;
-			if (levelnum>4)
-				levelnum=4;
+		
+		/* not all frames process the joystick - otherwise it would be too fast. */
+		waitcycle=(waitcycle+1)%2;
+		
+		if (waitcycle==0) {
+			/* joystick or keyboard up */		
+			if (gd_up() && i==0) {
+				levelnum++;
+				if (levelnum>4)
+					levelnum=4;
+			}
+			
+			/* joystick or keyboard down */
+			if (gd_down() && i==0) {
+				levelnum--;
+				if (levelnum<0)
+					levelnum=0;
+			}
+			
+			/* joystick or keyboard left */
+			if (gd_left() && i==0)
+				cavenum=previous_selectable_cave(cavenum);
+			
+			/* joystick or keyboard right */
+			if (gd_right() && i==0)
+				cavenum=next_selectable_cave(cavenum);
 		}
 		
-		/* joystick or keyboard down */
-		if (gd_down() && i==0) {
-			levelnum--;
-			if (levelnum<0)
-				levelnum=0;
-		}
-		
-		/* joystick or keyboard left */
-		if (gd_left() && i==0)
-			cavenum=previous_selectable_cave(cavenum);
-		
-		/* joystick or keyboard right */
-		if (gd_right() && i==0)
-			cavenum=next_selectable_cave(cavenum);
-
 		if (gd_space_or_enter_or_fire())
 			s=M_PLAY;
-					
-		SDL_Delay(75);
+
+		SDL_Delay(40);	/* 25 fps - we need exactly this for the animation */
 	}
+	
+	/* forget animation */
+	for (x=0; x<count; x++)
+		SDL_FreeSurface(animation[x]);
+	g_free(animation);
 	
 	return s;
 }
@@ -551,13 +593,14 @@ main_help()
 {
 	const char* strings_menu[]={
 		"CURSOR", "SELECT CAVE&LEVEL",
-		"SPACE", "PLAY GAME",
+		"SPACE, RETURN", "PLAY GAME",
 		"S", "SHOW HALL OF FAME",
 		"", "",
 		"L", "LOAD CAVESET",
 		"C", "LOAD FROM INSTALLED CAVES",
 		"", "",
 		"O", "OPTIONS",
+		"T", "INSTALL THEME",
 		"E", "ERROR CONSOLE", 
 		"A", "ABOUT GDASH",
 		"I", "LICENSE",
@@ -663,12 +706,12 @@ int main(int argc, char *argv[])
 				gd_param_level=0;
 		}
 
-	gd_sdl_init();
+	gd_sdl_init(gd_sdl_scale);
 	gd_sound_init();
 	
 	gd_loadfont_default();
+	gd_load_theme();
 
-	gd_loadcells_default();
 	gd_create_dark_background();
 	
 	username=g_strdup(g_get_real_name());
@@ -708,6 +751,10 @@ int main(int argc, char *argv[])
 			
 			case M_LOAD_FROM_INSTALLED:
 				load_file(gd_system_caves_dir);
+				break;
+				
+			case M_INSTALL_THEME:
+				gd_install_theme();
 				break;
 				
 			case M_OPTIONS:

@@ -15,6 +15,8 @@
  */
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
+#include <glib/gstdio.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include <string.h>
 #include "gtk_gfx.h"
 #include "caveset.h"
@@ -87,10 +89,64 @@ gd_icon (void)
 	return gdk_pixbuf_new_from_inline (-1, gdash, FALSE, NULL);
 }
 
-GdkPixbuf *
-gd_title (void)
+/* create and return an array of pixmaps, which contain the title animation.
+   the array is one pointer larger than all frames; the last pointer is a null.
+   up to the caller to free.
+ */
+GdkPixmap **
+gd_create_title_animation (void)
 {
-	return gdk_pixbuf_new_from_inline (-1, gdash_screen, FALSE, NULL);
+	GdkPixbuf *screen;
+	GdkPixbuf *tile;
+	GdkPixbuf *frame;
+	GdkPixbuf *bigone;
+	GdkPixmap **pixmaps;
+	int i;
+	int x, y;
+	int w, h, tw, th;
+
+	/* the screen */	
+	screen=gdk_pixbuf_new_from_inline (-1, gdash_screen, FALSE, NULL);
+	w=gdk_pixbuf_get_width(screen);
+	h=gdk_pixbuf_get_height(screen);
+
+	/* the tile to be put under the screen */
+	tile=gdk_pixbuf_new_from_inline (-1, gdash_tile, FALSE, NULL);
+	tw=gdk_pixbuf_get_width(tile);
+	th=gdk_pixbuf_get_height(tile);
+	
+	/* do not allow more than 40 frames of animation */
+	g_assert(th<40);
+
+	/* create a big image, which is one tile larger than the title image size */
+	bigone=gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, w, h+th);
+	/* and fill it with the tile. */
+	for (y=0; y<h+th; y+=th)
+		for (x=0; x<w; x+=th)
+			gdk_pixbuf_copy_area(tile, 0, 0, tw, th, bigone, x, y);
+
+	g_object_unref(tile);
+	
+	pixmaps=g_new0(GdkPixmap *, th+1);	/* 'th' number of images, and a NULL to the end */
+	frame=gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, w, h);
+	for (i=0; i<th; i++) {
+		GdkPixbuf *scaled;
+		/* copy part of the big tiled image */
+		gdk_pixbuf_copy_area(bigone, 0, i, w, h, frame, 0, 0);
+		/* and composite it with the title image */
+		gdk_pixbuf_composite(screen, frame, 0, 0, w, h, 0, 0, 1, 1, GDK_INTERP_NEAREST, 255);
+	
+		scaled=gd_pixbuf_scale(frame, gd_cell_scale_game);
+		pixmaps[i]=gdk_pixmap_new (gdk_get_default_root_window(), gdk_pixbuf_get_width(scaled), gdk_pixbuf_get_height(scaled), -1);
+		gdk_draw_pixbuf(pixmaps[i], NULL, scaled, 0, 0, 0, 0, gdk_pixbuf_get_width(scaled), gdk_pixbuf_get_height(scaled), GDK_RGB_DITHER_MAX, 0, 0);
+		g_object_unref(scaled);
+	}
+	g_object_unref(bigone);
+	g_object_unref(frame);
+		
+	g_object_unref(screen);
+
+	return pixmaps;
 }
 
 
@@ -110,18 +166,42 @@ enum {
 	NUM_THEME_COLS
 };
 
-GtkTreeIter*
-gd_add_png_to_store (GtkListStore *store, const char *filename)
+static gboolean
+find_image_in_store(GtkTreeModel *store, const gchar *find_name, GtkTreeIter *set_iter)
 {
+	GtkTreeIter iter;
+	
+	if (gtk_tree_model_get_iter_first(store, &iter)) {
+		do {
+			char *stored_name;
+
+			/* get filename from store */			
+			gtk_tree_model_get(store, &iter, THEME_COL_FILENAME, &stored_name, -1);
+			/* if find_name is null and stored_name is null: that is the builtin theme, so they are equal! */
+			/* otherwise, compare the strings. */
+			if ((!find_name && !stored_name) || (find_name && stored_name && g_str_equal(find_name, stored_name))) {
+				if (set_iter)
+					*set_iter=iter;
+				return TRUE;
+			}
+		} while (gtk_tree_model_iter_next(store, &iter));
+	}
+	
+	/* not found: return false */
+	return FALSE;
+}
+
+static GtkTreeIter *
+add_image_to_store (GtkListStore *store, const char *filename)
+{
+	static GtkTreeIter iter;
 	GdkPixbuf *pixbuf, *cell_pixbuf;
 	char *seen_name;
 	int cell_size;
 	int cell_num=gd_elements[O_PLAYER].image_game;	/* load the image of the player from every pixbuf */
 	GError *error=NULL;
-	static GtkTreeIter iter;
-	gboolean valid;
 
-	pixbuf=gdk_pixbuf_new_from_file (filename, &error);
+	pixbuf=gdk_pixbuf_new_from_file(filename, &error);
 	if (error) {
 		/* unlikely but check it */
 		g_warning("%s\n", error->message);
@@ -136,16 +216,8 @@ gd_add_png_to_store (GtkListStore *store, const char *filename)
 	g_assert(error==NULL);
 	
 	/* check list store to find if this file is already added. may happen if a theme is overwritten by the add theme button */
-	valid=gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter);
-	while (valid) {
-		char *other_filename;
-		
-		gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, THEME_COL_FILENAME, &other_filename, -1);
-		if (other_filename && filename && g_str_equal(other_filename, filename))
-			valid=gtk_list_store_remove(store, &iter);
-		else
-			valid=gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter);
-	}
+	if (find_image_in_store(GTK_TREE_MODEL(store), filename, &iter))
+		gtk_list_store_remove(store, &iter);
 	
 	/* add to list */
 	seen_name=g_filename_display_basename(filename);
@@ -155,9 +227,9 @@ gd_add_png_to_store (GtkListStore *store, const char *filename)
 	gtk_list_store_set(store, &iter, THEME_COL_FILENAME, filename, THEME_COL_NAME, seen_name, THEME_COL_PIXBUF, cell_pixbuf, -1);
 	g_free(seen_name);
 	g_object_unref(cell_pixbuf);
+
 	return &iter;
 }
-
 
 static void
 add_dir_to_store(GtkListStore *store, const char *dirname)
@@ -173,13 +245,16 @@ add_dir_to_store(GtkListStore *store, const char *dirname)
 			char *filename=g_build_filename(dirname, name, NULL);
 
 			/* if image file can be loaded and proper size for theme */
-			if (gd_is_png_ok_for_theme(filename))
-				gd_add_png_to_store(store, filename);
+			if (g_file_test(filename, G_FILE_TEST_IS_REGULAR) && gd_is_image_ok_for_theme(filename))
+				add_image_to_store(store, filename);
 			g_free(filename);
 		}
 		g_dir_close(dir);
-	} else
+	} else {
+		/* unable to open directory */
 		g_warning("%s", error->message);
+		g_error_free(error);
+	}
 }
 
 GtkListStore *
@@ -192,10 +267,15 @@ gd_create_themes_list()
 
 	/* default builtin theme */
 	gtk_list_store_append(store, &iter);
-	gtk_list_store_set(store, &iter, THEME_COL_FILENAME, NULL, THEME_COL_NAME, _("Default C64 theme"), THEME_COL_PIXBUF, gd_pixbuf_for_builtin, -1);
+	gtk_list_store_set(store, &iter, THEME_COL_FILENAME, NULL, THEME_COL_NAME, _("Default"), THEME_COL_PIXBUF, gd_pixbuf_for_builtin, -1);
 
+	/* add themes found in config directories */
 	add_dir_to_store(store, gd_system_data_dir);
 	add_dir_to_store(store, gd_user_config_dir);
+	
+	/* if the current theme cannot be found in the store for some reason, add it now. */
+	if (!find_image_in_store(GTK_TREE_MODEL(store), gd_theme, NULL))
+		add_image_to_store(store, gd_theme);
 	
 	return store;
 }
@@ -207,71 +287,119 @@ gd_create_themes_list()
  * settings window
  *
  */
-struct {
-	char *name;
-	int size;
-} static sizes[]={
-//	{N_("Half"), 0.5},
-	{N_("Original"), 1},
-	{N_("Double"), 2},
-	{N_("Triple"), 3},
-};
-
 typedef struct pref_info {
-	GtkWidget *treeview, *sizecombo;
-	GtkWidget *image;
+	GtkWidget *dialog;
+	GtkWidget *treeview, *sizecombo_game, *sizecombo_editor;
+	GtkWidget *image_game, *image_editor;
 } pref_info;
 
 static void
-update(pref_info* info)
+settings_window_update(pref_info* info)
 {
+	GdkPixbuf *orig_pb;
 	GdkPixbuf *pb;
 	GtkTreeIter iter;
 	GtkTreeModel *model;
-	int size;
 	
 	if (!gtk_tree_selection_get_selected(gtk_tree_view_get_selection(GTK_TREE_VIEW(info->treeview)), &model, &iter))
 		return;
-	gtk_tree_model_get(model, &iter, THEME_COL_PIXBUF, &pb, -1);
-	size=gdk_pixbuf_get_width(pb)*sizes[gtk_combo_box_get_active(GTK_COMBO_BOX(info->sizecombo))].size;
-	pb=gdk_pixbuf_scale_simple(pb, size, size, gd_gfx_interpolation?GDK_INTERP_BILINEAR:GDK_INTERP_NEAREST);
-	if (gd_tv_emulation)
+	gtk_tree_model_get(model, &iter, THEME_COL_PIXBUF, &orig_pb, -1);
+
+	/* sample for game */
+	pb=gd_pixbuf_scale(orig_pb, gtk_combo_box_get_active(GTK_COMBO_BOX(info->sizecombo_game)));
+	if (gd_tv_emulation_game)
 		gd_tv_pixbuf(pb);
-	
-	gtk_image_set_from_pixbuf(GTK_IMAGE(info->image), pb);
+	gtk_image_set_from_pixbuf(GTK_IMAGE(info->image_game), pb);
+	g_object_unref(pb);
+
+	/* sample for editor */
+	pb=gd_pixbuf_scale(orig_pb, gtk_combo_box_get_active(GTK_COMBO_BOX(info->sizecombo_editor)));
+	if (gd_tv_emulation_editor)
+		gd_tv_pixbuf(pb);
+	gtk_image_set_from_pixbuf(GTK_IMAGE(info->image_editor), pb);
 	g_object_unref(pb);
 }
 
 static void
-changed (gpointer object, gpointer data)
+settings_window_changed(gpointer object, gpointer data)
 {
-	update((pref_info *)data);
+	settings_window_update((pref_info *)data);
 }
 
+/* callback for a toggle button. data is a pointer to a gboolean. */
 static void
-save (GtkWidget *widget, gpointer data)
+settings_window_toggle(GtkWidget *widget, gpointer data)
 {
 	gboolean *bl=(gboolean *)data;
 	
 	*bl=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
 }
 
+/* return a list of image gtk_image_filter's. */
+/* they have floating reference. */
+/* the list is to be freed by the caller. */
+static GList *
+image_load_filters()
+{
+	GSList *formats=gdk_pixbuf_get_formats();
+	GSList *iter;
+	GtkFileFilter *all_filter;
+	GList *filters=NULL;	/* new list of filters */
+	
+	all_filter=gtk_file_filter_new();
+	gtk_file_filter_set_name(all_filter, _("All image files"));
+	
+	/* iterate the list of formats given by gdk. create file filters for each. */
+	for (iter=formats; iter!=NULL; iter=iter->next) {
+		GdkPixbufFormat *frm=iter->data;
+		
+		if (!gdk_pixbuf_format_is_disabled(frm)) {
+			GtkFileFilter *filter;
+			char **extensions;
+			int i;
+			
+			filter=gtk_file_filter_new();
+			gtk_file_filter_set_name(filter, gdk_pixbuf_format_get_description(frm));
+			extensions=gdk_pixbuf_format_get_extensions(frm);
+			for (i=0; extensions[i]!=NULL; i++) {
+				char *pattern;
+				
+				pattern=g_strdup_printf("*.%s", extensions[i]);
+				gtk_file_filter_add_pattern(filter, pattern);
+				gtk_file_filter_add_pattern(all_filter, pattern);
+				g_free(pattern);
+			}
+			g_strfreev(extensions);
+			
+			filters=g_list_append(filters, filter);
+		}
+	}
+	g_slist_free(formats);
+	
+	/* add "all image files" filter */
+	filters=g_list_prepend(filters, all_filter);
+	
+	return filters;
+}
+
 static void
 add_theme_cb(GtkWidget *widget, gpointer data)
 {
 	GtkWidget *dialog;
-	GtkFileFilter *filter;
+	GList *filters;
+	GList *iter;
 	int result;
 	char *filename=NULL;
 	pref_info *info=(pref_info *)data;
 	
-	dialog=gtk_file_chooser_dialog_new (_("Add Theme from PNG Image"), NULL, GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+	dialog=gtk_file_chooser_dialog_new (_("Add Theme from Image File"), GTK_WINDOW(info->dialog), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
 	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
 
-	filter=gtk_file_filter_new ();
-	gtk_file_filter_set_name (filter, _("PNG files"));
-	gtk_file_filter_add_pattern (filter, "*.png");
-	gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), filter);
+	/* obtain list of image filters, and add all to the window */
+	filters=image_load_filters();
+	for (iter=filters; iter!=NULL; iter=iter->next)
+		gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), GTK_FILE_FILTER(iter->data));
+	g_list_free(filters);
 
 	result=gtk_dialog_run (GTK_DIALOG (dialog));
 	if (result==GTK_RESPONSE_ACCEPT)
@@ -280,7 +408,7 @@ add_theme_cb(GtkWidget *widget, gpointer data)
 	gtk_widget_destroy (dialog);
 
 	if (filename) {
-		if (gd_is_png_ok_for_theme(filename)) {
+		if (gd_is_image_ok_for_theme(filename)) {
 			/* make up new filename */
 			char *basename, *new_filename;
 			GError *error=NULL;
@@ -297,7 +425,7 @@ add_theme_cb(GtkWidget *widget, gpointer data)
 				if (g_file_get_contents(filename, &contents, &length, &error) && g_file_set_contents(new_filename, contents, length, &error)) {
 					GtkTreeIter *iter;
 					
-					iter=gd_add_png_to_store (GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(info->treeview))), new_filename);
+					iter=add_image_to_store(GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(info->treeview))), new_filename);
 					if (iter)						/* select newly added. if there was an error, the old selection was not cleared */
 						gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(info->treeview)), iter);
 				}
@@ -309,10 +437,48 @@ add_theme_cb(GtkWidget *widget, gpointer data)
 			g_free(new_filename);
 		}
 		else
-			gd_errormessage(_("The PNG image cannot be used as a GDash theme."), NULL);
+			gd_errormessage(_("The selected image cannot be used as a GDash theme."), NULL);
+		g_free(filename);
 	}
-	g_free(filename);
 }
+
+static void
+remove_theme_cb(GtkWidget *widget, gpointer data)
+{
+	pref_info *info=(pref_info *)data;
+	GtkTreeIter iter;
+	GtkTreeSelection *selection;
+	GtkTreeModel *model;
+	char *filename, *seen_name;
+	GtkWidget *dialog;
+	int result;
+	
+	selection=gtk_tree_view_get_selection(GTK_TREE_VIEW(info->treeview));
+	/* if no row selected for some reason, don't care. return now. */
+	if (!gtk_tree_selection_get_selected(selection, &model, &iter))
+		return;
+
+	gtk_tree_model_get(model, &iter, THEME_COL_FILENAME, &filename, THEME_COL_NAME, &seen_name, -1);
+	/* do not thelete the built-in theme */
+	if (!filename)
+		return;
+	dialog=gtk_message_dialog_new (GTK_WINDOW (info->dialog), 0, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, _("Do you really want to remove theme '%s'?"), seen_name);
+	gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog), _("The image file of the theme is '%s'."), filename);
+
+	result=gtk_dialog_run (GTK_DIALOG (dialog));
+	gtk_widget_destroy(dialog);
+	if (result==GTK_RESPONSE_YES) {
+		/* remove */
+		if (g_unlink(filename)==0) {
+			gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
+			/* current file removed - select first iter found in list */
+			if (gtk_tree_model_get_iter_first(model, &iter))
+				gtk_tree_selection_select_iter(selection, &iter);
+		} else
+			gd_errormessage(_("Cannot delete the image file."), filename);
+	}
+}
+
 
 void
 gd_preferences (GtkWidget *parent)
@@ -325,8 +491,9 @@ gd_preferences (GtkWidget *parent)
 	} check_buttons[]={
 		{N_("<b>Cave options</b>"), NULL, NULL},
 		{N_("Ease levels"), N_("Make caves easier to play. Only one diamonds to collect, more time available, no expanding walls... This might render some caves unplayable!"), &gd_easy_play},
-		{N_("All caves selectable"), N_("All caves can be selected at game start."), &gd_all_caves_selectable, FALSE},
 		{N_("Mouse play (experimental!)"), N_("Use the mouse to play. The player will follow the cursor!"), &gd_mouse_play, FALSE},
+		{N_("All caves selectable"), N_("All caves and intermissions can be selected at game start."), &gd_all_caves_selectable, FALSE},
+		{N_("Import as all caves selectable"), N_("Original, C64 games are imported not with A, E, I, M caves selectable, but all caves (ABCD, EFGH... excluding intermissions). This does not affect BDCFF caves."), &gd_import_as_all_caves_selectable, FALSE},
 		{N_("Use BDCFF highscore"), N_("Use BDCFF highscores. GDash rather stores highscores in its own configuration directory, instead of saving them in "
 			" the *.bd file."), &gd_use_bdcff_highscore, FALSE},
 		{N_("<b>Display options</b>"), NULL, NULL},
@@ -336,10 +503,10 @@ gd_preferences (GtkWidget *parent)
    XXX currently dirt mod is not shown to the user.
 		{N_("Allow dirt mod"), N_("Enable caves to use alternative dirt graphics. This applies only to imported caves, not BDCFF (*.bd) files."), &allow_dirt_mod, FALSE},
 */
-		{N_("TV emulation"), N_("Use TV emulated graphics, ie. lines are striped."), &gd_tv_emulation, TRUE},
-		{N_("Interpolation"), N_("Use interpolation for scaling of graphics."), &gd_gfx_interpolation, TRUE},
+		{N_("TV emulation for game"), N_("Use TV emulated graphics, ie. lines are striped."), &gd_tv_emulation_game, TRUE},
+		{N_("TV emulation for editor"), N_("Use TV emulated graphics, ie. lines are striped."), &gd_tv_emulation_editor, TRUE},
 #ifdef GD_SOUND
-		{N_("<b>Sound options</b>"), NULL, NULL},
+		{N_("<b>Sound options</b> (require restart)"), NULL, NULL},
 		{N_("Sound"), N_("Play sounds. Enabling this setting requires a restart!"), &gd_sdl_sound, FALSE},
 		{N_("16-bit mixing"), N_("Use 16-bit mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_16bit_mixing, FALSE},
 		{N_("44kHz mixing"), N_("Use 44kHz mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_44khz_mixing, FALSE},
@@ -354,16 +521,23 @@ gd_preferences (GtkWidget *parent)
 	GtkTreeSelection *selection;
 	GtkTreeIter iter;
 	char *filename;
-	char *text;
-	
 	
 	dialog=gtk_dialog_new_with_buttons (_("GDash Preferences"), GTK_WINDOW (parent), GTK_DIALOG_DESTROY_WITH_PARENT, NULL);
+	info.dialog=dialog;
+	gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
 
+	/* remove theme button */
+	button=gtk_button_new_with_mnemonic(_("_Remove theme"));
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->action_area), button, FALSE, FALSE, 0);
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(remove_theme_cb), &info);
+
+	/* add theme button */
 	button=gtk_button_new_with_mnemonic(_("_Add theme"));
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->action_area), button, FALSE, FALSE, 0);
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(add_theme_cb), &info);
+
 	gtk_dialog_add_button(GTK_DIALOG(dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_ACCEPT);
 	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
-	gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
 
 	hbox=gtk_hbox_new(FALSE, 6);
 	gtk_container_set_border_width (GTK_CONTAINER (hbox), 6);
@@ -381,12 +555,13 @@ gd_preferences (GtkWidget *parent)
 			GtkWidget *widget;
 			
 			widget=gtk_check_button_new_with_label (_(check_buttons[i].name));
+			gtk_widget_set_tooltip_text(widget, _(check_buttons[i].description));
 			gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), *check_buttons[i].value);
 			gtk_table_attach_defaults (GTK_TABLE (table), widget, 1, 2, row, row + 1);
-			g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(save), check_buttons[i].value);
+			g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(settings_window_toggle), check_buttons[i].value);
 			/* if sample pixbuf should be updated */
 			if (check_buttons[i].update)
-				g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(changed), &info);
+				g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(settings_window_changed), &info);
 		} else {
 			label=gtk_label_new (NULL);
 			gtk_label_set_markup(GTK_LABEL(label), _(check_buttons[i].name));
@@ -395,29 +570,20 @@ gd_preferences (GtkWidget *parent)
 		}		
 		row ++;
 	}
-	
+
 	/* gfx */
 	store=gd_create_themes_list();
 	info.treeview=gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 	g_object_unref(store);
-	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter))
-		do {
-			char *filename;
-			
-			gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, THEME_COL_FILENAME, &filename, -1);
-			if ((!filename && !gd_theme) || (gd_theme && filename && g_str_equal(gd_theme, filename))) {
-				gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(info.treeview)), &iter);
-			}
-		} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter));
-	text=g_strdup_printf(_("This is the list of available themes. You can put .png files into the directory %s to see more."), gd_user_config_dir);
-	gtk_widget_set_tooltip_text(info.treeview, text);
-	g_free(text);
+
+	gtk_widget_set_tooltip_text(info.treeview, _("This is the list of available themes. Use the Add Theme button to install a new one."));
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(info.treeview), FALSE);	/* don't need headers as everything is self-explaining */
 	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(info.treeview), -1, "", gtk_cell_renderer_pixbuf_new(), "pixbuf", THEME_COL_PIXBUF, NULL);
 	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(info.treeview), -1, "", gtk_cell_renderer_text_new(), "text", THEME_COL_NAME, NULL);
 	selection=gtk_tree_view_get_selection(GTK_TREE_VIEW(info.treeview));
 	gtk_tree_selection_set_mode(selection, GTK_SELECTION_BROWSE);
-	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(add_theme_cb), &info);
+	if (find_image_in_store(GTK_TREE_MODEL(store), gd_theme, &iter))
+		gtk_tree_selection_select_iter(selection, &iter);
 
 	sw=gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
@@ -433,54 +599,81 @@ gd_preferences (GtkWidget *parent)
 	label=gtk_label_new(NULL);
 	gtk_label_set_markup(GTK_LABEL(label), _("<b>Theme</b>"));
 	gtk_misc_set_alignment(GTK_MISC (label), 0, 0.5);
-	gtk_table_attach(GTK_TABLE (table), label, 0, 2, 0, 1, GTK_EXPAND|GTK_FILL, 0, 0, 0);
+	gtk_table_attach(GTK_TABLE (table), label, 0, 3, 0, 1, GTK_EXPAND|GTK_FILL, 0, 0, 0);
 
-	gtk_table_attach_defaults(GTK_TABLE(table), sw, 1, 2, 1, 2);
+	gtk_table_attach_defaults(GTK_TABLE(table), sw, 1, 3, 1, 2);
 	
-	/* cells size combo */
-	info.sizecombo=gtk_combo_box_new_text();
-	for (i=0; i<G_N_ELEMENTS(sizes); i++) {
-		gtk_combo_box_append_text(GTK_COMBO_BOX(info.sizecombo), gettext(sizes[i].name));
-		if (gd_cell_scale==sizes[i].size)
-			gtk_combo_box_set_active(GTK_COMBO_BOX(info.sizecombo), i);
+	/* cells size combo for game */
+	gtk_table_attach(GTK_TABLE(table), gd_label_new_printf("<b>Game</b>"), 1, 2, 2, 3, GTK_EXPAND|GTK_FILL, 0, 0, 0);
+	info.sizecombo_game=gtk_combo_box_new_text();
+	for (i=0; i<GD_SCALING_MAX; i++) {
+		gtk_combo_box_append_text(GTK_COMBO_BOX(info.sizecombo_game), gettext(gd_scaling_name[i]));
+		if (gd_cell_scale_game==i)
+			gtk_combo_box_set_active(GTK_COMBO_BOX(info.sizecombo_game), i);
 	}
-	gtk_table_attach(GTK_TABLE(table), info.sizecombo, 1, 2, 2, 3, GTK_EXPAND|GTK_FILL, 0, 0, 0);
-	
+	gtk_table_attach(GTK_TABLE(table), info.sizecombo_game, 1, 2, 3, 4, GTK_EXPAND|GTK_FILL, 0, 0, 0);
+	/* image for game */
 	align=gtk_alignment_new(0.5, 0.5, 0, 0);
 	gtk_widget_set_size_request(align, 64, 64);
-	info.image=gtk_image_new();
-	gtk_container_add(GTK_CONTAINER(align), info.image);
-	gtk_table_attach(GTK_TABLE(table), align, 1, 2, 3, 4, GTK_EXPAND|GTK_FILL, 0, 0, 0);
+	info.image_game=gtk_image_new();
+	gtk_container_add(GTK_CONTAINER(align), info.image_game);
+	gtk_table_attach(GTK_TABLE(table), align, 1, 2, 4, 5, GTK_EXPAND|GTK_FILL, 0, 0, 0);
 	
-	g_signal_connect(G_OBJECT(info.sizecombo), "changed", G_CALLBACK(changed), &info);
-	g_signal_connect(G_OBJECT(gtk_tree_view_get_selection(GTK_TREE_VIEW(info.treeview))), "changed", G_CALLBACK(changed), &info);
-	update (&info);
+	/* cells size combo for editor */
+	gtk_table_attach(GTK_TABLE(table), gd_label_new_printf("<b>Editor</b>"), 2, 3, 2, 3, GTK_EXPAND|GTK_FILL, 0, 0, 0);
+	info.sizecombo_editor=gtk_combo_box_new_text();
+	for (i=0; i<GD_SCALING_MAX; i++) {
+		gtk_combo_box_append_text(GTK_COMBO_BOX(info.sizecombo_editor), gettext(gd_scaling_name[i]));
+		if (gd_cell_scale_editor==i)
+			gtk_combo_box_set_active(GTK_COMBO_BOX(info.sizecombo_editor), i);
+	}
+	gtk_table_attach(GTK_TABLE(table), info.sizecombo_editor, 2, 3, 3, 4, GTK_EXPAND|GTK_FILL, 0, 0, 0);
+	/* image for editor */	
+	align=gtk_alignment_new(0.5, 0.5, 0, 0);
+	gtk_widget_set_size_request(align, 64, 64);
+	info.image_editor=gtk_image_new();
+	gtk_container_add(GTK_CONTAINER(align), info.image_editor);
+	gtk_table_attach(GTK_TABLE(table), align, 2, 3, 4, 5, GTK_EXPAND|GTK_FILL, 0, 0, 0);
 	
+	/* add the "changed" signal handlers only here, as by appending the texts, the changes signal whould have been called */
+	g_signal_connect(G_OBJECT(info.sizecombo_game), "changed", G_CALLBACK(settings_window_changed), &info);
+	g_signal_connect(G_OBJECT(info.sizecombo_editor), "changed", G_CALLBACK(settings_window_changed), &info);
+	g_signal_connect(G_OBJECT(selection), "changed", G_CALLBACK(settings_window_changed), &info);
+	settings_window_update (&info);
+
+	/* run dialog */
 	gtk_widget_show_all (dialog);
 	gtk_dialog_run(GTK_DIALOG(dialog));
 
-	if (!gtk_tree_selection_get_selected(gtk_tree_view_get_selection(GTK_TREE_VIEW(info.treeview)), NULL, &iter))
-		return;
-	gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, THEME_COL_FILENAME, &filename, -1);
+	/* get cell sizes */
+	gd_cell_scale_game=gtk_combo_box_get_active(GTK_COMBO_BOX(info.sizecombo_game));
+	gd_cell_scale_editor=gtk_combo_box_get_active(GTK_COMBO_BOX(info.sizecombo_editor));
+	/* get theme file name from table */
+	if (gtk_tree_selection_get_selected(selection, NULL, &iter))
+		gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, THEME_COL_FILENAME, &filename, -1);
+	else
+		filename=NULL;
+	gtk_widget_destroy (dialog);
+
+	/* load new theme */
 	if (filename) {
 		if (gd_loadcells_file(filename)) {
 			/* if successful, remember theme setting */
 			g_free(gd_theme);
 			gd_theme=g_strdup(filename);
 		} else {
-			/* do nothing */
-			g_warning("%s: unable to load theme", filename);
+			/* unable to load; switch to default theme */
+			g_warning("%s: unable to load theme, switching to built-in", filename);
+			g_free(gd_theme);
+			gd_theme=NULL;
 		}
 	}
 	else {
 		/* no filename means the builtin */
-		gd_loadcells_default();
 		g_free(gd_theme);
 		gd_theme=NULL;
+		gd_loadcells_default();
 	}
-	gd_cell_scale=sizes[gtk_combo_box_get_active(GTK_COMBO_BOX(info.sizecombo))].size;
-
-	gtk_widget_destroy (dialog);
 }
 
 

@@ -45,7 +45,7 @@
 void gd_create_stock_icons (void);
 
 GdkPixbuf *gd_icon (void);
-GdkPixbuf *gd_title (void);
+GdkPixmap **gd_create_title_animation (void);
 
 void gd_preferences (GtkWidget *parent);
 

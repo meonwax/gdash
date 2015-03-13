@@ -16,6 +16,7 @@
 
 #include <glib.h>
 #include <glib/gi18n.h>
+#include "config.h"
 
 const char *gd_about_license="Copyright (c) 2007, 2008, Czirkos Zoltan <cirix@fw.hu>"
 				"\n"
@@ -33,7 +34,12 @@ const char *gd_about_license="Copyright (c) 2007, 2008, Czirkos Zoltan <cirix@fw
 
 
 const char *gd_about_artists[]={ "CWS", NULL };
-const char *gd_about_authors[]={ "cirix <cirix@fw.hu>", NULL };
+const char *gd_about_authors[]={ "cirix <cirix@fw.hu>",
+                                 "Scale2x: Andrea Mazzoleni",
+#ifdef USE_SDL
+                                 "SDL_gfx rotozoom: A. Schiffler",
+#endif
+								NULL };
 const char *gd_about_documenters[]={ "LogicDeLuxe", NULL };
 const char *gd_about_comments=N_("Classic game similar to Emerald Mines.\nCollect diamonds and find exit!");
 const char *gd_about_translator_credits=N_("translator-credits");

@@ -90,20 +90,20 @@ GdElements gd_elements[] = {
 	{O_DIRT_SLOPED_DOWN_RIGHT, N_("Sloped dirt (down & right)"), P_DIRT|P_SLOPED_DOWN|P_SLOPED_RIGHT|P_AMOEBA_CONSUMES, "DIRTSLOPEDDOWNRIGHT", 0, 283, 283, 283},
 	{O_DIRT2, N_("Dirt 2"), P_DIRT|P_AMOEBA_CONSUMES, "DIRT2", 0, 3, 3, 3},
 	{O_BRICK, N_("Brick wall"), P_SLOPED|P_CAN_BE_HAMMERED, "WALL", 'w', 5, 5, 5},
-	{O_BRICK_SLOPED_UP_RIGHT, N_("Brick wall (up & right)"), P_SLOPED_UP|P_SLOPED_RIGHT|P_CAN_BE_HAMMERED, "WALLSLOPEDUPRIGHT", 0, 276, 276, 276},
-	{O_BRICK_SLOPED_UP_LEFT, N_("Brick wall (up & left)"), P_SLOPED_UP|P_SLOPED_LEFT|P_CAN_BE_HAMMERED, "WALLSLOPEDUPLEFT", 0, 277, 277, 277},
-	{O_BRICK_SLOPED_DOWN_LEFT, N_("Brick wall (down & left)"), P_SLOPED_DOWN|P_SLOPED_LEFT|P_CAN_BE_HAMMERED, "WALLSLOPEDDOWNLEFT", 0, 278, 278, 278},
-	{O_BRICK_SLOPED_DOWN_RIGHT, N_("Brick wall (down & right)"), P_SLOPED_DOWN|P_SLOPED_RIGHT|P_CAN_BE_HAMMERED, "WALLSLOPEDDOWNRIGHT", 0, 279, 279, 279},
+	{O_BRICK_SLOPED_UP_RIGHT, N_("Sloped brick wall (up & right)"), P_SLOPED_UP|P_SLOPED_RIGHT|P_CAN_BE_HAMMERED, "WALLSLOPEDUPRIGHT", 0, 276, 276, 276},
+	{O_BRICK_SLOPED_UP_LEFT, N_("Sloped brick wall (up & left)"), P_SLOPED_UP|P_SLOPED_LEFT|P_CAN_BE_HAMMERED, "WALLSLOPEDUPLEFT", 0, 277, 277, 277},
+	{O_BRICK_SLOPED_DOWN_LEFT, N_("Sloped brick wall (down & left)"), P_SLOPED_DOWN|P_SLOPED_LEFT|P_CAN_BE_HAMMERED, "WALLSLOPEDDOWNLEFT", 0, 278, 278, 278},
+	{O_BRICK_SLOPED_DOWN_RIGHT, N_("Sloped brick wall (down & right)"), P_SLOPED_DOWN|P_SLOPED_RIGHT|P_CAN_BE_HAMMERED, "WALLSLOPEDDOWNRIGHT", 0, 279, 279, 279},
 	{O_MAGIC_WALL, N_("Magic wall"), 0, "MAGICWALL", 'M', 184, -184, -184},
 	{O_PRE_OUTBOX, N_("Outbox"), 0, "OUTBOX", 'X', 351, -291, 22},	/* 291, 292, 293, 294, 295, 296, 297, 298 */
 	{O_OUTBOX, N_("Outbox (open)"), 0, "OUTBOXopen", 0, 299, 299, 22},
 	{O_PRE_INVIS_OUTBOX, N_("Invisible outbox"), 0, "HIDDENOUTBOX", 'H', 288, 288, 22},
 	{O_INVIS_OUTBOX, N_("Invisible outbox (open)"), 0, "HIDDENOUTBOXopen", 0, 300, 300, 22},
 	{O_STEEL, N_("Steel wall"), P_NON_EXPLODABLE, "STEELWALL", 'W', 4, 4, 4},
-	{O_STEEL_SLOPED_UP_RIGHT, N_("Steel wall (up & right)"), P_SLOPED_UP|P_SLOPED_RIGHT|P_NON_EXPLODABLE, "STEELWALLSLOPEDUPRIGHT", 0, 284, 284, 284},
-	{O_STEEL_SLOPED_UP_LEFT, N_("Steel wall (up & left)"), P_SLOPED_UP|P_SLOPED_LEFT|P_NON_EXPLODABLE, "STEELWALLSLOPEDUPLEFT", 0, 285, 285, 285},
-	{O_STEEL_SLOPED_DOWN_LEFT, N_("Steel wall (down & left)"), P_SLOPED_DOWN|P_SLOPED_LEFT|P_NON_EXPLODABLE, "STEELWALLSLOPEDDOWNLEFT", 0, 286, 286, 286},
-	{O_STEEL_SLOPED_DOWN_RIGHT, N_("Steel wall (down & right)"), P_SLOPED_DOWN|P_SLOPED_RIGHT|P_NON_EXPLODABLE, "STEELWALLSLOPEDDOWNRIGHT", 0, 287, 287, 287},
+	{O_STEEL_SLOPED_UP_RIGHT, N_("Sloped steel wall (up & right)"), P_SLOPED_UP|P_SLOPED_RIGHT|P_NON_EXPLODABLE, "STEELWALLSLOPEDUPRIGHT", 0, 284, 284, 284},
+	{O_STEEL_SLOPED_UP_LEFT, N_("Sloped steel wall (up & left)"), P_SLOPED_UP|P_SLOPED_LEFT|P_NON_EXPLODABLE, "STEELWALLSLOPEDUPLEFT", 0, 285, 285, 285},
+	{O_STEEL_SLOPED_DOWN_LEFT, N_("Sloped steel wall (down & left)"), P_SLOPED_DOWN|P_SLOPED_LEFT|P_NON_EXPLODABLE, "STEELWALLSLOPEDDOWNLEFT", 0, 286, 286, 286},
+	{O_STEEL_SLOPED_DOWN_RIGHT, N_("Sloped steel wall (down & right)"), P_SLOPED_DOWN|P_SLOPED_RIGHT|P_NON_EXPLODABLE, "STEELWALLSLOPEDDOWNRIGHT", 0, 287, 287, 287},
 	{O_STEEL_EXPLODABLE, N_("Explodable steel wall"), 0, "STEELWALLDESTRUCTABLE", 'E', 309, 309, 4},
 	{O_STEEL_EATABLE, N_("Eatable steel wall"), 0, "STEELWALLEATABLE", 0, 339, 339, 4},
 	{O_BRICK_EATABLE, N_("Eatable brick wall"), 0, "WALLEATABLE", 0, 340, 340, 5},
@@ -357,8 +357,9 @@ const GdCaveProperties gd_cave_properties[] = {
 	{"TimeValue", GD_TYPE_INT, 0, N_("Score for time"), G_STRUCT_OFFSET(Cave, level_timevalue[0]), 5, N_("Points for each seconds remaining, when the player exits the level."), 1, 0, 50},
 	{"CaveScheduling", GD_TYPE_SCHEDULING, GD_DONT_SAVE, N_("Scheduling type"), G_STRUCT_OFFSET(Cave, scheduling), 1, N_("This flag sets whether the game uses an emulation of the original timing (c64-style), or a more modern milliseconds-based timing. The original game used a delay (empty loop) based timing of caves; this is selected by setting this to BD1, Construction Kit or Crazy Dream 7."), GD_SCHEDULING_MILLISECONDS},
 	{"CaveDelay", GD_TYPE_INT, GD_DONT_SAVE, N_("   Delay (c64-style)"), G_STRUCT_OFFSET(Cave, level_ckdelay[0]), 5, N_("The length of the delay loop between game frames. Used when milliseconds-based timing is inactive, ie. C64 scheduling is on."), 0, 0, 32},
+	{"HatchingTime", GD_TYPE_INT, 0, N_("   Hatching time (seconds)"), G_STRUCT_OFFSET(Cave, hatching_delay_time), 1, N_("This value sets how much the cave will move until the player enters the cave. This is used for the C64-like schedulings."), 2, 1, 40},
 	{"FrameTime", GD_TYPE_INT, GD_DONT_SAVE, N_("   Speed (ms)"), G_STRUCT_OFFSET(Cave, level_speed[0]), 5, N_("Number of milliseconds between game frames. Used when milliseconds-based timing is active, ie. C64 scheduling is off."), 200, 50, 500},
-	{"HatchingDelay", GD_TYPE_INT, 0, N_("Hatching delay"), G_STRUCT_OFFSET(Cave, hatching_delay), 1, N_("This value sets how much the cave will move until the player enters the cave. If C64 scheduling is used, then this is in seconds; if not, then it is in frames."), 21, 1, 40},
+	{"HatchingDelay", GD_TYPE_INT, 0, N_("   Hatching delay (frames)"), G_STRUCT_OFFSET(Cave, hatching_delay_frame), 1, N_("This value sets how much the cave will move until the player enters the cave. This is used for the milliseconds-based scheduling."), 21, 1, 40},
 	{"", GD_LABEL, 0, N_("<b>Elements</b>")},
 	{"RandSeed", GD_TYPE_INT, 0, N_("Random seed value"), G_STRUCT_OFFSET(Cave, level_rand[0]), 5, N_("Random seed value controls the predictable random number generator, which fills the cave initially. If set to -1, cave is totally random every time it is played."), 0, -1, 255},
 
@@ -392,8 +393,8 @@ const GdCaveProperties gd_cave_properties[] = {
 	/* voodoo */
 	{"", GD_LABEL, 0, N_("<b>Voodoo Doll</b>")},
 	{"DummyProperties.diamondcollector", GD_TYPE_BOOLEAN, 0, N_("Can collect diamonds"), G_STRUCT_OFFSET(Cave, voodoo_collects_diamonds), 1, N_("Controls if a voodoo doll can collect diamonds for the player."), FALSE},
+	{"DummyProperties.destructable", GD_TYPE_BOOLEAN, 0, N_("Can be destroyed by explosion"), G_STRUCT_OFFSET(Cave, voodoo_can_be_destroyed), 1, N_("Controls if the voodoo can be destroyed by an explosion nearby. If not, it is converted to a gravestone, and you get a time penalty."), TRUE},
 	{"DummyProperties.penalty", GD_TYPE_BOOLEAN, 0, N_("Dies if hit by a stone"), G_STRUCT_OFFSET(Cave, voodoo_dies_by_stone), 1, N_("Controls if the voodoo doll dies if it is hit by a stone. Then the player gets a time penalty."), FALSE},
-	{"DummyProperties.destructable", GD_TYPE_BOOLEAN, 0, N_("Can be destroyed"), G_STRUCT_OFFSET(Cave, voodoo_can_be_destroyed), 1, N_("Controls if the voodoo can be destroyed by an explosion nearby. If not, it is converted to a gravestone, and you get a time penalty."), TRUE},
 	{"PenaltyTime", GD_TYPE_INT, 0, N_("Time penalty (s)"), G_STRUCT_OFFSET(Cave, penalty_time), 1, N_("Penalty time when the voodoo is destroyed by a stone."), 30, 0, 100},
 
 	/* ACTIVE 1 */
@@ -416,6 +417,10 @@ const GdCaveProperties gd_cave_properties[] = {
 	{"AmoebaGrowthProb", GD_TYPE_PROBABILITY, 0, N_("Growth ratio, fast (%)"), G_STRUCT_OFFSET(Cave, amoeba_fast_growth_prob), 1, N_("This sets the speed at which a fast amoeba grows."), 250000},
 	{"AmoebaProperties", GD_TYPE_ELEMENT, 0, N_("If too big, converts to"), G_STRUCT_OFFSET(Cave, too_big_amoeba_to), 1, N_("Controls which element an overgrown amoeba converts to."), O_STONE},
 	{"AmoebaProperties", GD_TYPE_ELEMENT, 0, N_("If enclosed, converts to"), G_STRUCT_OFFSET(Cave, enclosed_amoeba_to), 1, N_("Controls which element an enclosed amoeba converts to."), O_DIAMOND},
+	/* water */
+	{"", GD_LABEL, 0, N_("<b>Water</b>")},
+	{"WaterProperties.doesnotflowdown", GD_TYPE_BOOLEAN, 0, N_("Water does not flow downwards"), G_STRUCT_OFFSET(Cave, water_does_not_flow_down), 1, N_("In CrDr, the water element had the odd property that it did not flow downwards, only in other directions. This flag emulates this behaviour."), FALSE},
+	{"WaterProperties.sound", GD_TYPE_BOOLEAN, 0, N_("Has sound"), G_STRUCT_OFFSET(Cave, water_sound), 1, N_("If true, the cave containing water will have sound."), TRUE},
 
 	/* ACTIVE 2 */
 	{"", GD_TAB, 0, N_("More elements")},
@@ -428,10 +433,12 @@ const GdCaveProperties gd_cave_properties[] = {
 	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("Eats this and converts to"), G_STRUCT_OFFSET(Cave, slime_converts_1), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though."), O_DIAMOND_F},
 	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("Eats this and converts to"), G_STRUCT_OFFSET(Cave, slime_eats_2), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though."), O_STONE},
 	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("Eats this and converts to"), G_STRUCT_OFFSET(Cave, slime_converts_2), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though."), O_STONE_F},
+	{"SlimeProperties.sound", GD_TYPE_BOOLEAN, 0, N_("Has sound"), G_STRUCT_OFFSET(Cave, slime_sound), 1, N_("If true, the elements passing slime will have sound."), TRUE},
 	/* acid */
 	{"", GD_LABEL, 0, N_("<b>Acid</b>")},
 	{"AcidProperties", GD_TYPE_ELEMENT, 0, N_("Eats this element"), G_STRUCT_OFFSET(Cave, acid_eats_this), 1, N_("The element which acid eats. If it cannot find any, it simply disappears."), O_DIRT},
 	{"AcidProperties", GD_TYPE_PROBABILITY, 0, N_("Spread ratio (%)"), G_STRUCT_OFFSET(Cave, acid_spread_ratio), 1, N_("The probability at which an acid will explode and eat neighbouring elements."), 31250},
+	{"AcidProperties.sound", GD_TYPE_BOOLEAN, 0, N_("Has sound"), G_STRUCT_OFFSET(Cave, acid_spread_sound), 1, N_("If true, the spearding acid will have sound."), TRUE},
 	{"ACIDEffect", GD_TYPE_EFFECT, 0, N_("Turns to this when spreading"), G_STRUCT_OFFSET(Cave, acid_turns_to), 1, N_("If acid converts to explosion on spreading or not."), O_EXPLODE_3},
 	/* biter */
 	{"", GD_LABEL, 0, N_("<b>Biter</b>")},
@@ -440,9 +447,6 @@ const GdCaveProperties gd_cave_properties[] = {
 	/* bladder */
 	{"", GD_LABEL, 0, N_("<b>Bladder</b>")},
 	{"BladderProperties", GD_TYPE_ELEMENT, 0, N_("Bladders convert to clock by touching"), G_STRUCT_OFFSET(Cave, bladder_converts_by), 1, NULL, O_VOODOO},
-	/* water */
-	{"", GD_LABEL, 0, N_("<b>Water</b>")},
-	{"WaterProperties.doesnotflowdown", GD_TYPE_BOOLEAN, 0, N_("Water does not flow downwards"), G_STRUCT_OFFSET(Cave, water_does_not_flow_down), 1, N_("In CrDr, the water element had the odd property that it did not flow downwards, only in other directions. This flag emulates this behaviour."), FALSE},
 
 	/* EFFECTS */
 	{"", GD_TAB, 0, N_("Effects")},
@@ -986,6 +990,27 @@ gd_cave_setup_for_game(Cave *cave)
 				}
 	}
 		
+	gd_cave_correct_visible_size(cave);
+
+	/* select number of milliseconds (for pal and ntsc) */
+	cave->timing_factor=cave->pal_timing?1200:1000;
+	cave->time*=cave->timing_factor;
+	cave->magic_wall_milling_time*=cave->timing_factor;
+	cave->amoeba_slow_growth_time*=cave->timing_factor;
+	cave->hatching_delay_time*=cave->timing_factor;
+	if (cave->hammered_walls_reappear)
+		cave->hammered_reappear=gd_cave_map_new(cave, int);
+}
+
+/* cave diamonds needed can be set to n<=0. */
+/* if so, count the diamonds at the time of the hatching, and decrement that value from */
+/* the number of diamonds found. */
+/* of course, this function is to be called from the cave engine, at the exact time of hatching. */
+void
+gd_cave_count_diamonds(Cave *cave)
+{
+	int x, y;
+	
 	/* if automatically counting diamonds. if this was negative,
 	 * the sum will be this less than the number of all the diamonds in the cave */
 	if (cave->diamonds_needed<=0) {
@@ -997,23 +1022,9 @@ gd_cave_setup_for_game(Cave *cave)
 			/* if still below zero, let this be 0, so gate will be open immediately */
 			cave->diamonds_needed=0;
 	}
-
-	gd_cave_correct_visible_size(cave);
-
-	/* select number of milliseconds (for pal and ntsc) */
-	cave->timing_factor=cave->pal_timing?1200:1000;
-	cave->time*=cave->timing_factor;
-	cave->magic_wall_milling_time*=cave->timing_factor;
-	cave->amoeba_slow_growth_time*=cave->timing_factor;
-	/* for all c64-type scheduling types, hatching delay means seconds. otherwise, it means frames, so we do not touch it. */
-	if (cave->scheduling!=GD_SCHEDULING_MILLISECONDS)
-		cave->hatching_delay*=cave->timing_factor;
-	if (cave->hammered_walls_reappear)
-		cave->hammered_reappear=gd_cave_map_new(cave, int);
 }
 
-
-/**
+/*
 	Put an object to the specified position.
 	Performs range checking.
 	order is a pointer to the GdObject describing this object. Thus the editor can identify which cell was created by which object.

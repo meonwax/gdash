@@ -18,28 +18,32 @@
 
 #include <gtk/gtkwidget.h>
 #include <gtk/gtkliststore.h>
+#include "settings.h"
 #include "cave.h"
 
-extern int cell_size;
-extern GdkPixmap *cells[NUM_OF_CELLS*3];
-extern GdkPixbuf *cells_pb[NUM_OF_CELLS];
+extern int gd_cell_size_game, gd_cell_size_editor;
 extern GdkPixbuf *gd_pixbuf_for_builtin;
 
 /* tv stripes for a pixbuf. exported for the settings window */
 void gd_tv_pixbuf(GdkPixbuf *pixbuf);
+GdkPixbuf *gd_pixbuf_scale(GdkPixbuf *orig, GdScalingType type);
 
 /* png graphics loading */
-gboolean gd_is_png_ok_for_theme(const char *filename);
+gboolean gd_is_image_ok_for_theme(const char *filename);
 void gd_loadcells_default();
 gboolean gd_loadcells_file(const char *filename);
 
 /* set scaling */
-void gd_create_pixmaps();
 void gd_select_pixbuf_colors (GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5);
+
+GdkPixmap *gd_game_pixmap(int index);
+GdkPixmap *gd_editor_pixmap(int index);
 
 GdkPixbuf *gd_get_element_pixbuf_with_border (GdElement element);
 GdkPixbuf *gd_get_element_pixbuf_simple_with_border (GdElement element);
 GdkPixbuf *gd_drawcave_to_pixbuf(const Cave * cave, const int width, const int height, const gboolean game_view);
+
+void gd_create_pixbuf_for_builtin_gfx();
 
 
 #endif

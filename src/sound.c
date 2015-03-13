@@ -89,7 +89,7 @@ loadsound(GdSound which, const char *filename)
 static gboolean
 is_sound_looped(GdSound sound)
 {
-	if (sound==GD_S_COVER || sound==GD_S_AMOEBA || sound==GD_S_MAGIC_WALL || sound==GD_S_COVER || sound==GD_S_PNEUMATIC_HAMMER)
+	if (sound==GD_S_COVER || sound==GD_S_AMOEBA || sound==GD_S_MAGIC_WALL || sound==GD_S_COVER || sound==GD_S_PNEUMATIC_HAMMER || sound==GD_S_WATER)
 		return TRUE;
 	else
 		return FALSE;
@@ -101,6 +101,14 @@ static void
 channel_done(int channel)
 {
 	sound_playing[channel]=GD_S_NONE;
+}
+#endif
+
+#ifdef GD_SOUND
+static void
+halt_channel(int channel)
+{
+	Mix_FadeOutChannel(channel, 80);
 }
 #endif
 
@@ -125,10 +133,6 @@ play_sound(int channel, GdSound sound)
 	/* others are hack! */
 	switch (sound) {
 		case GD_S_DIAMOND_RANDOM:
-		case GD_S_BOMB_COLLECT:
-		case GD_S_KEY_COLLECT:
-		case GD_S_SWITCH_CHANGE:
-		case GD_S_BLADDER_SPENDER:
 			sound=diamond_sounds[g_random_int_range(0, G_N_ELEMENTS(diamond_sounds))];
 			break;
 
@@ -146,21 +150,13 @@ play_sound(int channel, GdSound sound)
 			channel=1, other_channel=4;
 			
 		if (sound_playing[other_channel]!=GD_S_NONE)
-			Mix_FadeOutChannel(other_channel, 50);
+			halt_channel(other_channel);
 	}
 
 	/* channel 2 and 3 sounds are started immediately; channel 1 may have been changed to channel 4 above. */
 	Mix_PlayChannel(channel, sounds[sound], is_sound_looped(sound)?-1:0);
 	Mix_Volume(channel, MIX_MAX_VOLUME);
 	sound_playing[channel]=sound;
-}
-#endif
-
-#ifdef GD_SOUND
-static void
-halt_channel(int channel)
-{
-	Mix_FadeOutChannel(channel, 50);
 }
 #endif
 
@@ -188,6 +184,7 @@ gd_sound_init()
 	loadsound(GD_S_MAGIC_WALL, "magic_wall.ogg");
 	loadsound(GD_S_CRACK, "crack.ogg");
 	loadsound(GD_S_COVER, "cover.ogg");
+	loadsound(GD_S_GRAVITY_CHANGE, "gravity_change.ogg");
 
 	loadsound(GD_S_TIMEOUT_1, "timeout_1.ogg");
 	loadsound(GD_S_TIMEOUT_2, "timeout_2.ogg");
@@ -221,6 +218,28 @@ gd_sound_init()
 	loadsound(GD_S_DIAMOND_6, "diamond_6.ogg");
 	loadsound(GD_S_DIAMOND_7, "diamond_7.ogg");
 	loadsound(GD_S_DIAMOND_8, "diamond_8.ogg");
+	loadsound(GD_S_SLIME, "slime.ogg");
+	loadsound(GD_S_KEY_COLLECT, "key_collect.ogg");
+	loadsound(GD_S_BLADDER_SPENDER, "bladder_spender.ogg");
+	loadsound(GD_S_BLADDER_CONVERT, "bladder_convert.ogg");
+	loadsound(GD_S_BOMB_EXPLOSION, "bomb_explosion.ogg");
+	loadsound(GD_S_GHOST_EXPLOSION, "ghost_explosion.ogg");
+	loadsound(GD_S_VOODOO_EXPLOSION, "voodoo_explosion.ogg");
+	loadsound(GD_S_BOMB_PLACE, "bomb_place.ogg");
+	
+	loadsound(GD_S_PNEUMATIC_COLLECT, "pneumatic_collect.ogg");
+	loadsound(GD_S_CLOCK_COLLECT, "clock_collect.ogg");
+	loadsound(GD_S_BOMB_COLLECT, "bomb_collect.ogg");
+	loadsound(GD_S_SWEET_COLLECT, "sweet_collect.ogg");
+	loadsound(GD_S_BOX_PUSH, "box_push.ogg");
+	loadsound(GD_S_SWITCH_BITER, "switch_biter.ogg");
+	loadsound(GD_S_SWITCH_CREATURES, "switch_creatures.ogg");
+	loadsound(GD_S_SWITCH_GRAVITY, "switch_gravity.ogg");
+	loadsound(GD_S_SWITCH_GROWING, "switch_growing.ogg");
+
+	loadsound(GD_S_ACID_SPREAD, "acid_spread.ogg");
+	loadsound(GD_S_BONUS_LIFE, "bonus_life.ogg");
+	loadsound(GD_S_WATER, "water.ogg");
 
 	return TRUE;
 #else
@@ -256,17 +275,19 @@ gd_play_sounds(GdSound sound1, GdSound sound2, GdSound sound3)
 	
 	/* CHANNEL 3 is for crack sound, amoeba and magic wall. */
 	if (sound3!=GD_S_NONE) {
-		if (sound3==GD_S_CRACK) /* crack sound */
+		/* if requests a non-looped sound, play that immediately. that can be a crack sound, gravity change, new life, ... */
+		if (!is_sound_looped(sound3))
 			play_sound(3, sound3);
 		else {
-			/* only play, if another sound is requested, ie. != the previous one. otherwise it would not loop */
-			/* also, do not interrupt a crack sound */
-			if (sound_playing[3]!=GD_S_CRACK && sound3!=sound_playing[3])
+			/* if the sound is looped, play it, but only if != previous one. if they are equal, the sound is looped, and already playing. */
+			/* also, do not interrupt the previous sound, if it is non-looped. */
+			if (sound_playing[3]==GD_S_NONE || (sound3!=sound_playing[3] && is_sound_looped(sound_playing[3])))
 				play_sound(3, sound3);
 		}
 	} else {
-		/* sound3=none, so interrupt sound requested */
-		if (sound_playing[3]!=GD_S_CRACK)	/* do not interrupt crack sound */
+		/* sound3=none, so interrupt sound requested. */
+		/* only interrupt looped sounds. non-looped sounds will fade out automatically. */
+		if (is_sound_looped(sound_playing[3]))
 			halt_channel(3);
 	}
 
@@ -279,9 +300,7 @@ gd_play_sounds(GdSound sound1, GdSound sound2, GdSound sound3)
 		if (sound2==GD_S_EXPLOSION || sound_playing[2]!=GD_S_EXPLOSION)
 			play_sound(2, sound2);
 	} else {
-		/* pneumatic hammer is looped. stop it, if requested. */
-		if (sound_playing[2]==GD_S_PNEUMATIC_HAMMER)
-			halt_channel(2);
+		/* let sounds fade out. */
 	}
 
 	

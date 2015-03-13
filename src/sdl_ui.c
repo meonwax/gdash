@@ -46,7 +46,8 @@ enum {
 	
 };
 
-int clamp(int val, int min, int max)
+static int
+clamp(int val, int min, int max)
 {
 	g_assert(min<=max);
 	
@@ -58,11 +59,26 @@ int clamp(int val, int min, int max)
 }
 
 
+/* set title line (the first line in the screen) to text */
+void
+gd_title_line(const char *text)
+{
+	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, text);
+}
+
+/* set status line (the last line in the screen) to text */
+void
+gd_status_line(const char *text)
+{
+	gd_blittext_n(gd_screen, -1, gd_screen->h-gd_font_height(), GD_C64_GRAY2, text);
+}
+
+
 char *
 gd_select_file(const char *title, const char *start_dir, const char *glob)
 {
 	static char *current_dir=NULL;	/* static to not worry about freeing */
-	const int yd=10;
+	const int yd=gd_line_height();
 	const int names_per_page=gd_screen->h/yd-3;
 	char *result;
 	char *directory;
@@ -80,8 +96,8 @@ gd_select_file(const char *title, const char *start_dir, const char *glob)
 	current_dir=g_get_current_dir();
 	
 	gd_backup_and_dark_screen();
-	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, title);
-	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "MOVE: SELECT   J: JUMP   ESC: CANCEL");
+	gd_title_line(title);
+	gd_status_line("MOVE: SELECT   J: JUMP   ESC: CANCEL");
 
 	/* this is somewhat hackish; finds out the absolute path of start_dir. also tests is we can enter that directory */
 	if (g_chdir(start_dir)==-1) {
@@ -275,37 +291,180 @@ gd_select_file(const char *title, const char *start_dir, const char *glob)
 
 
 
+
+
+/*
+ *
+ * THEME HANDLING
+ *
+ */
+static gboolean
+is_image_ok_for_theme (const char *filename)
+{
+	SDL_Surface *surface;
+	gboolean result=FALSE;
+
+	surface=SDL_LoadBMP(filename);
+	if (!surface)
+		return FALSE;
+	/* if the bmp is loaded */
+	if (surface) {
+		gd_error_set_context("%s", filename);
+		if (gd_is_surface_ok_for_theme(surface))			/* if bmp passes all checks, result is "OK" */
+			result=TRUE;
+		gd_error_set_context(NULL);
+		SDL_FreeSurface(surface);
+	}
+	
+	return result;
+}
+
+
+static void
+add_file_to_themes(GPtrArray *themes, const char *filename)
+{
+	int i;
+	
+	g_assert(filename!=NULL);
+
+	/* if file name already in themes list, remove. */	
+	for (i=0; i<themes->len; i++)
+		if (g_ptr_array_index(themes, i)!=NULL && g_str_equal(g_ptr_array_index(themes, i), filename))
+			g_ptr_array_remove_index_fast(themes, i);
+
+	if (is_image_ok_for_theme(filename))
+		g_ptr_array_add(themes, g_strdup(filename));
+}
+
+
+static void
+add_dir_to_themes(GPtrArray *themes, const char *directory_name)
+{
+	GDir *dir;
+	const char *name;
+	
+	dir=g_dir_open(directory_name, 0, NULL);
+	if (!dir)
+		/* silently ignore unable-to-open directories */
+		return;
+	while((name=g_dir_read_name(dir))) {
+		char *filename;
+		char *lower;
+		
+		filename=g_build_filename(directory_name, name, NULL);
+		lower=g_ascii_strdown(filename, -1);
+
+		/* we can only open bmp files. converted to lowercase, to be able to check for .bmp */
+		if (g_str_has_suffix(lower, ".bmp") && g_file_test(filename, G_FILE_TEST_IS_REGULAR))
+			/* try to add the file. */
+			add_file_to_themes(themes, filename);
+
+		g_free(lower);
+		g_free(filename);
+	}
+}
+
+/* this is in glib 2.16, but that is too new for some users. */
+static int
+strcmp0(const char *str1, const char *str2)
+{
+	if (str1==NULL && str2==NULL)
+		return 0;
+	if (str1==NULL)
+		return -1;
+	if (str2==NULL)
+		return 1;
+	return strcmp(str1, str2);
+}
+
+/* will create a list of file names which can be used as themes. */
+/* the first item will be a NULL to represent the default, built-in theme. */
+GPtrArray *
+gd_create_themes_list()
+{
+	GPtrArray *themes;
+	int i;
+	gboolean current_found;
+	
+	themes=g_ptr_array_new();
+	g_ptr_array_add(themes, NULL);	/* this symbolizes the default theme */
+	add_dir_to_themes(themes, gd_system_data_dir);
+	add_dir_to_themes(themes, gd_user_config_dir);
+	
+	/* check if current theme is in the array */
+	current_found=FALSE;
+	for (i=0; i<themes->len; i++)
+		if (strcmp0(gd_sdl_theme, g_ptr_array_index(themes, i))==0)
+			current_found=TRUE;
+	if (!current_found)
+		add_file_to_themes(themes, gd_sdl_theme);
+
+	return themes;
+}
+
+
+/*
+ *   SDASH SETTINGS MENU
+ */
+
 void
 gd_settings_menu()
 {
+	static GPtrArray *themes=NULL;
 	gboolean finished;
-	const char *yes="yes", *no="no ";
+	const char *yes="yes", *no="no";
+	int themenum;
+	typedef enum _settingtype {
+		TypeBoolean,
+		TypeScale,
+		TypeTheme,
+	} SettingType;
 	struct _setting {
+		SettingType type;
 		char *name;
-		gboolean *var;
+		void *var;
 	} settings[]= {
-		{ "Fullscreen", &gd_sdl_fullscreen },
-		{ "Sound", &gd_sdl_sound },
-		{ "16-bit mixing", &gd_sdl_16bit_mixing },
-		{ "44khz mixing", &gd_sdl_44khz_mixing },
-		{ "Easy play", &gd_easy_play },
-		{ "Use BDCFF highscore", &gd_use_bdcff_highscore },
-		{ "All caves selectable", &gd_all_caves_selectable },
-		{ "Random colors", &gd_random_colors },
+		{ TypeBoolean, "Fullscreen", &gd_sdl_fullscreen },
+		{ TypeTheme,   "Theme", NULL },
+		{ TypeScale,   "Scale", &gd_sdl_scale },
+		{ TypeBoolean, "TV emulation", &gd_sdl_tv_emulation },
+		{ TypeBoolean, "Sound", &gd_sdl_sound },
+		{ TypeBoolean, "16-bit mixing", &gd_sdl_16bit_mixing },
+		{ TypeBoolean, "44kHz mixing", &gd_sdl_44khz_mixing },
+		{ TypeBoolean, "Easy play", &gd_easy_play },
+		{ TypeBoolean, "Use BDCFF highscore", &gd_use_bdcff_highscore },
+		{ TypeBoolean, "Show name of game", &gd_show_name_of_game },
+		{ TypeBoolean, "All caves selectable", &gd_all_caves_selectable },
+		{ TypeBoolean, "Import as all selectable", &gd_import_as_all_caves_selectable },
+		{ TypeBoolean, "Random colors", &gd_random_colors },
 	};
 	int n;
 	int current;
-	int width, x1;
+	int width, x1, y1, yd;
 	
+	/* optionally create the list of themes, and also find the current one in the list. */
+	themes=gd_create_themes_list();
+	themenum=-1;
+	for (n=0; n<themes->len; n++)
+		if (strcmp0(gd_sdl_theme, g_ptr_array_index(themes, n))==0)
+			themenum=n;
+	if (themenum==-1) {
+		g_warning("theme %s not found in array", gd_sdl_theme);
+		themenum=0;
+	}
+
 	width=0;
 	for (n=0; n<G_N_ELEMENTS(settings); n++)
-		width=MAX(width, (strlen(settings[n].name)+1+strlen(yes))*8);	/* FIXME: 8=font width */
+		width=MAX(width, (strlen(settings[n].name)+1+strlen(yes))*gd_font_width());
 	x1=(gd_screen->w-width)/2;
+	yd=gd_line_height();
+	y1=(gd_screen->h-(G_N_ELEMENTS(settings)+2)*yd)/2;
 		
 	gd_backup_and_dark_screen();
-	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, "GDASH OPTIONS");
-	gd_blittext_n(gd_screen, -1, gd_screen->h-32, GD_C64_GRAY2, "Some changes require restart.");
-	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "CRSR: MOVE   FIRE: CHANGE   ESC: EXIT");
+	gd_title_line("GDASH OPTIONS");
+	gd_status_line("CRSR: MOVE   FIRE: CHANGE   ESC: EXIT");
+	gd_blittext_n(gd_screen, -1, gd_screen->h-4*gd_line_height(), GD_C64_GRAY2, "Some changes require restart.");
+	gd_blittext_n(gd_screen, -1, gd_screen->h-3*gd_line_height(), GD_C64_GRAY2, "Use T in the menu for a new theme.");
 	
 	current=0;
 	finished=FALSE;
@@ -314,11 +473,29 @@ gd_settings_menu()
 		for (n=0; n<G_N_ELEMENTS(settings); n++) {
 			int x;
 
-			gd_clear_line(gd_screen, 20+n*10);
+			gd_clear_line(gd_screen, y1+n*yd);
 			x=x1;
-			x=gd_blittext_n(gd_screen, x, 20+n*10, GD_C64_YELLOW, *settings[n].var?yes:no);
-			x+=10;
-			x=gd_blittext_n(gd_screen, x, 20+n*10, current==n?GD_C64_LIGHTGREEN:GD_C64_LIGHTBLUE, settings[n].name);
+			x=gd_blittext_n(gd_screen, x, y1+n*yd, current==n?GD_C64_LIGHTRED:GD_C64_BLUE, settings[n].name);
+			x+=2*gd_font_width();
+			switch(settings[n].type) {	
+				case TypeBoolean:
+					x=gd_blittext_n(gd_screen, x, y1+n*yd, GD_C64_YELLOW, *(gboolean *)settings[n].var?yes:no);
+					break;
+				case TypeScale:
+					x=gd_blittext_n(gd_screen, x, y1+n*yd, GD_C64_YELLOW, gd_scaling_name[*(GdScalingType *)settings[n].var]);
+					break;
+				case TypeTheme:
+					if (themenum==0)
+						x=gd_blittext_n(gd_screen, x, y1+n*yd, GD_C64_YELLOW, "[Default]");
+					else {
+						char *thm;
+						thm=g_filename_display_basename(g_ptr_array_index(themes, themenum));
+						if (strrchr(thm, '.'))	/* remove extension */
+							*strrchr(thm, '.')='\0';
+						x=gd_blittext_n(gd_screen, x, y1+n*yd, GD_C64_YELLOW, thm);
+						g_free(thm);
+					}
+			}
 		}
 		SDL_Flip(gd_screen);
 		
@@ -330,36 +507,107 @@ gd_settings_menu()
 			current=clamp(current-1, 0, G_N_ELEMENTS(settings)-1);
 		if (gd_down())
 			current=clamp(current+1, 0, G_N_ELEMENTS(settings)-1);
-		if (gd_left())
-			*settings[current].var=FALSE;
-		if (gd_right())
-			*settings[current].var=TRUE;
-		if (gd_space_or_enter_or_fire())
-			*settings[current].var=!*settings[current].var;
 		if (gd_keystate[SDLK_ESCAPE])
 			finished=TRUE;
 
-		SDL_Delay(100);
+		switch (settings[current].type) {
+			case TypeBoolean:
+				if (gd_left())
+					*(gboolean *)settings[current].var=FALSE;
+				if (gd_right())
+					*(gboolean *)settings[current].var=TRUE;
+				if (gd_space_or_enter_or_fire())
+					*(gboolean *)settings[current].var=!*(gboolean *)settings[current].var;
+				break;
+			case TypeScale:
+				if (gd_left())
+					*(int *)settings[current].var=MAX(0,(*(int *)settings[current].var)-1);
+				if (gd_right())
+					*(int *)settings[current].var=MIN(GD_SCALING_MAX-1,(*(int *)settings[current].var)+1);
+				if (gd_space_or_enter_or_fire())
+					*(int *)settings[current].var=(*(int *)settings[current].var+1)%GD_SCALING_MAX;
+				break;
+			case TypeTheme:
+				if (gd_left())
+					themenum=clamp(themenum-1, 0, themes->len-1);
+				if (gd_right())
+					themenum=clamp(themenum+1, 0, themes->len-1);
+				if (gd_space_or_enter_or_fire())
+					themenum=(themenum+1)%themes->len;
+				break;
+		}
+
+		SDL_Delay(160);
 	}
+	
+	/* set the theme. other variables are already set by the above code. */
+	g_free(gd_sdl_theme);
+	gd_sdl_theme=NULL;
+	if (themenum!=0)
+		gd_sdl_theme=g_strdup(g_ptr_array_index(themes, themenum));
+	gd_load_theme();	/* this loads the theme given in the global variable gd_sdl_theme. */
+	
+	/* forget list of themes */
+	g_ptr_array_foreach(themes, (GFunc) g_free, NULL);
+	g_ptr_array_free(themes, TRUE);
 	
 	gd_restore_screen();
 }
 
 
+
+void
+gd_install_theme()
+{
+	char *filename;
+
+	filename=gd_select_file("SELECT .BMP IMAGE FOR THEME", g_get_home_dir(), "*.bmp");
+	if (filename) {
+		gd_clear_errors();
+		if (is_image_ok_for_theme(filename)) {
+			/* if file is said to be ok as a theme */
+			char *basename, *new_filename;
+			GError *error=NULL;
+			gchar *contents;
+			gsize length;
+
+			/* make up new filename */
+			basename=g_path_get_basename(filename);
+			new_filename=g_build_path(G_DIR_SEPARATOR_S, gd_user_config_dir, basename, NULL);
+			g_free(basename);
+
+			/* copy theme to user config directory */
+			if (g_file_get_contents(filename, &contents, &length, &error) && g_file_set_contents(new_filename, contents, length, &error)) {
+				/* copied file. */
+			}
+			else {
+				/* unable to copy file. */
+				g_warning("%s", error->message);
+			}
+		} else {
+			/* if file is not ok as a theme */
+			g_warning("%s cannot be used as a theme", filename);
+		}
+	}
+	g_free(filename);
+}
+
 void
 gd_show_highscore(Cave *highlight_cave, int highlight_line)
 {
+	Cave *cave;
+	const int screen_height=gd_screen->h/gd_line_height();
+	int max=MIN(G_N_ELEMENTS(cave->highscore), screen_height-3);
 	gboolean finished;
 	GList *current=NULL;	/* current cave to view */
 	
 	gd_backup_and_dark_screen();
-	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, "THE HALL OF FAME");
-	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "CRSR: CAVE   SPACE: EXIT");
+	gd_title_line("THE HALL OF FAME");
+	gd_status_line("CRSR: CAVE   SPACE: EXIT");
 	
 	current=NULL;
 	finished=FALSE;
 	while (!finished && !gd_quit) {
-		Cave *cave;
 		int i;
 		
 		/* current cave or game */
@@ -368,21 +616,19 @@ gd_show_highscore(Cave *highlight_cave, int highlight_line)
 		else
 			cave=gd_default_cave;
 
-		gd_clear_line(gd_screen, (1)*8);
-		gd_blittext_n(gd_screen, -1, (1)*8, GD_C64_YELLOW, cave->name);
-
-		for (i=0; i<20; i++)
-			gd_clear_line(gd_screen, (i+2)*8);
+		gd_clear_line(gd_screen, gd_font_height());
+		gd_blittext_n(gd_screen, -1, gd_font_height(), GD_C64_YELLOW, cave->name);
 
 		/* show scores */		
-		for (i=0; i<G_N_ELEMENTS(cave->highscore); i++) {
+		for (i=0; i<max; i++) {
 			int c;
 			
+			gd_clear_line(gd_screen, (i+2)*gd_line_height());
 			c=i/5%2?GD_C64_PURPLE:GD_C64_GREEN;
 			if (cave==highlight_cave && i==highlight_line)
 				c=GD_C64_WHITE;
 			if (cave->highscore[i].score!=0)
-				gd_blittext_printf_n(gd_screen, 0, (i+3)*8, c, "%2d %6d %s", i+1, cave->highscore[i].score, cave->highscore[i].name);
+				gd_blittext_printf_n(gd_screen, 0, (i+2)*gd_line_height(), c, "%2d %6d %s", i+1, cave->highscore[i].score, cave->highscore[i].name);
 		}
 		SDL_Flip(gd_screen);
 
@@ -460,24 +706,24 @@ gd_help(const char **strings)
 	/* remember screen contents */
 	gd_backup_and_dark_screen();
 	
-	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, "GDASH HELP");
-	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "SPACE: EXIT");
+	gd_title_line("GDASH HELP");
+	gd_status_line("SPACE: EXIT");
 
 	numstrings=g_strv_length((gchar **) strings);
 
 	charwidth=0;
 	for (n=0; n<numstrings; n+=2)
 		charwidth=MAX(charwidth, strlen(strings[n])+1+strlen(strings[n+1]));
-	x1=gd_screen->w/2-charwidth*8/2;	/* FIXME 8 */
+	x1=gd_screen->w/2-charwidth*gd_font_width()/2;
 
-	y=(gd_screen->h-numstrings*10/2)/2;
+	y=(gd_screen->h-numstrings*(gd_line_height())/2)/2;
 	for (n=0; n<numstrings; n+=2) {
 		int x;
 		
 		x=gd_blittext_printf_n(gd_screen, x1, y, GD_C64_YELLOW, "%s ", strings[n]);
 		x=gd_blittext_printf_n(gd_screen, x, y, GD_C64_LIGHTBLUE, "%s", strings[n+1]);
 		
-		y+=10;
+		y+=gd_line_height();
 	}
 
 	SDL_Flip(gd_screen);
@@ -495,7 +741,7 @@ gd_help(const char **strings)
 char *
 gd_input_string(const char *title, const char *current)
 {
-	const int height=40;
+	const int height=5*gd_line_height();
 	int y1;
 	SDL_Rect rect;
 	gboolean enter, escape;
@@ -510,7 +756,7 @@ gd_input_string(const char *title, const char *current)
 	gd_backup_and_black_screen();
 	SDL_FillRect(gd_screen, &rect, SDL_MapRGB(gd_screen->format, 0, 0, 0));
 
-	gd_blittext_n(gd_screen, -1, y1+4, GD_C64_WHITE, title);
+	gd_blittext_n(gd_screen, -1, y1+gd_line_height(), GD_C64_WHITE, title);
 	
 	text=g_string_new(current);
 
@@ -524,8 +770,8 @@ gd_input_string(const char *title, const char *current)
 		SDL_Event event;
 		
 		n=(n+1)%10;
-		gd_clear_line(gd_screen, y1+20);
-		gd_blittext_printf_n(gd_screen, -1, y1+20, GD_C64_WHITE, "%s%c", text->str, n>=5?'_':' ');
+		gd_clear_line(gd_screen, y1+3*gd_line_height());
+		gd_blittext_printf_n(gd_screen, -1, y1+3*gd_line_height(), GD_C64_WHITE, "%s%c", text->str, n>=5?'_':' ');
 		SDL_Flip(gd_screen);
 		
 		while(SDL_PollEvent(&event))
@@ -585,7 +831,7 @@ gd_error_console()
 {
 	GList *iter;
 	GPtrArray *err;
-	const int yd=10;
+	const int yd=gd_line_height();
 	const int names_per_page=gd_screen->h/yd-3;
 	gboolean exit, clear;
 	int sel;
@@ -599,8 +845,8 @@ gd_error_console()
 	gd_clear_error_flag();
 	
 	gd_backup_and_dark_screen();
-	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, "GDASH ERRORS");
-	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "CRSR: SELECT    C: CLEAR    ESC: EXIT");
+	gd_title_line("GDASH ERRORS");
+	gd_status_line("CRSR: SELECT    C: CLEAR    ESC: EXIT");
 
 	exit=FALSE;
 	clear=FALSE;
@@ -684,11 +930,11 @@ gd_show_license()
 	/* remember screen contents */
 	gd_backup_and_dark_screen();
 	
-	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, "GDASH LICENSE");
-	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "SPACE: EXIT");
+	gd_title_line("GDASH LICENSE");
+	gd_status_line("SPACE: EXIT");
 
 	wrapped=gd_wrap_text(gd_about_license, 40);
-	gd_blittext_n(gd_screen, 0, 12, GD_C64_LIGHTBLUE, wrapped);
+	gd_blittext_n(gd_screen, 0, gd_line_height(), GD_C64_LIGHTBLUE, wrapped);
 	g_free(wrapped);
 	SDL_Flip(gd_screen);
 
@@ -703,7 +949,7 @@ gd_show_license()
 static int
 help_writeattrib(int x, int y, const char *name, const char *content)
 {
-	const int yd=10;
+	const int yd=gd_line_height();
 	
 	gd_blittext_n(gd_screen, x, y, GD_C64_YELLOW, name);
 	gd_blittext_n(gd_screen, x+10, y+yd, GD_C64_LIGHTBLUE, content);
@@ -716,7 +962,7 @@ help_writeattrib(int x, int y, const char *name, const char *content)
 static int
 help_writeattribs(int x, int y, const char *name, const char *content[])
 {
-	const int yd=10;
+	const int yd=gd_line_height();
 	
 	if (content!=NULL && content[0]!=NULL) {
 		int i;
@@ -743,8 +989,8 @@ gd_about()
 	/* remember screen contents */
 	gd_backup_and_dark_screen();
 	
-	gd_blittext_printf_n(gd_screen, -1, 0, GD_C64_WHITE, "GDASH %s", PACKAGE_VERSION);
-	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "SPACE: EXIT");
+	gd_title_line("GDASH " PACKAGE_VERSION);
+	gd_status_line("SPACE: EXIT");
 
 	y=20;
 	
@@ -753,7 +999,7 @@ gd_about()
 	y=help_writeattribs(10, y, "AUTHORS", gd_about_authors);
 	y=help_writeattribs(10, y, "ARTISTS", gd_about_artists);
 	y=help_writeattribs(10, y, "DOCUMENTERS", gd_about_documenters);
-	// extern char *gd_about_translator_credits;
+	/* extern char *gd_about_translator_credits;  -  NO TRANSLATION IN SDASH */
 	SDL_Flip(gd_screen);
 	
 	wait_for_keypress();
@@ -769,26 +1015,20 @@ gd_show_error(GdErrorMessage *error)
 	char *wrapped;
 	char **lines;
 	int linenum;
-	int y1, i;
+	int y1, i, yd;
 
-	wrapped=gd_wrap_text(error->message, 38);	/* FIXME */
+	wrapped=gd_wrap_text(error->message, gd_screen->w/gd_font_width()-2);
 	gd_backup_and_dark_screen();
 	lines=g_strsplit_set(wrapped, "\n", -1);
 	linenum=g_strv_length(lines);
 
-	y1=gd_screen->h/2-(linenum+1)*10/2;
-#if 0
-	rect.x=8;
-	rect.w=gd_screen->w-16;
-	rect.y=y1;
-	rect.h=(linenum+1)*10;
-	SDL_FillRect(gd_screen, &rect, SDL_MapRGB(gd_screen->format, 0, 0, 0));
-#endif
+	yd=gd_line_height();
+	y1=gd_screen->h/2-(linenum+1)*yd/2;
 
-	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, "GDASH ERROR");
-	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "ANY KEY: CONTINUE");
+	gd_title_line("GDASH ERROR");
+	gd_status_line("ANY KEY: CONTINUE");
 	for (i=0; lines[i]!=NULL; i++)
-		gd_blittext_n(gd_screen, 8, y1+(i+1)*10, GD_C64_WHITE, lines[i]);
+		gd_blittext_n(gd_screen, 8, y1+(i+1)*yd, GD_C64_WHITE, lines[i]);
 	SDL_Flip(gd_screen);
 	
 	wait_for_keypress();

@@ -35,6 +35,7 @@ ICONS = \
 
 TITLE = \
 	gdash_screen.png \
+	gdash_tile.png \
 	gdash.png \
 	gdash_32.png
 
@@ -43,8 +44,7 @@ noinst_HEADERS = \
 	c64_gfx.h \
 	c64_font.h \
 	title.h \
-	levels.h \
-	chargen.h
+	levels.h
 
 icondir = $(datadir)/pixmaps
 icon_DATA = gdash.png
@@ -54,8 +54,7 @@ pkgdata_DATA = boulder_rush.png c64_gfx.png c64_font.png
 EXTRA_DIST = $(ICONS) $(TITLE) $(icon_DATA) \
 	icons.list title.list \
 	$(pkgdata_DATA) \
-	$(CAVES) levels.h process.sh \
-	chargen
+	$(CAVES) levels.h process.sh
 
 
 # for included ICONS
@@ -126,6 +125,3 @@ file2c_SOURCES = \
 levels.h: $(CAVES) file2c Makefile.am
 	sh process.sh $(CAVES)
 
-
-chargen.h: chargen file2c
-	./file2c chargen "guint8 chargen[] = {" "};"  >$@

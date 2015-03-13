@@ -21,4 +21,6 @@
 void gd_main_start_level(const Cave *snapshot_cave);	/* start a game, if cave given, from snapshot. used by editor */
 void gd_main_stop_game ();	/* stop game if running, also used by editor */
 
+void gd_main_window_set_title();	/* set the title to the name of the caveset or the cave currently played. also used by editor */
+
 #endif /* _GAME_H */

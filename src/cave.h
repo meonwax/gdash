@@ -358,9 +358,13 @@ typedef enum _direction {
 typedef enum _sound {
 	GD_S_NONE,
 	GD_S_DIAMOND_RANDOM,	/* randomly select a diamond sound */
-	GD_S_AMOEBA,	/* loop */
-	GD_S_MAGIC_WALL,	/* loop */
-	GD_S_COVER,	/* loop */
+	GD_S_AMOEBA,			/* loop */
+	GD_S_MAGIC_WALL,		/* loop */
+	GD_S_COVER,				/* loop */
+	GD_S_PNEUMATIC_HAMMER,	/* loop */
+	GD_S_WATER,				/* loop */
+	GD_S_CRACK,
+	GD_S_GRAVITY_CHANGE,
 	GD_S_STONE,
 	GD_S_FALLING_WALL,
 	GD_S_GROWING_WALL,
@@ -368,7 +372,6 @@ typedef enum _sound {
 	GD_S_WALK_EARTH,
 	GD_S_WALK_EMPTY,
 	GD_S_STIRRING,
-	GD_S_PNEUMATIC_HAMMER,	/* loop */
 	GD_S_DIAMOND_1,
 	GD_S_DIAMOND_2,
 	GD_S_DIAMOND_3,
@@ -378,12 +381,19 @@ typedef enum _sound {
 	GD_S_DIAMOND_7,
 	GD_S_DIAMOND_8,
 	GD_S_DIAMOND_COLLECT,
+	GD_S_PNEUMATIC_COLLECT,
 	GD_S_BOMB_COLLECT,
+	GD_S_CLOCK_COLLECT,
+	GD_S_SWEET_COLLECT,
 	GD_S_KEY_COLLECT,
 	GD_S_SKELETON_COLLECT,
+	GD_S_SLIME,
+	GD_S_ACID_SPREAD,
+	GD_S_WATER_SPREAD,
+	GD_S_BLADDER_CONVERT,
 	GD_S_BLADDER_SPENDER,
+	GD_S_BOX_PUSH,
 	GD_S_TELEPORTER,
-	GD_S_SWITCH_CHANGE,
 	GD_S_TIMEOUT_1,
 	GD_S_TIMEOUT_2,
 	GD_S_TIMEOUT_3,
@@ -393,9 +403,17 @@ typedef enum _sound {
 	GD_S_TIMEOUT_7,
 	GD_S_TIMEOUT_8,
 	GD_S_TIMEOUT_9,
-	GD_S_CRACK,
 	GD_S_EXPLOSION,
+	GD_S_BOMB_EXPLOSION,
+	GD_S_GHOST_EXPLOSION,
+	GD_S_VOODOO_EXPLOSION,
+	GD_S_BOMB_PLACE,
 	GD_S_FINISHED,
+	GD_S_SWITCH_BITER,
+	GD_S_SWITCH_CREATURES,
+	GD_S_SWITCH_GRAVITY,
+	GD_S_SWITCH_GROWING,
+	GD_S_BONUS_LIFE,
 	GD_S_MAX,
 } GdSound;
 
@@ -512,7 +530,7 @@ typedef struct _cave {
 	gboolean magic_wall_stops_amoeba;	/* Turning on magic wall changes amoeba to diamonds. Original BD: yes, constkit: no */
 	gboolean magic_timer_wait_for_hatching;	/* magic wall timer does not start before player's birth */
 	gboolean magic_wall_sound;	/* magic wall has sound */
-
+	
 	int amoeba_slow_growth_time;	/* Amoeba growing slow (low probability, default 3%) for seconds. After that, fast growth default (25%) */
 	double amoeba_growth_prob;		/* Amoeba slow growth probability */
 	double amoeba_fast_growth_prob;	/* Amoeba fast growth probability */
@@ -522,6 +540,7 @@ typedef struct _cave {
 
 	GdElement acid_eats_this;		/* acid eats this element */
 	double acid_spread_ratio;		/* Probability of acid blowing up, each frame */
+	gboolean acid_spread_sound;		/* acid has sound */
 	GdElement acid_turns_to;		/* whether acid converts to explosion on spreading or other */
 
 	double slime_permeability;		/* true random slime */
@@ -529,9 +548,11 @@ typedef struct _cave {
 	gboolean slime_predictable;		/* predictable random start for slime. yes for plck. */
 	GdElement slime_eats_1, slime_converts_1;	/* slime eats element x and converts to element x; for example diamond -> falling diamond */
 	GdElement slime_eats_2, slime_converts_2;
+	gboolean slime_sound;			/* slime has sound */
 
 	int bonus_time;					/* bonus time for clock collected. */
-	int hatching_delay;				/* Scan frames before Player's birth. */
+	int hatching_delay_frame;		/* Scan frames before Player's birth. */
+	int hatching_delay_time;		/* Scan frames before Player's birth. */
 
 	int penalty_time;				/* Time penalty when voodoo destroyed. */
 	gboolean voodoo_collects_diamonds;	/* Voodoo can collect diamonds */
@@ -539,6 +560,7 @@ typedef struct _cave {
 	gboolean voodoo_can_be_destroyed;	/* Voodoo can be destroyed by and explosion */
 	
 	gboolean water_does_not_flow_down;	/* if true, water will not grow downwards, only in other directions. */
+	gboolean water_sound;			/* water has sound */
 
 	/* effects */
 	GdElement explosion_to;			/* explosion converts to this element */
@@ -581,6 +603,8 @@ typedef struct _cave {
 	int hammered_wall_reappear_frame;
 	
 	/* internal variables, used during the game. private data :) */
+	gboolean hatched;			/* hatching has happened. (timers may run, ...) */
+	gboolean gate_open;			/* self-explaining */
 	guint32 render_seed;		/* the seed value, which was used to render the cave, is saved here. will be used by record&playback */
 	GRand *random;				/* random number generator of rendered cave */
 	int rendered;				/* if not null, rendered at level x */
@@ -715,6 +739,7 @@ void gd_cave_easy(Cave *cave);
 void gd_cave_set_random_colors(Cave *cave);
 void gd_cave_set_ckdelay_extra_for_animation(Cave *cave);
 void gd_cave_setup_for_game(Cave *cave);
+void gd_cave_count_diamonds(Cave *cave);
 
 /* support */
 gpointer gd_cave_map_new_for_cave(const Cave *cave, const int cell_size);

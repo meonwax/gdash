@@ -97,7 +97,7 @@ N_("To play the game, press the New Game button. You can select which level you 
 		{NULL, N_("Strange elements"), O_DIRT_GLUED, N_("Some caves contain strange elements, for example, diamonds which cannot be collected, a player that cannot move... Don't be surprised!")},
 		{NULL, NULL, O_NONE, NULL},
 		{GD_ICON_SNAPSHOT, N_("Snapshots"), O_NONE, N_("You can experiment with levels by saving and reloading snapshots. However, if you are playing a reloaded cave, you will not get score or extra lives.")},
-		{GTK_STOCK_SELECT_COLOR, N_("Themes"), O_NONE, N_("The game also supports themes. You can use the installed png file as a template. Cells can have any arbitrary size, not necessarily 16x16 pixels. However, they must be squares. If the image has only a small number of colours (fully saturated red for foreground colour 1, fully "
+		{GTK_STOCK_SELECT_COLOR, N_("Themes"), O_NONE, N_("The game also supports themes. You can use the installed png file as a template. Cells can have any arbitrary size, not necessarily 16x16 pixels. However, they must be squares, and the image must have an alpha channel. If the image has only a small number of colours (fully saturated red for foreground colour 1, fully "
 		"saturated green for amoeba...), the game will use original C64 colours, different ones for every cave. Whether the png file is interpreted as a true colour "
 		"image or one with C64 colours, depends on the colour values used, and is autodetected. An image file with only #000000, #00FF00 and the like is taken as "
 		"a C64 theme.\n"
@@ -116,7 +116,7 @@ N_("To play the game, press the New Game button. You can select which level you 
 			"- Importing may not be complete and correct for all games and engines. There may be some unplayable caves, as older games had no precise timing.\n"
 			"- As the game is sometimes changed, highscores may be lost due to the changing checksums generated.\n"
 			"- Default values for cave properties are sometimes changed, as the file format evolves. Some properties might change if a caveset is loaded, "
-				"which was saved with an older version.\n")},
+				"which was saved with an older version. You can use the 'Remove all unknown tags' option in the editor menu to get rid of older or unknown options.\n")},
 };
 
 

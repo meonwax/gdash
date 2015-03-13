@@ -47,9 +47,10 @@ typedef struct _gd_main_window {
 	GtkWidget *window;
 	GtkActionGroup *actions_normal, *actions_title, *actions_game, *actions_snapshot;
 	GtkWidget *scroll_window;
-	GtkWidget *drawing_area, *title_image;	   /**< two things that could be drawn in the main window */
-	GtkWidget *labels;		/**< parts of main window which have to be shown or hidden */
-	GtkWidget *label_score, *label_value, *label_time, *label_cave_name, *label_diamonds, *label_skeletons, *label_lives;		/**< different text labels in main window */
+	GtkWidget *drawing_area, *title_image;	   /* two things that could be drawn in the main window */
+	GdkPixmap **title_pixmaps;
+	GtkWidget *labels;		/* parts of main window which have to be shown or hidden */
+	GtkWidget *label_score, *label_value, *label_time, *label_cave_name, *label_diamonds, *label_skeletons, *label_lives;		/* different text labels in main window */
 	GtkWidget *label_key1, *label_key2, *label_key3, *label_gravity_will_change;
 	GtkWidget *label_variables;
 	GtkWidget *error_hbox, *error_label;
@@ -115,8 +116,8 @@ gd_main_stop_game()
 		gtk_window_present (GTK_WINDOW (editor_window));
 }
 
-static void
-main_window_set_title()
+void
+gd_main_window_set_title()
 {
 	if (!g_str_equal(gd_default_cave->name, "")) {
 		char *text;
@@ -250,8 +251,8 @@ drawing_area_motion_event (const GtkWidget * widget, const GdkEventMotion * even
 		state=event->state;
 	}
 
-	mouse_cell_x=x / cell_size;
-	mouse_cell_y=y / cell_size;
+	mouse_cell_x=x / gd_cell_size_game;
+	mouse_cell_y=y / gd_cell_size_game;
 	return TRUE;
 }
 
@@ -272,14 +273,14 @@ drawing_area_expose_event (const GtkWidget * widget, const GdkEventExpose * even
 	 * by the user removing another window. so this is not the main
 	 * game grawing routine, that is drawcave().
 	 */
-	x1=event->area.x / cell_size;
-	y1=event->area.y / cell_size;
-	x2=(event->area.x + event->area.width-1) / cell_size;
-	y2=(event->area.y + event->area.height-1) / cell_size;
+	x1=event->area.x / gd_cell_size_game;
+	y1=event->area.y / gd_cell_size_game;
+	x2=(event->area.x + event->area.width-1) / gd_cell_size_game;
+	y2=(event->area.y + event->area.height-1) / gd_cell_size_game;
 	for (y=y1; y<=y2; y++)
 		for (x=x1; x<=x2; x++)
 			if (game.gfx_buffer[y][x]!=-1)
-				gdk_draw_drawable (main_window.drawing_area->window, main_window.drawing_area->style->black_gc, cells[game.gfx_buffer[y][x]], 0, 0, x * cell_size, y * cell_size, cell_size, cell_size);
+				gdk_draw_drawable (main_window.drawing_area->window, main_window.drawing_area->style->black_gc, gd_game_pixmap(game.gfx_buffer[y][x]), 0, 0, x * gd_cell_size_game, y * gd_cell_size_game, gd_cell_size_game, gd_cell_size_game);
 
 	return TRUE;
 }
@@ -362,14 +363,14 @@ static void
 open_caveset_cb (GtkWidget * widget, gpointer data)
 {
 	gd_open_caveset (main_window.window, NULL);
-	main_window_set_title();
+	gd_main_window_set_title();
 }
 
 static void
 open_caveset_dir_cb (GtkWidget * widget, gpointer data)
 {
 	gd_open_caveset (main_window.window, gd_system_caves_dir);
-	main_window_set_title();
+	gd_main_window_set_title();
 }
 
 /* load internal game. */
@@ -377,7 +378,7 @@ static void
 load_internal_cb (GtkWidget * widget, gpointer data)
 {
 	gd_load_internal(main_window.window, GPOINTER_TO_INT(data));
-	main_window_set_title ();
+	gd_main_window_set_title ();
 }
 
 static void
@@ -420,7 +421,12 @@ showheader()
 	gd_label_set_markup_printf (GTK_LABEL(main_window.label_value), _("Value: <b>%d</b>"), cave->diamond_value);
 
 	/* diamonds needed */
-	gd_label_set_markup_printf (GTK_LABEL(main_window.label_diamonds), _("Diamonds: <b>%d</b>"), cave->diamonds_collected>=cave->diamonds_needed?0:cave->diamonds_needed-cave->diamonds_collected);
+	if (cave->diamonds_needed>0)
+		gd_label_set_markup_printf (GTK_LABEL(main_window.label_diamonds), _("Diamonds: <b>%d</b>"), cave->diamonds_collected>=cave->diamonds_needed?0:cave->diamonds_needed-cave->diamonds_collected);
+	else
+		/* did not already count diamonds */
+		gd_label_set_markup_printf (GTK_LABEL(main_window.label_diamonds), _("Diamonds: <b>??""?</b>"));	/* to avoid trigraph ??< */
+	
 
 	/* skeletons collected */
 	gd_label_set_markup_printf (GTK_LABEL(main_window.label_skeletons), _("Skeletons: <b>%d</b>"), cave->skeletons_collected);
@@ -464,6 +470,37 @@ showheader()
  * creates title screen or drawing area
  *
  */
+gboolean title_animation_func(gpointer data)
+{
+	static int animcycle=0;
+	int count;
+	
+	/* count the number of frames. */
+	count=0;
+	while (main_window.title_pixmaps[count]!=NULL)
+		count++;
+
+	if (gtk_window_has_toplevel_focus (GTK_WINDOW (main_window.window))) {
+		animcycle=(animcycle+1)%count;
+		gtk_image_set_from_pixmap(GTK_IMAGE(main_window.title_image), main_window.title_pixmaps[animcycle], NULL);
+	}
+	return TRUE;
+}
+
+void title_animation_remove()
+{
+	int i;
+	
+	g_source_remove_by_user_data(title_animation_func);
+	i=0;
+	while (main_window.title_pixmaps[i]!=NULL) {
+		g_object_unref(main_window.title_pixmaps[i]);
+		i++;
+	}
+	g_free(main_window.title_pixmaps);
+	main_window.title_pixmaps=NULL;
+}
+ 
 static void
 init_mainwindow (Cave *cave)
 {
@@ -493,11 +530,11 @@ init_mainwindow (Cave *cave)
 			gtk_container_add (GTK_CONTAINER (align), main_window.drawing_area);
 			if (gd_mouse_play)
 				gdk_window_set_cursor (main_window.drawing_area->window, gdk_cursor_new (GDK_CROSSHAIR));
-			/* set the minimum size of the viewport: 20*12 cells */
-			/* XXX adding some pixels for the scrollbars-here we add 20 */
-			gtk_widget_set_size_request(main_window.drawing_area->parent->parent, 20*cell_size + 20, 12*cell_size + 20);
 		}
-		gtk_widget_set_size_request (main_window.drawing_area, (cave->x2-cave->x1+1) * cell_size, (cave->y2-cave->y1+1) * cell_size);
+		/* set the minimum size of the scroll window: 20*12 cells */
+		/* XXX adding some pixels for the scrollbars-here we add 24 */
+		gtk_widget_set_size_request(main_window.scroll_window, 20*gd_cell_size_game+24, 12*gd_cell_size_game+24);
+		gtk_widget_set_size_request(main_window.drawing_area, (cave->x2-cave->x1+1)*gd_cell_size_game, (cave->y2-cave->y1+1)*gd_cell_size_game);
 
 		/* show cave data */
 		gtk_widget_show (main_window.labels);
@@ -517,14 +554,19 @@ init_mainwindow (Cave *cave)
 			gtk_widget_destroy (main_window.drawing_area->parent->parent);
 
 		if (!main_window.title_image) {
-			GdkPixbuf *pixbuf;
-
+			int w, h;
+			
 			/* title screen */
-			pixbuf=gd_title();
-			main_window.title_image=gtk_image_new_from_pixbuf (pixbuf);
-			g_object_unref (pixbuf);
+			main_window.title_pixmaps=gd_create_title_animation();
+			main_window.title_image=gtk_image_new();
 			g_signal_connect (G_OBJECT (main_window.title_image), "destroy", G_CALLBACK (gtk_widget_destroyed), &main_window.title_image);
+			g_signal_connect (G_OBJECT (main_window.title_image), "destroy", G_CALLBACK (title_animation_remove), NULL);
+			g_timeout_add(40, title_animation_func, title_animation_func);
 			gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (main_window.scroll_window), main_window.title_image);
+
+			/* resize the scrolling window so the image fits */			
+			gdk_drawable_get_size(GDK_DRAWABLE(main_window.title_pixmaps[0]), &w, &h);
+			gtk_widget_set_size_request(main_window.scroll_window, w+24, h+24);
 		}
 
 		/* hide cave data */
@@ -582,8 +624,8 @@ scroll(const Cave *cave, gboolean exact_scroll)
 	 * first guess is the middle of the screen.
 	 * main_window.drawing_area->parent->parent is the viewport.
 	 * +cellsize/2 gets the stomach of player :) so the very center */
-	scroll_center_x=player_x*cell_size + cell_size/2-main_window.drawing_area->parent->parent->allocation.width/2;
-	scroll_center_y=player_y*cell_size + cell_size/2-main_window.drawing_area->parent->parent->allocation.height/2;
+	scroll_center_x=player_x*gd_cell_size_game + gd_cell_size_game/2-main_window.drawing_area->parent->parent->allocation.width/2;
+	scroll_center_y=player_y*gd_cell_size_game + gd_cell_size_game/2-main_window.drawing_area->parent->parent->allocation.height/2;
 
 	/* HORIZONTAL */
 	/* hystheresis function.
@@ -600,7 +642,7 @@ scroll(const Cave *cave, gboolean exact_scroll)
 	}
 	scroll_desired_x=CLAMP(scroll_desired_x, 0, adjustment->upper-adjustment->step_increment-adjustment->page_increment);
 	/* check if active player is outside drawing area. if yes, we should wait for scrolling */
-	if ((player_x*cell_size)<adjustment->value || (player_x*cell_size+cell_size-1)>adjustment->value+main_window.drawing_area->parent->parent->allocation.width)
+	if ((player_x*gd_cell_size_game)<adjustment->value || (player_x*gd_cell_size_game+gd_cell_size_game-1)>adjustment->value+main_window.drawing_area->parent->parent->allocation.width)
 		/* but only do the wait, if the player SHOULD BE visible, ie. he is inside the defined visible area of the cave */
 		if (cave->player_x>=cave->x1 && cave->player_x<=cave->x2)
 			out_of_window=TRUE;
@@ -638,7 +680,7 @@ scroll(const Cave *cave, gboolean exact_scroll)
 	}
 	scroll_desired_y=CLAMP(scroll_desired_y, 0, adjustment->upper-adjustment->step_increment-adjustment->page_increment);
 	/* check if active player is outside drawing area. if yes, we should wait for scrolling */
-	if ((player_y*cell_size)<adjustment->value || (player_y*cell_size+cell_size-1)>adjustment->value+main_window.drawing_area->parent->parent->allocation.height)
+	if ((player_y*gd_cell_size_game)<adjustment->value || (player_y*gd_cell_size_game+gd_cell_size_game-1)>adjustment->value+main_window.drawing_area->parent->parent->allocation.height)
 		/* but only do the wait, if the player SHOULD BE visible, ie. he is inside the defined visible area of the cave */
 		if (cave->player_y>=cave->y1 && cave->player_y<=cave->y2)
 			out_of_window=TRUE;
@@ -680,7 +722,7 @@ drawcave (Cave *cave)
 		for (x=cave->x1, xd=0; x <= cave->x2; x++, xd++) {
 			if (game.gfx_buffer[y][x] & GD_REDRAW) {
 				game.gfx_buffer[y][x]=game.gfx_buffer[y][x] & ~GD_REDRAW;
-				gdk_draw_drawable (main_window.drawing_area->window, main_window.drawing_area->style->black_gc, cells[game.gfx_buffer[y][x]], 0, 0, xd * cell_size, yd * cell_size, cell_size, cell_size);
+				gdk_draw_drawable (main_window.drawing_area->window, main_window.drawing_area->style->black_gc, gd_game_pixmap(game.gfx_buffer[y][x]), 0, 0, xd * gd_cell_size_game, yd * gd_cell_size_game, gd_cell_size_game, gd_cell_size_game);
 			}
 		}
 	}
@@ -995,7 +1037,6 @@ gd_main_start_level(const Cave *snapshot_cave)
 	}
 	
 	gd_select_pixbuf_colors(game.cave->color0, game.cave->color1, game.cave->color2, game.cave->color3, game.cave->color4, game.cave->color5);
-	gd_create_pixmaps();
 	init_mainwindow(game.cave);
 	showheader();
 
@@ -1308,7 +1349,7 @@ main (int argc, char *argv[])
 
 	/* always load c64 graphics, as it is the builtin, and we need an icon for the theme selector. */
 	gd_loadcells_default();
-	gd_pixbuf_for_builtin=gdk_pixbuf_copy(cells_pb[ABS(gd_elements[O_PLAYER].image_game)]);
+	gd_create_pixbuf_for_builtin_gfx();
 	
 	/* load other theme, if specified in config. */
 	if (gd_theme!=NULL && !g_str_equal(gd_theme, "")) {
@@ -1369,7 +1410,7 @@ main (int argc, char *argv[])
 	/* create window */
 	gd_create_stock_icons ();
 	gd_create_main_window ();
-	main_window_set_title ();
+	gd_main_window_set_title ();
 
 	gd_sound_init();
 

@@ -243,9 +243,9 @@ button_drawing_area_expose_event (const GtkWidget * widget, const GdkEventExpose
 		return FALSE;
 	
 	if (cell)
-		gdk_draw_drawable (widget->window, widget->style->black_gc, cell, 0, 0, 2, 2, cell_size, cell_size);
-	gdk_draw_rectangle (widget->window, widget->style->black_gc, FALSE, 0, 0, cell_size+3, cell_size+3);
-	gdk_draw_rectangle (widget->window, widget->style->black_gc, FALSE, 1, 1, cell_size+1, cell_size+1);
+		gdk_draw_drawable (widget->window, widget->style->black_gc, cell, 0, 0, 2, 2, gd_cell_size_editor, gd_cell_size_editor);
+	gdk_draw_rectangle (widget->window, widget->style->black_gc, FALSE, 0, 0, gd_cell_size_editor+3, gd_cell_size_editor+3);
+	gdk_draw_rectangle (widget->window, widget->style->black_gc, FALSE, 1, 1, gd_cell_size_editor+1, gd_cell_size_editor+1);
 	return TRUE;
 }
 
@@ -281,8 +281,8 @@ redraw_timeout (gpointer data)
 			draw+=NUM_OF_CELLS;
 		/* set cell and queue draw if different from previous */
 		/* at first start, previous is null, so always different. */
-		if (g_object_get_data(G_OBJECT(da), GDASH_CELL)!=cells[draw]) {
-			g_object_set_data(G_OBJECT(da), GDASH_CELL, cells[draw]);
+		if (g_object_get_data(G_OBJECT(da), GDASH_CELL)!=gd_editor_pixmap(draw)) {
+			g_object_set_data(G_OBJECT(da), GDASH_CELL, gd_editor_pixmap(draw));
 			gtk_widget_queue_draw(da);
 		}
 	}
@@ -337,8 +337,7 @@ element_button_clicked(GtkWidget *button, gpointer data)
 		O_SPACE, O_GUARD_4, O_ALT_GUARD_4, O_SPACE, O_SPACE, O_BUTTER_4, O_ALT_BUTTER_4, O_SPACE, O_SPACE, O_STONEFLY_4, O_COW_4, O_SPACE, O_BLADDER, O_GHOST, O_WAITING_STONE, O_CHASING_STONE,
 
 		/* for effects */		
-		O_DIRT2, O_DIAMOND_F, O_STONE_F, O_FALLING_WALL_F, O_UNKNOWN, O_PLAYER, O_PLAYER_BOMB, O_PLAYER_STIRRING, O_OUTBOX, O_INVIS_OUTBOX,
-		O_TIME_PENALTY, O_GRAVESTONE, O_SPACE, O_SPACE, O_SPACE, O_SPACE,
+		O_DIRT2, O_DIAMOND_F, O_STONE_F, O_FALLING_WALL_F, O_UNKNOWN, O_PRE_PL_1, O_PRE_PL_2, O_PRE_PL_3, O_PLAYER, O_PLAYER_BOMB, O_PLAYER_STIRRING, O_OUTBOX, O_INVIS_OUTBOX, O_TIME_PENALTY, O_GRAVESTONE, O_SPACE,
 
 		O_BLADDER_1, O_BLADDER_2, O_BLADDER_3, O_BLADDER_4, O_BLADDER_5, O_BLADDER_6, O_BLADDER_7, O_BLADDER_8, O_BLADDER_9,
 		O_COW_ENCLOSED_1, O_COW_ENCLOSED_2, O_COW_ENCLOSED_3, O_COW_ENCLOSED_4, O_COW_ENCLOSED_5, O_COW_ENCLOSED_6, O_COW_ENCLOSED_7,
@@ -394,7 +393,7 @@ element_button_clicked(GtkWidget *button, gpointer data)
 		areas=g_list_prepend(areas, da);	/* put in list for animation timeout, that one will request redraw on them */
 		gtk_widget_add_events(da, GDK_BUTTON_PRESS_MASK|GDK_LEAVE_NOTIFY_MASK|GDK_ENTER_NOTIFY_MASK);
         g_object_set_data(G_OBJECT(da), GDASH_ELEMENT, GINT_TO_POINTER(elements[i]));
-		gtk_widget_set_size_request(da, cell_size+4, cell_size+4);
+		gtk_widget_set_size_request(da, gd_cell_size_editor+4, gd_cell_size_editor+4);
         gtk_widget_set_tooltip_text(da, _(gd_elements[elements[i]].name));
 		g_signal_connect(G_OBJECT(da), "expose-event", G_CALLBACK(button_drawing_area_expose_event), GINT_TO_POINTER(elements[i]));
 		g_signal_connect(G_OBJECT(da), "leave-notify-event", G_CALLBACK(button_drawing_area_crossing_event), NULL);

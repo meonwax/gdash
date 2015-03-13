@@ -29,6 +29,13 @@
 /* these can't be larger than 127, or they mess up with utf8 coding */
 #define GD_UNKNOWN_CHAR 31
 #define GD_BACKSLASH_CHAR 64
+#define GD_TILDE_CHAR 95
+#define GD_UNDERSCORE_CHAR 100
+#define GD_OPEN_BRACKET_CHAR 27
+#define GD_CLOSE_BRACKET_CHAR 29
+
+int gd_scale=1;	/* a graphics scale things which sets EVERYTHING. it is set with gd_sdl_init, and cannot be modified later. */
+int gd_scale_type=GD_SCALING_ORIGINAL;
 
 static SDL_Surface *cells[2*NUM_OF_CELLS];
 static const guchar *font;
@@ -37,16 +44,28 @@ static GdColor color0, color1, color2, color3, color4, color5;	/* currently used
 static guint8 *c64_custom_gfx=NULL;
 static gboolean using_png_gfx;
 
+/* these masks are always for RGB and RGBA ordering in memory.
+   that is what gdk-pixbuf uses, and also what sdl uses.
+   no BGR, no ABGR.
+ */
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
     static guint32 rmask = 0xff000000;
     static guint32 gmask = 0x00ff0000;
     static guint32 bmask = 0x0000ff00;
     static guint32 amask = 0x000000ff;
+
+    static guint32 rmask_24 = 0xff0000;
+    static guint32 gmask_24 = 0x00ff00;
+    static guint32 bmask_24 = 0x0000ff;
 #else
     static guint32 rmask = 0x000000ff;
     static guint32 gmask = 0x0000ff00;
     static guint32 bmask = 0x00ff0000;
     static guint32 amask = 0xff000000;
+
+    static guint32 rmask_24 = 0x0000ff;
+    static guint32 gmask_24 = 0x00ff00;
+    static guint32 bmask_24 = 0xff0000;
 #endif
 
 
@@ -54,19 +73,19 @@ static gboolean using_png_gfx;
 SDL_Surface *gd_screen=NULL;
 static SDL_Surface *dark_background=NULL;
 static GList *backup_screens=NULL, *dark_screens=NULL;
-const int play_area_w=320;
-const int play_area_h=180;
-const int statusbar_y1=1;
-const int statusbar_y2=10;
-const int statusbar_height=20;
-const int statusbar_mid=(20-8)/2;
+int play_area_w=320;
+int play_area_h=180;
+int statusbar_height=20;
+int statusbar_y1=1;
+int statusbar_y2=10;
+int statusbar_mid=(20-8)/2;
 static int scroll_x, scroll_y;
 
 
 /* quit, global variable which is set to true if the application should quit */
 gboolean gd_quit=FALSE;
 
-Uint8 *gd_keystate;
+guint8 *gd_keystate;
 SDL_Joystick *gd_joy;
 
 static int cell_size=16;
@@ -91,7 +110,7 @@ surface_from_gdk_pixbuf_data(guint32 *data)
 		surface=SDL_CreateRGBSurfaceFrom(data+6, GUINT32_FROM_BE(data[4]), GUINT32_FROM_BE(data[5]), 32, GUINT32_FROM_BE(data[3]), rmask, gmask, bmask, amask);
 	else
 	if (GUINT32_FROM_BE(data[2])==0x1010001)	/* 24-bit rgb */
-		surface=SDL_CreateRGBSurfaceFrom(data+6, GUINT32_FROM_BE(data[4]), GUINT32_FROM_BE(data[5]), 24, GUINT32_FROM_BE(data[3]), rmask, gmask, bmask, 0);
+		surface=SDL_CreateRGBSurfaceFrom(data+6, GUINT32_FROM_BE(data[4]), GUINT32_FROM_BE(data[5]), 24, GUINT32_FROM_BE(data[3]), rmask_24, gmask_24, bmask_24, 0);
 	else
 		/* unknown pixel format */
 		g_assert_not_reached();
@@ -100,11 +119,462 @@ surface_from_gdk_pixbuf_data(guint32 *data)
 	return surface;
 }
 
-/* returns the gdash title screen as an sdl surface. */
-SDL_Surface *
-gd_get_titleimage()
+
+
+/* This is taken from the SDL_gfx project. */
+/*  
+	SDL_rotozoom.c - rotozoomer for 32bit or 8bit surfaces
+	LGPL (c) A. Schiffler
+	32bit Zoomer with optional anti-aliasing by bilinear interpolation.
+	Zoomes 32bit RGBA/ABGR 'src' surface to 'dst' surface.
+*/
+
+typedef struct tColorRGBA {
+	guint8 r;
+	guint8 g;
+	guint8 b;
+	guint8 a;
+} tColorRGBA;
+
+static void zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst, gboolean smooth)
 {
-	return surface_from_gdk_pixbuf_data((guint32 *) gdash_screen);
+	int x, y, sx, sy, *sax, *say, *csax, *csay, csx, csy, ex, ey, t1, t2, sstep;
+	tColorRGBA *c00, *c01, *c10, *c11;
+	tColorRGBA *sp, *csp, *dp;
+	int dgap;
+
+	g_assert(src->format->BytesPerPixel==4);
+	g_assert(dst->format->BytesPerPixel==4);
+
+	/* Variable setup */
+	if (smooth) {
+		/* For interpolation: assume source dimension is one pixel */
+		/* smaller to avoid overflow on right and bottom edge. */
+		sx = (int) (65536.0 * (float) (src->w - 1) / (float) dst->w);
+		sy = (int) (65536.0 * (float) (src->h - 1) / (float) dst->h);
+	} else {
+		sx = (int) (65536.0 * (float) src->w / (float) dst->w);
+		sy = (int) (65536.0 * (float) src->h / (float) dst->h);
+	}
+
+	/* Allocate memory for row increments */
+	sax=g_new(gint32, dst->w+1);
+	say=g_new(gint32, dst->h+1);
+
+	/* Precalculate row increments */
+	SDL_LockSurface(src);
+	SDL_LockSurface(dst);
+	sp = csp = (tColorRGBA *) src->pixels;
+	dp = (tColorRGBA *) dst->pixels;
+
+	csx = 0;
+	csax = sax;
+	for (x = 0; x <= dst->w; x++) {
+		*csax = csx;
+		csax++;
+		csx &= 0xffff;
+		csx += sx;
+	}
+	csy = 0;
+	csay = say;
+	for (y = 0; y <= dst->h; y++) {
+		*csay = csy;
+		csay++;
+		csy &= 0xffff;
+		csy += sy;
+	}
+
+	dgap = dst->pitch - dst->w * 4;
+
+	/*
+	    * Switch between interpolating and non-interpolating code 
+	    */
+	if (smooth) {
+		/* Interpolating Zoom */
+
+		/* Scan destination */
+		csay = say;
+		for (y = 0; y < dst->h; y++) {
+		    /* Setup color source pointers */
+		    c00 = csp;
+		    c01 = csp;
+		    c01++;
+		    c10 = (tColorRGBA *) ((guint8 *) csp + src->pitch);
+		    c11 = c10;
+		    c11++;
+		    csax = sax;
+		    for (x = 0; x < dst->w; x++) {
+				/* Interpolate colors */
+				ex = (*csax & 0xffff);
+				ey = (*csay & 0xffff);
+				t1 = ((((c01->r - c00->r) * ex) >> 16) + c00->r) & 0xff;
+				t2 = ((((c11->r - c10->r) * ex) >> 16) + c10->r) & 0xff;
+				dp->r = (((t2 - t1) * ey) >> 16) + t1;
+				t1 = ((((c01->g - c00->g) * ex) >> 16) + c00->g) & 0xff;
+				t2 = ((((c11->g - c10->g) * ex) >> 16) + c10->g) & 0xff;
+				dp->g = (((t2 - t1) * ey) >> 16) + t1;
+				t1 = ((((c01->b - c00->b) * ex) >> 16) + c00->b) & 0xff;
+				t2 = ((((c11->b - c10->b) * ex) >> 16) + c10->b) & 0xff;
+				dp->b = (((t2 - t1) * ey) >> 16) + t1;
+				t1 = ((((c01->a - c00->a) * ex) >> 16) + c00->a) & 0xff;
+				t2 = ((((c11->a - c10->a) * ex) >> 16) + c10->a) & 0xff;
+				dp->a = (((t2 - t1) * ey) >> 16) + t1;
+
+				/* Advance source pointers */
+				csax++;
+				sstep = (*csax >> 16);
+				c00 += sstep;
+				c01 += sstep;
+				c10 += sstep;
+				c11 += sstep;
+				/* Advance destination pointer */
+				dp++;
+		    }
+		    /* Advance source pointer */
+		    csay++;
+		    csp = (tColorRGBA *) ((guint8 *) csp + (*csay >> 16) * src->pitch);
+		    /* Advance destination pointers */
+		    dp = (tColorRGBA *) ((guint8 *) dp + dgap);
+		}
+	} else {
+		/* Non-Interpolating Zoom */
+		csay = say;
+		for (y = 0; y < dst->h; y++) {
+		    sp = csp;
+		    csax = sax;
+		    for (x = 0; x < dst->w; x++) {
+				/* Draw */
+				*dp = *sp;
+				/* Advance source pointers */
+				csax++;
+				sstep = (*csax >> 16);
+				sp += sstep;
+				/* Advance destination pointer */
+				dp++;
+		    }
+		    /* Advance source pointer */
+		    csay++;
+		    sstep = (*csay >> 16) * src->pitch;
+		    csp = (tColorRGBA *) ((guint8 *) csp + sstep);
+
+		    /* Advance destination pointers */
+		    dp = (tColorRGBA *) ((guint8 *) dp + dgap);
+		}
+
+	}
+
+	SDL_UnlockSurface(src);
+	SDL_UnlockSurface(dst);
+
+	/* Remove temp arrays */
+	g_free(sax);
+	g_free(say);
+}
+
+
+/*
+  this requires a destination surface already setup to be twice as
+  large as the source. oh, and formats must match too. this will just
+  blindly assume you didn't flounder.
+*/
+
+/* somewhat optimized implementation of the Scale2x algorithm. */
+/* http://scale2x.sourceforge.net */
+static void
+scale2x(SDL_Surface *src, SDL_Surface *dst)
+{
+	int y, x;
+	const int srcpitch = src->pitch;
+	const int dstpitch = dst->pitch;
+	const int width = src->w;
+	const int height = src->h;
+
+	guint8* srcpix = (guint8*)src->pixels;
+	guint8* dstpix = (guint8*)dst->pixels;
+   	guint32 E0, E1, E2, E3, B, D, E, F, H;
+
+	g_assert(dst->w == src->w*2);
+	g_assert(dst->h == src->h*2);
+	g_assert(src->format->BytesPerPixel==4);
+	g_assert(dst->format->BytesPerPixel==4);
+
+	SDL_LockSurface(src);
+	SDL_LockSurface(dst);
+	for (y=0; y<height; ++y) {
+		for (x=0; x<width; ++x) {
+			B = *(guint32*)(srcpix + (MAX(0,y-1)*srcpitch) + (4*x));
+			D = *(guint32*)(srcpix + (y*srcpitch) + (4*MAX(0,x-1)));
+			E = *(guint32*)(srcpix + (y*srcpitch) + (4*x));
+			F = *(guint32*)(srcpix + (y*srcpitch) + (4*MIN(width-1,x+1)));
+			H = *(guint32*)(srcpix + (MIN(height-1,y+1)*srcpitch) + (4*x));
+			
+			if (B != H && D != F) {
+				E0 = D == B ? D : E;
+				E1 = B == F ? F : E;
+				E2 = D == H ? D : E;
+				E3 = H == F ? F : E;
+			} else {
+				E0 = E;
+				E1 = E;
+				E2 = E;
+				E3 = E;
+			}
+
+			*(guint32*)(dstpix + y*2*dstpitch + x*2*4) = E0;
+			*(guint32*)(dstpix + y*2*dstpitch + (x*2+1)*4) = E1;
+			*(guint32*)(dstpix + (y*2+1)*dstpitch + x*2*4) = E2;
+			*(guint32*)(dstpix + (y*2+1)*dstpitch + (x*2+1)*4) = E3;
+		}
+	}
+	SDL_UnlockSurface(src);
+	SDL_UnlockSurface(dst);
+}
+
+/* the same but 3x */
+static void
+scale3x(SDL_Surface *src, SDL_Surface *dst)
+{
+	int y, x;
+	const int srcpitch = src->pitch;
+	const int dstpitch = dst->pitch;
+	const int width = src->w;
+	const int height = src->h;
+
+	guint8* srcpix = (guint8*)src->pixels;
+	guint8* dstpix = (guint8*)dst->pixels;
+   	guint32 E0, E1, E2, E3, E4, E5, E6, E7, E8, A, B, C, D, E, F, G, H, I;
+
+	g_assert(dst->w == src->w*3);
+	g_assert(dst->h == src->h*3);
+	g_assert(src->format->BytesPerPixel==4);
+	g_assert(dst->format->BytesPerPixel==4);
+
+	SDL_LockSurface(src);
+	SDL_LockSurface(dst);
+	for (y=0; y<height; ++y) {
+		for (x=0; x<width; ++ x) {
+			A = *(guint32*)(srcpix + (MAX(0,y-1)*srcpitch) + (4*MAX(0,x-1)));
+			B = *(guint32*)(srcpix + (MAX(0,y-1)*srcpitch) + (4*x));
+			C = *(guint32*)(srcpix + (MAX(0,y-1)*srcpitch) + (4*MIN(width-1,x+1)));
+			D = *(guint32*)(srcpix + (y*srcpitch) + (4*MAX(0,x-1)));
+			E = *(guint32*)(srcpix + (y*srcpitch) + (4*x));
+			F = *(guint32*)(srcpix + (y*srcpitch) + (4*MIN(width-1,x+1)));
+			G = *(guint32*)(srcpix + (MIN(height-1,y+1)*srcpitch) + (4*MAX(0,x-1)));
+			H = *(guint32*)(srcpix + (MIN(height-1,y+1)*srcpitch) + (4*x));
+			I = *(guint32*)(srcpix + (MIN(height-1,y+1)*srcpitch) + (4*MIN(width-1,x+1)));
+			
+			if (B != H && D != F) {
+				E0 = D == B ? D : E;
+				E1 = (D == B && E != C) || (B == F && E != A) ? B : E;
+				E2 = B == F ? F : E;
+				E3 = (D == B && E != G) || (D == H && E != A) ? D : E;
+				E4 = E;
+				E5 = (B == F && E != I) || (H == F && E != C) ? F : E;
+				E6 = D == H ? D : E;
+				E7 = (D == H && E != I) || (H == F && E != G) ? H : E;
+				E8 = H == F ? F : E;
+			} else {
+				E0 = E;
+				E1 = E;
+				E2 = E;
+				E3 = E;
+				E4 = E;
+				E5 = E;
+				E6 = E;
+				E7 = E;
+				E8 = E;
+			}
+
+			*(guint32*)(dstpix + y*3*dstpitch + x*3*4) = E0;
+			*(guint32*)(dstpix + y*3*dstpitch + (x*3+1)*4) = E1;
+			*(guint32*)(dstpix + y*3*dstpitch + (x*3+2)*4) = E2;
+			*(guint32*)(dstpix + (y*3+1)*dstpitch + x*3*4) = E3;
+			*(guint32*)(dstpix + (y*3+1)*dstpitch + (x*3+1)*4) = E4;
+			*(guint32*)(dstpix + (y*3+1)*dstpitch + (x*3+2)*4) = E5;
+			*(guint32*)(dstpix + (y*3+2)*dstpitch + x*3*4) = E6;
+			*(guint32*)(dstpix + (y*3+2)*dstpitch + (x*3+1)*4) = E7;
+			*(guint32*)(dstpix + (y*3+2)*dstpitch + (x*3+2)*4) = E8;
+		}
+	}
+	SDL_UnlockSurface(src);
+	SDL_UnlockSurface(dst);
+}
+
+/* create tv-striped surface. */
+static void
+tv_surface(SDL_Surface *surface)
+{
+	SDL_Surface *black;
+	int y;
+	
+	/* the width is the same, the height is 1 pixel. */
+	black=SDL_CreateRGBSurface(0, surface->w, 1, 32, 0, 0, 0, 0);	/* no amask here, as we set overall alpha! */
+	SDL_FillRect(black, NULL, SDL_MapRGB(black->format, 0, 0, 0));
+	SDL_SetAlpha(black, SDL_SRCALPHA, 51);	/* 20x opacity (256/5) */
+	
+	/* blit the black stripe to every second row. */
+	for (y=0; y<surface->h; y+=2) {
+		SDL_Rect r;
+		
+		r.x=0;
+		r.y=y;
+		
+		SDL_BlitSurface(black, NULL, surface, &r);
+	}
+	
+	SDL_FreeSurface(black);
+}
+
+
+/* scales a pixbuf with the appropriate scaling type. */
+SDL_Surface *
+surface_scale(SDL_Surface *orig)
+{
+	SDL_Surface *dest;
+	
+	dest=SDL_CreateRGBSurface(orig->flags, orig->w*gd_scale, orig->h*gd_scale, orig->format->BitsPerPixel, orig->format->Rmask, orig->format->Gmask, orig->format->Bmask, orig->format->Amask);
+	
+	switch (gd_scale_type) {
+		case GD_SCALING_ORIGINAL:
+			SDL_BlitSurface(orig, NULL, dest, NULL);
+			break;
+		
+		case GD_SCALING_2X:
+			zoomSurfaceRGBA(orig, dest, FALSE);
+			break;
+
+		case GD_SCALING_2X_BILINEAR:
+			zoomSurfaceRGBA(orig, dest, TRUE);
+			break;
+
+		case GD_SCALING_2X_SCALE2X:
+			scale2x(orig, dest);
+			break;
+
+		case GD_SCALING_3X:
+			zoomSurfaceRGBA(orig, dest, FALSE);
+			break;
+
+		case GD_SCALING_3X_BILINEAR:
+			zoomSurfaceRGBA(orig, dest, TRUE);
+			break;
+
+		case GD_SCALING_3X_SCALE3X:
+			scale3x(orig, dest);
+			break;
+			
+		case GD_SCALING_MAX:
+			/* to avoid compiler warning */
+			g_assert_not_reached();
+			break;
+	}
+	
+	return dest;
+}
+
+
+
+
+/* create new surface, which is SDL_DisplayFormatted. */
+/* it is also scaled by gd_scale. */
+/* somewhat "optimized" */
+static SDL_Surface *
+displayformat(SDL_Surface *orig)
+{
+	SDL_Surface *scaled, *displayformat;
+	
+	g_assert(orig->format->BytesPerPixel==4);
+	
+	scaled=surface_scale(orig);
+	if (gd_sdl_tv_emulation)
+		tv_surface(scaled);
+	displayformat=SDL_DisplayFormat(scaled);
+	SDL_FreeSurface(scaled);
+
+	return displayformat;
+}
+
+/* needed to alpha-copy an src image over dst.
+   the resulting image of sdl_blitsurface is not exact?!
+   can't explain why. */
+static void
+copy_alpha(SDL_Surface *src, SDL_Surface *dst)
+{
+	int x, y;
+	
+	g_assert(src->format->BytesPerPixel==4);
+	g_assert(dst->format->BytesPerPixel==4);
+	g_assert(src->w == dst->w);
+	g_assert(src->h == dst->h);
+	
+	SDL_LockSurface(src);
+	SDL_LockSurface(dst);
+	for (y=0; y<src->h; y++) {
+		guint32 *srcpix=(guint32 *)((guint8*)src->pixels + src->pitch*y);
+		guint32 *dstpix=(guint32 *)((guint8*)dst->pixels + dst->pitch*y);
+		for (x=0; x<src->w; x++) {
+			if ((srcpix[x]&src->format->Amask)>>src->format->Ashift)	/* if alpha is nonzero */
+				dstpix[x]=srcpix[x];	/* copy pixel as it is */
+		}
+	}
+	SDL_UnlockSurface(src);
+	SDL_UnlockSurface(dst);
+}
+
+/* create and return an array of surfaces, which contain the title animation.
+   the array is one pointer larger than all frames; the last pointer is a null.
+   up to the caller to free.
+ */
+SDL_Surface **
+gd_get_title_animation()
+{
+	SDL_Surface *screen;
+	SDL_Surface *tile;
+	SDL_Surface *bigone;
+	SDL_Surface *frame;
+	SDL_Surface **animation;
+	int x, y, i;
+	
+	screen=surface_from_gdk_pixbuf_data((guint32 *) gdash_screen);
+	tile=surface_from_gdk_pixbuf_data((guint32 *) gdash_tile);
+
+	/* do not allow more than 40 frames of animation */
+	g_assert(tile->h<40);
+	animation=g_new0(SDL_Surface *, tile->h+1);
+	
+	/* create a big image, which is one tile larger than the title image size */
+	bigone=SDL_CreateRGBSurface(0, screen->w, screen->h+tile->h, 32, 0, 0, 0, 0);
+	/* and fill it with the tile. */
+	for (y=0; y<screen->h+tile->h; y+=tile->h)
+		for (x=0; x<screen->w; x+=tile->h) {
+			SDL_Rect dest;
+			
+			dest.x=x;
+			dest.y=y;
+			SDL_BlitSurface(tile, 0, bigone, &dest);
+		}
+	
+	frame=SDL_CreateRGBSurface(0, screen->w, screen->h, 32, rmask, gmask, bmask, amask);	/* must be same *mask so copy_alpha works correctly */
+	for (i=0; i<tile->h; i++) {
+		SDL_Rect src;
+		
+		/* copy part of the big tiled image */
+		src.x=0;
+		src.y=i;
+		src.w=screen->w;
+		src.h=screen->h;
+		SDL_BlitSurface(bigone, &src, frame, 0);
+		/* and composite it with the title image */
+		copy_alpha(screen, frame);
+
+		animation[i]=displayformat(frame);
+	}
+	SDL_FreeSurface(frame);
+	SDL_FreeSurface(bigone);
+	SDL_FreeSurface(screen);
+	SDL_FreeSurface(tile);
+
+	return animation;
 }
 
 static void
@@ -120,10 +590,20 @@ rendered_font_free(gpointer font)
 
 
 gboolean
-gd_sdl_init()
+gd_sdl_init(GdScalingType scaling_type)
 {
 	SDL_Surface *icon;
 	
+	/* set the cell scale option. */
+	gd_scale_type=scaling_type;
+	gd_scale=gd_scaling_scale[gd_scale_type];
+	play_area_w*=gd_scale;
+	play_area_h*=gd_scale;
+	statusbar_y1*=gd_scale;
+	statusbar_y2*=gd_scale;
+	statusbar_height*=gd_scale;
+	statusbar_mid*=gd_scale;
+
 	SDL_Init(SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK);
 	gd_screen=SDL_SetVideoMode(play_area_w, play_area_h+statusbar_height, 32, SDL_ANYFORMAT | (gd_sdl_fullscreen?SDL_FULLSCREEN:0));
 	SDL_ShowCursor(SDL_DISABLE);
@@ -341,6 +821,7 @@ free_cells()
 		}
 }
 
+
 static void
 loadcells(SDL_Surface *image)
 {
@@ -349,48 +830,36 @@ loadcells(SDL_Surface *image)
 	SDL_Surface *rect;
 	SDL_Surface *cut;
 
-	/* if we have scaled pixmaps, remove them */
+	/* if we have display-formatted pixmaps, remove them */
 	free_cells();
 
 	/* 8 (NUM_OF_CELLS_X) cells in a row, so divide by it and we get the size of a cell in pixels */
 	pixbuf_cell_size=image->w/NUM_OF_CELLS_X;
-	g_assert(pixbuf_cell_size==16);	/* FIXME currently only this is supported */
-	cell_size=pixbuf_cell_size;	/* FIXME no scaling supported yet */
+	cell_size=pixbuf_cell_size*gd_scale;
 
-	rect=SDL_CreateRGBSurface(0, pixbuf_cell_size, pixbuf_cell_size, 32, 0, 0, 0, 0);
+	rect=SDL_CreateRGBSurface(0, pixbuf_cell_size, pixbuf_cell_size, 32, 0, 0, 0, 0);	/* no amask, as we set overall alpha! */
 	SDL_FillRect(rect, NULL, SDL_MapRGB(rect->format, (gd_flash_color>>16)&0xff, (gd_flash_color>>8)&0xff, gd_flash_color&0xff));
 	SDL_SetAlpha(rect, SDL_SRCALPHA, 128);	/* 50% alpha; nice choice. also sdl is rendering faster for the special value alpha=128 */
 
-	cut=SDL_CreateRGBSurface(0, pixbuf_cell_size, pixbuf_cell_size, 32, 0, 0, 0, 0);
+	cut=SDL_CreateRGBSurface(0, pixbuf_cell_size, pixbuf_cell_size, 32, rmask, gmask, bmask, amask);
 
 	/* make individual cells */
 	for (i=0; i<NUM_OF_CELLS_X*NUM_OF_CELLS_Y; i++) {
 		SDL_Rect from;
 
-		from.x=(i%8)*pixbuf_cell_size;
-		from.y=(i/8)*pixbuf_cell_size;
+		from.x=(i%NUM_OF_CELLS_X)*pixbuf_cell_size;
+		from.y=(i/NUM_OF_CELLS_X)*pixbuf_cell_size;
 		from.w=pixbuf_cell_size;
 		from.h=pixbuf_cell_size;
 
 		SDL_BlitSurface(image, &from, cut, NULL);
-		cells[i]=SDL_DisplayFormat(cut);
+
+		cells[i]=displayformat(cut);
 		SDL_BlitSurface(rect, NULL, cut, NULL);		/* create yellowish image */
-		cells[NUM_OF_CELLS+i]=SDL_DisplayFormat(cut);
+		cells[NUM_OF_CELLS+i]=displayformat(cut);
 	}
 	SDL_FreeSurface(cut);
 	SDL_FreeSurface(rect);
-}
-
-/* creates a guint32 value, which can be raw-written to a sdl_surface memory area. */
-/* takes the pixel format of the surface into consideration. */
-static guint32
-rgba_pixel_from_color(SDL_PixelFormat *format, GdColor col, guint8 a)
-{
-	guint8 r=(col>>16)&255;
-	guint8 g=(col>>8)&255;
-	guint8 b=col&255;
-
-	return (r<<format->Rshift)+(g<<format->Gshift)+(b<<format->Bshift)+(a<<format->Ashift);
 }
 
 /* sets one of the colors in the indexed palette of an sdl surface to a GdColor. */
@@ -408,7 +877,7 @@ setpalette(SDL_Surface *image, int index, GdColor col)
 static void
 loadcells_c64(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5)
 {
-	const guchar *gfx;	/* currently used graphics, will point to c64_gfx or c64_custom_gfx */
+	const guint8 *gfx;	/* currently used graphics, will point to c64_gfx or c64_custom_gfx */
 	SDL_Surface *image;
 
 	gfx=c64_custom_gfx?c64_custom_gfx:c64_gfx;
@@ -416,7 +885,7 @@ loadcells_c64(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColo
 	/* create a 8-bit palette and set its colors */
 	/* gfx[0] is the pixel width and height of one cell. */
 	/* from gfx[1], we have the color data, one byte/pixel. so this is an indexed color image: 8bit/pixel. */
-	image=SDL_CreateRGBSurfaceFrom((void *)(gfx+1), NUM_OF_CELLS_X*gfx[0], NUM_OF_CELLS_Y*gfx[0], 8, NUM_OF_CELLS_X*gfx[0], 0, 0, 0, 0);
+	image=SDL_CreateRGBSurfaceFrom((void *)(gfx+1), NUM_OF_CELLS_X*(int)gfx[0], NUM_OF_CELLS_Y*(int)gfx[0], 8, NUM_OF_CELLS_X*(int)gfx[0], 0, 0, 0, 0);
 	/* sdl supports paletted images, so this is very easy: */
 	setpalette(image, 0, 0);
 	setpalette(image, 1, c0);
@@ -457,15 +926,15 @@ c64_gfx_data_from_pixbuf(SDL_Surface *image)
 	/* 1111 */ 8, /* white is the arrow */
 	};
 	int x, y;
-	guchar *data;
+	guint8 *data;
 	int out;
 	
 	g_assert(image->format->BytesPerPixel==4);
 
-	data=g_new(guchar, image->w*image->h+1);
+	data=g_new(guint8, image->w*image->h+1);
 	out=0;
 	data[out++]=image->w/NUM_OF_CELLS_X;
-	
+
 	SDL_LockSurface(image);
 	for (y=0; y<image->h; y++) {
 		guint32 *p=(guint32 *)((char *)image->pixels+y*image->pitch);
@@ -473,16 +942,17 @@ c64_gfx_data_from_pixbuf(SDL_Surface *image)
 		for (x=0; x<image->w; x++) {
 			int r, g, b, a, c;
 
-			r=(p[x]&image->format->Rmask) >> image->format->Rshift;
-			g=(p[x]&image->format->Gmask) >> image->format->Gshift;
-			b=(p[x]&image->format->Bmask) >> image->format->Bshift;
-			a=(p[x]&image->format->Amask) >> image->format->Ashift;
+			r=(p[x]&image->format->Rmask) >> image->format->Rshift << image->format->Rloss;
+			g=(p[x]&image->format->Gmask) >> image->format->Gshift << image->format->Gloss;
+			b=(p[x]&image->format->Bmask) >> image->format->Bshift << image->format->Bloss;
+			a=(p[x]&image->format->Amask) >> image->format->Ashift << image->format->Aloss;
+			
 			c=(a>>7)*8 + (b>>7)*4 + (g>>7)*2 + (r>>7)*1; /* lower 4 bits will be rgba */
-
 			data[out++]=cols[c];
 		}
 	}
 	SDL_UnlockSurface(image);
+	
 	return data;
 }
 
@@ -491,22 +961,42 @@ c64_gfx_data_from_pixbuf(SDL_Surface *image)
 static gboolean
 check_if_pixbuf_c64_png(SDL_Surface *image)
 {
-	guchar *p;
+	const guchar *p;
 	int x, y;
+	gboolean c64_png;
 
-	g_assert(image->format->Amask!=0);	
 	g_assert(image->format->BytesPerPixel==4);	
+
 	SDL_LockSurface(image);
+	c64_png=TRUE;
 	for (y=0; y<image->h; y++) {
-		p=(guchar *)image->pixels + y * image->pitch;
+		p=((guchar *)image->pixels) + y * image->pitch;
 		for (x=0; x<image->w*image->format->BytesPerPixel; x++)
 			if (p[x]!=0 && p[x]!=255)
-				return FALSE;
+				c64_png=FALSE;
 	}
 	SDL_UnlockSurface(image);
-	return TRUE;
+
+	return c64_png;
 }
 
+/* check if given surface is ok to be a gdash theme. */
+gboolean
+gd_is_surface_ok_for_theme (SDL_Surface *surface)
+{
+	if ((surface->w % NUM_OF_CELLS_X != 0) || (surface->h % NUM_OF_CELLS_Y != 0) || (surface->w / NUM_OF_CELLS_X != surface->h / NUM_OF_CELLS_Y)) {
+		g_warning("image should contain %d cells in a row and %d in a column!", NUM_OF_CELLS_X, NUM_OF_CELLS_Y);
+		return FALSE; /* Image should contain 16 cells in a row and 32 in a column! */
+	}
+	/* we do not check for an alpha channel, as in the gtk version. we do not need it here. */
+	/* the gtk version needs it because of the editor. */
+
+	return TRUE;	/* passed checks */
+}
+
+
+/* load theme from bmp file. */
+/* return true if successful. */
 gboolean
 gd_loadcells_file(const char *filename)
 {
@@ -517,42 +1007,73 @@ gd_loadcells_file(const char *filename)
 	surface=SDL_LoadBMP(filename);
 
 	if (!surface) {
-		g_warning("unable to load image");
+		g_warning("%s: unable to load image", filename);
 		return FALSE;
 	}
 
-	if ((surface->w % NUM_OF_CELLS_X != 0) || (surface->h % NUM_OF_CELLS_Y != 0) || (surface->w / NUM_OF_CELLS_X != surface->h / NUM_OF_CELLS_Y)) {
-		g_warning("Image should contain %d cells in a row and %d in a column!", NUM_OF_CELLS_X, NUM_OF_CELLS_Y);
+	/* do some checks. if those fail, the error is already reported by the function */	
+	if (!gd_is_surface_ok_for_theme(surface)) {
 		SDL_FreeSurface(surface);
 		return FALSE;
 	}
 
 	/* convert to 32bit rgba */
-	converted=SDL_CreateRGBSurface(SDL_SWSURFACE, surface->w, surface->h, 32, rmask, gmask, bmask, amask);
+	converted=SDL_CreateRGBSurface(0, surface->w, surface->h, 32, rmask, bmask, gmask, amask);
 	SDL_BlitSurface(surface, NULL, converted, NULL);
 	SDL_FreeSurface(surface);
-	surface=converted;
 
-	if (check_if_pixbuf_c64_png(surface)) {
+	if (check_if_pixbuf_c64_png(converted)) {
 		/* c64 pixbuf with a small number of colors which can be changed */
 		g_free(c64_custom_gfx);
-		c64_custom_gfx=c64_gfx_data_from_pixbuf(surface);
+		c64_custom_gfx=c64_gfx_data_from_pixbuf(converted);
 		using_png_gfx=FALSE;
 	} else {
 		/* normal, "truecolor" pixbuf */
 		g_free(c64_custom_gfx);
 		c64_custom_gfx=NULL;
 		using_png_gfx=TRUE;
-		loadcells(surface);
+		loadcells(converted);
 	}
-	SDL_FreeSurface(surface);
+	SDL_FreeSurface(converted);
 	
 	return TRUE;
 }
 
 
 
+/* load the theme specified in gd_sdl_theme. */
+/* if successful, ok. */
+/* if fails, or no theme specified, load the builtin, and forget gd_sdl_theme */
+void
+gd_load_theme()
+{
+	if (gd_sdl_theme) {
+		if (!gd_loadcells_file(gd_sdl_theme)) {
+			/* if failing to load the bmp file specified in the config file: forget the setting now, and load the builtin. */
+			g_free(gd_sdl_theme);
+			gd_sdl_theme=NULL;
+		}
+	}
+	if (!gd_sdl_theme)
+		gd_loadcells_default();		/* if no theme specified, or loading the file failed, simply load the builtin. */
+}
+
+
+
 /* C64 FONT HANDLING */
+
+/* creates a guint32 value, which can be raw-written to a sdl_surface memory area. */
+/* takes the pixel format of the surface into consideration. */
+static guint32
+rgba_pixel_from_gdcolor(SDL_PixelFormat *format, GdColor col, guint8 a)
+{
+	guint8 r=(col>>16)&255;
+	guint8 g=(col>>8)&255;
+	guint8 b=col&255;
+
+	return SDL_MapRGBA(format, r, g, b, a);
+}
+
 
 /* FIXME fixed font size: 8x8 */
 /* renders the fonts for a specific color. */
@@ -576,8 +1097,8 @@ renderfont_color(GdColor color)
 	image=SDL_CreateRGBSurface(0, 16, 8, 32, rmask, gmask, bmask, amask);
 	image_n=SDL_CreateRGBSurface(0, 8, 8, 32, rmask, gmask, bmask, amask);
 
-	col=rgba_pixel_from_color(image->format, color, 0xff);
-	black=rgba_pixel_from_color(image->format, 0, 0xff);
+	col=rgba_pixel_from_gdcolor(image->format, color, 0xff);
+	black=rgba_pixel_from_gdcolor(image->format, 0, 0xff);
 	
 	/* for all characters */
 	/* render character in "image", then do a displayformat(image) to generate the resulting one */
@@ -587,12 +1108,15 @@ renderfont_color(GdColor color)
 		y1=(j/16)*8;	/* 16 characters in a row */
 		x1=(j%16)*8;
 		
+		SDL_LockSurface(image);
+		SDL_LockSurface(image_n);
 		for (y=0; y<8; y++) {
 			guint32 *p=(guint32*) ((char *)image->pixels + y*image->pitch);
 			guint32 *p_n=(guint32*) ((char *)image_n->pixels + y*image_n->pitch);
 
 			for (x=0; x<8; x++) {
-				if (font[(y1+y)*128+x1+x]) {
+				/* the font array is encoded the same way as a c64-colored pixbuf. see c64_gfx_data...() */
+				if (font[(y1+y)*128+x1+x]!=1) {
 					p[0]=col;	/* wide */
 					p[1]=col;
 					p_n[0]=col;	/* normal */
@@ -605,8 +1129,10 @@ renderfont_color(GdColor color)
 				p_n++;
 			}
 		}
-		fw[j]=SDL_DisplayFormat(image);
-		fn[j]=SDL_DisplayFormat(image_n);
+		SDL_UnlockSurface(image);
+		SDL_UnlockSurface(image_n);
+		fw[j]=displayformat(image);
+		fn[j]=displayformat(image_n);
 		/* small font does not draw black background */
 		SDL_SetColorKey(fn[j], SDL_SRCCOLORKEY, SDL_MapRGB(fn[j]->format, 0, 0, 0));
 	}
@@ -645,6 +1171,20 @@ gd_loadfont_default()
 
 
 
+int gd_font_height()
+{
+	return 8*gd_scale;
+}
+
+int gd_font_width()
+{
+	return 8*gd_scale;
+}
+
+int gd_line_height()
+{
+	return gd_font_height()+2;
+}
 
 /* clears one line on the screen. takes dark screen or totally black screen into consideration. */
 void
@@ -655,7 +1195,7 @@ gd_clear_line(SDL_Surface *screen, int y)
 	rect.x=0;
 	rect.y=y;
 	rect.w=screen->w;
-	rect.h=8;	/* FIXME HACK */
+	rect.h=gd_font_height();
 	if (dark_screens!=NULL && dark_screens->data!=NULL)
 		SDL_BlitSurface(dark_screens->data, &rect, screen, &rect);
 	else
@@ -706,7 +1246,16 @@ gd_blittext_font(SDL_Surface *screen, SDL_Surface **font, int x1, int y, const c
 				i=GD_BACKSLASH_CHAR;
 			else
 			if (c=='_')
-				i=100;
+				i=GD_UNDERSCORE_CHAR;
+			else
+			if (c=='~')
+				i=GD_TILDE_CHAR;
+			else
+			if (c=='[')
+				i=GD_OPEN_BRACKET_CHAR;
+			else
+			if (c==']')
+				i=GD_CLOSE_BRACKET_CHAR;
 			else
 				i=GD_UNKNOWN_CHAR;
 			
@@ -778,7 +1327,6 @@ gd_blittext_printf_n(SDL_Surface *screen, int x, int y, GdColor color, const cha
 
 
 
-
 void
 gd_select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5)
 {
@@ -810,14 +1358,11 @@ gd_loadcells_default()
 	color0=0xffffffff;	/* this is an invalid gdash color; so redraw is forced */
 }
 
-/* after loading the cells, the dark gray background - which is
-   a tiled steel wall - can be created.
-   this function is to be called after initializing the application
-   and having done gd_loadcells_default.
- */
+/* the dark gray background */
 void
 gd_create_dark_background()
 {
+	SDL_Surface *tile, *dark_tile, *dark_screen_tiled;
 	int x, y;
 	
 	g_assert(gd_screen!=NULL);
@@ -825,17 +1370,29 @@ gd_create_dark_background()
 	if (dark_background)
 		SDL_FreeSurface(dark_background);
 
-	gd_select_pixbuf_colors(0x000000, 0x101010, 0x202020, 0x303030, 0x404040, 0x505050);		/* dark gray colors */
-	dark_background=SDL_CreateRGBSurface(0, gd_screen->w, gd_screen->h, 32, 0, 0, 0, 0);
-	for (y=0; y<gd_screen->h; y+=cells[0]->h)
-		for (x=0; x<gd_screen->w; x+=cells[0]->w) {
+	tile=surface_from_gdk_pixbuf_data((guint32 *) gdash_tile);
+	/* 24bpp, as it has no alpha channel */
+	dark_tile=SDL_CreateRGBSurface(0, tile->w, tile->h, 24, 0, 0, 0, 0);
+	SDL_BlitSurface(tile, NULL, dark_tile, NULL);
+	SDL_FreeSurface(tile);
+	SDL_SetAlpha(dark_tile, SDL_SRCALPHA, 64);	/* 1/4 opacity */
+	
+	/* create the image, and fill it with the tile. */
+	/* the image is screen size / gd_scale, so we prefer the original screen size here */
+	/* and only do the scaling later! */
+	dark_screen_tiled=SDL_CreateRGBSurface(0, gd_screen->w/gd_scale, gd_screen->h/gd_scale, 32, rmask, gmask, bmask, amask);
+	for (y=0; y<dark_screen_tiled->h; y+=dark_tile->h)
+		for (x=0; x<dark_screen_tiled->w; x+=dark_tile->w) {
 			SDL_Rect rect;
 			
 			rect.x=x;
 			rect.y=y;
 			
-			SDL_BlitSurface(cells[gd_elements[O_STEEL].image], NULL, dark_background, &rect);
+			SDL_BlitSurface(dark_tile, NULL, dark_screen_tiled, &rect);
 		}
+	SDL_FreeSurface(dark_tile);
+	dark_background=displayformat(dark_screen_tiled);
+	SDL_FreeSurface(dark_screen_tiled);
 }
 
 

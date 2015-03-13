@@ -75,6 +75,17 @@ gd_stop_game()
 	gd_no_sound();
 }
 
+/* add bonus life. if sound enabled, play sound, too. */
+static void
+add_bonus_life(gboolean sound)
+{
+	if (sound && game.cave)
+		game.cave->sound1=GD_S_BONUS_LIFE;	/* sound1 chosen for this; so "overwrites" diamond get sound */
+	if (game.player_lives)	/* only add a life, if lives is >0.  lives==0 is a test run or a snapshot, no bonus life then. */
+		game.player_lives++;
+	game.bonus_life_flash=100;
+}
+
 /* returns TRUE on success */
 gboolean
 gd_game_start_level(const Cave *snapshot_cave)
@@ -109,10 +120,8 @@ gd_game_start_level(const Cave *snapshot_cave)
 			gd_cave_set_random_colors(game.cave);
 		if (gd_easy_play)		/* if handicap on */
 			gd_cave_easy(game.cave);
-		if (game.cave->intermission && game.cave->intermission_instantlife) {
-			game.player_lives++;
-			game.bonus_life_flash=100;
-		}
+		if (game.cave->intermission && game.cave->intermission_instantlife)
+			add_bonus_life(FALSE);
 	}
 	else {
 		/* if a snapshot is requested, that one... just create a copy */
@@ -193,11 +202,8 @@ increment_score(int increment)
 	int i=game.player_score/500;
 	game.player_score+=increment;
 	game.cave_score+=increment;
-	if (game.player_score/500>i) {	/* if score crossed 500point boundary, */
-		if (game.player_lives)
-			game.player_lives++;	/* player gets an extra life, but only if no test or snapshot. */
-		game.bonus_life_flash=100;	/* also flash the screen for 100 frames=4 secs */
-	}
+	if (game.player_score/500>i)
+		add_bonus_life(TRUE);	/* if score crossed 500point boundary, bonus life */
 }
 
 
@@ -208,12 +214,13 @@ gd_game_iterate_cave(GdDirection player_move, gboolean fire, gboolean key_suicid
 	/* if already time=0, skip iterating */
 	if (game.cave->player_state!=PL_TIMEOUT) {
 		gd_cave_iterate (game.cave, player_move, fire, key_suicide);
+		if (game.cave->score)
+			increment_score (game.cave->score);
+
 		gd_play_sounds(game.cave->sound1, game.cave->sound2, game.cave->sound3);
 	} else
 		gd_no_sound();
 		
-	if (game.cave->score)
-		increment_score (game.cave->score);
 	if (game.cave->player_state==PL_EXITED) {
 		if (game.cave->intermission && game.cave->intermission_rewardlife && game.player_lives!=0) {
 			/* one life extra for completing intermission */
