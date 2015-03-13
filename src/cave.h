@@ -735,13 +735,16 @@ typedef struct _gd_cave {
 	double acid_spread_ratio;		/* Probability of acid blowing up, each frame */
 	gboolean acid_spread_sound;		/* acid has sound */
 	GdElement acid_turns_to;		/* whether acid converts to explosion on spreading or other */
+	
+	GdElement nut_turns_to_when_crushed;	/* when a nut is hit by a stone, it converts to this element */
 
 	double level_slime_permeability[5];		/* true random slime */
 	int level_slime_permeability_c64[5];	/* Appearing in bd 2 */
 	int level_slime_seed_c64[5];			/* predictable slime random seed */
 	gboolean slime_predictable;				/* predictable random start for slime. yes for plck. */
 	GdElement slime_eats_1, slime_converts_1;	/* slime eats element x and converts to element x; for example diamond -> falling diamond */
-	GdElement slime_eats_2, slime_converts_2;
+	GdElement slime_eats_2, slime_converts_2;	/* this is usually stone -> stone_f */
+	GdElement slime_eats_3, slime_converts_3;	/* this is usually nut -> nut_f */
 	gboolean slime_sound;			/* slime has sound */
 
 	gboolean lava_sound;			/* elements sinking in lava have sound */
@@ -800,6 +803,7 @@ typedef struct _gd_cave {
 	GdElement magic_diamond_to;		/* magic wall converts falling diamond to */
 	GdElement magic_mega_stone_to;	/* magic wall converts a falling mega stone to */
 	GdElement magic_nitro_pack_to;	/* magic wall converts a falling nitro pack to */
+	GdElement magic_nut_to;				/* magic wall converts a falling nut to */
 	GdElement magic_flying_stone_to;	/* flying stones are converted to */
 	GdElement magic_flying_diamond_to;	/* flying diamonds are converted to */
 

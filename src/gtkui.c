@@ -655,7 +655,7 @@ gd_preferences (GtkWidget *parent)
 		{TypeBoolean, N_("PAL emulation for editor"), N_("Use PAL emulated graphics, ie. lines are striped."), &gd_pal_emulation_editor, TRUE},
 //		{TypeBoolean, N_("Even lines vertical scroll"), N_("Even lines vertical scroll. Scrolls to every second scanline vertically. If you use PAL emulation and PAL scanline shade, scrolling might look better with this turned on."), &gd_even_line_pal_emu_vertical_scroll, FALSE},
 		{TypeBoolean, N_("Fine scroll"), N_("Fine scroll - 50 frames per second."), &gd_fine_scroll, FALSE},
-		{TypePercent,    N_("PAL scanline shade (%%)"), N_("Darker rows for PAL emulation."), &gd_pal_emu_scanline_shade, TRUE},
+		{TypePercent, N_("PAL scanline shade (%%)"), N_("Darker rows for PAL emulation."), &gd_pal_emu_scanline_shade, TRUE},
 		{TypeLabel, N_("<b>C64 palette</b>"), NULL, NULL},
 		{TypeStringv, NULL, N_("The color palette for games imported from C64 files."), &gd_c64_palette, FALSE, gd_color_get_c64_palette_names()},
 		{TypeLabel, N_("<b>C64 DTV palette</b>"), NULL, NULL},
@@ -716,7 +716,7 @@ gd_preferences (GtkWidget *parent)
 				break;
 
 			case TypeBoolean:
-				widget=gtk_check_button_new_with_label(_(options[i].name));
+				widget=gtk_check_button_new_with_mnemonic(_(options[i].name));
 				gtk_widget_set_tooltip_text(widget, _(options[i].description));
 				gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), *(gboolean *)options[i].value);
 				gtk_table_attach_defaults (GTK_TABLE (table), widget, col+1, col+2, row, row+1);
@@ -1144,7 +1144,7 @@ gd_discard_changes (GtkWidget *parent)
 	gtk_dialog_add_button(GTK_DIALOG (dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
 	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
 	/* create a discard button with a trash icon and Discard text */
-	button=gtk_button_new_with_label(_("_Discard"));
+	button=gtk_button_new_with_mnemonic(_("_Discard"));
 	gtk_button_set_image(GTK_BUTTON (button), gtk_image_new_from_stock(GTK_STOCK_DELETE, GTK_ICON_SIZE_BUTTON));
 	gtk_widget_show (button);
 	gtk_dialog_add_action_widget(GTK_DIALOG (dialog), button, GTK_RESPONSE_YES);
@@ -1372,6 +1372,13 @@ gd_open_caveset(GtkWidget *parent, const char *directory)
 	/* gtk bug - sometimes the above widget destroy creates an error message. */
 	/* so we delete the error flag here. */
 #ifdef G_OS_WIN32
+	gd_clear_error_flag();
+#else
+	/* MacOS GTK+ hack */
+	/* well, in MacOS, the file open dialog does report this error: */
+	/* "Unable to find default local directory monitor type" - original text */
+	/* "Vorgegebener Überwachungstyp für lokale Ordner konnte nicht gefunden werden" - german text */
+	/* so better to always clear the error flag. */
 	gd_clear_error_flag();
 #endif
 

@@ -19,7 +19,7 @@
 #include "cave.h"
 
 typedef enum _gd_object_type {
-	NONE,				/* this one to be zero. */
+	NONE,				    /* this one to be zero. */
 	GD_POINT,				/* single point of object1 */
 	GD_LINE,				/* line from (1) to (2) of object1 */
 	GD_RECTANGLE,			/* rectangle with corners (1) and (2) of object1 */
@@ -31,7 +31,7 @@ typedef enum _gd_object_type {
 	GD_MAZE,				/* maze */
 	GD_MAZE_UNICURSAL,		/* unicursal maze */
 	GD_MAZE_BRAID,			/* braid maze */
-	GD_RANDOM_FILL,		/* random fill */
+	GD_RANDOM_FILL,		    /* random fill */
 	GD_COPY_PASTE,			/* copy & paste with optional mirror and flip */
 } GdObjectType;
 
@@ -83,14 +83,14 @@ typedef struct _gd_object_description {
 extern GdObjectDescription gd_object_description[];
 
 
-void gd_cave_draw_object (GdCave *cave, const GdObject *object, int level);
+void gd_cave_draw_object(GdCave *cave, const GdObject *object, int level);
 char *gd_object_get_bdcff(const GdObject *object);
-char *gd_object_get_coordinates_text (GdObject *selected);
-char *gd_object_get_description_markup (GdObject *selected);
+char *gd_object_get_coordinates_text(GdObject *selected);
+char *gd_object_get_description_markup(GdObject *selected);
 GdObject *gd_object_new_from_string(char *str);
 
-GdCave *gd_cave_new_rendered(const GdCave * data, const int level, guint32 seed);
-void gd_flatten_cave(GdCave * cave, const int level);
+GdCave *gd_cave_new_rendered(const GdCave *data, const int level, guint32 seed);
+void gd_flatten_cave(GdCave *cave, const int level);
 
 #endif	/* CAVEOBJECT.H */
 

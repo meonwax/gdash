@@ -1,0 +1,27 @@
+# GdkPixbuf Image Loader Modules file
+#
+#
+"libpixbufloader-bmp.dll"
+"bmp" 5 "gtk20" "The BMP image format" "LGPL"
+"image/bmp" "image/x-bmp" "image/x-MS-bmp" ""
+"bmp" ""
+"BM" "" 100
+
+"libpixbufloader-gif.dll"
+"gif" 4 "gtk20" "The GIF image format" "LGPL"
+"image/gif" ""
+"gif" ""
+"GIF8" "" 100
+
+"libpixbufloader-jpeg.dll"
+"jpeg" 5 "gtk20" "The JPEG image format" "LGPL"
+"image/jpeg" ""
+"jpeg" "jpe" "jpg" ""
+"\377\330" "" 100
+
+"libpixbufloader-png.dll"
+"png" 5 "gtk20" "The PNG image format" "LGPL"
+"image/png" ""
+"png" ""
+"\211PNG\r\n\032\n" "" 100
+

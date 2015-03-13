@@ -52,29 +52,31 @@ Section "GDash (required)"
   File /oname=COPYING_SDL.txt "COPYING.SDL"
   File /oname=COPYING_GTK.txt "COPYING.GTK"
   File README-SDL.txt
-  
+
   ; Program files, Glib dlls
   SetOutPath $INSTDIR
   File ${MINGWDIR}\bin\intl.dll
-  File ${MINGWDIR}\bin\libglib-2.0-0.dll
   File ${MINGWDIR}\bin\libgio-2.0-0.dll
+  File ${MINGWDIR}\bin\libglib-2.0-0.dll
   File ${MINGWDIR}\bin\libgmodule-2.0-0.dll
   File ${MINGWDIR}\bin\libgobject-2.0-0.dll
   File ${MINGWDIR}\bin\libgthread-2.0-0.dll
   
   ; Program files, GTK+ dlls
   SetOutPath $INSTDIR
-  File ${MINGWDIR}\bin\jpeg62.dll 
+  File ${MINGWDIR}\bin\freetype6.dll
   File ${MINGWDIR}\bin\libatk-1.0-0.dll
   File ${MINGWDIR}\bin\libcairo-2.dll
-  File ${MINGWDIR}\bin\libgdk_pixbuf-2.0-0.dll
+  File ${MINGWDIR}\bin\libexpat-1.dll
+  File ${MINGWDIR}\bin\libfontconfig-1.dll
   File ${MINGWDIR}\bin\libgdk-win32-2.0-0.dll
+  File ${MINGWDIR}\bin\libgdk_pixbuf-2.0-0.dll
   File ${MINGWDIR}\bin\libgtk-win32-2.0-0.dll
   File ${MINGWDIR}\bin\libpango-1.0-0.dll
   File ${MINGWDIR}\bin\libpangocairo-1.0-0.dll
+  File ${MINGWDIR}\bin\libpangoft2-1.0-0.dll
   File ${MINGWDIR}\bin\libpangowin32-1.0-0.dll
   File ${MINGWDIR}\bin\libpng12-0.dll
-  File ${MINGWDIR}\bin\libtiff3.dll
   File ${MINGWDIR}\bin\zlib1.dll
   File ${MINGWDIR}\lib\gtk-2.0\2.10.0\loaders\libpixbufloader-png.dll
   File ${MINGWDIR}\lib\gtk-2.0\2.10.0\loaders\libpixbufloader-jpeg.dll

@@ -15,6 +15,5 @@ EXTRA_DIST = \
 	config.rpath mkinstalldirs m4/ChangeLog \
 	gdash.ico gdash.nsi.in $(desktop_DATA) \
 	engine_tests.bd replays_example.bd \
-	COPYING.SDL COPYING.GTK README-SDL.txt
+	COPYING.SDL COPYING.GTK README-SDL.txt \
 	gdk-pixbuf.loaders
-

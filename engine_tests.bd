@@ -438,7 +438,7 @@ CaveScheduling=ms
 PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
-RandomFill=BOULDER 20 SOKOBANBOX 5 MEGABOULDER 2 DIRT 0
+RandomFill=BOULDER 20 SOKOBANBOX 7 MEGABOULDER 4 BLADDER 2
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
 DummyProperties.destructable=false
@@ -539,7 +539,6 @@ FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
 RandomFill=BOULDER 32 NITRO 16 DIRT 0 DIRT 0
 SlimePermeabilityC64=0 0 0 0 0
-Effect=NITROEXPLOSIONeffect NITRO
 
 [objects]
 Point=5 4 INBOX
@@ -788,8 +787,6 @@ AmoebaTime=600 600 600 600 600
 MagicWallTime=600 600 600 600 600
 MagicWallProperties.waitforhatching=true
 MagicWallProperties.convertamoeba=false
-MagicWallProperties.flyingstoneto=FLYINGBOULDERf
-MagicWallProperties.flyingdiamondto=FLYINGDIAMONDf
 SlimePermeabilityC64=0 0 0 0 0
 EnemyDirectionProperties.changeathatching=true
 SkeletonsForPot=0
@@ -869,6 +866,7 @@ Effect=AMOEBADIAMONDeffect DIAMONDBIRTH1
 MagicWallTime=600 600 600 600 600
 MagicWallProperties.waitforhatching=true
 MagicWallProperties.convertamoeba=false
+MagicWallProperties.nutto=MEGABOULDERf
 SlimePermeabilityC64=0 0 0 0 0
 EnemyDirectionProperties.changeathatching=true
 BorderProperties.lineshift=true
@@ -877,6 +875,8 @@ ShortExplosions=false
 [objects]
 Point=10 9 INBOX
 Point=12 9 SWEET
+Line=5 10 9 10 MAGICWALL
+Line=15 10 21 10 SLIME
 [/objects]
 [/cave]
 [/game]

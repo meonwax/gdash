@@ -1,0 +1,1908 @@
+[BDCFF]
+Version=0.5
+[game]
+Name=Rock Fort 3- Rockford's Dream
+Author=Dustin
+Date=2009-01-29
+Lives=5 99
+Levels=5
+
+[cave]
+[highscore]
+638 test
+605 sndubach
+589 test
+585 test
+579 test
+510 test
+433 sndubach
+326 test
+[/highscore]
+Name=Cave A. Big Bang
+Author=Dustin (original: Peter Liepa)
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #905f25 #555555 #ffffff #ffffff #905f25
+DiamondsRequired=30 45 60 75 90
+DiamondValue=5 10
+CaveTime=200 200 200 160 160
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+RandSeed=10 11 12 13 14
+InitialFill=BOMBEXPLOSION1
+RandomFill=EXPLOSION1 60 BOULDERBIRTH1 50 DIAMONDBIRTH1 9 DIRT 0
+MagicWallTime=75 50 40 40 30
+SlimePermeabilityC64=0 0 0 0 0
+Effect=BOMBEXPLOSIONeffect DIRT
+Effect=NITROEXPLOSIONeffect MAGICWALL
+
+[objects]
+Line=1 7 30 7 NITROEXPLOSION1
+Line=9 14 38 14 NITROEXPLOSION1
+Add=0 -1 NITROEXPLOSION1 BOMBEXPLOSION1
+Point=3 2 GUYBIRTH1
+Point=38 16 OUTBOX
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+472 test
+414 test
+388 test
+360 test
+342 sndubach
+295 test
+[/highscore]
+Name=Cave B. Queen
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #5b7f26 #24b512 #2fec76 #12b514 #263b7f
+DiamondsRequired=9 9 9 9 9
+DiamondValue=20 0
+CaveTime=150 150 150 111 210
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+RandSeed=17 28 35 235 219
+RandomFill=BOULDER 75 DIRT 0 DIRT 0 DIRT 0
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+FillRect=9 1 30 20 DIRT
+FillRect=11 2 12 1 SPACE
+FillRect=15 1 16 2 SPACE
+FillRect=19 1 20 2 SPACE
+FillRect=23 1 24 2 SPACE
+FillRect=27 1 28 2 SPACE
+FillRect=27 5 28 6 SPACE
+FillRect=27 9 28 10 SPACE
+FillRect=27 13 28 14 SPACE
+FillRect=27 17 28 18 SPACE
+FillRect=11 5 12 6 SPACE
+FillRect=11 9 12 10 SPACE
+FillRect=11 13 12 14 SPACE
+FillRect=11 17 12 18 SPACE
+FillRect=15 17 16 18 SPACE
+FillRect=19 17 20 18 SPACE
+FillRect=23 17 24 18 SPACE
+FillRect=13 3 14 4 SPACE
+FillRect=17 3 18 4 SPACE
+FillRect=21 3 22 4 SPACE
+FillRect=25 3 26 4 SPACE
+FillRect=13 7 14 8 SPACE
+FillRect=15 5 16 6 SPACE
+FillRect=19 5 20 6 SPACE
+FillRect=23 5 24 6 SPACE
+FillRect=17 7 18 8 SPACE
+FillRect=21 7 22 8 SPACE
+FillRect=25 7 26 8 SPACE
+FillRect=15 9 16 10 SPACE
+FillRect=23 9 24 10 SPACE
+FillRect=13 11 14 12 SPACE
+FillRect=17 11 18 12 SPACE
+FillRect=21 11 22 12 SPACE
+FillRect=25 11 26 12 SPACE
+FillRect=15 13 16 14 SPACE
+FillRect=19 13 20 14 SPACE
+FillRect=23 13 24 14 SPACE
+FillRect=13 15 14 16 SPACE
+FillRect=17 15 18 16 SPACE
+FillRect=21 15 22 16 SPACE
+FillRect=25 15 26 16 SPACE
+Line=12 1 11 2 FIREFLYl
+Line=16 1 11 6 FIREFLYl
+Line=20 1 11 10 FIREFLYl
+Line=24 1 11 14 FIREFLYl
+Line=28 1 11 18 FIREFLYl
+Line=15 18 28 5 FIREFLYl
+Line=19 18 28 9 FIREFLYl
+Line=23 18 28 13 FIREFLYl
+[Level=5]
+Add=0 0 SPACE FIREFLYl
+[/Level]
+Line=27 18 28 17 FIREFLYl
+FillRect=19 9 20 10 SPACE
+Point=20 9 BUTTERFLYd
+Point=19 20 INBOX
+Point=20 21 OUTBOX
+[Level=1,2]
+Rectangle=11 1 28 18 DIRT
+[/Level]
+[Level=1,2]
+Rectangle=12 2 27 17 DIRT
+[/Level]
+[Level=1]
+Add=-1 1 FIREFLYl SPACE
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+471 test
+465 sndubach
+444 test
+360 test
+360 test
+281 sndubach
+263 test
+[/highscore]
+Name=Cave C. Disquietingly Light Bulbs
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #22ae23 #7f3c26 #c4dd16 #267f3c #2237ae
+DiamondsRequired=9 7 12 11 10
+DiamondValue=20 50
+CaveTime=120 120 120 100 150
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+InitialFill=SPACE
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+[Level=1,2]
+RandomFillC64=0 1 39 20 16 21 22 29 35 NONE DIAMOND 15 FIREFLYl 10
+[/Level]
+[Level=3,4,5]
+RandomFillC64=0 1 39 20 16 116 208 188 241 NONE DIAMOND 20 FIREFLYl 15
+[/Level]
+Rectangle=0 0 39 21 STEELWALL
+[Level=2,3,4,5]
+Raster=8 14 25 2 1 2 STEELWALL
+[/Level]
+[Level=5]
+Line=8 5 32 5 STEELWALL
+[/Level]
+Point=20 15 OUTBOX
+FillRect=19 8 21 10 DIRT INBOX
+Add=0 1 DIAMOND STEELWALL
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+906 test
+736 test
+674 test
+643 sndubach
+390 test
+170 test
+[/highscore]
+Name=Cave D. Lost Treasuries
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #26627f #24b6a6 #1749ee #29b624 #38267f
+DiamondsRequired=3 9 15 21 30
+DiamondValue=20 50
+CaveTime=120 120 120 120 180
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+InitialFill=SPACE
+MagicWallTime=0 0 0 0 0
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+Line=1 1 38 1 BOULDER
+FillRect=1 2 38 4 DIRT
+Raster=1 20 38 -3 1 2 MAGICWALL
+[Level=1,2]
+Raster=3 11 6 1 6 2 BUTTERFLYr
+[/Level]
+[Level=3,4,5]
+Raster=3 11 12 1 3 2 BUTTERFLYr
+[/Level]
+Point=19 8 INBOX
+Point=20 0 OUTBOX
+[Level=5]
+Add=0 -6 BUTTERFLYr BUTTERFLYl
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+268 test
+228 test
+205 test
+[/highscore]
+Name=Intermission Q. Stamina Test
+Author=Dustin
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+Size=20 12 0 0 19 11
+Colors=Black Black Blue Orange White White Orange
+DiamondsRequired=36 36 36 36 36
+DiamondValue=5 0
+CaveTime=50 50 50 50 50
+CaveScheduling=ms
+PALTiming=true
+FrameTime=100 100 100 100 100
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+SlimePermeabilityC64=248 248 248 248 248
+SlimePredictableC64.seed=35 35 35 35 35
+
+[objects]
+FillRect=1 1 7 10 STEELWALL
+Rectangle=1 5 6 10 SPACE
+Line=8 1 8 10 SPACE
+Point=8 1 BOULDER
+Raster=8 2 1 4 2 2 SLIME
+Point=8 9 FIREFLYl
+FillRect=10 2 17 9 BOULDER DIAMOND
+Point=3 5 FIREFLYl
+Point=4 5 INBOX
+Point=4 6 OUTBOX
+Point=7 10 WALL
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+502 test
+492 test
+487 sndubach
+440 test
+440 test
+343 test
+[/highscore]
+Name=Cave E. Dangerous Dance
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #580f1b #93b28b #219967 #ccca66 #339921 #918bb2
+DiamondsRequired=6 6 7 7 13
+DiamondValue=40 0
+CaveTime=120 120 120 90 120
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+InitialFill=SPACE
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+Raster=1 1 4 20 7 1 STEELWALL
+Raster=7 1 3 20 7 1 STEELWALL
+Raster=3 3 3 6 1 3 STEELWALL
+Raster=10 3 3 6 1 3 STEELWALL
+Raster=17 3 3 6 1 3 STEELWALL
+FillRect=24 5 36 17 STEELWALL
+Rectangle=25 6 35 16 DIRT
+Rectangle=27 8 33 14 DIRT
+Line=24 11 36 11 DIRT
+Line=30 5 30 17 DIRT
+[Level=1,2]
+Point=30 11 OUTBOX
+[/Level]
+[Level=3,4,5]
+Point=0 20 OUTBOX
+[/Level]
+Point=1 20 INBOX
+[Level=3,4,5]
+Point=30 11 DIAMOND
+[/Level]
+Raster=4 17 1 -1 1 6 FIREFLYl
+Add=0 -1 FIREFLYl FIREFLYr
+Point=11 2 FIREFLYl
+[Level=2,3,4,5]
+Point=13 5 FIREFLYu
+[/Level]
+[Level=2,3,4,5]
+Point=13 10 FIREFLYr
+[/Level]
+[Level=2,3,4,5]
+Point=11 13 FIREFLYr
+[/Level]
+[Level=2,3,4,5]
+Point=9 16 FIREFLYd
+[/Level]
+[Level=2,3,4,5]
+Point=9 17 FIREFLYl
+[/Level]
+Raster=18 17 1 -1 2 6 FIREFLYl
+Raster=18 16 1 -1 2 6 BUTTERFLYl
+Line=7 1 8 1 DIAMOND
+Line=14 20 15 20 DIAMOND
+Line=21 1 22 1 DIAMOND
+[Level=1]
+FillRect=3 3 5 4 SPACE FIREFLYr
+[/Level]
+[Level=1]
+FillRect=3 17 5 18 SPACE FIREFLYr
+[/Level]
+[Level=1]
+FillRect=17 17 19 18 SPACE FIREFLYr
+[/Level]
+[Level=1]
+FillRect=17 3 19 4 SPACE FIREFLYr
+[/Level]
+[Level=1]
+Point=13 6 FIREFLYu
+[/Level]
+[Level=1]
+Point=11 10 FIREFLYr
+[/Level]
+[Level=1]
+Point=9 12 FIREFLYd
+[/Level]
+[Level=1]
+Point=11 14 FIREFLYl
+[/Level]
+[Level=1]
+Point=13 18 FIREFLYu
+[/Level]
+[Level=5]
+Raster=1 6 3 2 7 9 DIAMOND
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+982 test
+567 test
+483 test
+477 sndubach
+431 test
+390 test
+[/highscore]
+Name=Cave F. Shooting Gallery
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #082005 #7f0c36 #709d2f #259fbb #2f9d34 #0c0e7f
+DiamondsRequired=36 36 54 63 64
+DiamondValue=5 20
+CaveTime=150 150 150 150 150
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+InitialFill=SPACE
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+FillRect=9 1 9 20 STEELWALL
+FillRect=20 1 20 20 STEELWALL
+FillRect=30 1 30 20 STEELWALL
+FillRect=9 9 30 12 STEELWALL SPACE
+Point=19 11 INBOX
+Point=20 11 OUTBOX
+Raster=14 9 2 2 10 3 HEXPANDINGWALL
+Raster=9 9 2 2 21 3 VEXPANDINGWALL
+Add=-1 0 HEXPANDINGWALL DIRT
+Add=1 0 HEXPANDINGWALL DIRT
+Line=9 10 9 11 DIRT
+Line=30 10 30 11 DIRT
+Line=14 3 14 6 DIRT
+[Level=2,3,4,5]
+Point=14 3 BOULDER
+[/Level]
+Point=15 4 BUTTERFLYd
+Line=21 1 21 8 WALL
+Line=22 1 22 8 DIRT
+Point=22 1 BOULDER
+Point=23 6 BUTTERFLYd
+Line=25 16 25 20 STEELWALL
+Point=23 15 BOULDER
+Point=27 15 BOULDER
+Point=23 16 DIRT
+Point=27 16 DIRT
+FillRect=24 15 26 16 STEELWALL
+Point=24 19 BUTTERFLYd
+Point=27 19 BUTTERFLYd
+Point=18 19 BUTTERFLYd
+[Level=2,3,4,5]
+Point=17 18 FIREFLYu
+[/Level]
+Point=12 19 BUTTERFLYd
+[Level=2,3,4,5]
+Point=11 18 FIREFLYd
+[/Level]
+Point=11 14 BOULDER
+Point=17 14 BOULDER
+Point=11 15 DIRT
+Point=17 15 DIRT
+FillRect=34 17 36 19 WALL BUTTERFLYd
+Point=35 16 FIREFLYl
+Point=35 13 BOULDER
+Point=35 11 BOULDER
+Point=35 14 DIRT
+Point=35 12 DIRT
+Point=33 18 WALL
+Point=37 18 WALL
+[Level=2,3,4,5]
+Point=34 18 HEXPANDINGWALL
+[/Level]
+FillRect=3 17 5 20 WALL SPACE
+Point=4 17 SLIME
+Point=4 18 BUTTERFLYd
+[Level=2,3,4,5]
+Point=3 14 FIREFLYl
+[/Level]
+Point=4 9 BOULDER
+Point=4 10 DIRT
+[Level=1]
+Point=4 14 FIREFLYl
+[/Level]
+[Level=1]
+Point=14 2 BOULDER
+[/Level]
+[Level=1]
+Point=23 5 DIRT
+[/Level]
+[Level=1]
+Point=19 18 FIREFLYu
+[/Level]
+[Level=1]
+Point=11 20 FIREFLYd
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+518 test
+511 test
+498 test
+486 sndubach
+350 test
+304 test
+[/highscore]
+Name=Cave G. Blue Sky
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #150844 #2236c0 #34aa33 #d4c915 #33aa3f #20197f
+DiamondsRequired=112 112 120 140 107
+DiamondValue=2 8
+CaveTime=250 250 250 210 250
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+RandSeed=7 14 21 28 35
+InitialFill=BOULDER
+RandomFill=DIAMOND 100 DIRT 0 DIRT 0 DIRT 0
+MagicWallTime=30 25 20 20 20
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+[Level=5]
+RandomFillC64=0 1 39 20 0 0 0 0 35 NONE BOULDER 100 NONE 70
+[/Level]
+FillRect=1 13 38 20 DIRT
+Line=8 1 8 12 WALL
+Line=16 1 16 12 WALL
+Line=24 2 24 18 WALL
+FillRect=27 3 36 7 DIRT
+Line=27 3 29 3 MAGICWALL
+Line=27 4 27 7 MAGICWALL
+Line=28 7 29 7 MAGICWALL
+Point=29 6 MAGICWALL
+Rectangle=31 3 33 7 MAGICWALL
+Line=36 3 36 5 MAGICWALL
+Point=36 7 MAGICWALL
+Line=27 13 36 13 MAGICWALL
+Rectangle=25 1 38 12 DIRT
+Point=38 20 INBOX
+Line=2 19 38 19 WALL
+Point=38 1 OUTBOX
+[Level=1]
+FillRect=1 11 23 12 DIRT
+[/Level]
+[Level=2]
+FillRect=1 12 23 12 DIRT
+[/Level]
+[Level=5]
+Rectangle=0 0 39 21 STEELWALL
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+533 test
+430 test
+398 sndubach
+372 test
+364 test
+257 test
+[/highscore]
+Name=Cave H. Reprieve
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #197f46 #44b011 #e1d543 #19b011 #19237f
+DiamondsRequired=5 6 8 9 25
+DiamondValue=10 40
+CaveTime=120 180 240 200 360
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+RandSeed=108 5 13 88 45
+RandomFill=DIRT 18 DIRT 18 BOULDER 18 DIAMOND 7
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+FillRect=1 12 29 20 DIRT
+Line=29 1 29 18 STEELWALL
+Line=3 18 28 18 STEELWALL
+[Level=1,2,3,4]
+Line=1 11 21 11 WALL
+[/Level]
+Line=21 1 21 10 WALL
+[Level=2,3,4,5]
+Line=21 12 21 17 WALL
+[/Level]
+[Level=3,4,5]
+Line=3 12 3 17 WALL
+[/Level]
+[Level=3,4]
+Line=12 12 12 17 WALL
+[/Level]
+[Level=2,3,4,5]
+Point=20 12 BOULDER
+[/Level]
+[Level=3,4]
+Point=11 12 BOULDER
+[/Level]
+[Level=3,4,5]
+Point=2 12 BOULDER
+[/Level]
+Point=22 3 BOULDER
+Point=34 2 INBOX
+Point=25 5 OUTBOX
+[Level=3,4,5]
+Rectangle=27 19 28 20 SPACE
+[/Level]
+Rectangle=19 19 20 20 SPACE
+Rectangle=11 19 12 20 SPACE
+[Level=3,4,5]
+Rectangle=3 19 4 20 SPACE
+[/Level]
+[Level=3,4,5]
+Point=4 19 FIREFLYl
+[/Level]
+[Level=2,3,4,5]
+Point=12 19 FIREFLYl
+[/Level]
+Point=20 19 FIREFLYl
+[Level=3,4,5]
+Point=28 19 FIREFLYl
+[/Level]
+[Level=5]
+Rectangle=7 19 8 20 SPACE
+[/Level]
+[Level=5]
+Rectangle=23 19 24 20 SPACE
+[/Level]
+[Level=5]
+Point=8 19 FIREFLYl
+[/Level]
+[Level=5]
+Point=24 19 FIREFLYl
+[/Level]
+[Level=5]
+Line=1 11 21 11 MAGICWALL
+[/Level]
+[Level=5]
+Line=9 12 9 17 WALL
+[/Level]
+[Level=5]
+Line=15 12 15 17 WALL
+[/Level]
+[Level=5]
+Point=8 12 BOULDER
+[/Level]
+[Level=5]
+Point=14 12 BOULDER
+[/Level]
+[Level=5]
+Rectangle=24 4 26 6 WALL
+[/Level]
+[Level=5]
+Point=25 3 BOULDER
+[/Level]
+[Level=1]
+Rectangle=13 19 18 20 SPACE
+[/Level]
+[Level=5]
+Rectangle=15 19 16 20 SPACE
+[/Level]
+[Level=5]
+Point=16 19 FIREFLYl
+[/Level]
+[Level=5]
+FillRect=6 4 15 7 WALL DIAMOND
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+318 test
+282 test
+248 test
+[/highscore]
+Name=Intermission R. Seven!
+Author=Dustin (original: Peter Liepa)
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+Charset=Original
+Fontset=Original
+Size=20 12 0 0 19 11
+Colors=Black Black Blue Orange White White Blue
+DiamondsRequired=7 7 7 7 7
+DiamondValue=30 0
+CaveTime=50 50 50 50 50
+CaveScheduling=ms
+PALTiming=true
+FrameTime=100 100 100 100 100
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+MagicWallTime=40 40 40 40 40
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+Rectangle=11 1 13 2 BOULDER
+FillRect=11 5 13 10 SPACE
+Line=11 4 13 4 MAGICWALL
+Line=11 8 13 8 MAGICWALL
+Line=8 5 10 7 BOULDER
+Point=3 1 INBOX
+Point=9 8 OUTBOX
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+944 test
+782 sndubach
+777 test
+484 test
+442 test
+365 test
+[/highscore]
+Name=Cave I. Party!
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #b0236d #7f7e0c #e26843 #237f0c #2350b0
+DiamondsRequired=45 60 60 90 150
+DiamondValue=5 10
+CaveTime=150 150 180 180 210
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+RandSeed=0 1 98 4 25
+RandomFill=FIREFLYl 125 SPACE 120 BOULDER 50 DIAMOND 20
+AmoebaTime=999 999 999 999 75
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+RandomFillC64=0 1 39 20 0 1 98 4 25 NONE OUTBOX 145 WALL 140 BUTTERFLYd 130 NONE 125
+RandomFillC64=0 1 39 20 0 1 98 4 25 NONE SLIME 160 STEELWALL 155 MAGICWALL 150 NONE 145
+[Level=3,4,5]
+RandomFillC64=0 1 39 20 0 1 98 4 25 NONE VEXPANDINGWALL 170 HEXPANDINGWALL 168 AMOEBA 165 NONE 160
+[/Level]
+Rectangle=0 0 39 21 STEELWALL
+FillRect=18 9 22 13 DIRT
+Point=20 11 INBOX
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+686 test
+570 test
+549 sndubach
+345 test
+164 test
+[/highscore]
+Name=Cave J. Villa
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #7f1948 #5032a6 #14cecc #32a639 #20197f
+DiamondsRequired=7 15 19 22 23
+DiamondValue=15 0
+CaveTime=120 210 300 240 300
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+RandSeed=193 50 43 25 201
+RandomFill=SPACE 60 BOULDER 50 DIAMOND 15 FIREFLYl 4
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+[Level=5]
+Point=24 8 BOULDER
+[/Level]
+[Level=5]
+Point=9 19 FIREFLYl
+[/Level]
+[Level=5]
+Point=8 16 FIREFLYl
+[/Level]
+Add=1 0 FIREFLYl SPACE
+Add=0 -1 FIREFLYl DIRT
+Add=-1 -1 FIREFLYl DIRT
+Add=1 -1 FIREFLYl DIRT
+Add=-1 0 FIREFLYl DIRT
+Add=2 1 FIREFLYl DIRT
+Add=-1 1 FIREFLYl DIRT
+Add=0 1 FIREFLYl DIRT
+Add=1 1 FIREFLYl DIRT
+Add=2 -1 FIREFLYl DIRT
+Add=2 0 FIREFLYl DIRT
+Rectangle=0 0 39 21 STEELWALL
+Raster=1 7 38 2 1 7 WALL
+Raster=13 1 2 20 13 1 WALL
+FillRect=14 1 25 6 DIRT
+Point=19 2 INBOX
+Point=20 2 OUTBOX
+Point=19 5 FIREFLYl
+Point=20 5 SPACE
+Point=14 2 BOULDER
+Point=25 2 BOULDER
+[Level=5]
+Raster=13 7 2 2 13 7 DIAMOND
+[/Level]
+Line=19 3 20 3 BOULDER
+[Level=3,4]
+FillRect=12 6 14 8 WALL DIAMOND
+[/Level]
+[Level=3,4]
+FillRect=25 6 27 8 WALL DIAMOND
+[/Level]
+[Level=3,4]
+FillRect=25 13 27 15 WALL DIAMOND
+[/Level]
+[Level=3,4]
+FillRect=12 13 14 15 WALL DIAMOND
+[/Level]
+[Level=1]
+FillRect=1 14 38 20 STEELWALL
+[/Level]
+[Level=1]
+FillRect=26 1 38 13 STEELWALL
+[/Level]
+[Level=1,2]
+Line=12 7 14 7 STEELWALL
+[/Level]
+[Level=1,2]
+Line=13 6 13 8 STEELWALL
+[/Level]
+[Level=2]
+Line=25 7 27 7 STEELWALL
+[/Level]
+[Level=2]
+Line=26 6 26 8 STEELWALL
+[/Level]
+[Level=2]
+Line=12 14 14 14 STEELWALL
+[/Level]
+[Level=2]
+Line=13 13 13 15 STEELWALL
+[/Level]
+[Level=2]
+Line=25 14 27 14 STEELWALL
+[/Level]
+[Level=2]
+Line=26 13 26 15 STEELWALL
+[/Level]
+[Level=5]
+Point=15 12 DIRT
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+262 test
+262 sndubach
+256 test
+182 test
+132 test
+[/highscore]
+Name=Cave K. Submachine
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #b23e5e #4c9699 #b0cc84 #4c9960 #3e42b2
+DiamondsRequired=20 20 20 24 25
+DiamondValue=2 0
+CaveTime=120 100 90 80 80
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+Line=8 2 8 20 STEELWALL
+FillRect=1 1 7 3 DIAMOND
+Point=4 2 INBOX
+Maze=9 1 38 20 2 1 50 0 138 44 108 13 EXPANDINGWALL DIRT braid
+[Level=3]
+Point=36 16 EXPANDINGWALL
+[/Level]
+[Level=3]
+Point=21 4 EXPANDINGWALL
+[/Level]
+[Level=3]
+Point=25 1 EXPANDINGWALL
+[/Level]
+[Level=3]
+Point=26 1 OUTBOX
+[/Level]
+[Level=3]
+Point=1 5 BOULDER
+[/Level]
+[Level=3]
+Point=3 5 BOULDER
+[/Level]
+[Level=3]
+Point=4 5 BOULDER
+[/Level]
+[Level=3]
+Point=6 5 BOULDER
+[/Level]
+[Level=3]
+Point=2 5 SLIME
+[/Level]
+[Level=3]
+Point=5 5 SLIME
+[/Level]
+[Level=3]
+Point=7 5 SLIME
+[/Level]
+[Level=3]
+Point=11 2 SLIME
+[/Level]
+[Level=3]
+Point=13 8 SLIME
+[/Level]
+[Level=3]
+Point=16 18 SLIME
+[/Level]
+[Level=3]
+Point=22 13 SLIME
+[/Level]
+[Level=3]
+Point=26 12 SLIME
+[/Level]
+[Level=3]
+Point=21 11 SLIME
+[/Level]
+[Level=3]
+Point=28 8 SLIME
+[/Level]
+[Level=3]
+Point=10 5 BOULDER
+[/Level]
+[Level=3]
+Point=10 10 BOULDER
+[/Level]
+[Level=3]
+Point=18 17 BOULDER
+[/Level]
+[Level=3]
+Point=23 17 BOULDER
+[/Level]
+[Level=3]
+Point=29 14 BOULDER
+[/Level]
+[Level=3]
+Point=25 9 BOULDER
+[/Level]
+[Level=3]
+Point=30 11 BOULDER
+[/Level]
+[Level=3,4,5]
+Raster=1 4 7 2 1 2 STEELWALL
+[/Level]
+[Level=4]
+Point=1 5 SLIME
+[/Level]
+[Level=4]
+Point=4 5 SLIME
+[/Level]
+[Level=4]
+Point=5 5 SLIME
+[/Level]
+[Level=4]
+Point=6 5 SLIME
+[/Level]
+[Level=4]
+Point=2 5 BOULDER
+[/Level]
+[Level=4]
+Point=3 5 BOULDER
+[/Level]
+[Level=4]
+Point=7 5 BOULDER
+[/Level]
+[Level=4]
+Point=12 19 OUTBOX
+[/Level]
+[Level=4]
+Point=24 1 DIAMOND
+[/Level]
+[Level=4]
+Point=24 4 EXPANDINGWALL
+[/Level]
+[Level=4]
+Point=36 19 DIAMOND
+[/Level]
+[Level=4]
+Point=27 13 DIAMOND
+[/Level]
+[Level=4]
+Point=15 16 EXPANDINGWALL
+[/Level]
+[Level=4]
+Point=17 10 EXPANDINGWALL
+[/Level]
+[Level=4]
+Point=10 5 BOULDER
+[/Level]
+[Level=4]
+Point=13 2 SLIME
+[/Level]
+[Level=4]
+Point=17 5 SLIME
+[/Level]
+[Level=4]
+Point=18 2 BOULDER
+[/Level]
+[Level=4]
+Point=28 4 BOULDER
+[/Level]
+[Level=4]
+Point=31 2 SLIME
+[/Level]
+[Level=4]
+Point=30 8 SLIME
+[/Level]
+[Level=4]
+Point=24 11 BOULDER
+[/Level]
+[Level=4]
+Point=35 11 SLIME
+[/Level]
+[Level=4]
+Point=32 7 BOULDER
+[/Level]
+[Level=4]
+Point=31 17 BOULDER
+[/Level]
+[Level=4]
+Point=32 13 SLIME
+[/Level]
+[Level=4]
+Point=25 16 SLIME
+[/Level]
+[Level=4]
+Point=21 14 BOULDER
+[/Level]
+[Level=4]
+Point=19 8 BOULDER
+[/Level]
+[Level=4]
+Point=19 11 SLIME
+[/Level]
+[Level=4]
+Point=9 19 DIAMOND
+[/Level]
+[Level=4]
+Point=4 6 BOULDER
+[/Level]
+[Level=4]
+Line=3 7 5 7 STEELWALL
+[/Level]
+[Level=1]
+Line=1 5 1 8 SLIME
+[/Level]
+[Level=1]
+Point=3 5 SLIME
+[/Level]
+[Level=1]
+Line=4 6 4 8 SLIME
+[/Level]
+[Level=1]
+Line=5 6 7 6 SLIME
+[/Level]
+[Level=1]
+Line=7 7 7 8 SLIME
+[/Level]
+[Level=1]
+Point=6 7 SLIME
+[/Level]
+[Level=1]
+Raster=1 10 2 1 2 2 SLIME
+[/Level]
+[Level=1]
+Line=2 11 2 12 SLIME
+[/Level]
+[Level=1]
+Rectangle=5 11 6 12 SLIME
+[/Level]
+[Level=1]
+Line=1 14 1 15 SLIME
+[/Level]
+[Level=1]
+Line=3 14 3 15 SLIME
+[/Level]
+[Level=1]
+Point=2 15 SLIME
+[/Level]
+[Level=1]
+Point=5 15 SLIME
+[/Level]
+[Level=1]
+Line=5 14 6 14 SLIME
+[/Level]
+[Level=1]
+Line=1 18 1 20 SLIME
+[/Level]
+[Level=1]
+Line=3 18 3 20 SLIME
+[/Level]
+[Level=1]
+Raster=2 17 1 2 2 2 SLIME
+[/Level]
+[Level=1]
+Line=4 19 4 20 SLIME
+[/Level]
+[Level=1]
+Point=4 17 SLIME
+[/Level]
+[Level=1]
+Rectangle=6 19 7 20 SLIME
+[/Level]
+[Level=1]
+Line=7 17 7 18 SLIME
+[/Level]
+[Level=1]
+Point=13 2 SLIME
+[/Level]
+[Level=1]
+Point=20 19 EXPANDINGWALL
+[/Level]
+[Level=1]
+Point=13 8 SLIME
+[/Level]
+[Level=1]
+Point=29 1 EXPANDINGWALL
+[/Level]
+[Level=1]
+Point=22 12 SLIME
+[/Level]
+[Level=1]
+Point=21 6 SLIME
+[/Level]
+[Level=1]
+Point=29 19 EXPANDINGWALL
+[/Level]
+[Level=1]
+Point=26 8 SLIME
+[/Level]
+[Level=1]
+Point=32 8 SLIME
+[/Level]
+[Level=1]
+Point=35 10 EXPANDINGWALL
+[/Level]
+[Level=1]
+Point=32 19 EXPANDINGWALL
+[/Level]
+[Level=1]
+Point=34 18 OUTBOX
+[/Level]
+[Level=1]
+Point=36 6 EXPANDINGWALL
+[/Level]
+[Level=4]
+Point=36 3 EXPANDINGWALL
+[/Level]
+[Level=2]
+Point=23 1 EXPANDINGWALL
+[/Level]
+[Level=2]
+Line=15 17 15 18 EXPANDINGWALL
+[/Level]
+[Level=2]
+Point=15 9 EXPANDINGWALL
+[/Level]
+[Level=2]
+Point=27 2 EXPANDINGWALL
+[/Level]
+[Level=2]
+Point=27 1 OUTBOX
+[/Level]
+[Level=2]
+FillRect=2 4 7 6 STEELWALL BOULDER
+[/Level]
+[Level=2]
+Line=4 5 5 5 SLIME
+[/Level]
+[Level=2]
+Line=2 10 3 10 SLIME
+[/Level]
+[Level=2]
+Line=2 12 3 12 SLIME
+[/Level]
+[Level=2]
+Point=2 11 SLIME
+[/Level]
+[Level=2]
+Rectangle=5 11 6 12 SLIME
+[/Level]
+[Level=2]
+Rectangle=2 16 3 17 SLIME
+[/Level]
+[Level=2]
+Line=3 14 3 15 SLIME
+[/Level]
+[Level=2]
+Rectangle=5 14 6 15 SLIME
+[/Level]
+[Level=2]
+Line=5 16 6 17 SLIME
+[/Level]
+[Level=2]
+Point=5 17 SLIME
+[/Level]
+[Level=2]
+Line=4 7 4 11 STEELWALL
+[/Level]
+[Level=2]
+Raster=3 8 2 1 2 2 STEELWALL
+[/Level]
+[Level=2]
+Raster=2 9 3 1 2 2 STEELWALL
+[/Level]
+[Level=2]
+Point=10 5 BOULDER
+[/Level]
+[Level=2]
+Point=14 2 SLIME
+[/Level]
+[Level=2]
+Point=10 15 SLIME
+[/Level]
+[Level=2]
+Point=11 15 BOULDER
+[/Level]
+[Level=2]
+Point=25 14 SLIME
+[/Level]
+[Level=2]
+Point=22 13 BOULDER
+[/Level]
+[Level=2]
+Point=26 17 BOULDER
+[/Level]
+[Level=2]
+Point=29 16 SLIME
+[/Level]
+[Level=2]
+Point=35 7 EXPANDINGWALL
+[/Level]
+[Level=5]
+Point=24 1 DIAMOND
+[/Level]
+[Level=5]
+Point=30 0 OUTBOX
+[/Level]
+[Level=5]
+Point=9 10 DIAMOND
+[/Level]
+[Level=5]
+Point=24 19 DIAMOND
+[/Level]
+[Level=5]
+Point=36 6 DIAMOND
+[/Level]
+[Level=5]
+Point=11 2 DIRT
+[/Level]
+[Level=5]
+Point=10 3 SLIME
+[/Level]
+[Level=5]
+Point=25 4 SLIME
+[/Level]
+[Level=5]
+Point=27 2 STEELWALL
+[/Level]
+[Level=5]
+Point=15 5 STEELWALL
+[/Level]
+[Level=5]
+Point=19 7 DIRT
+[/Level]
+[Level=5]
+Point=2 5 SLIME
+[/Level]
+[Level=5]
+Point=3 5 STEELWALL
+[/Level]
+[Level=5]
+Point=5 5 STEELWALL
+[/Level]
+[Level=5]
+Point=7 5 SLIME
+[/Level]
+[Level=5]
+Point=6 5 BOULDER
+[/Level]
+[Level=5]
+Point=10 15 BOULDER
+[/Level]
+[Level=5]
+Point=11 12 DIRT
+[/Level]
+[Level=5]
+Point=24 12 DIAMOND
+[/Level]
+[Level=5]
+Point=35 18 STEELWALL
+[/Level]
+[Level=5]
+Point=18 8 SLIME
+[/Level]
+[Level=5]
+Point=11 15 SLIME
+[/Level]
+[Level=5]
+Point=37 18 SLIME
+[/Level]
+[Level=5]
+Point=33 14 SLIME
+[/Level]
+[Level=5]
+Point=30 6 SLIME
+[/Level]
+[Level=5]
+Point=37 11 BOULDER
+[/Level]
+[Level=5]
+Point=12 2 BOULDER
+[/Level]
+[Level=5]
+Point=26 2 BOULDER
+[/Level]
+[Level=5]
+Point=16 5 BOULDER
+[/Level]
+[Level=5]
+Point=31 17 BOULDER
+[/Level]
+[Level=5]
+Point=35 5 BOULDER
+[/Level]
+[Level=5]
+Point=24 5 DIRT
+[/Level]
+[Level=5]
+Point=10 5 STEELWALL
+[/Level]
+[Level=5]
+Point=10 12 STEELWALL
+[/Level]
+[Level=5]
+Point=32 13 STEELWALL
+[/Level]
+[Level=5]
+Point=31 6 STEELWALL
+[/Level]
+[Level=5]
+Point=32 17 DIRT
+[/Level]
+[Level=5]
+Point=37 12 DIRT
+[/Level]
+[Level=5]
+Point=37 5 DIRT
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+681 test
+543 test
+515 sndubach
+418 test
+362 test
+[/highscore]
+Name=Cave L. Shortage Of Space
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #a9104f #47197f #d3aa3f #1c7f19 #1013a9
+DiamondsRequired=40 60 60 70 120
+DiamondValue=3 7
+CaveTime=210 210 210 210 240
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+RandSeed=171 71 17 117 0
+RandomFill=BOULDER 160 DIRT 0 DIRT 0 DIRT 0
+AmoebaTime=30 30 30 30 30
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+[Level=1,2]
+RandomFillC64=0 1 39 20 171 71 0 0 0 NONE DIRT 160 NONE 140
+[/Level]
+FillRect=17 13 22 18 DIRT BOULDER
+FillRect=19 16 20 15 AMOEBA
+Point=19 17 INBOX
+Point=20 17 OUTBOX
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+180 test
+146 test
+[/highscore]
+Name=Intermission S. Right Of Way
+Author=Dustin
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+Size=20 12 0 0 19 11
+Colors=Black Black Blue Orange White White Orange
+DiamondsRequired=1 1 1 1 1
+DiamondValue=100 0
+CaveTime=30 30 30 30 30
+CaveScheduling=ms
+PALTiming=true
+FrameTime=100 100 100 100 100
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+Line=9 1 9 10 SPACE
+Point=9 9 VEXPANDINGWALL
+Point=9 8 FIREFLYl
+Point=8 1 DIAMOND
+Point=10 1 BOULDER
+Point=18 1 INBOX
+Point=9 10 OUTBOX
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+732 test
+540 test
+374 test
+276 sndubach
+235 test
+[/highscore]
+Name=Cave M. Rotated Producer
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #b28459 #209923 #bbcba0 #209942 #7159b2
+DiamondsRequired=1 1 1 2 3
+DiamondValue=90 90
+CaveTime=180 210 240 300 300
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+RandSeed=13 64 141 42 120
+RandomFill=BOULDER 25 DIRT 0 DIRT 0 DIRT 0
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+Line=1 1 1 20 MAGICWALL
+FillRect=37 1 38 20 SPACE
+Raster=37 3 2 6 1 3 DIRT
+Raster=38 1 1 7 1 3 FIREFLYl
+Point=19 2 INBOX
+Point=20 2 OUTBOX
+Line=36 1 36 20 DIRT
+[Level=1,2]
+Raster=1 1 1 10 2 2 DIRT
+[/Level]
+[Level=1]
+Raster=1 2 1 3 2 2 DIRT
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+388 test
+362 test
+362 sndubach
+348 test
+333 test
+[/highscore]
+Name=Cave N. Powder- Keg
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #2e9c3b #3b3f41 #fe7f0f #0c7f10 #2e489c
+DiamondsRequired=32 32 32 32 30
+DiamondValue=10 0
+CaveTime=30 30 30 30 30
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+InitialFill=FIREFLYl
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+Maze=2 2 37 19 1 3 50 175 157 147 14 49 NONE DIRT unicursal
+Point=31 12 INBOX
+Point=31 13 OUTBOX
+[Level=2,3,4,5]
+Point=32 11 FIREFLYl
+[/Level]
+[Level=2]
+Point=31 2 BOULDER
+[/Level]
+Raster=3 3 8 4 4 4 DIAMOND
+[Level=5]
+Point=16 15 FIREFLYl
+[/Level]
+[Level=5]
+Point=18 15 FIREFLYl
+[/Level]
+[Level=5]
+Point=15 15 DIRT
+[/Level]
+[Level=5]
+Point=19 15 DIRT
+[/Level]
+[Level=5]
+Line=32 4 32 10 FIREFLYl
+[/Level]
+[Level=5]
+Line=24 4 24 9 FIREFLYl
+[/Level]
+[Level=5]
+Line=8 4 8 9 FIREFLYl
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+478 test
+441 test
+411 sndubach
+374 test
+298 test
+[/highscore]
+Name=Cave O. Think!
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #7431a4 #7f1a19 #7ac814 #317f19 #3c31a4
+DiamondsRequired=198 198 234 234 234
+DiamondValue=1 90
+CaveTime=150 150 240 180 200
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+AmoebaProperties.immediately=false
+AmoebaProperties.waitforhatching=true
+AmoebaTime=5 5 5 5 5
+MagicWallTime=5 5 5 5 5
+MagicWallProperties.waitforhatching=true
+MagicWallProperties.convertamoeba=false
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+FillRect=21 10 38 20 AMOEBA
+Line=20 10 20 20 WALL
+[Level=2,3,4,5]
+Line=20 9 38 9 HEXPANDINGWALL
+[/Level]
+[Level=3,4,5]
+Line=1 2 38 2 DIAMOND
+[/Level]
+[Level=3,4,5]
+Point=37 1 BOULDER
+[/Level]
+[Level=3,4]
+Point=5 1 DIAMOND
+[/Level]
+[Level=2,3,4]
+Point=4 2 FIREFLYl
+[/Level]
+Point=19 9 INBOX
+Line=17 1 23 1 SPACE
+Line=20 1 20 1 FIREFLYl
+[Level=3,4,5]
+FillRect=1 4 5 20 SPACE
+[/Level]
+[Level=3,4,5]
+FillRect=3 18 5 20 STEELWALL OUTBOX
+[/Level]
+[Level=3,4,5]
+Point=2 17 SLIME
+[/Level]
+[Level=3,4,5]
+FillRect=1 18 3 20 WALL FIREFLYl
+[/Level]
+[Level=3,4,5]
+Point=2 18 SPACE
+[/Level]
+[Level=2,3,4]
+Point=4 1 SPACE
+[/Level]
+[Level=2,3,4]
+Point=19 11 BOULDER
+[/Level]
+[Level=1]
+Line=20 9 38 9 WALL
+[/Level]
+[Level=1,2]
+Point=4 19 OUTBOX
+[/Level]
+[Level=3,4,5]
+Point=3 2 WALL
+[/Level]
+[Level=5]
+Point=2 13 WALL
+[/Level]
+[Level=5]
+Point=20 20 BOULDER
+[/Level]
+Point=30 2 BOULDER
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+2709 sndubach
+472 sndubach
+435 test
+408 test
+407 test
+352 test
+[/highscore]
+Name=Cave P. Rescue
+Author=Dustin
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #9b800f #79197f #37adb7 #197f34 #140f9b
+DiamondsRequired=5 6 8 11 9
+DiamondValue=25 50
+CaveTime=180 180 160 150 200
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 120 120
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+RandSeed=189 216 43 38 11
+RandomFill=BOULDER 48 DIAMOND 7 DIRT 0 DIRT 0
+DummyProperties.diamondcollector=true
+DummyProperties.penalty=true
+DummyProperties.alwayskillsplayer=true
+MagicWallTime=5 5 5 5 5
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+[Level=1,2]
+RandomFillC64=0 1 39 20 189 216 0 0 0 NONE DIRT 48 NONE 20
+[/Level]
+FillRect=1 1 17 20 DIRT
+Line=1 20 15 20 MAGICWALL
+Line=1 16 15 16 SLIME
+FillRect=7 7 9 9 AMOEBA OUTBOX
+Rectangle=2 2 14 14 FIREFLYl
+FillRect=1 17 15 19 SPACE
+Point=17 8 INBOX
+Line=16 2 16 20 STEELWALL
+Line=1 18 15 18 SLIME
+Rectangle=1 1 15 15 FIREFLYl
+[Level=1,2,3,4]
+Line=3 2 13 2 SPACE
+[/Level]
+[Level=1,2,3,4]
+Line=3 14 13 14 SPACE
+[/Level]
+[Level=1,2]
+Rectangle=0 0 39 21 STEELWALL
+[/Level]
+[Level=1]
+Rectangle=2 2 14 14 SPACE
+[/Level]
+[Level=5]
+Point=16 17 DIRT
+[/Level]
+[/objects]
+[/cave]
+
+[cave]
+[highscore]
+452 test
+345 test
+226 test
+116 test
+[/highscore]
+Name=Intermission T. The End
+Author=Dustin
+Selectable=false
+Intermission=true
+IntermissionProperties.instantlife=true
+Size=20 12 0 0 19 11
+Colors=#000000 #000000 #a62c21 #b88e08 #af3dcd #1c7f0c #2127a6
+DiamondsRequired=2 2 2 2 2
+DiamondValue=0 0
+CaveTime=120 120 120 120 120
+CaveScheduling=ms
+PALTiming=true
+FrameTime=150 150 150 150 150
+HatchingDelay=8 8 8 8 8
+CaveDelay=0 0 0 0 0
+InitialFill=STEELWALL
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+[Level=3,4]
+Line=0 0 4 0 OUTBOX
+[/Level]
+[Level=3,4]
+Line=2 1 2 4 OUTBOX
+[/Level]
+[Level=3,4]
+Line=7 0 7 4 OUTBOX
+[/Level]
+[Level=3,4]
+Line=10 0 10 4 OUTBOX
+[/Level]
+[Level=3,4]
+Line=8 2 9 2 OUTBOX
+[/Level]
+[Level=3,4]
+Line=13 0 16 0 OUTBOX
+[/Level]
+[Level=3,4]
+Line=13 1 13 4 OUTBOX
+[/Level]
+[Level=3,4]
+Line=14 2 15 2 OUTBOX
+[/Level]
+[Level=3,4]
+Line=14 4 16 4 OUTBOX
+[/Level]
+[Level=3,4]
+Line=3 6 6 6 OUTBOX
+[/Level]
+[Level=3,4]
+Line=3 7 3 10 OUTBOX
+[/Level]
+[Level=3,4]
+Line=4 10 6 10 OUTBOX
+[/Level]
+[Level=3,4]
+Line=4 8 5 8 OUTBOX
+[/Level]
+[Level=3,4]
+Line=9 7 9 10 OUTBOX
+[/Level]
+[Level=3,4]
+Line=11 6 10 6 OUTBOX
+[/Level]
+[Level=3,4]
+Line=12 7 12 10 OUTBOX
+[/Level]
+[Level=3,4]
+Line=15 6 15 10 OUTBOX
+[/Level]
+[Level=3,4]
+Line=16 6 17 6 OUTBOX
+[/Level]
+[Level=3,4]
+Line=18 7 18 9 OUTBOX
+[/Level]
+[Level=3,4]
+Line=16 10 17 10 OUTBOX
+[/Level]
+Rectangle=4 3 5 4 GUY
+Point=5 2 DUMMY
+Point=4 2 INBOX
+Line=4 1 5 1 DIAMOND
+[Level=1,2]
+Line=4 0 2 0 OUTBOX
+[/Level]
+[Level=1,2]
+Line=1 1 1 4 OUTBOX
+[/Level]
+[Level=1,2]
+Line=2 5 4 5 OUTBOX
+[/Level]
+[Level=1,2]
+Line=7 0 7 4 OUTBOX
+[/Level]
+[Level=1,2]
+Line=8 5 9 5 OUTBOX
+[/Level]
+[Level=1,2]
+Line=10 0 10 4 OUTBOX
+[/Level]
+[Level=1,2]
+Line=14 3 14 5 OUTBOX
+[/Level]
+[Level=1,2]
+Line=16 4 16 5 OUTBOX
+[/Level]
+[Level=1,2]
+Line=18 4 18 5 OUTBOX
+[/Level]
+[Level=1,2]
+Point=17 3 OUTBOX
+[/Level]
+[Level=1,2]
+Point=14 1 OUTBOX
+[/Level]
+[Level=1,2]
+Line=6 7 6 11 OUTBOX
+[/Level]
+[Level=1,2]
+Line=7 11 8 11 OUTBOX
+[/Level]
+[Level=1,2]
+Line=11 7 12 7 OUTBOX
+[/Level]
+[Level=1]
+Line=13 8 11 10 OUTBOX
+[/Level]
+[Level=1,2]
+Line=11 11 13 11 OUTBOX
+[/Level]
+[Level=2]
+Line=13 8 12 9 OUTBOX
+[/Level]
+[Level=2]
+Point=13 10 OUTBOX
+[/Level]
+[Level=5]
+Line=3 0 1 0 OUTBOX
+[/Level]
+[Level=5]
+Line=1 2 2 2 OUTBOX
+[/Level]
+[Level=5]
+Line=2 4 0 4 OUTBOX
+[/Level]
+[Level=5]
+Point=0 1 OUTBOX
+[/Level]
+[Level=5]
+Point=3 3 OUTBOX
+[/Level]
+[Level=5]
+Line=7 0 7 3 OUTBOX
+[/Level]
+[Level=5]
+Line=8 4 9 4 OUTBOX
+[/Level]
+[Level=5]
+Line=10 0 10 3 OUTBOX
+[/Level]
+[Level=5]
+Line=13 0 13 4 OUTBOX
+[/Level]
+[Level=5]
+Line=14 0 15 0 OUTBOX
+[/Level]
+[Level=5]
+Line=14 2 15 2 OUTBOX
+[/Level]
+[Level=5]
+Point=16 1 OUTBOX
+[/Level]
+[Level=5]
+Line=3 7 3 10 OUTBOX
+[/Level]
+[Level=5]
+Line=3 6 6 6 OUTBOX
+[/Level]
+[Level=5]
+Line=4 8 5 8 OUTBOX
+[/Level]
+[Level=5]
+Line=4 10 6 10 OUTBOX
+[/Level]
+[Level=5]
+Line=9 6 9 10 OUTBOX
+[/Level]
+[Level=5]
+Line=10 6 11 6 OUTBOX
+[/Level]
+[Level=5]
+Line=10 8 11 8 OUTBOX
+[/Level]
+[Level=5]
+Line=12 9 12 10 OUTBOX
+[/Level]
+[Level=5]
+Point=12 7 OUTBOX
+[/Level]
+[Level=5]
+Line=16 6 16 8 OUTBOX
+[/Level]
+[Level=5]
+Line=18 6 18 8 OUTBOX
+[/Level]
+[Level=5]
+Point=16 10 OUTBOX
+[/Level]
+[Level=5]
+Point=18 10 OUTBOX
+[/Level]
+[/objects]
+[/cave]
+[/game]
+[/BDCFF]

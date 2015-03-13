@@ -446,7 +446,7 @@ cell_explode(GdCave *cave, int x, int y, GdElement explode_to)
 {
 	if (non_explodable (cave, x, y))
 		return;
-		
+
 	if (cave->voodoo_any_hurt_kills_player && get(cave, x, y)==O_VOODOO)
 		cave->voodoo_touched=TRUE;
 
@@ -568,34 +568,34 @@ static void
 explode(GdCave *cave, int x, int y)
 {
 	GdElement e=get(cave, x, y)&O_MASK;
-	
+
 	switch (e) {
 		case O_GHOST:
 			ghost_explode(cave, x, y);
 			break;
 
-		case O_BOMB_TICK_7:			
+		case O_BOMB_TICK_7:
 			bomb_explode(cave, x, y);
 			break;
-			
+
 		case O_VOODOO:
 			voodoo_explode(cave, x, y);
 			break;
-		
+
 		case O_NITRO_PACK:
 		case O_NITRO_PACK_F:
 		case O_NITRO_PACK_EXPLODE:
 			nitro_explode(cave, x, y);
 			break;
-			
+
 		case O_AMOEBA_2:
 			creature_explode(cave, x, y, O_AMOEBA_2_EXPL_1);
 			break;
-			
+
 		case O_FALLING_WALL_F:
 			creature_explode(cave, x, y, O_EXPLODE_1);
 			break;
-		
+
 		case O_BUTTER_1:
 		case O_BUTTER_2:
 		case O_BUTTER_3:
@@ -623,7 +623,7 @@ explode(GdCave *cave, int x, int y)
 		case O_ALT_FIREFLY_4:
 			creature_explode(cave, x, y, cave->alt_firefly_explode_to);
 			break;
-			
+
 		case O_PLAYER:
 		case O_PLAYER_BOMB:
 		case O_PLAYER_GLUED:
@@ -632,21 +632,21 @@ explode(GdCave *cave, int x, int y)
 		case O_PLAYER_PNEUMATIC_RIGHT:
 			creature_explode(cave, x, y, O_EXPLODE_1);
 			break;
-		
+
 		case O_STONEFLY_1:
 		case O_STONEFLY_2:
 		case O_STONEFLY_3:
 		case O_STONEFLY_4:
 			creature_explode(cave, x, y, cave->stonefly_explode_to);
 			break;
-		
+
 		case O_DRAGONFLY_1:
 		case O_DRAGONFLY_2:
 		case O_DRAGONFLY_3:
 		case O_DRAGONFLY_4:
 			creature_explode(cave, x, y, cave->dragonfly_explode_to);
 			break;
-			
+
 		default:
 			g_assert_not_reached();
 			break;
@@ -1035,6 +1035,158 @@ gd_cave_clear_sounds(GdCave *cave)
 	cave->sound3=GD_S_NONE;
 }
 
+
+
+static void
+do_start_fall(GdCave *cave, int x, int y, GdDirection falling_direction, GdElement falling_element)
+{
+	if (cave->gravity_disabled)
+		return;
+
+	if (is_space_dir(cave, x, y, falling_direction)) {	/* beginning to fall */
+		play_sound_of_element(cave, get(cave, x, y));
+		move(cave, x, y, falling_direction, falling_element);
+	}
+	/* check if it is on a sloped element, and it can roll. */
+	/* for example, sloped wall looks like: */
+	/*  /| */
+	/* /_| */
+	/* this is tagged as sloped up&left. */
+	/* first check if the stone or diamond is coming from "up" (ie. opposite of gravity) */
+	/* then check the direction to roll (left or right) */
+	/* this way, gravity can also be pointing right, and the above slope will work as one would expect */
+	else if (sloped_dir(cave, x, y, falling_direction, opposite[falling_direction])) {	/* rolling down, if sitting on a sloped object  */
+		if (sloped_dir(cave, x, y, falling_direction, cw_fourth[falling_direction]) && is_space_dir(cave, x, y, cw_fourth[falling_direction]) && is_space_dir(cave, x, y, cw_eighth[falling_direction])) {
+			/* rolling left? - keep in mind that ccw_fourth rotates gravity ccw, so here we use cw_fourth */
+			play_sound_of_element(cave, get(cave, x, y));
+			move(cave, x, y, cw_fourth[falling_direction], falling_element);
+		}
+		else if (sloped_dir(cave, x, y, falling_direction, ccw_fourth[falling_direction]) && is_space_dir(cave, x, y, ccw_fourth[falling_direction]) && is_space_dir(cave, x, y, ccw_eighth[falling_direction])) {
+			/* rolling right? */
+			play_sound_of_element(cave, get(cave, x, y));
+			move(cave, x, y, ccw_fourth[falling_direction], falling_element);
+		}
+	}
+}
+
+static gboolean
+do_fall_try_crush_voodoo(GdCave *cave, int x, int y, GdDirection fall_dir)
+{
+	if (get_dir(cave, x, y, fall_dir)==O_VOODOO && cave->voodoo_dies_by_stone) {
+		/* this is a 1stB-style vodo. explodes by stone, collects diamonds */
+		explode_dir(cave, x, y, fall_dir);
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
+static gboolean
+do_fall_try_eat_voodoo(GdCave *cave, int x, int y, GdDirection fall_dir)
+{
+	if (get_dir(cave, x, y, fall_dir)==O_VOODOO && cave->voodoo_collects_diamonds) {
+		/* this is a 1stB-style voodoo. explodes by stone, collects diamonds */
+		player_get_element(cave, O_DIAMOND);	/* as if player got diamond */
+		store(cave, x, y, O_SPACE);	/* diamond disappears */
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
+
+static gboolean
+do_fall_try_crack_nut(GdCave *cave, int x, int y, GdDirection fall_dir, GdElement bouncing)
+{
+	if (get_dir(cave, x, y, fall_dir)==O_NUT || get_dir(cave, x, y, fall_dir)==O_NUT_F) {
+		/* stones */
+		store(cave, x, y, bouncing);
+		store_dir(cave, x, y, fall_dir, cave->nut_turns_to_when_crushed);
+		if (cave->nut_sound)
+			gd_sound_play(cave, GD_S_NUT_CRACK);
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
+static gboolean
+do_fall_try_magic(GdCave *cave, int x, int y, GdDirection fall_dir, GdElement magic)
+{
+	if (get_dir(cave, x, y, fall_dir)==O_MAGIC_WALL) {
+		play_sound_of_element(cave, O_DIAMOND);	/* always play diamond sound */
+		if (cave->magic_wall_state==GD_MW_DORMANT)
+			cave->magic_wall_state=GD_MW_ACTIVE;
+		if (cave->magic_wall_state==GD_MW_ACTIVE && is_space_dir(cave, x, y, MV_TWICE+fall_dir)) {
+			/* if magic wall active and place underneath, it turns element into anything the effect says to do. */
+			store_dir(cave, x, y, MV_TWICE+fall_dir, magic);
+		}
+		store(cave, x, y, O_SPACE);	/* active or non-active or anything, element falling in will always disappear */
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
+static gboolean
+do_fall_try_crush(GdCave *cave, int x, int y, GdDirection fall_dir)
+{
+	if (explodes_by_hit_dir(cave, x, y, fall_dir)) {
+		explode_dir(cave, x, y, fall_dir);
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
+static gboolean
+do_fall_roll_or_stop(GdCave *cave, int x, int y, GdDirection fall_dir, GdElement bouncing)
+{
+	if (is_space_dir(cave, x, y, fall_dir))	{ /* falling further */
+		move(cave, x, y, fall_dir, get(cave, x, y));
+		return TRUE;
+	}
+    /* check if it is on a sloped element, and it can roll. */
+    /* for example, sloped wall looks like: */
+    /*  /| */
+    /* /_| */
+    /* this is tagged as sloped up&left. */
+    /* first check if the stone or diamond is coming from "up" (ie. opposite of gravity) */
+    /* then check the direction to roll (left or right) */
+    /* this way, gravity can also be pointing right, and the above slope will work as one would expect */
+	if (sloped_dir(cave, x, y, fall_dir, opposite[fall_dir])) {	/* sloped element, falling to left or right */
+		if (sloped_dir(cave, x, y, fall_dir, cw_fourth[fall_dir]) && is_space_dir(cave, x, y, cw_eighth[fall_dir]) && is_space_dir(cave, x, y, cw_fourth[fall_dir])) {
+			play_sound_of_element(cave, get(cave, x, y));
+			move(cave, x, y, cw_fourth[fall_dir], get(cave, x, y));	/* try to roll left first - see O_STONE to understand why cw_fourth */
+		}
+		else if (sloped_dir(cave, x, y, fall_dir, ccw_fourth[fall_dir]) && is_space_dir(cave, x, y, ccw_eighth[fall_dir]) && is_space_dir(cave, x, y, ccw_fourth[fall_dir])) {
+			play_sound_of_element(cave, get(cave, x, y));
+			move(cave, x, y, ccw_fourth[fall_dir], get(cave, x, y));	/* if not, try to roll right */
+		}
+		else {
+			/* cannot roll in any direction, so it stops */
+			play_sound_of_element(cave, get(cave, x, y));
+			store(cave, x, y, bouncing);
+		}
+		return TRUE;
+	}
+
+	/* any other element, stops */
+	play_sound_of_element(cave, get(cave, x, y));
+	store(cave, x, y, bouncing);
+	return TRUE;
+}
+
+
+
+
+
+
+
+
+
+
+
 /* process a cave. */
 void
 gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gboolean suicide)
@@ -1378,325 +1530,107 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 			 * 	S T O N E S,   D I A M O N D S
 			 */
 			case O_STONE:	/* standing stone */
+				do_start_fall(cave, x, y, cave->gravity, cave->stone_falling_effect);
+				break;
+
 			case O_MEGA_STONE:	/* standing mega_stone */
+				do_start_fall(cave, x, y, cave->gravity, O_MEGA_STONE_F);
+				break;
+
 			case O_DIAMOND:	/* standing diamond */
+				do_start_fall(cave, x, y, cave->gravity, cave->diamond_falling_effect);
+				break;
+
 			case O_NUT:	/* standing nut */
-				if (!cave->gravity_disabled) {
-					/* if gravity is enabled, the stone might fall. */
-					GdElement falling;
-
-					switch (get(cave, x, y)) {
-						case O_STONE:
-							falling=cave->stone_falling_effect;
-							break;
-						case O_MEGA_STONE:
-							falling=O_MEGA_STONE_F;
-							break;
-						case O_DIAMOND:
-							falling=cave->diamond_falling_effect;
-							break;
-						case O_NUT:
-							falling=O_NUT_F;
-							break;
-						default:
-							g_assert_not_reached();
-					}
-
-					if (is_space_dir(cave, x, y, cave->gravity)) {	/* beginning to fall */
-						play_sound_of_element(cave, get(cave, x, y));
-						move(cave, x, y, cave->gravity, falling);
-					}
-					/* check if it is on a sloped element, and it can roll. */
-					/* for example, sloped wall looks like: */
-					/*  /| */
-					/* /_| */
-					/* this is tagged as sloped up&left. */
-					/* first check if the stone or diamond is coming from "up" (ie. opposite of gravity) */
-					/* then check the direction to roll (left or right) */
-					/* this way, gravity can also be pointing right, and the above slope will work as one would expect */
-					else if (sloped_dir(cave, x, y, cave->gravity, opposite[cave->gravity])) {	/* rolling down, if sitting on a sloped object  */
-						if (sloped_dir(cave, x, y, cave->gravity, cw_fourth[cave->gravity]) && is_space_dir(cave, x, y, cw_fourth[cave->gravity]) && is_space_dir(cave, x, y, cw_eighth[cave->gravity])) {
-							/* rolling left? - keep in mind that ccw_fourth rotates gravity ccw, so here we use cw_fourth */
-							play_sound_of_element(cave, get(cave, x, y));
-							move(cave, x, y, cw_fourth[cave->gravity], falling);
-						}
-						else if (sloped_dir(cave, x, y, cave->gravity, ccw_fourth[cave->gravity]) && is_space_dir(cave, x, y, ccw_fourth[cave->gravity]) && is_space_dir(cave, x, y, ccw_eighth[cave->gravity])) {
-							/* rolling right? */
-							play_sound_of_element(cave, get(cave, x, y));
-							move(cave, x, y, ccw_fourth[cave->gravity], falling);
-						}
-					}
-				}
-				break;
-			case O_STONE_F:	/* falling stone */
-			case O_MEGA_STONE_F:	/* falling mega stone */
-			case O_DIAMOND_F:	/* falling diamond */
-			case O_NUT_F:	/* falling nut */
-				if (!cave->gravity_disabled) {
-					GdElement bouncing;
-
-					switch (get(cave, x, y)) {
-						case O_STONE_F: bouncing=cave->stone_bouncing_effect; break;
-						case O_MEGA_STONE_F: bouncing=O_MEGA_STONE; break;
-						case O_DIAMOND_F: bouncing=cave->diamond_bouncing_effect; break;
-						case O_NUT_F: bouncing=O_NUT; break;
-						default: g_assert_not_reached();
-					}
-
-					if (is_space_dir(cave, x, y, cave->gravity))	/* falling further */
-						move(cave, x, y, cave->gravity, get(cave, x, y));
-					else if (get(cave, x, y)==O_DIAMOND_F && get_dir(cave, x, y, cave->gravity)==O_VOODOO && cave->voodoo_collects_diamonds) {
-						/* this is a 1stB-style voodoo. explodes by stone, collects diamonds */
-						player_get_element (cave, O_DIAMOND);	/* as if player got diamond */
-						store(cave, x, y, O_SPACE);	/* diamond disappears */
-					}
-					else if ((get(cave, x, y)==O_STONE_F || get(cave, x, y)==O_MEGA_STONE_F) && get_dir(cave, x, y, cave->gravity)==O_NUT) {
-						/* mega stones and normal stones crack nuts */
-						store(cave, x, y, bouncing);
-						store_dir(cave, x, y, cave->gravity, O_NUT_EXPL_1);
-						if (cave->nut_sound)
-							gd_sound_play(cave, GD_S_NUT_CRACK);
-					}
-					else if ((get(cave, x, y)==O_STONE_F || get(cave, x, y)==O_MEGA_STONE_F) && get_dir(cave, x, y, cave->gravity)==O_VOODOO && cave->voodoo_dies_by_stone) {
-						/* this is a 1stB-style vodo. explodes by stone, collects diamonds */
-						explode_dir (cave, x, y, cave->gravity);
-					}
-					else if (get_dir(cave, x, y, cave->gravity)==O_MAGIC_WALL) {
-						play_sound_of_element(cave, O_DIAMOND);	/* always play diamond sound */
-						if (cave->magic_wall_state==GD_MW_DORMANT)
-							cave->magic_wall_state=GD_MW_ACTIVE;
-						if (cave->magic_wall_state==GD_MW_ACTIVE && is_space_dir(cave, x, y, MV_TWICE+cave->gravity)) {
-							/* if magic wall active and place underneath, */
-							/* it turns boulder into diamond and vice versa. or anything the effect says to do. */
-							GdElement magic;
-
-							switch (get(cave, x, y)) {
-								case O_STONE_F:
-									magic=cave->magic_stone_to;
-									break;
-								case O_MEGA_STONE_F:
-									magic=cave->magic_mega_stone_to;
-									break;
-								case O_DIAMOND_F:
-									magic=cave->magic_diamond_to;
-									break;
-								case O_NUT_F:
-									magic=O_NUT_F;
-									break;
-								default:
-									g_assert_not_reached();
-							}
-
-							store_dir(cave, x, y, MV_TWICE+cave->gravity, magic);
-						}
-						store(cave, x, y, O_SPACE);	/* active or non-active or anything, element falling in will always disappear */
-					}
-					else if (explodes_by_hit_dir(cave, x, y, cave->gravity))
-						explode_dir(cave, x, y, cave->gravity);
-					else if (sloped_dir(cave, x, y, cave->gravity, opposite[cave->gravity])) {	/* sloped element, falling to left or right */
-						if (sloped_dir(cave, x, y, cave->gravity, cw_fourth[cave->gravity]) && is_space_dir(cave, x, y, cw_eighth[cave->gravity]) && is_space_dir(cave, x, y, cw_fourth[cave->gravity])) {
-							play_sound_of_element(cave, get(cave, x, y));
-							move(cave, x, y, cw_fourth[cave->gravity], get(cave, x, y));	/* try to roll left first - see O_STONE to understand why cw_fourth */
-						}
-						else if (sloped_dir(cave, x, y, cave->gravity, ccw_fourth[cave->gravity]) && is_space_dir(cave, x, y, ccw_eighth[cave->gravity]) && is_space_dir(cave, x, y, ccw_fourth[cave->gravity])) {
-							play_sound_of_element(cave, get(cave, x, y));
-							move(cave, x, y, ccw_fourth[cave->gravity], get(cave, x, y));	/* if not, try to roll right */
-						}
-						else {
-							/* cannot roll in any direction, so it stops */
-							play_sound_of_element(cave, get(cave, x, y));
-							store(cave, x, y, bouncing);
-						}
-					}
-					else {
-						/* any other element, stops */
-						play_sound_of_element(cave, get(cave, x, y));
-						store(cave, x, y, bouncing);
-					}
-				}
+				do_start_fall(cave, x, y, cave->gravity, O_NUT_F);
 				break;
 
-			/* DIRT BALL AND LOOSE DIRT */
 			case O_DIRT_BALL:	/* standing dirt ball */
+				do_start_fall(cave, x, y, cave->gravity, O_DIRT_BALL_F);
+				break;
+
 			case O_DIRT_LOOSE:	/* standing loose dirt */
-				if (!cave->gravity_disabled) {
-					/* if gravity is enabled, the stone might fall. */
-					GdElement falling;
-
-					switch (get(cave, x, y)) {
-						case O_DIRT_BALL: falling=O_DIRT_BALL_F; break;
-						case O_DIRT_LOOSE: falling=O_DIRT_LOOSE_F; break;
-						default: g_assert_not_reached();
-					}
-
-					if (is_space_dir(cave, x, y, cave->gravity)) {	/* beginning to fall */
-						play_sound_of_element(cave, get(cave, x, y));
-						move(cave, x, y, cave->gravity, falling);
-					}
-					/* check if it is on a sloped element, and it can roll. */
-					/* for example, sloped wall looks like: */
-					/*  /| */
-					/* /_| */
-					/* this is tagged as sloped up&left. */
-					/* first check if the stone or diamond is coming from "up" (ie. opposite of gravity) */
-					/* then check the direction to roll (left or right) */
-					/* this way, gravity can also be pointing right, and the above slope will work as one would expect */
-					else if (sloped_dir(cave, x, y, cave->gravity, opposite[cave->gravity])) {	/* rolling down, if sitting on a sloped object  */
-						if (sloped_dir(cave, x, y, cave->gravity, cw_fourth[cave->gravity]) && is_space_dir(cave, x, y, cw_fourth[cave->gravity]) && is_space_dir(cave, x, y, cw_eighth[cave->gravity])) {
-							/* rolling left? - keep in mind that ccw_fourth rotates gravity ccw, so here we use cw_fourth */
-							play_sound_of_element(cave, get(cave, x, y));
-							move(cave, x, y, cw_fourth[cave->gravity], falling);
-						}
-						else if (sloped_dir(cave, x, y, cave->gravity, ccw_fourth[cave->gravity]) && is_space_dir(cave, x, y, ccw_fourth[cave->gravity]) && is_space_dir(cave, x, y, ccw_eighth[cave->gravity])) {
-							/* rolling right? */
-							play_sound_of_element(cave, get(cave, x, y));
-							move(cave, x, y, ccw_fourth[cave->gravity], falling);
-						}
-					}
-				}
-				break;
-			case O_DIRT_BALL_F:	/* falling stone */
-			case O_DIRT_LOOSE_F:	/* falling mega stone */
-				if (!cave->gravity_disabled) {
-					GdElement bouncing;
-
-					switch (get(cave, x, y)) {
-						case O_DIRT_BALL_F: bouncing=O_DIRT_BALL; break;
-						case O_DIRT_LOOSE_F: bouncing=O_DIRT_LOOSE; break;
-						default: g_assert_not_reached();
-					}
-
-					if (is_space_dir(cave, x, y, cave->gravity))	/* falling further */
-						move(cave, x, y, cave->gravity, get(cave, x, y));
-					else if (sloped_dir(cave, x, y, cave->gravity, opposite[cave->gravity])) {	/* sloped element, falling to left or right */
-						if (sloped_dir(cave, x, y, cave->gravity, cw_fourth[cave->gravity]) && is_space_dir(cave, x, y, cw_eighth[cave->gravity]) && is_space_dir(cave, x, y, cw_fourth[cave->gravity])) {
-							play_sound_of_element(cave, get(cave, x, y));
-							move(cave, x, y, cw_fourth[cave->gravity], get(cave, x, y));	/* try to roll left first - see O_STONE to understand why cw_fourth */
-						}
-						else if (sloped_dir(cave, x, y, cave->gravity, ccw_fourth[cave->gravity]) && is_space_dir(cave, x, y, ccw_eighth[cave->gravity]) && is_space_dir(cave, x, y, ccw_fourth[cave->gravity])) {
-							play_sound_of_element(cave, get(cave, x, y));
-							move(cave, x, y, ccw_fourth[cave->gravity], get(cave, x, y));	/* if not, try to roll right */
-						}
-						else {
-							/* cannot roll in any direction, so it stops */
-							play_sound_of_element(cave, get(cave, x, y));
-							store(cave, x, y, bouncing);
-						}
-					}
-					else {
-						/* any other element, stops */
-						play_sound_of_element(cave, get(cave, x, y));
-						store(cave, x, y, bouncing);
-					}
-				}
+				do_start_fall(cave, x, y, cave->gravity, O_DIRT_LOOSE_F);
 				break;
 
+			case O_FLYING_STONE:	/* standing stone */
+				do_start_fall(cave, x, y, opposite[cave->gravity], O_FLYING_STONE_F);
+				break;
+
+			case O_FLYING_DIAMOND:	/* standing diamond */
+				do_start_fall(cave, x, y, opposite[cave->gravity], O_FLYING_DIAMOND_F);
+				break;
 
 			/*
-			 * 	F L Y I N G   S T O N E S,   D I A M O N D S
+			 * 	F A L L I N G    E L E M E N T S,    F L Y I N G   S T O N E S,   D I A M O N D S
 			 */
-			case O_FLYING_STONE:	/* standing stone */
-			case O_FLYING_DIAMOND:	/* standing diamond */
+			case O_DIRT_BALL_F:	/* falling dirt ball */
+				if (!cave->gravity_disabled)
+					do_fall_roll_or_stop(cave, x, y, cave->gravity, O_DIRT_BALL);
+				break;
+
+			case O_DIRT_LOOSE_F:	/* falling loose dirt */
+				if (!cave->gravity_disabled)
+					do_fall_roll_or_stop(cave, x, y, cave->gravity, O_DIRT_LOOSE);
+				break;
+
+			case O_STONE_F:	/* falling stone */
 				if (!cave->gravity_disabled) {
-					GdDirection fall_dir=opposite[cave->gravity];	/* these elements fall "up" */
-					GdElement falling;	/* if gravity is enabled, the stone might fall. */
-
-					switch (get(cave, x, y)) {
-						case O_FLYING_STONE: falling=O_FLYING_STONE_F; break;
-						case O_FLYING_DIAMOND: falling=O_FLYING_DIAMOND_F; break;
-						default: g_assert_not_reached();
-					}
-
-					if (is_space_dir(cave, x, y, fall_dir)) {	/* beginning to fall */
-						play_sound_of_element(cave, get(cave, x, y));
-						move(cave, x, y, fall_dir, falling);
-					}
-					/* check if it is on a sloped element, and it can roll. */
-					/* for example, sloped wall looks like: */
-					/*  /| */
-					/* /_| */
-					/* this is tagged as sloped up&left. */
-					/* first check if the stone or diamond is coming from "up" (ie. opposite of gravity) */
-					/* then check the direction to roll (left or right) */
-					/* this way, gravity can also be pointing right, and the above slope will work as one would expect */
-					else if (sloped_dir(cave, x, y, fall_dir, opposite[fall_dir])) {	/* rolling down, if sitting on a sloped object  */
-						if (sloped_dir(cave, x, y, fall_dir, cw_fourth[fall_dir]) && is_space_dir(cave, x, y, cw_fourth[fall_dir]) && is_space_dir(cave, x, y, cw_eighth[fall_dir])) {
-							/* rolling left? - keep in mind that ccw_fourth rotates gravity ccw, so here we use cw_fourth */
-							play_sound_of_element(cave, get(cave, x, y));
-							move(cave, x, y, cw_fourth[fall_dir], falling);
-						}
-						else if (sloped_dir(cave, x, y, fall_dir, ccw_fourth[fall_dir]) && is_space_dir(cave, x, y, ccw_fourth[fall_dir]) && is_space_dir(cave, x, y, ccw_eighth[fall_dir])) {
-							/* rolling right? */
-							play_sound_of_element(cave, get(cave, x, y));
-							move(cave, x, y, ccw_fourth[fall_dir], falling);
-						}
-					}
+					if (do_fall_try_crush_voodoo(cave, x, y, cave->gravity)) break;
+					if (do_fall_try_crack_nut(cave, x, y, cave->gravity, cave->stone_bouncing_effect)) break;
+					if (do_fall_try_magic(cave, x, y, cave->gravity, cave->magic_stone_to)) break;
+					if (do_fall_try_crush(cave, x, y, cave->gravity)) break;
+					do_fall_roll_or_stop(cave, x, y, cave->gravity, cave->stone_bouncing_effect);
 				}
 				break;
+
+			case O_MEGA_STONE_F:	/* falling mega */
+				if (!cave->gravity_disabled) {
+					if (do_fall_try_crush_voodoo(cave, x, y, cave->gravity)) break;
+					if (do_fall_try_crack_nut(cave, x, y, cave->gravity, O_MEGA_STONE)) break;
+					if (do_fall_try_magic(cave, x, y, cave->gravity, cave->magic_mega_stone_to)) break;
+					if (do_fall_try_crush(cave, x, y, cave->gravity)) break;
+					do_fall_roll_or_stop(cave, x, y, cave->gravity, O_MEGA_STONE);
+				}
+				break;
+
+			case O_DIAMOND_F:	/* falling diamond */
+				if (!cave->gravity_disabled) {
+					if (do_fall_try_eat_voodoo(cave, x, y, cave->gravity)) break;
+					if (do_fall_try_magic(cave, x, y, cave->gravity, cave->magic_diamond_to)) break;
+					if (do_fall_try_crush(cave, x, y, cave->gravity)) break;
+					do_fall_roll_or_stop(cave, x, y, cave->gravity, cave->diamond_bouncing_effect);
+				}
+				break;
+
+			case O_NUT_F:	/* falling nut */
+				if (!cave->gravity_disabled) {
+					if (do_fall_try_magic(cave, x, y, cave->gravity, cave->magic_nut_to)) break;
+					if (do_fall_try_crush(cave, x, y, cave->gravity)) break;
+					do_fall_roll_or_stop(cave, x, y, cave->gravity, O_NUT);
+				}
+				break;
+
 			case O_FLYING_STONE_F:	/* falling stone */
+				if (!cave->gravity_disabled) {
+					GdDirection fall_dir=opposite[cave->gravity];
+
+					if (do_fall_try_crush_voodoo(cave, x, y, fall_dir)) break;
+					if (do_fall_try_crack_nut(cave, x, y, fall_dir, O_FLYING_STONE)) break;
+					if (do_fall_try_magic(cave, x, y, fall_dir, cave->magic_flying_stone_to)) break;
+					if (do_fall_try_crush(cave, x, y, fall_dir)) break;
+					do_fall_roll_or_stop(cave, x, y, fall_dir, O_FLYING_STONE);
+				}
+				break;
+
 			case O_FLYING_DIAMOND_F:	/* falling diamond */
 				if (!cave->gravity_disabled) {
-					GdElement bouncing;
-					GdDirection fall_dir=opposite[cave->gravity];	/* these elements fall "up" */
+					GdDirection fall_dir=opposite[cave->gravity];
 
-					switch (get(cave, x, y)) {
-						case O_FLYING_STONE_F: bouncing=O_FLYING_STONE; break;
-						case O_FLYING_DIAMOND_F: bouncing=O_FLYING_DIAMOND; break;
-						default: g_assert_not_reached();
-					}
-
-					if (is_space_dir(cave, x, y, fall_dir))	/* falling further */
-						move(cave, x, y, fall_dir, get(cave, x, y));
-					else if (get(cave, x, y)==O_FLYING_DIAMOND_F && get_dir(cave, x, y, fall_dir)==O_VOODOO && cave->voodoo_collects_diamonds) {
-						/* this is a 1stB-style voodoo. explodes by stone, collects diamonds */
-						player_get_element(cave, O_FLYING_DIAMOND);	/* as if player got diamond */
-						store(cave, x, y, O_SPACE);	/* diamond disappears */
-					}
-					else if (get(cave, x, y)==O_FLYING_STONE_F && get_dir(cave, x, y, fall_dir)==O_VOODOO && cave->voodoo_dies_by_stone) {
-						/* this is a 1stB-style vodo. explodes by stone, collects diamonds */
-						explode_dir (cave, x, y, fall_dir);
-					}
-					else if (get_dir(cave, x, y, fall_dir)==O_MAGIC_WALL) {
-						play_sound_of_element(cave, O_DIAMOND);	/* always play diamond sound */
-						if (cave->magic_wall_state==GD_MW_DORMANT)
-							cave->magic_wall_state=GD_MW_ACTIVE;
-						if (cave->magic_wall_state==GD_MW_ACTIVE && is_space_dir(cave, x, y, MV_TWICE+fall_dir)) {
-							/* if magic wall active and place underneath, */
-							/* it turns boulder into diamond and vice versa. or anything the effect says to do. */
-							GdElement magic;
-
-							switch (get(cave, x, y)) {
-								case O_FLYING_STONE_F: magic=cave->magic_flying_stone_to; break;
-								case O_FLYING_DIAMOND_F: magic=cave->magic_flying_diamond_to; break;
-								default: g_assert_not_reached();
-							}
-
-							store_dir(cave, x, y, MV_TWICE+fall_dir, magic);
-						}
-						store(cave, x, y, O_SPACE);	/* active or non-active or anything, element falling in will always disappear */
-					}
-					else if (explodes_by_hit_dir(cave, x, y, fall_dir))
-						explode_dir(cave, x, y, fall_dir);
-					else if (sloped_dir(cave, x, y, fall_dir, opposite[fall_dir])) {	/* sloped element, falling to left or right */
-						if (sloped_dir(cave, x, y, fall_dir, cw_fourth[fall_dir]) && is_space_dir(cave, x, y, cw_eighth[fall_dir]) && is_space_dir(cave, x, y, cw_fourth[fall_dir])) {
-							play_sound_of_element(cave, get(cave, x, y));
-							move(cave, x, y, cw_fourth[fall_dir], get(cave, x, y));	/* try to roll left first - see O_STONE to understand why cw_fourth */
-						}
-						else if (sloped_dir(cave, x, y, fall_dir, ccw_fourth[fall_dir]) && is_space_dir(cave, x, y, ccw_eighth[fall_dir]) && is_space_dir(cave, x, y, ccw_fourth[fall_dir])) {
-							play_sound_of_element(cave, get(cave, x, y));
-							move(cave, x, y, ccw_fourth[fall_dir], get(cave, x, y));	/* if not, try to roll right */
-						}
-						else {
-							/* cannot roll in any direction, so it stops */
-							play_sound_of_element(cave, get(cave, x, y));
-							store(cave, x, y, bouncing);
-						}
-					}
-					else {
-						/* any other element, stops */
-						play_sound_of_element(cave, get(cave, x, y));
-						store(cave, x, y, bouncing);
-					}
+					if (do_fall_try_eat_voodoo(cave, x, y, fall_dir)) break;
+					if (do_fall_try_magic(cave, x, y, fall_dir, cave->magic_flying_diamond_to)) break;
+					if (do_fall_try_crush(cave, x, y, fall_dir)) break;
+					do_fall_roll_or_stop(cave, x, y, fall_dir, O_FLYING_DIAMOND);
 				}
 				break;
 
@@ -1706,58 +1640,20 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 			 * N I T R O    P A C K
 			 */
 			case O_NITRO_PACK:	/* standing nitro pack */
-				if (!cave->gravity_disabled) {
-					/* if gravity is enabled, the stone might fall. */
-					GdElement falling;
-
-					falling=O_NITRO_PACK_F;
-					if (is_space_dir(cave, x, y, cave->gravity)) {	/* beginning to fall */
-						play_sound_of_element(cave, get(cave, x, y));
-						move(cave, x, y, cave->gravity, falling);
-					}
-					/* check if it is on a sloped element, and it can roll. */
-					/* for example, sloped wall looks like: */
-					/*  /| */
-					/* /_| */
-					/* this is tagged as sloped up&left. */
-					/* first check if the stone or diamond is coming from "up" (ie. opposite of gravity) */
-					/* then check the direction to roll (left or right) */
-					/* this way, gravity can also be pointing right, and the above slope will work as one would expect */
-					else if (sloped_dir(cave, x, y, cave->gravity, opposite[cave->gravity])) {	/* rolling down, if sitting on a sloped object  */
-						if (sloped_dir(cave, x, y, cave->gravity, cw_fourth[cave->gravity]) && is_space_dir(cave, x, y, cw_fourth[cave->gravity]) && is_space_dir(cave, x, y, cw_eighth[cave->gravity])) {
-							/* rolling left? - keep in mind that ccw_fourth rotates gravity ccw, so here we use cw_fourth */
-							play_sound_of_element(cave, get(cave, x, y));
-							move(cave, x, y, cw_fourth[cave->gravity], falling);
-						}
-						else if (sloped_dir(cave, x, y, cave->gravity, ccw_fourth[cave->gravity]) && is_space_dir(cave, x, y, ccw_fourth[cave->gravity]) && is_space_dir(cave, x, y, ccw_eighth[cave->gravity])) {
-							/* rolling right? */
-							play_sound_of_element(cave, get(cave, x, y));
-							move(cave, x, y, ccw_fourth[cave->gravity], falling);
-						}
-					}
-				}
+				do_start_fall(cave, x, y, cave->gravity, O_NITRO_PACK_F);
 				break;
+
 			case O_NITRO_PACK_F:	/* falling nitro pack */
 				if (!cave->gravity_disabled) {
-					GdElement bouncing;
-
-					bouncing=O_NITRO_PACK;
-					if (is_space_dir(cave, x, y, cave->gravity))
-						/* if space, falling further */
+					if (is_space_dir(cave, x, y, cave->gravity))	/* if space, falling further */
 						move(cave, x, y, cave->gravity, get(cave, x, y));
-					else if (is_element_dir(cave, x, y, cave->gravity, O_MAGIC_WALL)) {
-						/* if magic wall, it transforms it. */
-						play_sound_of_element(cave, O_DIAMOND);	/* always play diamond sound */
-						if (cave->magic_wall_state==GD_MW_DORMANT)
-							cave->magic_wall_state=GD_MW_ACTIVE;
-						if (cave->magic_wall_state==GD_MW_ACTIVE && is_space_dir(cave, x, y, MV_TWICE+cave->gravity))
-							store_dir(cave, x, y, MV_TWICE+cave->gravity, cave->magic_nitro_pack_to);
-						store(cave, x, y, O_SPACE);	/* active or non-active or anything, element falling in will always disappear */
+					else if (do_fall_try_magic(cave, x, y, cave->gravity, cave->magic_nitro_pack_to)) {
+						/* try magic wall; if true, function did the work */
 					}
 					else if (is_element_dir(cave, x, y, cave->gravity, O_DIRT)) {
 						/* falling on a dirt, it does NOT explode - just stops at its place. */
-						play_sound_of_element(cave, bouncing);
-						store(cave, x, y, bouncing);
+						play_sound_of_element(cave, O_NITRO_PACK);
+						store(cave, x, y, O_NITRO_PACK);
 					}
 					else
 						/* falling on any other element it explodes */
@@ -2430,6 +2326,11 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 							store_dir(cave, x, y, oppos, O_SPACE);
 							play_sound_of_element(cave, O_SLIME);
 						}
+						else if (get_dir(cave, x, y, oppos)==cave->slime_eats_3) {
+							store_dir(cave, x, y, grav, cave->slime_converts_3);
+							store_dir(cave, x, y, oppos, O_SPACE);
+							play_sound_of_element(cave, O_SLIME);
+						}
 						else if (get_dir(cave, x, y, oppos)==O_WAITING_STONE) {	/* waiting stones pass without awakening */
 							store_dir(cave, x, y, grav, O_WAITING_STONE);
 							store_dir(cave, x, y, oppos, O_SPACE);
@@ -2698,8 +2599,8 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 		for (y=0; y<cave->h; y++)
 			for (x=0; x<cave->w; x++)
 				if (is_first_stage_of_explosion(cave, x, y)) {
-					next(cave, x, y);
-					store(cave, x, y, get(cave, x, y)&~SCANNED);
+					next(cave, x, y);	/* select next frame of explosion */
+					store(cave, x, y, get(cave, x, y)&~SCANNED);	/* forget scanned flag immediately */
 				}
 
 	/* finally: forget "scanned" flags for objects. */
@@ -2793,7 +2694,7 @@ gd_cave_iterate(GdCave *cave, GdDirection player_move, gboolean player_fire, gbo
 			break;
 
 		case GD_SCHEDULING_CRDR:
-			if (cave->hammered_walls_reappear)
+			if (cave->hammered_walls_reappear)	/* this made the engine very slow. */
 				cave->ckdelay+=60000;
 			cave->speed=MAX(130+cave->ckdelay/1000, cave->c64_timing*20);
 			break;

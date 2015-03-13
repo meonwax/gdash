@@ -1039,7 +1039,7 @@ int main(int argc, char* argv[])
 		printf("Converts memory dumps or vice snapshots of bd games\n");
 		printf("to formats loadable by gdash.\n");
 		printf("\n");
-		printf("Usage: %s [--force-diego] <inputfile> [outputfile]\n", argv[0]);
+		printf("Usage: %s <inputfile> [outputfile]\n", argv[0]);
 		printf("  where inputfile is a memory map or a vice snapshot.\n");
 		printf("\n");
 		printf("Use Alt-F11 or Alt-S in vice to create a snapshot file (*.vsf),\n");
@@ -1122,4 +1122,3 @@ int main(int argc, char* argv[])
 	
 	return result;
 }
-

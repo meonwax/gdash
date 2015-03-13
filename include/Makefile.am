@@ -72,6 +72,7 @@ EXTRA_DIST = $(ICONS) $(TITLE) $(icon_DATA) \
 	icons.list title.list \
 	files2c.sh \
 	c64_font.png \
+	c64_gfx_bd2.png \
 	$(pkgdata_DATA) \
 	$(CAVES) levels.h \
 	$(ATARIPALETTES) ataripal.h \

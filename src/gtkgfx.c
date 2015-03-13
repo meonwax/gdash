@@ -223,7 +223,7 @@ copy_cell(int dest, int src)
 {
 	g_assert(cells_pb[dest]==NULL);
 	g_assert(src<NUM_OF_CELLS);
-	cells_pb[dest]=gdk_pixbuf_copy (cells_pb[src]);
+	cells_pb[dest]=gdk_pixbuf_copy(cells_pb[src]);
 }
 
 /*
@@ -338,10 +338,10 @@ check_if_pixbuf_c64_png (GdkPixbuf *pixbuf)
 
 	n_channels=gdk_pixbuf_get_n_channels (pixbuf);
 
-	g_assert (gdk_pixbuf_get_colorspace (pixbuf) == GDK_COLORSPACE_RGB);
-	g_assert (gdk_pixbuf_get_bits_per_sample (pixbuf) == 8);
-	g_assert (gdk_pixbuf_get_has_alpha (pixbuf));
-	g_assert (n_channels == 4);
+	g_assert(gdk_pixbuf_get_colorspace (pixbuf) == GDK_COLORSPACE_RGB);
+	g_assert(gdk_pixbuf_get_bits_per_sample (pixbuf) == 8);
+	g_assert(gdk_pixbuf_get_has_alpha (pixbuf));
+	g_assert(n_channels == 4);
 
 	width=gdk_pixbuf_get_width (pixbuf);
 	height=gdk_pixbuf_get_height (pixbuf);
@@ -358,12 +358,29 @@ check_if_pixbuf_c64_png (GdkPixbuf *pixbuf)
 	return TRUE;
 }
 
+static void
+check_pixbuf(int i, const char *name)
+{
+    if (i>=0) {
+        if (cells_pb[i]==NULL)
+            g_critical("no pixbuf for %s", name);
+    } else {
+        int x;
+        
+        for (x=0; x<8; x++)
+            if (cells_pb[ABS(i)+x]==NULL)
+                g_critical("no pixbuf for %s", name);
+    }
+}
+
+
 /* load cells, eg. create cells_pb and combo_pb
    from a big pixbuf.
 */
 static void
 loadcells_from_pixbuf(GdkPixbuf *cells_pixbuf)
 {
+    static gboolean checked_cells=FALSE;
 	int i;
 	int pixbuf_cell_size;
 
@@ -383,12 +400,12 @@ loadcells_from_pixbuf(GdkPixbuf *cells_pixbuf)
 	free_pixmaps();
 
 	/* 8 (NUM_OF_CELLS_X) cells in a row, so divide by it and we get the size of a cell in pixels */
-	pixbuf_cell_size=gdk_pixbuf_get_width (cells_pixbuf) / NUM_OF_CELLS_X;
+	pixbuf_cell_size=gdk_pixbuf_get_width(cells_pixbuf) / NUM_OF_CELLS_X;
 
 	/* make individual cell pixbufs */
-	for (i=0; i < NUM_OF_CELLS_Y*NUM_OF_CELLS_X; i++)
+	for (i=0; i<NUM_OF_CELLS_Y*NUM_OF_CELLS_X; i++)
 		/* copy one cell */
-		cells_pb[i]=gdk_pixbuf_new_subpixbuf (cells_pixbuf, (i%NUM_OF_CELLS_X) * pixbuf_cell_size, (i/NUM_OF_CELLS_X) * pixbuf_cell_size, pixbuf_cell_size, pixbuf_cell_size);
+		cells_pb[i]=gdk_pixbuf_new_subpixbuf(cells_pixbuf, (i%NUM_OF_CELLS_X) * pixbuf_cell_size, (i/NUM_OF_CELLS_X) * pixbuf_cell_size, pixbuf_cell_size, pixbuf_cell_size);
 
 	/* set cell sizes */
 	gd_cell_size_game=pixbuf_cell_size*gd_scaling_scale[gd_cell_scale_game];
@@ -489,6 +506,18 @@ loadcells_from_pixbuf(GdkPixbuf *cells_pixbuf)
 	copy_cell(ABS(gd_elements[O_PRE_OUTBOX].image_simple)+5, gd_elements[O_OUTBOX_CLOSED].image_game);
 	copy_cell(ABS(gd_elements[O_PRE_OUTBOX].image_simple)+6, gd_elements[O_OUTBOX_CLOSED].image_game);
 	copy_cell(ABS(gd_elements[O_PRE_OUTBOX].image_simple)+7, gd_elements[O_OUTBOX_CLOSED].image_game);
+	
+	/* check if all cells have been generated; if not,
+	   some add_arrows or copy_cells are missing for a
+	   newly added element. do this only once per game run. */
+	if (!checked_cells) {
+	    checked_cells=TRUE;
+    	for (i=0; gd_elements[i].element!=-1; i++) {
+    	    check_pixbuf(gd_elements[i].image, gd_elements[i].name);
+    	    check_pixbuf(gd_elements[i].image_simple, gd_elements[i].name);
+    	    check_pixbuf(gd_elements[i].image_game, gd_elements[i].name);
+    	}
+    }
 }
 
 static guint32
@@ -505,7 +534,7 @@ rgba_pixel_from_color(GdColor col, guint8 a)
 }
 
 static void
-loadcells_c64_with_colors (GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5)
+loadcells_c64_with_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5)
 {
 	const guchar *gfx;	/* currently used graphics, will point to c64_gfx or c64_custom_gfx */
 	GdkPixbuf *cells_pixbuf;
@@ -556,9 +585,9 @@ c64_gfx_data_from_pixbuf(GdkPixbuf *pixbuf)
 	guchar *data;
 	int out;
 
-	g_assert (gdk_pixbuf_get_colorspace (pixbuf) == GDK_COLORSPACE_RGB);
-	g_assert (gdk_pixbuf_get_bits_per_sample (pixbuf) == 8);
-	g_assert (gdk_pixbuf_get_has_alpha (pixbuf));
+	g_assert(gdk_pixbuf_get_colorspace(pixbuf) == GDK_COLORSPACE_RGB);
+	g_assert(gdk_pixbuf_get_bits_per_sample(pixbuf) == 8);
+	g_assert(gdk_pixbuf_get_has_alpha(pixbuf));
 
 	n_channels=gdk_pixbuf_get_n_channels (pixbuf);
 	width=gdk_pixbuf_get_width (pixbuf);

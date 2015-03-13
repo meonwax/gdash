@@ -1,16 +1,19 @@
 DONE
 -----
-gritty amoeba+magic sound
-small changes
-voodoo kills player any way it is hurt
+magic nut to
+I also want to mention that a third element in the slime properties would be nice - not only for the nut but any other third element could be added... Smile
+
+About the new element "nut" - I'm still missing the magic wall and slime option for it (convert to .../eats... converts to...). And also the object property in which element it will convert to when it's hit by a boulder. This would make the new nut element just perfect... :) I know I already requested that - I just want to say it here again... ;) 
+
+In the editor the status information on the bottom of the screen is not updated if another level (2, 3, 4, 5) is selected. Time and diamonds needed are always shown for level 1.
+
+Is there a certain mode one can enable, such that the objects you are placing will ONLY appear on a certain level? 
+
 
 
 TO DO
 -----
-
-Is there a certain mode one can enable, such that the objects you are placing will ONLY appear on a certain level? 
-
-lehessen csak nézni is
+lehessen csak nézni is - ez mire vonatkozott, a replay converterre?
 
 fragile diamonds
 
@@ -20,8 +23,6 @@ How about a gate that shuts after a certain amount of diamonds have been collect
 replay long comment
 
 portable conveyor belts?	destructible, convey each other.
-
-new elements sound
 
 Amoeba2 sound
 new slime sound
@@ -38,7 +39,6 @@ STATUS BAR
 Maybe game notes can be displayed under the title screen as soon as the game is loaded. Optionally at least if someone does not like to show it automatically.
 
 Already suggested I think: Atari sounds.
-
 
 amoeba threshold - belül %-ban tárolódik,
 de az editor átállítja?

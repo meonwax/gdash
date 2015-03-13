@@ -413,7 +413,7 @@ gd_element_button_set(GtkWidget *button, const GdElement element)
 
 	image=gtk_image_new_from_pixbuf(gd_get_element_pixbuf_with_border (element));
 	gtk_button_set_image(GTK_BUTTON(button), image);
-	gtk_widget_show(image);	/* always display */
+	gtk_widget_show(image);	/* always display XXX hack between different GTK versions... */
 	gtk_button_set_label(GTK_BUTTON(button), _(gd_elements[element].name));
 	g_object_set_data (G_OBJECT(button), GDASH_ELEMENT, GINT_TO_POINTER(element));
 }
@@ -700,8 +700,8 @@ gd_element_button_new(GdElement initial_element, gboolean stays_open, const char
 	
 	button=gtk_button_new();
 	g_signal_connect(G_OBJECT(button), "destroy", (GCallback) element_button_destroyed, NULL);
-	/* minimum width 128px */
-	gtk_widget_set_size_request(button, 128, -1);
+	/* minimum width 96px */
+	gtk_widget_set_size_request(button, 96, -1);
 	if (stays_open)
 		g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(element_button_clicked_stay_open), NULL);
 	else

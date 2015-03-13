@@ -1069,7 +1069,7 @@ main_int_uninstall_timer()
 {
 	main_int_quit_thread=TRUE;
 	/* remove timeout associated to game play */
-	while (g_source_remove_by_user_data (main_window.window)) {
+	while (g_source_remove_by_user_data(main_window.window)) {
 		/* nothing */
 	}
 }
@@ -2296,6 +2296,11 @@ main(int argc, char *argv[])
 	if (!gtk_init_check(&argc, &argv)) {
 	    force_quit_no_gtk=TRUE;
 	}
+    /* ugly hack to override user gtk settings. */
+    /* the editor needs that button images are displayed. */
+    /* make sure the type is realized */
+    g_type_class_unref(g_type_class_ref(GTK_TYPE_IMAGE_MENU_ITEM));
+    g_object_set(gtk_settings_get_default(), "gtk-button-images", TRUE, NULL);
 
 	gd_settings_init_translation();
 
@@ -2393,6 +2398,7 @@ main(int argc, char *argv[])
 
 	/* create window */
 	gd_register_stock_icons();
+
 	create_main_window();
 	gd_main_window_set_title();
 
