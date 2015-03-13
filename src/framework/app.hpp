@@ -49,12 +49,12 @@ std::string help_strings_to_string(char const **strings);
 /**
  * The App object manages Activity objects by organizing them in a stack,
  * and always sending timer and user events to the topmost one.
- * 
+ *
  * The App object is responsible for the activity objects. New activities
  * are can be pushed into it, thus they become the topmost one. The
  * activities should be dynamically allocated, and the App will delete
  * them when they are no longer needed (they are popped from the stack).
- * 
+ *
  * The normal use of the App class is creating an App object and pushing
  * the first activity onto its stack. This first activity is then receiving
  * the events, and is also allowed to create new activities. All timer,
@@ -65,16 +65,16 @@ std::string help_strings_to_string(char const **strings);
  * events for the activities when it manages them; for example, when an
  * activity becomes the topmost one or it is occluded by a new one, it is
  * notified.
- * 
+ *
  * The activities are enabled to create Command objects and enqueue them
  * in the app. The app will execute these commands after any kind of event.
- * 
+ *
  * In order to make an App object work, it must be assigned many helper
  * objects which do the OS and graphics library abstraction. These objects
  * are a Screen, a GameInputHandler, a FontManager and a PixbufFactory. The
  * activities inside the application are allowed - and required - to use
  * these objects to do their work.
- * 
+ *
  * The App object also provides simple drawing methods not implemented anywhere
  * else, like clearing the screen, setting the color of the next text written,
  * or drawing a status line.
@@ -84,11 +84,11 @@ std::string help_strings_to_string(char const **strings);
  * therefore the app became defunct) or when one of the activities requested
  * a complete restart of the application. This is implemented using Command
  * objects, which can be assigned to such events.
- * 
+ *
  * The App object provides functions for common tasks like selecting a file
  * or showing a piece of text. By default, these functions create the corresponding
  * activity. However, derived classes of the App class are allowed to override
- * these functions to specialize the user interface: for example, a GTK+ 
+ * these functions to specialize the user interface: for example, a GTK+
  * specialization can provide the builtin file selection dialog of GTK+ instead of
  * the one implemented by the SelectFileActivity class.
  */
@@ -171,7 +171,7 @@ public:
     void status_line(const char *text);
     /** Draw a black window with a small frame. */
     void draw_window(int rx, int ry, int rw, int rh);
-    
+
     /* customizable ui features */
     /** Create a file selection dialog, and when the user accepts
      * the selection, parametrize the command with the name of the file and execute it.
@@ -218,7 +218,7 @@ public:
      * @param secondary The message to show - second part, additional info.
      * @param command_after_exit A command to execute when the user acknowledged the text. May be omitted. */
     virtual void show_message(std::string const &primary, std::string const &secondary = "", SmartPtr<Command> command_after_exit = SmartPtr<Command>());
-    
+
 
     /* events */
     /** See Activity::timer_event(). */
@@ -238,7 +238,7 @@ public:
     /** To be called when the user closes the window of the game. The quit_event_command
      * set via the set_quit_event_command() will be executed. */
     void quit_event();
-    
+
     /* handling activities and commands */
     /** Push a newly allocated activity on the top of the activity stack.
      * Before pushing, the old topmost activity is sent an Activity::hidden_event(),

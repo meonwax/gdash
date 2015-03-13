@@ -35,7 +35,7 @@
 class JumpToDirectoryCommand: public Command1Param<std::string> {
 public:
     JumpToDirectoryCommand(App *app, SelectFileActivity *activity)
-    :
+        :
         Command1Param<std::string>(app),
         directory(p1),
         activity(activity) {
@@ -54,7 +54,7 @@ private:
 class FileNameEnteredCommand: public Command1Param<std::string> {
 public:
     FileNameEnteredCommand(App *app, SelectFileActivity *activity)
-    :
+        :
         Command1Param<std::string>(app),
         filepath(p1),
         activity(activity) {
@@ -101,14 +101,13 @@ static bool filename_sort(std::string const &s1, std::string const &s2) {
 
 
 SelectFileActivity::SelectFileActivity(App *app, const char *title, const char *start_dir, const char *glob, bool for_save, const char *defaultname, SmartPtr<Command1Param<std::string> > command_when_successful)
-:
+    :
     Activity(app),
     command_when_successful(command_when_successful),
     title(title),
     for_save(for_save),
     defaultname(defaultname),
-    start_dir(start_dir?start_dir:"")
-{
+    start_dir(start_dir?start_dir:"") {
     yd = app->font_manager->get_line_height();
     names_per_page = app->screen->get_height()/yd-5;
     if (glob == NULL || g_str_equal(glob, ""))
@@ -159,13 +158,13 @@ void SelectFileActivity::jump_to_directory(char const *jump_to) {
     files.clear();
     char const *name;
     while ((name = g_dir_read_name(dir))!=NULL) {
-        #ifdef G_OS_WIN32
-            /* on windows, skip hidden files? */
-        #else
-            /* on unix, skip file names starting with a '.' - those are hidden files */
-            if (name[0]=='.')
-                continue;
-        #endif
+#ifdef G_OS_WIN32
+        /* on windows, skip hidden files? */
+#else
+        /* on unix, skip file names starting with a '.' - those are hidden files */
+        if (name[0]=='.')
+            continue;
+#endif
         if (g_file_test(name, G_FILE_TEST_IS_DIR))
             files.push_back(std::string(name) + G_DIR_SEPARATOR_S);    /* dirname/ or dirname\ */
         else {
@@ -180,13 +179,13 @@ void SelectFileActivity::jump_to_directory(char const *jump_to) {
     g_dir_close(dir);
 
     /* add "directory up" if we are NOT in a root directory */
-    #ifdef G_OS_WIN32
-        if (!g_str_has_suffix(directory, ":\\"))    /* root directory is "X:\" */
-            files.push_back(std::string("..")+G_DIR_SEPARATOR_S);    /* ..\ */
-    #else
-        if (!g_str_equal(directory, "/"))
-            files.push_back(std::string("..")+G_DIR_SEPARATOR_S);    /* ../ */
-    #endif
+#ifdef G_OS_WIN32
+    if (!g_str_has_suffix(directory, ":\\"))    /* root directory is "X:\" */
+        files.push_back(std::string("..")+G_DIR_SEPARATOR_S);    /* ..\ */
+#else
+    if (!g_str_equal(directory, "/"))
+        files.push_back(std::string("..")+G_DIR_SEPARATOR_S);    /* ../ */
+#endif
     /* sort the array */
     sort(files.begin(), files.end(), filename_sort);
     sel = 0;
@@ -210,8 +209,8 @@ void SelectFileActivity::file_selected_do_command() {
 class SelectFileForceSaveCommand: public Command {
 public:
     SelectFileForceSaveCommand(App *app, SelectFileActivity *activity)
-    : Command(app),
-      activity(activity) {
+        : Command(app),
+          activity(activity) {
     }
 private:
     SelectFileActivity *activity;
@@ -256,7 +255,7 @@ void SelectFileActivity::process_enter() {
 
 void SelectFileActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
     switch (keycode) {
-        /* movements */
+            /* movements */
         case App::PageUp:
             sel = gd_clamp(sel - names_per_page, 0, files.size()-1);
             redraw_event();
@@ -284,14 +283,14 @@ void SelectFileActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
         case App::Enter:
             process_enter();
             break;
-        
-        /* jump to directory (name will be typed) */
+
+            /* jump to directory (name will be typed) */
         case 'j':
         case 'J':
             // TRANSLATORS: 35 chars max
             app->input_text_and_do_command(_("Jump to directory"), directory, new JumpToDirectoryCommand(app, this));
             break;
-        /* enter new filename - only if saving allowed */
+            /* enter new filename - only if saving allowed */
         case 'n':
         case 'N':
             if (for_save) {
@@ -299,14 +298,14 @@ void SelectFileActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
                 app->input_text_and_do_command(_("Enter new file name"), defaultname.c_str(), new FileNameEnteredCommand(app, this));
             }
             break;
-        
+
         case App::Escape:
             app->enqueue_command(new PopActivityCommand(app));
             break;
-        
+
         default:
             /* other keys do nothing */
-            break;    
+            break;
     }
 }
 
@@ -321,15 +320,14 @@ void SelectFileActivity::redraw_event() {
     if (for_save) {
         // TRANSLATORS: 40 chars max
         app->status_line(_("Crsr:select  N:new  J:jump  Esc:cancel"));   /* for saving, we allow the user to select a new filename. */
-    }
-    else {
+    } else {
         // TRANSLATORS: 40 chars max
         app->status_line(_("Crsr: select   J: jump   Esc: cancel"));
     }
     unsigned i, page = sel/names_per_page, cur;
     for (i=0, cur=page*names_per_page; i<names_per_page; i++, cur++) {
         if (cur<files.size()) {    /* may not be as much filenames as it would fit on the screen */
-            app->set_color((cur==sel)?GD_GDASH_YELLOW:GD_GDASH_LIGHTBLUE);
+            app->set_color((cur==unsigned(sel)) ? GD_GDASH_YELLOW : GD_GDASH_LIGHTBLUE);
             app->blittext_n(app->font_manager->get_font_width_narrow(), (i+3)*yd, files[cur].c_str());
         }
     }

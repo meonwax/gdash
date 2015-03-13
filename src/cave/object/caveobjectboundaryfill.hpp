@@ -29,16 +29,18 @@ class CaveBoundaryFill : public CaveFill {
 public:
     CaveBoundaryFill(Coordinate _start, GdElementEnum _border_element, GdElementEnum _fill_element);
     CaveBoundaryFill(): CaveFill(GD_FLOODFILL_BORDER) {}
-    virtual CaveBoundaryFill *clone() const { return new CaveBoundaryFill(*this); }
+    virtual CaveBoundaryFill *clone() const {
+        return new CaveBoundaryFill(*this);
+    }
     virtual void draw(CaveRendered &cave) const;
     virtual std::string get_bdcff() const;
-    virtual CaveBoundaryFill* clone_from_bdcff(const std::string &name, std::istream &is) const;
+    virtual CaveBoundaryFill *clone_from_bdcff(const std::string &name, std::istream &is) const;
 
 private:
     static PropertyDescription const descriptor[];
 
 public:
-    virtual PropertyDescription const* get_description_array() const;
+    virtual PropertyDescription const *get_description_array() const;
 
     virtual std::string get_description_markup() const;
 };

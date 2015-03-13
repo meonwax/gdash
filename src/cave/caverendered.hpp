@@ -59,9 +59,12 @@ class CaveObject;
 /// @ingroup Cave
 class CaveRendered : public CaveBase {
 private:
-    GdElementEnum player_eat_element(GdElementEnum element);
-    void play_sound_of_element(GdElementEnum element, int x, int y, bool particles = true);
     void add_particle_set(int x, int y, GdElementEnum particletype);
+    void play_effect_of_element(GdElementEnum element, int x, int y, GdDirectionEnum dir = MV_STILL, bool particles = true);
+    void play_eat_sound_of_element(GdElementEnum element, int x, int y);
+    void play_eat_particle_of_element(GdElementEnum element, int x, int y);
+
+    GdElementEnum player_eat_element(GdElementEnum element, int x, int y, GdDirectionEnum dir);
 
     void cell_explode(int x, int y, GdElementEnum explode_to);
     void creature_explode(int x, int y, GdElementEnum explode_to);
@@ -96,7 +99,6 @@ private:
     GdElementEnum get(int x, int y, GdDirectionEnum dir) const;
     void store(int x, int y, GdElementEnum element, bool disable_particle = false);
     void store(int x, int y, GdDirectionEnum dir, GdElementEnum element);
-    void store_no_scanned(int x, int y, GdElementEnum element);
     void move(int x, int y, GdDirectionEnum dir, GdElementEnum element);
     void next(int x, int y);
     void unscan(int x, int y);
@@ -162,6 +164,7 @@ public:
     GdInt amoeba_max_count;             ///< selected amoeba 1 threshold for this level
     GdInt amoeba_2_max_count;           ///< selected amoeba 2 threshold for this level
     AmoebaState amoeba_state;           ///< state of amoeba 1
+    GdBool convert_amoeba_this_frame;   ///< To implement BD1 buggy amoeba+magic wall behaviour.
     AmoebaState amoeba_2_state;         ///< state of amoeba 2
     GdInt magic_wall_time;              ///< magic wall 'on' state for seconds
     GdProbability slime_permeability;           ///< true random slime
@@ -193,11 +196,13 @@ public:
     GdBool player_tapping;                      ///< Player is tapping with his legs. Used by drawing routines
 
     GdBool voodoo_touched;
-    
+
     SoundWithPos sound1, sound2, sound3;        ///< sound set for 3 channels after each iteration
     std::list<ParticleSet> particles;
-    GdColor dirt_particle_color, diamond_particle_color, stone_particle_color,
-            explosion_particle_color, magic_wall_particle_color;
+    GdColor dirt_particle_color, dirt_2_particle_color, diamond_particle_color,
+            stone_particle_color, mega_stone_particle_color,
+            explosion_particle_color, magic_wall_particle_color, expanding_wall_particle_color,
+            expanding_steel_wall_particle_color, lava_particle_color;
 
     /* these should be inside some context variable */
     GdInt score;                        ///< Score got this frame.

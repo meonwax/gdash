@@ -28,14 +28,13 @@
 
 
 MessageActivity::MessageActivity(App *app, std::string const &primary, std::string const &secondary, SmartPtr<Command> command_after_exit)
-:
+    :
     Activity(app),
-    command_after_exit(command_after_exit)
-{
+    command_after_exit(command_after_exit) {
     std::string text;
     if (secondary != "")
         text = SPrintf("%c%s\n\n%c%s") % GD_COLOR_INDEX_WHITE % primary % GD_COLOR_INDEX_GRAY3 % secondary;
-    else 
+    else
         text = SPrintf("%c%s") % GD_COLOR_INDEX_WHITE % primary;
     wrapped_text = gd_wrap_text(text.c_str(), app->screen->get_width() / app->font_manager->get_font_width_narrow()-6);
 }
@@ -48,11 +47,11 @@ void MessageActivity::redraw_event() {
 
     app->draw_window(cx, cy, cw, ch);
     app->screen->set_clip_rect(cx, cy, cw, ch);
-    
+
     app->set_color(GD_GDASH_WHITE);
     for (size_t i = 0; i < wrapped_text.size(); ++i)
         app->blittext_n(-1, y1+(i+1)*app->font_manager->get_line_height(), wrapped_text[i].c_str());
-    
+
     app->screen->remove_clip_rect();
 
     app->screen->flip();

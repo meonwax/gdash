@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(GDash, 20130313unstable, [http://code.google.com/p/gdash/])
+AC_INIT(GDash, 20130317unstable, [http://code.google.com/p/gdash/])
 AC_CONFIG_SRCDIR([src/gtkmain.cpp])
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
@@ -54,6 +54,8 @@ if test x"$with_sdl" = "xyes" ; then
   AC_DEFINE(HAVE_SDL,,[Use SDL.])
   AM_PATH_SDL(1.2.0, :, AC_MSG_ERROR(Test for SDL failed. See the file 'INSTALL' for help.))
 fi
+
+AX_CHECK_GL
 
 PKG_CHECK_MODULES(LIBPNG, [libpng], AC_DEFINE(HAVE_LIBPNG, 1, Define if you have libpng), [])
 

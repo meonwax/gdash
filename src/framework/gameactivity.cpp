@@ -30,15 +30,14 @@
 
 
 GameActivity::GameActivity(App *app, GameControl *game)
-:   Activity(app),
-    game(game),
-    cellrenderer(*app->pixbuf_factory, gd_theme),
-    gamerenderer(*app->screen, cellrenderer, *app->font_manager, *game),
-    exit_game(false),
-    show_highscore(false),
-    paused(false),
-    time_ms(0)
-{
+    :   Activity(app),
+        game(game),
+        cellrenderer(*app->pixbuf_factory, gd_theme),
+        gamerenderer(*app->screen, cellrenderer, *app->font_manager, *game),
+        exit_game(false),
+        show_highscore(false),
+        paused(false),
+        time_ms(0) {
 }
 
 
@@ -84,37 +83,37 @@ void GameActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
             gamerenderer.set_random_colors();
             break;
         case 'h':
-        case 'H':
-            {
-                /* switch off sounds when showing help. */
-                /* no need to turn on sounds later; next cave iteration will restore them. */
-                gd_sound_off(); 
-                const char* strings_menu[]={
-                    app->gameinput->get_key_name(GameInputHandler::KeyLeft), _("Move left"),
-                    app->gameinput->get_key_name(GameInputHandler::KeyRight), _("Move right"),
-                    app->gameinput->get_key_name(GameInputHandler::KeyUp), _("Move up"),
-                    app->gameinput->get_key_name(GameInputHandler::KeyDown), _("Move down"),
-                    app->gameinput->get_key_name(GameInputHandler::KeyFire1), _("Snap"),
-                    app->gameinput->get_key_name(GameInputHandler::KeySuicide), _("Suicide"),
-                    // TRANSLATORS: "hold" here means that the key must be kept depressed by the user.
-                    app->gameinput->get_key_name(GameInputHandler::KeyFastForward), _("Fast forward (hold)"),
-                    // TRANSLATORS: "hold" here means that the key must be kept depressed by the user.
-                    app->gameinput->get_key_name(GameInputHandler::KeyStatusBar), _("Status bar (hold)"),
-                    app->gameinput->get_key_name(GameInputHandler::KeyRestartLevel), _("Restart level"),
-                    /* if you change these, change the enum in the class definition as well */
-                    "", "",
-                    _("Space"), _("Pause"),
-                    "F3", _("Take snapshot"),
-                    "F4", _("Revert to snapshot"),
-                    "", "",
-                    "F2", _("Random colors"),
-                    "F1", _("End game"),
-                    NULL
-                };
-                // TRANSLATORS: title of the help window during the game
-                app->show_text_and_do_command(_("Game Help"), help_strings_to_string(strings_menu));
-            }
-            break;
+        case 'H': {
+            /* switch off sounds when showing help. */
+            /* no need to turn on sounds later; next cave iteration will restore them. */
+            gd_sound_off();
+            const char *strings_menu[]= {
+                app->gameinput->get_key_name(GameInputHandler::KeyLeft), _("Move left"),
+                app->gameinput->get_key_name(GameInputHandler::KeyRight), _("Move right"),
+                app->gameinput->get_key_name(GameInputHandler::KeyUp), _("Move up"),
+                app->gameinput->get_key_name(GameInputHandler::KeyDown), _("Move down"),
+                app->gameinput->get_key_name(GameInputHandler::KeyFire1), _("Snap"),
+                app->gameinput->get_key_name(GameInputHandler::KeySuicide), _("Suicide"),
+                // TRANSLATORS: "hold" here means that the key must be kept depressed by the user.
+                app->gameinput->get_key_name(GameInputHandler::KeyFastForward), _("Fast forward (hold)"),
+                // TRANSLATORS: "hold" here means that the key must be kept depressed by the user.
+                app->gameinput->get_key_name(GameInputHandler::KeyStatusBar), _("Status bar (hold)"),
+                app->gameinput->get_key_name(GameInputHandler::KeyRestartLevel), _("Restart level"),
+                /* if you change these, change the enum in the class definition as well */
+                "", "",
+                _("Space"), _("Pause"),
+                //~ "F3", _("Take snapshot"),
+                //~ "F4", _("Revert to snapshot"),
+                "", "",
+                "F2", _("Random colors"),
+                "F9", _("Sound volume"),
+                "F1", _("End game"),
+                NULL
+            };
+            // TRANSLATORS: title of the help window during the game
+            app->show_text_and_do_command(_("Game Help"), help_strings_to_string(strings_menu));
+        }
+        break;
     }
 }
 
@@ -126,7 +125,7 @@ void GameActivity::timer_event(int ms_elapsed) {
     if (time_ms < step)
         return;
     time_ms -= step;
-    
+
     GdDirectionEnum player_move = gd_direction_from_keypress(app->gameinput->up(), app->gameinput->down(), app->gameinput->left(), app->gameinput->right());
     GameRenderer::State state = gamerenderer.main_int(step, player_move, app->gameinput->fire1() || app->gameinput->fire2(), app->gameinput->suicide, app->gameinput->restart_level, paused, app->gameinput->alternate_status, app->gameinput->fast_forward);
 
@@ -146,7 +145,7 @@ void GameActivity::timer_event(int ms_elapsed) {
             show_highscore=true;
             break;
     }
-    
+
     if (exit_game) {
         /* pop the game activity. */
         app->enqueue_command(new PopActivityCommand(app));
@@ -158,8 +157,7 @@ void GameActivity::timer_event(int ms_elapsed) {
             /* enter to highscore table */
             int rank = game->caveset->highscore.add(game->player_name, game->player_score);
             app->enqueue_command(new ShowHighScoreCommand(app, NULL, rank));
-        }
-        else {
+        } else {
             /* no high score */
         }
     }

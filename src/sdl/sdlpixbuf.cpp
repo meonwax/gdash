@@ -36,7 +36,7 @@ int SDLPixbuf::get_height() const {
 void SDLPixbuf::check_and_convert_to_rgba() {
     /* if the r/g/b/masks do not match our preset values, the image is not stored in R,G,B,[A] byte order
      * in memory. so convert it. */
-    if (surface->format->Rmask != rmask || surface->format->Gmask != gmask || surface->format->Bmask != bmask) {
+    if (surface->format->BytesPerPixel!=4 || surface->format->Rmask != rmask || surface->format->Gmask != gmask || surface->format->Bmask != bmask) {
         SDL_Surface *newsurface = SDL_CreateRGBSurface(SDL_SRCALPHA, surface->w, surface->h, 32, rmask, gmask, bmask, surface->format->Amask != 0 ? amask : 0);
         SDL_SetAlpha(surface, 0, SDL_ALPHA_OPAQUE);
         SDL_BlitSurface(surface, NULL, newsurface, NULL);
@@ -71,7 +71,7 @@ SDLPixbuf::SDLPixbuf(int w, int h) {
 
 
 SDLPixbuf::SDLPixbuf(SDL_Surface *surface_)
-:   surface(surface_) {
+    :   surface(surface_) {
 }
 
 
@@ -80,7 +80,7 @@ SDLPixbuf::~SDLPixbuf() {
 }
 
 
-void SDLPixbuf::fill_rect(int x, int y, int w, int h, const GdColor& c) {
+void SDLPixbuf::fill_rect(int x, int y, int w, int h, const GdColor &c) {
     SDL_Rect dst;
     dst.x=x;
     dst.y=y;
@@ -104,7 +104,7 @@ void SDLPixbuf::blit_full(int x, int y, int w, int h, Pixbuf &dest, int dx, int 
     dst.x=dx;
     dst.y=dy;
     SDL_SetAlpha(surface, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
-    SDL_BlitSurface(surface, &src, static_cast<SDLPixbuf&>(dest).surface, &dst);
+    SDL_BlitSurface(surface, &src, static_cast<SDLPixbuf &>(dest).surface, &dst);
 }
 
 
@@ -117,7 +117,7 @@ void SDLPixbuf::copy_full(int x, int y, int w, int h, Pixbuf &dest, int dx, int 
     dst.x=dx;
     dst.y=dy;
     SDL_SetAlpha(surface, 0, SDL_ALPHA_OPAQUE);
-    SDL_BlitSurface(surface, &src, static_cast<SDLPixbuf&>(dest).surface, &dst);
+    SDL_BlitSurface(surface, &src, static_cast<SDLPixbuf &>(dest).surface, &dst);
 }
 
 

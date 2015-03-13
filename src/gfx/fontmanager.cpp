@@ -44,44 +44,44 @@ public:
         CHARS_Y=4,
         NUM_OF_CHARS=CHARS_X*CHARS_Y
     };
-    
+
     /// Constructor.
     /// @param bitmap_ Raw font data.
     /// @param color_ The color of drawing.
     /// @param pixbuf_factory_ The pixbuf factory used to create glyphs.
-    RenderedFont(std::vector<unsigned char> const& bitmap_,  unsigned font_size_, GdColor const& color_, PixbufFactory const& pixbuf_factory_);
-    
+    RenderedFont(std::vector<unsigned char> const &bitmap_,  unsigned font_size_, GdColor const &color_, PixbufFactory const &pixbuf_factory_);
+
     /// Destructor.
     virtual ~RenderedFont();
-    
+
     /// Return the pixmap for a given character; maybe after creating it.
     /// @param j The ASCII (or GDash) code of the character
     Pixmap const &get_character(int j) const;
-    
+
     /// GdColor::get_uint() code of color, for easy searching in a font manager.
     guint32 uint;
 
 protected:
     /// Raw font data.
-    std::vector<unsigned char> const& bitmap;
+    std::vector<unsigned char> const &bitmap;
 
     /// Font size (pixbufs)
     unsigned int font_size;
-    
+
     /// Pixbuf factory for drawing.
-    PixbufFactory const& pixbuf_factory;
+    PixbufFactory const &pixbuf_factory;
 
     /// RGBA format of color in pixbufs.
     guint32 col;
 
     /// RGBA format of transparent pixel in pixbufs.
     guint32 transparent;
-    
+
     /// The rendered glyphs are stored in this array as pixmaps.
     mutable Pixmap *_character[NUM_OF_CHARS];
 
-    RenderedFont(const RenderedFont&);      // not implemented
-    RenderedFont& operator=(const RenderedFont&);   // not implemented
+    RenderedFont(const RenderedFont &);     // not implemented
+    RenderedFont &operator=(const RenderedFont &);  // not implemented
 
 private:
     /// Render a single character. The narrow and wide fonts implement this.
@@ -93,8 +93,8 @@ private:
     virtual void render_character(int j) const;
 
 public:
-    RenderedFontNarrow(std::vector<unsigned char> const& bitmap_,  unsigned font_size_, GdColor const& color, PixbufFactory const& pixbuf_factory_)
-    : RenderedFont(bitmap_, font_size_, color, pixbuf_factory_) {}
+    RenderedFontNarrow(std::vector<unsigned char> const &bitmap_,  unsigned font_size_, GdColor const &color, PixbufFactory const &pixbuf_factory_)
+        : RenderedFont(bitmap_, font_size_, color, pixbuf_factory_) {}
 };
 
 class RenderedFontWide: public RenderedFont {
@@ -102,17 +102,17 @@ private:
     virtual void render_character(int j) const;
 
 public:
-    RenderedFontWide(std::vector<unsigned char> const& bitmap_,  unsigned font_size_, GdColor const& color, PixbufFactory const& pixbuf_factory_)
-    : RenderedFont(bitmap_, font_size_, color, pixbuf_factory_) {}
+    RenderedFontWide(std::vector<unsigned char> const &bitmap_,  unsigned font_size_, GdColor const &color, PixbufFactory const &pixbuf_factory_)
+        : RenderedFont(bitmap_, font_size_, color, pixbuf_factory_) {}
 };
 
 
-RenderedFont::RenderedFont(std::vector<unsigned char> const& bitmap_, unsigned font_size_, GdColor const& color, PixbufFactory const& pixbuf_factory_)
-:   uint(color.get_uint()),
-    bitmap(bitmap_),
-    font_size(font_size_),
-    pixbuf_factory(pixbuf_factory_),
-    _character() {
+RenderedFont::RenderedFont(std::vector<unsigned char> const &bitmap_, unsigned font_size_, GdColor const &color, PixbufFactory const &pixbuf_factory_)
+    :   uint(color.get_uint()),
+        bitmap(bitmap_),
+        font_size(font_size_),
+        pixbuf_factory(pixbuf_factory_),
+        _character() {
     g_assert(font_size_*font_size_*NUM_OF_CHARS==bitmap_.size());
     col=Pixbuf::rgba_pixel_from_color(color, 0xff); /* opaque */
     transparent=Pixbuf::rgba_pixel_from_color(GdColor::from_rgb(0, 0, 0), 0x00);    /* color does not matter as totally transparent */
@@ -121,7 +121,7 @@ RenderedFont::RenderedFont(std::vector<unsigned char> const& bitmap_, unsigned f
 void RenderedFontNarrow::render_character(int j) const {
     int y1=(j/CHARS_X)*font_size;
     int x1=(j%CHARS_X)*font_size;
-    
+
     Pixbuf *image=pixbuf_factory.create(font_size, font_size);
     image->lock();
     for (unsigned y=0; y<font_size; y++) {
@@ -142,7 +142,7 @@ void RenderedFontNarrow::render_character(int j) const {
 void RenderedFontWide::render_character(int j) const {
     int y1=(j/CHARS_X)*font_size;
     int x1=(j%CHARS_X)*font_size;
-    
+
     Pixbuf *image=pixbuf_factory.create(font_size*2, font_size);
     image->lock();
     for (unsigned y=0; y<font_size; y++) {
@@ -152,8 +152,7 @@ void RenderedFontWide::render_character(int j) const {
             if (bitmap[(y1+y)*(CHARS_X*font_size)+x1+x]!=1) {     /* 1 is black there!! */
                 p[0]=col;    /* normal */
                 p[1]=col;
-            }
-            else {
+            } else {
                 p[0]=transparent;    /* normal */
                 p[1]=transparent;    /* normal */
             }
@@ -181,8 +180,8 @@ Pixmap const &RenderedFont::get_character(int j) const {
 /* check if given surface is ok to be a gdash theme. */
 bool FontManager::is_pixbuf_ok_for_theme(const Pixbuf &surface) {
     if ((surface.get_width() % RenderedFont::CHARS_X != 0)
-       || (surface.get_height() % RenderedFont::CHARS_Y != 0)
-       || (surface.get_width() / RenderedFont::CHARS_X != surface.get_height() / RenderedFont::CHARS_Y)) {
+            || (surface.get_height() % RenderedFont::CHARS_Y != 0)
+            || (surface.get_width() / RenderedFont::CHARS_X != surface.get_height() / RenderedFont::CHARS_Y)) {
         gd_critical(CPrintf("image should contain %d chars in a row and %d in a column!") % int(RenderedFont::CHARS_X) % int(RenderedFont::CHARS_Y));
         return false;
     }
@@ -207,7 +206,7 @@ bool FontManager::is_image_ok_for_theme(PixbufFactory &pixbuf_factory, const cha
     }
 }
 
-bool FontManager::loadfont_image(Pixbuf const& image) {
+bool FontManager::loadfont_image(Pixbuf const &image) {
     if (!is_pixbuf_ok_for_theme(image))
         return false;
 
@@ -219,7 +218,7 @@ bool FontManager::loadfont_image(Pixbuf const& image) {
 
 /* load theme from image file. */
 /* return true if successful. */
-bool FontManager::loadfont_file(const std::string& filename) {
+bool FontManager::loadfont_file(const std::string &filename) {
     /* load cell graphics */
     /* load from file */
     try {
@@ -238,7 +237,7 @@ bool FontManager::loadfont_file(const std::string& filename) {
 /* load the theme from the given file. */
 /* if successful, ok. */
 /* if fails, or no theme specified, load the builtin */
-void FontManager::load_theme(const std::string& theme_file) {
+void FontManager::load_theme(const std::string &theme_file) {
     if (theme_file!="" && loadfont_file(theme_file)) {
         /* loaded from png file */
     } else {
@@ -249,8 +248,9 @@ void FontManager::load_theme(const std::string& theme_file) {
     }
 }
 
-FontManager::FontManager(const PixbufFactory& pixbuf_factory_, const std::string& theme_file)
-:
+FontManager::FontManager(const PixbufFactory &pixbuf_factory_, const std::string &theme_file)
+    :
+    current_color(GD_GDASH_WHITE),
     pixbuf_factory(pixbuf_factory_) {
     load_theme(theme_file);
 }
@@ -262,12 +262,12 @@ FontManager::~FontManager() {
 struct FindRenderedFont {
     guint32 uint;
     FindRenderedFont(guint32 uint_): uint(uint_) {}
-    bool operator()(const RenderedFont* font) const {
+    bool operator()(const RenderedFont *font) const {
         return font->uint==uint;
     }
 };
 
-RenderedFont* FontManager::narrow(const GdColor &c) {
+RenderedFont *FontManager::narrow(const GdColor &c) {
     // find font in list
     container::iterator it=find_if(_narrow.begin(), _narrow.end(), FindRenderedFont(c.get_uint()));
     if (it==_narrow.end()) {
@@ -285,7 +285,7 @@ RenderedFont* FontManager::narrow(const GdColor &c) {
     return *_narrow.begin();
 }
 
-RenderedFont* FontManager::wide(const GdColor &c) {
+RenderedFont *FontManager::wide(const GdColor &c) {
     // find font in list
     container::iterator it=find_if(_wide.begin(), _wide.end(), FindRenderedFont(c.get_uint()));
     if (it==_wide.end()) {
@@ -328,7 +328,7 @@ int FontManager::blittext_internal(Screen &screen, int x, int y, char const *tex
         }
         x = screen.get_width()/2 - (w*len)/2;
     }
-    
+
     int xc=x;
     gunichar c;
     for (int i = 0; (c = ucs[i]) != '\0'; ++i) {
@@ -355,28 +355,84 @@ int FontManager::blittext_internal(Screen &screen, int x, int y, char const *tex
             c-=64;
             current_color = GdColor::from_gdash_index(c);
             font = widefont ? wide(current_color) : narrow(current_color);
-            
+
             continue;
         }
 
         /* some unicode hack - substitutions */
         switch (c) {
-            case 0x2018: c='\''; break; /* left single quotation mark */
-            case 0x2019: c='\''; break; /* right single quotation mark */
-            case 0x201A: c=','; break; /* low single comma quotation mark */
-            case 0x201B: c='\''; break; /* high-reversed-9 quotation mark */
-            case 0x201C: c='\"'; break; /* left double quotation mark */
-            case 0x201D: c='\"'; break; /* right double quotation mark */
-            case 0x201E: c='\"'; break; /* low double quotation mark */
-            case 0x201F: c='\"'; break; /* double reversed comma quotation mark */
-            case 0x2032: c='\''; break; /* prime */
-            case 0x2033: c='\"'; break; /* double prime */
-            case 0x2034: c='\"'; break; /* triple prime */
-            case 0x2035: c='\''; break; /* reversed prime */
-            case 0x2036: c='\"'; break; /* reversed double prime */
-            case 0x2037: c='\"'; break; /* reversed triple prime */
-            case 0x2039: c='<'; break; /* single left-pointing angle quotation mark */
-            case 0x203A: c='>'; break; /* single right-pointing angle quotation mark */
+            case 0x00AB:
+                c='<';
+                break; /* LEFT-POINTING DOUBLE ANGLE QUOTATION MARK */
+            case 0x00BB:
+                c='>';
+                break; /* RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK */
+            case 0x2010:
+                c='-';
+                break; /* hyphen */
+            case 0x2011:
+                c='-';
+                break; /* non-breaking hyphen */
+            case 0x2012:
+                c='-';
+                break; /* figure dash */
+            case 0x2013:
+                c='-';
+                break; /* en dash */
+            case 0x2014:
+                c='-';
+                break; /* em dash */
+            case 0x2015:
+                c='-';
+                break; /* horizontal bar */
+            case 0x2018:
+                c='\'';
+                break; /* left single quotation mark */
+            case 0x2019:
+                c='\'';
+                break; /* right single quotation mark */
+            case 0x201A:
+                c=',';
+                break; /* low single comma quotation mark */
+            case 0x201B:
+                c='\'';
+                break; /* high-reversed-9 quotation mark */
+            case 0x201C:
+                c='\"';
+                break; /* left double quotation mark */
+            case 0x201D:
+                c='\"';
+                break; /* right double quotation mark */
+            case 0x201E:
+                c='\"';
+                break; /* low double quotation mark */
+            case 0x201F:
+                c='\"';
+                break; /* double reversed comma quotation mark */
+            case 0x2032:
+                c='\'';
+                break; /* prime */
+            case 0x2033:
+                c='\"';
+                break; /* double prime */
+            case 0x2034:
+                c='\"';
+                break; /* triple prime */
+            case 0x2035:
+                c='\'';
+                break; /* reversed prime */
+            case 0x2036:
+                c='\"';
+                break; /* reversed double prime */
+            case 0x2037:
+                c='\"';
+                break; /* reversed triple prime */
+            case 0x2039:
+                c='<';
+                break; /* single left-pointing angle quotation mark */
+            case 0x203A:
+                c='>';
+                break; /* single right-pointing angle quotation mark */
         }
 
         if (c=='\n') {
@@ -385,7 +441,7 @@ int FontManager::blittext_internal(Screen &screen, int x, int y, char const *tex
             xc=x;
         } else {
             gunichar i;
-            
+
             if (c<RenderedFont::NUM_OF_CHARS)
                 i=c;
             else
@@ -395,7 +451,7 @@ int FontManager::blittext_internal(Screen &screen, int x, int y, char const *tex
             xc+=w;
         }
     }
-        
+
     g_free(ucs);
     return xc;
 }

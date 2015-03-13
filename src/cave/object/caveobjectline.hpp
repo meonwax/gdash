@@ -31,21 +31,25 @@ public:
     CaveLine(Coordinate _p1, Coordinate _p2, GdElementEnum _element);
     CaveLine(): CaveObject(GD_LINE) {}
     virtual void draw(CaveRendered &cave) const;
-    virtual CaveLine *clone() const { return new CaveLine(*this); }
+    virtual CaveLine *clone() const {
+        return new CaveLine(*this);
+    }
     virtual std::string get_bdcff() const;
-    virtual CaveLine* clone_from_bdcff(const std::string &name, std::istream &is) const;
+    virtual CaveLine *clone_from_bdcff(const std::string &name, std::istream &is) const;
 
 private:
     static PropertyDescription const descriptor[];
 
 public:
-    virtual PropertyDescription const* get_description_array() const;
+    virtual PropertyDescription const *get_description_array() const;
 
     virtual void create_drag(Coordinate current, Coordinate displacement);
     virtual void move(Coordinate current, Coordinate displacement);
     virtual void move(Coordinate displacement);
     virtual std::string get_coordinates_text() const;
-    virtual GdElementEnum get_characteristic_element() const { return element; }
+    virtual GdElementEnum get_characteristic_element() const {
+        return element;
+    }
     virtual std::string get_description_markup() const;
 };
 

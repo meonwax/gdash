@@ -25,7 +25,7 @@
 class CaveSet;
 
 std::vector<unsigned char> load_file_to_vector(char const *filename);
-CaveSet create_from_file(const char *filename) throw (std::runtime_error);
+CaveSet create_from_file(const char *filename) throw(std::runtime_error);
 CaveSet create_from_buffer(const unsigned char *buffer, int length, char const *filename = "");
 
 #endif

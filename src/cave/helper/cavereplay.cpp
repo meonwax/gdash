@@ -102,41 +102,51 @@ bool CaveReplay::load_one_from_bdcff(const std::string &str) {
     bool fire, suicide;
     int num=-1;
     unsigned int count, i;
-    
+
     fire=suicide=up=down=left=right=false;
     for (i=0; i<str.length(); i++)
-        switch(str[i]) {
-            case 'U': fire=true;
-            case 'u': up=true;
+        switch (str[i]) {
+            case 'U':
+                fire=true;
+            case 'u':
+                up=true;
                 break;
 
-            case 'D': fire=true;
-            case 'd': down=true;
+            case 'D':
+                fire=true;
+            case 'd':
+                down=true;
                 break;
 
-            case 'L': fire=true;
-            case 'l': left=true;
+            case 'L':
+                fire=true;
+            case 'l':
+                left=true;
                 break;
 
-            case 'R': fire=true;
-            case 'r': right=true;
+            case 'R':
+                fire=true;
+            case 'r':
+                right=true;
                 break;
 
-            case 'F': fire=true;
+            case 'F':
+                fire=true;
                 break;
 
-            case 'k': suicide=true;
+            case 'k':
+                suicide=true;
                 break;
-                
+
             case '.':
                 /* do nothing, as all other movements are false */
                 break;
-                
+
             case 'c':
             case 'C':
                 /* bdcff 'combined' flags. do nothing. */
                 break;
-                
+
             default:
                 if (g_ascii_isdigit(str[i])) {
                     if (num==-1)
@@ -150,34 +160,43 @@ bool CaveReplay::load_one_from_bdcff(const std::string &str) {
         count=num;
     for (i=0; i<count; i++)
         store_movement(dir, fire, suicide);
-        
+
     return true;
 }
 
-bool CaveReplay::load_from_bdcff(std::string const& str) {
+bool CaveReplay::load_from_bdcff(std::string const &str) {
     std::istringstream is(str);
     std::string one;
     bool result=true;
     while (is >> one)
         result=result && load_one_from_bdcff(one);
-    
+
     return result;
 }
 
 
-const char * CaveReplay::direction_to_bdcff(GdDirectionEnum mov) {
+const char *CaveReplay::direction_to_bdcff(GdDirectionEnum mov) {
     switch (mov) {
-        /* not moving */
-        case MV_STILL: return REPLAY_BDCFF_STILL;
-        /* directions */
-        case MV_UP: return REPLAY_BDCFF_UP;
-        case MV_UP_RIGHT: return REPLAY_BDCFF_UP_RIGHT;
-        case MV_RIGHT: return REPLAY_BDCFF_RIGHT;
-        case MV_DOWN_RIGHT: return REPLAY_BDCFF_DOWN_RIGHT;
-        case MV_DOWN: return REPLAY_BDCFF_DOWN;
-        case MV_DOWN_LEFT: return REPLAY_BDCFF_DOWN_LEFT;
-        case MV_LEFT: return REPLAY_BDCFF_LEFT;
-        case MV_UP_LEFT: return REPLAY_BDCFF_UP_LEFT;
+            /* not moving */
+        case MV_STILL:
+            return REPLAY_BDCFF_STILL;
+            /* directions */
+        case MV_UP:
+            return REPLAY_BDCFF_UP;
+        case MV_UP_RIGHT:
+            return REPLAY_BDCFF_UP_RIGHT;
+        case MV_RIGHT:
+            return REPLAY_BDCFF_RIGHT;
+        case MV_DOWN_RIGHT:
+            return REPLAY_BDCFF_DOWN_RIGHT;
+        case MV_DOWN:
+            return REPLAY_BDCFF_DOWN;
+        case MV_DOWN_LEFT:
+            return REPLAY_BDCFF_DOWN_LEFT;
+        case MV_LEFT:
+            return REPLAY_BDCFF_LEFT;
+        case MV_UP_LEFT:
+            return REPLAY_BDCFF_UP_LEFT;
         default:
             g_assert_not_reached();    /* programmer error */
             return REPLAY_BDCFF_STILL;
@@ -221,7 +240,7 @@ std::string CaveReplay::movements_to_bdcff() const {
         str+=direction_fire_to_bdcff(GdDirectionEnum(data & REPLAY_MOVE_MASK), (data & REPLAY_FIRE_MASK)!=0);
         if (num!=1) {
             std::ostringstream s;
-            
+
             s<<num;
             str+=s.str();
         }

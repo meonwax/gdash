@@ -27,6 +27,7 @@
 #include "framework/replaymenuactivity.hpp"
 #include "framework/commands.hpp"
 #include "input/gameinputhandler.hpp"
+#include "input/joystick.hpp"
 #include "cave/caveset.hpp"
 #include "cave/titleanimation.hpp"
 #include "settings.hpp"
@@ -41,18 +42,17 @@
 
 
 TitleScreenActivity::TitleScreenActivity(App *app)
-:
+    :
     Activity(app),
     scale(app->pixbuf_factory->get_pixmap_scale()),
     image_centered_threshold(164*scale),
     frames(0), time_ms(0), animcycle(0),
-    alternate_status(false)
-{
+    alternate_status(false) {
     cavenum = app->caveset->last_selected_cave;
     levelnum = app->caveset->last_selected_level;
 }
-    
-    
+
+
 TitleScreenActivity::~TitleScreenActivity() {
     clear_animation();
 }
@@ -73,8 +73,7 @@ void TitleScreenActivity::shown_event() {
         y_gameline=-1;
         y_caveline=image_h + (app->screen->get_height()-image_h-font_h)/2;    /* centered in the small place */
         show_status=false;
-    }
-    else if (app->screen->get_height()-image_h < 3*font_h) {
+    } else if (app->screen->get_height()-image_h < 3*font_h) {
         /* more than 2, less than 3 - place for status bar. game name is not shown, as this will */
         /* only be true for a game with its own title screen, and i decided that in that case it */
         /* would make more sense. */
@@ -91,6 +90,11 @@ void TitleScreenActivity::shown_event() {
         show_status=true;
     }
 
+    /* this is required because the caveset might have changed since the last redraw, and
+     * thus the title screen might have changed, and the new title screen might have fewer
+     * frames than the original. */
+    animcycle = 0;
+    
     app->screen->set_title(CPrintf("GDash - %s") % app->caveset->name);
     gd_music_play_random();
 }
@@ -109,8 +113,6 @@ void TitleScreenActivity::hidden_event() {
 
 
 void TitleScreenActivity::redraw_event() {
-    app->screen->start_drawing();
-    
     app->clear_screen();
 
     if (y_gameline!=-1) {
@@ -127,21 +129,18 @@ void TitleScreenActivity::redraw_event() {
     app->screen->blit(*animation[animcycle], dx, dy);
 
     if (show_status) {
-        if (alternate_status) {
+        if (Joystick::have_joystick() && alternate_status) {
             // TRANSLATORS: 40 chars max. Joy here is the joystick (that one can also select the cave)
             app->status_line(_("Joy: select   Fire: play"));
         } else {
             // TRANSLATORS: 40 chars max. Select the game to play.
-            app->status_line(_("Crsr: select   Space: Play   H: Help"));
+            if (get_active_logger().empty()) {
+                app->status_line(_("Crsr: select   Space: play   H: help"));
+            } else {
+                app->status_line(_("Crsr: select   Space: play   X: errors"));
+            }
         }
     }
-    if (!get_active_logger().empty()) {
-        /* show error flag */
-        app->set_color(GD_GDASH_RED);
-        app->blittext_n(app->screen->get_width()-app->font_manager->get_font_width_narrow(),
-                        app->screen->get_height()-app->font_manager->get_font_height(), CPrintf("%c") % GD_BALL_CHAR);
-    }
-
     /* selected cave */
     if (app->caveset->caves.size() == 0) {
         app->blittext_n(0, y_caveline, CPrintf(_("%cNo caves.")) % GD_COLOR_INDEX_WHITE);
@@ -154,7 +153,7 @@ void TitleScreenActivity::redraw_event() {
 }
 
 
-static int previous_selectable_cave(CaveSet& caveset, unsigned cavenum) {
+static int previous_selectable_cave(CaveSet &caveset, unsigned cavenum) {
     unsigned cn=cavenum;
     while (cn>0) {
         cn--;
@@ -167,7 +166,7 @@ static int previous_selectable_cave(CaveSet& caveset, unsigned cavenum) {
 }
 
 
-static int next_selectable_cave(CaveSet& caveset, unsigned cavenum) {
+static int next_selectable_cave(CaveSet &caveset, unsigned cavenum) {
     unsigned cn=cavenum;
     while (cn+1<caveset.caves.size()) {
         cn++;
@@ -211,7 +210,7 @@ void TitleScreenActivity::timer_event(int ms_elapsed) {
             /* joystick or keyboard right */
             if (app->gameinput->right())
                 cavenum = next_selectable_cave(*app->caveset, cavenum);
-            
+
             /* for a fire event, maybe from the joystick, start the game immediately.
              * when from the keyboard, we would ask the user name,
              * but how would the user press the enter key? :) */
@@ -229,8 +228,8 @@ void TitleScreenActivity::timer_event(int ms_elapsed) {
 
 void show_errors(App *app, Logger &l) {
     std::string text;
-    
-    Logger::Container const& errors = l.get_messages();
+
+    Logger::Container const &errors = l.get_messages();
     for (Logger::Container::const_iterator it = errors.begin(); it != errors.end(); ++it) {
         text += it->message;
         text += "\n\n";
@@ -244,38 +243,37 @@ void show_errors(App *app, Logger &l) {
 void TitleScreenActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
     switch (keycode) {
         case 'h':
-        case 'H':
-            {
-                static char const *strings[]={
-                    // TRANSLATORS: cursor keys selected for playing, or joystick movement
-                    _("Cursor, joy"), _("Select cave & level"),
-                    // TRANSLATORS: users press space of game/joystick fire button to play
-                    _("Space, Fire1"), _("Play the game"),
-                    "", "",
-                    // TRANSLATORS: string should be short (~20 chars)
-                    "L, Tab (C)", _("Load (installed caves)"),
-                    // TRANSLATORS: string should be short (~20 chars)
-                    "S (N)", _("Save (Save as)"),
-                    "I", _("Caveset info"),
-                    "F", _("Hall of fame"),
-                    "R", _("Replays"),
-                    "", "",
-                    "E", _("Editor"),
-                    "", "",
-                    "F9", _("Sound volume"),
-                    // TRANSLATORS: string should be short (~20 chars)
-                    "F11", _("Fullscreen ON/OFF"),
-                    "O", _("Options"),
-                    "K", _("Keyboard options"),
-                    "X", _("Error console"),
-                    "A", _("About GDash"),
-                    "", "",
-                    "Escape", _("Quit game"),
-                    NULL
-                };
-                app->show_text_and_do_command(_("GDash Help"), help_strings_to_string(strings));
-            }
-            break;
+        case 'H': {
+            static char const *strings[]= {
+                // TRANSLATORS: cursor keys selected for playing, or joystick movement
+                _("Cursor, joy"), _("Select cave & level"),
+                // TRANSLATORS: users press space of game/joystick fire button to play
+                _("Space, Fire1"), _("Play the game"),
+                "", "",
+                // TRANSLATORS: string should be short (~20 chars)
+                "L, Tab (C)", _("Load (installed caves)"),
+                // TRANSLATORS: string should be short (~20 chars)
+                "S (N)", _("Save (Save as)"),
+                "I", _("Caveset info"),
+                "F", _("Hall of fame"),
+                "R", _("Replays"),
+                "", "",
+                "E", _("Editor"),
+                "", "",
+                "F9", _("Sound volume"),
+                // TRANSLATORS: string should be short (~20 chars)
+                "F11", _("Fullscreen on/off"),
+                "O", _("Options"),
+                "K", _("Keyboard options"),
+                "X", _("Error console"),
+                "A", _("About GDash"),
+                "", "",
+                "Escape, Q", _("Quit game"),
+                NULL
+            };
+            app->show_text_and_do_command(_("GDash Help"), help_strings_to_string(strings));
+        }
+        break;
         case 'a':
         case 'A':
             app->show_about_info();
@@ -304,7 +302,7 @@ void TitleScreenActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
         case 'e':
         case 'E':
             app->start_editor();
-			break;
+            break;
         case 'o':
         case 'O':
             app->show_settings(gd_get_game_settings_array());
@@ -331,9 +329,18 @@ void TitleScreenActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
             app->caveset->last_selected_level = levelnum;
             app->input_text_and_do_command(_("Enter your name"), gd_username.c_str(), new NewGameCommand(app, cavenum, levelnum));
             break;
-        case App::Escape:
-            /* escape on the title screen is the same as closing the application */
+        case 'q':
+        case 'Q':
             app->quit_event();
+            break;
+        case App::Escape:
+            /* if edited, do as if a quit is requested. then the user will be asked if discards edit. */
+            /* otherwise, simply ask if he wants to quit. */
+            if (app->caveset->edited)
+                app->quit_event();
+            else
+                app->ask_yesorno_and_do_command(_("Quit game?"), _("yes"), _("no"), new PopAllActivitiesCommand(app),
+                    SmartPtr<Command>());
             break;
     }
 }

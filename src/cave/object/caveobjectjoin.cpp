@@ -26,13 +26,11 @@
 #include "misc/util.hpp"
 #include "cave/elementproperties.hpp"
 
-std::string CaveJoin::get_bdcff() const
-{
+std::string CaveJoin::get_bdcff() const {
     return BdcffFormat(backwards?"AddBackward":"Add") << dist << search_element << put_element;
 }
 
-CaveJoin* CaveJoin::clone_from_bdcff(const std::string &name, std::istream &is) const
-{
+CaveJoin *CaveJoin::clone_from_bdcff(const std::string &name, std::istream &is) const {
     Coordinate dist;
     GdElementEnum search, replace;
     if (!(is >> dist >> search >> replace))
@@ -43,16 +41,14 @@ CaveJoin* CaveJoin::clone_from_bdcff(const std::string &name, std::istream &is) 
 }
 
 CaveJoin::CaveJoin(Coordinate _dist, GdElementEnum _search_element, GdElementEnum _put_element, bool _backward)
-:   CaveObject(GD_JOIN),
-    dist(_dist),
-    search_element(_search_element),
-    put_element(_put_element),
-    backwards(_backward)
-{
+    :   CaveObject(GD_JOIN),
+        dist(_dist),
+        search_element(_search_element),
+        put_element(_put_element),
+        backwards(_backward) {
 }
 
-void CaveJoin::draw(CaveRendered &cave) const
-{
+void CaveJoin::draw(CaveRendered &cave) const {
     /* find every object, and put fill_element next to it. relative coordinates dx,dy */
     if (!backwards) {
         /* from top to bottom */
@@ -81,19 +77,19 @@ PropertyDescription const CaveJoin::descriptor[] = {
     {"", GD_TYPE_ELEMENT, 0, N_("Search element"), GetterBase::create_new(&CaveJoin::search_element), N_("The element to look for. Every element found will generate an add element.")},
     {"", GD_TYPE_ELEMENT, 0, N_("Add element"), GetterBase::create_new(&CaveJoin::put_element), N_("The element to draw.")},
     {"", GD_TYPE_COORDINATE, 0, N_("Distance"), GetterBase::create_new(&CaveJoin::dist), N_("The distance to draw the new element at."), -40, 40},
-    {"", GD_TYPE_BOOLEAN, 0, N_("Backwards"), GetterBase::create_new(&CaveJoin::backwards), N_("Normally the cave is searched from top to bottom, to find the search element, and draw the add element nearby. If the distance vector of the drawn element is pointing down or right, it might be feasible to do the search from bottom to top, so search elements are not overwritten before finding them, or "
+    {
+        "", GD_TYPE_BOOLEAN, 0, N_("Backwards"), GetterBase::create_new(&CaveJoin::backwards), N_("Normally the cave is searched from top to bottom, to find the search element, and draw the add element nearby. If the distance vector of the drawn element is pointing down or right, it might be feasible to do the search from bottom to top, so search elements are not overwritten before finding them, or "
         "the elements may be multiplied, if the search and add elements are the same. "
-        "When drawing a join element, GDash automatically selects backward search, if needed - so this setting is provided for compatiblity of old caves only.")},
+        "When drawing a join element, GDash automatically selects backward search, if needed - so this setting is provided for compatiblity of old caves only.")
+    },
     {NULL},
 };
 
-PropertyDescription const* CaveJoin::get_description_array() const
-{
+PropertyDescription const *CaveJoin::get_description_array() const {
     return descriptor;
 }
 
-std::string CaveJoin::get_coordinates_text() const
-{
+std::string CaveJoin::get_coordinates_text() const {
     return SPrintf("%+d,%+d") % dist.x % dist.y;
 }
 
@@ -101,8 +97,7 @@ std::string CaveJoin::get_coordinates_text() const
 /// Sets displacement and guesses if backwards searching is needed.
 /// Here it could be made automatic, as it is more intuitive, and
 /// BDCFF can code backward searches as well.
-void CaveJoin::create_drag(Coordinate current, Coordinate displacement)
-{
+void CaveJoin::create_drag(Coordinate current, Coordinate displacement) {
     dist+=displacement;
     /* when just created, guess backwards flag. */
     if (dist.y>0 || (dist.y==0 && dist.x>0))
@@ -111,18 +106,15 @@ void CaveJoin::create_drag(Coordinate current, Coordinate displacement)
         backwards=false;
 }
 
-void CaveJoin::move(Coordinate current, Coordinate displacement)
-{
+void CaveJoin::move(Coordinate current, Coordinate displacement) {
     dist+=displacement;
 }
 
-void CaveJoin::move(Coordinate displacement)
-{
+void CaveJoin::move(Coordinate displacement) {
     dist+=displacement;
 }
 
-std::string CaveJoin::get_description_markup() const
-{
-    return SPrintf(_("Join <b>%s</b> to every <b>%s</b>, distance %+d,%+d"))
-        % gd_element_properties[put_element].lowercase_name % gd_element_properties[search_element].lowercase_name % dist.x % dist.y;
+std::string CaveJoin::get_description_markup() const {
+    return SPrintf(_("Join <b>%ms</b> to every <b>%ms</b>, distance %+d,%+d"))
+           % gd_element_properties[put_element].lowercase_name % gd_element_properties[search_element].lowercase_name % dist.x % dist.y;
 }

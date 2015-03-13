@@ -55,36 +55,32 @@ inline guint32 RGBtoYUV(guint32 c) {
 }
 
 /* Test if there is difference in color */
-inline int Diff(guint32 w1, guint32 w2)
-{
+inline int Diff(guint32 w1, guint32 w2) {
     guint32 YUV1 = RGBtoYUV(w1);
     guint32 YUV2 = RGBtoYUV(w2);
-    return ( abs((YUV1 & Ymask) - (YUV2 & Ymask)) > trY )
-        || ( abs((YUV1 & Umask) - (YUV2 & Umask)) > trU )
-        || ( abs((YUV1 & Vmask) - (YUV2 & Vmask)) > trV );
+    return (abs((YUV1 & Ymask) - (YUV2 & Ymask)) > trY)
+           || (abs((YUV1 & Umask) - (YUV2 & Umask)) > trU)
+           || (abs((YUV1 & Vmask) - (YUV2 & Vmask)) > trV);
 }
 
 /* Interpolate functions */
-inline void Interp1(guint32 * pc, guint32 c1, guint32 c2)
-{
+inline void Interp1(guint32 *pc, guint32 c1, guint32 c2) {
     //*pc = (c1*3+c2)/4;
     if (c1 == c2) {
         *pc = c1;
         return;
     }
     *pc = ((((c1 & MASK_24)/4 * 3 + (c2 & MASK_24)/4)) & MASK_24)
-        + ((((c1 & MASK_13)/4 * 3 + (c2 & MASK_13)/4)) & MASK_13);
+          + ((((c1 & MASK_13)/4 * 3 + (c2 & MASK_13)/4)) & MASK_13);
 }
 
-inline void Interp2(guint32 * pc, guint32 c1, guint32 c2, guint32 c3)
-{
+inline void Interp2(guint32 *pc, guint32 c1, guint32 c2, guint32 c3) {
     //*pc = (c1*2+c2+c3)/4;
     *pc = ((((c1 & MASK_24)/4 * 2 + (c2 & MASK_24)/4 + (c3 & MASK_24)/4)) & MASK_24)
-        + ((((c1 & MASK_13)/4 * 2 + (c2 & MASK_13)/4 + (c3 & MASK_13)/4)) & MASK_13);
+          + ((((c1 & MASK_13)/4 * 2 + (c2 & MASK_13)/4 + (c3 & MASK_13)/4)) & MASK_13);
 }
 
-inline void Interp3(guint32 * pc, guint32 c1, guint32 c2)
-{
+inline void Interp3(guint32 *pc, guint32 c1, guint32 c2) {
     //*pc = (c1*7+c2)/8;
     if (c1 == c2) {
         *pc = c1;
@@ -94,15 +90,13 @@ inline void Interp3(guint32 * pc, guint32 c1, guint32 c2)
           ((((c1 & MASK_13)/8 * 7 + (c2 & MASK_13)/8)) & MASK_13);
 }
 
-inline void Interp4(guint32 * pc, guint32 c1, guint32 c2, guint32 c3)
-{
+inline void Interp4(guint32 *pc, guint32 c1, guint32 c2, guint32 c3) {
     //*pc = (c1*2+(c2+c3)*7)/16;
     *pc = ((((c1 & MASK_24)/16 * 2 + (c2 & MASK_24)/16 * 7 + (c3 & MASK_24)/16 * 7)) & MASK_24) +
           ((((c1 & MASK_13)/16 * 2 + (c2 & MASK_13)/16 * 7 + (c3 & MASK_13)/16 * 7)) & MASK_13);
 }
 
-inline void Interp5(guint32 * pc, guint32 c1, guint32 c2)
-{
+inline void Interp5(guint32 *pc, guint32 c1, guint32 c2) {
     //*pc = (c1+c2)/2;
     if (c1 == c2) {
         *pc = c1;
@@ -112,22 +106,19 @@ inline void Interp5(guint32 * pc, guint32 c1, guint32 c2)
           ((((c1 & MASK_13)/2 + (c2 & MASK_13)/2)) & MASK_13);
 }
 
-inline void Interp6(guint32 * pc, guint32 c1, guint32 c2, guint32 c3)
-{
+inline void Interp6(guint32 *pc, guint32 c1, guint32 c2, guint32 c3) {
     //*pc = (c1*5+c2*2+c3)/8;
     *pc = ((((c1 & MASK_24)/8 * 5 + (c2 & MASK_24)/8 * 2 + (c3 & MASK_24)/8)) & MASK_24) +
           ((((c1 & MASK_13)/8 * 5 + (c2 & MASK_13)/8 * 2 + (c3 & MASK_13)/8)) & MASK_13);
 }
 
-inline void Interp7(guint32 * pc, guint32 c1, guint32 c2, guint32 c3)
-{
+inline void Interp7(guint32 *pc, guint32 c1, guint32 c2, guint32 c3) {
     //*pc = (c1*6+c2+c3)/8;
     *pc = ((((c1 & MASK_24)/8 * 6 + (c2 & MASK_24)/8 + (c3 & MASK_24)/8)) & MASK_24) +
           ((((c1 & MASK_13)/8 * 6 + (c2 & MASK_13)/8 + (c3 & MASK_13)/8)) & MASK_13);
 }
 
-inline void Interp8(guint32 * pc, guint32 c1, guint32 c2)
-{
+inline void Interp8(guint32 *pc, guint32 c1, guint32 c2) {
     //*pc = (c1*5+c2*3)/8;
     if (c1 == c2) {
         *pc = c1;
@@ -137,15 +128,13 @@ inline void Interp8(guint32 * pc, guint32 c1, guint32 c2)
           ((((c1 & MASK_13)/8 * 5 + (c2 & MASK_13)/8 * 3)) & MASK_13);
 }
 
-inline void Interp9(guint32 * pc, guint32 c1, guint32 c2, guint32 c3)
-{
+inline void Interp9(guint32 *pc, guint32 c1, guint32 c2, guint32 c3) {
     //*pc = (c1*2+(c2+c3)*3)/8;
     *pc = ((((c1 & MASK_24)/8 * 2 + (c2 & MASK_24)/8 * 3 + (c3 & MASK_24)/8 * 3)) & MASK_24) +
           ((((c1 & MASK_13)/8 * 2 + (c2 & MASK_13)/8 * 3 + (c3 & MASK_13)/8 * 3)) & MASK_13);
 }
 
-inline void Interp10(guint32 * pc, guint32 c1, guint32 c2, guint32 c3)
-{
+inline void Interp10(guint32 *pc, guint32 c1, guint32 c2, guint32 c3) {
     //*pc = (c1*14+c2+c3)/16;
     *pc = ((((c1 & MASK_24)/16 * 14 + (c2 & MASK_24)/16 + (c3 & MASK_24)/16)) & MASK_24) +
           ((((c1 & MASK_13)/16 * 14 + (c2 & MASK_13)/16 + (c3 & MASK_13)/16)) & MASK_13);

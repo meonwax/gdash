@@ -28,18 +28,22 @@ class CaveRectangle : public CaveRectangular {
 public:
     CaveRectangle(Coordinate _p1, Coordinate _p2, GdElementEnum _element);
     CaveRectangle(): CaveRectangular(GD_RECTANGLE) {}
-    virtual CaveRectangle *clone() const { return new CaveRectangle(*this); };
+    virtual CaveRectangle *clone() const {
+        return new CaveRectangle(*this);
+    };
     virtual void draw(CaveRendered &cave) const;
     virtual std::string get_bdcff() const;
-    virtual CaveRectangle* clone_from_bdcff(const std::string &name, std::istream &is) const;
+    virtual CaveRectangle *clone_from_bdcff(const std::string &name, std::istream &is) const;
 
 private:
     static PropertyDescription const descriptor[];
 
 public:
-    virtual PropertyDescription const* get_description_array() const;
+    virtual PropertyDescription const *get_description_array() const;
 
-    virtual GdElementEnum get_characteristic_element() const { return element; }
+    virtual GdElementEnum get_characteristic_element() const {
+        return element;
+    }
     virtual std::string get_description_markup() const;
 };
 

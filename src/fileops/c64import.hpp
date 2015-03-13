@@ -48,10 +48,10 @@ public:
         GD_FORMAT_CRLI,         ///<  crazy light construction kit
         GD_FORMAT_CRDR_7,       ///<  crazy dream 7
         GD_FORMAT_FIRSTB,       ///<  first boulder
-        
+
         GD_FORMAT_UNKNOWN,      ///<  unknown format
     };
-    
+
     static char const *gd_format_strings[GD_FORMAT_UNKNOWN+1];
 
     enum ImportHack {
@@ -74,8 +74,8 @@ public:
     static void cave_set_engine_defaults(CaveStored &cave, GdEngineEnum engine);
 
     // import helper routines
-    typedef GdElementEnum (*ImportFuncArray) (unsigned char const data[], unsigned i);
-    typedef GdElementEnum (*ImportFuncByte) (unsigned char const c, unsigned i);
+    typedef GdElementEnum(*ImportFuncArray)(unsigned char const data[], unsigned i);
+    typedef GdElementEnum(*ImportFuncByte)(unsigned char const c, unsigned i);
 
     static GdElementEnum bd1_import(unsigned char const data[], unsigned i);
     static GdElementEnum bd1_import_byte(unsigned char const c, unsigned i);
@@ -90,7 +90,7 @@ public:
 
     static int slime_plck(unsigned c64_data);
     static GdString name_from_c64_bin(const unsigned char *data);
-    
+
     // import routines
     static int cave_copy_from_bd1(CaveStored &cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format, ImportHack hack);
     static int cave_copy_from_bd2(CaveStored &cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format);

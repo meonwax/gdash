@@ -33,8 +33,7 @@
 #include "framework/replaymenuactivity.hpp"
 
 ReplayMenuActivity::ReplayMenuActivity(App *app)
-: Activity(app)
-{
+    : Activity(app) {
     lines_per_page = (app->screen->get_height() / app->font_manager->get_line_height()) - 5;
 
     /* for all caves */
@@ -79,10 +78,10 @@ void ReplayMenuActivity::redraw_event() {
     app->title_line(CPrintf(_("Replays, Page %d/%d")) % (page+1) % (items.size()/lines_per_page+1));
     // TRANSLATORS: 40 chars max
     app->status_line(_("Space: play  F1: keys  Esc: exit"));
-    
+
     for (unsigned n=0; n<lines_per_page && page*lines_per_page+n<items.size(); n++) {
         unsigned pos=page*lines_per_page+n;
-        
+
         int y = (n+2) * app->font_manager->get_line_height();
 
         if (items[pos].cave && !items[pos].replay) {
@@ -93,10 +92,10 @@ void ReplayMenuActivity::redraw_event() {
         if (items[pos].replay) {
             /* level, successful/not, saved/not, player name  */
             app->blittext_n(0, y, CPrintf("  %c%c %c%c %cL%d, %s")
-                                  % GD_COLOR_INDEX_LIGHTBLUE % (items[pos].replay->saved?GD_CHECKED_BOX_CHAR:GD_UNCHECKED_BOX_CHAR)
-                                  % (items[pos].replay->success?GD_COLOR_INDEX_GREEN:GD_COLOR_INDEX_RED) % GD_BALL_CHAR
-                                  % (current==pos ? GD_COLOR_INDEX_YELLOW : GD_COLOR_INDEX_GRAY3)
-                                  % items[pos].replay->level % items[pos].replay->player_name);
+                            % GD_COLOR_INDEX_LIGHTBLUE % (items[pos].replay->saved?GD_CHECKED_BOX_CHAR:GD_UNCHECKED_BOX_CHAR)
+                            % (items[pos].replay->success?GD_COLOR_INDEX_GREEN:GD_COLOR_INDEX_RED) % GD_BALL_CHAR
+                            % (current==pos ? GD_COLOR_INDEX_YELLOW : GD_COLOR_INDEX_GRAY3)
+                            % items[pos].replay->level % items[pos].replay->player_name);
         }
     }
 
@@ -110,12 +109,11 @@ void ReplayMenuActivity::redraw_event() {
 class SaveReplayCommand: public Command1Param<std::string> {
 public:
     SaveReplayCommand(App *app, CaveStored *cave, CaveReplay *replay)
-    :
+        :
         Command1Param<std::string>(app),
         filename_prefix(p1),
         cave(cave),
-        replay(replay)
-    {
+        replay(replay) {
     }
 private:
     std::string &filename_prefix;
@@ -132,38 +130,37 @@ private:
 void ReplayMenuActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
     /* these keys are active also when there are replays and when there aren't any. */
     switch (keycode) {
-        case App::F1:
-            {
-                char const *help[]={
-                    _("Cursor keys"), _("Move"),
-                    // TRANSLATORS: play here means playing the replay movie
-                    _("Space, Enter"), _("Play"),
-                    "I", _("Show replay info"),
-                    "", "",
-                    // TRANSLATORS: this is for a checkbox which selects if the replays is to be saved with the cave or not.
-                    "S", _("Toggle if saved with caves"),
-/* the replay saver thing only works in the sdl version */
+        case App::F1: {
+            char const *help[]= {
+                _("Cursor keys"), _("Move"),
+                // TRANSLATORS: play here means playing the replay movie
+                _("Space, Enter"), _("Play"),
+                "I", _("Show replay info"),
+                "", "",
+                // TRANSLATORS: this is for a checkbox which selects if the replays is to be saved with the cave or not.
+                "S", _("Toggle if saved with caves"),
+                /* the replay saver thing only works in the sdl version */
 #ifdef HAVE_SDL
-                    "W", _("Save movie"),
+                "W", _("Save movie"),
 #endif /* IFDEF HAVE_SDL */
-                    "", "",
-                    "ESC", _("Main menu"),
-                    NULL
-                };
-                // TRANSLATORS: title of the cave replays window
-                app->show_text_and_do_command(_("Replays Help"), help_strings_to_string(help));
-            }
-            break;
+                "", "",
+                "ESC", _("Main menu"),
+                NULL
+            };
+            // TRANSLATORS: title of the cave replays window
+            app->show_text_and_do_command(_("Replays Help"), help_strings_to_string(help));
+        }
+        break;
         case App::Escape:
             app->enqueue_command(new PopActivityCommand(app));
             break;
     }
-    
+
     /* if no replays, the keys below should be inactive. so return. */
     if (items.empty())
         return;
-    
-    
+
+
     switch (keycode) {
         case App::Up:
             do {
@@ -186,34 +183,33 @@ void ReplayMenuActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
             redraw_event();
             break;
         case 'i':
-        case 'I':
-            {
-                std::string s;
-                CaveReplay *r = items[current].replay;
-                s += SPrintf("%c%s: %c%s\n") % GD_COLOR_INDEX_WHITE % _("Cave") % GD_COLOR_INDEX_YELLOW % items[current].cave->name;
-                // TRANSLATORS: Cave level (1-5)
-                s += SPrintf("%c%s: %c%d\n") % GD_COLOR_INDEX_WHITE % _("Level") % GD_COLOR_INDEX_YELLOW % r->level;
-                // TRANSLATORS: "player" here means the name of the human player who played the replay
-                s += SPrintf("%c%s: %c%s\n") % GD_COLOR_INDEX_WHITE % _("Player") % GD_COLOR_INDEX_YELLOW % r->player_name;
-                s += SPrintf("%c%s: %c%s\n") % GD_COLOR_INDEX_WHITE % _("Successful") % GD_COLOR_INDEX_LIGHTBLUE % (r->success ? _("yes") : _("no"));
-                s += SPrintf("%c%s: %c%d %s\n") % GD_COLOR_INDEX_WHITE % _("Score") % GD_COLOR_INDEX_LIGHTBLUE % r->score % _("points");
-                s += "\n";
-                if (r->comment != "")
-                    s += SPrintf("%c%s: %c%s\n") % GD_COLOR_INDEX_WHITE % _("Comment") % GD_COLOR_INDEX_LIGHTBLUE % r->comment;
-                if  (r->duration > 0) {
-                    // TRANSLATORS: duration of replay in seconds
-                    s += SPrintf("%c%s: %c%ds\n") % GD_COLOR_INDEX_WHITE % _("Duration") % GD_COLOR_INDEX_LIGHTBLUE % r->duration;
-                }
-                if (r->date != "")
-                    s += SPrintf("%c%s: %c%s\n") % GD_COLOR_INDEX_WHITE % _("Date") % GD_COLOR_INDEX_LIGHTBLUE % r->date;
-                if (r->recorded_with != "")
-                    // TRANSLATORS: ie. software by which the replay was recorded.
-                    s += SPrintf("%c%s: %c%s\n") % GD_COLOR_INDEX_WHITE % _("Recorded with") % GD_COLOR_INDEX_LIGHTBLUE % r->recorded_with;
-                
-                // TRANSLATORS: title of the window showing data about a particular replay
-                app->show_message(_("Replay Info"), s);
+        case 'I': {
+            std::string s;
+            CaveReplay *r = items[current].replay;
+            s += SPrintf("%c%s: %c%s\n") % GD_COLOR_INDEX_WHITE % _("Cave") % GD_COLOR_INDEX_YELLOW % items[current].cave->name;
+            // TRANSLATORS: Cave level (1-5)
+            s += SPrintf("%c%s: %c%d\n") % GD_COLOR_INDEX_WHITE % _("Level") % GD_COLOR_INDEX_YELLOW % r->level;
+            // TRANSLATORS: "player" here means the name of the human player who played the replay
+            s += SPrintf("%c%s: %c%s\n") % GD_COLOR_INDEX_WHITE % _("Player") % GD_COLOR_INDEX_YELLOW % r->player_name;
+            s += SPrintf("%c%s: %c%s\n") % GD_COLOR_INDEX_WHITE % _("Successful") % GD_COLOR_INDEX_LIGHTBLUE % (r->success ? _("yes") : _("no"));
+            s += SPrintf("%c%s: %c%d %s\n") % GD_COLOR_INDEX_WHITE % _("Score") % GD_COLOR_INDEX_LIGHTBLUE % r->score % _("points");
+            s += "\n";
+            if (r->comment != "")
+                s += SPrintf("%c%s: %c%s\n") % GD_COLOR_INDEX_WHITE % _("Comment") % GD_COLOR_INDEX_LIGHTBLUE % r->comment;
+            if (r->duration > 0) {
+                // TRANSLATORS: duration of replay in seconds
+                s += SPrintf("%c%s: %c%ds\n") % GD_COLOR_INDEX_WHITE % _("Duration") % GD_COLOR_INDEX_LIGHTBLUE % r->duration;
             }
-            break;
+            if (r->date != "")
+                s += SPrintf("%c%s: %c%s\n") % GD_COLOR_INDEX_WHITE % _("Date") % GD_COLOR_INDEX_LIGHTBLUE % r->date;
+            if (r->recorded_with != "")
+                // TRANSLATORS: ie. software by which the replay was recorded.
+                s += SPrintf("%c%s: %c%s\n") % GD_COLOR_INDEX_WHITE % _("Recorded with") % GD_COLOR_INDEX_LIGHTBLUE % r->recorded_with;
+
+            // TRANSLATORS: title of the window showing data about a particular replay
+            app->show_message(_("Replay Info"), s);
+        }
+        break;
         case 's':
         case 'S':
             if (items[current].replay) {
@@ -222,16 +218,15 @@ void ReplayMenuActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
                 redraw_event();
             }
             break;
-/* the replay saver thing only works in the sdl version */
+            /* the replay saver thing only works in the sdl version */
 #ifdef HAVE_SDL
         case 'w':
-        case 'W':
-            {
-                std::string prefix = SPrintf("%s%sout") % gd_last_folder % G_DIR_SEPARATOR;
-                // TRANSLATE: the prefix of the name of the output files when saving the replay.
-                app->input_text_and_do_command(_("Output filename prefix"), prefix.c_str(), new SaveReplayCommand(app, items[current].cave, items[current].replay));
-            }
-            break;
+        case 'W': {
+            std::string prefix = SPrintf("%s%sout") % gd_last_folder % G_DIR_SEPARATOR;
+            // TRANSLATE: the prefix of the name of the output files when saving the replay.
+            app->input_text_and_do_command(_("Output filename prefix"), prefix.c_str(), new SaveReplayCommand(app, items[current].cave, items[current].replay));
+        }
+        break;
 #endif /* IFDEF HAVE_SDL */
         case ' ':
         case App::Enter:

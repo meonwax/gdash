@@ -25,26 +25,30 @@ class CavePoint: public CaveObject {
 private:
     Coordinate p;
     GdElement element;
-    
+
 public:
     CavePoint(Coordinate _p, GdElementEnum _element);
     CavePoint(): CaveObject(GD_POINT) {}
     virtual void draw(CaveRendered &cave) const;
-    virtual CavePoint *clone() const { return new CavePoint(*this); };
+    virtual CavePoint *clone() const {
+        return new CavePoint(*this);
+    };
     virtual std::string get_bdcff() const;
-    virtual CavePoint* clone_from_bdcff(const std::string &name, std::istream &is) const;
+    virtual CavePoint *clone_from_bdcff(const std::string &name, std::istream &is) const;
 
 private:
     static PropertyDescription const descriptor[];
 
 public:
-    virtual PropertyDescription const* get_description_array() const;
+    virtual PropertyDescription const *get_description_array() const;
 
     virtual void create_drag(Coordinate current, Coordinate displacement);
     virtual void move(Coordinate current, Coordinate displacement);
     virtual void move(Coordinate displacement);
     virtual std::string get_coordinates_text() const;
-    virtual GdElementEnum get_characteristic_element() const { return element; }
+    virtual GdElementEnum get_characteristic_element() const {
+        return element;
+    }
     virtual std::string get_description_markup() const;
 };
 

@@ -54,22 +54,26 @@ public:
     HighScoreTable highscore;       ///< highscore table for caveset
 
     GdBool edited;                  ///< changed since last save
-    GdInt last_selected_cave;
-    GdInt last_selected_level;
-    GdString filename;              ///< Loaded from file
+    GdString filename;              ///< Loaded from / save to this file
+    GdInt last_selected_cave;       ///< If running a game, the index of the selected gave is stored here
+    GdInt last_selected_level;      ///< If running a game, the level of the selected gave is stored here
 
     AdoptingContainer<CaveStored> caves;
 
     /* highscore in config directory */
-    void save_highscore(const char* directory) const;
-    bool load_highscore(const char* directory);
+    void save_highscore(const char *directory) const;
+    bool load_highscore(const char *directory);
 
-    void save_to_file(const char *filename) throw (std::runtime_error);
+    void save_to_file(const char *filename) throw(std::runtime_error);
     void set_name_from_filename(const char *filename);
 
     bool has_replays();
-    bool has_caves() const { return !caves.empty(); }
-    CaveStored& cave(unsigned i) const { return *(caves.at(i)); }
+    bool has_caves() const {
+        return !caves.empty();
+    }
+    CaveStored &cave(unsigned i) const {
+        return *(caves.at(i));
+    }
     int cave_index(CaveStored const *cave) const;
     int first_selectable_cave_index() const;
 
@@ -80,7 +84,9 @@ private:
 // for reflective
 public:
     static PropertyDescription const descriptor[];
-    virtual PropertyDescription const *get_description_array() const { return descriptor; }
+    virtual PropertyDescription const *get_description_array() const {
+        return descriptor;
+    }
 };
 
 extern const char *gd_caveset_extensions[];

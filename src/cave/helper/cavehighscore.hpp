@@ -36,18 +36,28 @@ class HighScoreTable {
 private:
     std::vector<HighScore> table;   ///< The table
     enum { GD_HIGHSCORE_NUM=20 };   ///< Maximum size
-    
+
 public:
     /// Return nth entry
-    HighScore& operator[](unsigned n) { return table.at(n); }
-    const HighScore& operator[](unsigned n) const { return table.at(n); }
+    HighScore &operator[](unsigned n) {
+        return table.at(n);
+    }
+    const HighScore &operator[](unsigned n) const {
+        return table.at(n);
+    }
     /// Check if the table has at least one entry. @return True, if there is an entry.
-    bool has_highscore() { return !table.empty(); }
+    bool has_highscore() {
+        return !table.empty();
+    }
     bool is_highscore(int score) const;
 
     int add(const std::string &name, int score);
-    void clear() { table.clear(); }
-    unsigned size() const { return table.size(); }
+    void clear() {
+        table.clear();
+    }
+    unsigned size() const {
+        return table.size();
+    }
 };
 
 #endif

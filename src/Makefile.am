@@ -190,12 +190,14 @@ gtksources = \
 	gtk/gtkmainwindow.cpp \
 	sdl/sdlpixbuf.cpp \
 	sdl/sdlpixmap.cpp \
+	sdl/sdlabstractscreen.cpp \
 	sdl/sdlscreen.cpp \
 	sdl/sdlpixbuffactory.cpp \
+	sdl/ogl.cpp \
 	sdl/sdlgameinputhandler.cpp \
 	sdl/sdlmainwindow.cpp \
 	sdl/IMG_savepng.c \
-	sdl/gfxprim.cpp \
+	sdl/sdlparticle.cpp \
 	gtkmain.cpp
 
 gtkheaders = \
@@ -217,11 +219,13 @@ gtkheaders = \
 	gtk/gtkmainwindow.hpp \
 	sdl/sdlpixbuf.hpp \
 	sdl/sdlpixmap.hpp \
+	sdl/sdlabstractscreen.hpp \
 	sdl/sdlscreen.hpp \
 	sdl/sdlpixbuffactory.hpp \
+	sdl/ogl.hpp \
 	sdl/sdlgameinputhandler.hpp \
 	sdl/sdlmainwindow.hpp \
-	sdl/gfxprim.hpp \
+	sdl/sdlparticle.hpp \
 	sdl/IMG_savepng.h
 
 
@@ -236,12 +240,12 @@ noinst_HEADERS = \
 
 
 
-gdash_CPPFLAGS = -g -Wall -DGDASH_GTK @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@ @LIBPNG_CFLAGS@
+gdash_CPPFLAGS = -g -Wall -DGDASH_GTK @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@ @GL_CFLAGS@ @LIBPNG_CFLAGS@
 gdash_LDFLAGS = -g -Wall
 if SDL
     GDASH_LIBADD=-lSDL_mixer -lSDL_image
 endif
-gdash_LDADD = @GTK_LIBS@ @GLIB_LIBS@ @LIBINTL@ @SDL_LIBS@ @LIBPNG_LIBS@ $(GDASH_LIBADD)
+gdash_LDADD = @GTK_LIBS@ @GLIB_LIBS@ @LIBINTL@ @SDL_LIBS@ @GL_LIBS@ @LIBPNG_LIBS@ $(GDASH_LIBADD)
 gdash_SOURCES = \
 	$(base_sources) \
 	$(gtksources) \

@@ -26,18 +26,18 @@ class App;
  * @brief An activity object is a mini-application controlled by the user in the
  * game - for example the title screen, a file selection dialog or the game
  * playing.
- * 
+ *
  * The activity objects are managed by an App object, which organizes them in
  * a stack. Every user event (keypress etc.) is always sent to the topmost activity,
  * which is an instance of a derived class of this Activity class.
- * 
+ *
  * Activities are free to do just like anything to the screen. They can measure time
  * by overloading the Activity::timer_event() function; they can receive keypresses
  * by overloading the Activity::keypress_event() function. They are notified when
  * they become the topmost one by calling their Activity::shown_event() method,
  * and when occluded by a new activity, by their Activity::hidden_event() method.
  * Their redraw_event() is called by the App object, when they must redraw the screen.
- * 
+ *
  * Activities can enqueue Command objects in the queue of the App. After calling any
  * of the event methods, the App will check if there are any commands enqueued. If so,
  * they are executed, and this way the activities can control the flow of the whole
@@ -55,7 +55,7 @@ public:
      * Pure virtual, but implemented in the cpp file: a trick to make
      * this an abstract base class. */
     virtual ~Activity() = 0;
-    
+
     /**
      * Inform the Activity object about time elapsing.
      * @param ms_elapsed The number of milliseconds elapsed. These are
@@ -112,7 +112,7 @@ protected:
 private:
     Activity(Activity const &);       ///< Not meant to be copied.
     void operator=(Activity const &); ///< Not meant to be assigned.
-    
+
 };
 
 #endif // GD_ACTIVITY_H

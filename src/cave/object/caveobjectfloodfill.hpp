@@ -31,15 +31,17 @@ public:
     CaveFloodFill(Coordinate _start, GdElementEnum _fill_element, GdElementEnum _search_element);
     CaveFloodFill(): CaveFill(GD_FLOODFILL_REPLACE) {}
     virtual void draw(CaveRendered &cave) const;
-    virtual CaveFloodFill *clone() const { return new CaveFloodFill(*this); };
+    virtual CaveFloodFill *clone() const {
+        return new CaveFloodFill(*this);
+    };
     virtual std::string get_bdcff() const;
-    virtual CaveFloodFill* clone_from_bdcff(const std::string &name, std::istream &is) const;
+    virtual CaveFloodFill *clone_from_bdcff(const std::string &name, std::istream &is) const;
 
 private:
     static PropertyDescription const descriptor[];
 
 public:
-    virtual PropertyDescription const* get_description_array() const;
+    virtual PropertyDescription const *get_description_array() const;
 
     virtual std::string get_description_markup() const;
 };

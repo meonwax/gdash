@@ -16,8 +16,8 @@
 #include "config.h"
 
 #ifdef HAVE_SDL
-    #include <SDL/SDL.h>
-    #include <SDL/SDL_mixer.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_mixer.h>
 #endif
 
 #include <glib.h>
@@ -33,11 +33,11 @@
 
 /**
     @file sound/sound.cpp
-    
+
     SDL Sound routines.
 
     The C64 sound chip (the SID) had 3 channels. Boulder Dash used all 3 of them.
-    
+
     Different channels were used for different sounds.
 
     - Channel 1: Small sounds, ie. diamonds falling, boulders rolling.
@@ -46,7 +46,7 @@
 
     - Channel 3: amoeba sound, magic wall sound,
         cave cover & uncover sound, and the crack sound (gate open)
-    
+
     Sounds have precedence over each other. Ie. the crack sound is given precedence
     over other sounds (amoeba, for example.)
     Different channels also behave differently. Channel 2 sounds are not stopped, ie.
@@ -100,19 +100,19 @@ void gd_sound_set_chunk_volumes() {
 
 #ifdef HAVE_SDL
 static void loadsound(GdSound which, const char *filename) {
-    g_assert(!gd_sound_is_fake(which));    
+    g_assert(!gd_sound_is_fake(which));
     g_assert(mixer_started);
-    /* make sure sound isn't already loaded */    
+    /* make sure sound isn't already loaded */
     if (sounds[which]!=NULL)
         Mix_FreeChunk(sounds[which]);
-    
+
     std::string full_filename=gd_find_data_file(filename, gd_sound_dirs);
     if (full_filename=="") {
         /* if cannot find file, exit now */
         gd_message(CPrintf("%s: no such sound file") % filename);
         return;
     }
-        
+
     sounds[which]=Mix_LoadWAV(full_filename.c_str());
     if (sounds[which]==NULL)
         gd_message(CPrintf("%s: %s") % filename % Mix_GetError());
@@ -148,7 +148,7 @@ static void set_channel_panning(int channel, int dx, int dy) {
 static void play_sound(int channel, SoundWithPos sound) {
     /* channel 1 and channel 4 are used alternating */
     /* channel 2 and channel 5 are used alternating */
-    static const GdSound diamond_sounds[]={
+    static const GdSound diamond_sounds[]= {
         GD_S_DIAMOND_1,
         GD_S_DIAMOND_2,
         GD_S_DIAMOND_3,
@@ -163,14 +163,14 @@ static void play_sound(int channel, SoundWithPos sound) {
     if (gd_classic_sound)
         if (!gd_sound_is_classic(sound.sound))
             sound.sound = gd_sound_classic_equivalent(sound.sound);
-    /* no sound is possible, as not all sounds have classic equivalent */    
+    /* no sound is possible, as not all sounds have classic equivalent */
     if (sound.sound == GD_S_NONE)
         return;
 
     /* change diamond falling random to a selected diamond falling sound. */
     if (sound.sound == GD_S_DIAMOND_RANDOM)
         sound.sound = diamond_sounds[g_random_int_range(0, G_N_ELEMENTS(diamond_sounds))];
-    
+
     /* at this point, fake sounds should have been changed to normal sounds */
     g_assert(!gd_sound_is_fake(sound.sound));
 
@@ -187,14 +187,14 @@ gboolean gd_sound_init(unsigned int bufsize) {
 #ifdef HAVE_SDL
     g_assert(!mixer_started);
     mixer_started=false;
-    
+
     for (unsigned i=0; i<G_N_ELEMENTS(snd_playing); i++)
         snd_playing[i]=GD_S_NONE;
 
     // if sound turned off by user, return now
     if (!gd_sound_enabled)
         return TRUE;
-    
+
     if (SDL_InitSubSystem(SDL_INIT_AUDIO)<0) {
         gd_message(SDL_GetError());
         return FALSE;
@@ -206,11 +206,11 @@ gboolean gd_sound_init(unsigned int bufsize) {
     mixer_started=true;
     /* add callback when a sound stops playing */
     Mix_ChannelFinished(channel_done);
-    
+
     for (unsigned i=0; i<GD_S_MAX; i++)
         if (gd_sound_get_filename(GdSound(i))!=NULL)
             loadsound(GdSound(i), gd_sound_get_filename(GdSound(i)));
-    
+
     return TRUE;
 #else
     /* if compiled without sound support, return TRUE, "sound init successful" */
@@ -224,7 +224,7 @@ void gd_sound_close() {
         return;
 
     gd_sound_off();
-    Mix_CloseAudio();    
+    Mix_CloseAudio();
     for (unsigned i=0; i<GD_S_MAX; i++)
         if (sounds[i]!=0) {
             Mix_FreeChunk(sounds[i]);
@@ -270,16 +270,16 @@ void gd_sound_play_sounds(SoundWithPos const &sound1, SoundWithPos const &sound2
         if (gd_sound_is_looped(sound_playing(1)))
             halt_channel(1);
     }
-    
+
     /* CHANNEL 2 is for walking, explosions */
     /* if no sound requested, do nothing. */
     if (sound2.sound!=GD_S_NONE) {
         gboolean play=FALSE;
-        
+
         /* always start if not currently playing a sound. */
         if (sound_playing(2)==GD_S_NONE
-            || gd_sound_force_start(sound2.sound)
-            || gd_sound_get_precedence(sound2.sound)>gd_sound_get_precedence(sound_playing(2)))
+                || gd_sound_force_start(sound2.sound)
+                || gd_sound_get_precedence(sound2.sound)>gd_sound_get_precedence(sound_playing(2)))
             play=TRUE;
 
         /* if figured out to play: do it. */
@@ -291,7 +291,7 @@ void gd_sound_play_sounds(SoundWithPos const &sound1, SoundWithPos const &sound2
         if (gd_sound_is_looped(sound_playing(2)))
             halt_channel(2);
     }
-    
+
     /* CHANNEL 3 is for crack sound, amoeba and magic wall. */
     if (sound3.sound!=GD_S_NONE) {
         /* if requests a non-looped sound, play that immediately. that can be a crack sound, gravity change, new life, ... */
@@ -327,10 +327,10 @@ void gd_music_play_random() {
     if (!mixer_started || !gd_sound_enabled)
         return;
 
-    /* if already playing, do nothing */    
+    /* if already playing, do nothing */
     if (Mix_PlayingMusic())
         return;
-        
+
     Mix_FreeMusic(music);
     music=NULL;
 
@@ -338,9 +338,9 @@ void gd_music_play_random() {
         const char *name;    /* name of file */
         const char *opened;        /* directory we use */
         GDir *musicdir;
-        
+
         music_dir_read=true;
-        
+
         opened=gd_system_music_dir;
         musicdir=g_dir_open(opened, 0, NULL);
         if (!musicdir) {
@@ -350,18 +350,18 @@ void gd_music_play_random() {
         }
         if (!musicdir)
             return;            /* if still cannot open, return now */
-        
+
         while ((name=g_dir_read_name(musicdir))) {
             if (g_str_has_suffix(name, ".ogg"))
                 music_filenames.push_back(g_build_filename(opened, name, NULL));
         }
         g_dir_close(musicdir);
     }
-    
+
     /* if loaded dir contents, but no file found */
     if (music_filenames.empty())
         return;
-    
+
     music=Mix_LoadMUS(music_filenames[g_random_int_range(0, music_filenames.size())]);
     if (!music)
         gd_message(SDL_GetError());
@@ -376,8 +376,8 @@ void gd_music_stop() {
 #ifdef HAVE_SDL
     if (!mixer_started)
         return;
-    
+
     if (Mix_PlayingMusic())
-        Mix_FadeOutMusic(200);
+        Mix_FadeOutMusic(120);
 #endif
 }

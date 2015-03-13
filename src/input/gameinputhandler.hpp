@@ -36,7 +36,7 @@ public:
     struct KeyAssignment {
         Keys index;
         int &gfxlib_keycode;
-        bool GameInputHandler::* ptr;
+        bool GameInputHandler::*ptr;
     };
 
     GameInputHandler();

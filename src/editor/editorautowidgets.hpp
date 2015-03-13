@@ -21,19 +21,19 @@
 #include <gtk/gtkwidget.h>
 
 class Reflective;
-class PropertyDescription;
+struct PropertyDescription;
 
 class EditorAutoUpdate {
 private:
-    EditorAutoUpdate(EditorAutoUpdate const&);      // deliberately not implemented
-    void operator=(EditorAutoUpdate const&);        // deliberately not implemented
+    EditorAutoUpdate(EditorAutoUpdate const &);     // deliberately not implemented
+    void operator=(EditorAutoUpdate const &);       // deliberately not implemented
 public:
     Reflective *r;                      ///< A reflective object to work on
     Reflective *def;                    ///< A reflective object, if any, which stores default value
     PropertyDescription const *descr;   ///< A pointer to the description of the property this is working on
     GtkWidget *widget;                  ///< A widget to show on the screen. May not be the widget which stores data!
     bool expand_vertically;             ///< For longstrings - fill window with widget.
-    
+
     void update_cave() const;
     void reload() const;
     EditorAutoUpdate(Reflective *r, Reflective *def, PropertyDescription const *descr, void (*cave_update_cb)());

@@ -38,6 +38,7 @@ private:
     unsigned numsettings, numpages, current, yd;
     std::vector<int> y1;
     std::vector<std::string> themes;
+    bool have_theme;
     int themenum;
     bool restart;
 };

@@ -46,7 +46,7 @@ private:
 public:
     /// Default ctor, which constructs a NULL smartpointer.
     SmartPtr() : rawptr(NULL), counter(NULL) {}
-    
+
     /// Create a smart pointer, optionally pointing to a newly allocated
     /// object. If the pointer given as the first parameter is not NULL,
     /// it must have been allocated with new, and no other SmartPtr objects
@@ -58,21 +58,21 @@ public:
         if (rawptr != NULL)
             counter = new int(1);
     }
-    
+
     /// Simple copy ctor.
     /// @param the_other The other smart pointer to share the managed object with.
     SmartPtr(SmartPtr const &the_other) {
         copy(the_other);
     }
-    
+
     /// Templated copy ctor to allow smart pointers to handle inheritance
     /// relationships between objects pointed to.
     /// @param the_other The other smart pointer to share the managed object with.
-    template <typename U>    
+    template <typename U>
     SmartPtr(SmartPtr<U> const &the_other) {
         copy(the_other);
     }
-    
+
     /// Simple assignment operator. May delete the object that was pointed to.
     /// @param the_other The other smart pointer to share the managed object with.
     SmartPtr &operator=(SmartPtr const &the_other) {
@@ -82,7 +82,7 @@ public:
         }
         return *this;
     }
-    
+
     /// Templated assignment operator to allow smart pointers to handle inheritance
     /// relationships between objects pointed to.
     /// @param the_other The other smart pointer to share the managed object with.
@@ -94,32 +94,32 @@ public:
         }
         return *this;
     }
-    
+
     /// Destructor. If the destructed smart pointer was the last one pointing to
     /// the managed object, it will be deleted.
     ~SmartPtr() {
         release();
     }
-    
+
     /// Dereferencing.
     T &operator*() const {
         if (rawptr == NULL)
             throw std::logic_error("Null SmartPtr");
         return *rawptr;
     }
-    
+
     /// Dereferencing.
     T *operator->() const {
         if (rawptr == NULL)
             throw std::logic_error("Null SmartPtr");
         return rawptr;
     }
-    
+
     /// Compare for equality: two smart pointers are equal if they point to the same object.
     bool operator==(void *ptr) const {
         return rawptr == ptr;
     }
-    
+
     /// Compare for inequality: two smart pointers are inequal if they point to different objects.
     bool operator!=(void *ptr) const {
         return rawptr != ptr;

@@ -25,8 +25,7 @@
 #include "cave/caverendered.hpp"
 #include "misc/printf.hpp"
 
-std::string CaveFillRect::get_bdcff() const
-{
+std::string CaveFillRect::get_bdcff() const {
     BdcffFormat f("FillRect");
     f << p1 << p2 << border_element;
     if (border_element!=fill_element)
@@ -35,8 +34,7 @@ std::string CaveFillRect::get_bdcff() const
     return f;
 }
 
-CaveFillRect* CaveFillRect::clone_from_bdcff(const std::string &name, std::istream &is) const
-{
+CaveFillRect *CaveFillRect::clone_from_bdcff(const std::string &name, std::istream &is) const {
     Coordinate p1, p2;
     std::string s;
     GdElementEnum element, element_fill;
@@ -45,8 +43,7 @@ CaveFillRect* CaveFillRect::clone_from_bdcff(const std::string &name, std::istre
     if (is >> s) {  /* optional paramter - yuck */
         std::istringstream is(s);
         is >> element_fill;
-    }
-    else
+    } else
         element_fill=element;
 
     return new CaveFillRect(p1, p2, element, element_fill);
@@ -54,14 +51,12 @@ CaveFillRect* CaveFillRect::clone_from_bdcff(const std::string &name, std::istre
 
 /// Create filled rectangle cave object.
 CaveFillRect::CaveFillRect(Coordinate _p1, Coordinate _p2, GdElementEnum _element, GdElementEnum _fill_element)
-:   CaveRectangular(GD_FILLED_RECTANGLE, _p1, _p2),
-    border_element(_element),
-    fill_element(_fill_element)
-{
+    :   CaveRectangular(GD_FILLED_RECTANGLE, _p1, _p2),
+        border_element(_element),
+        fill_element(_fill_element) {
 }
 
-void CaveFillRect::draw(CaveRendered &cave) const
-{
+void CaveFillRect::draw(CaveRendered &cave) const {
     /* reorder coordinates if not drawing from northwest to southeast */
     int x1=p1.x;
     int y1=p1.y;
@@ -87,13 +82,11 @@ PropertyDescription const CaveFillRect::descriptor[] = {
     {NULL},
 };
 
-PropertyDescription const* CaveFillRect::get_description_array() const
-{
+PropertyDescription const *CaveFillRect::get_description_array() const {
     return descriptor;
 }
 
-std::string CaveFillRect::get_description_markup() const
-{
-    return SPrintf(_("Rectangle from %d,%d to %d,%d of <b>%s</b>, filled with <b>%s</b>"))
-        % p1.x % p1.y % p2.x % p2.y % gd_element_properties[border_element].lowercase_name % gd_element_properties[fill_element].lowercase_name;
+std::string CaveFillRect::get_description_markup() const {
+    return SPrintf(_("Rectangle from %d,%d to %d,%d of <b>%ms</b>, filled with <b>%ms</b>"))
+           % p1.x % p1.y % p2.x % p2.y % gd_element_properties[border_element].lowercase_name % gd_element_properties[fill_element].lowercase_name;
 }

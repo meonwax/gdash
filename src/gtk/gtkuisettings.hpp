@@ -16,25 +16,27 @@
 
 #include "config.h"
 
-#include <glib/gi18n.h>
 #include <gtk/gtk.h>
-#include <cstring>
-#include "misc/printf.hpp"
-#include "settings.hpp"
-
 
 class Setting;
 class PixbufFactory;
 
-struct SettingsWindow {
+/**
+ * A collection of functions which implement a settings dialog in GTK+.
+ * A Setting array can be given, and the window will be automatically
+ * generated and run modally.
+ */
+class SettingsWindow {
+private:
     static void bool_toggle(GtkWidget *widget, gpointer data);
     static void int_change(GtkWidget *widget, gpointer data);
     static void stringv_change(GtkWidget *widget, gpointer data);
+    static void theme_change(GtkWidget *widget, gpointer data);
     static GtkWidget *combo_box_new_from_stringv(const char **str);
     static GtkWidget *combo_box_new_from_themelist(std::vector<std::string> const &strings);
-    static void do_settings_dialog(Setting *settings, PixbufFactory &pf);
-
-    static gboolean keysim_button_keypress_event(GtkWidget* widget, GdkEventKey* event, gpointer data);
+    static gboolean keysim_button_keypress_event(GtkWidget *widget, GdkEventKey *event, gpointer data);
     static void keysim_button_clicked_cb(GtkWidget *button, gpointer data);
-    static GtkWidget *gd_keysim_button(const char *what_for, int *keyval);
+    static GtkWidget *gd_keysim_button(Setting *setting);
+public:
+    static bool do_settings_dialog(Setting *settings, PixbufFactory &pf);
 };

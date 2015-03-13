@@ -29,7 +29,7 @@ class MessageActivity: public Activity {
 public:
     MessageActivity(App *app, std::string const &primary, std::string const &secondary = "", SmartPtr<Command> command_after_exit = SmartPtr<Command>());
     ~MessageActivity();
-    
+
     virtual void redraw_event();
     virtual void keypress_event(KeyCode keycode, int gfxlib_keycode);
 

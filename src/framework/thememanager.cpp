@@ -81,8 +81,7 @@ void load_themes_list(PixbufFactory &pf, std::vector<std::string> &themes, int &
         for (unsigned n = 1; n < themes.size(); n++)
             if (themes[n] == gd_theme)
                 themenum = n;
-    }
-    else
+    } else
         themenum = 0;
     if (themenum == -1) {
         gd_warning(CPrintf("theme %s not found in array") % gd_theme);
@@ -104,7 +103,7 @@ std::string filename_for_new_theme(const char *theme_to_install) {
     g_free(lowercase);
     g_free(utf8);
     g_free(basename);
-    
+
     std::string ret = new_filename;
     g_free(new_filename);
     return ret;

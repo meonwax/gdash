@@ -40,12 +40,12 @@ class CellRenderer {
 protected:
     /// The pixbuf which was loaded from the disk.
     Pixbuf *loaded;
-    
+
     /// The pixbuf which stores rgb data of all images.
     Pixbuf *cells_all;
-    
+
     bool is_c64_colored;
-    
+
     /// The size of the loaded pixbufs
     unsigned cell_size;
 
@@ -60,26 +60,26 @@ protected:
 
     void create_colorized_cells();
     bool loadcells_image(Pixbuf *loadcells_image);
-    bool loadcells_file(const std::string& filename);
+    bool loadcells_file(const std::string &filename);
     virtual void remove_cached();
-    
-    CellRenderer(const CellRenderer&);  // not implemented
-    CellRenderer& operator=(const CellRenderer&);   // not implemented
-    
+
+    CellRenderer(const CellRenderer &); // not implemented
+    CellRenderer &operator=(const CellRenderer &);  // not implemented
+
 public:
     /// The pixbuf factory which is used to create pixbufs and pixmaps.
     /// Public, so can be used by other objects - why not.
-    PixbufFactory& pixbuf_factory;
+    PixbufFactory &pixbuf_factory;
 
     /// Constructor. Loads a theme file (or nothing); uses pixbuf_factory as a gfx engine.
-    CellRenderer(PixbufFactory& pixbuf_factory_, const std::string& theme_file);
+    CellRenderer(PixbufFactory &pixbuf_factory_, const std::string &theme_file);
 
     /// Destructor.
     virtual ~CellRenderer();
 
     /// @brief Loads a new theme.
     /// The theme_file can be a file name of a png file, or empty.
-    void load_theme_file(const std::string& theme_file);
+    void load_theme_file(const std::string &theme_file);
 
     /// @brief Returns a particular cell.
     Pixbuf &cell_pixbuf(unsigned i);
@@ -90,23 +90,21 @@ public:
     /// @brief Returns the size of the pixmaps stored.
     /// They are squares, so there is only one function, not two for width and height.
     int get_cell_size();
-    
+
     /// @brief Returns the size of the pixbufs
     /// They are squares, so there is only one function, not two for width and height.
-    int get_cell_pixbuf_size()
-    {
+    int get_cell_pixbuf_size() {
         return cell_size;
     }
 
     /// Returns the background color currently used.
-    const GdColor& get_background_color() const
-    {
+    const GdColor &get_background_color() const {
         return color0;
     }
-    
+
     /// Returns true if the pixbuf factory used uses pal emulation.
     bool get_pal_emulation() const;
-    
+
     /// @brief Select a color theme, when using C64 graphics.
     /// If no c64 graphics is used, then this function does nothing.
     virtual void select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5);

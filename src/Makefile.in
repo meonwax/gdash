@@ -57,7 +57,9 @@ subdir = src
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_gl.m4 \
+	$(top_srcdir)/m4/ax_lang_compiler_ms.m4 \
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -121,11 +123,11 @@ am__objects_2 = gdash-gtkpixbuf.$(OBJEXT) gdash-gtkpixmap.$(OBJEXT) \
 	gdash-exportcrli.$(OBJEXT) gdash-editor.$(OBJEXT) \
 	gdash-help.$(OBJEXT) gdash-gtkapp.$(OBJEXT) \
 	gdash-gtkmainwindow.$(OBJEXT) gdash-sdlpixbuf.$(OBJEXT) \
-	gdash-sdlpixmap.$(OBJEXT) gdash-sdlscreen.$(OBJEXT) \
-	gdash-sdlpixbuffactory.$(OBJEXT) \
-	gdash-sdlgameinputhandler.$(OBJEXT) \
+	gdash-sdlpixmap.$(OBJEXT) gdash-sdlabstractscreen.$(OBJEXT) \
+	gdash-sdlscreen.$(OBJEXT) gdash-sdlpixbuffactory.$(OBJEXT) \
+	gdash-ogl.$(OBJEXT) gdash-sdlgameinputhandler.$(OBJEXT) \
 	gdash-sdlmainwindow.$(OBJEXT) gdash-IMG_savepng.$(OBJEXT) \
-	gdash-gfxprim.$(OBJEXT) gdash-gtkmain.$(OBJEXT)
+	gdash-sdlparticle.$(OBJEXT) gdash-gtkmain.$(OBJEXT)
 am_gdash_OBJECTS = $(am__objects_1) $(am__objects_2)
 gdash_OBJECTS = $(am_gdash_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -206,6 +208,8 @@ GLIB_COMPILE_RESOURCES = @GLIB_COMPILE_RESOURCES@
 GLIB_GENMARSHAL = @GLIB_GENMARSHAL@
 GLIB_LIBS = @GLIB_LIBS@
 GLIB_MKENUMS = @GLIB_MKENUMS@
+GL_CFLAGS = @GL_CFLAGS@
+GL_LIBS = @GL_LIBS@
 GMSGFMT = @GMSGFMT@
 GMSGFMT_015 = @GMSGFMT_015@
 GOBJECT_QUERY = @GOBJECT_QUERY@
@@ -250,6 +254,7 @@ POSUB = @POSUB@
 SDL_CFLAGS = @SDL_CFLAGS@
 SDL_CONFIG = @SDL_CONFIG@
 SDL_LIBS = @SDL_LIBS@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -258,6 +263,7 @@ VERSION = @VERSION@
 XGETTEXT = @XGETTEXT@
 XGETTEXT_015 = @XGETTEXT_015@
 XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
+XMKMF = @XMKMF@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -488,12 +494,14 @@ gtksources = \
 	gtk/gtkmainwindow.cpp \
 	sdl/sdlpixbuf.cpp \
 	sdl/sdlpixmap.cpp \
+	sdl/sdlabstractscreen.cpp \
 	sdl/sdlscreen.cpp \
 	sdl/sdlpixbuffactory.cpp \
+	sdl/ogl.cpp \
 	sdl/sdlgameinputhandler.cpp \
 	sdl/sdlmainwindow.cpp \
 	sdl/IMG_savepng.c \
-	sdl/gfxprim.cpp \
+	sdl/sdlparticle.cpp \
 	gtkmain.cpp
 
 gtkheaders = \
@@ -515,21 +523,23 @@ gtkheaders = \
 	gtk/gtkmainwindow.hpp \
 	sdl/sdlpixbuf.hpp \
 	sdl/sdlpixmap.hpp \
+	sdl/sdlabstractscreen.hpp \
 	sdl/sdlscreen.hpp \
 	sdl/sdlpixbuffactory.hpp \
+	sdl/ogl.hpp \
 	sdl/sdlgameinputhandler.hpp \
 	sdl/sdlmainwindow.hpp \
-	sdl/gfxprim.hpp \
+	sdl/sdlparticle.hpp \
 	sdl/IMG_savepng.h
 
 noinst_HEADERS = \
 	$(base_headers) \
 	$(gtkheaders)
 
-gdash_CPPFLAGS = -g -Wall -DGDASH_GTK @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@ @LIBPNG_CFLAGS@
+gdash_CPPFLAGS = -g -Wall -DGDASH_GTK @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@ @GL_CFLAGS@ @LIBPNG_CFLAGS@
 gdash_LDFLAGS = -g -Wall
 @SDL_TRUE@GDASH_LIBADD = -lSDL_mixer -lSDL_image
-gdash_LDADD = @GTK_LIBS@ @GLIB_LIBS@ @LIBINTL@ @SDL_LIBS@ @LIBPNG_LIBS@ $(GDASH_LIBADD)
+gdash_LDADD = @GTK_LIBS@ @GLIB_LIBS@ @LIBINTL@ @SDL_LIBS@ @GL_LIBS@ @LIBPNG_LIBS@ $(GDASH_LIBADD)
 gdash_SOURCES = \
 	$(base_sources) \
 	$(gtksources) \
@@ -670,7 +680,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gamecontrol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gameinputhandler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gamerender.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gfxprim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkapp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkgameinputhandler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-gtkmain.Po@am__quote@
@@ -687,6 +696,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-loadfile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-logger.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-messageactivity.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-ogl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-particle.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-pixbuf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-pixbuffactory.Po@am__quote@
@@ -699,8 +709,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-replaymenuactivity.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-replaysaveractivity.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-screen.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlabstractscreen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlgameinputhandler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlmainwindow.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlparticle.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlpixbuf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlpixbuffactory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdash-sdlpixmap.Po@am__quote@
@@ -2004,6 +2016,20 @@ gdash-sdlpixmap.obj: sdl/sdlpixmap.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-sdlpixmap.obj `if test -f 'sdl/sdlpixmap.cpp'; then $(CYGPATH_W) 'sdl/sdlpixmap.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/sdlpixmap.cpp'; fi`
 
+gdash-sdlabstractscreen.o: sdl/sdlabstractscreen.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-sdlabstractscreen.o -MD -MP -MF $(DEPDIR)/gdash-sdlabstractscreen.Tpo -c -o gdash-sdlabstractscreen.o `test -f 'sdl/sdlabstractscreen.cpp' || echo '$(srcdir)/'`sdl/sdlabstractscreen.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-sdlabstractscreen.Tpo $(DEPDIR)/gdash-sdlabstractscreen.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/sdlabstractscreen.cpp' object='gdash-sdlabstractscreen.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-sdlabstractscreen.o `test -f 'sdl/sdlabstractscreen.cpp' || echo '$(srcdir)/'`sdl/sdlabstractscreen.cpp
+
+gdash-sdlabstractscreen.obj: sdl/sdlabstractscreen.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-sdlabstractscreen.obj -MD -MP -MF $(DEPDIR)/gdash-sdlabstractscreen.Tpo -c -o gdash-sdlabstractscreen.obj `if test -f 'sdl/sdlabstractscreen.cpp'; then $(CYGPATH_W) 'sdl/sdlabstractscreen.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/sdlabstractscreen.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-sdlabstractscreen.Tpo $(DEPDIR)/gdash-sdlabstractscreen.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/sdlabstractscreen.cpp' object='gdash-sdlabstractscreen.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-sdlabstractscreen.obj `if test -f 'sdl/sdlabstractscreen.cpp'; then $(CYGPATH_W) 'sdl/sdlabstractscreen.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/sdlabstractscreen.cpp'; fi`
+
 gdash-sdlscreen.o: sdl/sdlscreen.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-sdlscreen.o -MD -MP -MF $(DEPDIR)/gdash-sdlscreen.Tpo -c -o gdash-sdlscreen.o `test -f 'sdl/sdlscreen.cpp' || echo '$(srcdir)/'`sdl/sdlscreen.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-sdlscreen.Tpo $(DEPDIR)/gdash-sdlscreen.Po
@@ -2031,6 +2057,20 @@ gdash-sdlpixbuffactory.obj: sdl/sdlpixbuffactory.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/sdlpixbuffactory.cpp' object='gdash-sdlpixbuffactory.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-sdlpixbuffactory.obj `if test -f 'sdl/sdlpixbuffactory.cpp'; then $(CYGPATH_W) 'sdl/sdlpixbuffactory.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/sdlpixbuffactory.cpp'; fi`
+
+gdash-ogl.o: sdl/ogl.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-ogl.o -MD -MP -MF $(DEPDIR)/gdash-ogl.Tpo -c -o gdash-ogl.o `test -f 'sdl/ogl.cpp' || echo '$(srcdir)/'`sdl/ogl.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-ogl.Tpo $(DEPDIR)/gdash-ogl.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/ogl.cpp' object='gdash-ogl.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-ogl.o `test -f 'sdl/ogl.cpp' || echo '$(srcdir)/'`sdl/ogl.cpp
+
+gdash-ogl.obj: sdl/ogl.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-ogl.obj -MD -MP -MF $(DEPDIR)/gdash-ogl.Tpo -c -o gdash-ogl.obj `if test -f 'sdl/ogl.cpp'; then $(CYGPATH_W) 'sdl/ogl.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/ogl.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-ogl.Tpo $(DEPDIR)/gdash-ogl.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/ogl.cpp' object='gdash-ogl.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-ogl.obj `if test -f 'sdl/ogl.cpp'; then $(CYGPATH_W) 'sdl/ogl.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/ogl.cpp'; fi`
 
 gdash-sdlgameinputhandler.o: sdl/sdlgameinputhandler.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-sdlgameinputhandler.o -MD -MP -MF $(DEPDIR)/gdash-sdlgameinputhandler.Tpo -c -o gdash-sdlgameinputhandler.o `test -f 'sdl/sdlgameinputhandler.cpp' || echo '$(srcdir)/'`sdl/sdlgameinputhandler.cpp
@@ -2060,19 +2100,19 @@ gdash-sdlmainwindow.obj: sdl/sdlmainwindow.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-sdlmainwindow.obj `if test -f 'sdl/sdlmainwindow.cpp'; then $(CYGPATH_W) 'sdl/sdlmainwindow.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/sdlmainwindow.cpp'; fi`
 
-gdash-gfxprim.o: sdl/gfxprim.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gfxprim.o -MD -MP -MF $(DEPDIR)/gdash-gfxprim.Tpo -c -o gdash-gfxprim.o `test -f 'sdl/gfxprim.cpp' || echo '$(srcdir)/'`sdl/gfxprim.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-gfxprim.Tpo $(DEPDIR)/gdash-gfxprim.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/gfxprim.cpp' object='gdash-gfxprim.o' libtool=no @AMDEPBACKSLASH@
+gdash-sdlparticle.o: sdl/sdlparticle.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-sdlparticle.o -MD -MP -MF $(DEPDIR)/gdash-sdlparticle.Tpo -c -o gdash-sdlparticle.o `test -f 'sdl/sdlparticle.cpp' || echo '$(srcdir)/'`sdl/sdlparticle.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-sdlparticle.Tpo $(DEPDIR)/gdash-sdlparticle.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/sdlparticle.cpp' object='gdash-sdlparticle.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-gfxprim.o `test -f 'sdl/gfxprim.cpp' || echo '$(srcdir)/'`sdl/gfxprim.cpp
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-sdlparticle.o `test -f 'sdl/sdlparticle.cpp' || echo '$(srcdir)/'`sdl/sdlparticle.cpp
 
-gdash-gfxprim.obj: sdl/gfxprim.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gfxprim.obj -MD -MP -MF $(DEPDIR)/gdash-gfxprim.Tpo -c -o gdash-gfxprim.obj `if test -f 'sdl/gfxprim.cpp'; then $(CYGPATH_W) 'sdl/gfxprim.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/gfxprim.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-gfxprim.Tpo $(DEPDIR)/gdash-gfxprim.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/gfxprim.cpp' object='gdash-gfxprim.obj' libtool=no @AMDEPBACKSLASH@
+gdash-sdlparticle.obj: sdl/sdlparticle.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-sdlparticle.obj -MD -MP -MF $(DEPDIR)/gdash-sdlparticle.Tpo -c -o gdash-sdlparticle.obj `if test -f 'sdl/sdlparticle.cpp'; then $(CYGPATH_W) 'sdl/sdlparticle.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/sdlparticle.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gdash-sdlparticle.Tpo $(DEPDIR)/gdash-sdlparticle.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sdl/sdlparticle.cpp' object='gdash-sdlparticle.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-gfxprim.obj `if test -f 'sdl/gfxprim.cpp'; then $(CYGPATH_W) 'sdl/gfxprim.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/gfxprim.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gdash-sdlparticle.obj `if test -f 'sdl/sdlparticle.cpp'; then $(CYGPATH_W) 'sdl/sdlparticle.cpp'; else $(CYGPATH_W) '$(srcdir)/sdl/sdlparticle.cpp'; fi`
 
 gdash-gtkmain.o: gtkmain.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gdash_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gdash-gtkmain.o -MD -MP -MF $(DEPDIR)/gdash-gtkmain.Tpo -c -o gdash-gtkmain.o `test -f 'gtkmain.cpp' || echo '$(srcdir)/'`gtkmain.cpp

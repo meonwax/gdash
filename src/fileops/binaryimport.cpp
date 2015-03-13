@@ -30,7 +30,7 @@ public:
     using std::vector<unsigned char>::size;
     using std::vector<unsigned char>::empty;
     using std::vector<unsigned char>::clear;
-    unsigned char & operator[] (size_t s) {
+    unsigned char &operator[](size_t s) {
         if (s >= size())
             this->resize(s+1);
         // call op[] of parent class
@@ -212,6 +212,7 @@ static bool try_plck(std::vector<unsigned char> const &memory) {
     gd_debug(has_names ? "PLCK caves have names." : "PLCK caves have no names.");
 
     i=0;
+    //~ while (i<17) {   // For Bert Bogger Pro 2
     /* while present and (selectable or nonselectable)   <- find any valid byte in cave selection table. */
     while ((!has_names && (memory[0x5e8b+i]!=0 && (memory[0x5e8b+i]==0x0e || memory[0x5e8b+i]==0x19)))
             || (has_names && (memory[0x5e8b+i*13+12]!=0 && (memory[0x5e8b+i*13+12]==0x0e || memory[0x5e8b+i*13+12]==0x19)))) {
@@ -244,20 +245,27 @@ static bool try_plck(std::vector<unsigned char> const &memory) {
 
         /* and fill the rest with our own data. this way we stay compatible, as cave was always 1f0 bytes */
         if (has_names) {    /* we detected that it has names */
-            out[outpos++]=memory[0x5e8b+i*13+12];
-            out[outpos++]=memory[0x5e8b+i*13+12]+1; /* save twice, add +1 for second for detection in gdash */
-            if (memory[0x5e8b+i*13+12]!=0x0e && memory[0x5e8b+i*13+12]!=0x19)
+            if (memory[0x5e8b+i*13+12]!=0x0e && memory[0x5e8b+i*13+12]!=0x19) {
                 gd_debug("ERROR: cave selection table corrupt or autodetection failed");
+                out[outpos++] = 0x19;
+                out[outpos++] = 0x19+1;
+            } else {
+                out[outpos++]=memory[0x5e8b+i*13+12];
+                out[outpos++]=memory[0x5e8b+i*13+12]+1; /* save twice, add +1 for second for detection in gdash */
+            }
             for (j=0; j<12; j++)
                 out[outpos++]=memory[0x5e8b+i*13+j];
             out[outpos++]=0;    /* fill the rest with zero */
             out[outpos++]=0;
-        }
-        else {  /* no names */
-            out[outpos++]=memory[0x5e8b+i];
-            out[outpos++]=memory[0x5e8b+i]+1;   /* save twice for detection, add 1 to second one */
-            if (memory[0x5e8b+i]!=0x0e && memory[0x5e8b+i]!=0x19)
+        } else { /* no names */
+            if (memory[0x5e8b+i]!=0x0e && memory[0x5e8b+i]!=0x19) {
                 gd_debug("ERROR: cave selection table corrupt or autodetection failed");
+                out[outpos++]=0x19;
+                out[outpos++]=0x19+1;
+            } else {
+                out[outpos++]=memory[0x5e8b+i];
+                out[outpos++]=memory[0x5e8b+i]+1;   /* save twice for detection, add 1 to second one */
+            }
             for (j=2; j<16; j++)
                 out[outpos++]=0;
         }
@@ -482,8 +490,7 @@ static bool try_crli(std::vector<unsigned char> const &memory) {
                     /* escaped byte */
                     cavepos+=memory[pos+2]; /* number of bytes */
                     pos += 3;
-                }
-                else {
+                } else {
                     /* plain data */
                     cavepos++;
                     pos++;
@@ -533,7 +540,7 @@ static bool try_crdr(std::vector<unsigned char> const &memory) {
             out[outpos++]=memory[pos++];
         /* cave objects */
         while (memory[pos]!=0xff) {
-            switch(memory[pos]) {
+            switch (memory[pos]) {
                 case 1: /* point */
                     for (int j=0; j<4; j++)
                         out[outpos++]=memory[pos++];
@@ -755,14 +762,14 @@ std::vector<unsigned char> load_memory_dump(unsigned char const *file, size_t le
         0x74, 0x20, 0x46, 0x69, 0x6C, 0x65, 0x1A, 0x01, 0x00, 0x43, 0x36, 0x34
     };
     std::vector<unsigned char> memory(65536);
-    
+
     if (memcmp(vicemagic, file, sizeof(vicemagic))==0) {
         /* FOUND a vice snapshot file. */
         gd_debug("File is a VICE snapshot.");
         memcpy(&memory[0], file + 0x80, 65536);
         return memory;
     }
-    
+
     /* 65538 bytes: we hope that this is a full-memory map saved by vice. check it. */
     if (length==65538) {
         /* check start address */
@@ -791,13 +798,13 @@ std::vector<unsigned char> load_memory_dump(unsigned char const *file, size_t le
 
 std::vector<unsigned char> gdash_binary_import(std::vector<unsigned char> const &memory) {
     if (try_plck(memory) || try_atari_plck(memory) || try_bd1(memory, false) || try_bd1(memory, true)
-        || try_bd2(memory, false) || try_bd2(memory, true) || try_crli(memory) || try_1stb(memory) || try_crdr(memory)) {
+            || try_bd2(memory, false) || try_bd2(memory, true) || try_crli(memory) || try_1stb(memory) || try_crdr(memory)) {
         /* write data length in little endian */
         out[8]=((outpos-12))&0xff;
         out[9]=((outpos-12)>>8)&0xff;
         out[10]=((outpos-12)>>16)&0xff;
         out[11]=((outpos-12)>>24)&0xff;
-        
+
         return out;
     }
 

@@ -21,23 +21,20 @@
 #include "gtk/gtkscreen.hpp"
 #include "gtk/gtkpixmap.hpp"
 
-GTKPixmap::~GTKPixmap()
-{
+GTKPixmap::~GTKPixmap() {
     if (pixmap)
         g_object_unref(pixmap);
     if (mask)
         g_object_unref(mask);
 }
 
-int GTKPixmap::get_width() const
-{
+int GTKPixmap::get_width() const {
     int x;
     gdk_drawable_get_size(pixmap, &x, NULL);
     return x;
 }
 
-int GTKPixmap::get_height() const
-{
+int GTKPixmap::get_height() const {
     int y;
     gdk_drawable_get_size(pixmap, NULL, &y);
     return y;

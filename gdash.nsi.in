@@ -1,7 +1,23 @@
 ; GDash.nsi
-;
 
-;--------------------------------
+; UI
+!include "MUI2.nsh"
+
+!define MUI_ICON "gdash.ico"
+!define MUI_UNICON "gdash.ico"
+!define MUI_COMPONENTSPAGE_NODESC
+
+!insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_COMPONENTS
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
+
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+
+; Should be inserted as last one
+!insertmacro MUI_LANGUAGE "English"
 
 ; The name of the installer
 Name "GDash"
@@ -18,16 +34,6 @@ InstallDir $PROGRAMFILES\GDash
 ; Registry key to check for directory (so if you install again, it will 
 ; overwrite the old one automatically)
 InstallDirRegKey HKLM "Software\GDash" "Install_Dir"
-
-;--------------------------------
-
-; Pages
-Page components
-Page directory
-Page instfiles
-
-UninstPage uninstConfirm
-UninstPage instfiles
 
 ;--------------------------------
 
@@ -82,7 +88,14 @@ Section "GDash (required)"
   File ${MINGWDIR}\bin\libpng14-14.dll
   File ${MINGWDIR}\bin\libpng15-15.dll
   File ${MINGWDIR}\bin\zlib1.dll
-  
+  ; GTK+ theming stuff for Win32
+  SetOutPath $INSTDIR\etc\gtk-2.0
+  File /oname=gtkrc gtkrc_win32
+  SetOutPath $INSTDIR\share\themes\MS-Windows\gtk-2.0
+  File ${MINGWDIR}\share\themes\MS-Windows\gtk-2.0\gtkrc
+  SetOutPath $INSTDIR\lib\gtk-2.0\2.10.0\engines
+  File ${MINGWDIR}\lib\gtk-2.0\2.10.0\engines\libwimp.dll
+
   ; Program files, SDL dlls
   SetOutPath $INSTDIR
   File ${MINGWDIR}\bin\SDL.dll
@@ -186,17 +199,6 @@ SectionEnd
 
 
 
-; Optional section (can be disabled by the user)
-Section "any2gdash conversion utility"
-
-  SetOutPath $INSTDIR
-  File "util\any2gdash.exe"
-  
-SectionEnd
-
-
-
-
 
 ;--------------------------------
 ; Uninstaller
@@ -218,4 +220,3 @@ Section "Uninstall"
   RMDir /r "$INSTDIR"
 
 SectionEnd
-

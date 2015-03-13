@@ -57,9 +57,11 @@ public:
 
     /// @brief Set scaling type and pal emulation for factory.
     void set_properties(GdScalingType scaling_type_, bool pal_emulation_);
-    
+
     /// @brief Returns true, if the factory uses pal emulation.
-    bool get_pal_emulation() { return pal_emulation; }
+    bool get_pal_emulation() {
+        return pal_emulation;
+    }
 
     /// @brief Virtual destructor.
     virtual ~PixbufFactory() {}
@@ -90,8 +92,8 @@ public:
     /// @param c Color
     /// @param a Alpha value; 0 will be invisible, 255 will totally cover. Default is 128, which looks nice, and is accelerated by SDL.
     /// @return The new pixbuf.
-    virtual Pixbuf *create_composite_color(const Pixbuf &src, const GdColor& c, unsigned char alpha=128) const=0;
-    
+    virtual Pixbuf *create_composite_color(const Pixbuf &src, const GdColor &c, unsigned char alpha=128) const=0;
+
     /// @brief Create a pixbuf, which is a part of this one.
     /// Pixels will be shared!
     virtual Pixbuf *create_subpixbuf(Pixbuf &src, int x, int y, int w, int h) const=0;
@@ -100,7 +102,7 @@ public:
     /// @param pb The pixbuf to set the contents from.
     /// @param format_alpha Preserve alpha channel.
     /// @return A newly allocated pixmap object. Free with delete.
-    virtual Pixmap *create_pixmap_from_pixbuf(Pixbuf const& pb, bool format_alpha) const=0;
+    virtual Pixmap *create_pixmap_from_pixbuf(Pixbuf const &pb, bool format_alpha) const=0;
 
     Pixbuf *create_scaled(const Pixbuf &src) const;
 

@@ -24,9 +24,9 @@
 
 class GdColor;
 
-GtkWidget *gd_color_combo_new(const GdColor& color);
-void gd_color_combo_set(GtkComboBox *combo, const GdColor& color);
-const GdColor& gd_color_combo_get_color(GtkWidget *widget);
+GtkWidget *gd_color_combo_new(const GdColor &color);
+void gd_color_combo_set(GtkComboBox *combo, const GdColor &color);
+const GdColor &gd_color_combo_get_color(GtkWidget *widget);
 
 void gd_element_button_set_dialog_title(GtkWidget *button, const char *title);
 void gd_element_button_set_dialog_sensitive(GtkWidget *button, gboolean sens);

@@ -23,16 +23,14 @@
 #include "cave/helper/colors.hpp"
 #include "gtk/gtkpixmap.hpp"
 
-GTKPixbuf *GTKPixbufFactory::create_composite_color(const Pixbuf &src, const GdColor& c, unsigned char alpha) const
-{
+GTKPixbuf *GTKPixbufFactory::create_composite_color(const Pixbuf &src, const GdColor &c, unsigned char alpha) const {
     GTKPixbuf const &srcgtk = static_cast<GTKPixbuf const &>(src);
     guint32 color = (c.get_r()<<16) | (c.get_g()<<8) | (c.get_b()<<0);
     GdkPixbuf *pb = gdk_pixbuf_composite_color_simple(srcgtk.get_gdk_pixbuf(), src.get_width(), src.get_height(), GDK_INTERP_NEAREST, 255-alpha, 1, color, color);
     return new GTKPixbuf(pb);
 }
 
-GTKPixbuf *GTKPixbufFactory::create_subpixbuf(Pixbuf &src, int x, int y, int w, int h) const
-{
+GTKPixbuf *GTKPixbufFactory::create_subpixbuf(Pixbuf &src, int x, int y, int w, int h) const {
     GTKPixbuf &srcgtk = static_cast<GTKPixbuf &>(src);
     GdkPixbuf *sub = gdk_pixbuf_new_subpixbuf(srcgtk.get_gdk_pixbuf(), x, y, w, h);
     g_assert(sub!=NULL);
@@ -40,12 +38,11 @@ GTKPixbuf *GTKPixbufFactory::create_subpixbuf(Pixbuf &src, int x, int y, int w, 
     return new GTKPixbuf(sub);
 }
 
-Pixmap *GTKPixbufFactory::create_pixmap_from_pixbuf(const Pixbuf& pb, bool format_alpha) const
-{
+Pixmap *GTKPixbufFactory::create_pixmap_from_pixbuf(const Pixbuf &pb, bool format_alpha) const {
     GTKPixbuf *scaled = static_cast<GTKPixbuf *>(create_scaled(pb));
     GdkDrawable *pixmap;
     GdkBitmap *mask;
-    
+
     if (format_alpha)
         gdk_pixbuf_render_pixmap_and_mask(scaled->get_gdk_pixbuf(), &pixmap, &mask, 128);     // 128 = alpha threshold
     else {
@@ -53,13 +50,12 @@ Pixmap *GTKPixbufFactory::create_pixmap_from_pixbuf(const Pixbuf& pb, bool forma
         mask=NULL;
     }
     delete scaled;
-    
+
     return new GTKPixmap(pixmap, mask);
 }
 
-GTKPixbuf *GTKPixbufFactory::create_rotated(const Pixbuf &src, Rotation r) const
-{
-    GdkPixbuf const *srcgtk = static_cast<GTKPixbuf const&>(src).get_gdk_pixbuf();
+GTKPixbuf *GTKPixbufFactory::create_rotated(const Pixbuf &src, Rotation r) const {
+    GdkPixbuf const *srcgtk = static_cast<GTKPixbuf const &>(src).get_gdk_pixbuf();
     GdkPixbuf *pb=NULL;
     switch (r) {
         case None:
@@ -81,24 +77,20 @@ GTKPixbuf *GTKPixbufFactory::create_rotated(const Pixbuf &src, Rotation r) const
 
 
 GTKPixbufFactory::GTKPixbufFactory(GdScalingType scaling_type_, bool pal_emulation_)
-:   PixbufFactory(scaling_type_, pal_emulation_)
-{
+    :   PixbufFactory(scaling_type_, pal_emulation_) {
 }
 
 
-GTKPixbuf *GTKPixbufFactory::create(int w, int h) const
-{
+GTKPixbuf *GTKPixbufFactory::create(int w, int h) const {
     return new GTKPixbuf(w, h);
 }
 
 
-GTKPixbuf *GTKPixbufFactory::create_from_inline(int length, unsigned char const *data) const
-{
+GTKPixbuf *GTKPixbufFactory::create_from_inline(int length, unsigned char const *data) const {
     return new GTKPixbuf(length, data);
 }
 
 
-GTKPixbuf *GTKPixbufFactory::create_from_file(const char *filename) const
-{
+GTKPixbuf *GTKPixbufFactory::create_from_file(const char *filename) const {
     return new GTKPixbuf(filename);
 }

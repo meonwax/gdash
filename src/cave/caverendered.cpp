@@ -29,7 +29,7 @@
 void CaveRendered::set_ckdelay_extra_for_animation() {
     g_assert(!map.empty());
 
-    bool has_amoeba=false, has_firefly=false, has_butterfly=false, has_slime=false;
+    bool has_amoeba=false, has_firefly=false, has_butterfly=false;
 
     for (int y=0; y<height(); y++)
         for (int x=0; x<width(); x++) {
@@ -49,9 +49,6 @@ void CaveRendered::set_ckdelay_extra_for_animation() {
                 case O_AMOEBA:
                     has_amoeba=true;
                     break;
-                case O_SLIME:
-                    has_slime=true;
-                    break;
                 default:
                     /* other animated elements are not important,
                      * because they were not present in bd2. */
@@ -67,8 +64,6 @@ void CaveRendered::set_ckdelay_extra_for_animation() {
         ckdelay_extra_for_animation+=2600;
     if (has_amoeba)
         ckdelay_extra_for_animation+=2600;
-    if (has_slime)
-        ; /* slime was always animated, no extra cost */
 }
 
 /// Do some init - setup some cave variables before the game.
@@ -169,8 +164,7 @@ void CaveRendered::draw_indexes(CaveMap<int> &gfx_buffer, CaveMap<bool> const &c
     if (last_direction) {   /* he is moving, so stop blinking and tapping. */
         player_blinking=false;
         player_tapping=false;
-    }
-    else {                      /* he is idle, so animations can be done. */
+    } else {                    /* he is idle, so animations can be done. */
         if (animcycle==0) { /* blinking and tapping is started at the beginning of animation sequences. */
             player_blinking=g_random_int_range(0, 4)==0;    /* 1/4 chance of blinking, every sequence. */
             if (g_random_int_range(0, 16)==0)   /* 1/16 chance of starting or stopping tapping. */
@@ -200,8 +194,7 @@ void CaveRendered::draw_indexes(CaveMap<int> &gfx_buffer, CaveMap<bool> const &c
         elemdrawing[O_CONVEYOR_RIGHT]=temp;
 
         elemdrawing[O_CONVEYOR_DIR_SWITCH]=gd_element_properties[O_CONVEYOR_DIR_CHANGED].image_game;
-    }
-    else
+    } else
         elemdrawing[O_CONVEYOR_DIR_SWITCH]=gd_element_properties[O_CONVEYOR_DIR_NORMAL].image_game;
     if (!conveyor_belts_active) {
         /* if they are not running, do not animate them. */
@@ -225,17 +218,19 @@ void CaveRendered::draw_indexes(CaveMap<int> &gfx_buffer, CaveMap<bool> const &c
             draw=gd_element_properties[O_PLAYER_TAP].image_game;
         else
             draw=gd_element_properties[O_PLAYER].image_game;
-    }
-    else if (last_horizontal_direction == MV_LEFT)
+    } else if (last_horizontal_direction == MV_LEFT)
         draw=gd_element_properties[O_PLAYER_LEFT].image_game;
     else
         /* of course this is MV_RIGHT. */
         draw=gd_element_properties[O_PLAYER_RIGHT].image_game;
     elemdrawing[O_PLAYER]=draw;
     elemdrawing[O_PLAYER_GLUED]=draw;
-    /* player with bomb does not blink or tap - no graphics drawn for that. running is drawn using w/o bomb cells */
-    if (last_direction!=MV_STILL)
+    /* player with bomb/rocketlauncher does not blink or tap - no graphics drawn for that.
+     * running is drawn using w/o bomb/rocketlauncher cells */
+    if (last_direction!=MV_STILL) {
         elemdrawing[O_PLAYER_BOMB]=draw;
+        elemdrawing[O_PLAYER_ROCKET_LAUNCHER]=draw;
+    }
     elemdrawing[O_INBOX]=gd_element_properties[inbox_flash_toggle ? O_OUTBOX_OPEN : O_OUTBOX_CLOSED].image_game;
     elemdrawing[O_OUTBOX]=gd_element_properties[inbox_flash_toggle ? O_OUTBOX_OPEN : O_OUTBOX_CLOSED].image_game;
     elemdrawing[O_BITER_SWITCH]=gd_element_properties[O_BITER_SWITCH].image_game+biter_delay_frame;   /* hack, cannot do this with gd_element_properties */
@@ -432,8 +427,7 @@ void CaveRendered::create_map(CaveStored const &data, int level) {
             map(x, 0)=data.initial_border;
             map(x, h-1)=data.initial_border;
         }
-    }
-    else {
+    } else {
         /* IF CAVE HAS A MAP, SIMPLY USE IT... no need to fill with random elements */
         map=data.map;
         /* initialize c64 predictable random for slime. the values were taken from afl bd, see docs/internals.txt */
@@ -459,7 +453,7 @@ void CaveRendered::create_map(CaveStored const &data, int level) {
 /// @param level The level to draw at, 0 is level1, 4 is level5.
 /// @param seed Random seed.
 CaveRendered::CaveRendered(CaveStored const &data, int level, int seed)
-:
+    :
     CaveBase(data),
     objects_order(),
     amoeba_state(GD_AM_SLEEPING),

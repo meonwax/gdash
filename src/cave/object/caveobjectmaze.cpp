@@ -27,24 +27,28 @@
 #include "misc/logger.hpp"
 #include "misc/util.hpp"
 
-std::string CaveMaze::get_bdcff() const
-{
+std::string CaveMaze::get_bdcff() const {
     BdcffFormat f("Maze");
 
     f << p1 << p2 << wall_width << path_width << horiz;
     f << seed[0] << seed[1] << seed[2] << seed[3] << seed[4] << wall_element << path_element;
     switch (maze_type) {
-        case Perfect: f << "perfect"; break;
-        case Unicursal: f << "unicursal"; break;
-        case Braid: f << "braid"; break;
+        case Perfect:
+            f << "perfect";
+            break;
+        case Unicursal:
+            f << "unicursal";
+            break;
+        case Braid:
+            f << "braid";
+            break;
         default:
             g_assert_not_reached();
     };
     return f;
 }
 
-CaveMaze* CaveMaze::clone_from_bdcff(const std::string &name, std::istream &is) const
-{
+CaveMaze *CaveMaze::clone_from_bdcff(const std::string &name, std::istream &is) const {
     Coordinate p1, p2;
     int ww, pw, horiz;
     int seed[5];
@@ -74,8 +78,7 @@ CaveMaze* CaveMaze::clone_from_bdcff(const std::string &name, std::istream &is) 
 
 /* create a maze in a bool map. */
 /* recursive algorithm. */
-void CaveMaze::mazegen(CaveMap<bool> &maze, RandomGenerator &rand, int x, int y, int horiz)
-{
+void CaveMaze::mazegen(CaveMap<bool> &maze, RandomGenerator &rand, int x, int y, int horiz) {
     int dirmask=15;
 
     maze(x,y)=true;
@@ -93,7 +96,7 @@ void CaveMaze::mazegen(CaveMap<bool> &maze, RandomGenerator &rand, int x, int y,
         if (dirmask&(1<<dir)) {
             dirmask&=~(1<<dir);
 
-            switch(dir) {
+            switch (dir) {
                 case 0: /* up */
                     if (y>=2 && !maze(x, y-2)) {
                         maze(x, y-1)=true;
@@ -127,8 +130,7 @@ void CaveMaze::mazegen(CaveMap<bool> &maze, RandomGenerator &rand, int x, int y,
 
 
 void
-CaveMaze::braidmaze(CaveMap<bool> &maze, RandomGenerator &rand)
-{
+CaveMaze::braidmaze(CaveMap<bool> &maze, RandomGenerator &rand) {
     int w=maze.width();
     int h=maze.height();
 
@@ -165,19 +167,26 @@ CaveMaze::braidmaze(CaveMap<bool> &maze, RandomGenerator &rand)
                 /* make up a random direction, and open in that direction, so dead end is removed */
                 int dir=closed_dirs[rand.rand_int_range(0, dirs)];
 
-                switch(dir) {
-                    case MV_LEFT: maze(x-1, y)=true; break;
-                    case MV_UP: maze(x, y-1)=true; break;
-                    case MV_RIGHT: maze(x+1, y)=true; break;
-                    case MV_DOWN: maze(x, y+1)=true; break;
+                switch (dir) {
+                    case MV_LEFT:
+                        maze(x-1, y)=true;
+                        break;
+                    case MV_UP:
+                        maze(x, y-1)=true;
+                        break;
+                    case MV_RIGHT:
+                        maze(x+1, y)=true;
+                        break;
+                    case MV_DOWN:
+                        maze(x, y+1)=true;
+                        break;
                 }
             }
         }
 }
 
 
-void CaveMaze::unicursalmaze(CaveMap<bool> &maze, int &w, int &h)
-{
+void CaveMaze::unicursalmaze(CaveMap<bool> &maze, int &w, int &h) {
     /* convert to unicursal maze */
     /* original:
         xxx x
@@ -196,7 +205,7 @@ void CaveMaze::unicursalmaze(CaveMap<bool> &maze, int &w, int &h)
     CaveMap<bool> unicursal(w*2+1, h*2+1, false);
 
     for (int y=0; y<h; y++)
-        for(int x=0; x<w; x++) {
+        for (int x=0; x<w; x++) {
             if (maze(x, y)) {
                 unicursal(x*2, y*2)=true;
                 unicursal(x*2+2, y*2)=true;
@@ -219,28 +228,25 @@ void CaveMaze::unicursalmaze(CaveMap<bool> &maze, int &w, int &h)
 
 
 CaveMaze::CaveMaze(Coordinate _p1, Coordinate _p2, GdElementEnum _wall, GdElementEnum _path, MazeType _type)
-:   CaveRectangular(_type==Perfect?GD_MAZE:(_type==Braid?GD_MAZE_BRAID:GD_MAZE_UNICURSAL), _p1, _p2),
-    maze_type(_type),
-    wall_width(1),
-    path_width(1),
-    wall_element(_wall),
-    path_element(_path),
-    horiz(50)
-{
+    :   CaveRectangular(_type==Perfect?GD_MAZE:(_type==Braid?GD_MAZE_BRAID:GD_MAZE_UNICURSAL), _p1, _p2),
+        maze_type(_type),
+        wall_width(1),
+        path_width(1),
+        wall_element(_wall),
+        path_element(_path),
+        horiz(50) {
     for (int j=0; j<5; j++)
         seed[j]=-1;
 }
 
 /// Set wall and path width.
-void CaveMaze::set_widths(int wall, int path)
-{
+void CaveMaze::set_widths(int wall, int path) {
     wall_width=wall;
     path_width=path;
 }
 
 /// Set seed values.
-void CaveMaze::set_seed(int s1, int s2, int s3, int s4, int s5)
-{
+void CaveMaze::set_seed(int s1, int s2, int s3, int s4, int s5) {
     seed[0]=s1;
     seed[1]=s2;
     seed[2]=s3;
@@ -250,14 +256,13 @@ void CaveMaze::set_seed(int s1, int s2, int s3, int s4, int s5)
 
 /*
  * This draws all kinds of mazes.
- * 
+ *
  * Steps:
  * - draw a normal maze with walls and paths of 1 cell in width.
  * - if needed, convert it to braid maze or unicursal maze.
  * - resize the maze to the given path and wall width.
  */
-void CaveMaze::draw(CaveRendered &cave) const
-{
+void CaveMaze::draw(CaveRendered &cave) const {
     /* change coordinates if not in correct order */
     int x1=p1.x;
     int y1=p1.y;
@@ -335,7 +340,7 @@ void CaveMaze::draw(CaveRendered &cave) const
                     cave.store_rc(xk++, yk, map(x, y)?path_element:wall_element, this);
 
             /* if width is smaller than requested, fill with wall */
-            for(int x=xk; x<=x2; x++)
+            for (int x=xk; x<=x2; x++)
                 cave.store_rc(x, yk, wall_element, this);
 
             yk++;
@@ -361,13 +366,11 @@ PropertyDescription const CaveMaze::descriptor[] = {
     {NULL},
 };
 
-PropertyDescription const* CaveMaze::get_description_array() const
-{
+PropertyDescription const *CaveMaze::get_description_array() const {
     return descriptor;
 }
 
-std::string CaveMaze::get_description_markup() const
-{
-    return SPrintf(_("Maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"))
-        % p1.x % p1.y % p2.x % p2.y % gd_element_properties[wall_element].lowercase_name % gd_element_properties[path_element].lowercase_name;
+std::string CaveMaze::get_description_markup() const {
+    return SPrintf(_("Maze from %d,%d to %d,%d, wall <b>%ms</b>, path <b>%ms</b>"))
+           % p1.x % p1.y % p2.x % p2.y % gd_element_properties[wall_element].lowercase_name % gd_element_properties[path_element].lowercase_name;
 }

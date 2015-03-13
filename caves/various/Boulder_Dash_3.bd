@@ -1,33 +1,35 @@
 [BDCFF]
 Version=0.5
+
 [game]
 Name=Boulder Dash 3
 Author=American Action
 TitleScreen=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
 TitleScreenScroll=iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAABHNCSVQICAgIfAhkiAAAACpJREFUGNNjVJWs/8+ABzAxEACM////x2sCY3L4bsqsIKiA5dChI5SZAAD3QQqEayfdxwAAAABJRU5ErkJggg==
-Levels=5
 
 [cave]
-Name=Cave A
-Intermission=false
+Name=A. pálya
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Gray1 Gray2 White White White
 DiamondsRequired=80 80 80 80 80
-DiamondValue=10 15
 CaveTime=150 110 110 110 110
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=10 15
 RandSeed=10 187 12 173 62
 RandomFill=DIRT 254 SPACE 64 BOULDER 64 DIAMOND 37
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=SLIME 0.8314
+AcidProperties=DIRT 0.8314
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -45,27 +47,30 @@ Point=8 21 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave B
-Intermission=false
+Name=B. pálya
+Selectable=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Red LightRed White White White
 DiamondsRequired=50 50 50 50 50
-DiamondValue=15 20
 CaveTime=150 110 110 110 110
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=15 20
 RandSeed=7 128 144 160 176
 RandomFill=DIRT 16 SPACE 32 BOULDER 32 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=BOULDER 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=BOULDER 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -85,27 +90,30 @@ Point=4 21 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave C
-Intermission=false
+Name=C. pálya
+Selectable=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Brown Orange Yellow Yellow Yellow
 DiamondsRequired=40 40 40 40 40
-DiamondValue=10 15
 CaveTime=201 150 150 110 110
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=10 15
 RandSeed=1 34 3 4 5
 RandomFill=SPACE 48 MAGICWALL 112 BOULDER 64 DIAMOND 16
 ActiveGuyIsFirst=false
 AmoebaTime=64 64 64 64 64
 MagicWallTime=64 64 64 64 64
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=BUTTERFLYd 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=BUTTERFLYd 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -116,27 +124,30 @@ Point=5 3 INBOX
 [/cave]
 
 [cave]
-Name=Cave D
-Intermission=false
+Name=D. pálya
+Selectable=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Red Purple White White White
 DiamondsRequired=75 75 75 75 75
-DiamondValue=15 20
 CaveTime=201 201 150 150 110
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=15 20
 RandSeed=160 176 192 208 224
 RandomFill=SPACE 32 BOULDER 48 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=75 75 75 75 75
 MagicWallTime=75 75 75 75 75
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=DIAMONDBIRTH2 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=DIAMONDBIRTH1 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -156,28 +167,30 @@ Point=7 1 OUTBOX
 [/cave]
 
 [cave]
-Name=Intermission 1
+Name=1. jutalom pálya
 Selectable=false
-Intermission=true
 IntermissionProperties.instantlife=true
+Intermission=true
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 19 11
 Colors=Black Black LightBlue Cyan White White White
 DiamondsRequired=30 30 30 30 30
-DiamondValue=15 25
 CaveTime=30 30 30 30 30
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=15 25
 RandSeed=10 11 12 13 14
 RandomFill=SPACE 255 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=16 16 16 16 16
 MagicWallTime=16 16 16 16 16
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=UNKNOWN 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=DIRT 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -194,27 +207,29 @@ Point=2 1 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave E
-Intermission=false
+Name=E. pálya
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Green LightGreen White White White
 DiamondsRequired=20 20 20 20 20
-DiamondValue=20 25
 CaveTime=150 110 110 110 110
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=20 25
 RandSeed=17 34 51 68 85
 RandomFill=SPACE 32 BOULDERf 48 FIREFLYl 16 DIAMOND 10
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=DIAMONDBIRTH2 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=DIAMONDBIRTH1 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -225,27 +240,30 @@ Point=4 2 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave F
-Intermission=false
+Name=F. pálya
+Selectable=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Gray2 Gray3 White White White
 DiamondsRequired=50 50 50 50 50
-DiamondValue=10 25
 CaveTime=150 100 100 75 75
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=10 25
 RandSeed=18 52 86 120 154
 RandomFill=SPACE 80 BOULDER 64 FIREFLYl 56 DIAMOND 37
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=BOULDER 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=DIRT 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -256,27 +274,30 @@ Point=36 14 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave G
-Intermission=false
+Name=G. pálya
+Selectable=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Blue LightBlue White White White
 DiamondsRequired=25 25 25 25 25
-DiamondValue=10 15
 CaveTime=150 150 150 150 150
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=10 15
 RandSeed=10 11 12 13 14
 RandomFill=SPACE 0 SPACE 0 BOULDER 32 FIREFLYl 2
 ActiveGuyIsFirst=false
 AmoebaTime=67 67 67 67 67
 MagicWallTime=67 67 67 67 67
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=SPACE 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=SPACE 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -295,27 +316,30 @@ Point=37 2 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave H
-Intermission=false
+Name=H. pálya
+Selectable=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Orange Yellow White White White
 DiamondsRequired=15 15 15 15 15
-DiamondValue=10 15
 CaveTime=150 150 110 110 86
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=10 15
 RandSeed=170 187 204 13 238
 RandomFill=BOULDER 48 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=32 32 32 32 32
 MagicWallTime=32 32 32 32 32
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=BUTTERFLYd 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=BUTTERFLYd 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -329,28 +353,30 @@ Point=2 21 OUTBOX
 [/cave]
 
 [cave]
-Name=Intermission 2
+Name=2. jutalom pálya
 Selectable=false
-Intermission=true
 IntermissionProperties.instantlife=true
+Intermission=true
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 19 11
 Colors=Black Black LightBlue Cyan White White White
 DiamondsRequired=99 99 99 99 99
-DiamondValue=10 20
 CaveTime=30 30 30 30 30
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=10 20
 RandSeed=170 171 172 173 174
 RandomFill=SPACE 0 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=SPACE 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=SPACE 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -378,27 +404,29 @@ Point=13 10 FIREFLYl
 [/cave]
 
 [cave]
-Name=Cave I
-Intermission=false
+Name=I. pálya
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Gray1 Gray2 White White White
 DiamondsRequired=90 90 90 90 90
-DiamondValue=10 15
 CaveTime=150 150 110 110 110
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=10 15
 RandSeed=49 37 45 61 60
 RandomFill=SPACE 0 BOULDER 80 DIAMOND 53 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=SPACE 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=SPACE 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -419,27 +447,29 @@ Point=37 2 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave J
-Intermission=false
+Name=J. pálya
+Selectable=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Red LightRed White White White
 DiamondsRequired=10 10 10 10 10
-DiamondValue=25 0
 CaveTime=150 150 110 110 110
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=25 0
 RandSeed=1 1 1 1 1
 RandomFill=SPACE 0 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
-AmoebaTime=0 0 0 0 0
 MagicWallTime=0 0 0 0 0
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=SPACE 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=SPACE 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -470,27 +500,30 @@ Point=38 18 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave K
-Intermission=false
+Name=K. pálya
+Selectable=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Brown Orange Yellow Yellow Yellow
 DiamondsRequired=25 25 25 25 25
-DiamondValue=10 15
 CaveTime=150 150 110 110 110
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=10 15
 RandSeed=152 135 136 101 84
 RandomFill=SPACE 0 BOULDER 48 FIREFLYl 5 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=48 48 48 48 48
 MagicWallTime=48 48 48 48 48
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=SPACE 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=SPACE 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -503,27 +536,30 @@ Point=38 20 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave L
-Intermission=false
+Name=L. pálya
+Selectable=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Red Purple White White White
 DiamondsRequired=25 25 25 25 25
-DiamondValue=10 15
 CaveTime=150 150 150 110 110
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=10 15
 RandSeed=86 120 108 152 171
 RandomFill=BOULDER 69 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=48 48 48 48 48
 MagicWallTime=48 48 48 48 48
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=OUTBOXopen 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=DIRT 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -537,28 +573,30 @@ Point=39 18 OUTBOX
 [/cave]
 
 [cave]
-Name=Intermission 3
+Name=3. jutalom pálya
 Selectable=false
-Intermission=true
 IntermissionProperties.instantlife=true
+Intermission=true
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 19 11
 Colors=Black Black LightBlue Cyan White White White
 DiamondsRequired=9 9 9 9 9
-DiamondValue=15 0
 CaveTime=20 20 20 20 20
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=15 0
 RandSeed=170 187 204 221 238
 RandomFill=SPACE 0 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=20 20 20 20 20
 MagicWallTime=20 20 20 20 20
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=SPACE 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=SPACE 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -576,27 +614,29 @@ Line=4 2 4 9 WALL
 [/cave]
 
 [cave]
-Name=Cave M
-Intermission=false
+Name=M. pálya
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Green LightGreen White White White
 DiamondsRequired=95 95 95 95 95
-DiamondValue=10 15
 CaveTime=150 150 110 110 110
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=10 15
 RandSeed=86 136 144 18 171
 RandomFill=BOULDER 32 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=138 138 138 138 138
 MagicWallTime=138 138 138 138 138
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=DIAMONDBIRTH2 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=DIAMONDBIRTH1 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -615,27 +655,30 @@ Point=39 19 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave N
-Intermission=false
+Name=N. pálya
+Selectable=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Gray2 Gray3 White White White
 DiamondsRequired=85 85 85 85 85
-DiamondValue=10 15
 CaveTime=150 150 110 110 110
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=10 15
 RandSeed=170 102 87 198 86
 RandomFill=BOULDER 21 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=94 94 94 94 94
 MagicWallTime=94 94 94 94 94
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=DIAMOND 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=DIAMOND 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -653,27 +696,30 @@ Point=39 19 OUTBOX
 [/cave]
 
 [cave]
-Name=Cave O
-Intermission=false
+Name=O. pálya
+Selectable=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Blue LightBlue White White White
 DiamondsRequired=95 95 95 95 95
-DiamondValue=5 10
 CaveTime=150 150 110 110 110
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=5 10
 RandSeed=170 187 204 221 238
 RandomFill=BOULDER 37 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=58 58 58 58 58
 MagicWallTime=58 58 58 58 58
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=INBOX 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=INBOX 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -686,27 +732,30 @@ Point=2 1 INBOX
 [/cave]
 
 [cave]
-Name=Cave P
-Intermission=false
+Name=P. pálya
+Selectable=false
 IntermissionProperties.instantlife=true
+Intermission=false
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 39 21
 Colors=Black Black Orange Yellow White White White
 DiamondsRequired=95 95 95 95 95
-DiamondValue=10 15
 CaveTime=150 150 110 110 110
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=10 15
 RandSeed=68 85 102 119 136
 RandomFill=BOULDER 80 DIAMOND 48 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=32 32 32 32 32
 MagicWallTime=32 32 32 32 32
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=BOULDER 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=DIRT 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 
@@ -720,28 +769,30 @@ Point=39 20 OUTBOX
 [/cave]
 
 [cave]
-Name=Intermission 4
+Name=4. jutalom pálya
 Selectable=false
-Intermission=true
 IntermissionProperties.instantlife=true
+Intermission=true
 IntermissionProperties.rewardlife=false
 Size=40 22 0 0 19 11
 Colors=Black Black LightBlue Cyan White White White
 DiamondsRequired=7 7 7 7 7
-DiamondValue=14 20
 CaveTime=10 10 10 10 10
 CaveScheduling=bd1
 PALTiming=true
+FrameTime=180 160 140 120 120
 CaveDelay=12 6 3 1 0
-FrameTime=200 200 200 200 200
+DiamondValue=14 20
 RandSeed=0 0 0 0 0
 RandomFill=SPACE 0 SPACE 0 SPACE 0 SPACE 0
 ActiveGuyIsFirst=false
 AmoebaTime=37 37 37 37 37
 MagicWallTime=37 37 37 37 37
+MagicWallProperties.convertamoeba=false
+MagicWallProperties.breakscan=true
 SlimePermeabilityC64=0 0 0 0 0
-AcidProperties=SPACE 0.0000
 Effect=ACIDEffect ACID
+AcidProperties=SPACE 0.0000
 BorderProperties.lineshift=true
 BorderProperties.objectwraparound=true
 

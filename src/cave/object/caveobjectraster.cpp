@@ -25,8 +25,7 @@
 #include "cave/caverendered.hpp"
 #include "misc/printf.hpp"
 
-std::string CaveRaster::get_bdcff() const
-{
+std::string CaveRaster::get_bdcff() const {
     Coordinate number;
     number.x=((p2.x-p1.x)/dist.x+1);
     number.y=((p2.y-p1.y)/dist.y+1);
@@ -34,8 +33,7 @@ std::string CaveRaster::get_bdcff() const
     return BdcffFormat("Raster") << p1 << number << dist << element;
 }
 
-CaveRaster* CaveRaster::clone_from_bdcff(const std::string &name, std::istream &is) const
-{
+CaveRaster *CaveRaster::clone_from_bdcff(const std::string &name, std::istream &is) const {
     Coordinate p1, n, d, p2;
     GdElementEnum element;
 
@@ -48,14 +46,12 @@ CaveRaster* CaveRaster::clone_from_bdcff(const std::string &name, std::istream &
 }
 
 CaveRaster::CaveRaster(Coordinate _p1, Coordinate _p2, Coordinate _dist, GdElementEnum _element)
-:   CaveRectangular(GD_RASTER, _p1, _p2),
-    dist(_dist),
-    element(_element)
-{
+    :   CaveRectangular(GD_RASTER, _p1, _p2),
+        dist(_dist),
+        element(_element) {
 }
 
-void CaveRaster::draw(CaveRendered &cave) const
-{
+void CaveRaster::draw(CaveRendered &cave) const {
     /* reorder coordinates if not drawing from northwest to southeast */
     int x1=p1.x, y1=p1.y;
     int x2=p2.x, y2=p2.y;
@@ -83,18 +79,15 @@ PropertyDescription const CaveRaster::descriptor[] = {
     {NULL},
 };
 
-PropertyDescription const* CaveRaster::get_description_array() const
-{
+PropertyDescription const *CaveRaster::get_description_array() const {
     return descriptor;
 }
 
-std::string CaveRaster::get_coordinates_text() const
-{
+std::string CaveRaster::get_coordinates_text() const {
     return SPrintf("%d,%d-%d,%d (%d,%d)") % p1.x % p1.y % p2.x % p2.y % dist.x % dist.y;
 }
 
-std::string CaveRaster::get_description_markup() const
-{
-    return SPrintf(_("Raster from %d,%d to %d,%d of <b>%s</b>, distance %+d,%+d"))
-        % p1.x % p1.y % p2.x % p2.y % gd_element_properties[element].lowercase_name % dist.x % dist.y;
+std::string CaveRaster::get_description_markup() const {
+    return SPrintf(_("Raster from %d,%d to %d,%d of <b>%ms</b>, distance %+d,%+d"))
+           % p1.x % p1.y % p2.x % p2.y % gd_element_properties[element].lowercase_name % dist.x % dist.y;
 }

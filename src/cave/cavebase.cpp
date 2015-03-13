@@ -26,8 +26,8 @@
   brick walls won't be the darkest color, for example.
 */
 void gd_cave_set_random_c64_colors(CaveBase &cave) {
-    const int bright_colors[]={1, 3, 7};
-    const int dark_colors[]={2, 6, 8, 9, 11};
+    const int bright_colors[]= {1, 3, 7};
+    const int dark_colors[]= {2, 6, 8, 9, 11};
     RandomGenerator r;
 
     /* always black */
@@ -50,7 +50,7 @@ void gd_cave_set_random_c64_colors(CaveBase &cave) {
 }
 
 static void
-cave_set_random_indexed_colors(CaveBase &cave, GdColor (*color_indexer_func) (unsigned, unsigned)) {
+cave_set_random_indexed_colors(CaveBase &cave, GdColor(*color_indexer_func)(unsigned, unsigned)) {
     RandomGenerator r;
     int hue=r.rand_int_range(0, 15);
     int hue_spread=r.rand_int_range(1, 6);  /* 1..5 */
@@ -138,9 +138,15 @@ gd_cave_set_random_rgb_colors(CaveBase &cave) {
     if (r.rand_boolean()) std::swap(s2, s3);
     if (r.rand_boolean()) std::swap(s1, s3);
 
-    h1*=360.0; s1*=100.0; v1*=100.0;
-    h2*=360.0; s2*=100.0; v2*=100.0;
-    h3*=360.0; s3*=100.0; v3*=100.0;
+    h1*=360.0;
+    s1*=100.0;
+    v1*=100.0;
+    h2*=360.0;
+    s2*=100.0;
+    v2*=100.0;
+    h3*=360.0;
+    s3*=100.0;
+    v3*=100.0;
 
     cave.colorb = GdColor::from_hsv(0,0,0).to_rgb();
     cave.color0 = GdColor::from_hsv(0,0,0).to_rgb();       /* black for background */

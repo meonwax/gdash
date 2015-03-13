@@ -27,19 +27,16 @@
 
 /* POINT */
 CavePoint::CavePoint(Coordinate _p, GdElementEnum _element)
-:   CaveObject(GD_POINT),
-    p(_p),
-    element(_element)
-{
+    :   CaveObject(GD_POINT),
+        p(_p),
+        element(_element) {
 }
 
-std::string CavePoint::get_bdcff() const
-{
+std::string CavePoint::get_bdcff() const {
     return BdcffFormat("Point") << p << element;
 }
 
-CavePoint* CavePoint::clone_from_bdcff(const std::string &name, std::istream &is) const
-{
+CavePoint *CavePoint::clone_from_bdcff(const std::string &name, std::istream &is) const {
     Coordinate p;
     GdElementEnum element;
 
@@ -48,8 +45,7 @@ CavePoint* CavePoint::clone_from_bdcff(const std::string &name, std::istream &is
     return new CavePoint(p, element);
 }
 
-void CavePoint::draw(CaveRendered &cave) const
-{
+void CavePoint::draw(CaveRendered &cave) const {
     cave.store_rc(p.x, p.y, element, this);
 }
 
@@ -61,33 +57,27 @@ PropertyDescription const CavePoint::descriptor[] = {
     {NULL},
 };
 
-PropertyDescription const* CavePoint::get_description_array() const
-{
+PropertyDescription const *CavePoint::get_description_array() const {
     return descriptor;
 }
 
-std::string CavePoint::get_coordinates_text() const
-{
+std::string CavePoint::get_coordinates_text() const {
     return SPrintf("%d,%d") % p.x % p.y;
 }
 
-void CavePoint::create_drag(Coordinate current, Coordinate displacement)
-{
+void CavePoint::create_drag(Coordinate current, Coordinate displacement) {
     p=current;
 }
-    
-void CavePoint::move(Coordinate current, Coordinate displacement)
-{
+
+void CavePoint::move(Coordinate current, Coordinate displacement) {
     p+=displacement;
 }
 
-void CavePoint::move(Coordinate displacement)
-{
+void CavePoint::move(Coordinate displacement) {
     p+=displacement;
 }
 
-std::string CavePoint::get_description_markup() const
-{
-    return SPrintf(_("Point of <b>%s</b> at %d,%d"))
-        % gd_element_properties[element].lowercase_name % p.x % p.y;
+std::string CavePoint::get_description_markup() const {
+    return SPrintf(_("Point of <b>%ms</b> at %d,%d"))
+           % gd_element_properties[element].lowercase_name % p.x % p.y;
 }

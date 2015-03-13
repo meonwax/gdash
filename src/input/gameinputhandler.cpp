@@ -19,8 +19,7 @@
 #include "input/gameinputhandler.hpp"
 #include "input/joystick.hpp"
 
-GameInputHandler::GameInputHandler()
-{
+GameInputHandler::GameInputHandler() {
     clear_all_keypresses();
 }
 

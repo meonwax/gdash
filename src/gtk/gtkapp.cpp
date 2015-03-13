@@ -35,28 +35,49 @@
 
 static Activity::KeyCode activity_keycode_from_gdk_keyval(guint keyval) {
     switch (keyval) {
-        case GDK_Up: return App::Up;
-        case GDK_Down: return App::Down;
-        case GDK_Left: return App::Left;
-        case GDK_Right: return App::Right;
-        case GDK_Page_Up: return App::PageUp;
-        case GDK_Page_Down: return App::PageDown;
-        case GDK_Home: return App::Home;
-        case GDK_End: return App::End;
-        case GDK_F1: return App::F1;
-        case GDK_F2: return App::F2;
-        case GDK_F3: return App::F3;
-        case GDK_F4: return App::F4;
-        case GDK_F5: return App::F5;
-        case GDK_F6: return App::F6;
-        case GDK_F7: return App::F7;
-        case GDK_F8: return App::F8;
-        case GDK_F9: return App::F9;
-        case GDK_BackSpace: return App::BackSpace;
-        case GDK_Return: return App::Enter;
-        case GDK_Tab: return App::Tab;
-        case GDK_Escape: return App::Escape;
-        
+        case GDK_Up:
+            return App::Up;
+        case GDK_Down:
+            return App::Down;
+        case GDK_Left:
+            return App::Left;
+        case GDK_Right:
+            return App::Right;
+        case GDK_Page_Up:
+            return App::PageUp;
+        case GDK_Page_Down:
+            return App::PageDown;
+        case GDK_Home:
+            return App::Home;
+        case GDK_End:
+            return App::End;
+        case GDK_F1:
+            return App::F1;
+        case GDK_F2:
+            return App::F2;
+        case GDK_F3:
+            return App::F3;
+        case GDK_F4:
+            return App::F4;
+        case GDK_F5:
+            return App::F5;
+        case GDK_F6:
+            return App::F6;
+        case GDK_F7:
+            return App::F7;
+        case GDK_F8:
+            return App::F8;
+        case GDK_F9:
+            return App::F9;
+        case GDK_BackSpace:
+            return App::BackSpace;
+        case GDK_Return:
+            return App::Enter;
+        case GDK_Tab:
+            return App::Tab;
+        case GDK_Escape:
+            return App::Escape;
+
         default:
             return gdk_keyval_to_unicode(keyval);
     }
@@ -97,17 +118,15 @@ gboolean drawing_area_expose(GtkWidget *drawing_area, GdkEventExpose *event, gpo
 
 /* this function is an idle func which will run in the main thread.
  * the main thread has the applicaton, and also it is allowed to use gtk and the other libs. */
-gboolean GTKApp::timing_event_idle_func(gpointer data)
-{
+gboolean GTKApp::timing_event_idle_func(gpointer data) {
     GTKApp *the_app = static_cast<GTKApp *>(data);
     /* the number of events received since the last processing.
      * if the computer is slow, or the window is moved by the user with the mouse,
      * then this may be more than one. */
     int timer_events_received = the_app->timer_events;
     /* process the event; but only do it once, even if the counter is lagging. */
-    if (gtk_window_is_active(GTK_WINDOW(the_app->toplevel)) && timer_events_received > 0) {
+    if (timer_events_received > 0) {
         the_app->timer_event(20);
-        the_app->process_commands();
         g_atomic_int_add(&the_app->timer_events, -timer_events_received);
     }
     return FALSE;
@@ -118,7 +137,7 @@ gboolean GTKApp::timing_event_idle_func(gpointer data)
 gpointer GTKApp::timing_thread(gpointer data) {
     GTKApp *the_app = static_cast<GTKApp *>(data);
     int const interval_msec = 20;
-    
+
     /* wait before we first call it */
     g_usleep(interval_msec*1000);
     while (!the_app->quit_thread) {
@@ -134,10 +153,9 @@ gpointer GTKApp::timing_thread(gpointer data) {
 
 
 GTKApp::GTKApp(GtkWidget *drawing_area, GtkActionGroup *actions_game)
-:
+    :
     drawing_area(drawing_area),
-    actions_game(actions_game)
-{
+    actions_game(actions_game) {
     pixbuf_factory = new GTKPixbufFactory();
     pixbuf_factory->set_properties(GdScalingType(gd_cell_scale_game), gd_pal_emulation_game);
     font_manager = new FontManager(*pixbuf_factory, "");
@@ -155,11 +173,11 @@ GTKApp::GTKApp(GtkWidget *drawing_area, GtkActionGroup *actions_game)
     quit_thread = false;
     timer_events = 0;
 #ifndef G_THREADS_ENABLED
-    #error Thread support in Glib must be enabled
+#error Thread support in Glib must be enabled
 #endif
     timer_thread = g_thread_create(timing_thread, this, TRUE, NULL);
     g_assert(timer_thread != NULL);
-    
+
     game_active(false);
 }
 
@@ -169,10 +187,10 @@ GTKApp::~GTKApp() {
     quit_thread = true;
     g_thread_join(timer_thread);
     /* disconnect any signals and timeout handlers */
-	g_signal_handler_disconnect(G_OBJECT(toplevel), focus_handler);
-	g_signal_handler_disconnect(G_OBJECT(toplevel), keypress_handler);
-	g_signal_handler_disconnect(G_OBJECT(toplevel), keyrelease_handler);
-	g_signal_handler_disconnect(G_OBJECT(drawing_area), expose_handler);
+    g_signal_handler_disconnect(G_OBJECT(toplevel), focus_handler);
+    g_signal_handler_disconnect(G_OBJECT(toplevel), keypress_handler);
+    g_signal_handler_disconnect(G_OBJECT(toplevel), keyrelease_handler);
+    g_signal_handler_disconnect(G_OBJECT(drawing_area), expose_handler);
     while (g_idle_remove_by_data(this))
         ; /* remove all */
 }
@@ -180,8 +198,8 @@ GTKApp::~GTKApp() {
 
 void GTKApp::select_file_and_do_command(const char *title, const char *start_dir, const char *glob, bool for_save, const char *defaultname, SmartPtr<Command1Param<std::string> > command_when_successful) {
     GtkWidget *dialog=gtk_file_chooser_dialog_new(title, GTK_WINDOW(toplevel),
-        for_save ? GTK_FILE_CHOOSER_ACTION_SAVE : GTK_FILE_CHOOSER_ACTION_OPEN,
-        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+                      for_save ? GTK_FILE_CHOOSER_ACTION_SAVE : GTK_FILE_CHOOSER_ACTION_OPEN,
+                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT);
     if (for_save)
         gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), TRUE);
@@ -215,7 +233,7 @@ void GTKApp::select_file_and_do_command(const char *title, const char *start_dir
 
 void GTKApp::ask_yesorno_and_do_command(char const *question, const char *yes_answer, char const *no_answer, SmartPtr<Command> command_when_yes, SmartPtr<Command> command_when_no) {
     GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(toplevel), GtkDialogFlags(0),
-        GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, "%s", question);
+                        GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, "%s", question);
 
     GtkWidget *buttonno=gtk_button_new_with_mnemonic(no_answer);
     gtk_button_set_image(GTK_BUTTON(buttonno), gtk_image_new_from_stock(GTK_STOCK_NO, GTK_ICON_SIZE_BUTTON));
@@ -228,7 +246,7 @@ void GTKApp::ask_yesorno_and_do_command(char const *question, const char *yes_an
     gtk_widget_show_all(dialog);
     bool yes = gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES;
     gtk_widget_destroy(dialog);
-    
+
     if (yes)
         enqueue_command(command_when_yes);
     else
@@ -239,13 +257,13 @@ void GTKApp::ask_yesorno_and_do_command(char const *question, const char *yes_an
 void GTKApp::show_text_and_do_command(char const *title_line, std::string const &text, SmartPtr<Command> command_after_exit) {
     /* create text buffer */
     GtkTextIter iter;
-    
+
     GtkWidget *dialog=gtk_dialog_new_with_buttons(title_line, GTK_WINDOW(toplevel), GTK_DIALOG_NO_SEPARATOR,
-        GTK_STOCK_CLOSE, GTK_RESPONSE_OK, NULL);
+                      GTK_STOCK_CLOSE, GTK_RESPONSE_OK, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
     gtk_window_set_default_size(GTK_WINDOW(dialog), 512, 384);
     GtkWidget *sw = gtk_scrolled_window_new(NULL, NULL);
-    gtk_box_pack_start_defaults(GTK_BOX (GTK_DIALOG(dialog)->vbox), sw);
+    gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), sw);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(sw), GTK_SHADOW_IN);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
@@ -288,8 +306,8 @@ void GTKApp::show_about_info() {
 
 void GTKApp::input_text_and_do_command(char const *title_line, char const *default_text, SmartPtr<Command1Param<std::string> > command_when_successful) {
     GtkWidget *dialog = gtk_dialog_new_with_buttons(title_line, GTK_WINDOW(toplevel),
-        GtkDialogFlags(GTK_DIALOG_NO_SEPARATOR|GTK_DIALOG_DESTROY_WITH_PARENT),
-        GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
+                        GtkDialogFlags(GTK_DIALOG_NO_SEPARATOR|GTK_DIALOG_DESTROY_WITH_PARENT),
+                        GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT);
     GtkWidget *entry = gtk_entry_new();
     gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
@@ -313,7 +331,9 @@ void GTKApp::game_active(bool active) {
 
 
 void GTKApp::show_settings(Setting *settings) {
-    SettingsWindow::do_settings_dialog(settings, *pixbuf_factory);
+    bool restart_reqd = SettingsWindow::do_settings_dialog(settings, *pixbuf_factory);
+    if (restart_reqd)
+        request_restart();
 }
 
 

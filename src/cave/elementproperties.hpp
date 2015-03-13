@@ -24,7 +24,7 @@
 /// This enum lists some properties of elements, which are used by the engine.
 enum ElementPropertyEnum {
     E_P_SCANNED,                ///< is a scanned element
-    
+
     E_P_SLOPED_LEFT,            ///< stones and diamonds roll to left on this
     E_P_SLOPED_RIGHT,           ///< stones and diamonds roll to right on this
     E_P_SLOPED_UP,              ///< stones and diamonds roll from up on this

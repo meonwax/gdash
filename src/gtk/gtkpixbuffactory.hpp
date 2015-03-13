@@ -28,9 +28,9 @@ public:
     virtual GTKPixbuf *create_from_inline(int length, unsigned char const *data) const;
     virtual GTKPixbuf *create_from_file(const char *filename) const;
     virtual GTKPixbuf *create_rotated(const Pixbuf &src, Rotation r) const;
-    virtual GTKPixbuf *create_composite_color(const Pixbuf &src, const GdColor& c, unsigned char alpha) const;
+    virtual GTKPixbuf *create_composite_color(const Pixbuf &src, const GdColor &c, unsigned char alpha) const;
     virtual GTKPixbuf *create_subpixbuf(Pixbuf &src, int x, int y, int w, int h) const;
-    virtual Pixmap *create_pixmap_from_pixbuf(const Pixbuf& pb, bool format_alpha) const;
+    virtual Pixmap *create_pixmap_from_pixbuf(const Pixbuf &pb, bool format_alpha) const;
 };
 
 #endif

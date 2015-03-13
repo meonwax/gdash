@@ -33,7 +33,7 @@ public:
     virtual void redraw_event();
     virtual void keypress_event(KeyCode keycode, int gfxlib_keycode);
     virtual void timer_event(int ms_elapsed);
-    
+
     /* if you change these, change the help strings in the cpp file as well */
     enum Keys {
         EndGameKey = App::F1,

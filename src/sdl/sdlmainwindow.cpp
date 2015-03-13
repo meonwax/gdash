@@ -29,6 +29,8 @@
 
 #include "sdl/sdlmainwindow.hpp"
 
+// OPENGL
+#include "sdl/ogl.hpp"
 
 
 
@@ -38,11 +40,14 @@ public:
 };
 
 SDLApp::SDLApp() {
-    pixbuf_factory = new SDLPixbufFactory;
+    //~ screen = new SDLScreen;
+    //~ pixbuf_factory = new SDLPixbufFactory;
+    // OPENGL
+    screen = new SDLOGLScreen;
+    pixbuf_factory = new SDLOGLPixbufFactory;
     pixbuf_factory->set_properties(GdScalingType(gd_cell_scale_game), gd_pal_emulation_game);
     font_manager = new FontManager(*pixbuf_factory, "");
     gameinput = new SDLGameInputHandler;
-    screen = new SDLScreen;
 }
 
 
@@ -59,28 +64,49 @@ static Uint32 timer_callback(Uint32 interval, void *param) {
 
 static Activity::KeyCode activity_keycode_from_sdl_key_event(SDL_KeyboardEvent const &ev) {
     switch (ev.keysym.sym) {
-        case SDLK_UP: return App::Up;
-        case SDLK_DOWN: return App::Down;
-        case SDLK_LEFT: return App::Left;
-        case SDLK_RIGHT: return App::Right;
-        case SDLK_PAGEUP: return App::PageUp;
-        case SDLK_PAGEDOWN: return App::PageDown;
-        case SDLK_HOME: return App::Home;
-        case SDLK_END: return App::End;
-        case SDLK_F1: return App::F1;
-        case SDLK_F2: return App::F2;
-        case SDLK_F3: return App::F3;
-        case SDLK_F4: return App::F4;
-        case SDLK_F5: return App::F5;
-        case SDLK_F6: return App::F6;
-        case SDLK_F7: return App::F7;
-        case SDLK_F8: return App::F8;
-        case SDLK_F9: return App::F9;
-        case SDLK_BACKSPACE: return App::BackSpace;
-        case SDLK_RETURN: return App::Enter;
-        case SDLK_TAB: return App::Tab;
-        case SDLK_ESCAPE: return App::Escape;
-        
+        case SDLK_UP:
+            return App::Up;
+        case SDLK_DOWN:
+            return App::Down;
+        case SDLK_LEFT:
+            return App::Left;
+        case SDLK_RIGHT:
+            return App::Right;
+        case SDLK_PAGEUP:
+            return App::PageUp;
+        case SDLK_PAGEDOWN:
+            return App::PageDown;
+        case SDLK_HOME:
+            return App::Home;
+        case SDLK_END:
+            return App::End;
+        case SDLK_F1:
+            return App::F1;
+        case SDLK_F2:
+            return App::F2;
+        case SDLK_F3:
+            return App::F3;
+        case SDLK_F4:
+            return App::F4;
+        case SDLK_F5:
+            return App::F5;
+        case SDLK_F6:
+            return App::F6;
+        case SDLK_F7:
+            return App::F7;
+        case SDLK_F8:
+            return App::F8;
+        case SDLK_F9:
+            return App::F9;
+        case SDLK_BACKSPACE:
+            return App::BackSpace;
+        case SDLK_RETURN:
+            return App::Enter;
+        case SDLK_TAB:
+            return App::Tab;
+        case SDLK_ESCAPE:
+            return App::Escape;
+
         default:
             return ev.keysym.unicode;
     }
@@ -91,7 +117,9 @@ class SetNextActionCommandSDL : public Command {
 public:
     SetNextActionCommandSDL(App *app, NextAction &na, NextAction to_what): Command(app), na(na), to_what(to_what) {}
 private:
-    virtual void execute() { na = to_what; }
+    virtual void execute() {
+        na = to_what;
+    }
     NextAction &na;
     NextAction to_what;
 };
@@ -102,7 +130,7 @@ static void run_the_app(App &the_app, NextAction &na) {
     int const timer_ms = 20;
     SDL_InitSubSystem(SDL_INIT_TIMER);
     SDL_TimerID id = SDL_AddTimer(timer_ms, timer_callback, NULL);
-    
+
     the_app.set_no_activity_command(new SetNextActionCommandSDL(&the_app, na, Quit));
 
     /* sdl_waitevent will wait until at least one event appears. */
@@ -111,17 +139,21 @@ static void run_the_app(App &the_app, NextAction &na) {
         /* and now we poll all the events, as there might be more than one. */
         bool had_timer_event1 = false;
         SDL_Event ev;
-        
+
         while (SDL_PollEvent(&ev)) {
             switch (ev.type) {
                 case SDL_QUIT:
                     the_app.quit_event();
                     break;
                 case SDL_KEYDOWN:
-                    if (ev.key.keysym.sym == SDLK_F11) {
+                    if ((ev.key.keysym.sym == SDLK_F11)
+                            || (ev.key.keysym.sym == SDLK_RETURN && (ev.key.keysym.mod & (KMOD_LALT | KMOD_RALT)))) {
                         gd_fullscreen = !gd_fullscreen;
                         the_app.screen->reinit();
                         the_app.redraw_event();
+                    }
+                    else if ((ev.key.keysym.sym == SDLK_q) && (ev.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))) {
+                        the_app.quit_event();
                     } else {
                         Activity::KeyCode keycode = activity_keycode_from_sdl_key_event(ev.key);
                         the_app.keypress_event(keycode, ev.key.keysym.sym);
@@ -142,19 +174,20 @@ static void run_the_app(App &the_app, NextAction &na) {
             } // switch ev.type
         } // while pollevent
 
-        if (had_timer_event1 && (SDL_GetAppState() & SDL_APPINPUTFOCUS))
+        if (had_timer_event1)
             the_app.timer_event(timer_ms);
-        
+
+#ifdef HAVE_GTK
         // check if the g_main_loop has something to do. if it has,
         // it is usually gtk stuff - so let gtk live :D
         while (g_main_context_pending(NULL))
             g_main_context_iteration(NULL, FALSE);
+#endif
     }
 
     SDL_RemoveTimer(id);
 }
 
-#include "misc/about.hpp"
 void gd_main_window_sdl_run(CaveSet *caveset, NextAction &na) {
     SDLApp the_app;
 

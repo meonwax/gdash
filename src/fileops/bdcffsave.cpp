@@ -31,8 +31,7 @@
 /// BDCFF save functions
 
 /// write highscore to a bdcff file
-static void write_highscore_func(std::list<std::string> &out, HighScoreTable const &scores)
-{
+static void write_highscore_func(std::list<std::string> &out, HighScoreTable const &scores) {
     for (unsigned int i=0; i<scores.size(); i++)
         out.push_back(BdcffFormat() << scores[i].score << scores[i].name);
 }
@@ -44,8 +43,7 @@ static void write_highscore_func(std::list<std::string> &out, HighScoreTable con
 /// @param str_def Another reflective object, which is of the same type. Default values are taken from that,
 ///                 i.e. if a property in str has the same value as in str_def, it is not saved.
 /// @param ratio The cave size, for ratio types. Set to cave->w*cave->h when calling.
-static void save_properties(std::list<std::string> &out, Reflective &str, Reflective &str_def, int ratio)
-{
+static void save_properties(std::list<std::string> &out, Reflective &str, Reflective &str_def, int ratio) {
     PropertyDescription const *prop_desc=str.get_description_array();
     bool should_write=false;
     const char *identifier=NULL;
@@ -82,14 +80,14 @@ static void save_properties(std::list<std::string> &out, Reflective &str, Reflec
                 out.push_back(BdcffFormat("Effect") << prop_desc[i].identifier << str.get<GdElement>(prop));
             continue;
         }
-        
+
         // and now process tags which have to be treated normally.
 
         // if identifier differs from the previous, write out the line collected, and start a new one
         if (!identifier || strcmp(prop_desc[i].identifier, identifier)!=0) {
             // write lines only which carry information other than the default settings
             if (should_write)
-                out.push_back(line);                
+                out.push_back(line);
 
             line.start_new(prop_desc[i].identifier);
             should_write=false;
@@ -103,69 +101,69 @@ static void save_properties(std::list<std::string> &out, Reflective &str, Reflec
             should_write=true;
 
         switch (prop_desc[i].type) {
-        case GD_TYPE_BOOLEAN:
-            line << str.get<GdBool>(prop);
-            if (str.get<GdBool>(prop)!=str_def.get<GdBool>(prop))
-                should_write=true;
-            break;
-        case GD_TYPE_INT:
-            if (prop_desc[i].flags&GD_BDCFF_RATIO_TO_CAVE_SIZE)
-                line << (str.get<GdInt>(prop)/(double)ratio);   /* save as ratio! */
-            else
-                line << str.get<GdInt>(prop);                   /* save as normal int */
-            if (str.get<GdInt>(prop)!=str_def.get<GdInt>(prop))
-                should_write=true;
-            break;
-        case GD_TYPE_INT_LEVELS:
-            for (unsigned j=0; j<prop->count; j++) {
+            case GD_TYPE_BOOLEAN:
+                line << str.get<GdBool>(prop);
+                if (str.get<GdBool>(prop)!=str_def.get<GdBool>(prop))
+                    should_write=true;
+                break;
+            case GD_TYPE_INT:
                 if (prop_desc[i].flags&GD_BDCFF_RATIO_TO_CAVE_SIZE)
-                    line << (str.get<GdIntLevels>(prop)[j]/(double)ratio);   /* save as ratio! */
+                    line << (str.get<GdInt>(prop)/(double)ratio);   /* save as ratio! */
                 else
-                    line << str.get<GdIntLevels>(prop)[j];                   /* save as normal int */
-                if (str.get<GdIntLevels>(prop)[j]!=str_def.get<GdIntLevels>(prop)[j])
+                    line << str.get<GdInt>(prop);                   /* save as normal int */
+                if (str.get<GdInt>(prop)!=str_def.get<GdInt>(prop))
                     should_write=true;
-            }
-            break;
-        case GD_TYPE_PROBABILITY:
-            line << str.get<GdProbability>(prop);
-            if (str.get<GdProbability>(prop)!=str_def.get<GdProbability>(prop))
-                should_write=true;
-            break;
-        case GD_TYPE_PROBABILITY_LEVELS:
-            for (unsigned j=0; j<prop->count; j++) {
-                line << str.get<GdProbabilityLevels>(prop)[j];
-                if (str.get<GdProbabilityLevels>(prop)[j]!=str_def.get<GdProbabilityLevels>(prop)[j])
+                break;
+            case GD_TYPE_INT_LEVELS:
+                for (unsigned j=0; j<prop->count; j++) {
+                    if (prop_desc[i].flags&GD_BDCFF_RATIO_TO_CAVE_SIZE)
+                        line << (str.get<GdIntLevels>(prop)[j]/(double)ratio);   /* save as ratio! */
+                    else
+                        line << str.get<GdIntLevels>(prop)[j];                   /* save as normal int */
+                    if (str.get<GdIntLevels>(prop)[j]!=str_def.get<GdIntLevels>(prop)[j])
+                        should_write=true;
+                }
+                break;
+            case GD_TYPE_PROBABILITY:
+                line << str.get<GdProbability>(prop);
+                if (str.get<GdProbability>(prop)!=str_def.get<GdProbability>(prop))
                     should_write=true;
-            }
-            break;
-        case GD_TYPE_ELEMENT:
-            line << str.get<GdElement>(prop);
-            if (str.get<GdElement>(prop)!=str_def.get<GdElement>(prop))
+                break;
+            case GD_TYPE_PROBABILITY_LEVELS:
+                for (unsigned j=0; j<prop->count; j++) {
+                    line << str.get<GdProbabilityLevels>(prop)[j];
+                    if (str.get<GdProbabilityLevels>(prop)[j]!=str_def.get<GdProbabilityLevels>(prop)[j])
+                        should_write=true;
+                }
+                break;
+            case GD_TYPE_ELEMENT:
+                line << str.get<GdElement>(prop);
+                if (str.get<GdElement>(prop)!=str_def.get<GdElement>(prop))
+                    should_write=true;
+                break;
+            case GD_TYPE_COLOR:
+                line << str.get<GdColor>(prop);
                 should_write=true;
-            break;
-        case GD_TYPE_COLOR:
-            line << str.get<GdColor>(prop);
-            should_write=true;
-            break;
-        case GD_TYPE_DIRECTION:
-            line << str.get<GdDirection>(prop);
-            if (str.get<GdDirection>(prop)!=str_def.get<GdDirection>(prop))
-                should_write=true;
-            break;
-        case GD_TYPE_SCHEDULING:
-            line << str.get<GdScheduling>(prop);
-            if (str.get<GdScheduling>(prop)!=str_def.get<GdScheduling>(prop))
-                should_write=true;
-            break;
-        case GD_TAB:
-        case GD_LABEL:
-        case GD_TYPE_EFFECT:            /* handled above */
-        case GD_TYPE_STRING:            /* handled above */
-        case GD_TYPE_LONGSTRING:        /* handled above */
-        case GD_TYPE_COORDINATE:        /* currently not needed */
-        case GD_TYPE_BOOLEAN_LEVELS:    /* currently not needed */
-            g_assert_not_reached();
-            break;
+                break;
+            case GD_TYPE_DIRECTION:
+                line << str.get<GdDirection>(prop);
+                if (str.get<GdDirection>(prop)!=str_def.get<GdDirection>(prop))
+                    should_write=true;
+                break;
+            case GD_TYPE_SCHEDULING:
+                line << str.get<GdScheduling>(prop);
+                if (str.get<GdScheduling>(prop)!=str_def.get<GdScheduling>(prop))
+                    should_write=true;
+                break;
+            case GD_TAB:
+            case GD_LABEL:
+            case GD_TYPE_EFFECT:            /* handled above */
+            case GD_TYPE_STRING:            /* handled above */
+            case GD_TYPE_LONGSTRING:        /* handled above */
+            case GD_TYPE_COORDINATE:        /* currently not needed */
+            case GD_TYPE_BOOLEAN_LEVELS:    /* currently not needed */
+                g_assert_not_reached();
+                break;
         }
     }
     /* write remaining data */
@@ -177,13 +175,11 @@ static void save_properties(std::list<std::string> &out, Reflective &str, Reflec
 /* remove a line from the list of strings. */
 /* the prefix should be a property; add an equal sign! so properties which have names like
    "slime" and "slimeproperties" won't match each other. */
-static void cave_properties_remove(std::list<std::string> &out, const char *attrib)
-{
+static void cave_properties_remove(std::list<std::string> &out, const char *attrib) {
     out.remove_if(HasAttrib(attrib));
 }
 
-static BdcffSection save_replay_func(CaveReplay &replay)
-{
+static BdcffSection save_replay_func(CaveReplay &replay) {
     BdcffSection out;
     CaveReplay default_values;                          // an empty replay to store default values
     save_properties(out, replay, default_values, 0);    // 0 is for ratio, here it is not used
@@ -194,8 +190,7 @@ static BdcffSection save_replay_func(CaveReplay &replay)
 
 /// Output properties of a CaveStored to a BdcffFile::CaveInfo structure.
 /// Saves everything; properties, map, objects.
-static BdcffFile::CaveInfo caveset_save_cave_func(CaveStored &cave)
-{
+static BdcffFile::CaveInfo caveset_save_cave_func(CaveStored &cave) {
     BdcffFile::CaveInfo out;
 
     write_highscore_func(out.highscore, cave.highscore);
@@ -279,8 +274,7 @@ static BdcffFile::CaveInfo caveset_save_cave_func(CaveStored &cave)
 /// @param name The name of the group in te bdcff file.
 /// @param in The list of properties to save to the file. Will be cleared after this.
 /// @param out The list of strings, which will be the bdcff file. Writes to this list.
-static void add_group(std::string name, std::list<std::string> &in, std::list<std::string> &out)
-{
+static void add_group(std::string name, std::list<std::string> &in, std::list<std::string> &out) {
     if (!in.empty()) {
         out.push_back("");
         out.push_back("[" + name + "]");
@@ -291,8 +285,7 @@ static void add_group(std::string name, std::list<std::string> &in, std::list<st
 }
 
 /// Save caveset in BDCFF format to a list of strings.
-void save_to_bdcff(CaveSet &caveset, std::list<std::string> &out)
-{
+void save_to_bdcff(CaveSet &caveset, std::list<std::string> &out) {
 
     BdcffFile outfile;
 
@@ -311,7 +304,7 @@ void save_to_bdcff(CaveSet &caveset, std::list<std::string> &out)
         // if they have a map (random elements+object based maps do not need characters)
         if (!cave.map.empty()) {
             // check every element of map
-            for(int y=0; y<cave.h; ++y)
+            for (int y=0; y<cave.h; ++y)
                 for (int x=0; x<cave.w; ++x) {
                     GdElementEnum e=cave.map(x, y);
                     if (gd_element_properties[e].character_new==0) {

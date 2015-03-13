@@ -34,13 +34,13 @@ class GameControl;
 /**
  * This activity plays a replay, and saves every animation frame to
  * a PNG file, along with the sound to a WAV file.
- * 
+ *
  * This is implemented using a normal GameControl object, but it is given
  * a special kind of Screen which can be saved to a PNG file. Also
  * the normal sound stream is closed, and a special stream is requested
  * from SDL with the dummy audio driver. A mixer callback func is also
  * registered for SDL_Mixer, which will save the audio data.
- * 
+ *
  * During saving the replay, the normal timer events which are forwarded
  * from the App are not used for the timing of the cave. The mixer callback
  * registered to SDL_Mixer also pushes SDL events (SDL_USEREVENT+1), which
@@ -49,12 +49,12 @@ class GameControl;
  * the sound buffer is set to hold 20ms of sound data, so SDL_Mixer is
  * forced to generate us the events every 20ms - thus we can do an 50fps
  * animation.
- * 
+ *
  * During saving the replay, the image is shown to the user, but it is not
  * scaled, and there will be no sound. (As sound goes only to the memory
  * and the WAV file.) This does not take too much CPU power; compressing
  * the PNG files is eats much more.
- * 
+ *
  * The whole thing only works in the SDL version, it is not implemented
  * in the GTK game. Maybe it would be nice to put it in the GTK version
  * instead. */
@@ -99,7 +99,7 @@ private:
     std::string filename_prefix;
     /** The WAV file opened for writing. */
     FILE *wavfile;
-    
+
     // saved settings
     /** User's sound preference to be restored after replay saving. */
     bool saved_gd_sdl_sound;
@@ -124,7 +124,7 @@ private:
         ~SDLInmemoryScreen();
         void save(char const *filename);
     };
-    
+
     /** GameControl object which plays the replay. */
     GameControl *game;
     /** A PixbufFactory set to no scaling, no pal emulation. */

@@ -36,9 +36,9 @@ std::string Printf::flag_characters="0-+lhm";
  * @brief This function html-markups a string.
  * It will change <, >, &, and \n characters into &lt; &gt; &amp; and <br>.
  */
-std::string Printf::html_markup_text(const std::string& of_what) {
+std::string Printf::html_markup_text(const std::string &of_what) {
     std::string result;
-    
+
     for (unsigned i=0; i<of_what.size(); ++i) {
         switch (of_what[i]) {
             case '<':
@@ -58,7 +58,7 @@ std::string Printf::html_markup_text(const std::string& of_what) {
                 break;
         }
     }
-    
+
     return result;
 }
 
@@ -66,8 +66,8 @@ std::string Printf::html_markup_text(const std::string& of_what) {
 /// Printf object constructor.
 /// @param percent Character which specifies a conversion. Default is %, as in misc/printf.
 /// @param format The format string.
-Printf::Printf(const std::string& format_, char percent)
-:
+Printf::Printf(const std::string &format_, char percent)
+    :
     format(format_),
     inserted_chars(0) {
     size_t pos, nextpos=0;
@@ -86,7 +86,7 @@ Printf::Printf(const std::string& format_, char percent)
             size_t last=format.find_first_of(conv_specifiers, pos+1);
             if (last==std::string::npos)
                 throw std::runtime_error("unterminated conversion specifier");
-            
+
             // ok we found something like %-5s. get the conversion type (s), and get
             // the manipulator (-5).
             Conversion c;
@@ -109,7 +109,7 @@ Printf::Printf(const std::string& format_, char percent)
 /// Also it removes the conversion specifier from the format string.
 /// @param os The ostringstream to setup according to the next found conversion specifier.
 /// @param pos The position, which is the char position of the original conversion specifier.
-void Printf::configure_ostream(std::ostringstream& os, Conversion &conversion) const {
+void Printf::configure_ostream(std::ostringstream &os, Conversion &conversion) const {
     // process format specifier.
     // the type of the variable to be written is mainly handled by
     // the c++ type system. here we only take care of the small
@@ -119,7 +119,7 @@ void Printf::configure_ostream(std::ostringstream& os, Conversion &conversion) c
 
     // if we have a manipulator, is it at the beginning of the string
     while (flag_characters.find_first_of(conversion.manip[0])!=std::string::npos) {
-        switch(conversion.manip[0]) {
+        switch (conversion.manip[0]) {
             case '-':
                 os << std::left;
                 break;

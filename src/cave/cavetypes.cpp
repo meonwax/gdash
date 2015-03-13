@@ -32,25 +32,25 @@
 
 
 /* TRANSLATORS: None here means "no direction to move"; when there is no gravity while stirring the pot. */
-static const char* direction_name[]={ N_("None"), N_("Up"), N_("Up+right"), N_("Right"), N_("Down+right"), N_("Down"), N_("Down+left"), N_("Left"), N_("Up+left") };
-static const char* direction_filename[]={ "none", "up", "upright", "right", "downright", "down", "downleft", "left", "upleft" };
+static const char *direction_name[]= { N_("None"), N_("Up"), N_("Up+right"), N_("Right"), N_("Down+right"), N_("Down"), N_("Down+left"), N_("Left"), N_("Up+left") };
+static const char *direction_filename[]= { "none", "up", "upright", "right", "downright", "down", "downleft", "left", "upleft" };
 
-static const char* scheduling_name[]={ N_("Milliseconds"), "BD1", "BD2", "Construction Kit", "Crazy Dream 7", "Atari BD1", "Atari BD2/Construction Kit" };
-static const char* scheduling_filename[]={ "ms", "bd1", "bd2", "plck", "crdr7", "bd1atari", "bd2ckatari" };
+static const char *scheduling_name[]= { N_("Milliseconds"), "BD1", "BD2", "Construction Kit", "Crazy Dream 7", "Atari BD1", "Atari BD2/Construction Kit" };
+static const char *scheduling_filename[]= { "ms", "bd1", "bd2", "plck", "crdr7", "bd1atari", "bd2ckatari" };
 
 /* used for bdcff engine flag. */
-static const char *engines_name[]={"BD1", "BD2", "PLCK", "1stB", "Crazy Dream", "Crazy Light"};
-static const char *engines_filename[]={"BD1", "BD2", "PLCK", "1stB", "CrDr", "CrLi"};
+static const char *engines_name[]= {"BD1", "BD2", "PLCK", "1stB", "Crazy Dream", "Crazy Light"};
+static const char *engines_filename[]= {"BD1", "BD2", "PLCK", "1stB", "CrDr", "CrLi"};
 
 /// Write a coordinate to an output stream.
 /// Delimits the x and y components with space.
-std::ostream& operator<<(std::ostream &os, Coordinate const &p) {
+std::ostream &operator<<(std::ostream &os, Coordinate const &p) {
     return (os << p.x << ' ' << p.y);
 }
 
 /// Read a coordinate from an input stream.
 /// Reads x and y coordinates; if both could be read, set p.
-std::istream& operator>>(std::istream &is, Coordinate &p) {
+std::istream &operator>>(std::istream &is, Coordinate &p) {
     int x, y;
     is >> x >> y;
     /* only modify p if read both parameters correctly */
@@ -63,20 +63,20 @@ std::istream& operator>>(std::istream &is, Coordinate &p) {
 
 /// Add a vector to a coordinate.
 /// @param p The vector to add.
-Coordinate& Coordinate::operator+=(Coordinate const &p) {
+Coordinate &Coordinate::operator+=(Coordinate const &p) {
     x+=p.x;
     y+=p.y;
     return *this;
 }
 
 /// Add two coordinates (vectors).
-Coordinate Coordinate::operator+(Coordinate const& rhs) const {
+Coordinate Coordinate::operator+(Coordinate const &rhs) const {
     return Coordinate(x+rhs.x, y+rhs.y);
 }
 
 /// Compare two coordinates for equality.
 /// @return True, if they are the same.
-bool Coordinate::operator==(Coordinate const& rhs) const {
+bool Coordinate::operator==(Coordinate const &rhs) const {
     return x==rhs.x && y==rhs.y;
 }
 
@@ -102,20 +102,16 @@ void Coordinate::drag_rectangle(Coordinate &p1, Coordinate &p2, Coordinate curre
     if (current.x==p1.x && current.y==p1.y) {           /* try to drag (x1;y1) corner. */
         p1.x+=displacement.x;
         p1.y+=displacement.y;
-    }
-    else if (current.x==p2.x && current.y==p1.y) {      /* try to drag (x2;y1) corner. */
+    } else if (current.x==p2.x && current.y==p1.y) {    /* try to drag (x2;y1) corner. */
         p2.x+=displacement.x;
         p1.y+=displacement.y;
-    }
-    else if (current.x==p1.x && current.y==p2.y) {      /* try to drag (x1;y2) corner. */
+    } else if (current.x==p1.x && current.y==p2.y) {    /* try to drag (x1;y2) corner. */
         p1.x+=displacement.x;
         p2.y+=displacement.y;
-    }
-    else if (current.x==p2.x && current.y==p2.y) {      /* try to drag (x2;y2) corner. */
+    } else if (current.x==p2.x && current.y==p2.y) {    /* try to drag (x2;y2) corner. */
         p2.x+=displacement.x;
         p2.y+=displacement.y;
-    }
-    else {
+    } else {
         /* drag the whole thing */
         p1.x+=displacement.x;
         p1.y+=displacement.y;
@@ -175,7 +171,7 @@ const char *visible_name(GdElementEnum elem) {
 CharToElementTable::CharToElementTable() {
     for (unsigned i=0; i<ArraySize; i++)
         table[i]=O_UNKNOWN;
-    
+
     /* then set fixed characters */
     for (unsigned i=0; i<O_MAX; i++) {
         int c=gd_element_properties[i].character;
@@ -190,7 +186,7 @@ CharToElementTable::CharToElementTable() {
 
 /**
  * @brief Return the GdElementEnum assigned to the character.
- * 
+ *
  * @param i The character.
  * @return The element, or O_UNKNOWN if character is invalid.
  */
@@ -205,18 +201,18 @@ GdElementEnum CharToElementTable::get(unsigned i) const {
 /**
  * @brief Find an empty character to store the element in a map.
  * If finds a suitable character, also remembers.
- * 
+ *
  * @param e The element to find place for.
  * @return The (new) character for the element.
  */
 unsigned CharToElementTable::find_place_for(GdElementEnum e) {
     const char *not_allowed="<>&[]/=\\";
-    
+
     // first check if it is already in the array.
     for (unsigned i=32; i<ArraySize; ++i)
         if (table[i]==e)
             return i;
-    
+
     unsigned i;
     for (i=32; i<ArraySize; ++i)
         // if found a good empty char, break
@@ -230,7 +226,7 @@ unsigned CharToElementTable::find_place_for(GdElementEnum e) {
 
 /**
  * @brief Set an element assigned to a character.
- * 
+ *
  * @param i The character.
  * @param e The element assigned.
  */
@@ -239,7 +235,7 @@ void CharToElementTable::set(unsigned i, GdElementEnum e) {
         gd_warning(CPrintf("Invalid character representing element: %c") % char(i));
         return;
     }
-    
+
     if (table[i]!=O_UNKNOWN)
         gd_warning(CPrintf("Character %c already used by elements %s") % char(i) % visible_name(table[i]));
 
@@ -325,7 +321,7 @@ void gd_cave_types_init() {
 /// If the element name is not found, an error state is also set.
 /// @param is The istream to load from.
 /// @param e The element to store to.
-std::istream& operator>>(std::istream &is, GdElementEnum &e) {
+std::istream &operator>>(std::istream &is, GdElementEnum &e) {
     std::string s;
     if (is>>s) {
         if (!name_to_element.has_name(s))
@@ -337,7 +333,7 @@ std::istream& operator>>(std::istream &is, GdElementEnum &e) {
 }
 
 /// Save a GdBool to a stream, by writing either "false" or "true".
-std::ostream& operator<<(std::ostream& os, GdBool const& b) {
+std::ostream &operator<<(std::ostream &os, GdBool const &b) {
     os << (b?"true":"false");
     return os;
 }
@@ -347,18 +343,17 @@ std::ostream& operator<<(std::ostream& os, GdBool const& b) {
 /// @param s The string to convert. Can contain 0, 1, true, false, on, off, yes, no.
 /// @param b The GdBool to write to.
 /// @return true, if the conversion succeeded.
-bool read_from_string(const std::string& s, GdBool& b) {
+bool read_from_string(const std::string &s, GdBool &b) {
     if (s=="1"
-        || gd_str_ascii_caseequal(s, "true")
-        || gd_str_ascii_caseequal(s, "on")
-        || gd_str_ascii_caseequal(s, "yes")) {
+            || gd_str_ascii_caseequal(s, "true")
+            || gd_str_ascii_caseequal(s, "on")
+            || gd_str_ascii_caseequal(s, "yes")) {
         b=true;
         return true;
-    }
-    else if (s=="0"
-        || gd_str_ascii_caseequal(s, "false")
-        || gd_str_ascii_caseequal(s, "off")
-        || gd_str_ascii_caseequal(s, "no")) {
+    } else if (s=="0"
+               || gd_str_ascii_caseequal(s, "false")
+               || gd_str_ascii_caseequal(s, "off")
+               || gd_str_ascii_caseequal(s, "no")) {
         b=false;
         return true;
     }
@@ -366,7 +361,7 @@ bool read_from_string(const std::string& s, GdBool& b) {
 }
 
 /// Save a GdInt to an ostream.
-std::ostream& operator<<(std::ostream& os, GdInt const& i) {
+std::ostream &operator<<(std::ostream &os, GdInt const &i) {
     /* have to convert, or else it would be infinite recursion? */
     int conv=i;
     os << conv;
@@ -378,7 +373,7 @@ std::ostream& operator<<(std::ostream& os, GdInt const& i) {
 /// @param s The string to convert.
 /// @param i The GdInt to write to.
 /// @return true, if the conversion succeeded.
-bool read_from_string(const std::string& s, GdInt& i) {
+bool read_from_string(const std::string &s, GdInt &i) {
     std::istringstream is(s);
     /* was saved as a normal int */
     int read;
@@ -390,7 +385,7 @@ bool read_from_string(const std::string& s, GdInt& i) {
 
 
 /// Save a GdProbability to an ostream.
-std::ostream& operator<<(std::ostream& os, GdProbability const& i) {
+std::ostream &operator<<(std::ostream &os, GdProbability const &i) {
     double conv=i/1000000.0;
     os << conv;
     return os;
@@ -401,7 +396,7 @@ std::ostream& operator<<(std::ostream& os, GdProbability const& i) {
 /// @param s The string to convert.
 /// @param p The GdProbability to write to.
 /// @return true, if the conversion succeeded.
-bool read_from_string(const std::string& s, GdProbability& p) {
+bool read_from_string(const std::string &s, GdProbability &p) {
     std::istringstream is(s);
     double read;
     bool success=(is>>read) && (read>=0 && read<=1);
@@ -416,7 +411,7 @@ bool read_from_string(const std::string& s, GdProbability& p) {
 /// @param i The GdInt to write to.
 /// @param conversion_ratio The number to multiply the converted value with. (1million for probabilities, cave width*height for ratios)
 /// @return true, if the conversion succeeded.
-bool read_from_string(const std::string& s, GdInt& i, double conversion_ratio) {
+bool read_from_string(const std::string &s, GdInt &i, double conversion_ratio) {
     std::istringstream is(s);
     double read;
     bool success=(is>>read) && (read>=0 && read<=1);
@@ -426,7 +421,7 @@ bool read_from_string(const std::string& s, GdInt& i, double conversion_ratio) {
 }
 
 /// Save a GdScheduling to an ostream with its name.
-std::ostream& operator<<(std::ostream& os, GdScheduling const& s) {
+std::ostream &operator<<(std::ostream &os, GdScheduling const &s) {
     os << scheduling_filename[s];
     return os;
 }
@@ -436,7 +431,7 @@ std::ostream& operator<<(std::ostream& os, GdScheduling const& s) {
 /// @param s The string to convert.
 /// @param sch The GdScheduling to write to.
 /// @return true, if the conversion succeeded.
-bool read_from_string(const std::string& s, GdScheduling& sch) {
+bool read_from_string(const std::string &s, GdScheduling &sch) {
     for (unsigned i=0; i<G_N_ELEMENTS(scheduling_filename); ++i)
         if (gd_str_ascii_caseequal(s, scheduling_filename[i])) {
             sch=GdSchedulingEnum(i);
@@ -446,7 +441,7 @@ bool read_from_string(const std::string& s, GdScheduling& sch) {
 }
 
 /// Save a GdDirection to an ostream with its name.
-std::ostream& operator<<(std::ostream& os, GdDirection const& d) {
+std::ostream &operator<<(std::ostream &os, GdDirection const &d) {
     os << direction_name[d];
     return os;
 }
@@ -456,7 +451,7 @@ std::ostream& operator<<(std::ostream& os, GdDirection const& d) {
 /// @param s The string to convert.
 /// @param d The GdDirection to write to.
 /// @return true, if the conversion succeeded.
-bool read_from_string(const std::string& s, GdDirection& d) {
+bool read_from_string(const std::string &s, GdDirection &d) {
     for (unsigned i=0; i<G_N_ELEMENTS(direction_filename); ++i)
         if (gd_str_ascii_caseequal(s, direction_filename[i])) {
             d=GdDirectionEnum(i);
@@ -466,7 +461,7 @@ bool read_from_string(const std::string& s, GdDirection& d) {
 }
 
 /// Save a GdElement to an ostream with its name.
-std::ostream& operator<<(std::ostream& os, GdElement const& e) {
+std::ostream &operator<<(std::ostream &os, GdElement const &e) {
     os << gd_element_properties[e].filename;
     return os;
 }
@@ -476,7 +471,7 @@ std::ostream& operator<<(std::ostream& os, GdElement const& e) {
 /// @param s The string to convert.
 /// @param e The GdElement to write to.
 /// @return true, if the conversion succeeded.
-bool read_from_string(const std::string& s, GdElement& e) {
+bool read_from_string(const std::string &s, GdElement &e) {
     if (!name_to_element.has_name(s))
         return false;
     e=name_to_element.lookup_name(s);
@@ -488,7 +483,7 @@ bool read_from_string(const std::string& s, GdElement& e) {
 /// @param s The string to convert.
 /// @param e The GdEngine to write to.
 /// @return true, if the conversion succeeded.
-bool read_from_string(const std::string& s, GdEngine& e) {
+bool read_from_string(const std::string &s, GdEngine &e) {
     for (unsigned i=0; i<G_N_ELEMENTS(engines_filename); ++i)
         if (gd_str_ascii_caseequal(s, engines_filename[i])) {
             e=GdEngineEnum(i);

@@ -40,7 +40,7 @@ private:
     int image_h, y_gameline, y_caveline;
     bool show_status, alternate_status;
     int cavenum, levelnum;
-    
+
     void clear_animation();
 };
 

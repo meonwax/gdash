@@ -34,25 +34,25 @@ class CaveStored;
  * It loads a cave from the caveset, passes movement keypresses
  * to the cave iterate routine, controls uncover and cover animations,
  * saves replays, manages highscore.
- * 
+ *
  * While it is not the responsibility of this class to draw the cave to
  * the screen, it manages two maps; one map (gfx_buffer) contains the cell
  * indexes, which are essentially the cave, and the other one (covered)
  * is a map of booleans which show which cell is covered and which is not
  * (after loading and before a new cave). These maps are in the GameControl
  * class so it can easily manage them when loading a cave.
- * 
+ *
  * The GameControl class has members which store the cave number, the pointer
  * to the currently played cave and so on. When playing a game, a new
  * GameControl object is created, and it is given a caveset with a start cave
  * number, or a rendered cave with or without a replay, or a stored cave
  * to test from the editor.
- * 
+ *
  * The object controls rendereding the caves if needed, and also has a gfx_buffer
  * structure, which is a map with the same size that of the cave, and stores
  * the pixbuf indexes of the elements. It also controls recording replays.
  * Manages counting lives, manages bonus scores.
- * 
+ *
  * To run the whole process, the main_int() function has to be called regurarly.
  * Usually it is called at 25hz or 50hz, depending on user interface settings.
  * Its first parameter is a milliseconds value, in which the caller tells the
@@ -62,7 +62,7 @@ class CaveStored;
  * of this function has information valuable to the caller; for example, loading
  * the cave is signaled (new cave size, new cave colors), also it is signaled
  * when the status bars have to be updated.
- * 
+ *
  * Internally the GameControl has a state counter, which starts from its lowest value
  * (LOAD_CAVE), and is or is not incremented by the main_int() call. The
  * life cycle of a singe cave is as follows:
@@ -118,8 +118,10 @@ public:
     State main_int(int millisecs_elapsed, GdDirectionEnum player_move, bool fire, bool suicide, bool restart, bool allow_iterate, bool fast_forward);
 
     /// Returns true if the game is running or finished - ie. game header should be shown.
-    bool game_header() const { return state_counter>=0; }
-    
+    bool game_header() const {
+        return state_counter>=0;
+    }
+
     /* public variables */
     Type type;
 
@@ -168,10 +170,10 @@ private:
 
     // default constructor - only used internally
     GameControl();
-    
+
     // do not allow copying and assigning - these functions are unimplemented
-    GameControl(const GameControl&);
-    GameControl& operator=(const GameControl&);
+    GameControl(const GameControl &);
+    GameControl &operator=(const GameControl &);
 };
 
 #endif

@@ -30,18 +30,15 @@
 /// @param _search_element Overwrite this element.
 /// @param _fill_element Draw this element.
 CaveFloodFill::CaveFloodFill(Coordinate _start, GdElementEnum _fill_element, GdElementEnum _search_element)
-:   CaveFill(GD_FLOODFILL_REPLACE, _start, _fill_element),
-    search_element(_search_element)
-{
+    :   CaveFill(GD_FLOODFILL_REPLACE, _start, _fill_element),
+        search_element(_search_element) {
 }
 
-std::string CaveFloodFill::get_bdcff() const
-{
+std::string CaveFloodFill::get_bdcff() const {
     return BdcffFormat("FloodFill") << start << fill_element << search_element;
 }
 
-CaveFloodFill* CaveFloodFill::clone_from_bdcff(const std::string &name, std::istream &is) const
-{
+CaveFloodFill *CaveFloodFill::clone_from_bdcff(const std::string &name, std::istream &is) const {
     Coordinate start;
     GdElementEnum fill, search;
     if (!(is >> start >> fill >> search))
@@ -51,8 +48,7 @@ CaveFloodFill* CaveFloodFill::clone_from_bdcff(const std::string &name, std::ist
 }
 
 /// Standard recursive floodfill algorithm.
-void CaveFloodFill::draw_proc(CaveRendered &cave, int x, int y) const
-{
+void CaveFloodFill::draw_proc(CaveRendered &cave, int x, int y) const {
     cave.store_rc(x, y, fill_element, this);
 
     if (x>0 && cave.map(x-1, y)==search_element) draw_proc(cave, x-1, y);
@@ -61,8 +57,7 @@ void CaveFloodFill::draw_proc(CaveRendered &cave, int x, int y) const
     if (y<cave.h-1 && cave.map(x, y+1)==search_element) draw_proc(cave, x, y+1);
 }
 
-void CaveFloodFill::draw(CaveRendered &cave) const
-{
+void CaveFloodFill::draw(CaveRendered &cave) const {
     /* check bounds */
     if (start.x<0 || start.y<0 || start.x>=cave.w || start.y>=cave.h)
         return;
@@ -81,13 +76,11 @@ PropertyDescription const CaveFloodFill::descriptor[] = {
     {NULL},
 };
 
-PropertyDescription const* CaveFloodFill::get_description_array() const
-{
+PropertyDescription const *CaveFloodFill::get_description_array() const {
     return descriptor;
 }
 
-std::string CaveFloodFill::get_description_markup() const
-{
-    return SPrintf(_("Flood fill from %d,%d of <b>%s</b>, replacing <b>%s</b>"))
-        % start.x % start.y % gd_element_properties[fill_element].lowercase_name % gd_element_properties[search_element].lowercase_name;
+std::string CaveFloodFill::get_description_markup() const {
+    return SPrintf(_("Flood fill from %d,%d of <b>%ms</b>, replacing <b>%ms</b>"))
+           % start.x % start.y % gd_element_properties[fill_element].lowercase_name % gd_element_properties[search_element].lowercase_name;
 }

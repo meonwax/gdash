@@ -32,8 +32,7 @@
 #include "fileops/c64import.hpp"  /* c64import defines the engine types */
 #include "cave/object/caveobjectfillrect.hpp" /* bdcff intermission hack - adding a cavefillrect */
 
-static bool struct_set_property(Reflective &str, const std::string &attrib, const std::string &param, int ratio)
-{
+static bool struct_set_property(Reflective &str, const std::string &attrib, const std::string &param, int ratio) {
     PropertyDescription const *prop_desc=str.get_description_array();
     int paramindex=0;
 
@@ -63,7 +62,7 @@ static bool struct_set_property(Reflective &str, const std::string &attrib, cons
                 was_string=true;    /* remember this to skip checking the number of parameters at the end of the function */
                 continue;
             }
-            
+
             /* not a string, so use scanf calls */
             /* try to read as many words, as there are elements in this property (array) */
             /* ALSO, if no more parameters to process, exit loop */
@@ -71,54 +70,54 @@ static bool struct_set_property(Reflective &str, const std::string &attrib, cons
                 bool success=false;
 
                 switch (prop_desc[i].type) {
-                case GD_TYPE_BOOLEAN:
-                    success=read_from_string(params[paramindex], str.get<GdBool>(prop));
-                    /* if we are processing an array, fill other values with these. if there are other values specified, those will be overwritten. */
-                    break;
-                case GD_TYPE_INT:
-                    if (prop_desc[i].flags&GD_BDCFF_RATIO_TO_CAVE_SIZE)
-                        success=read_from_string(params[paramindex], str.get<GdInt>(prop), ratio);   /* saved as double, ratio to cave size */
-                    else
-                        success=read_from_string(params[paramindex], str.get<GdInt>(prop));
-                    break;
-                case GD_TYPE_INT_LEVELS:
-                    if (prop_desc[i].flags&GD_BDCFF_RATIO_TO_CAVE_SIZE)
-                        success=read_from_string(params[paramindex], str.get<GdIntLevels>(prop)[j], ratio);   /* saved as double, ratio to cave size */
-                    else
-                        success=read_from_string(params[paramindex], str.get<GdIntLevels>(prop)[j]);
-                    if (success) /* copy to other if array */
-                        for (unsigned k=j+1; k<prop->count; k++)
-                            str.get<GdIntLevels>(prop)[k]=str.get<GdIntLevels>(prop)[j];
-                    break;
-                case GD_TYPE_PROBABILITY:
-                    success=read_from_string(params[paramindex], str.get<GdProbability>(prop));
-                    break;
-                case GD_TYPE_PROBABILITY_LEVELS:
-                    success=read_from_string(params[paramindex], str.get<GdProbabilityLevels>(prop)[j]);
-                    if (success) /* copy to other if array */
-                        for (unsigned k=j+1; k<prop->count; k++)
-                            str.get<GdProbabilityLevels>(prop)[k]=str.get<GdProbabilityLevels>(prop)[j];
-                    break;
-                case GD_TYPE_ELEMENT:
-                    success=read_from_string(params[paramindex], str.get<GdElement>(prop));
-                    break;
-                case GD_TYPE_DIRECTION:
-                    success=read_from_string(params[paramindex], str.get<GdDirection>(prop));
-                    break;
-                case GD_TYPE_SCHEDULING:
-                    success=read_from_string(params[paramindex], str.get<GdScheduling>(prop));
-                    break;
+                    case GD_TYPE_BOOLEAN:
+                        success=read_from_string(params[paramindex], str.get<GdBool>(prop));
+                        /* if we are processing an array, fill other values with these. if there are other values specified, those will be overwritten. */
+                        break;
+                    case GD_TYPE_INT:
+                        if (prop_desc[i].flags&GD_BDCFF_RATIO_TO_CAVE_SIZE)
+                            success=read_from_string(params[paramindex], str.get<GdInt>(prop), ratio);   /* saved as double, ratio to cave size */
+                        else
+                            success=read_from_string(params[paramindex], str.get<GdInt>(prop));
+                        break;
+                    case GD_TYPE_INT_LEVELS:
+                        if (prop_desc[i].flags&GD_BDCFF_RATIO_TO_CAVE_SIZE)
+                            success=read_from_string(params[paramindex], str.get<GdIntLevels>(prop)[j], ratio);   /* saved as double, ratio to cave size */
+                        else
+                            success=read_from_string(params[paramindex], str.get<GdIntLevels>(prop)[j]);
+                        if (success) /* copy to other if array */
+                            for (unsigned k=j+1; k<prop->count; k++)
+                                str.get<GdIntLevels>(prop)[k]=str.get<GdIntLevels>(prop)[j];
+                        break;
+                    case GD_TYPE_PROBABILITY:
+                        success=read_from_string(params[paramindex], str.get<GdProbability>(prop));
+                        break;
+                    case GD_TYPE_PROBABILITY_LEVELS:
+                        success=read_from_string(params[paramindex], str.get<GdProbabilityLevels>(prop)[j]);
+                        if (success) /* copy to other if array */
+                            for (unsigned k=j+1; k<prop->count; k++)
+                                str.get<GdProbabilityLevels>(prop)[k]=str.get<GdProbabilityLevels>(prop)[j];
+                        break;
+                    case GD_TYPE_ELEMENT:
+                        success=read_from_string(params[paramindex], str.get<GdElement>(prop));
+                        break;
+                    case GD_TYPE_DIRECTION:
+                        success=read_from_string(params[paramindex], str.get<GdDirection>(prop));
+                        break;
+                    case GD_TYPE_SCHEDULING:
+                        success=read_from_string(params[paramindex], str.get<GdScheduling>(prop));
+                        break;
 
-                case GD_TYPE_LONGSTRING:
-                case GD_TYPE_STRING:
-                case GD_TYPE_COLOR:
-                case GD_TYPE_EFFECT:
-                case GD_TYPE_COORDINATE:    /* caves do not have */
-                case GD_TYPE_BOOLEAN_LEVELS:    /* caves do not have */
-                case GD_TAB:                /* ui */
-                case GD_LABEL:              /* ui */
-                    g_assert_not_reached();
-                    break;
+                    case GD_TYPE_LONGSTRING:
+                    case GD_TYPE_STRING:
+                    case GD_TYPE_COLOR:
+                    case GD_TYPE_EFFECT:
+                    case GD_TYPE_COORDINATE:    /* caves do not have */
+                    case GD_TYPE_BOOLEAN_LEVELS:    /* caves do not have */
+                    case GD_TAB:                /* ui */
+                    case GD_LABEL:              /* ui */
+                        g_assert_not_reached();
+                        break;
                 }
 
                 if (success)
@@ -136,8 +135,7 @@ static bool struct_set_property(Reflective &str, const std::string &attrib, cons
     return identifier_found;
 }
 
-static bool replay_process_tag(CaveReplay &replay, const std::string &attrib, const std::string &param)
-{
+static bool replay_process_tag(CaveReplay &replay, const std::string &attrib, const std::string &param) {
     bool identifier_found=false;
 
     /* movements */
@@ -155,8 +153,7 @@ static bool replay_process_tag(CaveReplay &replay, const std::string &attrib, co
 }
 
 
-static bool cave_process_tags_func(CaveStored &cave, const std::string &attrib, const std::string &param)
-{
+static bool cave_process_tags_func(CaveStored &cave, const std::string &attrib, const std::string &param) {
     char **params=g_strsplit_set(param.c_str(), " ", -1);
     int paramcount=g_strv_length(params);
     bool identifier_found=false;
@@ -172,154 +169,144 @@ static bool cave_process_tags_func(CaveStored &cave, const std::string &attrib, 
                 cave.snap_element=O_SPACE;
         } else
             gd_warning(CPrintf("invalid param for '%s': '%s'") % attrib % param);
-    }
-    else
-    /* compatibility with old bd1scheduling flag */
-    if (gd_str_ascii_caseequal(attrib, "BD1Scheduling")) {
-        identifier_found=true;
-        GdBool b;
-        if (read_from_string(param, b)) {
-            if (b)
-                if (cave.scheduling==GD_SCHEDULING_PLCK)
-                    cave.scheduling=GD_SCHEDULING_BD1;
+    } else
+        /* compatibility with old bd1scheduling flag */
+        if (gd_str_ascii_caseequal(attrib, "BD1Scheduling")) {
+            identifier_found=true;
+            GdBool b;
+            if (read_from_string(param, b)) {
+                if (b)
+                    if (cave.scheduling==GD_SCHEDULING_PLCK)
+                        cave.scheduling=GD_SCHEDULING_BD1;
+            } else
+                gd_warning(CPrintf("invalid param for '%s': '%s'") % attrib % param);
         } else
-            gd_warning(CPrintf("invalid param for '%s': '%s'") % attrib % param);
-    }
-    else
-    /* bdcff engine flag */
-    if (gd_str_ascii_caseequal(attrib, "Engine")) {
-        identifier_found=true;
-        GdEngine e;
-        if (read_from_string(param, e))
-            C64Import::cave_set_engine_defaults(cave, e);
-        else
-            gd_warning(CPrintf("invalid param for '%s': '%s'") % attrib % param);
-    }
-    else
-    /* compatibility with old AmoebaProperties flag */
-    if (gd_str_ascii_caseequal(attrib, "AmoebaProperties")) {
-        identifier_found=true;
-        GdElement elem1=O_STONE, elem2=O_DIAMOND;
-        bool success=read_from_string(params[0], elem1) && read_from_string(params[1], elem2);
-        if (success) {
-            cave.amoeba_too_big_effect=elem1;
-            cave.amoeba_enclosed_effect=elem2;
-        } else
-            gd_warning(CPrintf("invalid param for '%s': '%s'") % attrib % param);
-    }
-    else
-    /* colors attribute is a mess, have to process explicitly */
-    if (gd_str_ascii_caseequal(attrib, "Colors")) {
-        /* Colors=[border background] foreground1 foreground2 foreground3 [amoeba slime] */
-        identifier_found=true;
-        bool ok=true;
-        GdColor cb, c0, c1, c2, c3, c4, c5;
+            /* bdcff engine flag */
+            if (gd_str_ascii_caseequal(attrib, "Engine")) {
+                identifier_found=true;
+                GdEngine e;
+                if (read_from_string(param, e))
+                    C64Import::cave_set_engine_defaults(cave, e);
+                else
+                    gd_warning(CPrintf("invalid param for '%s': '%s'") % attrib % param);
+            } else
+                /* compatibility with old AmoebaProperties flag */
+                if (gd_str_ascii_caseequal(attrib, "AmoebaProperties")) {
+                    identifier_found=true;
+                    GdElement elem1=O_STONE, elem2=O_DIAMOND;
+                    bool success=read_from_string(params[0], elem1) && read_from_string(params[1], elem2);
+                    if (success) {
+                        cave.amoeba_too_big_effect=elem1;
+                        cave.amoeba_enclosed_effect=elem2;
+                    } else
+                        gd_warning(CPrintf("invalid param for '%s': '%s'") % attrib % param);
+                } else
+                    /* colors attribute is a mess, have to process explicitly */
+                    if (gd_str_ascii_caseequal(attrib, "Colors")) {
+                        /* Colors=[border background] foreground1 foreground2 foreground3 [amoeba slime] */
+                        identifier_found=true;
+                        bool ok=true;
+                        GdColor cb, c0, c1, c2, c3, c4, c5;
 
-        if (paramcount==3) {
-            // only color1,2,3
-            cb=GdColor::from_c64(0);   // border - black
-            c0=GdColor::from_c64(0);   // background - black
-            ok=ok&&read_from_string(params[0], c1);
-            ok=ok&&read_from_string(params[1], c2);
-            ok=ok&&read_from_string(params[2], c3);
-            c4=c3;    // amoeba
-            c5=c1;    // slime
-        } else
-        if (paramcount==5) {
-            /* bg,color0,1,2,3 */
-            ok=ok&&read_from_string(params[0], cb);
-            ok=ok&&read_from_string(params[1], c0);
-            ok=ok&&read_from_string(params[2], c1);
-            ok=ok&&read_from_string(params[3], c2);
-            ok=ok&&read_from_string(params[4], c3);
-            c4=c3;    // amoeba
-            c5=c1;    // slime
-        } else
-        if (paramcount==7) {
-            // bg,color0,1,2,3,amoeba,slime
-            ok=ok&&read_from_string(params[0], cb);
-            ok=ok&&read_from_string(params[1], c0);
-            ok=ok&&read_from_string(params[2], c1);
-            ok=ok&&read_from_string(params[3], c2);
-            ok=ok&&read_from_string(params[4], c3);
-            ok=ok&&read_from_string(params[5], c4); // amoeba
-            ok=ok&&read_from_string(params[6], c5); // slime
-        } else {
-            ok=false;
-        }
+                        if (paramcount==3) {
+                            // only color1,2,3
+                            cb=GdColor::from_c64(0);   // border - black
+                            c0=GdColor::from_c64(0);   // background - black
+                            ok=ok&&read_from_string(params[0], c1);
+                            ok=ok&&read_from_string(params[1], c2);
+                            ok=ok&&read_from_string(params[2], c3);
+                            c4=c3;    // amoeba
+                            c5=c1;    // slime
+                        } else if (paramcount==5) {
+                            /* bg,color0,1,2,3 */
+                            ok=ok&&read_from_string(params[0], cb);
+                            ok=ok&&read_from_string(params[1], c0);
+                            ok=ok&&read_from_string(params[2], c1);
+                            ok=ok&&read_from_string(params[3], c2);
+                            ok=ok&&read_from_string(params[4], c3);
+                            c4=c3;    // amoeba
+                            c5=c1;    // slime
+                        } else if (paramcount==7) {
+                            // bg,color0,1,2,3,amoeba,slime
+                            ok=ok&&read_from_string(params[0], cb);
+                            ok=ok&&read_from_string(params[1], c0);
+                            ok=ok&&read_from_string(params[2], c1);
+                            ok=ok&&read_from_string(params[3], c2);
+                            ok=ok&&read_from_string(params[4], c3);
+                            ok=ok&&read_from_string(params[5], c4); // amoeba
+                            ok=ok&&read_from_string(params[6], c5); // slime
+                        } else {
+                            ok=false;
+                        }
 
-        if (ok) {
-            cave.colorb=cb;
-            cave.color0=c0;
-            cave.color1=c1;
-            cave.color2=c2;
-            cave.color3=c3;
-            cave.color4=c4;
-            cave.color5=c5;
-        } else {
-            gd_message(CPrintf("invalid param for '%s': '%s'") % attrib % param);
-        }
-    }
-    else
-    /* effects are also handled in an ugly way in bdcff */
-    if (gd_str_ascii_caseequal(attrib, "Effect")) {
-        identifier_found=true;
-        /* an effect command has two parameters */
-        if (paramcount==2) {
-            bool success=false;
-            PropertyDescription const *descriptor=cave.get_description_array();
+                        if (ok) {
+                            cave.colorb=cb;
+                            cave.color0=c0;
+                            cave.color1=c1;
+                            cave.color2=c2;
+                            cave.color3=c3;
+                            cave.color4=c4;
+                            cave.color5=c5;
+                        } else {
+                            gd_message(CPrintf("invalid param for '%s': '%s'") % attrib % param);
+                        }
+                    } else
+                        /* effects are also handled in an ugly way in bdcff */
+                        if (gd_str_ascii_caseequal(attrib, "Effect")) {
+                            identifier_found=true;
+                            /* an effect command has two parameters */
+                            if (paramcount==2) {
+                                bool success=false;
+                                PropertyDescription const *descriptor=cave.get_description_array();
 
-            int i;
-            for (i=0; descriptor[i].identifier!=NULL; i++) {
-                /* we have to search for this effect */
-                if (descriptor[i].type==GD_TYPE_EFFECT && gd_str_ascii_caseequal(params[0], descriptor[i].identifier)) {
-                    /* found identifier */
-                    success=read_from_string(params[1], cave.get<GdElement>(descriptor[i].prop));
-                    if (success)
-                        cave.get<GdElement>(descriptor[i].prop)=nonscanned_pair(cave.get<GdElement>(descriptor[i].prop));
-                    break;
-                }
-            }
-            /* if we didn't find first element name */
-            if (descriptor[i].identifier==NULL) {
-                /* for compatibility with tim stridmann's memorydump->bdcff converter... .... ... */
-                if (gd_str_ascii_caseequal(params[0], "BOUNCING_BOULDER")) {
-                    success=read_from_string(params[1], cave.stone_bouncing_effect);
-                    if (success)
-                        cave.stone_bouncing_effect=nonscanned_pair(cave.stone_bouncing_effect);
-                }
-                else if (gd_str_ascii_caseequal(params[0], "EXPLOSION3S")) {
-                    success=read_from_string(params[1], cave.explosion_3_effect);
-                    if (success)
-                        cave.explosion_3_effect=nonscanned_pair(cave.explosion_3_effect);
-                }
-                /* falling with one l... */
-                else if (gd_str_ascii_caseequal(params[0], "STARTING_FALING_DIAMOND")) {
-                    success=read_from_string(params[1], cave.diamond_falling_effect);
-                    if (success)
-                        cave.diamond_falling_effect=nonscanned_pair(cave.diamond_falling_effect);
-                }
-                /* dirt lookslike */
-                else if (gd_str_ascii_caseequal(params[0], "DIRT"))
-                    success=read_from_string(params[1], cave.dirt_looks_like);
-                else if (gd_str_ascii_caseequal(params[0], "HEXPANDING_WALL") && gd_str_ascii_caseequal(params[1], "STEEL_HEXPANDING_WALL")) {
-                    success=read_from_string(params[1], cave.expanding_wall_looks_like);
-                }
-                else {
-                    /* didn't find at all */
-                    gd_warning(CPrintf("invalid effect name '%s'") % params[0]);
-                    success=true;       // to ignore
-                }
+                                int i;
+                                for (i=0; descriptor[i].identifier!=NULL; i++) {
+                                    /* we have to search for this effect */
+                                    if (descriptor[i].type==GD_TYPE_EFFECT && gd_str_ascii_caseequal(params[0], descriptor[i].identifier)) {
+                                        /* found identifier */
+                                        success=read_from_string(params[1], cave.get<GdElement>(descriptor[i].prop));
+                                        if (success)
+                                            cave.get<GdElement>(descriptor[i].prop)=nonscanned_pair(cave.get<GdElement>(descriptor[i].prop));
+                                        break;
+                                    }
+                                }
+                                /* if we didn't find first element name */
+                                if (descriptor[i].identifier==NULL) {
+                                    /* for compatibility with tim stridmann's memorydump->bdcff converter... .... ... */
+                                    if (gd_str_ascii_caseequal(params[0], "BOUNCING_BOULDER")) {
+                                        success=read_from_string(params[1], cave.stone_bouncing_effect);
+                                        if (success)
+                                            cave.stone_bouncing_effect=nonscanned_pair(cave.stone_bouncing_effect);
+                                    } else if (gd_str_ascii_caseequal(params[0], "EXPLOSION3S")) {
+                                        success=read_from_string(params[1], cave.explosion_3_effect);
+                                        if (success)
+                                            cave.explosion_3_effect=nonscanned_pair(cave.explosion_3_effect);
+                                    }
+                                    /* falling with one l... */
+                                    else if (gd_str_ascii_caseequal(params[0], "STARTING_FALING_DIAMOND")) {
+                                        success=read_from_string(params[1], cave.diamond_falling_effect);
+                                        if (success)
+                                            cave.diamond_falling_effect=nonscanned_pair(cave.diamond_falling_effect);
+                                    }
+                                    /* dirt lookslike */
+                                    else if (gd_str_ascii_caseequal(params[0], "DIRT"))
+                                        success=read_from_string(params[1], cave.dirt_looks_like);
+                                    else if (gd_str_ascii_caseequal(params[0], "HEXPANDING_WALL") && gd_str_ascii_caseequal(params[1], "STEEL_HEXPANDING_WALL")) {
+                                        success=read_from_string(params[1], cave.expanding_wall_looks_like);
+                                    } else {
+                                        /* didn't find at all */
+                                        gd_warning(CPrintf("invalid effect name '%s'") % params[0]);
+                                        success=true;       // to ignore
+                                    }
 
-                if (!success)
-                    gd_warning(CPrintf("cannot read element name '%s'") % params[1]);
-            }
-        } else
-            gd_warning(CPrintf("invalid effect specification '%s'") % param);
-    }
-    else {
-        identifier_found=struct_set_property(cave, attrib, param, cave.w*cave.h);
-    }
+                                    if (!success)
+                                        gd_warning(CPrintf("cannot read element name '%s'") % params[1]);
+                                }
+                            } else
+                                gd_warning(CPrintf("invalid effect specification '%s'") % param);
+                        } else {
+                            identifier_found=struct_set_property(cave, attrib, param, cave.w*cave.h);
+                        }
     g_strfreev(params);
 
     /* a ghrfunc should return true if the identifier is to be removed */
@@ -332,8 +319,7 @@ static bool cave_process_tags_func(CaveStored &cave, const std::string &attrib, 
 /// @param lines The list of lines to find the attrib in.
 /// @param name The name of the attribute to find.
 /// @return true, if the property is found. If found, it is also processed and removed.
-static bool cave_process_specific_tag(CaveStored &cave, BdcffSection &lines, const std::string& name)
-{
+static bool cave_process_specific_tag(CaveStored &cave, BdcffSection &lines, const std::string &name) {
     BdcffSectionIterator it=find_if(lines.begin(), lines.end(), HasAttrib(name));
     bool found=it!=lines.end();
     if (found) {
@@ -353,8 +339,7 @@ static bool cave_process_specific_tag(CaveStored &cave, BdcffSection &lines, con
 /// For example, the name is processed first, to be able to show all error messages with the cave name context.
 /// Then the engine tag is processed - well, because bdcff sucks.
 /// Then the size - to make sure ratios are read correctly - bdcff sucks.
-static void cave_process_all_tags(CaveStored &cave, BdcffSection &lines)
-{
+static void cave_process_all_tags(CaveStored &cave, BdcffSection &lines) {
     BdcffSectionIterator it;
 
     // first check cave name, so we can report errors correctly (saying that CaveStored xy: error foobar)
@@ -373,7 +358,7 @@ static void cave_process_all_tags(CaveStored &cave, BdcffSection &lines)
         cave.slime_predictable=false;
     if (cave_process_specific_tag(cave, lines, "SlimePermeabilityC64"))
         cave.slime_predictable=true;
-        
+
     // these set scheduling type. framedelay takes precedence, if both exist. so we check it AFTER checking CaveDelay..
     if (cave_process_specific_tag(cave, lines, "CaveDelay")) {
         // only set scheduling type, when it is not the gdash-default.
@@ -404,8 +389,7 @@ static void cave_process_all_tags(CaveStored &cave, BdcffSection &lines)
     }
 }
 
-static bool add_highscore(HighScoreTable &hs, const std::string &name, const std::string &score)
-{
+static bool add_highscore(HighScoreTable &hs, const std::string &name, const std::string &score) {
     std::istringstream is(score);
     int sc;
 
@@ -419,8 +403,7 @@ static bool add_highscore(HighScoreTable &hs, const std::string &name, const std
     return true;
 }
 
-static BdcffFile parse_bdcff_sections(const char *file_contents) throw (std::runtime_error)
-{
+static BdcffFile parse_bdcff_sections(const char *file_contents) throw(std::runtime_error) {
     BdcffFile file;
     std::istringstream is(file_contents);
     enum ReadState {
@@ -461,88 +444,78 @@ static BdcffFile parse_bdcff_sections(const char *file_contents) throw (std::run
                     bailout=true;
                 }
                 state=Bdcff;
-            }
-            else if (gd_str_ascii_caseequal(line, "[/BDCFF]")) {
+            } else if (gd_str_ascii_caseequal(line, "[/BDCFF]")) {
                 state=Start;
-            }
-            else if (gd_str_ascii_caseequal(line, "[game]")) {
+            } else if (gd_str_ascii_caseequal(line, "[game]")) {
                 if (state!=Bdcff)
                     gd_warning("[game] should be inside [BDCFF]");
                 state=Game;
-            }
-            else if (gd_str_ascii_caseequal(line, "[/game]")) {
+            } else if (gd_str_ascii_caseequal(line, "[/game]")) {
                 if (state!=Game)
                     gd_warning("[/game] not in [game] section");
-            }
-            else if (gd_str_ascii_caseequal(line, "[mapcodes]")) {
+            } else if (gd_str_ascii_caseequal(line, "[mapcodes]")) {
                 switch (state) {
                     case Game:
-                        state=GameMapCodes; break;
+                        state=GameMapCodes;
+                        break;
                     case Bdcff:
-                        state=BdcffMapCodes; break;
+                        state=BdcffMapCodes;
+                        break;
                     default:
                         gd_warning("[mapcodes] allowed only in [game] section");
                         state=BdcffMapCodes;
                         break;
                 }
-            }
-            else if (gd_str_ascii_caseequal(line, "[/mapcodes]")) {
+            } else if (gd_str_ascii_caseequal(line, "[/mapcodes]")) {
                 switch (state) {
                     case GameMapCodes:
-                        state=Game; break;
+                        state=Game;
+                        break;
                     case BdcffMapCodes:
-                        state=Bdcff; break;
+                        state=Bdcff;
+                        break;
                     default:
                         gd_warning("[/mapcodes] not after [mapcodes]");
-                    state=Game;
+                        state=Game;
                 }
-            }
-            else if (gd_str_ascii_caseequal(line, "[cave]")) {
+            } else if (gd_str_ascii_caseequal(line, "[cave]")) {
                 if (state!=Game)
                     gd_warning("[cave] allowed only in [game] section");
                 state=Cave;
                 file.caves.push_back(BdcffFile::CaveInfo());    /* new empty space for a cave */
-            }
-            else if (gd_str_ascii_caseequal(line, "[/cave]")) {
+            } else if (gd_str_ascii_caseequal(line, "[/cave]")) {
                 if (state!=Cave)
                     gd_warning("[/cave] tag without starting [cave]");
                 state=Game;
-            }
-            else if (gd_str_ascii_caseequal(line, "[map]")) {
+            } else if (gd_str_ascii_caseequal(line, "[map]")) {
                 if (state!=Cave)
                     gd_warning("[map] section only allowed inside [cave]");
                 else    /* else: do not enter map reading when not in a cave! */
                     state=CaveMap;
-            }
-            else if (gd_str_ascii_caseequal(line, "[/map]")) {
+            } else if (gd_str_ascii_caseequal(line, "[/map]")) {
                 if (state!=CaveMap)
                     gd_warning("[/map] tag without starting [map]");
                 state=Cave;
-            }
-            else if (gd_str_ascii_caseequal(line, "[highscore]")) {
+            } else if (gd_str_ascii_caseequal(line, "[highscore]")) {
                 /* can be inside game or cave */
                 if (state==Game)
                     state=GameHighScore;
-                else
-                if (state==Cave)
+                else if (state==Cave)
                     state=CaveHighScore;
                 else {
                     gd_critical("[highscore] section only allowed inside [game] and [cave]. This confuses the parser, bailing out!");
                     bailout=true;
                 }
-            }
-            else if (gd_str_ascii_caseequal(line, "[/highscore]")) {
+            } else if (gd_str_ascii_caseequal(line, "[/highscore]")) {
                 if (state==GameHighScore)
                     state=Game;
-                else
-                if (state==CaveHighScore)
+                else if (state==CaveHighScore)
                     state=Cave;
                 else {
                     gd_critical("[/highscore] only allowed after starting [highscore]. This confuses the parser, bailing out!");
                     bailout=true;
                 }
-            }
-            else if (gd_str_ascii_caseequal(line, "[objects]")) {
+            } else if (gd_str_ascii_caseequal(line, "[objects]")) {
                 if (state!=Cave)
                     gd_warning("[objects] tag only allowed in [cave]");
                 if (file.caves.empty()) {
@@ -550,13 +523,11 @@ static BdcffFile parse_bdcff_sections(const char *file_contents) throw (std::run
                     file.caves.push_back(BdcffFile::CaveInfo());
                 }
                 state=CaveObjects;
-            }
-            else if (gd_str_ascii_caseequal(line, "[/objects]")) {
+            } else if (gd_str_ascii_caseequal(line, "[/objects]")) {
                 if (state!=CaveObjects)
                     gd_warning("[/objects] tag without starting [objects] tag");
                 state=Cave;
-            }
-            else if (gd_str_ascii_caseequal(line, "[demo]")) {
+            } else if (gd_str_ascii_caseequal(line, "[demo]")) {
                 if (state!=Cave)
                     gd_warning("[demo] tag only allowed in [cave]");
                 if (file.caves.empty()) {
@@ -565,13 +536,11 @@ static BdcffFile parse_bdcff_sections(const char *file_contents) throw (std::run
                 }
                 state=CaveDemo;
                 file.caves.back().demo.push_back("");   /* push an empty string, lines will be added */
-            }
-            else if (gd_str_ascii_caseequal(line, "[/demo]")) {
+            } else if (gd_str_ascii_caseequal(line, "[/demo]")) {
                 if (state!=CaveDemo)
                     gd_warning("[/demo] tag without starting [demo] tag");
                 state=Cave;
-            }
-            else if (gd_str_ascii_caseequal(line, "[replay]")) {
+            } else if (gd_str_ascii_caseequal(line, "[replay]")) {
                 if (state!=Cave)
                     gd_warning("[replay] tag only allowed in [cave]");
                 if (file.caves.empty()) {
@@ -580,8 +549,7 @@ static BdcffFile parse_bdcff_sections(const char *file_contents) throw (std::run
                 }
                 state=CaveSReplay;
                 file.caves.back().replays.push_back(BdcffSection());
-            }
-            else if (gd_str_ascii_caseequal(line, "[/replay]")) {
+            } else if (gd_str_ascii_caseequal(line, "[/replay]")) {
                 if (state!=CaveSReplay)
                     gd_warning("[/replay] tag without starting [replay] tag");
                 state=Cave;
@@ -593,15 +561,13 @@ static BdcffFile parse_bdcff_sections(const char *file_contents) throw (std::run
                     gd_message("[level] tag only allowed inside [objects] section. Ignored.");
                 else
                     file.caves.back().objects.push_back(line);
-            }
-            else if (gd_str_ascii_caseequal(line, "[/level]")) {
+            } else if (gd_str_ascii_caseequal(line, "[/level]")) {
                 /* dump this thing in the object list. */
                 if (state!=CaveObjects)
                     gd_message("[/level] tag only allowed inside [objects] section. Ignored.");
                 else
                     file.caves.back().objects.push_back(line);
-            }
-            else
+            } else
                 gd_warning(CPrintf("unknown section: \"%s\"") % line);
 
             continue;
@@ -669,15 +635,14 @@ static BdcffFile parse_bdcff_sections(const char *file_contents) throw (std::run
                 break;
         }
     }
-    
+
     if (bailout)
         throw std::runtime_error("Error parsing BDCFF input");
 
     return file;
 }
 
-CaveSet load_from_bdcff(const char *contents) throw(std::runtime_error)
-{
+CaveSet load_from_bdcff(const char *contents) throw(std::runtime_error) {
     // this may throw, but we do not catch
     BdcffFile file = parse_bdcff_sections(contents);
 
@@ -694,16 +659,14 @@ CaveSet load_from_bdcff(const char *contents) throw(std::runtime_error)
 
         if (gd_str_ascii_caseequal(ap.attrib, "Version"))
             version_read=ap.param;
-        else
-        if (gd_str_ascii_caseequal(ap.attrib, "Engine")) {
+        else if (gd_str_ascii_caseequal(ap.attrib, "Engine")) {
             // invalid but we accept
             cave_process_tags_func(default_cave, ap.attrib, ap.param);
             gd_message("Invalid BDCFF: Engine= belongs in the [game] section!");
-        }
-        else
+        } else
             gd_warning(CPrintf("Invalid attribute: %s") % ap.attrib);
     }
-    
+
     CaveSet cs;
 
     /* PROCESS CAVESET PROPERTIES */
@@ -825,8 +788,7 @@ CaveSet load_from_bdcff(const char *contents) throw(std::runtime_error)
             if (*oit=="[/Level]") {
                 for (unsigned n=0; n<5; ++n)
                     levels[n]=true;
-            }
-            else if (gd_str_ascii_prefix(*oit, "[Level=")) {
+            } else if (gd_str_ascii_prefix(*oit, "[Level=")) {
                 std::istringstream is(oit->substr(oit->find('=')+1));
                 for (unsigned n=0; n<5; ++n)
                     levels[n]=false;
@@ -849,8 +811,7 @@ CaveSet load_from_bdcff(const char *contents) throw(std::runtime_error)
                     for (unsigned n=0; n<5; ++n)
                         newobj->seen_on[n]=levels[n];
                     cave.objects.push_back_adopt(newobj);
-                }
-                else
+                } else
                     gd_warning(CPrintf("invalid object specification: %s") % *oit);
             }
         }
@@ -902,8 +863,10 @@ CaveSet load_from_bdcff(const char *contents) throw(std::runtime_error)
                 /* we do not set the cave to 20x12, rather to 40x22 with 20x12 visible. */
                 cav.w=40;
                 cav.h=22;
-                cav.x1=0; cav.y1=0;
-                cav.x2=19; cav.y2=11;
+                cav.x1=0;
+                cav.y1=0;
+                cav.x2=19;
+                cav.y2=11;
 
                 /* and cover the invisible area */
                 cav.objects.push_back_adopt(new CaveFillRect(Coordinate(0, 11), Coordinate(39, 21), cav.initial_border, cav.initial_border));
@@ -918,7 +881,7 @@ CaveSet load_from_bdcff(const char *contents) throw(std::runtime_error)
     // check for replays which are problematic
     for (unsigned int i=0; i<cs.caves.size(); ++i)
         gd_cave_check_replays(cs.cave(i), true, false, false);
-    
+
     // return the created caveset.
     return cs;
 }

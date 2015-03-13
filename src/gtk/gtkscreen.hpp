@@ -31,9 +31,9 @@ private:
     GdkPixmap *pixmap;
     GdkGC *gc;
 
-    GTKScreen(const GTKScreen&);            // not impl
-    GTKScreen& operator=(const GTKScreen&); // not impl
-    
+    GTKScreen(const GTKScreen &);           // not impl
+    GTKScreen &operator=(const GTKScreen &); // not impl
+
 public:
     /** Creates a new GTKScreen, using the drawing area given as canvas.
      * @param drawing_area A GtkDrawingArea.
@@ -42,13 +42,13 @@ public:
     virtual void configure_size();
     virtual void set_title(char const *title);
 
-    virtual void fill_rect(int x, int y, int w, int h, const GdColor& c);
+    virtual void fill_rect(int x, int y, int w, int h, const GdColor &c);
 
     virtual void blit_full(Pixmap const &src, int dx, int dy, int x, int y, int w, int h) const;
 
     virtual void set_clip_rect(int x1, int y1, int w, int h);
     virtual void remove_clip_rect();
-    
+
     virtual void flip();
 };
 #endif

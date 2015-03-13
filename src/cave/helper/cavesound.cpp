@@ -127,7 +127,7 @@ sound_flags[] = {
 
 /*
  *   some sound things
- * 
+ *
  */
 
 /// Get the filename of a sound, in which the sample should be stored.
@@ -180,7 +180,7 @@ int gd_sound_get_precedence(GdSound sound) {
 /* only if sound compiled in. otherwise does nothing. */
 /* at program start, do some checks. */
 static class _init {
-    public:
+public:
     _init() {
         /* check if the number of sounds in the array matches. */
         g_assert(G_N_ELEMENTS(sound_flags)==GD_S_MAX);

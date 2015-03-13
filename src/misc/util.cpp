@@ -28,7 +28,7 @@
 
 std::string gd_tostring_free(char *str) {
     std::string ret;
-    
+
     if (str) {
         ret=str;
         g_free(str);
@@ -49,24 +49,24 @@ static std::string find_file_try_path(const char *path, const char *filename) {
         ret=result;
     g_free(result);
 
-    return ret;    
+    return ret;
 }
 
 
 /* tries to find a file in the gdash installation and returns a path */
-std::string gd_find_data_file(const std::string& filename, const std::vector<std::string>& dirs) {
+std::string gd_find_data_file(const std::string &filename, const std::vector<std::string>& dirs) {
     for (unsigned i=0; i<dirs.size(); ++i) {
         std::string result=find_file_try_path(dirs[i].c_str(), filename.c_str());
         if (result!="")
             return result;
     }
-    
+
     return "";
 }
 
 int gd_clamp(int val, int min, int max) {
     g_assert(min<=max);
-    
+
     if (val<min)
         return min;
     if (val>max)
@@ -77,24 +77,24 @@ int gd_clamp(int val, int min, int max) {
 /* return current date in 2008-12-04 format */
 std::string gd_get_current_date() {
     char dats[128];
-    
+
     GDate *dat=g_date_new();
     g_date_set_time_t(dat, time(NULL));
     g_date_strftime(dats, sizeof(dats), "%Y-%m-%d", dat);
     g_date_free(dat);
-    
+
     return dats;
 }
 
 
 std::string gd_get_current_date_time() {
     char dats[128];
-    
+
     GDate *dat=g_date_new();
     g_date_set_time_t(dat, time(0));
     g_date_strftime(dats, sizeof(dats), "%Y-%m-%d %H:%I", dat);
     g_date_free(dat);
-    
+
     return dats;
 }
 
@@ -109,7 +109,7 @@ void gd_strchomp(std::string &s) {
 int gd_str_ascii_casecmp(const std::string &s1, const std::string &s2) {
     int s1len=s1.length();
     int s2len=s2.length();
-    
+
     if (s1len==0 && s2len==0)
         return 0;
     if (s1len==0 && s2len!=0)
@@ -119,8 +119,7 @@ int gd_str_ascii_casecmp(const std::string &s1, const std::string &s2) {
 
     /* compare characters */
     int i=0;
-    while (i<s1len && i<s2len)
-    {
+    while (i<s1len && i<s2len) {
         int c1=s1[i];
         if (c1>='A' && c1<='Z')
             c1=c1-'A'+'a';    /* convert to lowercase, but only ascii characters */
@@ -163,7 +162,7 @@ std::vector<std::string> gd_wrap_text(const char *input, int width) {
         gunichar *inputtext = g_utf8_to_ucs4(thisline.c_str(), -1, NULL, NULL, NULL);
         std::vector<gunichar> one_line, one_word;
         int wordlen = 0, linelen = 0;
-        
+
         int i = 0;
         while (inputtext[i] != 0) {
             switch (inputtext[i]) {

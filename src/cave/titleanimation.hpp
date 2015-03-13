@@ -29,7 +29,7 @@ class PixbufFactory;
  * Create and return an array of pixbufs, which contain the title animation, or the first frame only.
  * Up to the caller to delete the pixbufs!
  */
-std::vector<Pixbuf *> get_title_animation_pixbuf(const GdString& title_screen, const GdString& title_screen_scroll, bool one_frame_only, PixbufFactory& pixbuf_factory);
-std::vector<Pixmap *> get_title_animation_pixmap(const GdString& title_screen, const GdString& title_screen_scroll, bool one_frame_only, PixbufFactory& pixbuf_factory);
+std::vector<Pixbuf *> get_title_animation_pixbuf(const GdString &title_screen, const GdString &title_screen_scroll, bool one_frame_only, PixbufFactory &pixbuf_factory);
+std::vector<Pixmap *> get_title_animation_pixmap(const GdString &title_screen, const GdString &title_screen_scroll, bool one_frame_only, PixbufFactory &pixbuf_factory);
 
 #endif

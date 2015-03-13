@@ -29,8 +29,8 @@ class SDLPixmap: public Pixmap {
 protected:
     SDL_Surface *surface;
 
-    SDLPixmap(const SDLPixmap&);                // copy ctor not implemented
-    SDLPixmap& operator=(const SDLPixmap&);     // operator= not implemented
+    SDLPixmap(const SDLPixmap &);               // copy ctor not implemented
+    SDLPixmap &operator=(const SDLPixmap &);    // operator= not implemented
     SDLPixmap(SDL_Surface *surface_) : surface(surface_) {}
 
 public:

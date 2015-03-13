@@ -68,18 +68,18 @@ public:
     static void show_errors_cb(GtkWidget *widget, gpointer data);
     static void cave_editor_cb(GtkWidget *widget, gpointer data);
     static void recent_chooser_activated_cb(GtkRecentChooser *chooser, gpointer data);
-    static void toggle_fullscreen_cb (GtkWidget *widget, gpointer data);
+    static void toggle_fullscreen_cb(GtkWidget *widget, gpointer data);
     static void pause_game_cb(GtkWidget *widget, gpointer data);
     static void show_replays_cb(GtkWidget *widget, gpointer data);
     static void cave_info_cb(GtkWidget *widget, gpointer data);
-    
+
     GdMainWindow(bool add_menu, NextAction &na);
     ~GdMainWindow();
 };
 
 
 /* Menu UI */
-static GtkActionEntry action_entries_normal[]={
+static GtkActionEntry action_entries_normal[]= {
     {"PlayMenu", NULL, N_("Play")},
     {"FileMenu", NULL, N_("File")},
     {"HelpMenu", NULL, N_("Help")},
@@ -104,7 +104,7 @@ static GtkActionEntry action_entries_normal[]={
     {"FullScreen", GTK_STOCK_FULLSCREEN, NULL, "F11", N_("Fullscreen mode"), G_CALLBACK(GdMainWindow::toggle_fullscreen_cb)},
 };
 
-static GtkActionEntry action_entries_game[]={
+static GtkActionEntry action_entries_game[]= {
     {"TakeSnapshot", GD_ICON_SNAPSHOT, N_("_Take snapshot"), NULL, NULL, G_CALLBACK(GdMainWindow::take_snapshot_cb)},
     {"RevertToSnapshot", GTK_STOCK_UNDO, N_("_Revert to snapshot"), NULL, NULL, G_CALLBACK(GdMainWindow::revert_to_snapshot_cb)},
     {"RandomColors", GTK_STOCK_SELECT_COLOR, N_("Random _colors"), NULL, NULL, G_CALLBACK(GdMainWindow::random_colors_cb)},
@@ -183,8 +183,7 @@ void GdMainWindow::main_window_set_fullscreen() {
     if (fullscreen) {
         gtk_widget_hide(menubar);
         g_idle_add_full(G_PRIORITY_LOW, (GSourceFunc) main_window_set_fullscreen_idle_func, window, NULL);
-    }
-    else {
+    } else {
         gtk_window_unfullscreen(GTK_WINDOW(window));
         gtk_widget_show(menubar);
     }
@@ -368,8 +367,7 @@ void GdMainWindow::cave_info_cb(GtkWidget *widget, gpointer data) {
 
 
 GdMainWindow::GdMainWindow(bool add_menu, NextAction &na)
-: na(na)
-{
+    : na(na) {
     this->fullscreen = false;
     window=gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_default_size(GTK_WINDOW(window), 320, 200);
@@ -377,14 +375,14 @@ GdMainWindow::GdMainWindow(bool add_menu, NextAction &na)
 
     /* vertical box */
     GtkWidget *vbox=gtk_vbox_new(FALSE, 0);
-    gtk_container_add(GTK_CONTAINER (window), vbox);
+    gtk_container_add(GTK_CONTAINER(window), vbox);
 
     /* menu */
     if (add_menu) {
         actions_normal=gtk_action_group_new("actions_normal");
         gtk_action_group_set_translation_domain(actions_normal, PACKAGE);
         gtk_action_group_add_actions(actions_normal, action_entries_normal, G_N_ELEMENTS(action_entries_normal), this);
-        
+
         actions_game=gtk_action_group_new("actions_game");
         gtk_action_group_set_translation_domain(actions_game, PACKAGE);
         gtk_action_group_add_actions(actions_game, action_entries_game, G_N_ELEMENTS(action_entries_game), this);
@@ -408,7 +406,7 @@ GdMainWindow::GdMainWindow(bool add_menu, NextAction &na)
         gtk_recent_chooser_set_local_only(GTK_RECENT_CHOOSER(recent_chooser), TRUE);
         gtk_recent_chooser_set_limit(GTK_RECENT_CHOOSER(recent_chooser), 10);
         gtk_recent_chooser_set_sort_type(GTK_RECENT_CHOOSER(recent_chooser), GTK_RECENT_SORT_MRU);
-        gtk_menu_item_set_submenu(GTK_MENU_ITEM (gtk_ui_manager_get_widget (ui, "/MenuBar/FileMenu/LoadRecent")), recent_chooser);
+        gtk_menu_item_set_submenu(GTK_MENU_ITEM(gtk_ui_manager_get_widget(ui, "/MenuBar/FileMenu/LoadRecent")), recent_chooser);
         g_signal_connect(G_OBJECT(recent_chooser), "item-activated", G_CALLBACK(GdMainWindow::recent_chooser_activated_cb), this);
 
         g_object_unref(ui);
@@ -446,7 +444,7 @@ void gd_main_window_gtk_run(CaveSet *caveset, NextAction &na) {
 
     /* and run */
     gtk_main();
-    
+
     delete main_window;
     /* process all pending events before returning,
      * because the widget destroying created many. without processing them,
@@ -467,7 +465,7 @@ void gd_main_window_gtk_run_a_game(GameControl *game) {
 
     /* and run */
     gtk_main();
-    
+
     delete main_window;
     /* process all pending events before returning,
      * because the widget destroying created many. without processing them,

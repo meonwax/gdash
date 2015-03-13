@@ -56,7 +56,7 @@ void ReplaySaverActivity::SDLInmemoryScreen::save(char const *filename) {
 
 
 ReplaySaverActivity::ReplaySaverActivity(App *app, CaveStored *cave, CaveReplay *replay, std::string const &filename_prefix)
-:
+    :
     Activity(app),
     filename_prefix(filename_prefix),
     game(GameControl::new_replay(app->caveset, cave, replay)),
@@ -64,8 +64,7 @@ ReplaySaverActivity::ReplaySaverActivity(App *app, CaveStored *cave, CaveReplay 
     fm(pf, ""),
     pm(),
     cellrenderer(pf, gd_theme),
-    gamerenderer(pm, cellrenderer, fm, *game)
-{
+    gamerenderer(pm, cellrenderer, fm, *game) {
     int cell_size = cellrenderer.get_cell_size();
     pm.set_size(cell_size*GAME_RENDERER_SCREEN_SIZE_X, cell_size*GAME_RENDERER_SCREEN_SIZE_Y);
     gamerenderer.set_show_replay_sign(false);
@@ -105,26 +104,35 @@ ReplaySaverActivity::~ReplaySaverActivity() {
 
     int i=0;
     i+=fwrite("RIFF", 1, 4, wavfile);    /* "RIFF" */
-    out32=GUINT32_TO_LE(wavlen+36); i+=fwrite(&out32, 1, 4, wavfile);    /* 4 + 8+subchunk1size + 8+subchunk2size */
+    out32=GUINT32_TO_LE(wavlen+36);
+    i+=fwrite(&out32, 1, 4, wavfile);    /* 4 + 8+subchunk1size + 8+subchunk2size */
     i+=fwrite("WAVE", 1, 4, wavfile);    /* "WAVE" */
 
     i+=fwrite("fmt ", 1, 4, wavfile); /* "fmt " */
-    out32=GUINT32_TO_LE(16); i+=fwrite(&out32, 1, 4, wavfile); /* fmt chunk size=16 bytes */
-    out16=GUINT16_TO_LE(1); i+=fwrite(&out16, 1, 2, wavfile); /* 1=pcm */
-    out16=GUINT16_TO_LE(channels); i+=fwrite(&out16, 1, 2, wavfile);
-    out32=GUINT32_TO_LE(frequency); i+=fwrite(&out32, 1, 4, wavfile);
-    out32=GUINT32_TO_LE(frequency*bits/8*channels); i+=fwrite(&out32, 1, 4, wavfile); /* byterate */
-    out16=GUINT16_TO_LE(bits/8*channels); i+=fwrite(&out16, 1, 2, wavfile); /* blockalign */
-    out16=GUINT16_TO_LE(bits); i+=fwrite(&out16, 1, 2, wavfile); /* bitspersample */
+    out32=GUINT32_TO_LE(16);
+    i+=fwrite(&out32, 1, 4, wavfile); /* fmt chunk size=16 bytes */
+    out16=GUINT16_TO_LE(1);
+    i+=fwrite(&out16, 1, 2, wavfile); /* 1=pcm */
+    out16=GUINT16_TO_LE(channels);
+    i+=fwrite(&out16, 1, 2, wavfile);
+    out32=GUINT32_TO_LE(frequency);
+    i+=fwrite(&out32, 1, 4, wavfile);
+    out32=GUINT32_TO_LE(frequency*bits/8*channels);
+    i+=fwrite(&out32, 1, 4, wavfile); /* byterate */
+    out16=GUINT16_TO_LE(bits/8*channels);
+    i+=fwrite(&out16, 1, 2, wavfile); /* blockalign */
+    out16=GUINT16_TO_LE(bits);
+    i+=fwrite(&out16, 1, 2, wavfile); /* bitspersample */
 
     i+=fwrite("data", 1, 4, wavfile); /* "data" */
-    out32=GUINT32_TO_LE(wavlen); i+=fwrite(&out32, 1, 4, wavfile);    /* actual data length */
+    out32=GUINT32_TO_LE(wavlen);
+    i+=fwrite(&out32, 1, 4, wavfile);    /* actual data length */
     fclose(wavfile);
 
     if (i!=44)
         gd_critical("Could not write wav header to file!");
 
-    std::string message = SPrintf(_("Saved %d video frames and %dMiB of audio data to %s_*.png and %s.wav.")) % (frame+1) %  (wavlen/1048576) % filename_prefix % filename_prefix;
+    std::string message = SPrintf(_("Saved %d video frames and %dMiB of audio data to %s_*.png and %s.wav.")) % (frame+1) % (wavlen/1048576) % filename_prefix % filename_prefix;
     app->show_message(_("Replay Saved"), message);
 
     // restore settings
@@ -138,7 +146,7 @@ ReplaySaverActivity::~ReplaySaverActivity() {
 
 void ReplaySaverActivity::install_own_mixer() {
     gd_sound_close();
-    
+
     /* we setup mixing and other parameters for our own needs. */
     saved_gd_sdl_sound=gd_sound_enabled;
     saved_gd_sdl_44khz_mixing=gd_sound_44khz_mixing;
@@ -163,13 +171,25 @@ void ReplaySaverActivity::install_own_mixer() {
     if (frequency!=44100)        /* something must be really going wrong. */
         gd_critical("Cannot initialize mixer to 44100Hz mixing. The replay saver will not work correctly!");
 
-    switch(format) {
-        case AUDIO_U8: bits=8; break;
-        case AUDIO_S8: bits=8; break;
-        case AUDIO_U16LSB: bits=16; break;
-        case AUDIO_S16LSB: bits=16; break;
-        case AUDIO_U16MSB: bits=16; break;
-        case AUDIO_S16MSB: bits=16; break;
+    switch (format) {
+        case AUDIO_U8:
+            bits=8;
+            break;
+        case AUDIO_S8:
+            bits=8;
+            break;
+        case AUDIO_U16LSB:
+            bits=16;
+            break;
+        case AUDIO_S16LSB:
+            bits=16;
+            break;
+        case AUDIO_U16MSB:
+            bits=16;
+            break;
+        case AUDIO_S16MSB:
+            bits=16;
+            break;
         default:
             g_assert_not_reached();
     }
@@ -177,8 +197,7 @@ void ReplaySaverActivity::install_own_mixer() {
 }
 
 
-void ReplaySaverActivity::uninstall_own_mixer()
-{
+void ReplaySaverActivity::uninstall_own_mixer() {
     gd_sound_close();
 
     // restore settings
@@ -186,12 +205,12 @@ void ReplaySaverActivity::uninstall_own_mixer()
     gd_sound_44khz_mixing=saved_gd_sdl_44khz_mixing;
     gd_sound_16bit_mixing=saved_gd_sdl_16bit_mixing;
     gd_sound_stereo=saved_gd_sound_stereo;
-    
+
     if (saved_driver!="")
         g_setenv("SDL_AUDIODRIVER", saved_driver.c_str(), TRUE);
     else
         g_unsetenv("SDL_AUDIODRIVER");
-    
+
     gd_sound_init();
 }
 
@@ -199,9 +218,9 @@ void ReplaySaverActivity::uninstall_own_mixer()
 /* this function saves the wav file, and also does the timing! */
 void ReplaySaverActivity::mixfunc(void *udata, Uint8 *stream, int len) {
     ReplaySaverActivity *rs=static_cast<ReplaySaverActivity *>(udata);
-    
+
     if (!rs->wavfile)
-        return;    
+        return;
     if (fwrite(stream, 1, len, rs->wavfile)!=size_t(len))
         gd_critical("Cannot write to wav file!");
 
@@ -216,9 +235,9 @@ void ReplaySaverActivity::mixfunc(void *udata, Uint8 *stream, int len) {
 
 void ReplaySaverActivity::redraw_event() {
     app->clear_screen();
-    
-    app->title_line("SAVING REPLAY");
-    app->status_line("PLEASE WAIT");
+
+    app->title_line(_("Saving Replay"));
+    app->status_line(_("Please wait"));
 
     // show it to the user.
     // it is not in displayformat, but a small image - not that slow to draw.
@@ -231,7 +250,7 @@ void ReplaySaverActivity::redraw_event() {
     destr.y = y;
     destr.w = 0;
     destr.h = 0;
-    SDL_BlitSurface(pm.get_surface(), 0, static_cast<SDLScreen*>(app->screen)->get_surface(), &destr);
+    SDL_BlitSurface(pm.get_surface(), 0, static_cast<SDLScreen *>(app->screen)->get_surface(), &destr);
 
     app->screen->flip();
 }
@@ -261,7 +280,7 @@ void ReplaySaverActivity::timer2_event() {
     char *filename=g_strdup_printf("%s_%08d.png", filename_prefix.c_str(), frame);
     pm.save(filename);
     g_free(filename);
-    
+
     redraw_event();
     frame++;
 }

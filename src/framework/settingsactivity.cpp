@@ -39,8 +39,8 @@
 class SelectKeyActivity: public Activity {
 public:
     SelectKeyActivity(App *app, char const *title, char const *action, int *pkeycode)
-    : Activity(app),
-      title(title), action(action), pkeycode(pkeycode) {
+        : Activity(app),
+          title(title), action(action), pkeycode(pkeycode) {
     }
     virtual void keypress_event(KeyCode keycode, int gfxlib_keycode);
     virtual void redraw_event();
@@ -76,7 +76,7 @@ void SelectKeyActivity::redraw_event() {
 class ThemeSelectedCommand: public Command1Param<std::string> {
 public:
     ThemeSelectedCommand(App *app, SettingsActivity *activity)
-    :
+        :
         Command1Param<std::string>(app),
         activity(activity),
         filename(p1) {
@@ -95,7 +95,7 @@ private:
         } else {
             /* if file is not ok as a theme, error was logged */
         }
-        
+
         if (!l.empty()) {
             app->show_text_and_do_command(_("Cannot install theme!"), l.get_messages_in_one_string());
             l.clear();
@@ -110,8 +110,7 @@ void SettingsActivity::load_themes() {
 
 
 SettingsActivity::SettingsActivity(App *app, Setting *settings_data)
-: Activity(app)
-{
+    : Activity(app) {
     /* copy the pointer into the member variable */
     settings = settings_data;
     for (numsettings = 0; settings[numsettings].name != NULL; ++numsettings)
@@ -120,6 +119,7 @@ SettingsActivity::SettingsActivity(App *app, Setting *settings_data)
 
     load_themes();
 
+    /* check the settings, calculate sizes etc. */
     yd = app->font_manager->get_line_height();
     y1.resize(numpages);
     for (unsigned page = 0; page < numpages; page++) {
@@ -131,6 +131,11 @@ SettingsActivity::SettingsActivity(App *app, Setting *settings_data)
     }
     current = 1;    /* 0th is presumably a page identifier */
     restart = false;
+    /* check if a theme settings is included */
+    have_theme = false;
+    for (unsigned n = 0; n < numsettings; n++)
+        if (settings[n].type == TypeTheme)
+            have_theme = true;
 }
 
 
@@ -146,6 +151,8 @@ void SettingsActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
     switch (keycode) {
         case App::Up:
             current = gd_clamp(current-1, 0, numsettings-1);
+            while (current > 0 && settings[current].type == TypePage)
+                current--;
             break;
         case App::Down:
             current = gd_clamp(current+1, 0, numsettings-1);
@@ -161,7 +168,7 @@ void SettingsActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
                     current++;    /* increment until previous page is found */
             break;
 
-        /* CHANGE SETTINGS */
+            /* CHANGE SETTINGS */
         case App::Left:    /* key left */
             switch (settings[current].type) {
                 case TypePage:
@@ -186,7 +193,7 @@ void SettingsActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
             break;
 
         case App::Right:    /* key right */
-            switch(settings[current].type) {
+            switch (settings[current].type) {
                 case TypePage:
                     break;
                 case TypeBoolean:
@@ -239,12 +246,19 @@ void SettingsActivity::keypress_event(KeyCode keycode, int gfxlib_keycode) {
             // TRANSLATORS: 40 chars max
             app->select_file_and_do_command(_("Select Image for Theme"), g_get_home_dir(), "*.bmp;*.png", false, "", new ThemeSelectedCommand(app, this));
             break;
+        
+        case 'h':
+        case 'H':
+        case '?':
+            if (settings[current].description)
+                app->show_message(settings[current].description);
+            break;
 
         case App::Escape:    /* finished options menu */
             app->enqueue_command(new PopActivityCommand(app));
             break;
     }
-    
+
     if (settings[current].type == TypePage)
         current++;
     redraw_event();
@@ -256,10 +270,11 @@ void SettingsActivity::redraw_event() {
     // TRANSLATORS: 40 chars max
     app->title_line(CPrintf(_("GDash Options, page %d/%d")) % (settings[current].page+1) % numpages);
     // TRANSLATORS: 40 chars max. Change means to change the setting
-    app->status_line(_("Crsr: Move   Space: change   Esc: exit"));
+    app->status_line(_("Space: change   H: help   Esc: exit"));
     app->set_color(GD_GDASH_GRAY1);
     // TRANSLATORS: 40 chars max
-    app->blittext_n(-1, app->screen->get_height() - 2*app->font_manager->get_line_height(), _("Press T to install a new theme."));
+    if (have_theme)
+        app->blittext_n(-1, app->screen->get_height() - 2*app->font_manager->get_line_height(), _("Press T to install a new theme."));
 
     /* show settings */
     unsigned page = settings[current].page;
@@ -267,7 +282,7 @@ void SettingsActivity::redraw_event() {
     for (unsigned n = 0; n < numsettings; n++) {
         if (settings[n].page == page) {
             std::string value;
-            switch(settings[n].type) {
+            switch (settings[n].type) {
                 case TypePage:
                     break;
                 case TypeBoolean:
@@ -294,7 +309,7 @@ void SettingsActivity::redraw_event() {
                     value = app->gameinput->get_key_name_from_keycode(*(guint *)settings[n].var);
                     break;
             }
-            
+
             int y = y1[page]+linenum*yd;
             if (settings[n].type != TypePage) {
                 int x = 4*app->font_manager->get_font_width_narrow();

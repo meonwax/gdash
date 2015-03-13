@@ -22,9 +22,9 @@
 
 /* names of scaling types supported. */
 /* scale2x and scale3x are not translated: the license says that we should call it in its original name. */
-const char *gd_scaling_name[]={N_("Original"), N_("2x nearest"), "Scale2x", "HQ2x", N_("3x nearest"), "Scale3x", "HQ3x", N_("4x nearest"), "Scale4x", "HQ4x", NULL};
+const char *gd_scaling_name[]= {N_("Original"), N_("2x nearest"), "Scale2x", "HQ2x", N_("3x nearest"), "Scale3x", "HQ3x", N_("4x nearest"), "Scale4x", "HQ4x", NULL};
 /* scaling factors of scaling types supported. */
-const int gd_scaling_scale[]={1, 2, 2, 2, 3, 3, 3, 4, 4, 4};
+const int gd_scaling_scale[]= {1, 2, 2, 2, 3, 3, 3, 4, 4, 4};
 
 /* check the arrays on start */
 static class _init {
@@ -36,8 +36,7 @@ public:
 } _init;
 
 /* scales a pixbuf with the appropriate scaling type. */
-Pixbuf *PixbufFactory::create_scaled(const Pixbuf &src) const
-{
+Pixbuf *PixbufFactory::create_scaled(const Pixbuf &src) const {
     int gd_scale=gd_scaling_scale[scaling_type];
     Pixbuf *scaled=this->create(src.get_width()*gd_scale, src.get_height()*gd_scale);
 
@@ -68,28 +67,27 @@ Pixbuf *PixbufFactory::create_scaled(const Pixbuf &src) const
         case GD_SCALING_3X_HQ3X:
             hq3x(src, *scaled);
             break;
-        case GD_SCALING_4X:
-            {
-                Pixbuf *scale2x=this->create(src.get_width()*2, src.get_height()*2);
-                scale2xnearest(src, *scale2x);
-                scale2xnearest(*scale2x, *scaled);
-                delete scale2x;
-            }
-            break;
+        case GD_SCALING_4X: {
+            Pixbuf *scale2x=this->create(src.get_width()*2, src.get_height()*2);
+            scale2xnearest(src, *scale2x);
+            scale2xnearest(*scale2x, *scaled);
+            delete scale2x;
+        }
+        break;
         case GD_SCALING_4X_SCALE4X:
             /* scale2x applied twice. */
-            {
-                Pixbuf *scale2xpb=this->create(src.get_width()*2, src.get_height()*2);
-                scale2x(src, *scale2xpb);
-                scale2x(*scale2xpb, *scaled);
-                delete scale2xpb;
-            }
-            break;
+        {
+            Pixbuf *scale2xpb=this->create(src.get_width()*2, src.get_height()*2);
+            scale2x(src, *scale2xpb);
+            scale2x(*scale2xpb, *scaled);
+            delete scale2xpb;
+        }
+        break;
         case GD_SCALING_4X_HQ4X:
             hq4x(src, *scaled);
             break;
     }
-    
+
     if (pal_emulation)
         pal_emulate(*scaled);
 
@@ -97,25 +95,21 @@ Pixbuf *PixbufFactory::create_scaled(const Pixbuf &src) const
 }
 
 PixbufFactory::PixbufFactory(GdScalingType scaling_type_, bool pal_emulation_)
-:
+    :
     scaling_type(scaling_type_),
-    pal_emulation(pal_emulation_)
-{
+    pal_emulation(pal_emulation_) {
 }
 
-int PixbufFactory::get_pixmap_scale() const
-{
+int PixbufFactory::get_pixmap_scale() const {
     return gd_scaling_scale[scaling_type];
 }
 
-void PixbufFactory::set_properties(GdScalingType scaling_type_, bool pal_emulation_)
-{
+void PixbufFactory::set_properties(GdScalingType scaling_type_, bool pal_emulation_) {
     scaling_type=scaling_type_;
     pal_emulation=pal_emulation_;
 }
 
-Pixbuf *PixbufFactory::create_from_base64(const char *base64) const
-{
+Pixbuf *PixbufFactory::create_from_base64(const char *base64) const {
     gsize len;
     guchar *decoded=g_base64_decode(base64, &len);
     // creating the pixbuf might fail, in that case, also free memory

@@ -17,9 +17,9 @@ gdash.nsi: gdash.nsi.in
 EXTRA_DIST = \
 	$(icon_DATA) $(desktop_DATA) \
 	config.rpath mkinstalldirs m4/ChangeLog \
-	gdash.ico gdash.nsi.in \
+	gdash.ico gdash.nsi.in gtkrc_win32 \
 	engine_tests.bd replays_example.bd \
-	COPYING.SDL COPYING.SDLgfx COPYING.GTK COPYING.HQX README-SDL.txt \
+	COPYING.SDL COPYING.GTK COPYING.HQX README-SDL.txt \
 	doxygen.conf doxygen.css
 
 doxy:

@@ -40,21 +40,25 @@ public:
     CaveJoin(Coordinate _dist, GdElementEnum _search_element, GdElementEnum _put_element, bool _backward=false);
     CaveJoin(): CaveObject(GD_JOIN) {}
     virtual void draw(CaveRendered &cave) const;
-    virtual CaveJoin *clone() const { return new CaveJoin(*this); };
+    virtual CaveJoin *clone() const {
+        return new CaveJoin(*this);
+    };
     virtual std::string get_bdcff() const;
-    virtual CaveJoin* clone_from_bdcff(const std::string &name, std::istream &is) const;
+    virtual CaveJoin *clone_from_bdcff(const std::string &name, std::istream &is) const;
 
 private:
     static PropertyDescription const descriptor[];
 
 public:
-    virtual PropertyDescription const* get_description_array() const;
+    virtual PropertyDescription const *get_description_array() const;
 
     virtual void create_drag(Coordinate current, Coordinate displacement);
     virtual void move(Coordinate current, Coordinate displacement);
     virtual void move(Coordinate displacement);
     virtual std::string get_coordinates_text() const;
-    virtual GdElementEnum get_characteristic_element() const { return put_element; }
+    virtual GdElementEnum get_characteristic_element() const {
+        return put_element;
+    }
     virtual std::string get_description_markup() const;
 };
 

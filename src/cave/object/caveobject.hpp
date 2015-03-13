@@ -69,15 +69,15 @@ public:
 
     /// Get BDCFF description of object. All derived objects must implement.
     virtual std::string get_bdcff() const=0;
-    
+
     /// Create a new object, and load properties from an istream.
     /// As sometimes the object name in the bdcff file also stores information about
     /// an object (for example, AddBackwards, we must also pass the name.
     /// Implementations should return NULL, if a read error occurs.
-    virtual CaveObject* clone_from_bdcff(const std::string &name, std::istream &is) const=0;
+    virtual CaveObject *clone_from_bdcff(const std::string &name, std::istream &is) const=0;
 
     /// Object factory.
-    static CaveObject* create_from_bdcff(const std::string &str);
+    static CaveObject *create_from_bdcff(const std::string &str);
 
     /* for the editor */
     /// Move an object after creating it in the editor; dragging the mouse at the moment when the
@@ -90,25 +90,27 @@ public:
     /// @param current The coordinate clicked.
     /// @param displacement The movement vector after the last click.
     virtual void move(Coordinate current, Coordinate displacement)=0;
-    
+
     /// This function is called when multiple objects are dragged in the editor.
     /// @param displacement The movement vector.
     virtual void move(Coordinate displacement)=0;
-    
+
     /// Get a short string which shows the coordinates of the object in the object list of the editor.
     virtual std::string get_coordinates_text() const=0;
-    
+
     /// Get an element which is very characteristic of the object - to show in the object list.
     /// If there is none, this returns O_NONE (for example a copy&paste object).
     virtual GdElementEnum get_characteristic_element() const=0;
-    
+
     /// Get a string which describes the object in one sentence. It is translated to the current language.
     virtual std::string get_description_markup() const=0;
 
 protected:
     /// Protected constructor for all derived classes.
     /// This class has no default constructor, to make sure the type variable is always set.
-    explicit CaveObject(Type t): type(t) { enable_on_all(); }
+    explicit CaveObject(Type t): type(t) {
+        enable_on_all();
+    }
 };
 
 /// Initializes cave object factory. Must be called at program start.

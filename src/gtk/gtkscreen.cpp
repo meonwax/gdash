@@ -22,8 +22,7 @@
 #include "gtk/gtkscreen.hpp"
 #include "cave/helper/colors.hpp"
 
-void GTKScreen::fill_rect(int x, int y, int w, int h, const GdColor& c)
-{
+void GTKScreen::fill_rect(int x, int y, int w, int h, const GdColor &c) {
     GdkColor col;
     col.red=c.get_r()*257;   // 257, as 255*257=65535
     col.green=c.get_g()*257;   // 257, as 255*257=65535
@@ -32,8 +31,7 @@ void GTKScreen::fill_rect(int x, int y, int w, int h, const GdColor& c)
     gdk_draw_rectangle(pixmap, gc, TRUE, x, y, w, h);
 }
 
-void GTKScreen::blit_full(Pixmap const &src, int dx, int dy, int x, int y, int w, int h) const
-{
+void GTKScreen::blit_full(Pixmap const &src, int dx, int dy, int x, int y, int w, int h) const {
     GTKPixmap const &srcgtk=static_cast<GTKPixmap const &>(src);
 
     if (srcgtk.mask) {
@@ -47,8 +45,7 @@ void GTKScreen::blit_full(Pixmap const &src, int dx, int dy, int x, int y, int w
     }
 }
 
-void GTKScreen::set_clip_rect(int x1, int y1, int w, int h)
-{
+void GTKScreen::set_clip_rect(int x1, int y1, int w, int h) {
     GdkRectangle rect;
     rect.x=x1;
     rect.y=y1;
@@ -57,17 +54,16 @@ void GTKScreen::set_clip_rect(int x1, int y1, int w, int h)
     gdk_gc_set_clip_rectangle(gc, &rect);
 }
 
-void GTKScreen::remove_clip_rect()
-{
+void GTKScreen::remove_clip_rect() {
     gdk_gc_set_clip_rectangle(gc, NULL);
 }
 
 
 GTKScreen::GTKScreen(GtkWidget *drawing_area_)
-:   Screen(),
-    drawing_area(drawing_area_),
-    pixmap(NULL),
-    gc(NULL)
+  : Screen()
+  , drawing_area(drawing_area_)
+  , pixmap(NULL)
+  , gc(NULL)
 {
     gtk_widget_set_double_buffered(drawing_area, FALSE);
 }

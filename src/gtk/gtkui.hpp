@@ -71,7 +71,7 @@ void gd_save_caveset(CaveSet &caveset);
 void gd_open_caveset(const char *directory, CaveSet &caveset);
 
 bool gd_question_yesno(const char *primary, const char *secondary);
-bool gd_discard_changes(CaveSet const& caveset);
+bool gd_discard_changes(CaveSet const &caveset);
 
 void gd_warningmessage(const char *primary, const char *secondary);
 void gd_errormessage(const char *primary, const char *secondary);

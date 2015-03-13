@@ -38,11 +38,10 @@ Command::~Command() {
 
 
 NewGameCommand::NewGameCommand(App *app, int cavenum, int levelnum)
-: Command1Param<std::string>(app),
-  username(p1),
-  cavenum(cavenum),
-  levelnum(levelnum)
-{
+    : Command1Param<std::string>(app),
+      username(p1),
+      cavenum(cavenum),
+      levelnum(levelnum) {
 }
 
 
@@ -64,7 +63,7 @@ void PopAllActivitiesCommand::execute() {
 
 
 PushActivityCommand::PushActivityCommand(App *app, Activity *activity_to_push)
-:
+    :
     Command(app),
     activity_to_push(activity_to_push) {
 }
@@ -100,7 +99,7 @@ void ShowHighScoreCommand::execute() {
         CaveStored *cave = (i==-1) ? NULL : &app->caveset->cave(i);
         /* select the highscore table; for the caveset or for the cave */
         HighScoreTable *scores = (cave == NULL) ? &app->caveset->highscore : &cave->highscore;
-            
+
         if (scores->size() > 0) {
             /* if this is a cave, add its name */
             // TRANSLATORS: showing highscore, categories
@@ -112,7 +111,7 @@ void ShowHighScoreCommand::execute() {
             }
         }
     }
-    
+
     // TRANSLATORS: should be 40 chars max. Title of the highscore window/activity.
     app->show_text_and_do_command(_("Hall of Fame"), text);
 }
@@ -120,7 +119,7 @@ void ShowHighScoreCommand::execute() {
 
 void ShowCaveInfoCommand::execute() {
     std::string s;
-    
+
     if (app->caveset->name != "")
         s += SPrintf("%c%s: %c%s\n") % GD_COLOR_INDEX_WHITE % _("Caveset") % GD_COLOR_INDEX_YELLOW % app->caveset->name;
     if (app->caveset->author != "")
@@ -147,7 +146,7 @@ void ShowCaveInfoCommand::execute() {
         if (cave.remark != "")
             s += SPrintf("%c%s: %c%s\n") % GD_COLOR_INDEX_WHITE % _("Remark") % GD_COLOR_INDEX_LIGHTBLUE % cave.remark;
     }
-    
+
     // TRANSLATORS: should be 40 chars max. Title of the caveset info window/activity.
     app->show_text_and_do_command(_("Caveset Information"), s);
 }
@@ -167,7 +166,7 @@ void AskIfChangesDiscardedCommand::execute() {
 void OpenFileCommand::execute() {
     gd_last_folder = gd_tostring_free(g_path_get_dirname(filename.c_str()));
     app->caveset->save_highscore(gd_user_config_dir);
-    
+
     try {
         *app->caveset = create_from_file(filename.c_str());
         /* if this is a bd file, and we load highscores from our own config dir */
@@ -175,7 +174,7 @@ void OpenFileCommand::execute() {
             app->caveset->load_highscore(gd_user_config_dir);
         /* start a new title screen */
         app->enqueue_command(new RestartWithTitleScreenCommand(app));
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         // TRANSLATORS: title of the "file open fail" error message window.
         app->show_message(_("Caveset Load Error"), e.what());
     }
@@ -187,7 +186,7 @@ void SaveCavesetToFileCommand::execute() {
     try {
         app->caveset->save_to_file(filename.c_str());
         app->caveset->edited = false;
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         // TRANSLATORS: title of the "file save fail" error window.
         app->show_message(_("Cave Save Error"), e.what());
     }
@@ -216,7 +215,7 @@ void SaveFileAsCommand::execute() {
 class SelectFileToLoadCommand: public Command {
 public:
     SelectFileToLoadCommand(App *app, std::string const &start_dir): Command(app), start_dir(start_dir) {}
-    
+
 private:
     std::string start_dir;
     virtual void execute() {
@@ -241,8 +240,8 @@ void SelectFileToLoadIfDiscardableCommand::execute() {
 
 void ShowErrorsCommand::execute() {
     std::string text;
-    
-    Logger::Container const& errors = l.get_messages();
+
+    Logger::Container const &errors = l.get_messages();
     for (Logger::Container::const_iterator it = errors.begin(); it != errors.end(); ++it) {
         text += it->message;
         text += "\n\n";

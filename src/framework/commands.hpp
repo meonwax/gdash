@@ -34,11 +34,11 @@ class Activity;
  * Commands are little objects which are usually enqueued by an Activity
  * object in its parent App object to be executed after processing an
  * event.
- * 
+ *
  * The Command class is abstract. The Command::execute() method is intended
  * to be overloaded by all descendants, as it is the method which should
  * perform the action.
- * 
+ *
  * The memory management of Command objects is handler via the SmartPtr
  * class by the App.
  */
@@ -52,7 +52,7 @@ protected:
      * @param app The parent App. */
     Command(App *app): app(app) {}
     /** The parent App. */
-    App * const app;
+    App *const app;
 
 private:
     /** This method should perform the action which is the role of the Command. */
@@ -77,7 +77,9 @@ protected:
 public:
     /** Parametrize the Command.
      * @param p The value to copy into the command. */
-    void set_param1(T const& p) { p1 = p; }
+    void set_param1(T const &p) {
+        p1 = p;
+    }
 };
 
 
@@ -168,9 +170,9 @@ public:
      * @param highlight_cave The cave to be highlighted.
      * @param highlight_line The line number to be highlighted in the highscore list. */
     ShowHighScoreCommand(App *app, CaveStored *highlight_cave, int highlight_line)
-    :   Command(app),
-        highlight_cave(highlight_cave),
-        highlight_line(highlight_line) {}
+        :   Command(app),
+            highlight_cave(highlight_cave),
+            highlight_line(highlight_line) {}
 
 private:
     CaveStored *highlight_cave;
@@ -222,8 +224,8 @@ public:
      * @param app The parent app, which also knows the CaveSet.
      * @param filename The file to be loaded. Can be given to the constructor, or omitted and set later via set_param1(). */
     OpenFileCommand(App *app, std::string const &filename = "")
-    :   Command1Param<std::string>(app),
-        filename(p1) {
+        :   Command1Param<std::string>(app),
+            filename(p1) {
         this->filename = filename;
     }
 
@@ -242,8 +244,8 @@ public:
     /** Ctor.
      * @param app The parent app. */
     SaveCavesetToFileCommand(App *app)
-    :   Command1Param<std::string>(app),
-        filename(p1) {
+        :   Command1Param<std::string>(app),
+            filename(p1) {
     }
 
 private:
@@ -260,7 +262,7 @@ public:
     /** Ctor.
      * @param app The parent app, which also knows the caveset. */
     SaveFileCommand(App *app) : Command(app) { }
-    
+
 private:
     virtual void execute();
 };
@@ -273,7 +275,7 @@ public:
     /** Ctor.
      * @param app The parent app, which also knows the caveset. */
     SaveFileAsCommand(App *app) : Command(app) { }
-    
+
 private:
     virtual void execute();
 };
@@ -284,7 +286,7 @@ class SelectFileToLoadIfDiscardableCommand: public Command {
 public:
 
     SelectFileToLoadIfDiscardableCommand(App *app, std::string const &start_dir) : Command(app), start_dir(start_dir) {}
-    
+
 private:
     std::string start_dir;
     virtual void execute();

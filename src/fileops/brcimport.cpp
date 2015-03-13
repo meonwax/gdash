@@ -22,8 +22,7 @@
 #include "misc/printf.hpp"
 #include "cave/elementproperties.hpp"
 
-static GdElementEnum brc_import_table[]=
-{
+static GdElementEnum brc_import_table[]= {
     /* 0 */
     O_SPACE, O_DIRT, O_BRICK, O_MAGIC_WALL, O_PRE_OUTBOX, O_OUTBOX, O_UNKNOWN, O_STEEL,
     O_H_EXPANDING_WALL, O_H_EXPANDING_WALL_scanned, O_FIREFLY_1_scanned, O_FIREFLY_1_scanned, O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
@@ -50,8 +49,7 @@ static GdElementEnum brc_import_table[]=
     O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN,
 };
 
-static GdElementEnum brc_effect_table[]=
-{
+static GdElementEnum brc_effect_table[]= {
     O_STEEL, O_DIRT, O_SPACE, O_STONE, O_STONE_F, O_STONE_GLUED, O_DIAMOND, O_DIAMOND_F, O_DIAMOND_GLUED, O_PRE_DIA_1,
     O_PLAYER, O_PRE_PL_1, O_PLAYER_BOMB, O_PRE_OUTBOX, O_OUTBOX, O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
     O_BUTTER_1, O_BUTTER_2, O_BUTTER_3, O_BUTTER_4, O_BRICK, O_MAGIC_WALL, O_H_EXPANDING_WALL, O_V_EXPANDING_WALL, O_EXPANDING_WALL,
@@ -62,8 +60,7 @@ static GdElementEnum brc_effect_table[]=
 
 static double brc_hue_table[] = { 92, 211, 29, 346, 263, 147, 317, 10, 64 };
 
-static GdElementEnum brc_effect(unsigned char byt)
-{
+static GdElementEnum brc_effect(unsigned char byt) {
     if (byt>=G_N_ELEMENTS(brc_effect_table)) {
         gd_warning(CPrintf("invalid element identifier for brc effect: %02x") % unsigned(byt));
         return O_UNKNOWN;
@@ -72,8 +69,7 @@ static GdElementEnum brc_effect(unsigned char byt)
     return brc_effect_table[byt];
 }
 
-GdElementEnum brc_import_elem(unsigned char c)
-{
+GdElementEnum brc_import_elem(unsigned char c) {
     if (c>=G_N_ELEMENTS(brc_import_table)) {
         gd_warning(CPrintf("invalid brc element byte %x") % unsigned(c));
         return O_UNKNOWN;
@@ -82,8 +78,7 @@ GdElementEnum brc_import_elem(unsigned char c)
 }
 
 
-void brc_import(CaveSet &caveset, guint8 *data)
-{
+void brc_import(CaveSet &caveset, guint8 *data) {
     /* we import 100 caves, and the put them in the correct order. */
     CaveStored *imported[100];
     bool import_effect;
@@ -158,12 +153,12 @@ void brc_import(CaveSet &caveset, guint8 *data)
                       Begin tab[x,y]:=0;col[x,y+2]:=col[x,y];tab[x,y+2]:=27;mat[x,y+2]:=9;Voice4:=2;end;
                where slime is the byte loaded from the file as it is.
                pascal random function generates a random number between 0..limit-1, inclusive, for random(limit).
-               
+
                so a random number between 0..limit*4-1 is generated.
                for limit=1, 0..3, which is always < 4, so P=1.
                for limit=2, 0..7, 0..7 is < 4 in P=50%.
                for limit=3, 0..11, is < 4 in P=33%.
-               So the probability is exactly 100%/limit. 
+               So the probability is exactly 100%/limit.
                just make sure we do not divide by zero for some broken input.
             */
             if (data[7*c+datapos]!=0)
@@ -184,11 +179,11 @@ void brc_import(CaveSet &caveset, guint8 *data)
             colind=data[31*c+datapos]%G_N_ELEMENTS(brc_hue_table);
             cave->colorb=GdColor::from_rgb(0, 0, 0);    /* fixed rgb black */
             cave->color0=GdColor::from_rgb(0, 0, 0);    /* fixed rgb black */
-            cave->color1=GdColor::from_hsv(brc_hue_table[colind], 0.70, 0.70);  /* brc specified dirt color */
-            cave->color2=GdColor::from_hsv(brc_hue_table[colind]+120, 0.85, 0.80);
-            cave->color3=GdColor::from_hsv(brc_hue_table[colind]+240, 0.15, 0.90);  /* almost white for brick */
-            cave->color4=GdColor::from_hsv(120, 0.90, 0.90);    /* fixed for amoeba */
-            cave->color5=GdColor::from_hsv(240, 0.90, 0.90);    /* fixed for slime */
+            cave->color1=GdColor::from_hsv(brc_hue_table[colind], 70, 70);  /* brc specified dirt color */
+            cave->color2=GdColor::from_hsv(brc_hue_table[colind]+120, 85, 80);
+            cave->color3=GdColor::from_hsv(brc_hue_table[colind]+240, 15, 90);  /* almost white for brick */
+            cave->color4=GdColor::from_hsv(120, 90, 90);    /* fixed for amoeba */
+            cave->color5=GdColor::from_hsv(240, 90, 90);    /* fixed for slime */
 
             if (import_effect) {
                 cave->amoeba_enclosed_effect=brc_effect(data[14*c+datapos+1]);
@@ -210,7 +205,7 @@ void brc_import(CaveSet &caveset, guint8 *data)
     /* put them in the caveset - take correct order into consideration. */
     for (int level=0; level<5; level++) {
         for (int cavenum=0; cavenum<20; cavenum++) {
-            static const int reorder[]={0, 1, 2, 3, 16, 4, 5, 6, 7, 17, 8, 9, 10, 11, 18, 12, 13, 14, 15, 19};
+            static const int reorder[]= {0, 1, 2, 3, 16, 4, 5, 6, 7, 17, 8, 9, 10, 11, 18, 12, 13, 14, 15, 19};
             int i=level*20+reorder[cavenum];
             CaveStored *cave=imported[i];
 

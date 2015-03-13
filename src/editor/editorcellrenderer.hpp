@@ -26,10 +26,10 @@
 class GTKPixbufFactory;
 class CaveRendered;
 
-/** 
+/**
  * @brief The EditorCellRenderer is a special cell renderer used in the GTK
  * version of the game, which has cells used only in the editor.
- * 
+ *
  * When created (or colors are changed), some cells are also drawn. Most of
  * these cells are for example creatures with direction of movement arrows.
  */
@@ -47,31 +47,37 @@ private:
 public:
     /**
      * @brief Constructor.
-     * 
+     *
      * Loads a theme file (or "" for default theme); uses pixbuf_factory as a gfx engine.
      * @param pixbuf_factory_ The gfx engine to use.
      * @param theme_name The theme name from the caveset "charset" field.
      * @param default_theme_file The name of the file to load a theme from, if the specified theme is not found. Can be the empty string, to load the built-in theme.
      */
-    EditorCellRenderer(GTKPixbufFactory& pixbuf_factory_, const std::string& theme_file);
+    EditorCellRenderer(GTKPixbufFactory &pixbuf_factory_, const std::string &theme_file);
     virtual void remove_cached();
     virtual void select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5);
 
     /** Returns cave background color currently used by the cell renderer. */
-    const GdColor &background_color() const { return color0; }
+    const GdColor &background_color() const {
+        return color0;
+    }
 
     /** Convenience function which returns the GdkPixbuf* of a cell. */
-    GdkPixbuf *cell_gdk_pixbuf(unsigned i) { return static_cast<GTKPixbuf &>(cell_pixbuf(i)).get_gdk_pixbuf(); }
+    GdkPixbuf *cell_gdk_pixbuf(unsigned i) {
+        return static_cast<GTKPixbuf &>(cell_pixbuf(i)).get_gdk_pixbuf();
+    }
 
     /** Convenience function which returns the GdkDrawable* (pixmap) of a cell. */
-    GdkDrawable *cell_gdk_drawable(unsigned i) { return static_cast<GTKPixmap &>(cell(i)).get_drawable(); }
+    GdkDrawable *cell_gdk_drawable(unsigned i) {
+        return static_cast<GTKPixmap &>(cell(i)).get_drawable();
+    }
 
     /** @brief Returns a small picture of the element, for use in the editor.
      *  The picture will be GTK_ICON_SIZE_MENU, +1 pixel black border.
      *  For convenience, the picture is returned as a GdkPixbuf *.
      */
     GdkPixbuf *combo_pixbuf(GdElementEnum element);
-    
+
     /** @brief Returns a small picture of the element, for use in the editor.
      *  The picture is the simplistic one (not showing movement arrows).
      *  The picture will be GTK_ICON_SIZE_MENU, +1 pixel black border.
@@ -80,4 +86,4 @@ public:
     GdkPixbuf *combo_pixbuf_simple(GdElementEnum element);
 };
 
-GdkPixbuf *gd_drawcave_to_pixbuf(const CaveRendered *cave, EditorCellRenderer& cr, int width, int height, bool game_view, bool border);
+GdkPixbuf *gd_drawcave_to_pixbuf(const CaveRendered *cave, EditorCellRenderer &cr, int width, int height, bool game_view, bool border);

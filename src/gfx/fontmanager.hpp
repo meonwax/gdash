@@ -61,13 +61,13 @@ class RenderedFont;
 /// @ingroup Graphics
 /**
  * @brief The class which manages font rendering and drawing.
- * 
+ *
  * After creating a font manager, its blittext functions
  * can be used to draw text on the screen using C64 fonts.
  * The blittext function draws wide (16x8), the blittext_n
  * function draws narrow (8x8) characters. (Of course,
  * these sizes are enlarged by the pixbuf factory.)
- * 
+ *
  */
 class FontManager {
 private:
@@ -76,36 +76,36 @@ private:
     /// A font map consists of 128 chars, each usually 8x8 pixel.
     /// The 128 chars are in a table, 16 horizontally x 8 vertically.
     std::vector<unsigned char> font;
-    
+
     /// The size of the font pixbufs, in pixels. This may be sized up when drawing.
     unsigned int font_size;
-    
+
     /// The currently selected color
     GdColor current_color;
 
     /// The pixbuf factory used to render the fonts.
-    PixbufFactory const& pixbuf_factory;
+    PixbufFactory const &pixbuf_factory;
 
     /// Rendered fonts are stored in a list for caching.
-    typedef std::list<RenderedFont*> container;
+    typedef std::list<RenderedFont *> container;
     /// Cached fonts for narrow and wide letters.
     container _narrow, _wide;
-    
+
     /// @brief Return with the narrow rendered font.
     /// If it does not exist yet, create. If too many
     /// rendered characters are in the cache, delete the
     /// oldest (least recently used) one.
     /// @param c The color to draw the font.
     /// @return The font created for the color.
-    RenderedFont* narrow(const GdColor &c);
-    
+    RenderedFont *narrow(const GdColor &c);
+
     /// @brief Return with the wide rendered font.
     /// If it does not exist yet, create. If too many
     /// rendered characters are in the cache, delete the
     /// oldest (least recently used) one.
     /// @param c The color to draw the font.
     /// @return The font created for the color.
-    RenderedFont* wide(const GdColor &c);
+    RenderedFont *wide(const GdColor &c);
 
     /// @brief Draw a piece of text with wide or narrow font.
     /// @param screen The screen or pixmap to draw on.
@@ -120,24 +120,24 @@ private:
     ///     By this, more text can be written with successive blittext calls.
     int blittext_internal(Screen &screen, int x, int y, char const *text, bool widefont);
 
-    FontManager(const FontManager&);    // not implemented
-    FontManager& operator=(const FontManager&); // not implemented
+    FontManager(const FontManager &);   // not implemented
+    FontManager &operator=(const FontManager &); // not implemented
 
-    bool loadfont_image(Pixbuf const& loadcells_image);
-    bool loadfont_file(const std::string& filename);
+    bool loadfont_image(Pixbuf const &loadcells_image);
+    bool loadfont_file(const std::string &filename);
 
 public:
     /// @brief Creates a font manager.
-    FontManager(const PixbufFactory& pixbuf_factory_, const std::string& theme_file);
+    FontManager(const PixbufFactory &pixbuf_factory_, const std::string &theme_file);
 
     /// @brief Destructor.
     ~FontManager();
-    
+
     /// @brief Set the color for the next piece of text drawn.
     void set_color(GdColor const &color) {
         current_color = color;
     }
-    
+
     /// @brief Write text on the screen with the wide font.
     /// For more info, look at blittext_internal.
     int blittext(Screen &screen, int x, int y, char const *text) {
@@ -166,23 +166,23 @@ public:
 
     /// @brief Set font of the manager.
     /// Destroys cache and starts drawing with a different font.
-    void load_theme(const std::string& theme_file);
+    void load_theme(const std::string &theme_file);
 
     /// @brief Destroy cache.
     void clear();
 
     /// @brief Get scale factor for drawing. @todo Remove?
     int get_pixmap_scale() const;
-    
+
     /// @brief Get height of font in pixels.
     int get_font_height() const;
-    
+
     /// @brief Get line height in pixels - a bit taller than font height.
     int get_line_height() const;
-    
+
     /// @brief Get width of wide font in pixels.
     int get_font_width_wide() const;
-    
+
     /// @brief Get width of narrow font in pixels.
     int get_font_width_narrow() const;
 

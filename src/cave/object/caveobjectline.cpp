@@ -31,20 +31,17 @@
 /// @param _p2 Ending point of the line.
 /// @param _element Element to draw.
 CaveLine::CaveLine(Coordinate _p1, Coordinate _p2, GdElementEnum _element)
-:   CaveObject(GD_LINE),
-    p1(_p1),
-    p2(_p2),
-    element(_element)
-{
+    :   CaveObject(GD_LINE),
+        p1(_p1),
+        p2(_p2),
+        element(_element) {
 }
 
-std::string CaveLine::get_bdcff() const
-{
+std::string CaveLine::get_bdcff() const {
     return BdcffFormat("Line") << p1 << p2 << element;
 }
 
-CaveLine* CaveLine::clone_from_bdcff(const std::string &name, std::istream &is) const
-{
+CaveLine *CaveLine::clone_from_bdcff(const std::string &name, std::istream &is) const {
     Coordinate p1, p2;
     GdElementEnum element;
     if (!(is >> p1 >> p2 >> element))
@@ -55,8 +52,7 @@ CaveLine* CaveLine::clone_from_bdcff(const std::string &name, std::istream &is) 
 
 /// Draws the line.
 /// Uses Bresenham's algorithm, as descriped in Wikipedia.
-void CaveLine::draw(CaveRendered &cave) const
-{
+void CaveLine::draw(CaveRendered &cave) const {
     int x1=p1.x;
     int y1=p1.y;
     int x2=p2.x;
@@ -98,27 +94,22 @@ PropertyDescription const CaveLine::descriptor[] = {
     {NULL},
 };
 
-PropertyDescription const* CaveLine::get_description_array() const
-{
+PropertyDescription const *CaveLine::get_description_array() const {
     return descriptor;
 }
 
-std::string CaveLine::get_coordinates_text() const
-{
+std::string CaveLine::get_coordinates_text() const {
     return SPrintf("%d,%d-%d,%d") % p1.x % p1.y % p2.x % p2.y;
 }
 
-void CaveLine::create_drag(Coordinate current, Coordinate displacement)
-{
+void CaveLine::create_drag(Coordinate current, Coordinate displacement) {
     p2=current;
 }
 
-void CaveLine::move(Coordinate current, Coordinate displacement)
-{
+void CaveLine::move(Coordinate current, Coordinate displacement) {
     if (current==p1)
         p1+=displacement;   /* move endpoint 1 */
-    else
-    if (current==p2)
+    else if (current==p2)
         p2+=displacement;   /* or move endpoint 2 */
     else {
         p1+=displacement;   /* or move the whole thing */
@@ -126,14 +117,12 @@ void CaveLine::move(Coordinate current, Coordinate displacement)
     }
 }
 
-void CaveLine::move(Coordinate displacement)
-{
+void CaveLine::move(Coordinate displacement) {
     p1+=displacement;
     p2+=displacement;
 }
 
-std::string CaveLine::get_description_markup() const
-{
-    return SPrintf(_("Line from %d,%d to %d,%d of <b>%s</b>"))
-        % p1.x % p1.y % p2.x % p2.y % gd_element_properties[element].lowercase_name;
+std::string CaveLine::get_description_markup() const {
+    return SPrintf(_("Line from %d,%d to %d,%d of <b>%ms</b>"))
+           % p1.x % p1.y % p2.x % p2.y % gd_element_properties[element].lowercase_name;
 }

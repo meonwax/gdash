@@ -22,10 +22,10 @@
 #include <fstream>
 
 #ifdef HAVE_SDL
-    /* on windows, sdl does some hack on the main function.
-     * therefore we need to include this file, even if it seems
-     * to do nothing. */
-    #include <SDL/SDL.h>
+/* on windows, sdl does some hack on the main function.
+ * therefore we need to include this file, even if it seems
+ * to do nothing. */
+#include <SDL/SDL.h>
 #endif
 
 #include "cave/caveset.hpp"
@@ -34,17 +34,22 @@
 #include "misc/logger.hpp"
 #include "misc/about.hpp"
 #include "settings.hpp"
+#include "framework/commands.hpp"
+#include "fileops/loadfile.hpp"
+#include "fileops/binaryimport.hpp"
+#include "input/joystick.hpp"
+
+#ifdef HAVE_SDL
+#include "sdl/sdlmainwindow.hpp"
+#endif
+#ifdef HAVE_GTK
+#include "gtk/gtkmainwindow.hpp"
 #include "editor/editor.hpp"
 #include "editor/editorcellrenderer.hpp"
 #include "editor/exporthtml.hpp"
 #include "gtk/gtkpixbuffactory.hpp"
 #include "gtk/gtkui.hpp"
-#include "framework/commands.hpp"
-#include "fileops/loadfile.hpp"
-#include "fileops/binaryimport.hpp"
-
-#include "sdl/sdlmainwindow.hpp"
-#include "gtk/gtkmainwindow.hpp"
+#endif
 
 /* includes cavesets built in to the executable */
 #include "levels.cpp"
@@ -57,7 +62,7 @@ int main(int argc, char *argv[]) {
     gboolean editor=FALSE;
     char *gallery_filename=NULL;
     char *png_filename=NULL, *png_size=NULL;
-    char *save_cave_name=NULL, *save_gds_name;
+    char *save_cave_name=NULL, *save_gds_name=NULL;
     gboolean force_quit_no_gtk;
 
     GError *error=NULL;
@@ -98,21 +103,19 @@ int main(int argc, char *argv[]) {
 
     gd_settings_init();
     gd_settings_init_dirs();
-
     gd_load_settings();
-
-    gtk_set_locale();
     gd_settings_set_locale();
+    gd_settings_init_translation();
 
     force_quit_no_gtk=FALSE;
     if (!gtk_init_check(&argc, &argv))
         force_quit_no_gtk=TRUE;
 
-    gd_settings_init_translation();
 
     gd_cave_types_init();
     gd_cave_objects_init();
-    
+    Joystick::init();
+
     /* if memory snapshot -> gds file conversion requested */
     if (save_gds_name != NULL) {
         Logger thislogger;
@@ -126,17 +129,16 @@ int main(int argc, char *argv[]) {
         std::vector<unsigned char> gds = gdash_binary_import(memory);
         std::fstream os(save_gds_name, std::ios::out | std::ios::binary);
         os.write((char *) &gds[0], gds.size());
-        
+
         thislogger.clear();
     }
-    
+
     /* LOAD A CAVESET FROM A FILE, OR AN INTERNAL ONE */
     /* if remaining arguments, they are filenames */
     try {
         if (gd_param_cavenames && gd_param_cavenames[0]) {
-            caveset=create_from_file(gd_param_cavenames[0]);
-        }
-        else {
+            caveset = create_from_file(gd_param_cavenames[0]);
+        } else {
             /* if nothing requested, load default */
             caveset = create_from_buffer(level_pointers[0], -1);
             caveset.name = level_names[0];
@@ -167,7 +169,7 @@ int main(int argc, char *argv[]) {
         CaveRendered renderedcave(caveset.cave(0), 0, 0);
         GTKPixbufFactory pf;
         EditorCellRenderer cr(pf, gd_theme);
-        
+
         GdkPixbuf *pixbuf = gd_drawcave_to_pixbuf(&renderedcave, cr, size_x, size_y, true, false);
         GError *error=NULL;
         if (!gdk_pixbuf_save(pixbuf, png_filename, "png", &error, "compression", "9", NULL)) {
@@ -203,12 +205,12 @@ int main(int argc, char *argv[]) {
     else
         na = StartTitle;
 
-    restart_from_here:
-    
+restart_from_here:
+
     gd_sound_init();
     gd_sound_set_music_volume();
     gd_sound_set_chunk_volumes();
-    
+
     while (na != Quit) {
         switch (na) {
             case StartTitle:
@@ -230,7 +232,7 @@ int main(int argc, char *argv[]) {
     }
 
     gd_sound_close();
-    
+
     caveset.save_highscore(gd_user_config_dir);
 
     gd_save_settings();

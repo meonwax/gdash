@@ -28,8 +28,8 @@ class GTKPixbuf: public Pixbuf {
 private:
     GdkPixbuf *pixbuf;
 
-    GTKPixbuf(const GTKPixbuf&);                // copy ctor not implemented
-    GTKPixbuf& operator=(const GTKPixbuf&);     // operator= not implemented
+    GTKPixbuf(const GTKPixbuf &);               // copy ctor not implemented
+    GTKPixbuf &operator=(const GTKPixbuf &);    // operator= not implemented
 public:
     GTKPixbuf(int length, unsigned char const *data);
     GTKPixbuf(const char *filename);
@@ -42,7 +42,7 @@ public:
     virtual void copy_full(int x, int y, int w, int h, Pixbuf &dest, int dx, int dy) const;
 
     virtual bool has_alpha() const;
-    virtual void fill_rect(int x, int y, int w, int h, const GdColor& c);
+    virtual void fill_rect(int x, int y, int w, int h, const GdColor &c);
 
     virtual unsigned char *get_pixels() const;
     virtual int get_pitch() const;
@@ -50,11 +50,15 @@ public:
     /**
      * Return the GdkPixbuf* associated with the object.
      */
-    GdkPixbuf *get_gdk_pixbuf() { return pixbuf; }
+    GdkPixbuf *get_gdk_pixbuf() {
+        return pixbuf;
+    }
     /**
      * Return the GdkPixbuf* associated with the object.
      */
-    GdkPixbuf const *get_gdk_pixbuf() const { return pixbuf; }
+    GdkPixbuf const *get_gdk_pixbuf() const {
+        return pixbuf;
+    }
 
     virtual ~GTKPixbuf();
 };

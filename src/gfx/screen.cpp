@@ -27,9 +27,13 @@ void Screen::reinit() {
 }
 
 
-void Screen::start_drawing() {
+bool Screen::must_redraw_all_before_flip() {
+    return false;
+}
+
+void Screen::flip() {
 }
 
 
-void Screen::flip() {
+void Screen::draw_particle_set(int dx, int dy, ParticleSet const &ps) {
 }

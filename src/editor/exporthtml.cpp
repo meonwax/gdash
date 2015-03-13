@@ -45,18 +45,17 @@ void gd_save_html(char *htmlname, GtkWidget *window, CaveSet &caveset) {
     if (window) {
         dialog=gtk_dialog_new();
         gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(window));
-        progress=gtk_progress_bar_new ();
+        progress=gtk_progress_bar_new();
         gtk_window_set_title(GTK_WINDOW(dialog), _("Saving HTML gallery"));
-        gtk_box_pack_start_defaults(GTK_BOX (GTK_DIALOG (dialog)->vbox), progress);
+        gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), progress);
         gtk_widget_show_all(dialog);
     }
 
-    if (g_str_has_suffix (htmlname, ".html")) {
+    if (g_str_has_suffix(htmlname, ".html")) {
         /* has html extension */
         pngoutbasename=g_strdup(htmlname);
         *g_strrstr(pngoutbasename, ".html")=0;
-    }
-    else {
+    } else {
         /* has no html extension */
         pngoutbasename=g_strdup(htmlname);
         htmlname=g_strdup_printf("%s.html", pngoutbasename);
@@ -85,7 +84,7 @@ void gd_save_html(char *htmlname, GtkWidget *window, CaveSet &caveset) {
         std::vector<Pixbuf *> title_images = get_title_animation_pixbuf(caveset.title_screen, caveset.title_screen_scroll, true, pf);
         if (!title_images.empty()) {
             GdkPixbuf *title_image=static_cast<GTKPixbuf *>(title_images[0])->get_gdk_pixbuf();
-            
+
             char *pngname=g_strdup_printf("%s_%03d.png", pngoutbasename, 0);  /* it is the "zeroth" image */
             gdk_pixbuf_save(title_image, pngname, "png", &error, "compression", "9", NULL);
             if (error) {
@@ -130,7 +129,7 @@ void gd_save_html(char *htmlname, GtkWidget *window, CaveSet &caveset) {
     EditorCellRenderer cr(pf, gd_theme);
     for (unsigned i=0; i<caveset.caves.size(); i++) {
         if (progress) {
-            gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR (progress), (float) i/caveset.caves.size());
+            gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress), (float) i/caveset.caves.size());
             gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress), CPrintf("%d/%d") % i % caveset.caves.size());
             gdk_window_process_all_updates();
         }
@@ -147,7 +146,7 @@ void gd_save_html(char *htmlname, GtkWidget *window, CaveSet &caveset) {
                     has_amoeba=true;
                 if (rendered.map(x, y)==O_MAGIC_WALL)
                     has_magic=true;
-                    break;
+                break;
             }
 
         /* cave header */

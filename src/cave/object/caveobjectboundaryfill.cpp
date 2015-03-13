@@ -26,13 +26,11 @@
 #include "cave/object/caveobjectboundaryfill.hpp"
 
 
-std::string CaveBoundaryFill::get_bdcff() const
-{
+std::string CaveBoundaryFill::get_bdcff() const {
     return BdcffFormat("BoundaryFill") << start << fill_element << border_element;
 }
 
-CaveBoundaryFill* CaveBoundaryFill::clone_from_bdcff(const std::string &name, std::istream &is) const
-{
+CaveBoundaryFill *CaveBoundaryFill::clone_from_bdcff(const std::string &name, std::istream &is) const {
     Coordinate start;
     GdElementEnum fill, boundary;
     if (!(is >> start >> fill >> boundary))
@@ -46,9 +44,8 @@ CaveBoundaryFill* CaveBoundaryFill::clone_from_bdcff(const std::string &name, st
 /// @param _border_element This is the element which is drawn on the outline of the area.
 /// @param _fill_element The inside of the area will be filled with this element.
 CaveBoundaryFill::CaveBoundaryFill(Coordinate _start, GdElementEnum _fill_element, GdElementEnum _border_element)
-:   CaveFill(GD_FLOODFILL_BORDER, _start, _fill_element),
-    border_element(_border_element)
-{
+    :   CaveFill(GD_FLOODFILL_BORDER, _start, _fill_element),
+        border_element(_border_element) {
 }
 
 /// Recursive function to fill an area of the cave, until the boundary is reached.
@@ -58,8 +55,7 @@ CaveBoundaryFill::CaveBoundaryFill(Coordinate _start, GdElementEnum _fill_elemen
 /// @param cave The cave to do the drawing in.
 /// @param x The x coordinate to draw at.
 /// @param y The y coordinate to draw at.
-void CaveBoundaryFill::draw_proc(CaveRendered &cave, int x, int y) const
-{
+void CaveBoundaryFill::draw_proc(CaveRendered &cave, int x, int y) const {
     /* fill with border so we do not come back */
     cave.store_rc(x, y, border_element, this);
 
@@ -75,8 +71,7 @@ void CaveBoundaryFill::draw_proc(CaveRendered &cave, int x, int y) const
 /// the elements drawn by it are replaced with the fill element.
 /// @param cave The cave to draw in.
 /// @param level The level the cave is rendered on.
-void CaveBoundaryFill::draw(CaveRendered &cave) const
-{
+void CaveBoundaryFill::draw(CaveRendered &cave) const {
     /* check bounds */
     if (start.x<0 || start.y<0 || start.x>=cave.w || start.y>=cave.h)
         return;
@@ -101,13 +96,11 @@ PropertyDescription const CaveBoundaryFill::descriptor[] = {
     {NULL},
 };
 
-PropertyDescription const* CaveBoundaryFill::get_description_array() const
-{
+PropertyDescription const *CaveBoundaryFill::get_description_array() const {
     return descriptor;
 }
 
-std::string CaveBoundaryFill::get_description_markup() const
-{
-    return SPrintf(_("Boundary fill from %d,%d of <b>%s</b>, border <b>%s</b>"))
-        % start.x % start.y % gd_element_properties[fill_element].lowercase_name % gd_element_properties[border_element].lowercase_name;
+std::string CaveBoundaryFill::get_description_markup() const {
+    return SPrintf(_("Boundary fill from %d,%d of <b>%ms</b>, border <b>%ms</b>"))
+           % start.x % start.y % gd_element_properties[fill_element].lowercase_name % gd_element_properties[border_element].lowercase_name;
 }

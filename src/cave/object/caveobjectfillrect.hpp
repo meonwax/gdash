@@ -30,18 +30,22 @@ class CaveFillRect : public CaveRectangular {
 public:
     CaveFillRect(Coordinate _p1, Coordinate _p2, GdElementEnum _element, GdElementEnum _fill_element);
     CaveFillRect(): CaveRectangular(GD_FILLED_RECTANGLE) {}
-    virtual CaveFillRect *clone() const { return new CaveFillRect(*this); };
+    virtual CaveFillRect *clone() const {
+        return new CaveFillRect(*this);
+    };
     virtual void draw(CaveRendered &cave) const;
     virtual std::string get_bdcff() const;
-    virtual CaveFillRect* clone_from_bdcff(const std::string &name, std::istream &is) const;
+    virtual CaveFillRect *clone_from_bdcff(const std::string &name, std::istream &is) const;
 
 private:
     static PropertyDescription const descriptor[];
 
 public:
-    virtual PropertyDescription const* get_description_array() const;
+    virtual PropertyDescription const *get_description_array() const;
 
-    virtual GdElementEnum get_characteristic_element() const { return fill_element; }
+    virtual GdElementEnum get_characteristic_element() const {
+        return fill_element;
+    }
     virtual std::string get_description_markup() const;
 };
 

@@ -71,7 +71,7 @@ void scale2xnearest(const Pixbuf &src, Pixbuf &dest) {
         // first double a line horizontally
         for (int x=0; x<src.get_width(); ++x) {
             guint32 p=src(x, y);
-            
+
             dest(2*x, 2*y)=p;
             dest(2*x+1, 2*y)=p;
         }
@@ -86,7 +86,7 @@ void scale3xnearest(const Pixbuf &src, Pixbuf &dest) {
         // first 3x a line horizontally
         for (int x=0; x<src.get_width(); ++x) {
             guint32 p=src(x, y);
-            
+
             dest(3*x, 3*y)=p;
             dest(3*x+1, 3*y)=p;
             dest(3*x+2, 3*y)=p;
@@ -188,17 +188,16 @@ struct YUV {
 };
 
 #include <cstdlib>
-static void luma_blur(YUV **yuv, YUV **work, int width, int height)
-{
+static void luma_blur(YUV **yuv, YUV **work, int width, int height) {
     /* convolution "matrices" could be 5 numbers, ie. x-2, x-1, x, x+1, x+2... */
     /* but the output already has problems for x-1 and x+1. as the game only
        pal_emus cells, not complete screens - so they are only 3 pixels wide */
     /* convolution "matrix" for luminance */
     static const int lconv[] = { 1, 3, 1, }, ldiv = lconv[0]+lconv[1]+lconv[2];
     /* for left edge of image. */
-    static const int lconv_left[] = { 1, 5, 3, }, ldiv_left=lconv_left[0]+lconv_left[1]+lconv_left[2];
+    static const int lconv_left[] = { 1, 10, 6, }, ldiv_left=lconv_left[0]+lconv_left[1]+lconv_left[2];
     /* for right edge of image. */
-    static const int lconv_right[] = { 3, 5, 1, }, ldiv_right=lconv_right[0]+lconv_right[1]+lconv_right[2];
+    static const int lconv_right[] = { 6, 10, 1, }, ldiv_right=lconv_right[0]+lconv_right[1]+lconv_right[2];
 
     /* apply convolution matrix */
     /* luma blur */
@@ -235,8 +234,7 @@ static void luma_blur(YUV **yuv, YUV **work, int width, int height)
 }
 
 
-static void chroma_blur(YUV **yuv, YUV **work, int width, int height)
-{
+static void chroma_blur(YUV **yuv, YUV **work, int width, int height) {
     /* convolution "matrix" for chrominance */
     /* x-2, x-1, x, x+1, x+2 */
     static const int cconv[] = { 1, 1, 1, 1, 1, }, cdiv=cconv[0]+cconv[1]+cconv[2]+cconv[3]+cconv[4];
@@ -257,7 +255,7 @@ static void chroma_blur(YUV **yuv, YUV **work, int width, int height)
             work[y][x].v=(yuv[y][xm2].v*cconv[0]+yuv[y][xm].v*cconv[1]+yuv[y][x].v*cconv[2]+yuv[y][xp].v*cconv[3]+yuv[y][xp2].v*cconv[4])/cdiv;
         }
     }
-    
+
     for (int y=0; y<height; y++)
         for (int x=0; x<width; x++) {
             yuv[y][x].u = work[y][x].u;
@@ -267,8 +265,7 @@ static void chroma_blur(YUV **yuv, YUV **work, int width, int height)
 
 #define CROSSTALK_SIZE 16
 
-static void chroma_crosstalk_to_luma(YUV **yuv, YUV **work, int width, int height)
-{
+static void chroma_crosstalk_to_luma(YUV **yuv, YUV **work, int width, int height) {
     /* arrays to store things */
     static int crosstalk_sin[CROSSTALK_SIZE];
     static int crosstalk_cos[CROSSTALK_SIZE];
@@ -285,11 +282,11 @@ static void chroma_crosstalk_to_luma(YUV **yuv, YUV **work, int width, int heigh
             crosstalk_cos[i]=crosstalk_amplitude*cos(f);
         }
     }
-    
+
     /* apply edge detection matrix */
     for (int y=0; y<height; y++) {
         for (int x=0; x<width; x++) {
-            const int conv[]={-1, 1, 0, 0, 0,};
+            const int conv[]= {-1, 1, 0, 0, 0,};
 
             /* turnaround coordinates */
             int xm2=(x-2+width)%width;
@@ -302,7 +299,7 @@ static void chroma_crosstalk_to_luma(YUV **yuv, YUV **work, int width, int heigh
             work[y][x].v=yuv[y][xm2].v*conv[0]+yuv[y][xm].v*conv[1]+yuv[y][x].v*conv[2]+yuv[y][xp].v*conv[3]+yuv[y][xp2].v*conv[4];
         }
     }
-    
+
     for (int y=0; y<height; y++)
         if (y/2%2==1) /* rows 3&4 */
             for (int x=0; x<width; x++)
@@ -315,8 +312,7 @@ static void chroma_crosstalk_to_luma(YUV **yuv, YUV **work, int width, int heigh
 #undef CROSSTALK_SIZE
 
 
-static void scanline_shade(YUV **yuv, YUV **work, int width, int height)
-{
+static void scanline_shade(YUV **yuv, YUV **work, int width, int height) {
     if (gd_pal_emu_scanline_shade<0)
         gd_pal_emu_scanline_shade=0;
     if (gd_pal_emu_scanline_shade>100)
@@ -327,11 +323,10 @@ static void scanline_shade(YUV **yuv, YUV **work, int width, int height)
     for (int y=1; y<height; y+=2)
         for (int x=0; x<width; x++)
             yuv[y][x].y=yuv[y][x].y*shade/256;
-}    
+}
 
 
-static inline int clamp(int value, int min, int max)
-{
+static inline int clamp(int value, int min, int max) {
     if (value<min)
         return min;
     if (value>max)
@@ -339,8 +334,7 @@ static inline int clamp(int value, int min, int max)
     return value;
 }
 
-void pal_emulate(Pixbuf &pb)
-{
+void pal_emulate(Pixbuf &pb) {
     int width=pb.get_width();
     int height=pb.get_height();
 
@@ -349,7 +343,7 @@ void pal_emulate(Pixbuf &pb)
     for (int y=0; y<height; y++)
         yuv[y]=new YUV[width];
     YUV **work=new YUV*[height];
-    for (int y=0; y<height; y++)        
+    for (int y=0; y<height; y++)
         work[y]=new YUV[width];
     YUV **alpha=new YUV*[height];   /* alpha is not really yuv, only y will be used. luma blur touches only y. */
     for (int y=0; y<height; y++)
@@ -368,18 +362,18 @@ void pal_emulate(Pixbuf &pb)
             yuv[y][x].y= 77*r+150*g+ 29*b;  /* always pos */
             yuv[y][x].u=-37*r -74*g+111*b;  /* pos or neg */
             yuv[y][x].v=157*r-131*g -26*b;  /* pos or neg */
-            
+
             /* alpha is copied as is, and is not *256 */
             alpha[y][x].y=(row[x]>>pb.ashift)&0xff;
         }
     }
-    
+
     /* we give them an array to "work" in, so that is not free()d and malloc() four times */
     luma_blur(yuv, work, width, height);
     chroma_blur(yuv, work, width, height);
     chroma_crosstalk_to_luma(yuv, work, width, height);
     scanline_shade(yuv, work, width, height);
-    
+
     luma_blur(alpha, work, width, height);
 
     /* convert back to rgb */
@@ -439,15 +433,15 @@ GdColor average_nonblack_colors_in_pixbuf(Pixbuf const &pb) {
 
 
 GdColor lightest_color_in_pixbuf(Pixbuf const &pb) {
-    guint32 red = 0, green = 0, blue = 0;
+    int red = 0, green = 0, blue = 0;
     int w = pb.get_width(), h = pb.get_height();
     for (int y = 0; y < h; ++y) {
         guint32 const *row = pb.get_row(y);
         for (int x = 0; x < w; ++x) {
             guint32 pixel = row[x];
-            unsigned char tred = (pixel >> pb.rshift) & 0xFF;
-            unsigned char tgreen = (pixel >> pb.gshift) & 0xFF;
-            unsigned char tblue = (pixel >> pb.bshift) & 0xFF;
+            int tred = (pixel >> pb.rshift) & 0xFF;
+            int tgreen = (pixel >> pb.gshift) & 0xFF;
+            int tblue = (pixel >> pb.bshift) & 0xFF;
             // if lighter than previous
             if (tred + tgreen + tblue > red + green + blue) {
                 red = tred;

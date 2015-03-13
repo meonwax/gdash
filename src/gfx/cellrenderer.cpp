@@ -32,21 +32,20 @@
 /* data */
 #include "c64_gfx.cpp"
 
-CellRenderer::CellRenderer(PixbufFactory& pixbuf_factory_, const std::string& theme_file)
-:   loaded(0),
-    cells_all(0),
-    is_c64_colored(false),
-    cell_size(0),
-    cells_pixbufs(),
-    cells(),
-    color0(GD_GDASH_BLACK),
-    color1(GD_GDASH_MIDDLEBLUE),
-    color2(GD_GDASH_LIGHTRED),
-    color3(GD_GDASH_WHITE),
-    color4(GD_GDASH_WHITE),
-    color5(GD_GDASH_WHITE),
-    pixbuf_factory(pixbuf_factory_)
-{
+CellRenderer::CellRenderer(PixbufFactory &pixbuf_factory_, const std::string &theme_file)
+    :   loaded(0),
+        cells_all(0),
+        is_c64_colored(false),
+        cell_size(0),
+        cells_pixbufs(),
+        cells(),
+        color0(GD_GDASH_BLACK),
+        color1(GD_GDASH_MIDDLEBLUE),
+        color2(GD_GDASH_LIGHTRED),
+        color3(GD_GDASH_WHITE),
+        color4(GD_GDASH_WHITE),
+        color5(GD_GDASH_WHITE),
+        pixbuf_factory(pixbuf_factory_) {
     load_theme_file(theme_file);
 }
 
@@ -58,8 +57,7 @@ CellRenderer::~CellRenderer() {
 }
 
 /* remove pixmaps from x server */
-void CellRenderer::remove_cached()
-{
+void CellRenderer::remove_cached() {
     /* if cells loaded, delete them */
     for (unsigned i=0; i<G_N_ELEMENTS(cells_pixbufs); ++i) {
         delete cells_pixbufs[i];
@@ -75,8 +73,7 @@ void CellRenderer::remove_cached()
     }
 }
 
-Pixbuf &CellRenderer::cell_pixbuf(unsigned i)
-{
+Pixbuf &CellRenderer::cell_pixbuf(unsigned i) {
     g_assert(i<G_N_ELEMENTS(cells_pixbufs));
     if (cells_all == NULL)
         create_colorized_cells();
@@ -86,8 +83,7 @@ Pixbuf &CellRenderer::cell_pixbuf(unsigned i)
     return *cells_pixbufs[i];
 }
 
-Pixmap &CellRenderer::cell(unsigned i)
-{
+Pixmap &CellRenderer::cell(unsigned i) {
     g_assert(i<G_N_ELEMENTS(cells));
     if (cells[i]==0) {
         int type=i/NUM_OF_CELLS;    // 0=normal, 1=colored1, 2=colored2
@@ -98,21 +94,19 @@ Pixmap &CellRenderer::cell(unsigned i)
             case 0:
                 cells[i]=pixbuf_factory.create_pixmap_from_pixbuf(pb, false);
                 break;
-            case 1:
-                {
-                    Pixbuf *colored=pixbuf_factory.create_composite_color(pb, gd_flash_color);
-                    cells[i]=pixbuf_factory.create_pixmap_from_pixbuf(*colored, false);
-                    delete colored;
-                }
-                break;
-            
-            case 2:
-                {
-                    Pixbuf *colored=pixbuf_factory.create_composite_color(pb, gd_select_color);
-                    cells[i]=pixbuf_factory.create_pixmap_from_pixbuf(*colored, false);
-                    delete colored;
-                }
-                break;
+            case 1: {
+                Pixbuf *colored=pixbuf_factory.create_composite_color(pb, gd_flash_color);
+                cells[i]=pixbuf_factory.create_pixmap_from_pixbuf(*colored, false);
+                delete colored;
+            }
+            break;
+
+            case 2: {
+                Pixbuf *colored=pixbuf_factory.create_composite_color(pb, gd_select_color);
+                cells[i]=pixbuf_factory.create_pixmap_from_pixbuf(*colored, false);
+                delete colored;
+            }
+            break;
             default:
                 g_assert_not_reached();
         }
@@ -121,11 +115,10 @@ Pixmap &CellRenderer::cell(unsigned i)
 }
 
 /* check if given surface is ok to be a gdash theme. */
-bool CellRenderer::is_pixbuf_ok_for_theme(const Pixbuf &surface)
-{
+bool CellRenderer::is_pixbuf_ok_for_theme(const Pixbuf &surface) {
     if ((surface.get_width() % NUM_OF_CELLS_X != 0)
-       || (surface.get_height() % NUM_OF_CELLS_Y != 0)
-       || (surface.get_width() / NUM_OF_CELLS_X != surface.get_height() / NUM_OF_CELLS_Y)) {
+            || (surface.get_height() % NUM_OF_CELLS_Y != 0)
+            || (surface.get_width() / NUM_OF_CELLS_X != surface.get_height() / NUM_OF_CELLS_Y)) {
         gd_critical(CPrintf("Image should contain %d cells in a row and %d in a column!") % int(NUM_OF_CELLS_X) % int(NUM_OF_CELLS_Y));
         return false;
     }
@@ -140,8 +133,7 @@ bool CellRenderer::is_pixbuf_ok_for_theme(const Pixbuf &surface)
     return true;    /* passed checks */
 }
 
-bool CellRenderer::is_image_ok_for_theme(PixbufFactory &pixbuf_factory, const char *filename)
-{
+bool CellRenderer::is_image_ok_for_theme(PixbufFactory &pixbuf_factory, const char *filename) {
     try {
         Pixbuf *image=pixbuf_factory.create_from_file(filename);
         /* if the image is loaded */
@@ -156,8 +148,7 @@ bool CellRenderer::is_image_ok_for_theme(PixbufFactory &pixbuf_factory, const ch
 
 /* load theme from image file. */
 /* return true if successful. */
-bool CellRenderer::loadcells_image(Pixbuf *image)
-{
+bool CellRenderer::loadcells_image(Pixbuf *image) {
     /* do some checks. if those fail, the error is already reported by the function */
     if (!is_pixbuf_ok_for_theme(*image)) {
         delete image;
@@ -168,11 +159,11 @@ bool CellRenderer::loadcells_image(Pixbuf *image)
     remove_cached();
     delete loaded;
     loaded = NULL;
-    
+
     /* load new stuff */
     cell_size = image->get_width()/NUM_OF_CELLS_X;
     loaded = image;
-    
+
     if (check_if_pixbuf_c64_png(*loaded)) {
         /* c64 pixbuf with a small number of colors which can be changed */
         cells_all = NULL;
@@ -189,8 +180,7 @@ bool CellRenderer::loadcells_image(Pixbuf *image)
 
 /* load theme from image file. */
 /* return true if successful. */
-bool CellRenderer::loadcells_file(const std::string& filename)
-{
+bool CellRenderer::loadcells_file(const std::string &filename) {
     /* load cell graphics */
     /* load from file */
     try {
@@ -205,8 +195,7 @@ bool CellRenderer::loadcells_file(const std::string& filename)
 /* load the theme specified in theme_file. */
 /* if successful, ok. */
 /* if fails, or no theme specified, load the builtin */
-void CellRenderer::load_theme_file(const std::string& theme_file)
-{
+void CellRenderer::load_theme_file(const std::string &theme_file) {
     if (theme_file!="" && loadcells_file(theme_file)) {
         /* loaded from png file */
     } else {
@@ -215,18 +204,15 @@ void CellRenderer::load_theme_file(const std::string& theme_file)
     }
 }
 
-int CellRenderer::get_cell_size()
-{
+int CellRenderer::get_cell_size() {
     return cell_size*pixbuf_factory.get_pixmap_scale();
 }
 
-bool CellRenderer::get_pal_emulation() const
-{
+bool CellRenderer::get_pal_emulation() const {
     return pixbuf_factory.get_pal_emulation();
 }
 
-void CellRenderer::select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5)
-{
+void CellRenderer::select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5) {
     if (c0!=color0 || c1!=color1 || c2!=color2 || c3!=color3 || c4!=color4 || c5!=color5) {
         /* if not the same colors as requested before */
         color0 = c0;
@@ -243,8 +229,7 @@ void CellRenderer::select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdCo
 
 
 static inline int
-c64_color_index(int h, int s, int v, int a)
-{
+c64_color_index(int h, int s, int v, int a) {
     if (a < 0x80)
         return 8;   /* transparent */
     if (v < 0x10)
@@ -271,8 +256,7 @@ c64_color_index(int h, int s, int v, int a)
 
 
 /* returns true, if the given pixbuf seems to be a c64 imported image. */
-bool CellRenderer::check_if_pixbuf_c64_png(Pixbuf const& image)
-{
+bool CellRenderer::check_if_pixbuf_c64_png(Pixbuf const &image) {
     int wx=image.get_width()*4;       // 4 bytes/pixel
     int h=image.get_height();
 
@@ -292,7 +276,7 @@ bool CellRenderer::check_if_pixbuf_c64_png(Pixbuf const& image)
 
 /** This function takes the loaded image, and transforms it using the selected
  * cave colors, to create cells_all.
- * 
+ *
  * The process is as follows. All pixels are converted to HSV (hue, saturation,
  * value). The hues of the pixels should be 0 (red), 60 (yellow), 120 (green)
  * etc, n*60. This way will the routine recognize the colors.
@@ -300,18 +284,19 @@ bool CellRenderer::check_if_pixbuf_c64_png(Pixbuf const& image)
  * The resulting color will use the hue of the selected cave color, the product
  * of the saturations of the cave color and the original color, and the
  * product of the values:
- * 
+ *
  *   Hresult = Hcave
  *   Sresult = Scave * Sloadedimage
  *   Vresult = Vcave * Vloadedimage.
- * 
+ *
  * This allows for modulating the cave colors in saturation and value. If the
  * loaded image contains a dark purple color instead of RGB(255;0;255) purple,
  * the cave color will also be darkened at that pixel and so on. */
+#include <iostream>
 void CellRenderer::create_colorized_cells() {
     g_assert(is_c64_colored);
     g_assert(loaded != NULL);
-    
+
     if (cells_all)
         delete cells_all;
 
@@ -338,29 +323,34 @@ void CellRenderer::create_colorized_cells() {
         guint32 *to = cells_all->get_row(y);
         for (int x=0; x<w; x++) {
             /* rgb values found in image */
-            int r = (p[x] & loaded->rmask) >> loaded->rshift;
-            int g = (p[x] & loaded->gmask) >> loaded->gshift;
-            int b = (p[x] & loaded->bmask) >> loaded->bshift;
-            int a = (p[x] & loaded->amask) >> loaded->ashift;
+            unsigned r = (p[x] & loaded->rmask) >> loaded->rshift;
+            unsigned g = (p[x] & loaded->gmask) >> loaded->gshift;
+            unsigned b = (p[x] & loaded->bmask) >> loaded->bshift;
+            unsigned a = (p[x] & loaded->amask) >> loaded->ashift;
 
             GdColor in = GdColor::from_rgb(r, g, b).to_hsv();
             /* the color code from the original image (essentially the hue) will select the color index */
             unsigned index = c64_color_index(in.get_h(), in.get_s(), in.get_v(), a);
-            /* and the saturation and value from the original image will modify it */
-            unsigned s_multiplier = in.get_s();
-            unsigned v_multiplier = in.get_v();
-            
-            GdColor newcol = GdColor::from_hsv(
-                cols[index].get_h(),
-                cols[index].get_s() * s_multiplier / 100,
-                cols[index].get_v() * v_multiplier / 100).to_rgb();
+            GdColor newcol;
+            if (index == 0 || index >= 6) {
+                /* for the background and the editor colors, no shading is used */
+                newcol = cols[index];
+            } else {
+                /* otherwise the saturation and value from the original image will modify it */
+                unsigned s_multiplier = in.get_s();
+                unsigned v_multiplier = in.get_v();
+                newcol = GdColor::from_hsv(
+                             cols[index].get_h(),
+                             cols[index].get_s() * s_multiplier / 100,
+                             cols[index].get_v() * v_multiplier / 100).to_rgb();
+            }
 
             guint32 newcolword =
                 newcol.get_r() << cells_all->rshift |
                 newcol.get_g() << cells_all->gshift |
                 newcol.get_b() << cells_all->bshift |
                 a << cells_all->ashift;
-            
+
             to[x] = newcolword;
         }
     }

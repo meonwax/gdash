@@ -19,6 +19,7 @@
 #include <sstream>
 #include "cave/object/caveobject.hpp"
 #include "cave/helper/namevaluepair.hpp"
+#include "misc/logger.hpp"
 
 /* for factory */
 #include "misc/smartptr.hpp"
@@ -89,10 +90,11 @@ CaveObject *CaveObject::create_from_bdcff(const std::string &str) {
     std::string::size_type f=str.find('=');
     if (f==std::string::npos)
         return NULL;
-    std::string type=str.substr(0, f);
-    if (!object_prototypes.has_name(type))
-        return NULL;        // if no such object, return
-
-    std::istringstream is(str.substr(f+1));
-    return object_prototypes.lookup_name(type)->clone_from_bdcff(type, is);
+    try {
+        std::string type=str.substr(0, f);
+        std::istringstream is(str.substr(f+1));
+        return object_prototypes.lookup_name(type)->clone_from_bdcff(type, is);
+    } catch (std::exception &e) {
+        return NULL;
+    }
 }

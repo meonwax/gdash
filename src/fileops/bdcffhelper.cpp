@@ -26,14 +26,12 @@
 /// Create the functor which checks if the string
 /// has an attrib= prefix.
 HasAttrib::HasAttrib(const std::string &attrib_)
-    : attrib(attrib_)
-{
+    : attrib(attrib_) {
     attrib+='=';
 }
 
 /// Check if the given string has the prefix.
-bool HasAttrib::operator()(const std::string &str) const
-{
+bool HasAttrib::operator()(const std::string &str) const {
     return gd_str_ascii_prefix(str, attrib);
 }
 
@@ -41,8 +39,7 @@ bool HasAttrib::operator()(const std::string &str) const
 /// Constructor: split string given by the separator given to attrib and param.
 /// @param str The string to split.
 /// @param separator Separator between attrib and param; default is =.
-AttribParam::AttribParam(const std::string &str, char separator)
-{
+AttribParam::AttribParam(const std::string &str, char separator) {
     size_t equal=str.find(separator);
     if (equal==std::string::npos)
         throw std::runtime_error(SPrintf("No separator in line: '%s'") % str);
@@ -55,16 +52,14 @@ AttribParam::AttribParam(const std::string &str, char separator)
 /// @param F The name of the output string; for example
 ///         give it "Point" if intending to write a line like "Point=1 2 DIRT"
 BdcffFormat::BdcffFormat(const std::string &f)
-:   name(f),
-    firstparam(true)
-{
+    :   name(f),
+        firstparam(true) {
     os << std::setprecision(4) << std::fixed;
 }
 
 /// Get the output string.
 /// @return The converted string.
-std::string BdcffFormat::str() const
-{
+std::string BdcffFormat::str() const {
     if (name.empty())
         return os.str();
     else
@@ -73,8 +68,7 @@ std::string BdcffFormat::str() const
 
 /// Start a new conversion with a new name.
 /// @param f The new name.
-void BdcffFormat::start_new(const std::string &f)
-{
+void BdcffFormat::start_new(const std::string &f) {
     name=f;
     firstparam=true;
     os.str("");     /* clear output */

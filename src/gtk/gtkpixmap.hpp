@@ -38,7 +38,9 @@ public:
     virtual int get_width() const;
     virtual int get_height() const;
 
-    GdkDrawable *get_drawable() const { return pixmap; }
+    GdkDrawable *get_drawable() const {
+        return pixmap;
+    }
 
     virtual ~GTKPixmap();
 };

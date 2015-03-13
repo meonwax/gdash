@@ -40,29 +40,29 @@
 // TODO should not remember screen size in play_area_w and _h?
 
 const char **gd_status_bar_colors_get_names() {
-    static const char *types[]={
+    static const char *types[]= {
         "C64 BD",
         "1stB",
         "CrLi",
         "Final BD",
         "Atari BD",
         NULL
-    };    
+    };
     return types;
 }
 
 GameRenderer::GameRenderer(Screen &screen_, CellRenderer &cells_, FontManager &font_manager_, GameControl &game_)
-:   screen(screen_),
-    cells(cells_),
-    font_manager(font_manager_),
-    game(game_),
-    play_area_w(0), play_area_h(0),
-    statusbar_height(0), statusbar_y1(0), statusbar_y2(0), statusbar_mid(0),
-    out_of_window(false), show_replay_sign(true),
-    scroll_x(0), scroll_y(0),
-    scroll_desired_x(0), scroll_desired_y(0),
-    story_background(NULL),
-    statusbar_since(0) {
+    :   screen(screen_),
+        cells(cells_),
+        font_manager(font_manager_),
+        game(game_),
+        play_area_w(0), play_area_h(0),
+        statusbar_height(0), statusbar_y1(0), statusbar_y2(0), statusbar_mid(0),
+        out_of_window(false), show_replay_sign(true),
+        scroll_x(0), scroll_y(0),
+        scroll_desired_x(0), scroll_desired_y(0),
+        story_background(NULL),
+        statusbar_since(0) {
 }
 
 GameRenderer::~GameRenderer() {
@@ -92,7 +92,7 @@ void GameRenderer::scroll_to_origin() {
     speed: pixels to scroll at once
     cell_size: size of one cell. used to determine if the play field is only a slightly larger than the screen, in that case no scrolling is desirable
 */
- bool GameRenderer::cave_scroll(int logical_size, int physical_size, int center, bool exact, int start, int to, int &current, int &desired, int speed, int cell_size) {
+bool GameRenderer::cave_scroll(int logical_size, int physical_size, int center, bool exact, int start, int to, int &current, int &desired, int speed, int cell_size) {
     int max=logical_size-physical_size;
     if (max<0)
         max=0;
@@ -168,14 +168,14 @@ bool GameRenderer::scroll(int ms, bool exact_scroll) {
     int visible_x=(game.played_cave->x2-game.played_cave->x1+1)*cell_size;  /* pixel size of visible part of the cave (may be smaller in intermissions) */
     int visible_y=(game.played_cave->y2-game.played_cave->y1+1)*cell_size;
 
-    bool changed=false;
+    bool scrolled=false;
     if (cave_scroll(visible_x, play_area_w, player_x*cell_size+cell_size/2-play_area_w/2, exact_scroll, play_area_w/4, play_area_w/8, scroll_x, scroll_desired_x, scroll_speed, cell_size))
-        changed=true;
+        scrolled=true;
     if (cave_scroll(visible_y, play_area_h, player_y*cell_size+cell_size/2-play_area_h/2, exact_scroll, play_area_h/5, play_area_h/10, scroll_y, scroll_desired_y, scroll_speed, cell_size))
-        changed=true;
+        scrolled=true;
 
     /* if scrolling, we should update entire screen. */
-    if (changed) {
+    if (scrolled) {
         for (int y=0; y<game.played_cave->h; y++)
             for (int x=0; x<game.played_cave->w; x++)
                 game.gfx_buffer(x, y) |= GD_REDRAW;
@@ -183,15 +183,18 @@ bool GameRenderer::scroll(int ms, bool exact_scroll) {
 
     /* check if active player is visible at the moment. */
     bool out_of_window=false;
-    /* check if active player is outside drawing area. if yes, we should wait for scrolling */
-    if ((player_x*cell_size)<scroll_x || (player_x*cell_size+cell_size-1)>scroll_x+play_area_w)
-        /* but only do the wait, if the player SHOULD BE visible, ie. he is inside the defined visible area of the cave */
-        if (game.played_cave->player_x>=game.played_cave->x1 && game.played_cave->player_x<=game.played_cave->x2)
-            out_of_window=true;
-    if ((player_y*cell_size)<scroll_y || (player_y*cell_size+cell_size-1)>scroll_y+play_area_h)
-        /* but only do the wait, if the player SHOULD BE visible, ie. he is inside the defined visible area of the cave */
-        if (game.played_cave->player_y>=game.played_cave->y1 && game.played_cave->player_y<=game.played_cave->y2)
-            out_of_window=true;
+    /* check if active player is outside drawing area. if yes, we should wait for scrolling.
+     * but only if scrolling happened at all! */
+    if (scrolled) {
+        if ((player_x*cell_size)<scroll_x || (player_x*cell_size+cell_size-1)>scroll_x+play_area_w)
+            /* but only do the wait, if the player SHOULD BE visible, ie. he is inside the defined visible area of the cave */
+            if (game.played_cave->player_x>=game.played_cave->x1 && game.played_cave->player_x<=game.played_cave->x2)
+                out_of_window=true;
+        if ((player_y*cell_size)<scroll_y || (player_y*cell_size+cell_size-1)>scroll_y+play_area_h)
+            /* but only do the wait, if the player SHOULD BE visible, ie. he is inside the defined visible area of the cave */
+            if (game.played_cave->player_y>=game.played_cave->y1 && game.played_cave->player_y<=game.played_cave->y2)
+                out_of_window=true;
+    }
 
     /* if not yet born, we treat as visible. so cave will run. the user is unable to control an unborn player, so this is the right behaviour. */
     if (game.played_cave->player_state==GD_PL_NOT_YET)
@@ -225,6 +228,15 @@ void GameRenderer::drawcave(bool force_draw) {
     else
         yplus=0;
 
+    /* if using particle effects, draw the background, as particles might have moved "out" of it.
+     * we should only do this if the cave is smaller than the screen! that we well know from the xplus
+     * and yplus variables set above. */
+    if (gd_particle_effects && (xplus != 0 || yplus != 0)) {
+        /* fill screen with status bar background color - particle effects might have gone "out" of the cave */
+        screen.fill(cols.background);
+    }
+
+
     /* here we draw all cells to be redrawn. the in-cell clipping will be done by the graphics
      * engine, we only clip full cells. */
     /* the x and y coordinates are cave physical coordinates.
@@ -246,26 +258,30 @@ void GameRenderer::drawcave(bool force_draw) {
             }
         }
     }
-    
+
     /* now draw the particles */
     if (gd_particle_effects) {
-        int xs=xplus - scroll_x;
-        int ys=yplus + statusbar_height - scroll_y_aligned;
+        int xs = xplus - scroll_x - game.played_cave->x1 * cell_size;
+        int ys = yplus + statusbar_height - scroll_y_aligned - game.played_cave->y1 * cell_size;
         std::list<ParticleSet>::const_iterator it;
         for (it = game.played_cave->particles.begin(); it != game.played_cave->particles.end(); ++it)
             screen.draw_particle_set(xs, ys, *it);
-        /* and remember to redraw the whole cave */
-        for (y=game.played_cave->y1; y<=game.played_cave->y2; y++)
-            for (x=game.played_cave->x1; x<=game.played_cave->x2; x++)
-                game.gfx_buffer(x, y) |= GD_REDRAW;
     }
 
+    /* if using particle effects, the whole cave needs to be redrawn later. */
+    if (gd_particle_effects || screen.must_redraw_all_before_flip()) {
+        /* remember to redraw the whole cave */
+        for (int y=game.played_cave->y1; y<=game.played_cave->y2; y++)
+            for (int x=game.played_cave->x1; x<=game.played_cave->x2; x++)
+                game.gfx_buffer(x, y) |= GD_REDRAW;
+    }
+    
     /* restore clipping to whole screen */
     screen.remove_clip_rect();
 }
 
 void GameRenderer::select_status_bar_colors() {
-    GdColor (*color_indexer) (unsigned i);
+    GdColor(*color_indexer)(unsigned i);
     /* first, count the number of c64 colors the cave uses. */
     /* if it uses mostly c64 colors, we will use c64 colors for the status bar. */
     /* otherwise we will use gdash colors. */
@@ -353,8 +369,7 @@ bool GameRenderer::showheader_firstline(bool in_game) {
                 // TRANSLATORS: the translated string must be at most 20 characters long
                 font_manager.blittext(screen, -1, statusbar_y1, GD_GDASH_YELLOW, _("PLAYING REPLAY"));
                 first_line=true;
-            }
-            else if (gd_show_name_of_game && !in_game) {
+            } else if (gd_show_name_of_game && !in_game) {
                 /* if showing the name of the cave... */
                 int len=g_utf8_strlen(game.caveset->name.c_str(), -1);
                 if (screen.get_width()/font_manager.get_font_width_wide()>=len) /* if have place for double-width font */
@@ -393,18 +408,16 @@ bool GameRenderer::showheader_firstline(bool in_game) {
                     // TRANSLATORS: the translated string must be at most 20 characters long
                     font_manager.blittext(screen, -1, statusbar_y1, cols.default_color, _("ONE LIFE EXTRA"));
                     first_line=true;
-                }
-                else
-                if (gd_show_name_of_game) {
-                        /* if not an intermission, we may show the name of the game (caveset) */
-                        /* if showing the name of the cave... */
-                        int len=g_utf8_strlen(game.caveset->name.c_str(), -1);
-                        if (screen.get_width()/font_manager.get_font_width_wide()>=len) /* if have place for double-width font */
+                } else if (gd_show_name_of_game) {
+                    /* if not an intermission, we may show the name of the game (caveset) */
+                    /* if showing the name of the cave... */
+                    int len=g_utf8_strlen(game.caveset->name.c_str(), -1);
+                    if (screen.get_width()/font_manager.get_font_width_wide()>=len) /* if have place for double-width font */
                         font_manager.blittext(screen, -1, statusbar_y1, cols.default_color, game.caveset->name.c_str());
-                        else
-                            font_manager.blittext_n(screen, -1, statusbar_y1, cols.default_color, game.caveset->name.c_str());
-                        first_line=true;
-                    }
+                    else
+                        font_manager.blittext_n(screen, -1, statusbar_y1, cols.default_color, game.caveset->name.c_str());
+                    first_line=true;
+                }
                 break;
             }
     }
@@ -436,12 +449,17 @@ void GameRenderer::showheader_uncover() {
 
 
 static char gravity_char(GdDirectionEnum dir) {
-    switch(dir) {
-        case MV_DOWN: return GD_DOWN_CHAR;
-        case MV_LEFT: return GD_LEFT_CHAR;
-        case MV_RIGHT: return GD_RIGHT_CHAR;
-        case MV_UP: return GD_UP_CHAR;
-        default: return '?';
+    switch (dir) {
+        case MV_DOWN:
+            return GD_DOWN_CHAR;
+        case MV_LEFT:
+            return GD_LEFT_CHAR;
+        case MV_RIGHT:
+            return GD_RIGHT_CHAR;
+        case MV_UP:
+            return GD_UP_CHAR;
+        default:
+            return '?';
     }
 }
 
@@ -509,8 +527,7 @@ void GameRenderer::showheader_game(bool alternate_status_bar, bool fast_forward)
                 else
                     /* did not already count diamonds needed */
                     x=font_manager.blittext(screen, x, y, cols.diamond_needed, CPrintf("%c%c%c") % GD_DIAMOND_CHAR % GD_DIAMOND_CHAR % GD_DIAMOND_CHAR);
-            }
-            else
+            } else
                 x=font_manager.blittext(screen, x, y, cols.default_color, CPrintf(" %c%c") % GD_DIAMOND_CHAR % GD_DIAMOND_CHAR);
             x=font_manager.blittext(screen, x, y, cols.default_color, CPrintf("%c") % GD_DIAMOND_CHAR);
             x=font_manager.blittext(screen, x, y, cols.diamond_value, CPrintf("%02d") % game.played_cave->diamond_value);
@@ -548,18 +565,21 @@ void GameRenderer::set_colors_from_cave() {
     cells.select_pixbuf_colors(game.played_cave->color0, game.played_cave->color1, game.played_cave->color2, game.played_cave->color3, game.played_cave->color4, game.played_cave->color5);
     /* select status bar colors here, as some depend on actual cave colors */
     select_status_bar_colors();
-    
-    game.played_cave->dirt_particle_color = average_nonblack_colors_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[O_DIRT].image_simple)));
-    game.played_cave->stone_particle_color = average_nonblack_colors_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[O_STONE].image_simple)));
-    game.played_cave->diamond_particle_color = lightest_color_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[O_DIAMOND].image_simple)));
-    game.played_cave->explosion_particle_color = lightest_color_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[O_EXPLODE_1].image_simple)));
-    game.played_cave->magic_wall_particle_color = average_nonblack_colors_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[O_MAGIC_WALL].image_simple)));
+
+    game.played_cave->dirt_particle_color = average_nonblack_colors_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[game.played_cave->dirt_looks_like].image_game)));
+    game.played_cave->dirt_2_particle_color = average_nonblack_colors_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[O_DIRT2].image_game)));
+    game.played_cave->stone_particle_color = average_nonblack_colors_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[O_STONE].image_game)));
+    game.played_cave->mega_stone_particle_color = average_nonblack_colors_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[O_MEGA_STONE].image_game)));
+    game.played_cave->diamond_particle_color = lightest_color_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[O_DIAMOND].image_game)));
+    game.played_cave->explosion_particle_color = lightest_color_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[O_EXPLODE_1].image_game)));
+    game.played_cave->magic_wall_particle_color = average_nonblack_colors_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[O_MAGIC_WALL].image_game)));
+    game.played_cave->expanding_wall_particle_color = average_nonblack_colors_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[game.played_cave->expanding_wall_looks_like].image_game)));
+    game.played_cave->expanding_steel_wall_particle_color = average_nonblack_colors_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[O_EXPANDING_STEEL_WALL].image_game)));
+    game.played_cave->lava_particle_color = average_nonblack_colors_in_pixbuf(cells.cell_pixbuf(abs(gd_element_properties[O_LAVA].image_game)));
 }
 
 
 GameRenderer::State GameRenderer::main_int(int ms, GdDirectionEnum player_move, bool fire, bool &suicide, bool &restart, bool paused, bool alternate_status, bool fast_forward) {
-    screen.start_drawing();
-
     /* tell the interrupt "x ms has passed" */
     GameControl::State state=game.main_int(ms, player_move, fire, suicide, restart, !paused && !out_of_window, fast_forward);
     /* always render the cave to the gfx buffer; however it may do nothing if animcycle was not changed. */
@@ -579,7 +599,6 @@ GameRenderer::State GameRenderer::main_int(int ms, GdDirectionEnum player_move, 
             statusbar_y2=font_manager.get_font_height();
             statusbar_mid=(statusbar_height-font_manager.get_font_height())/2;
             scroll_to_origin();
-            screen.set_title(CPrintf("GDash - %s/%d") % game.played_cave->name % (game.played_cave->rendered_on+1));
             break;
 
         case GameControl::STATE_SHOW_STORY:
@@ -682,7 +701,7 @@ GameRenderer::State GameRenderer::main_int(int ms, GdDirectionEnum player_move, 
                 showheader_game(alternate_status, fast_forward);    /* true = show "playing replay" if necessary */
         }
     }
-    
+
     screen.flip();
 
     switch (state) {
@@ -726,15 +745,15 @@ void GameRenderer::drawstory() {
     // text
     for (unsigned l=0; l<linesavailable && story_y+l<wrapped_story.size(); ++l)
         font_manager.blittext_n(screen, font_manager.get_font_width_narrow()*2,
-            l*font_manager.get_line_height()+font_manager.get_line_height()*3, GD_GDASH_WHITE, wrapped_story[story_y+l].c_str());
+                                l*font_manager.get_line_height()+font_manager.get_line_height()*3, GD_GDASH_WHITE, wrapped_story[story_y+l].c_str());
 
     // up & down arrow
     if (story_y<story_max_y)
         font_manager.blittext_n(screen, screen.get_width()-font_manager.get_font_width_narrow(),
-            screen.get_height()-3*font_manager.get_line_height(), GD_GDASH_GRAY2, CPrintf("%c") % GD_DOWN_CHAR);
+                                screen.get_height()-3*font_manager.get_line_height(), GD_GDASH_GRAY2, CPrintf("%c") % GD_DOWN_CHAR);
     if (story_y>0)
         font_manager.blittext_n(screen, screen.get_width()-font_manager.get_font_width_narrow(),
-            font_manager.get_line_height()*2, GD_GDASH_GRAY2, CPrintf("%c") % GD_UP_CHAR);
+                                font_manager.get_line_height()*2, GD_GDASH_GRAY2, CPrintf("%c") % GD_UP_CHAR);
 }
 
 

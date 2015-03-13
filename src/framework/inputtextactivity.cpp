@@ -22,12 +22,11 @@
 #include "misc/printf.hpp"
 
 InputTextActivity::InputTextActivity(App *app, char const *title_line, const char *default_text, SmartPtr<Command1Param<std::string> > command_when_successful)
-:
+    :
     Activity(app),
     title(title_line),
     command_when_successful(command_when_successful),
-    ms(0), blink(false)
-{
+    ms(0), blink(false) {
     text = g_string_new(default_text);
 }
 

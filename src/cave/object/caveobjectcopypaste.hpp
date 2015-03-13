@@ -35,22 +35,26 @@ public:
     CaveCopyPaste(Coordinate _p1, Coordinate _p2, Coordinate _dest);
     CaveCopyPaste(): CaveObject(GD_COPY_PASTE) {}
     virtual void draw(CaveRendered &cave) const;
-    virtual CaveCopyPaste *clone() const { return new CaveCopyPaste(*this); };
+    virtual CaveCopyPaste *clone() const {
+        return new CaveCopyPaste(*this);
+    };
     void set_mirror_flip(bool _mirror, bool _flip);
     virtual std::string get_bdcff() const;
-    virtual CaveCopyPaste* clone_from_bdcff(const std::string &name, std::istream &is) const;
+    virtual CaveCopyPaste *clone_from_bdcff(const std::string &name, std::istream &is) const;
 
 private:
     static PropertyDescription const descriptor[];
 
 public:
-    virtual PropertyDescription const* get_description_array() const;
+    virtual PropertyDescription const *get_description_array() const;
 
     virtual void create_drag(Coordinate current, Coordinate displacement);
     virtual void move(Coordinate current, Coordinate displacement);
     virtual void move(Coordinate displacement);
     virtual std::string get_coordinates_text() const;
-    virtual GdElementEnum get_characteristic_element() const { return O_NONE; }
+    virtual GdElementEnum get_characteristic_element() const {
+        return O_NONE;
+    }
     virtual std::string get_description_markup() const;
 };
 

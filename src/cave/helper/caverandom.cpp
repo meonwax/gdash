@@ -31,14 +31,14 @@ RandomGenerator::RandomGenerator(unsigned int seed) {
 }
 
 /// Standard assignment operator.
-RandomGenerator& RandomGenerator::operator=(const RandomGenerator &rhs) {
+RandomGenerator &RandomGenerator::operator=(const RandomGenerator &rhs) {
     /* handle self-assignment */
     if (this==&rhs)
         return *this;
-        
+
     g_rand_free(rand);
     rand=g_rand_copy(rhs.rand);
-    
+
     return *this;
 }
 

@@ -15,16 +15,16 @@
  */
 
 #include "config.h"
-    
+
 #ifdef HAVE_SDL
-    #include <SDL.h>
+#include <SDL.h>
 #endif
 
 #include "input/joystick.hpp"
 
 
 #ifdef HAVE_SDL
-    static SDL_Joystick *joystick_1 = NULL;
+static SDL_Joystick *joystick_1 = NULL;
 #endif
 
 void Joystick::init() {
@@ -33,6 +33,14 @@ void Joystick::init() {
         SDL_InitSubSystem(SDL_INIT_JOYSTICK);
     if (SDL_NumJoysticks()>0)
         joystick_1=SDL_JoystickOpen(0);
+#endif
+}
+
+bool Joystick::have_joystick() {
+#ifdef HAVE_SDL
+    return joystick_1 != NULL;
+#else
+    return false;
 #endif
 }
 

@@ -16,11 +16,11 @@
 
 /**
  * @defgroup Framework
- * 
+ *
  * This group is the documentation of the Activity the App and
  * the Command class, which together control the graphical presentation
  * of everything in GDash (except the editor) to the user.
- * 
+ *
  * An Activity object is a screen on which the user can do something,
  * for example play the game, select a file or read about a cave. Most
  * of the activities fill the whole screen. (Some of them are small
@@ -28,14 +28,14 @@
  * activity receives events from the application, and can organize its
  * inner workings according to these events. There are keypress, timer,
  * redraw and other kinds of events.
- * 
+ *
  * The activities are contained in an App object which organizes them into
  * a stack. Every time an event is received from the user or the timer,
  * the App object forwards the events (maybe after some preprocessing)
  * to the topmost activity on the stack. New activities are put on top
  * of the stack, and an activity can quit by requesting the App to
  * pop it off the top of the stack.
- * 
+ *
  * The App object has the responsibility to connect the low level user
  * interface (screen, keyboard, graphics objects) to the activities.
  * The main program (which may be an SDL or a GTK implementation)
@@ -49,14 +49,14 @@
  * activity, which will receive the events from the app. Those which
  * are occluded by these do not receive any events, and so they are
  * stopped.
- * 
+ *
  * In order to provide a means of communication between activities,
  * Command objects can be created. Each activity is allowed to push
  * as many command objects as it wants into the command queue of the
  * App from any of its event methods. The App will check the command
  * queue after calling any of the event methods of the topmost activity,
  * and execute all commands which are queued.
- * 
+ *
  * The starting of the game from the title screen is a typical use of
  * these commands objects. When the user presses space, his name is asked
  * for. After that, he can start the game by typing his name and pressing
@@ -74,7 +74,7 @@
  * - If the user presses escape, the command is not executed, so after
  *   popping the InputTextActivity nothing else happens. And so the
  *   TitleScreenActivity is on the top again.
- * 
+ *
  * The command queue also serves the purpose of preventing object
  * creation/destruction ordering problems from happening. For example,
  * in the above scenario, the InputTextActivity object should not be
@@ -93,7 +93,7 @@
  * - The NewGameCommand is executed. It creates the GameActivity and
  *   pushes it onto the top of the activity stack.
  * - The game runs.
- * 
+ *
  * The App class has some methods which can be called for common tasks like
  * selecting a file or asking a user a yes or no question. By default, these
  * methods push the corresponding activity. However, they can be overridden
@@ -252,7 +252,7 @@ void App::show_about_info() {
     }
     // TRANSLATORS: about dialog box categories.
     text += SPrintf("%c%s\n%c%s") % GD_COLOR_INDEX_YELLOW % _("License") % GD_COLOR_INDEX_LIGHTBLUE % About::license;
-    
+
     show_text_and_do_command(PACKAGE_NAME PACKAGE_VERSION, text);
 }
 
@@ -290,8 +290,8 @@ void App::title_line(const char *text) {
 void App::timer_event(int ms_elapsed) {
     if (topmost_activity()) {
         topmost_activity()->timer_event(ms_elapsed);
-        process_commands();
     }
+    process_commands();
 }
 
 
@@ -306,17 +306,17 @@ void App::timer2_event() {
 void App::keypress_event(Activity::KeyCode keycode, int gfxlib_keycode) {
     /* send it to the gameinput object. */
     gameinput->keypress(gfxlib_keycode);
-    
+
     /* and process it. */
     switch (keycode) {
         case F9:
             /* if we have sound, key f9 will push a volume activity.
              * that activity will receive the keypresses. */
-            #ifdef HAVE_SDL
+#ifdef HAVE_SDL
             if (dynamic_cast<VolumeActivity *>(topmost_activity()) == NULL) {
                 enqueue_command(new PushActivityCommand(this, new VolumeActivity(this)));
             }
-            #endif // ifdef HAVE_SDL
+#endif // ifdef HAVE_SDL
             break;
         case F10:
             /* f10 is reserved for the menu in the gtk version. do not pass to the activity,
@@ -357,7 +357,7 @@ void App::process_commands() {
         command_queue.pop();
         command->execute();
     }
-    
+
     if (running_activities.empty() && no_activity_command != NULL) {
         no_activity_command->execute();
         no_activity_command.release();  /* process this one only once! so forget the object. */

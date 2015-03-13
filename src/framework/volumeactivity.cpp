@@ -28,7 +28,7 @@
 
 
 VolumeActivity::VolumeActivity(App *app)
-: Activity(app), wait_ms(WaitBeforeDisappearMs) {
+    : Activity(app), wait_ms(WaitBeforeDisappearMs) {
 }
 
 
@@ -44,7 +44,7 @@ void VolumeActivity::redraw_event() {
     app->blittext_n(-1, y1+app->font_manager->get_line_height(), _("Volume"));
 
     std::string name, value;
-    
+
     // TRANSLATORS: sound volume during game. the space at the end makes the text of the same length with the other string.
     name = _("Cave volume ");
     value = "";

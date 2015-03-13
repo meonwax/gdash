@@ -29,7 +29,7 @@
 #include "cave/cavetypes.hpp"
 #include "cave/titleanimation.hpp"
 
-std::vector<Pixbuf *> get_title_animation_pixbuf(const GdString& title_screen, const GdString& title_screen_scroll, bool one_frame_only, PixbufFactory& pixbuf_factory) {
+std::vector<Pixbuf *> get_title_animation_pixbuf(const GdString &title_screen, const GdString &title_screen_scroll, bool one_frame_only, PixbufFactory &pixbuf_factory) {
     typedef std::auto_ptr<Pixbuf> PixbufPtr;
 
     std::vector<Pixbuf *> animation;
@@ -40,7 +40,7 @@ std::vector<Pixbuf *> get_title_animation_pixbuf(const GdString& title_screen, c
             screen=PixbufPtr(pixbuf_factory.create_from_base64(title_screen.c_str()));
         if (screen.get()!=NULL && screen->has_alpha() && title_screen_scroll!="")
             tile=PixbufPtr(pixbuf_factory.create_from_base64(title_screen_scroll.c_str()));
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         gd_message(CPrintf("Caveset is storing an invalid title screen image: %s") % e.what());
         return animation;
     }
@@ -92,7 +92,7 @@ std::vector<Pixbuf *> get_title_animation_pixbuf(const GdString& title_screen, c
     return animation;
 }
 
-std::vector<Pixmap *> get_title_animation_pixmap(const GdString& title_screen, const GdString& title_screen_scroll, bool one_frame_only, PixbufFactory& pixbuf_factory) {
+std::vector<Pixmap *> get_title_animation_pixmap(const GdString &title_screen, const GdString &title_screen_scroll, bool one_frame_only, PixbufFactory &pixbuf_factory) {
     std::vector<Pixbuf *> pixbufs;
     pixbufs = get_title_animation_pixbuf(title_screen, title_screen_scroll, one_frame_only, pixbuf_factory);
     if (pixbufs.empty())

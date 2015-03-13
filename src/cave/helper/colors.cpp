@@ -32,62 +32,62 @@
 /* Stores the DTV palettes. */
 #include "dtvpal.cpp"
 
-static const char *c64_color_bdcff_names[]={
+static const char *c64_color_bdcff_names[]= {
     "Black", "White", "Red", "Cyan", "Purple", "Green", "Blue", "Yellow",
     "Orange", "Brown", "LightRed", "Gray1", "Gray2", "LightGreen", "LightBlue", "Gray3",
 };
 
-static const char *c64_color_visible_names[]={
+static const char *c64_color_visible_names[]= {
     N_("Black"), N_("White"), N_("Red"), N_("Cyan"), N_("Purple"), N_("Green"), N_("Blue"), N_("Yellow"),
     N_("Orange"), N_("Brown"), N_("Light red"), N_("Dark gray"), N_("Gray"), N_("Light green"), N_("Light blue"), N_("Light gray"),
 };
 
-static guint32 c64_colors_vice_old[]={
+static guint32 c64_colors_vice_old[]= {
     0x000000, 0xFFFFFF, 0x68372b, 0x70a4b2, 0x6f3d86, 0x588d43, 0x352879, 0xb8c76f,
     0x6f4f25, 0x433900, 0x9a6759, 0x444444, 0x6c6c6c, 0x9ad284, 0x6c5eb5, 0x959595,
 };
 
-static guint32 c64_colors_vice_new[]={
+static guint32 c64_colors_vice_new[]= {
     0x000000, 0xffffff, 0x894036, 0x7abfc7, 0x8a46ae, 0x68a941, 0x3e31a2, 0xd0dc71,
     0x905f25, 0x5c4700, 0xbb776d, 0x555555, 0x808080, 0xacea88, 0x7c70da, 0xababab,
 };
 
-static guint32 c64_colors_c64_hq[]={
+static guint32 c64_colors_c64_hq[]= {
     0x0A0A0A, 0xFFF8FF, 0x851F02, 0x65CDA8, 0xA73B9F, 0x4DAB19, 0x1A0C92, 0xEBE353,
     0xA94B02, 0x441E00, 0xD28074, 0x464646, 0x8B8B8B, 0x8EF68E, 0x4D91D1, 0xBABABA,
 };
 
-static guint32 c64_colors_c64s[]={
+static guint32 c64_colors_c64s[]= {
     0x000000, 0xFCFCFC, 0xA80000, 0x54FCFC, 0xA800A8, 0x00A800, 0x0000A8, 0xFCFC00,
     0xA85400, 0x802C00, 0xFC5454, 0x545454, 0x808080, 0x54FC54, 0x5454FC, 0xA8A8A8,
 };
 
-static guint32 c64_colors_ccs64[]={
+static guint32 c64_colors_ccs64[]= {
     0x101010, 0xFFFFFF, 0xE04040, 0x60FFFF, 0xE060E0, 0x40E040, 0x4040E0, 0xFFFF40,
     0xE0A040, 0x9C7448, 0xFFA0A0, 0x545454, 0x888888, 0xA0FFA0, 0xA0A0FF, 0xC0C0C0,
 };
 
-static guint32 c64_colors_vice_default[]={
+static guint32 c64_colors_vice_default[]= {
     0x000000, 0xFDFEFC, 0xBE1A24, 0x30E6C6, 0xB41AE2, 0x1FD21E, 0x211BAE, 0xDFF60A,
     0xB84104, 0x6A3304, 0xFE4A57, 0x424540, 0x70746F, 0x59FE59, 0x5F53FE, 0xA4A7A2,
 };
 
-static guint32 c64_colors_frodo[]={
+static guint32 c64_colors_frodo[]= {
     0x000000, 0xFFFFFF, 0xCC0000, 0x00FFCC, 0xFF00FF, 0x00CC00, 0x0000CC, 0xFFFF00,
     0xFF8800, 0x884400, 0xFF8888, 0x444444, 0x888888, 0x88FF88, 0x8888FF, 0xCCCCCC,
 };
 
-static guint32 c64_colors_godot[]={
+static guint32 c64_colors_godot[]= {
     0x000000, 0xFFFFFF, 0x880000, 0xAAFFEE, 0xCC44CC, 0x00CC55, 0x0000AA, 0xEEEE77,
     0xDD8855, 0x664400, 0xFE7777, 0x333333, 0x777777, 0xAAFF66, 0x0088FF, 0xBBBBBB,
 };
 
-static guint32 c64_colors_pc64[]={
+static guint32 c64_colors_pc64[]= {
     0x212121, 0xFFFFFF, 0xB52121, 0x73FFFF, 0xB521B5, 0x21B521, 0x2121B5, 0xFFFF21,
     0xB57321, 0x944221, 0xFF7373, 0x737373, 0x949494, 0x73FF73, 0x7373FF, 0xB5B5B5,
 };
 
-static guint32 c64_colors_rtadash[]={
+static guint32 c64_colors_rtadash[]= {
     0x000000, 0xffffff, 0xea3418, 0x58ffff, 0xd82cff, 0x55fb00, 0x4925ff, 0xffff09,
     0xe66c00, 0x935f00, 0xff7c64, 0x6c6c6c, 0xa1a1a1, 0xafff4d, 0x9778ff, 0xd8d8d8,
 };
@@ -101,22 +101,22 @@ static guint32 c64_colors_rtadash[]={
 /* not in the png: cyan, purple. gray3 is darker in the png. */
 /* 17th color is the player's leg in the png. i not connected it to any c64 */
 /* color, but it is used for theme images for example. */
-static const guint32 gdash_colors[]={
+static const guint32 gdash_colors[]= {
     0x000000, 0xffffff, 0xe33939, 0x55aaaa, 0xaa55aa, 0x71aa55, 0x0039ff, 0xffff55,
     0xe37139, 0xaa7139, 0xe09080, 0x555555, 0x717171, 0xc6e38e, 0xaaaaff, 0x8e8e8e,
-    
+
     0x5555aa,
 };
 
 
 /* make sure that pointeres and names match! */
-static guint32 *c64_palette_pointers[]={
+static guint32 *c64_palette_pointers[]= {
     c64_colors_vice_new,
     c64_colors_vice_old, c64_colors_vice_default, c64_colors_c64_hq, c64_colors_c64s,
     c64_colors_ccs64, c64_colors_frodo, c64_colors_godot, c64_colors_pc64, c64_colors_rtadash,
     NULL
 };
-static const char *c64_palettes_names[]={
+static const char *c64_palettes_names[]= {
     "Vice new",
     "Vice old", "Vice default", "C64HQ", "C64S",
     "CCS64", "Frodo", "GoDot", "PC64", "RTADash",
@@ -124,7 +124,7 @@ static const char *c64_palettes_names[]={
 };
 
 /* indexes in this array must match GdColorType */
-static const char *palette_types_names[]={
+static const char *palette_types_names[]= {
     N_("RGB colors"),
     N_("C64 colors"),
     N_("C64DTV colors"),
@@ -145,17 +145,17 @@ const char **GdColor::get_palette_types_names() {
 }
 
 /// Get an array of C strings, which stores the names of C64 palettes known.
-const char ** GdColor::get_c64_palette_names() {
+const char **GdColor::get_c64_palette_names() {
     return c64_palettes_names;
 }
 
 /// Get an array of C strings, which stores the names of C64DTV palettes known.
-const char ** GdColor::get_c64dtv_palette_names() {
+const char **GdColor::get_c64dtv_palette_names() {
     return c64dtv_palettes_names;
 }
 
 /// Get an array of C strings, which stores the names of Atari palettes known.
-const char ** GdColor::get_atari_palette_names() {
+const char **GdColor::get_atari_palette_names() {
     return atari_palettes_names;
 }
 
@@ -246,14 +246,14 @@ GdColor GdColor::from_hsv(unsigned short h, unsigned char s, unsigned char v) {
 /// Create a color from a BDCFF description.
 /// @param color The string which contains the BDCFF representation.
 /// @return The new color object.
-bool read_from_string(std::string const& str, GdColor &c) {
+bool read_from_string(std::string const &str, GdColor &c) {
     // check if it is a name of a c64 color
     for (unsigned i=0; i<G_N_ELEMENTS(c64_color_bdcff_names); i++)
         if (gd_str_ascii_caseequal(str, c64_color_bdcff_names[i])) {
             c=GdColor::from_c64(i);
             return true;
         }
-    
+
     std::string strupper(str);
     for (unsigned i=0; i<strupper.size(); ++i)
         strupper[i]=toupper(strupper[i]);
@@ -280,7 +280,7 @@ bool read_from_string(std::string const& str, GdColor &c) {
         c = GdColor::from_rgb(r, g, b);
         return true;
     }
-    
+
     // could not read in any way
     return false;
 }
@@ -295,7 +295,7 @@ GdColor GdColor::to_rgb() const {
     const guint8 *atari_pal;
     const guint8 *c64dtv_pal;
     const guint32 *c64_pal;
-    
+
     switch (type) {
         case TypeRGB:
             /* is already rgb */
@@ -318,33 +318,42 @@ GdColor GdColor::to_rgb() const {
                 gd_atari_palette=0;
             atari_pal=atari_palettes_pointers[gd_atari_palette];
             return from_rgb(atari_pal[index*3], atari_pal[index*3+1], atari_pal[index*3+2]);
-        
-        case TypeHSV:
-            {
-                double h = hsv.h, s = hsv.s/100.0, v = hsv.v/100.0;
-                int i = (int)(h/60)%6;       /* divided by 60 degrees */
-                double f = h/60-(int)(h/60);    /* fractional part */
-                double p = v*(1-s);
-                double q = v*(1-s*f);
-                double t = v*(1-s*(1-f));
-                
-                v *= 255.0;
-                p *= 255.0;
-                q *= 255.0;
-                t *= 255.0;
-                
-                switch (i) {
-                    case 0: return GdColor::from_rgb(v, t, p);
-                    case 1: return GdColor::from_rgb(q, v, p);
-                    case 2: return GdColor::from_rgb(p, v, t);
-                    case 3: return GdColor::from_rgb(p, q, v);
-                    case 4: return GdColor::from_rgb(t, p, v);
-                    case 5: return GdColor::from_rgb(v, p, q);
-                }
-                /* no way we reach this */
-                g_assert_not_reached();
-                return GdColor::from_rgb(0,0,0);
+
+        case TypeHSV: {
+            double h = hsv.h, s = hsv.s/100.0, v = hsv.v/100.0;
+            int i = (int)(h/60)%6;       /* divided by 60 degrees */
+            double f = h/60-(int)(h/60);    /* fractional part */
+            double p = v*(1-s);
+            double q = v*(1-s*f);
+            double t = v*(1-s*(1-f));
+
+            v *= 255.0;
+            p *= 255.0;
+            q *= 255.0;
+            t *= 255.0;
+
+            switch (i) {
+                case 0:
+                    return GdColor::from_rgb(v, t, p);
+                case 1:
+                    return GdColor::from_rgb(q, v, p);
+                case 2:
+                    return GdColor::from_rgb(p, v, t);
+                case 3:
+                    return GdColor::from_rgb(p, q, v);
+                case 4:
+                    return GdColor::from_rgb(t, p, v);
+                case 5:
+                    return GdColor::from_rgb(v, p, q);
             }
+            /* no way we reach this */
+            g_assert_not_reached();
+            return GdColor::from_rgb(0,0,0);
+        }
+        break;
+        case TypeInvalid:
+            g_assert_not_reached();
+            break;
     }
     g_assert_not_reached();
 }
@@ -354,7 +363,7 @@ GdColor GdColor::to_rgb() const {
 GdColor GdColor::to_hsv() const {
     if (type == TypeHSV)
         return *this;
-    
+
     double R = get_r()/255.0, G = get_g()/255.0, B = get_b()/255.0;
     double M = std::max(std::max(R, G), B);
     double m = std::min(std::min(R, G), B);
@@ -437,13 +446,13 @@ unsigned int GdColor::get_uint() const {
     unsigned r = get_r();
     unsigned g = get_g();
     unsigned b = get_b();
-    
+
     return (r<<16)+(g<<8)+b;
 }
 
 
 /// Standard operator<< to write BDCFF info of the color to an ostream.
-std::ostream& operator<<(std::ostream& os, const GdColor& c) {
+std::ostream &operator<<(std::ostream &os, const GdColor &c) {
     char text[32];
 
     switch (c.type) {
@@ -454,14 +463,17 @@ std::ostream& operator<<(std::ostream& os, const GdColor& c) {
         case GdColor::TypeAtari:
             sprintf(text, "Atari%02x", c.index);
             break;
-            
+
         case GdColor::TypeC64DTV:
             sprintf(text, "C64DTV%02x", c.index);
             break;
-            
+
         case GdColor::TypeRGB:
         case GdColor::TypeHSV:
             sprintf(text, "#%02x%02x%02x", c.get_r(), c.get_g(), c.get_b());
+            break;
+        case GdColor::TypeInvalid:
+            g_assert_not_reached();
             break;
     }
     os << text;
@@ -471,14 +483,14 @@ std::ostream& operator<<(std::ostream& os, const GdColor& c) {
 /// Return on-screen visible name of color.
 /// Returns strings which can be translated.
 /// @todo throw?
-std::string visible_name(const GdColor& c) {
+std::string visible_name(const GdColor &c) {
     char text[32];
-    
+
     switch (c.type) {
         case GdColor::TypeC64:
             return c64_color_visible_names[c.index];
             break;
-            
+
         case GdColor::TypeAtari:
             sprintf(text, "Atari #%02X", c.index);
             return text;
@@ -486,11 +498,14 @@ std::string visible_name(const GdColor& c) {
         case GdColor::TypeC64DTV:
             sprintf(text, "C64DTV #%02X", c.index);
             return text;
-            
+
         case GdColor::TypeRGB:
         case GdColor::TypeHSV:
             sprintf(text, "RGB #%02X%02X%02X", c.get_r(), c.get_g(), c.get_b());
             return text;
+        case GdColor::TypeInvalid:
+            g_assert_not_reached();
+            break;
     }
     /* should not happen */
     return N_("Invalid");
@@ -518,7 +533,7 @@ int GdColor::get_c64_index() const {
 bool GdColor::operator==(const GdColor &rhs) const {
     if (type!=rhs.type)
         return false;
-    
+
     /* for rgb, all must match. */
     if (type==TypeRGB)
         return rgb.r==rhs.rgb.r && rgb.g==rhs.rgb.g && rgb.b==rhs.rgb.b;

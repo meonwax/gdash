@@ -29,7 +29,7 @@
 
 
 /* list of possible extensions which can be opened */
-const char *gd_caveset_extensions[]={"*.gds", "*.bd", "*.bdr", "*.brc", "*.vsf", "*.mem", NULL};
+const char *gd_caveset_extensions[]= {"*.gds", "*.bd", "*.bdr", "*.brc", "*.vsf", "*.mem", NULL};
 
 
 PropertyDescription const CaveSet::descriptor[] = {
@@ -284,7 +284,7 @@ void CaveSet::set_name_from_filename(const char *filename) {
 /// Save caveset in BDCFF to the file.
 /// @param filename The name of the file to write to.
 /// @return true, if successful; false, if error.
-void CaveSet::save_to_file(const char *filename) throw (std::runtime_error) {
+void CaveSet::save_to_file(const char *filename) throw(std::runtime_error) {
     std::ofstream outfile;
     outfile.open(filename);
     if (!outfile)
@@ -296,7 +296,9 @@ void CaveSet::save_to_file(const char *filename) throw (std::runtime_error) {
     outfile.close();
     if (!outfile)
         throw std::runtime_error(_("Error writing to file."));
+    /* remember savename and that now it is not edited */
     this->filename = filename;
+    this->edited = false;
 }
 
 /// Check if there are any replays in the caveset.

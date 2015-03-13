@@ -52,7 +52,7 @@ int HighScoreTable::add(const std::string &name, int score) {
     if (table.size()>GD_HIGHSCORE_NUM)
         table.resize(GD_HIGHSCORE_NUM);
 
-    /* and find it so we can return an index */ 
+    /* and find it so we can return an index */
     for (unsigned int i=0; i<table.size(); i++)
         if (table[i].name==name && table[i].score==score)
             return i;

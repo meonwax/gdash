@@ -91,148 +91,288 @@ public:
    for generated cells (ie. guard + an arrow), use the above enum
 */
 GdElementPorperty gd_element_properties[] = {
-    {O_SPACE, O_SPACE, N_("Space"), P_AMOEBA_CONSUMES,
-        "SPACE", ' ', 0, 0, 0},
-    {O_DIRT, O_DIRT, N_("Dirt"), P_AMOEBA_CONSUMES|P_VISUAL_EFFECT|P_DIRT,
-        "DIRT", '.', 2, 2, 2},
-    {O_DIRT_SLOPED_UP_RIGHT, O_DIRT_SLOPED_UP_RIGHT, N_("Sloped dirt (up & right)"), P_DIRT|P_SLOPED_UP|P_SLOPED_RIGHT|P_AMOEBA_CONSUMES,
-        "DIRTSLOPEDUPRIGHT", 0, 280, 280, 280},
-    {O_DIRT_SLOPED_UP_LEFT, O_DIRT_SLOPED_UP_LEFT, N_("Sloped dirt (up & left)"), P_DIRT|P_SLOPED_UP|P_SLOPED_LEFT|P_AMOEBA_CONSUMES,
-        "DIRTSLOPEDUPLEFT", 0, 281, 281, 281},
-    {O_DIRT_SLOPED_DOWN_LEFT, O_DIRT_SLOPED_DOWN_LEFT, N_("Sloped dirt (down & left)"), P_DIRT|P_SLOPED_DOWN|P_SLOPED_LEFT|P_AMOEBA_CONSUMES,
-        "DIRTSLOPEDDOWNLEFT", 0, 282, 282, 282},
-    {O_DIRT_SLOPED_DOWN_RIGHT, O_DIRT_SLOPED_DOWN_RIGHT, N_("Sloped dirt (down & right)"), P_DIRT|P_SLOPED_DOWN|P_SLOPED_RIGHT|P_AMOEBA_CONSUMES,
-        "DIRTSLOPEDDOWNRIGHT", 0, 283, 283, 283},
-    {O_DIRT_BALL, O_DIRT_BALL_scanned, N_("Dirt ball"), P_DIRT|P_SLOPED|P_AMOEBA_CONSUMES|P_MOVED_BY_CONVEYOR_TOP,
-        "DIRTBALL", 0, 289, 289, 289, 120},    /* has ckdelay */
-    {O_DIRT_BALL_scanned, O_DIRT_BALL, N_("Dirt ball (scanned)"), P_SCANNED,
-        "SCANN_DIRTBALL", 0, 289, 289, 289},
-    {O_DIRT_BALL_F, O_DIRT_BALL_F_scanned, N_("Dirt ball, falling"), 0,
-        "DIRTBALLf", 0, 289, 289, 289, 120},    /* has ckdelay */
-    {O_DIRT_BALL_F_scanned, O_DIRT_BALL_F, N_("Dirt ball, falling (scanned)"), P_SCANNED,
-        "SCANN_DIRTBALLf", 0, 289, 289, 289},
-    {O_DIRT_LOOSE, O_DIRT_LOOSE_scanned, N_("Loose dirt"), P_DIRT|P_AMOEBA_CONSUMES|P_MOVED_BY_CONVEYOR_TOP,
-        "DIRTLOOSE", 0, 352, 352, 352, 60},    /* has ckdelay */
-    {O_DIRT_LOOSE_scanned, O_DIRT_LOOSE, N_("Loose dirt (scanned)"), P_SCANNED,
-        "SCANN_DIRTLOOSE", 0, 352, 352, 352},
-    {O_DIRT_LOOSE_F, O_DIRT_LOOSE_F_scanned, N_("Loose dirt, falling"), 0,
-        "DIRTLOOSEf", 0, 352, 352, 352, 60},    /* has ckdelay */
-    {O_DIRT_LOOSE_F_scanned, O_DIRT_LOOSE_F, N_("Loose dirt, falling (scanned)"), P_SCANNED,
-        "SCANN_DIRTLOOSEf", 0, 352, 352, 352},
-    {O_DIRT2, O_DIRT2, N_("Dirt 2"), P_DIRT|P_AMOEBA_CONSUMES,
-        "DIRT2", 0, 3, 3, 3},
-    {O_BRICK, O_BRICK, N_("Brick wall"), P_SLOPED|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED,
-        "WALL", 'w', 5, 5, 5},
-    {O_BRICK_SLOPED_UP_RIGHT, O_BRICK_SLOPED_UP_RIGHT, N_("Sloped brick wall (up & right)"), P_SLOPED_UP|P_SLOPED_RIGHT|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED,
-        "WALLSLOPEDUPRIGHT", 0, 276, 276, 276},
-    {O_BRICK_SLOPED_UP_LEFT, O_BRICK_SLOPED_UP_LEFT, N_("Sloped brick wall (up & left)"), P_SLOPED_UP|P_SLOPED_LEFT|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED,
-        "WALLSLOPEDUPLEFT", 0, 277, 277, 277},
-    {O_BRICK_SLOPED_DOWN_LEFT, O_BRICK_SLOPED_DOWN_LEFT, N_("Sloped brick wall (down & left)"), P_SLOPED_DOWN|P_SLOPED_LEFT|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED,
-        "WALLSLOPEDDOWNLEFT", 0, 278, 278, 278},
-    {O_BRICK_SLOPED_DOWN_RIGHT, O_BRICK_SLOPED_DOWN_RIGHT, N_("Sloped brick wall (down & right)"), P_SLOPED_DOWN|P_SLOPED_RIGHT|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED,
-        "WALLSLOPEDDOWNRIGHT", 0, 279, 279, 279},
-    {O_BRICK_NON_SLOPED, O_BRICK_NON_SLOPED, N_("Non-sloped brick wall"), P_CAN_BE_HAMMERED,
-        "WALLNONSLOPED", 0, i_brick_non_sloped, i_brick_non_sloped, 5},
-    {O_MAGIC_WALL, O_MAGIC_WALL, N_("Magic wall"), P_CAN_BE_HAMMERED,
-        "MAGICWALL", 'M', 184, -184, -184},
-    {O_PRE_OUTBOX, O_PRE_OUTBOX, N_("Outbox"), 0,
-        "OUTBOX", 'X', i_pre_outbox_nonblink, -i_pre_outbox_frame_1, 22},
-    {O_OUTBOX, O_OUTBOX, N_("Outbox (open)"), 0,
-        "OUTBOXopen", 0, i_outbox, i_outbox, 22},
-    {O_PRE_INVIS_OUTBOX, O_PRE_INVIS_OUTBOX, N_("Invisible outbox"), 0,
-        "HIDDENOUTBOX", 'H', i_pre_invis_outbox, i_pre_invis_outbox, 22},
-    {O_INVIS_OUTBOX, O_INVIS_OUTBOX, N_("Invisible outbox (open)"), 0,
-        "HIDDENOUTBOXopen", 0, i_invis_outbox, i_invis_outbox, 22},
-    {O_STEEL, O_STEEL, N_("Steel wall"), P_NON_EXPLODABLE,
-        "STEELWALL", 'W', 4, 4, 4},
-    {O_STEEL_SLOPED_UP_RIGHT, O_STEEL_SLOPED_UP_RIGHT, N_("Sloped steel wall (up & right)"), P_SLOPED_UP|P_SLOPED_RIGHT|P_NON_EXPLODABLE,
-        "STEELWALLSLOPEDUPRIGHT", 0, 284, 284, 284},
-    {O_STEEL_SLOPED_UP_LEFT, O_STEEL_SLOPED_UP_LEFT, N_("Sloped steel wall (up & left)"), P_SLOPED_UP|P_SLOPED_LEFT|P_NON_EXPLODABLE,
-        "STEELWALLSLOPEDUPLEFT", 0, 285, 285, 285},
-    {O_STEEL_SLOPED_DOWN_LEFT, O_STEEL_SLOPED_DOWN_LEFT, N_("Sloped steel wall (down & left)"), P_SLOPED_DOWN|P_SLOPED_LEFT|P_NON_EXPLODABLE,
-        "STEELWALLSLOPEDDOWNLEFT", 0, 286, 286, 286},
-    {O_STEEL_SLOPED_DOWN_RIGHT, O_STEEL_SLOPED_DOWN_RIGHT, N_("Sloped steel wall (down & right)"), P_SLOPED_DOWN|P_SLOPED_RIGHT|P_NON_EXPLODABLE,
-        "STEELWALLSLOPEDDOWNRIGHT", 0, 287, 287, 287},
-    {O_STEEL_EXPLODABLE, O_STEEL_EXPLODABLE, N_("Explodable steel wall"), P_CAN_BE_HAMMERED,
-        "STEELWALLDESTRUCTABLE", 'E', 72, 72, 4},
-    {O_STEEL_EATABLE, O_STEEL_EATABLE, N_("Eatable steel wall"), 0,
-        "STEELWALLEATABLE", 0, i_steel_eatable, i_steel_eatable, 4},
-    {O_BRICK_EATABLE, O_BRICK_EATABLE, N_("Eatable brick wall"), 0,
-        "WALLEATABLE", 0, i_brick_eatable, i_brick_eatable, 5},
-    {O_STONE, O_STONE_scanned, N_("Stone"), P_SLOPED|P_MOVED_BY_CONVEYOR_TOP,
-        "BOULDER", 'r', 1, 1, 1, 156},    /* has ckdelay */
-    {O_STONE_scanned, O_STONE, N_("Stone (scanned)"), P_SCANNED,
-        "SCANN_BOULDER", 0, 1, 1, 1},
-    {O_STONE_F, O_STONE_F_scanned, N_("Stone, falling"), 0,
-        "BOULDERf", 'R', i_stone_f, i_stone_f, 1, 156},    /* has ckdelay */
-    {O_STONE_F_scanned, O_STONE_F, N_("Stone, falling (scanned)"), P_SCANNED,
-        "SCANN_BOULDERf", 0, i_stone_f, i_stone_f, 1},
-    {O_FLYING_STONE, O_FLYING_STONE_scanned, N_("Flying stone"), P_SLOPED|P_MOVED_BY_CONVEYOR_BOTTOM,
-        "FLYINGBOULDER", 0, 357, 357, 357, 156},    /* has ckdelay */
-    {O_FLYING_STONE_scanned, O_FLYING_STONE, N_("Flying stone (scanned)"), P_SCANNED,
-        "SCANN_FLYINGBOULDER", 0, 357, 357, 357},
-    {O_FLYING_STONE_F, O_FLYING_STONE_F_scanned, N_("Flying stone, flying"), 0,
-        "FLYINGBOULDERf", 0, i_flying_stone_f, i_flying_stone_f, 357, 156},    /* has ckdelay */
-    {O_FLYING_STONE_F_scanned, O_FLYING_STONE_F, N_("Flying stone, flying (scanned)"), P_SCANNED,
-        "SCANN_FLYINGBOULDERf", 0, i_flying_stone_f, i_flying_stone_f, 357},
-    {O_MEGA_STONE, O_MEGA_STONE_scanned, N_("Mega stone"), P_SLOPED|P_MOVED_BY_CONVEYOR_TOP,
-        "MEGABOULDER", 0, 272, 272, 272, 156},    /* has ckdelay */
-    {O_MEGA_STONE_scanned, O_MEGA_STONE, N_("Mega stone (scanned)"), P_SCANNED,
-        "SCANN_MEGABOULDER", 0, 272, 272, 272},
-    {O_MEGA_STONE_F, O_MEGA_STONE_F_scanned, N_("Mega stone, falling"), 0,
-        "MEGABOULDERf", 0, i_mega_stone_falling, i_mega_stone_falling, 272, 156},    /* has ckdelay */
-    {O_MEGA_STONE_F_scanned, O_MEGA_STONE_F, N_("Mega stone, falling (scanned)"), P_SCANNED,
-        "SCANN_MEGABOULDERf", 0, i_mega_stone_falling, i_mega_stone_falling, 272},
-    {O_DIAMOND, O_DIAMOND_scanned, N_("Diamond"), P_SLOPED|P_MOVED_BY_CONVEYOR_TOP,
-        "DIAMOND", 'd', 248, -248, -248, 156},    /* has ckdelay */
-    {O_DIAMOND_scanned, O_DIAMOND, N_("Diamond (scanned)"), P_SCANNED,
-        "SCANN_DIAMOND", 0, 248, -248, -248},
-    {O_DIAMOND_F, O_DIAMOND_F_scanned, N_("Diamond, falling"), 0,
-        "DIAMONDf", 'D', i_diamond_f, i_diamond_f, -248, 156},    /* has ckdelay */
-    {O_DIAMOND_F_scanned, O_DIAMOND_F, N_("Diamond, falling (scanned)"), P_SCANNED,
-        "SCANN_DIAMONDf", 0, i_diamond_f, i_diamond_f, -248},
-    {O_FLYING_DIAMOND, O_FLYING_DIAMOND_scanned, N_("Flying diamond"), P_SLOPED|P_MOVED_BY_CONVEYOR_BOTTOM,
-        "FLYINGDIAMOND", 0, 344, -344, -344, 156},    /* has ckdelay */
-    {O_FLYING_DIAMOND_scanned, O_FLYING_DIAMOND, N_("Flying diamond (scanned)"), P_SCANNED,
-        "SCANN_FLYINGDIAMOND", 0, 344, -344, -344},
-    {O_FLYING_DIAMOND_F, O_FLYING_DIAMOND_F_scanned, N_("Flying diamond, flying"), 0,
-        "FLYINGDIAMONDf", 0, i_flying_diamond_f, i_flying_diamond_f, -344, 156},    /* has ckdelay */
-    {O_FLYING_DIAMOND_F_scanned, O_FLYING_DIAMOND_F, N_("Flying diamond, flying"), P_SCANNED,
-        "SCANN_FLYINGDIAMONDf", 0, i_flying_diamond_f, i_flying_diamond_f, -344},
-     {O_NUT, O_NUT_scanned, N_("Nut"), P_SLOPED|P_MOVED_BY_CONVEYOR_TOP,
-        "NUT", 0, 358, 358, 358, 156},    /* has ckdelay */
-     {O_NUT_scanned, O_NUT, N_("Nut (scanned)"), P_SCANNED,
-        "SCANN_NUT", 0, 358, 358, 358},
-     {O_NUT_F, O_NUT_F_scanned, N_("Nut, falling"), 0,
-        "NUTf", 0, i_nut_f, i_nut_f, 358},    /* has ckdelay */
-     {O_NUT_F_scanned, O_NUT_F, N_("Nut, falling (scanned)"), P_SCANNED,
-        "SCANN_NUTf", 0, i_nut_f, i_nut_f, 358},
+    {
+        O_SPACE, O_SPACE, N_("Space"), P_AMOEBA_CONSUMES,
+        "SPACE", ' ', 0, 0, 0
+    },
+    {
+        O_DIRT, O_DIRT, N_("Dirt"), P_AMOEBA_CONSUMES|P_VISUAL_EFFECT|P_DIRT,
+        "DIRT", '.', 2, 2, 2
+    },
+    {
+        O_DIRT_SLOPED_UP_RIGHT, O_DIRT_SLOPED_UP_RIGHT, N_("Sloped dirt (up & right)"), P_DIRT|P_SLOPED_UP|P_SLOPED_RIGHT|P_AMOEBA_CONSUMES,
+        "DIRTSLOPEDUPRIGHT", 0, 280, 280, 280
+    },
+    {
+        O_DIRT_SLOPED_UP_LEFT, O_DIRT_SLOPED_UP_LEFT, N_("Sloped dirt (up & left)"), P_DIRT|P_SLOPED_UP|P_SLOPED_LEFT|P_AMOEBA_CONSUMES,
+        "DIRTSLOPEDUPLEFT", 0, 281, 281, 281
+    },
+    {
+        O_DIRT_SLOPED_DOWN_LEFT, O_DIRT_SLOPED_DOWN_LEFT, N_("Sloped dirt (down & left)"), P_DIRT|P_SLOPED_DOWN|P_SLOPED_LEFT|P_AMOEBA_CONSUMES,
+        "DIRTSLOPEDDOWNLEFT", 0, 282, 282, 282
+    },
+    {
+        O_DIRT_SLOPED_DOWN_RIGHT, O_DIRT_SLOPED_DOWN_RIGHT, N_("Sloped dirt (down & right)"), P_DIRT|P_SLOPED_DOWN|P_SLOPED_RIGHT|P_AMOEBA_CONSUMES,
+        "DIRTSLOPEDDOWNRIGHT", 0, 283, 283, 283
+    },
+    {
+        O_DIRT_BALL, O_DIRT_BALL_scanned, N_("Dirt ball"), P_DIRT|P_SLOPED|P_AMOEBA_CONSUMES|P_MOVED_BY_CONVEYOR_TOP,
+        "DIRTBALL", 0, 289, 289, 289, 120
+    },    /* has ckdelay */
+    {
+        O_DIRT_BALL_scanned, O_DIRT_BALL, N_("Dirt ball (scanned)"), P_SCANNED,
+        "SCANN_DIRTBALL", 0, 289, 289, 289
+    },
+    {
+        O_DIRT_BALL_F, O_DIRT_BALL_F_scanned, N_("Dirt ball, falling"), 0,
+        "DIRTBALLf", 0, 289, 289, 289, 120
+    },    /* has ckdelay */
+    {
+        O_DIRT_BALL_F_scanned, O_DIRT_BALL_F, N_("Dirt ball, falling (scanned)"), P_SCANNED,
+        "SCANN_DIRTBALLf", 0, 289, 289, 289
+    },
+    {
+        O_DIRT_LOOSE, O_DIRT_LOOSE_scanned, N_("Loose dirt"), P_DIRT|P_AMOEBA_CONSUMES|P_MOVED_BY_CONVEYOR_TOP,
+        "DIRTLOOSE", 0, 352, 352, 352, 60
+    },    /* has ckdelay */
+    {
+        O_DIRT_LOOSE_scanned, O_DIRT_LOOSE, N_("Loose dirt (scanned)"), P_SCANNED,
+        "SCANN_DIRTLOOSE", 0, 352, 352, 352
+    },
+    {
+        O_DIRT_LOOSE_F, O_DIRT_LOOSE_F_scanned, N_("Loose dirt, falling"), 0,
+        "DIRTLOOSEf", 0, 352, 352, 352, 60
+    },    /* has ckdelay */
+    {
+        O_DIRT_LOOSE_F_scanned, O_DIRT_LOOSE_F, N_("Loose dirt, falling (scanned)"), P_SCANNED,
+        "SCANN_DIRTLOOSEf", 0, 352, 352, 352
+    },
+    {
+        O_DIRT2, O_DIRT2, N_("Dirt 2"), P_DIRT|P_AMOEBA_CONSUMES,
+        "DIRT2", 0, 3, 3, 3
+    },
+    {
+        O_BRICK, O_BRICK, N_("Brick wall"), P_SLOPED|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED,
+        "WALL", 'w', 5, 5, 5
+    },
+    {
+        O_BRICK_SLOPED_UP_RIGHT, O_BRICK_SLOPED_UP_RIGHT, N_("Sloped brick wall (up & right)"), P_SLOPED_UP|P_SLOPED_RIGHT|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED,
+        "WALLSLOPEDUPRIGHT", 0, 276, 276, 276
+    },
+    {
+        O_BRICK_SLOPED_UP_LEFT, O_BRICK_SLOPED_UP_LEFT, N_("Sloped brick wall (up & left)"), P_SLOPED_UP|P_SLOPED_LEFT|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED,
+        "WALLSLOPEDUPLEFT", 0, 277, 277, 277
+    },
+    {
+        O_BRICK_SLOPED_DOWN_LEFT, O_BRICK_SLOPED_DOWN_LEFT, N_("Sloped brick wall (down & left)"), P_SLOPED_DOWN|P_SLOPED_LEFT|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED,
+        "WALLSLOPEDDOWNLEFT", 0, 278, 278, 278
+    },
+    {
+        O_BRICK_SLOPED_DOWN_RIGHT, O_BRICK_SLOPED_DOWN_RIGHT, N_("Sloped brick wall (down & right)"), P_SLOPED_DOWN|P_SLOPED_RIGHT|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED,
+        "WALLSLOPEDDOWNRIGHT", 0, 279, 279, 279
+    },
+    {
+        O_BRICK_NON_SLOPED, O_BRICK_NON_SLOPED, N_("Non-sloped brick wall"), P_CAN_BE_HAMMERED,
+        "WALLNONSLOPED", 0, i_brick_non_sloped, i_brick_non_sloped, 5
+    },
+    {
+        O_MAGIC_WALL, O_MAGIC_WALL, N_("Magic wall"), P_CAN_BE_HAMMERED,
+        "MAGICWALL", 'M', 184, -184, -184
+    },
+    {
+        O_PRE_OUTBOX, O_PRE_OUTBOX, N_("Outbox"), 0,
+        "OUTBOX", 'X', i_pre_outbox_nonblink, -i_pre_outbox_frame_1, 22
+    },
+    {
+        O_OUTBOX, O_OUTBOX, N_("Outbox (open)"), 0,
+        "OUTBOXopen", 0, i_outbox, i_outbox, 22
+    },
+    {
+        O_PRE_INVIS_OUTBOX, O_PRE_INVIS_OUTBOX, N_("Invisible outbox"), 0,
+        "HIDDENOUTBOX", 'H', i_pre_invis_outbox, i_pre_invis_outbox, 22
+    },
+    {
+        O_INVIS_OUTBOX, O_INVIS_OUTBOX, N_("Invisible outbox (open)"), 0,
+        "HIDDENOUTBOXopen", 0, i_invis_outbox, i_invis_outbox, 22
+    },
+    {
+        O_STEEL, O_STEEL, N_("Steel wall"), P_NON_EXPLODABLE,
+        "STEELWALL", 'W', 4, 4, 4
+    },
+    {
+        O_STEEL_SLOPED_UP_RIGHT, O_STEEL_SLOPED_UP_RIGHT, N_("Sloped steel wall (up & right)"), P_SLOPED_UP|P_SLOPED_RIGHT|P_NON_EXPLODABLE,
+        "STEELWALLSLOPEDUPRIGHT", 0, 284, 284, 284
+    },
+    {
+        O_STEEL_SLOPED_UP_LEFT, O_STEEL_SLOPED_UP_LEFT, N_("Sloped steel wall (up & left)"), P_SLOPED_UP|P_SLOPED_LEFT|P_NON_EXPLODABLE,
+        "STEELWALLSLOPEDUPLEFT", 0, 285, 285, 285
+    },
+    {
+        O_STEEL_SLOPED_DOWN_LEFT, O_STEEL_SLOPED_DOWN_LEFT, N_("Sloped steel wall (down & left)"), P_SLOPED_DOWN|P_SLOPED_LEFT|P_NON_EXPLODABLE,
+        "STEELWALLSLOPEDDOWNLEFT", 0, 286, 286, 286
+    },
+    {
+        O_STEEL_SLOPED_DOWN_RIGHT, O_STEEL_SLOPED_DOWN_RIGHT, N_("Sloped steel wall (down & right)"), P_SLOPED_DOWN|P_SLOPED_RIGHT|P_NON_EXPLODABLE,
+        "STEELWALLSLOPEDDOWNRIGHT", 0, 287, 287, 287
+    },
+    {
+        O_STEEL_EXPLODABLE, O_STEEL_EXPLODABLE, N_("Explodable steel wall"), P_CAN_BE_HAMMERED,
+        "STEELWALLDESTRUCTABLE", 'E', 72, 72, 4
+    },
+    {
+        O_STEEL_EATABLE, O_STEEL_EATABLE, N_("Eatable steel wall"), 0,
+        "STEELWALLEATABLE", 0, i_steel_eatable, i_steel_eatable, 4
+    },
+    {
+        O_BRICK_EATABLE, O_BRICK_EATABLE, N_("Eatable brick wall"), 0,
+        "WALLEATABLE", 0, i_brick_eatable, i_brick_eatable, 5
+    },
+    {
+        O_STONE, O_STONE_scanned, N_("Stone"), P_SLOPED|P_MOVED_BY_CONVEYOR_TOP,
+        "BOULDER", 'r', 1, 1, 1, 156
+    },    /* has ckdelay */
+    {
+        O_STONE_scanned, O_STONE, N_("Stone (scanned)"), P_SCANNED,
+        "SCANN_BOULDER", 0, 1, 1, 1
+    },
+    {
+        O_STONE_F, O_STONE_F_scanned, N_("Stone, falling"), 0,
+        "BOULDERf", 'R', i_stone_f, i_stone_f, 1, 156
+    },    /* has ckdelay */
+    {
+        O_STONE_F_scanned, O_STONE_F, N_("Stone, falling (scanned)"), P_SCANNED,
+        "SCANN_BOULDERf", 0, i_stone_f, i_stone_f, 1
+    },
+    {
+        O_FLYING_STONE, O_FLYING_STONE_scanned, N_("Flying stone"), P_SLOPED|P_MOVED_BY_CONVEYOR_BOTTOM,
+        "FLYINGBOULDER", 0, 357, 357, 357, 156
+    },    /* has ckdelay */
+    {
+        O_FLYING_STONE_scanned, O_FLYING_STONE, N_("Flying stone (scanned)"), P_SCANNED,
+        "SCANN_FLYINGBOULDER", 0, 357, 357, 357
+    },
+    {
+        O_FLYING_STONE_F, O_FLYING_STONE_F_scanned, N_("Flying stone, flying"), 0,
+        "FLYINGBOULDERf", 0, i_flying_stone_f, i_flying_stone_f, 357, 156
+    },    /* has ckdelay */
+    {
+        O_FLYING_STONE_F_scanned, O_FLYING_STONE_F, N_("Flying stone, flying (scanned)"), P_SCANNED,
+        "SCANN_FLYINGBOULDERf", 0, i_flying_stone_f, i_flying_stone_f, 357
+    },
+    {
+        O_MEGA_STONE, O_MEGA_STONE_scanned, N_("Mega stone"), P_SLOPED|P_MOVED_BY_CONVEYOR_TOP,
+        "MEGABOULDER", 0, 272, 272, 272, 156
+    },    /* has ckdelay */
+    {
+        O_MEGA_STONE_scanned, O_MEGA_STONE, N_("Mega stone (scanned)"), P_SCANNED,
+        "SCANN_MEGABOULDER", 0, 272, 272, 272
+    },
+    {
+        O_MEGA_STONE_F, O_MEGA_STONE_F_scanned, N_("Mega stone, falling"), 0,
+        "MEGABOULDERf", 0, i_mega_stone_falling, i_mega_stone_falling, 272, 156
+    },    /* has ckdelay */
+    {
+        O_MEGA_STONE_F_scanned, O_MEGA_STONE_F, N_("Mega stone, falling (scanned)"), P_SCANNED,
+        "SCANN_MEGABOULDERf", 0, i_mega_stone_falling, i_mega_stone_falling, 272
+    },
+    {
+        O_DIAMOND, O_DIAMOND_scanned, N_("Diamond"), P_SLOPED|P_MOVED_BY_CONVEYOR_TOP,
+        "DIAMOND", 'd', 248, -248, -248, 156
+    },    /* has ckdelay */
+    {
+        O_DIAMOND_scanned, O_DIAMOND, N_("Diamond (scanned)"), P_SCANNED,
+        "SCANN_DIAMOND", 0, 248, -248, -248
+    },
+    {
+        O_DIAMOND_F, O_DIAMOND_F_scanned, N_("Diamond, falling"), 0,
+        "DIAMONDf", 'D', i_diamond_f, i_diamond_f, -248, 156
+    },    /* has ckdelay */
+    {
+        O_DIAMOND_F_scanned, O_DIAMOND_F, N_("Diamond, falling (scanned)"), P_SCANNED,
+        "SCANN_DIAMONDf", 0, i_diamond_f, i_diamond_f, -248
+    },
+    {
+        O_FLYING_DIAMOND, O_FLYING_DIAMOND_scanned, N_("Flying diamond"), P_SLOPED|P_MOVED_BY_CONVEYOR_BOTTOM,
+        "FLYINGDIAMOND", 0, 344, -344, -344, 156
+    },    /* has ckdelay */
+    {
+        O_FLYING_DIAMOND_scanned, O_FLYING_DIAMOND, N_("Flying diamond (scanned)"), P_SCANNED,
+        "SCANN_FLYINGDIAMOND", 0, 344, -344, -344
+    },
+    {
+        O_FLYING_DIAMOND_F, O_FLYING_DIAMOND_F_scanned, N_("Flying diamond, flying"), 0,
+        "FLYINGDIAMONDf", 0, i_flying_diamond_f, i_flying_diamond_f, -344, 156
+    },    /* has ckdelay */
+    {
+        O_FLYING_DIAMOND_F_scanned, O_FLYING_DIAMOND_F, N_("Flying diamond, flying"), P_SCANNED,
+        "SCANN_FLYINGDIAMONDf", 0, i_flying_diamond_f, i_flying_diamond_f, -344
+    },
+    {
+        O_NUT, O_NUT_scanned, N_("Nut"), P_SLOPED|P_MOVED_BY_CONVEYOR_TOP,
+        "NUT", 0, 358, 358, 358, 156
+    },    /* has ckdelay */
+    {
+        O_NUT_scanned, O_NUT, N_("Nut (scanned)"), P_SCANNED,
+        "SCANN_NUT", 0, 358, 358, 358
+    },
+    {
+        O_NUT_F, O_NUT_F_scanned, N_("Nut, falling"), 0,
+        "NUTf", 0, i_nut_f, i_nut_f, 358
+    },    /* has ckdelay */
+    {
+        O_NUT_F_scanned, O_NUT_F, N_("Nut, falling (scanned)"), P_SCANNED,
+        "SCANN_NUTf", 0, i_nut_f, i_nut_f, 358
+    },
     {O_BLADDER_SPENDER, O_BLADDER_SPENDER, N_("Bladder Spender"), 0, "BLADDERSPENDER", 0, 6, 6, 6, 20},    /* has ckdelay */
     {O_INBOX, O_INBOX, N_("Inbox"), 0, "INBOX", 'P', 35, 35, 22},
-    {O_H_EXPANDING_WALL, O_H_EXPANDING_WALL_scanned, N_("Expanding wall, horizontal"), P_VISUAL_EFFECT | P_CAN_BE_HAMMERED,
-        "HEXPANDINGWALL", 'x', i_h_expanding_wall, i_h_expanding_wall, 5, 111},    /* has ckdelay */
-    {O_H_EXPANDING_WALL_scanned, O_H_EXPANDING_WALL, N_("Expanding wall, horizontal (scanned)"), P_SCANNED,
-        "SCANN_HEXPANDINGWALL", 0, i_h_expanding_wall, i_h_expanding_wall, 5},
-    {O_V_EXPANDING_WALL, O_V_EXPANDING_WALL_scanned, N_("Expanding wall, vertical"), P_VISUAL_EFFECT | P_CAN_BE_HAMMERED,
-        "VEXPANDINGWALL", 'v', i_v_expanding_wall, i_v_expanding_wall, 5, 111},    /* has ckdelay */
-    {O_V_EXPANDING_WALL_scanned, O_V_EXPANDING_WALL, N_("Expanding wall, vertical (scanned)"), P_SCANNED,
-        "SCANN_VEXPANDINGWALL", 0, i_v_expanding_wall, i_v_expanding_wall, 5},
-    {O_EXPANDING_WALL, O_EXPANDING_WALL_scanned, N_("Expanding wall"), P_VISUAL_EFFECT | P_CAN_BE_HAMMERED,
-        "EXPANDINGWALL", 'e', i_expanding_wall, i_expanding_wall, 5, 111},    /* has ckdelay */
-    {O_EXPANDING_WALL_scanned, O_EXPANDING_WALL, N_("Expanding wall (scanned)"), P_SCANNED,
-        "SCANN_EXPANDINGWALL", 0, i_expanding_wall, i_expanding_wall, 5},
-    {O_H_EXPANDING_STEEL_WALL, O_H_EXPANDING_STEEL_WALL_scanned, N_("Expanding steel wall, horizontal"), P_NON_EXPLODABLE,
-        "HEXPANDINGSTEELWALL", 0, i_h_expanding_steel_wall, i_h_expanding_steel_wall, 4, 111},    /* has ckdelay */
-    {O_H_EXPANDING_STEEL_WALL_scanned, O_H_EXPANDING_STEEL_WALL, N_("Expanding steel wall, horizontal (scanned)"), P_NON_EXPLODABLE|P_SCANNED,
-        "SCANN_HEXPANDINGSTEELWALL", 0, i_h_expanding_steel_wall, i_h_expanding_steel_wall, 4},
-    {O_V_EXPANDING_STEEL_WALL, O_V_EXPANDING_STEEL_WALL_scanned, N_("Expanding steel wall, vertical"), P_NON_EXPLODABLE,
-        "VEXPANDINGSTEELWALL", 0, i_v_expanding_steel_wall, i_v_expanding_steel_wall, 4, 111},    /* has ckdelay */
-    {O_V_EXPANDING_STEEL_WALL_scanned, O_V_EXPANDING_STEEL_WALL, N_("Expanding steel wall, vertical (scanned)"), P_NON_EXPLODABLE|P_SCANNED,
-        "SCANN_VEXPANDINGSTEELWALL", 0, i_v_expanding_steel_wall, i_v_expanding_steel_wall, 4},
-    {O_EXPANDING_STEEL_WALL, O_EXPANDING_STEEL_WALL_scanned, N_("Expanding steel wall"), P_NON_EXPLODABLE,
-        "EXPANDINGSTEELWALL", 0, i_expanding_steel_wall, i_expanding_steel_wall, 4, 111},    /* has ckdelay */
-    {O_EXPANDING_STEEL_WALL_scanned, O_EXPANDING_STEEL_WALL, N_("Expanding steel wall (scanned)"), P_NON_EXPLODABLE|P_SCANNED,
-        "SCANN_EXPANDINGSTEELWALL", 0, i_expanding_steel_wall, i_expanding_steel_wall, 4},
+    {
+        O_H_EXPANDING_WALL, O_H_EXPANDING_WALL_scanned, N_("Expanding wall, horizontal"), P_VISUAL_EFFECT | P_CAN_BE_HAMMERED,
+        "HEXPANDINGWALL", 'x', i_h_expanding_wall, i_h_expanding_wall, 5, 111
+    },    /* has ckdelay */
+    {
+        O_H_EXPANDING_WALL_scanned, O_H_EXPANDING_WALL, N_("Expanding wall, horizontal (scanned)"), P_SCANNED,
+        "SCANN_HEXPANDINGWALL", 0, i_h_expanding_wall, i_h_expanding_wall, 5
+    },
+    {
+        O_V_EXPANDING_WALL, O_V_EXPANDING_WALL_scanned, N_("Expanding wall, vertical"), P_VISUAL_EFFECT | P_CAN_BE_HAMMERED,
+        "VEXPANDINGWALL", 'v', i_v_expanding_wall, i_v_expanding_wall, 5, 111
+    },    /* has ckdelay */
+    {
+        O_V_EXPANDING_WALL_scanned, O_V_EXPANDING_WALL, N_("Expanding wall, vertical (scanned)"), P_SCANNED,
+        "SCANN_VEXPANDINGWALL", 0, i_v_expanding_wall, i_v_expanding_wall, 5
+    },
+    {
+        O_EXPANDING_WALL, O_EXPANDING_WALL_scanned, N_("Expanding wall"), P_VISUAL_EFFECT | P_CAN_BE_HAMMERED,
+        "EXPANDINGWALL", 'e', i_expanding_wall, i_expanding_wall, 5, 111
+    },    /* has ckdelay */
+    {
+        O_EXPANDING_WALL_scanned, O_EXPANDING_WALL, N_("Expanding wall (scanned)"), P_SCANNED,
+        "SCANN_EXPANDINGWALL", 0, i_expanding_wall, i_expanding_wall, 5
+    },
+    {
+        O_H_EXPANDING_STEEL_WALL, O_H_EXPANDING_STEEL_WALL_scanned, N_("Expanding steel wall, horizontal"), P_NON_EXPLODABLE,
+        "HEXPANDINGSTEELWALL", 0, i_h_expanding_steel_wall, i_h_expanding_steel_wall, 4, 111
+    },    /* has ckdelay */
+    {
+        O_H_EXPANDING_STEEL_WALL_scanned, O_H_EXPANDING_STEEL_WALL, N_("Expanding steel wall, horizontal (scanned)"), P_NON_EXPLODABLE|P_SCANNED,
+        "SCANN_HEXPANDINGSTEELWALL", 0, i_h_expanding_steel_wall, i_h_expanding_steel_wall, 4
+    },
+    {
+        O_V_EXPANDING_STEEL_WALL, O_V_EXPANDING_STEEL_WALL_scanned, N_("Expanding steel wall, vertical"), P_NON_EXPLODABLE,
+        "VEXPANDINGSTEELWALL", 0, i_v_expanding_steel_wall, i_v_expanding_steel_wall, 4, 111
+    },    /* has ckdelay */
+    {
+        O_V_EXPANDING_STEEL_WALL_scanned, O_V_EXPANDING_STEEL_WALL, N_("Expanding steel wall, vertical (scanned)"), P_NON_EXPLODABLE|P_SCANNED,
+        "SCANN_VEXPANDINGSTEELWALL", 0, i_v_expanding_steel_wall, i_v_expanding_steel_wall, 4
+    },
+    {
+        O_EXPANDING_STEEL_WALL, O_EXPANDING_STEEL_WALL_scanned, N_("Expanding steel wall"), P_NON_EXPLODABLE,
+        "EXPANDINGSTEELWALL", 0, i_expanding_steel_wall, i_expanding_steel_wall, 4, 111
+    },    /* has ckdelay */
+    {
+        O_EXPANDING_STEEL_WALL_scanned, O_EXPANDING_STEEL_WALL, N_("Expanding steel wall (scanned)"), P_NON_EXPLODABLE|P_SCANNED,
+        "SCANN_EXPANDINGSTEELWALL", 0, i_expanding_steel_wall, i_expanding_steel_wall, 4
+    },
 
     {O_EXPANDING_WALL_SWITCH, O_EXPANDING_WALL_SWITCH, N_("Expanding wall switch"), 0, "EXPANDINGWALLSWITCH", 0, 40, 40, 40},
     {O_CREATURE_SWITCH, O_CREATURE_SWITCH, N_("Creature direction switch"), 0, "FIREFLYBUTTERFLYSWITCH", 0, 18, 18, 18},
@@ -241,16 +381,26 @@ GdElementPorperty gd_element_properties[] = {
     {O_CONVEYOR_SWITCH, O_CONVEYOR_SWITCH, N_("Conveyor belt power switch"), 0, "CONVEYORSWITCH", 0, 356, 356, 356},
     {O_CONVEYOR_DIR_SWITCH, O_CONVEYOR_DIR_SWITCH, N_("Conveyor belt direction switch"), 0, "CONVEYORDIRECTIONSWITCH", 0, 353, 353, 353},
 
-    {O_ACID, O_ACID_scanned, N_("Acid"), 0,
-        "ACID", 0, 20, 20, 20, 128},    /* has ckdelay */
-    {O_ACID_scanned, O_ACID, N_("Acid (scanned)"), P_SCANNED,
-        "SCANN_ACID", 0, 20, 20, 20},
-    {O_FALLING_WALL, O_FALLING_WALL, N_("Falling wall"), P_CAN_BE_HAMMERED,
-        "FALLINGWALL", 0, i_falling_wall, i_falling_wall, 5, 80},    /* has ckdelay */
-    {O_FALLING_WALL_F, O_FALLING_WALL_F_scanned, N_("Falling wall, falling"), P_CAN_BE_HAMMERED,
-        "FALLINGWALLf", 0, i_falling_wall_falling, i_falling_wall_falling, 5, 80},    /* has ckdelay */
-    {O_FALLING_WALL_F_scanned, O_FALLING_WALL_F, N_("Falling wall, falling (scanned)"), P_SCANNED,
-        "SCANN_FALLINGWALLf", 0, i_falling_wall_falling, i_falling_wall_falling, 5},
+    {
+        O_ACID, O_ACID_scanned, N_("Acid"), 0,
+        "ACID", 0, 20, 20, 20, 128
+    },    /* has ckdelay */
+    {
+        O_ACID_scanned, O_ACID, N_("Acid (scanned)"), P_SCANNED,
+        "SCANN_ACID", 0, 20, 20, 20
+    },
+    {
+        O_FALLING_WALL, O_FALLING_WALL, N_("Falling wall"), P_CAN_BE_HAMMERED,
+        "FALLINGWALL", 0, i_falling_wall, i_falling_wall, 5, 80
+    },    /* has ckdelay */
+    {
+        O_FALLING_WALL_F, O_FALLING_WALL_F_scanned, N_("Falling wall, falling"), P_CAN_BE_HAMMERED,
+        "FALLINGWALLf", 0, i_falling_wall_falling, i_falling_wall_falling, 5, 80
+    },    /* has ckdelay */
+    {
+        O_FALLING_WALL_F_scanned, O_FALLING_WALL_F, N_("Falling wall, falling (scanned)"), P_SCANNED,
+        "SCANN_FALLINGWALLf", 0, i_falling_wall_falling, i_falling_wall_falling, 5
+    },
 
     {O_BOX, O_BOX, N_("Box"), 0, "SOKOBANBOX", 0, 21, 21, 21},
     {O_TIME_PENALTY, O_TIME_PENALTY, N_("Time penalty"), P_NON_EXPLODABLE, "TIMEPENALTY", 0, i_time_penalty, i_time_penalty, 9},
@@ -310,14 +460,22 @@ GdElementPorperty gd_element_properties[] = {
     {O_WALLED_KEY_2, O_WALLED_KEY_2, N_("Walled key 2"), P_CAN_BE_HAMMERED, "WALLED_KEY2", 0, i_walled_key_2, i_walled_key_2, 5},
     {O_WALLED_KEY_3, O_WALLED_KEY_3, N_("Walled key 3"), P_CAN_BE_HAMMERED, "WALLED_KEY3", 0, i_walled_key_3, i_walled_key_3, 5},
 
-    {O_AMOEBA, O_AMOEBA_scanned, N_("Amoeba"), P_BLOWS_UP_FLIES,
-        "AMOEBA", 'a', 192, -192, -192, 260},    /* has ckdelay */
-    {O_AMOEBA_scanned, O_AMOEBA, N_("Amoeba (scanned)"), P_SCANNED,   
-        "SCANN_AMOEBA", 0, 192, -192, -192},
-    {O_AMOEBA_2, O_AMOEBA_2_scanned, N_("Amoeba 2"), P_BLOWS_UP_FLIES|P_VISUAL_EFFECT, 
-        "AMOEBA2", 0, 296, -296, -296, 260},    /* has ckdelay */
-    {O_AMOEBA_2_scanned, O_AMOEBA_2, N_("Amoeba 2 (scanned)"), P_SCANNED,
-        "SCANN_AMOEBA2", 0, 296, -296, -296},
+    {
+        O_AMOEBA, O_AMOEBA_scanned, N_("Amoeba"), P_BLOWS_UP_FLIES,
+        "AMOEBA", 'a', 192, -192, -192, 260
+    },    /* has ckdelay */
+    {
+        O_AMOEBA_scanned, O_AMOEBA, N_("Amoeba (scanned)"), P_SCANNED,
+        "SCANN_AMOEBA", 0, 192, -192, -192
+    },
+    {
+        O_AMOEBA_2, O_AMOEBA_2_scanned, N_("Amoeba 2"), P_BLOWS_UP_FLIES|P_VISUAL_EFFECT,
+        "AMOEBA2", 0, 296, -296, -296, 260
+    },    /* has ckdelay */
+    {
+        O_AMOEBA_2_scanned, O_AMOEBA_2, N_("Amoeba 2 (scanned)"), P_SCANNED,
+        "SCANN_AMOEBA2", 0, 296, -296, -296
+    },
     {O_REPLICATOR, O_REPLICATOR, N_("Replicator"), P_NON_EXPLODABLE, "REPLICATOR", 0, 304, -304, -304, 210},    /* has ckdelay */
     {O_CONVEYOR_LEFT, O_CONVEYOR_LEFT, N_("Conveyor belt (left)"), P_NON_EXPLODABLE, "CONVEYORLEFT", 0, i_conveyor_left, -328, -328, 256 },    /* has ckdelay */
     {O_CONVEYOR_RIGHT, O_CONVEYOR_RIGHT, N_("Conveyor belt (right)"), P_NON_EXPLODABLE, "CONVEYORRIGHT", 0, i_conveyor_right, -320, -320 },
@@ -335,98 +493,190 @@ GdElementPorperty gd_element_properties[] = {
     {O_BLADDER_7, O_BLADDER_7, N_("Bladder (7)"), 0, "BLADDERd7", 0, 176, -176, -176},
     {O_BLADDER_8, O_BLADDER_8, N_("Bladder (8)"), 0, "BLADDERd8", 0, 176, -176, -176},
 
-    {O_WAITING_STONE, O_WAITING_STONE_scanned, N_("Waiting stone"), P_SLOPED,
-        "WAITINGBOULDER", 0, i_waiting_stone, i_waiting_stone, 1, 176},    /* has ckdelay */
-    {O_WAITING_STONE_scanned, O_WAITING_STONE, N_("Waiting stone (scanned)"), P_SCANNED,
-        "SCANN_WAITINGBOULDER", 0, i_waiting_stone, i_waiting_stone, 1},
-    {O_CHASING_STONE, O_CHASING_STONE_scanned, N_("Chasing stone"), P_SLOPED,
-        "CHASINGBOULDER", 0, 17, 17, 17, 269},    /* has ckdelay */
-    {O_CHASING_STONE_scanned, O_CHASING_STONE, N_("Chasing stone (scanned)"), P_SCANNED,
-        "SCANN_CHASINGBOULDER", 0, 17, 17, 17},
-    {O_GHOST, O_GHOST_scanned, N_("Ghost"), 0,
-        "GHOST", 'g', 160, -160, -160, 50},    /* has ckdelay */
-    {O_GHOST_scanned, O_GHOST, N_("Ghost (scanned)"), P_SCANNED,
-        "SCANN_GHOST", 0, 160, -160, -160},
-    {O_FIREFLY_1, O_FIREFLY_1_scanned, N_("Guard, left"), P_EXPLODES_BY_HIT | P_CCW,
-        "FIREFLYl", 'Q', i_guard_1, -136, -136, 384},    /* has ckdelay */
-    {O_FIREFLY_2, O_FIREFLY_2_scanned, N_("Guard, up"), P_EXPLODES_BY_HIT | P_CCW,
-        "FIREFLYu", 'o', i_guard_2, -136, -136, 384},    /* has ckdelay */
-    {O_FIREFLY_3, O_FIREFLY_3_scanned, N_("Guard, right"), P_EXPLODES_BY_HIT | P_CCW,
-        "FIREFLYr", 'O', i_guard_3, -136, -136, 384},    /* has ckdelay */
-    {O_FIREFLY_4, O_FIREFLY_4_scanned, N_("Guard, down"), P_EXPLODES_BY_HIT | P_CCW,
-        "FIREFLYd", 'q', i_guard_4, -136, -136, 384},    /* has ckdelay */
-    {O_FIREFLY_1_scanned, O_FIREFLY_1, N_("Guard, left (scanned)"), P_SCANNED,
-        "SCANN_FIREFLYl", 0, i_guard_1, -136, -136},
-    {O_FIREFLY_2_scanned, O_FIREFLY_2, N_("Guard, up (scanned)"), P_SCANNED,
-        "SCANN_FIREFLYu", 0, i_guard_2, -136, -136},
-    {O_FIREFLY_3_scanned, O_FIREFLY_3, N_("Guard, right (scanned)"), P_SCANNED,
-        "SCANN_FIREFLYr", 0, i_guard_3, -136, -136},
-    {O_FIREFLY_4_scanned, O_FIREFLY_4, N_("Guard, down (scanned)"), P_SCANNED,
-        "SCANN_FIREFLYd", 0, i_guard_4, -136, -136},
-    {O_ALT_FIREFLY_1, O_ALT_FIREFLY_1_scanned, N_("Alternative guard, left"), P_EXPLODES_BY_HIT,
-        "A_FIREFLYl", 0, i_alt_guard_1, -104, -104, 384},    /* has ckdelay */
-    {O_ALT_FIREFLY_2, O_ALT_FIREFLY_2_scanned, N_("Alternative guard, up"), P_EXPLODES_BY_HIT,
-        "A_FIREFLYu", 0, i_alt_guard_2, -104, -104, 384},    /* has ckdelay */
-    {O_ALT_FIREFLY_3, O_ALT_FIREFLY_3_scanned, N_("Alternative guard, right"), P_EXPLODES_BY_HIT,
-        "A_FIREFLYr", 0, i_alt_guard_3, -104, -104, 384},    /* has ckdelay */
-    {O_ALT_FIREFLY_4, O_ALT_FIREFLY_4_scanned, N_("Alternative guard, down"), P_EXPLODES_BY_HIT,
-        "A_FIREFLYd", 0, i_alt_guard_4, -104, -104, 384},    /* has ckdelay */
-    {O_ALT_FIREFLY_1_scanned, O_ALT_FIREFLY_1, N_("Alternative guard, left (scanned)"), P_SCANNED,
-        "SCANN_A_FIREFLYl", 0, i_alt_guard_1, -104, -104},
-    {O_ALT_FIREFLY_2_scanned, O_ALT_FIREFLY_2, N_("Alternative guard, up (scanned)"), P_SCANNED,
-        "SCANN_A_FIREFLYu", 0, i_alt_guard_2, -104, -104},
-    {O_ALT_FIREFLY_3_scanned, O_ALT_FIREFLY_3, N_("Alternative guard, right (scanned)"), P_SCANNED,
-        "SCANN_A_FIREFLYr", 0, i_alt_guard_3, -104, -104},
-    {O_ALT_FIREFLY_4_scanned, O_ALT_FIREFLY_4, N_("Alternative guard, down (scanned)"), P_SCANNED,
-        "SCANN_A_FIREFLYd", 0, i_alt_guard_4, -104, -104},
-    {O_BUTTER_1, O_BUTTER_1_scanned, N_("Butterfly, left"), P_EXPLODES_BY_HIT,
-        "BUTTERFLYl", 'C', i_butter_1, -144, -144, 384},    /* has ckdelay */
-    {O_BUTTER_2, O_BUTTER_2_scanned, N_("Butterfly, up"), P_EXPLODES_BY_HIT,
-        "BUTTERFLYu", 'b', i_butter_2, -144, -144, 384},    /* has ckdelay */
-    {O_BUTTER_3, O_BUTTER_3_scanned, N_("Butterfly, right"), P_EXPLODES_BY_HIT,
-        "BUTTERFLYr", 'B', i_butter_3, -144, -144, 384},    /* has ckdelay */
-    {O_BUTTER_4, O_BUTTER_4_scanned, N_("Butterfly, down"), P_EXPLODES_BY_HIT,
-        "BUTTERFLYd", 'c', i_butter_4, -144, -144, 384},    /* has ckdelay */
-    {O_BUTTER_1_scanned, O_BUTTER_1, N_("Butterfly, left (scanned)"), P_SCANNED,
-        "SCANN_BUTTERFLYl", 0, i_butter_1, -144, -144},
-    {O_BUTTER_2_scanned, O_BUTTER_2, N_("Butterfly, up (scanned)"), P_SCANNED,
-        "SCANN_BUTTERFLYu", 0, i_butter_2, -144, -144},
-    {O_BUTTER_3_scanned, O_BUTTER_3, N_("Butterfly, right (scanned)"), P_SCANNED,
-        "SCANN_BUTTERFLYr", 0, i_butter_3, -144, -144},
-    {O_BUTTER_4_scanned, O_BUTTER_4, N_("Butterfly, down (scanned)"), P_SCANNED,
-        "SCANN_BUTTERFLYd", 0, i_butter_4, -144, -144},
-    {O_ALT_BUTTER_1, O_ALT_BUTTER_1_scanned, N_("Alternative butterfly, left"), P_EXPLODES_BY_HIT | P_CCW,
-        "A_BUTTERFLYl", 0, i_alt_butter_1, -112, -112, 384},    /* has ckdelay */
-    {O_ALT_BUTTER_2, O_ALT_BUTTER_2_scanned, N_("Alternative butterfly, up"), P_EXPLODES_BY_HIT | P_CCW,
-        "A_BUTTERFLYu", 0, i_alt_butter_2, -112, -112, 384},    /* has ckdelay */
-    {O_ALT_BUTTER_3, O_ALT_BUTTER_3_scanned, N_("Alternative butterfly, right"), P_EXPLODES_BY_HIT | P_CCW,
-        "A_BUTTERFLYr", 0, i_alt_butter_3, -112, -112, 384},    /* has ckdelay */
-    {O_ALT_BUTTER_4, O_ALT_BUTTER_4_scanned, N_("Alternative butterfly, down"), P_EXPLODES_BY_HIT | P_CCW,
-        "A_BUTTERFLYd", 0, i_alt_butter_4, -112, -112, 384},    /* has ckdelay */
-    {O_ALT_BUTTER_1_scanned, O_ALT_BUTTER_1, N_("Alternative butterfly, left (scanned)"), P_SCANNED,
-        "SCANN_A_BUTTERFLYl", 0, i_alt_butter_1, -112, -112},
-    {O_ALT_BUTTER_2_scanned, O_ALT_BUTTER_2, N_("Alternative butterfly, up (scanned)"), P_SCANNED,
-        "SCANN_A_BUTTERFLYu", 0, i_alt_butter_2, -112, -112},
-    {O_ALT_BUTTER_3_scanned, O_ALT_BUTTER_3, N_("Alternative butterfly, right (scanned)"), P_SCANNED,
-        "SCANN_A_BUTTERFLYr", 0, i_alt_butter_3, -112, -112},
-    {O_ALT_BUTTER_4_scanned, O_ALT_BUTTER_4, N_("Alternative butterfly, down (scanned)"), P_SCANNED,
-        "SCANN_A_BUTTERFLYd", 0, i_alt_butter_4, -112, -112},
-    {O_STONEFLY_1, O_STONEFLY_1_scanned, N_("Stonefly, left"), P_EXPLODES_BY_HIT,
-        "STONEFLYl", 0, i_stonefly_1, -152, -152, 384},    /* has ckdelay */
-    {O_STONEFLY_2, O_STONEFLY_2_scanned, N_("Stonefly, up"), P_EXPLODES_BY_HIT,
-        "STONEFLYu", 0, i_stonefly_2, -152, -152, 384},    /* has ckdelay */
-    {O_STONEFLY_3, O_STONEFLY_3_scanned, N_("Stonefly, right"), P_EXPLODES_BY_HIT,
-        "STONEFLYr", 0, i_stonefly_3, -152, -152, 384},    /* has ckdelay */
-    {O_STONEFLY_4, O_STONEFLY_4_scanned, N_("Stonefly, down"), P_EXPLODES_BY_HIT,
-        "STONEFLYd", 0, i_stonefly_4, -152, -152, 384},    /* has ckdelay */
-    {O_STONEFLY_1_scanned, O_STONEFLY_1, N_("Stonefly, left (scanned)"), P_SCANNED,
-        "SCANN_STONEFLYl", 0, i_stonefly_1, -152, -152},
-    {O_STONEFLY_2_scanned, O_STONEFLY_2, N_("Stonefly, up (scanned)"), P_SCANNED,
-        "SCANN_STONEFLYu", 0, i_stonefly_2, -152, -152},
-    {O_STONEFLY_3_scanned, O_STONEFLY_3, N_("Stonefly, right (scanned)"), P_SCANNED,
-        "SCANN_STONEFLYr", 0, i_stonefly_3, -152, -152},
-    {O_STONEFLY_4_scanned, O_STONEFLY_4, N_("Stonefly, down (scanned)"), P_SCANNED,
-        "SCANN_STONEFLYd", 0, i_stonefly_4, -152, -152},
+    {
+        O_WAITING_STONE, O_WAITING_STONE_scanned, N_("Waiting stone"), P_SLOPED,
+        "WAITINGBOULDER", 0, i_waiting_stone, i_waiting_stone, 1, 176
+    },    /* has ckdelay */
+    {
+        O_WAITING_STONE_scanned, O_WAITING_STONE, N_("Waiting stone (scanned)"), P_SCANNED,
+        "SCANN_WAITINGBOULDER", 0, i_waiting_stone, i_waiting_stone, 1
+    },
+    {
+        O_CHASING_STONE, O_CHASING_STONE_scanned, N_("Chasing stone"), P_SLOPED,
+        "CHASINGBOULDER", 0, 17, 17, 17, 269
+    },    /* has ckdelay */
+    {
+        O_CHASING_STONE_scanned, O_CHASING_STONE, N_("Chasing stone (scanned)"), P_SCANNED,
+        "SCANN_CHASINGBOULDER", 0, 17, 17, 17
+    },
+    {
+        O_GHOST, O_GHOST_scanned, N_("Ghost"), 0,
+        "GHOST", 'g', 160, -160, -160, 50
+    },    /* has ckdelay */
+    {
+        O_GHOST_scanned, O_GHOST, N_("Ghost (scanned)"), P_SCANNED,
+        "SCANN_GHOST", 0, 160, -160, -160
+    },
+    {
+        O_FIREFLY_1, O_FIREFLY_1_scanned, N_("Guard, left"), P_EXPLODES_BY_HIT | P_CCW,
+        "FIREFLYl", 'Q', i_guard_1, -136, -136, 384
+    },    /* has ckdelay */
+    {
+        O_FIREFLY_2, O_FIREFLY_2_scanned, N_("Guard, up"), P_EXPLODES_BY_HIT | P_CCW,
+        "FIREFLYu", 'o', i_guard_2, -136, -136, 384
+    },    /* has ckdelay */
+    {
+        O_FIREFLY_3, O_FIREFLY_3_scanned, N_("Guard, right"), P_EXPLODES_BY_HIT | P_CCW,
+        "FIREFLYr", 'O', i_guard_3, -136, -136, 384
+    },    /* has ckdelay */
+    {
+        O_FIREFLY_4, O_FIREFLY_4_scanned, N_("Guard, down"), P_EXPLODES_BY_HIT | P_CCW,
+        "FIREFLYd", 'q', i_guard_4, -136, -136, 384
+    },    /* has ckdelay */
+    {
+        O_FIREFLY_1_scanned, O_FIREFLY_1, N_("Guard, left (scanned)"), P_SCANNED,
+        "SCANN_FIREFLYl", 0, i_guard_1, -136, -136
+    },
+    {
+        O_FIREFLY_2_scanned, O_FIREFLY_2, N_("Guard, up (scanned)"), P_SCANNED,
+        "SCANN_FIREFLYu", 0, i_guard_2, -136, -136
+    },
+    {
+        O_FIREFLY_3_scanned, O_FIREFLY_3, N_("Guard, right (scanned)"), P_SCANNED,
+        "SCANN_FIREFLYr", 0, i_guard_3, -136, -136
+    },
+    {
+        O_FIREFLY_4_scanned, O_FIREFLY_4, N_("Guard, down (scanned)"), P_SCANNED,
+        "SCANN_FIREFLYd", 0, i_guard_4, -136, -136
+    },
+    {
+        O_ALT_FIREFLY_1, O_ALT_FIREFLY_1_scanned, N_("Alternative guard, left"), P_EXPLODES_BY_HIT,
+        "A_FIREFLYl", 0, i_alt_guard_1, -104, -104, 384
+    },    /* has ckdelay */
+    {
+        O_ALT_FIREFLY_2, O_ALT_FIREFLY_2_scanned, N_("Alternative guard, up"), P_EXPLODES_BY_HIT,
+        "A_FIREFLYu", 0, i_alt_guard_2, -104, -104, 384
+    },    /* has ckdelay */
+    {
+        O_ALT_FIREFLY_3, O_ALT_FIREFLY_3_scanned, N_("Alternative guard, right"), P_EXPLODES_BY_HIT,
+        "A_FIREFLYr", 0, i_alt_guard_3, -104, -104, 384
+    },    /* has ckdelay */
+    {
+        O_ALT_FIREFLY_4, O_ALT_FIREFLY_4_scanned, N_("Alternative guard, down"), P_EXPLODES_BY_HIT,
+        "A_FIREFLYd", 0, i_alt_guard_4, -104, -104, 384
+    },    /* has ckdelay */
+    {
+        O_ALT_FIREFLY_1_scanned, O_ALT_FIREFLY_1, N_("Alternative guard, left (scanned)"), P_SCANNED,
+        "SCANN_A_FIREFLYl", 0, i_alt_guard_1, -104, -104
+    },
+    {
+        O_ALT_FIREFLY_2_scanned, O_ALT_FIREFLY_2, N_("Alternative guard, up (scanned)"), P_SCANNED,
+        "SCANN_A_FIREFLYu", 0, i_alt_guard_2, -104, -104
+    },
+    {
+        O_ALT_FIREFLY_3_scanned, O_ALT_FIREFLY_3, N_("Alternative guard, right (scanned)"), P_SCANNED,
+        "SCANN_A_FIREFLYr", 0, i_alt_guard_3, -104, -104
+    },
+    {
+        O_ALT_FIREFLY_4_scanned, O_ALT_FIREFLY_4, N_("Alternative guard, down (scanned)"), P_SCANNED,
+        "SCANN_A_FIREFLYd", 0, i_alt_guard_4, -104, -104
+    },
+    {
+        O_BUTTER_1, O_BUTTER_1_scanned, N_("Butterfly, left"), P_EXPLODES_BY_HIT,
+        "BUTTERFLYl", 'C', i_butter_1, -144, -144, 384
+    },    /* has ckdelay */
+    {
+        O_BUTTER_2, O_BUTTER_2_scanned, N_("Butterfly, up"), P_EXPLODES_BY_HIT,
+        "BUTTERFLYu", 'b', i_butter_2, -144, -144, 384
+    },    /* has ckdelay */
+    {
+        O_BUTTER_3, O_BUTTER_3_scanned, N_("Butterfly, right"), P_EXPLODES_BY_HIT,
+        "BUTTERFLYr", 'B', i_butter_3, -144, -144, 384
+    },    /* has ckdelay */
+    {
+        O_BUTTER_4, O_BUTTER_4_scanned, N_("Butterfly, down"), P_EXPLODES_BY_HIT,
+        "BUTTERFLYd", 'c', i_butter_4, -144, -144, 384
+    },    /* has ckdelay */
+    {
+        O_BUTTER_1_scanned, O_BUTTER_1, N_("Butterfly, left (scanned)"), P_SCANNED,
+        "SCANN_BUTTERFLYl", 0, i_butter_1, -144, -144
+    },
+    {
+        O_BUTTER_2_scanned, O_BUTTER_2, N_("Butterfly, up (scanned)"), P_SCANNED,
+        "SCANN_BUTTERFLYu", 0, i_butter_2, -144, -144
+    },
+    {
+        O_BUTTER_3_scanned, O_BUTTER_3, N_("Butterfly, right (scanned)"), P_SCANNED,
+        "SCANN_BUTTERFLYr", 0, i_butter_3, -144, -144
+    },
+    {
+        O_BUTTER_4_scanned, O_BUTTER_4, N_("Butterfly, down (scanned)"), P_SCANNED,
+        "SCANN_BUTTERFLYd", 0, i_butter_4, -144, -144
+    },
+    {
+        O_ALT_BUTTER_1, O_ALT_BUTTER_1_scanned, N_("Alternative butterfly, left"), P_EXPLODES_BY_HIT | P_CCW,
+        "A_BUTTERFLYl", 0, i_alt_butter_1, -112, -112, 384
+    },    /* has ckdelay */
+    {
+        O_ALT_BUTTER_2, O_ALT_BUTTER_2_scanned, N_("Alternative butterfly, up"), P_EXPLODES_BY_HIT | P_CCW,
+        "A_BUTTERFLYu", 0, i_alt_butter_2, -112, -112, 384
+    },    /* has ckdelay */
+    {
+        O_ALT_BUTTER_3, O_ALT_BUTTER_3_scanned, N_("Alternative butterfly, right"), P_EXPLODES_BY_HIT | P_CCW,
+        "A_BUTTERFLYr", 0, i_alt_butter_3, -112, -112, 384
+    },    /* has ckdelay */
+    {
+        O_ALT_BUTTER_4, O_ALT_BUTTER_4_scanned, N_("Alternative butterfly, down"), P_EXPLODES_BY_HIT | P_CCW,
+        "A_BUTTERFLYd", 0, i_alt_butter_4, -112, -112, 384
+    },    /* has ckdelay */
+    {
+        O_ALT_BUTTER_1_scanned, O_ALT_BUTTER_1, N_("Alternative butterfly, left (scanned)"), P_SCANNED,
+        "SCANN_A_BUTTERFLYl", 0, i_alt_butter_1, -112, -112
+    },
+    {
+        O_ALT_BUTTER_2_scanned, O_ALT_BUTTER_2, N_("Alternative butterfly, up (scanned)"), P_SCANNED,
+        "SCANN_A_BUTTERFLYu", 0, i_alt_butter_2, -112, -112
+    },
+    {
+        O_ALT_BUTTER_3_scanned, O_ALT_BUTTER_3, N_("Alternative butterfly, right (scanned)"), P_SCANNED,
+        "SCANN_A_BUTTERFLYr", 0, i_alt_butter_3, -112, -112
+    },
+    {
+        O_ALT_BUTTER_4_scanned, O_ALT_BUTTER_4, N_("Alternative butterfly, down (scanned)"), P_SCANNED,
+        "SCANN_A_BUTTERFLYd", 0, i_alt_butter_4, -112, -112
+    },
+    {
+        O_STONEFLY_1, O_STONEFLY_1_scanned, N_("Stonefly, left"), P_EXPLODES_BY_HIT,
+        "STONEFLYl", 0, i_stonefly_1, -152, -152, 384
+    },    /* has ckdelay */
+    {
+        O_STONEFLY_2, O_STONEFLY_2_scanned, N_("Stonefly, up"), P_EXPLODES_BY_HIT,
+        "STONEFLYu", 0, i_stonefly_2, -152, -152, 384
+    },    /* has ckdelay */
+    {
+        O_STONEFLY_3, O_STONEFLY_3_scanned, N_("Stonefly, right"), P_EXPLODES_BY_HIT,
+        "STONEFLYr", 0, i_stonefly_3, -152, -152, 384
+    },    /* has ckdelay */
+    {
+        O_STONEFLY_4, O_STONEFLY_4_scanned, N_("Stonefly, down"), P_EXPLODES_BY_HIT,
+        "STONEFLYd", 0, i_stonefly_4, -152, -152, 384
+    },    /* has ckdelay */
+    {
+        O_STONEFLY_1_scanned, O_STONEFLY_1, N_("Stonefly, left (scanned)"), P_SCANNED,
+        "SCANN_STONEFLYl", 0, i_stonefly_1, -152, -152
+    },
+    {
+        O_STONEFLY_2_scanned, O_STONEFLY_2, N_("Stonefly, up (scanned)"), P_SCANNED,
+        "SCANN_STONEFLYu", 0, i_stonefly_2, -152, -152
+    },
+    {
+        O_STONEFLY_3_scanned, O_STONEFLY_3, N_("Stonefly, right (scanned)"), P_SCANNED,
+        "SCANN_STONEFLYr", 0, i_stonefly_3, -152, -152
+    },
+    {
+        O_STONEFLY_4_scanned, O_STONEFLY_4, N_("Stonefly, down (scanned)"), P_SCANNED,
+        "SCANN_STONEFLYd", 0, i_stonefly_4, -152, -152
+    },
     {O_BITER_1, O_BITER_1_scanned, N_("Biter, up"), 0, "BITERu", 0, i_biter_1, -168, -168, 518},    /* has ckdelay */
     {O_BITER_2, O_BITER_2_scanned, N_("Biter, right"), 0, "BITERr", 0, i_biter_2, -168, -168, 518},    /* has ckdelay */
     {O_BITER_3, O_BITER_3_scanned, N_("Biter, down"), 0, "BITERd", 0, i_biter_3, -168, -168, 518},    /* has ckdelay */
@@ -444,24 +694,60 @@ GdElementPorperty gd_element_properties[] = {
     {O_DRAGONFLY_3_scanned, O_DRAGONFLY_3, N_("Dragonfly, right (scanned)"), P_SCANNED, "SCANN_DRAGONFLYr", 0, i_dragonfly_3, -336, -336},
     {O_DRAGONFLY_4_scanned, O_DRAGONFLY_4, N_("Dragonfly, down (scanned)"), P_SCANNED, "SCANN_DRAGONFLYd", 0, i_dragonfly_4, -336, -336},
 
-    {O_PRE_PL_1, O_PRE_PL_1, N_("Player birth (1)"), P_PLAYER,
-        "GUYBIRTH1", 0, 32, 32, 32},
-    {O_PRE_PL_2, O_PRE_PL_2, N_("Player birth (2)"), P_PLAYER,
-        "GUYBIRTH2", 0, 33, 33, 33},
-    {O_PRE_PL_3, O_PRE_PL_3, N_("Player birth (3)"), P_PLAYER,
-        "GUYBIRTH3", 0, 34, 34, 34},
-    {O_PLAYER, O_PLAYER_scanned, N_("Player"), P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT | P_PLAYER,
-        "GUY", 0, i_player, i_player, 35, 32},    /* has ckdelay */
-    {O_PLAYER_scanned, O_PLAYER, N_("Player (scanned)"), P_SCANNED,
-        "SCANN_GUY", 0, i_player, i_player, 35},
-    {O_PLAYER_BOMB, O_PLAYER_BOMB_scanned, N_("Player with bomb"), P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT | P_PLAYER,
-        "GUYBOMB", 0, 42, 42, 42, 25},    /* has ckdelay */
-    {O_PLAYER_BOMB_scanned, O_PLAYER_BOMB, N_("Player with bomb (scanned)"), P_SCANNED,
-        "SCANN_GUYBOMB", 0, 42, 42, 42},
-    {O_PLAYER_GLUED, O_PLAYER_GLUED, N_("Glued player"), P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT,
-        "GUYGLUED", 0, i_player_glued, i_player_glued, 35},    /* is not a real player! so active x, y will not find it. no P_PLAYER bit! */
-    {O_PLAYER_STIRRING, O_PLAYER_STIRRING, N_("Player stirring"), P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT | P_PLAYER,
-        "GUYSTIRRING", 0, 256, -256, -256},
+    {
+        O_PRE_PL_1, O_PRE_PL_1, N_("Player birth (1)"), P_PLAYER,
+        "GUYBIRTH1", 0, 32, 32, 32
+    },
+    {
+        O_PRE_PL_2, O_PRE_PL_2, N_("Player birth (2)"), P_PLAYER,
+        "GUYBIRTH2", 0, 33, 33, 33
+    },
+    {
+        O_PRE_PL_3, O_PRE_PL_3, N_("Player birth (3)"), P_PLAYER,
+        "GUYBIRTH3", 0, 34, 34, 34
+    },
+    {
+        O_PLAYER, O_PLAYER_scanned, N_("Player"), P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT | P_PLAYER,
+        "GUY", 0, i_player, i_player, 35, 32
+    },    /* has ckdelay */
+    {
+        O_PLAYER_scanned, O_PLAYER, N_("Player (scanned)"), P_BLOWS_UP_FLIES | P_SCANNED,
+        "SCANN_GUY", 0, i_player, i_player, 35
+    },
+    {
+        O_PLAYER_BOMB, O_PLAYER_BOMB_scanned, N_("Player with bomb"), P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT | P_PLAYER,
+        "GUYBOMB", 0, 42, 42, 42, 25
+    },    /* has ckdelay */
+    {
+        O_PLAYER_BOMB_scanned, O_PLAYER_BOMB, N_("Player with bomb (scanned)"), P_SCANNED,
+        "SCANN_GUYBOMB", 0, 42, 42, 42
+    },
+    {
+        O_PLAYER_ROCKET_LAUNCHER, O_PLAYER_ROCKET_LAUNCHER_scanned, N_("Player with rocket launcher"), P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT | P_PLAYER,
+        "GUYROCKETLAUNCER", 0, 369, 369, 369, 25
+    },    /* has ckdelay */
+    {
+        O_PLAYER_ROCKET_LAUNCHER_scanned, O_PLAYER_ROCKET_LAUNCHER, N_("Player with rocket launcher (scanned)"), P_SCANNED,
+        "SCANN_GUYROCKETLAUNCER", 0, 369, 369, 369
+    },
+    {
+        O_PLAYER_GLUED, O_PLAYER_GLUED, N_("Glued player"), P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT,
+        "GUYGLUED", 0, i_player_glued, i_player_glued, 35
+    },    /* is not a real player! so active x, y will not find it. no P_PLAYER bit! */
+    {
+        O_PLAYER_STIRRING, O_PLAYER_STIRRING, N_("Player stirring"), P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT | P_PLAYER,
+        "GUYSTIRRING", 0, 256, -256, -256
+    },
+
+    {O_ROCKET_LAUNCHER, O_ROCKET_LAUNCHER, N_("Rocket launcher"), 0, "ROCKET_LAUNCHER", 0, 368, 368, 368},
+    {O_ROCKET_1, O_ROCKET_1_scanned, N_("Rocket (right)"), 0, "ROCKETr", 0, 364, 364, 364, 40 /* has ckdelay */},
+    {O_ROCKET_1_scanned, O_ROCKET_1, N_("Rocket (right)"), P_SCANNED, "SCANN_ROCKETr", 0, 364, 364, 364, 0},
+    {O_ROCKET_2, O_ROCKET_2_scanned, N_("Rocket (up)"), 0, "ROCKETu", 0, 365, 365, 365, 40 /* has ckdelay */},
+    {O_ROCKET_2_scanned, O_ROCKET_2, N_("Rocket (up)"), P_SCANNED, "SCANN_ROCKETu", 0, 365, 365, 365, 0},
+    {O_ROCKET_3, O_ROCKET_3_scanned, N_("Rocket (left)"), 0, "ROCKETl", 0, 366, 366, 366, 40 /* has ckdelay */},
+    {O_ROCKET_3_scanned, O_ROCKET_3, N_("Rocket (left)"), P_SCANNED, "SCANN_ROCKETl", 0, 366, 366, 366, 0},
+    {O_ROCKET_4, O_ROCKET_4_scanned, N_("Rocket (down)"), 0, "ROCKETd", 0, 367, 367, 367, 40 /* has ckdelay */},
+    {O_ROCKET_4_scanned, O_ROCKET_4, N_("Rocket (down)"), P_SCANNED, "SCANN_ROCKETd", 0, 367, 367, 367, 0},
 
     {O_BOMB, O_BOMB, N_("Bomb"), 0, "BOMB", 0, 48, 48, 48},
     {O_BOMB_TICK_1, O_BOMB_TICK_1, N_("Ticking bomb (1)"), P_EXPLOSION_FIRST_STAGE, "IGNITEDBOMB1", 0, 49, 49, 49},
@@ -472,18 +758,30 @@ GdElementPorperty gd_element_properties[] = {
     {O_BOMB_TICK_6, O_BOMB_TICK_6, N_("Ticking bomb (6)"), 0, "IGNITEDBOMB6", 0, 54, 54, 54},
     {O_BOMB_TICK_7, O_BOMB_TICK_7, N_("Ticking bomb (7)"), 0, "IGNITEDBOMB7", 0, 55, 55, 55},
 
-    {O_NITRO_PACK, O_NITRO_PACK_scanned, N_("Nitro pack"), P_SLOPED|P_EXPLODES_BY_HIT|P_MOVED_BY_CONVEYOR_TOP,
-        "NITRO", 0, 288, 288, 288},
-    {O_NITRO_PACK_scanned, O_NITRO_PACK, N_("Nitro pack (scanned)"), P_SCANNED,
-        "SCANN_NITRO", 0, 288, 288, 288},
-    {O_NITRO_PACK_F, O_NITRO_PACK_F_scanned, N_("Nitro pack, falling"), P_EXPLODES_BY_HIT,
-        "NITROf", 0, i_nitro_pack_f, i_nitro_pack_f, 288},
-    {O_NITRO_PACK_F_scanned, O_NITRO_PACK_F, N_("Nitro pack, falling (scanned)"), P_SCANNED,
-        "SCANN_NITROf", 0, i_nitro_pack_f, i_nitro_pack_f, 288},
-    {O_NITRO_PACK_EXPLODE, O_NITRO_PACK_EXPLODE_scanned, N_("Nitro pack, triggered"), P_EXPLODES_BY_HIT,
-        "NITROtriggered", 0, i_nitro_explode, i_nitro_explode, 288},
-    {O_NITRO_PACK_EXPLODE_scanned, O_NITRO_PACK_EXPLODE, N_("Nitro pack, triggered (scanned)"), P_SCANNED,
-        "SCANN_NITROtriggered", 0, i_nitro_explode, i_nitro_explode, 288},
+    {
+        O_NITRO_PACK, O_NITRO_PACK_scanned, N_("Nitro pack"), P_SLOPED|P_EXPLODES_BY_HIT|P_MOVED_BY_CONVEYOR_TOP,
+        "NITRO", 0, 288, 288, 288
+    },
+    {
+        O_NITRO_PACK_scanned, O_NITRO_PACK, N_("Nitro pack (scanned)"), P_SCANNED,
+        "SCANN_NITRO", 0, 288, 288, 288
+    },
+    {
+        O_NITRO_PACK_F, O_NITRO_PACK_F_scanned, N_("Nitro pack, falling"), P_EXPLODES_BY_HIT,
+        "NITROf", 0, i_nitro_pack_f, i_nitro_pack_f, 288
+    },
+    {
+        O_NITRO_PACK_F_scanned, O_NITRO_PACK_F, N_("Nitro pack, falling (scanned)"), P_SCANNED,
+        "SCANN_NITROf", 0, i_nitro_pack_f, i_nitro_pack_f, 288
+    },
+    {
+        O_NITRO_PACK_EXPLODE, O_NITRO_PACK_EXPLODE_scanned, N_("Nitro pack, triggered"), P_EXPLODES_BY_HIT,
+        "NITROtriggered", 0, i_nitro_explode, i_nitro_explode, 288
+    },
+    {
+        O_NITRO_PACK_EXPLODE_scanned, O_NITRO_PACK_EXPLODE, N_("Nitro pack, triggered (scanned)"), P_SCANNED,
+        "SCANN_NITROtriggered", 0, i_nitro_explode, i_nitro_explode, 288
+    },
 
     {O_PRE_CLOCK_0, O_PRE_CLOCK_1, N_("Clock birth (0)"), P_SCANNED, "CLOCKBIRTH0", 0, 28, 28, 28},
     {O_PRE_CLOCK_1, O_PRE_CLOCK_0, N_("Clock birth (1)"), 0, "CLOCKBIRTH1", 0, 28, 28, 28, 280},    /* has ckdelay */
@@ -532,21 +830,29 @@ GdElementPorperty gd_element_properties[] = {
     {O_AMOEBA_2_EXPL_2, O_AMOEBA_2_EXPL_2, N_("Amoeba 2 explosion (2)"), 0, "AMOEBA2EXPLOSION2", 0, 293, 293, 293, 280},    /* has ckdelay */
     {O_AMOEBA_2_EXPL_3, O_AMOEBA_2_EXPL_3, N_("Amoeba 2 explosion (3)"), 0, "AMOEBA2EXPLOSION3", 0, 294, 294, 294, 280},    /* has ckdelay */
     {O_AMOEBA_2_EXPL_4, O_AMOEBA_2_EXPL_4, N_("Amoeba 2 explosion (4)"), 0, "AMOEBA2EXPLOSION4", 0, 295, 295, 295, 280},    /* has ckdelay */
-    /* nut "explosions" are not real explosions, but the stages of a cracked nut opening. therefore they are rounded */
-     {O_NUT_CRACK_0, O_NUT_CRACK_1, N_("Nut crack (0)"), P_SCANNED, "NUTCRACK0", 0, 360, 360, 360},
-     {O_NUT_CRACK_1, O_NUT_CRACK_0, N_("Nut crack (1)"), P_SLOPED, "NUTCRACK1", 0, 360, 360, 360, 280},    /* has ckdelay */
-     {O_NUT_CRACK_2, O_NUT_CRACK_2, N_("Nut crack (2)"), P_SLOPED, "NUTCRACK2", 0, 361, 361, 361, 280},    /* has ckdelay */
-     {O_NUT_CRACK_3, O_NUT_CRACK_3, N_("Nut crack (3)"), P_SLOPED, "NUTCRACK3", 0, 362, 362, 362, 280},    /* has ckdelay */
-     {O_NUT_CRACK_4, O_NUT_CRACK_4, N_("Nut crack (4)"), P_SLOPED, "NUTCRACK4", 0, 363, 363, 363, 280},    /* has ckdelay */
+    /* nut "explosions" are not real explosions, but the stages of a cracked nut opening. therefore they are sloped */
+    {O_NUT_CRACK_0, O_NUT_CRACK_1, N_("Nut crack (0)"), P_SCANNED, "NUTCRACK0", 0, 360, 360, 360},
+    {O_NUT_CRACK_1, O_NUT_CRACK_0, N_("Nut crack (1)"), P_SLOPED, "NUTCRACK1", 0, 360, 360, 360, 280},    /* has ckdelay */
+    {O_NUT_CRACK_2, O_NUT_CRACK_2, N_("Nut crack (2)"), P_SLOPED, "NUTCRACK2", 0, 361, 361, 361, 280},    /* has ckdelay */
+    {O_NUT_CRACK_3, O_NUT_CRACK_3, N_("Nut crack (3)"), P_SLOPED, "NUTCRACK3", 0, 362, 362, 362, 280},    /* has ckdelay */
+    {O_NUT_CRACK_4, O_NUT_CRACK_4, N_("Nut crack (4)"), P_SLOPED, "NUTCRACK4", 0, 363, 363, 363, 280},    /* has ckdelay */
 
-    {O_PLAYER_PNEUMATIC_LEFT, O_PLAYER_PNEUMATIC_LEFT, NULL /* Player using hammer, left */, P_BLOWS_UP_FLIES|P_EXPLODES_BY_HIT|P_PLAYER,
-        "GUYHAMMERl", 0, 265, 265, 265},
-    {O_PLAYER_PNEUMATIC_RIGHT, O_PLAYER_PNEUMATIC_RIGHT, NULL /* Player using hammer, right */, P_BLOWS_UP_FLIES|P_EXPLODES_BY_HIT|P_PLAYER,
-        "GUYHAMMERr", 0, 268, 268, 268},
-    {O_PNEUMATIC_ACTIVE_LEFT, O_PNEUMATIC_ACTIVE_LEFT, NULL /* Active hammer, left */, 0,
-        "HAMMERACTIVEl", 0, 264, 264, 264},
-    {O_PNEUMATIC_ACTIVE_RIGHT, O_PNEUMATIC_ACTIVE_RIGHT, NULL /* Active hammer, right */, 0,
-        "HAMMERACTIVEr", 0, 269, 269, 269},
+    {
+        O_PLAYER_PNEUMATIC_LEFT, O_PLAYER_PNEUMATIC_LEFT, NULL /* Player using hammer, left */, P_BLOWS_UP_FLIES|P_EXPLODES_BY_HIT|P_PLAYER,
+        "GUYHAMMERl", 0, 265, 265, 265
+    },
+    {
+        O_PLAYER_PNEUMATIC_RIGHT, O_PLAYER_PNEUMATIC_RIGHT, NULL /* Player using hammer, right */, P_BLOWS_UP_FLIES|P_EXPLODES_BY_HIT|P_PLAYER,
+        "GUYHAMMERr", 0, 268, 268, 268
+    },
+    {
+        O_PNEUMATIC_ACTIVE_LEFT, O_PNEUMATIC_ACTIVE_LEFT, NULL /* Active hammer, left */, 0,
+        "HAMMERACTIVEl", 0, 264, 264, 264
+    },
+    {
+        O_PNEUMATIC_ACTIVE_RIGHT, O_PNEUMATIC_ACTIVE_RIGHT, NULL /* Active hammer, right */, 0,
+        "HAMMERACTIVEr", 0, 269, 269, 269
+    },
 
     {O_UNKNOWN, O_UNKNOWN, N_("Unknown element"), P_NON_EXPLODABLE, "UNKNOWN", 0, i_unknown, i_unknown, 4},
     {O_NONE, O_NONE, N_("No element"), 0, "NONE", 0, 79, 79, 79},
@@ -574,7 +880,7 @@ GdElementPorperty gd_element_properties[] = {
     {O_CONVEYOR_SWITCH_ON, O_CONVEYOR_SWITCH_ON, NULL, 0, NULL, 0, 356, 356, 356},
 
     {O_PLAYER_HELP, O_PLAYER_HELP, N_("Player"), 0, 0, 0, 35, 35, 35},
-    
+
     {O_QUESTION_MARK, O_QUESTION_MARK, NULL, 0, NULL, 0, 70, 70, 70},
     {O_EATABLE, O_EATABLE, NULL, 0, NULL, 0, 71, 71, 71},
     {O_DOWN_ARROW, O_DOWN_ARROW, NULL, 0, NULL, 0, 73, 73, 73},

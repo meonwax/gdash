@@ -25,29 +25,24 @@
 /// @param _start The starting coordinates of the fill.
 /// @param _fill_element The inside of the area will be filled with this element.
 CaveFill::CaveFill(CaveObject::Type _type, Coordinate _start, GdElementEnum _fill_element)
-:   CaveObject(_type),
-    start(_start),
-    fill_element(_fill_element)
-{
+    :   CaveObject(_type),
+        start(_start),
+        fill_element(_fill_element) {
 }
 
-std::string CaveFill::get_coordinates_text() const
-{
+std::string CaveFill::get_coordinates_text() const {
     return SPrintf("%d,%d") % start.x % start.y;
 }
 
-void CaveFill::create_drag(Coordinate current, Coordinate displacement)
-{
+void CaveFill::create_drag(Coordinate current, Coordinate displacement) {
     start=current;
 }
 
-void CaveFill::move(Coordinate current, Coordinate displacement)
-{
+void CaveFill::move(Coordinate current, Coordinate displacement) {
     if (start==current)     /* can only drag by the starting point */
         start+=displacement;
 }
 
-void CaveFill::move(Coordinate displacement)
-{
+void CaveFill::move(Coordinate displacement) {
     start+=displacement;
 }

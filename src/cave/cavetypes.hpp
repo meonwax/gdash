@@ -49,14 +49,14 @@ enum GdType {
 enum {
     /* these define the number of the cells in the png file */
     NUM_OF_CELLS_X=8,
-    NUM_OF_CELLS_Y=46,
+    NUM_OF_CELLS_Y=48,
     /* +80: placeholder for cells which are rendered by the game; for example diamond+arrow = falling diamond */
     NUM_OF_CELLS=NUM_OF_CELLS_X*NUM_OF_CELLS_Y+80,
 };
 
 /**
  * These are the "objects" (cells) in caves.
- * 
+ *
  * Many of them have a "scanned" pair, which is required by the engine.
  */
 enum GdElementEnum {
@@ -298,8 +298,20 @@ enum GdElementEnum {
     O_PLAYER_scanned,
     O_PLAYER_BOMB,
     O_PLAYER_BOMB_scanned,
+    O_PLAYER_ROCKET_LAUNCHER,
+    O_PLAYER_ROCKET_LAUNCHER_scanned,
     O_PLAYER_GLUED,
     O_PLAYER_STIRRING,
+    
+    O_ROCKET_LAUNCHER,
+    O_ROCKET_1,
+    O_ROCKET_1_scanned,
+    O_ROCKET_2,
+    O_ROCKET_2_scanned,
+    O_ROCKET_3,
+    O_ROCKET_3_scanned,
+    O_ROCKET_4,
+    O_ROCKET_4_scanned,
 
     O_BOMB,
     O_BOMB_TICK_1,
@@ -405,7 +417,7 @@ enum GdElementEnum {
     O_CONVEYOR_DIR_CHANGED,
     O_CONVEYOR_SWITCH_OFF,
     O_CONVEYOR_SWITCH_ON,
-    
+
     // fake element for the help window, to show the player without an exclamation mark
     O_PLAYER_HELP,
 
@@ -479,9 +491,13 @@ class PlainOldData {
 private:
     T value;
 public:
-    PlainOldData(const T& value = T()): value(value) {}
-    operator T&() { return value; }
-    operator const T&() const { return value; }
+    PlainOldData(const T &value = T()): value(value) {}
+    operator T &() {
+        return value;
+    }
+    operator const T &() const {
+        return value;
+    }
 };
 
 /// A boolean stored in a cave.
@@ -501,8 +517,14 @@ typedef PlainOldData<GdDirectionEnum> GdDirection;
 /// A string stored in a cave. Used inheritance, so it is a different class (not a typedef'ed std::string).
 class GdString: public std::string {
 public:
-    GdString& operator=(const char *x) { std::string::operator=(x); return *this; }
-    GdString& operator=(const std::string& x) { std::string::operator=(x); return *this; }
+    GdString &operator=(const char *x) {
+        std::string::operator=(x);
+        return *this;
+    }
+    GdString &operator=(const std::string &x) {
+        std::string::operator=(x);
+        return *this;
+    }
 };
 /// A probability between 0.000 and 1.000.
 /// It is stored as an integer between 0 and 1000000; the in-file representation is a double.
@@ -511,9 +533,9 @@ public:
 class GdProbability: private PlainOldData<int> {
 public:
     GdProbability() {}
-    GdProbability(const int& value): PlainOldData<int>(value) {}
-    using PlainOldData<int>::operator int&;
-    using PlainOldData<int>::operator const int&;
+    GdProbability(const int &value): PlainOldData<int>(value) {}
+    using PlainOldData<int>::operator int &;
+    using PlainOldData<int>::operator const int &;
 };
 /// An array of probabilities for cave difficulty levels.
 typedef GdProbability GdProbabilityLevels[5];
@@ -529,9 +551,9 @@ public:
     Coordinate() : x(0), y(0) {}
     /// Create a coordinate of (x,y).
     Coordinate(int x, int y) : x(x), y(y) {}
-    Coordinate& operator+=(Coordinate const &p);
-    Coordinate operator+(Coordinate const& rhs) const;
-    bool operator==(Coordinate const& rhs) const;
+    Coordinate &operator+=(Coordinate const &p);
+    Coordinate operator+(Coordinate const &rhs) const;
+    bool operator==(Coordinate const &rhs) const;
     static void drag_rectangle(Coordinate &p1, Coordinate &p2, Coordinate current, Coordinate displacement);
 };
 
@@ -551,26 +573,26 @@ public:
 void gd_cave_types_init();
 
 // These istream operators are needed by the bdcff reader.
-std::istream& operator>>(std::istream &is, GdElementEnum &e);
-std::istream& operator>>(std::istream &is, Coordinate &p);
+std::istream &operator>>(std::istream &is, GdElementEnum &e);
+std::istream &operator>>(std::istream &is, Coordinate &p);
 
-std::ostream& operator<<(std::ostream& os, GdBool const& b);
-std::ostream& operator<<(std::ostream& os, GdInt const& i);
-std::ostream& operator<<(std::ostream& os, GdProbability const& p);
-std::ostream& operator<<(std::ostream& os, GdScheduling const& s);
-std::ostream& operator<<(std::ostream& os, GdDirection const& d);
-std::ostream& operator<<(std::ostream& os, GdElement const& s);
-std::ostream& operator<<(std::ostream& os, GdEngine const& s);
-std::ostream& operator<<(std::ostream &os, Coordinate const &p);
+std::ostream &operator<<(std::ostream &os, GdBool const &b);
+std::ostream &operator<<(std::ostream &os, GdInt const &i);
+std::ostream &operator<<(std::ostream &os, GdProbability const &p);
+std::ostream &operator<<(std::ostream &os, GdScheduling const &s);
+std::ostream &operator<<(std::ostream &os, GdDirection const &d);
+std::ostream &operator<<(std::ostream &os, GdElement const &s);
+std::ostream &operator<<(std::ostream &os, GdEngine const &s);
+std::ostream &operator<<(std::ostream &os, Coordinate const &p);
 
-bool read_from_string(const std::string& s, GdBool& b);
-bool read_from_string(const std::string& s, GdInt& i);
-bool read_from_string(const std::string& s, GdInt& i, double conversion_ratio);
-bool read_from_string(const std::string& s, GdProbability& i);
-bool read_from_string(const std::string& s, GdDirection& d);
-bool read_from_string(const std::string& s, GdScheduling& sch);
-bool read_from_string(const std::string& s, GdElement& e);
-bool read_from_string(const std::string& s, GdEngine& e);
+bool read_from_string(const std::string &s, GdBool &b);
+bool read_from_string(const std::string &s, GdInt &i);
+bool read_from_string(const std::string &s, GdInt &i, double conversion_ratio);
+bool read_from_string(const std::string &s, GdProbability &i);
+bool read_from_string(const std::string &s, GdDirection &d);
+bool read_from_string(const std::string &s, GdScheduling &sch);
+bool read_from_string(const std::string &s, GdElement &e);
+bool read_from_string(const std::string &s, GdEngine &e);
 
 const char *visible_name(GdBool const &b);
 std::string visible_name(GdInt const &i);

@@ -25,7 +25,7 @@
 
 /**
  * A class which is able to process format strings like misc/printf.
- * 
+ *
  * Usage:
  * std::string s = Printf("Hello, %s! %-5d") % "world" % 9;
  * The format string is passed in the constructor, and parameters
@@ -67,18 +67,18 @@ private:
         bool html_markup;   ///< Must do HTML conversion (> to &gt; etc.) for this one
     };
     mutable std::deque<Conversion> conversions;
-    
+
     static const char *conv_specifiers;
     static std::string flag_characters;
-    static std::string html_markup_text(const std::string& of_what);
+    static std::string html_markup_text(const std::string &of_what);
 
     void configure_ostream(std::ostringstream &os, Conversion &conversion) const;
     void insert_converted(std::string const &os, Conversion &conversion) const;
-    
+
 public:
-    Printf(const std::string& format, char percent='%');
-    
-    template <class TIP> Printf const& operator%(const TIP& x) const;
+    Printf(const std::string &format, char percent='%');
+
+    template <class TIP> Printf const &operator%(const TIP &x) const;
 };
 
 /// The % operator feeds the next data item into the string.
@@ -86,19 +86,19 @@ public:
 /// @param x The parameter to convert to string in the specified format.
 /// @return The Printf object itself, so successive calls can be linked.
 template <class TIP>
-Printf const& Printf::operator%(TIP const& x) const {
+Printf const &Printf::operator%(TIP const &x) const {
     std::ostringstream os;
     g_assert(!conversions.empty());
     Conversion conversion = conversions.front();
     conversions.pop_front();
-    
+
     configure_ostream(os, conversion);
     os << x;
     if (conversion.html_markup)
         insert_converted(html_markup_text(os.str()), conversion);
     else
         insert_converted(os.str(), conversion);
-    
+
     return *this;
 }
 
@@ -107,13 +107,15 @@ Printf const& Printf::operator%(TIP const& x) const {
 /// cast to a char const *.
 class CPrintf : public Printf {
 public:
-    CPrintf(const std::string& format, char percent='%') : Printf(format, percent) {}
+    CPrintf(const std::string &format, char percent='%') : Printf(format, percent) {}
 
     /// Convert result to const char *.
-    operator char const *() const { return format.c_str(); }
+    operator char const *() const {
+        return format.c_str();
+    }
 
     template <class TIP>
-    CPrintf const& operator%(TIP const& x) const {
+    CPrintf const &operator%(TIP const &x) const {
         Printf::operator%(x);
         return *this;
     }
@@ -124,13 +126,15 @@ public:
 /// cast to an std::string.
 class SPrintf : public Printf {
 public:
-    SPrintf(const std::string& format, char percent='%') : Printf(format, percent) {}
+    SPrintf(const std::string &format, char percent='%') : Printf(format, percent) {}
 
     /// Convert result to std::string.
-    operator std::string const &() const { return format; }
+    operator std::string const &() const {
+        return format;
+    }
 
     template <class TIP>
-    SPrintf const& operator%(TIP const& x) const {
+    SPrintf const &operator%(TIP const &x) const {
         Printf::operator%(x);
         return *this;
     }

@@ -35,29 +35,35 @@ public:
     virtual ~Screen() {}
     void set_size(int w, int h);
     virtual void reinit();
-    int get_width() const { return w; }
-    int get_height() const { return h; }
-    
+    int get_width() const {
+        return w;
+    }
+    int get_height() const {
+        return h;
+    }
+
     virtual void set_title(char const *title) = 0;
 
-    virtual void fill_rect(int x, int y, int w, int h, const GdColor& c)=0;
+    virtual void fill_rect(int x, int y, int w, int h, const GdColor &c)=0;
     void fill(const GdColor &c) {
         fill_rect(0, 0, get_width(), get_height(), c);
     }
 
-    virtual void blit_full(Pixmap const &src, int dx, int dy, int x, int y, int w, int h) const=0;
-    void blit(Pixmap const &src, int dx, int dy) const { blit_full(src, dx, dy, 0, 0, src.get_width(), src.get_height()); }
+    virtual void blit_full(Pixmap const &src, int dx, int dy, int x, int y, int w, int h) const = 0;
+    void blit(Pixmap const &src, int dx, int dy) const {
+        blit_full(src, dx, dy, 0, 0, src.get_width(), src.get_height());
+    }
 
-    virtual void set_clip_rect(int x1, int y1, int w, int h)=0;
-    virtual void remove_clip_rect()=0;
+    virtual void set_clip_rect(int x1, int y1, int w, int h) = 0;
+    virtual void remove_clip_rect() = 0;
+
+    virtual void draw_particle_set(int dx, int dy, ParticleSet const &ps);
     
-    virtual void draw_particle_set(int dx, int dy, ParticleSet const &ps) {}
-
     /**
-     * Signal the screen that drawing begins.
-     */
-    virtual void start_drawing();
-    
+     * Returns if the screen is double buffered, which means that everything must be redrawn
+     * before flipping. */
+    virtual bool must_redraw_all_before_flip();
+
     /**
      * Copies the contents of the drawing back buffer of the screen. To be called
      * when drawing is finished.

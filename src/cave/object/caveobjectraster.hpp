@@ -30,18 +30,22 @@ public:
     CaveRaster(Coordinate _p1, Coordinate _p2, Coordinate _dist, GdElementEnum _element);
     CaveRaster(): CaveRectangular(GD_RASTER) {}
     virtual void draw(CaveRendered &cave) const;
-    virtual CaveRaster *clone() const { return new CaveRaster(*this); };
+    virtual CaveRaster *clone() const {
+        return new CaveRaster(*this);
+    };
     virtual std::string get_bdcff() const;
-    virtual CaveRaster* clone_from_bdcff(const std::string &name, std::istream &is) const;
+    virtual CaveRaster *clone_from_bdcff(const std::string &name, std::istream &is) const;
 
 private:
     static PropertyDescription const descriptor[];
 
 public:
-    virtual PropertyDescription const* get_description_array() const;
+    virtual PropertyDescription const *get_description_array() const;
 
     std::string get_coordinates_text() const;
-    virtual GdElementEnum get_characteristic_element() const { return element; }
+    virtual GdElementEnum get_characteristic_element() const {
+        return element;
+    }
     virtual std::string get_description_markup() const;
 };
 

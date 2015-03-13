@@ -25,13 +25,11 @@
 #include "cave/caverendered.hpp"
 #include "misc/printf.hpp"
 
-std::string CaveRectangle::get_bdcff() const
-{
+std::string CaveRectangle::get_bdcff() const {
     return BdcffFormat("Rectangle") << p1 << p2 << element;
 }
 
-CaveRectangle* CaveRectangle::clone_from_bdcff(const std::string &name, std::istream &is) const
-{
+CaveRectangle *CaveRectangle::clone_from_bdcff(const std::string &name, std::istream &is) const {
     Coordinate p1, p2;
     GdElementEnum element;
     if (!(is >> p1 >> p2 >> element))
@@ -41,14 +39,12 @@ CaveRectangle* CaveRectangle::clone_from_bdcff(const std::string &name, std::ist
 
 
 CaveRectangle::CaveRectangle(Coordinate _p1, Coordinate _p2, GdElementEnum _element)
-:   CaveRectangular(GD_RECTANGLE, _p1, _p2),
-    element(_element)
-{
+    :   CaveRectangular(GD_RECTANGLE, _p1, _p2),
+        element(_element) {
 }
 
 /* rectangle, frame only */
-void CaveRectangle::draw(CaveRendered &cave) const
-{
+void CaveRectangle::draw(CaveRendered &cave) const {
     /* reorder coordinates if not drawing from northwest to southeast */
     int x1=p1.x;
     int y1=p1.y;
@@ -78,13 +74,11 @@ PropertyDescription const CaveRectangle::descriptor[] = {
     {NULL},
 };
 
-PropertyDescription const* CaveRectangle::get_description_array() const
-{
+PropertyDescription const *CaveRectangle::get_description_array() const {
     return descriptor;
 }
 
-std::string CaveRectangle::get_description_markup() const
-{
-    return SPrintf(_("Rectangle from %d,%d to %d,%d of <b>%s</b>"))
-        % p1.x % p1.y % p2.x % p2.y % gd_element_properties[element].lowercase_name;
+std::string CaveRectangle::get_description_markup() const {
+    return SPrintf(_("Rectangle from %d,%d to %d,%d of <b>%ms</b>"))
+           % p1.x % p1.y % p2.x % p2.y % gd_element_properties[element].lowercase_name;
 }

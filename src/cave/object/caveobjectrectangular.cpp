@@ -21,29 +21,24 @@
 #include "misc/printf.hpp"
 
 CaveRectangular::CaveRectangular(CaveObject::Type type, Coordinate _p1, Coordinate _p2)
-:   CaveObject(type),
-    p1(_p1),
-    p2(_p2)
-{
+    :   CaveObject(type),
+        p1(_p1),
+        p2(_p2) {
 }
 
-void CaveRectangular::create_drag(Coordinate current, Coordinate displacement)
-{
+void CaveRectangular::create_drag(Coordinate current, Coordinate displacement) {
     p2=current;
 }
 
-void CaveRectangular::move(Coordinate current, Coordinate displacement)
-{
+void CaveRectangular::move(Coordinate current, Coordinate displacement) {
     Coordinate::drag_rectangle(p1, p2, current, displacement);
 }
 
-void CaveRectangular::move(Coordinate displacement)
-{
+void CaveRectangular::move(Coordinate displacement) {
     p1+=displacement;
     p2+=displacement;
 }
 
-std::string CaveRectangular::get_coordinates_text() const
-{
+std::string CaveRectangular::get_coordinates_text() const {
     return SPrintf("%d,%d-%d,%d") % p1.x % p1.y % p2.x % p2.y;
 }

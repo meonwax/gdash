@@ -23,7 +23,7 @@ DiamondsRequired=15 15 15 15 15
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
 PALTiming=true
-FrameTime=200 120 120 120 120
+FrameTime=150 150 150 150 150
 CaveDelay=0 0 0 0 0
 DiamondValue=0 0
 DummyProperties.diamondcollector=true
@@ -68,6 +68,11 @@ Line=8 3 8 9 SPACE
 Point=8 9 FIREFLYl
 Point=8 3 BOULDER
 Line=7 18 28 18 BLADDERSPENDER
+Point=7 6 DUMMY
+Point=11 3 DIAMOND
+Point=12 7 DIAMOND
+Point=10 6 DIAMOND
+Point=13 1 DIAMOND
 [/objects]
 
 [highscore]
@@ -388,7 +393,7 @@ Line=14 12 8 12 BOULDER
 Name=Biter and PAL emu
 Intermission=false
 Size=40 22 0 0 39 21
-Colors=Black Black Blue Orange White White Orange
+Colors=Black Black Blue Red White White Orange
 DiamondsRequired=10 10 10 10 10
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
@@ -396,7 +401,7 @@ PALTiming=true
 FrameTime=200 200 200 200 200
 CaveDelay=0 0 0 0 0
 DiamondValue=0 0
-RandomFill=DIAMOND 32 BOULDER 16 DIRT 0 DIRT 0
+RandomFill=DIRTBALL 160 DIRT2 128 DIAMOND 32 BOULDER 16
 DummyProperties.diamondcollector=true
 DummyProperties.penalty=true
 DummyProperties.destructable=false
@@ -413,7 +418,7 @@ BorderProperties.lineshift=true
 ShortExplosions=false
 
 [objects]
-Point=16 9 BITERr
+Point=2 8 BITERr
 Point=9 4 BITERSWITCH
 Point=7 5 INBOX
 Point=11 10 WALLSLOPEDDOWNRIGHT
@@ -424,6 +429,9 @@ Rectangle=9 8 12 11 SPACE
 CopyPaste=9 8 12 11 22 7 nomirror noflip
 CopyPaste=9 8 12 11 22 11 mirror flip
 CopyPaste=22 7 25 14 33 5 nomirror noflip
+FillRect=12 2 22 4 WALL BOULDER
+Point=13 3 SPACE
+Point=14 3 BITERl
 [/objects]
 [/cave]
 
@@ -569,12 +577,12 @@ Point=4 3 INBOX
 [/cave]
 
 [cave]
-Name=Dirt Ball and Loose Dirt
+Name=Dirt Types
 Author=Czirkos Zoltan
 Date=2009-01-08
 Intermission=false
 Size=40 22 0 0 39 21
-Colors=#000000 #000000 #1e993a #b2a659 #b5cca2 #62b259 #2b1e99
+Colors=#000000 #000000 #994c68 #b23a21 #cca7c8 #2bb221 #4c5d99
 DiamondsRequired=10 10 10 10 10
 CaveTime=999 999 999 999 999
 CaveScheduling=ms
@@ -591,6 +599,12 @@ Point=10 12 INBOX
 Rectangle=22 3 30 8 DIRTLOOSE
 Line=11 1 19 1 NITRO
 Point=20 8 AMOEBA
+FillRect=15 12 22 16 DIRT2 DIRT
+FillRect=26 12 32 16 SPACE DIRT
+Point=27 13 DIRTSLOPEDUPLEFT
+Point=27 15 DIRTSLOPEDDOWNLEFT
+Point=31 13 DIRTSLOPEDUPRIGHT
+Point=31 15 DIRTSLOPEDDOWNRIGHT
 [/objects]
 [/cave]
 
@@ -788,9 +802,9 @@ AmoebaProperties.waitforhatching=true
 AmoebaTime=600 600 600 600 600
 MagicWallTime=600 600 600 600 600
 MagicWallProperties.waitforhatching=true
-MagicWallProperties.convertamoeba=false
 MagicWallProperties.flyingstoneto=FLYINGBOULDERf
 MagicWallProperties.flyingdiamondto=FLYINGDIAMONDf
+MagicWallProperties.convertamoeba=false
 SlimePermeabilityC64=0 0 0 0 0
 EnemyDirectionProperties.changeathatching=true
 SkeletonsForPot=0
@@ -895,9 +909,12 @@ SlimePermeabilityC64=0 0 0 0 0
 [objects]
 FillRect=1 1 38 20 STEELWALL
 FillRect=15 8 22 13 STEELWALL SPACE
-Point=16 12 INBOX
-Point=22 12 OUTBOX
+Point=15 12 INBOX
+Point=15 9 OUTBOX
 Point=18 9 DIAMOND
+Line=20 9 20 12 DIRT
+Point=21 9 FIREFLYl
+Point=20 9 BOULDER
 [/objects]
 [/cave]
 
@@ -920,6 +937,76 @@ SlimePermeabilityC64=0 0 0 0 0
 Point=14 8 INBOX
 Point=20 11 AMOEBA
 [/objects]
+[/cave]
+
+[cave]
+Name=Keys and doors
+Author=Czirkos Zoltan
+Date=2013-03-16
+Intermission=false
+Size=40 22 0 0 39 21
+Colors=#000000 #000000 #544c99 #b23190 #ccac94 #36b231 #4f4c99
+DiamondsRequired=10 10 10 10 10
+CaveTime=999 999 999 999 999
+CaveScheduling=ms
+FrameTime=180 160 140 120 120
+CaveDelay=0 0 0 0 0
+DiamondValue=0 0
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+Point=5 7 KEY1
+Point=8 7 KEY2
+Point=11 7 KEY3
+Point=14 7 DIAMONDRELEASEKEY
+Point=5 9 DOOR1
+Point=8 9 DOOR2
+Point=11 9 DOOR3
+Point=14 9 TRAPPEDDIAMOND
+Point=3 4 INBOX
+[/objects]
+[/cave]
+
+[cave]
+Name=Rocket launcher
+Author=Czirkos Zoltan
+Date=2013-03-17
+Intermission=true
+Size=20 12 0 0 19 11
+Colors=#000000 #000000 #994c87 #3533b2 #92ccc0 #33b242 #594c99
+DiamondsRequired=8 8 8 8 8
+CaveTime=60 60 60 60 60
+CaveScheduling=ms
+FrameTime=180 160 140 120 120
+CaveDelay=0 0 0 0 0
+DiamondValue=0 0
+RocketLauncher.infinite=true
+SlimePermeabilityC64=0 0 0 0 0
+
+[objects]
+Point=1 11 INBOX
+Point=1 6 ROCKET_LAUNCHER
+Point=18 0 OUTBOX
+FillRect=5 1 1 4 WALL DIAMOND
+FillRect=9 1 5 4 WALL DIAMOND
+FillRect=13 1 9 4 WALL DIAMOND
+FillRect=18 1 13 4 WALL DIAMOND
+[/objects]
+
+[highscore]
+4 Czirkos Zoltan
+[/highscore]
+
+[replay]
+Level=1
+Player=Czirkos Zoltan
+Date=2013-03-17 00:12
+RecordedWith=GDash 20130315unstable
+RandomSeed=14435
+Score=4
+CheckSum=-564246749
+Movements=.28 u5 r2 .6 u . d3 . U . r3 .10 l3 . u2 r u l2 d2 r3 . u2 . l3 u2 d3 .3 u r15 dr d l17 .2 R .22 u .2 R .22 r5 dr d4 . U r4 . u2 . U . d2 r2 .11 u3 l8 d2 r2 d r3 ur u2 r7 .2 l3 r3 u3 l u ul l2 u2 r3 d3 l7 .4 L .4 R . U . d2 l2 .3 u5 .3 R .8 R .11 r11 u2
+[/replay]
 [/cave]
 [/game]
 [/BDCFF]

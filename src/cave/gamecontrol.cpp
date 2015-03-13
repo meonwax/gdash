@@ -282,12 +282,12 @@ void GameControl::select_next_level_indexes() {
 
 /*
  * functions for different states.
- */ 
+ */
 
 /// Show story for a cave, if it has not been already shown.
 GameControl::State GameControl::show_story() {
     State return_state;
-    
+
     /* if we have a story... */
     /* and user settings permit showing that... etc */
     if (gd_show_story && !story_shown && type==TYPE_NORMAL && original_cave->story!="") {
@@ -301,7 +301,7 @@ GameControl::State GameControl::show_story() {
         state_counter=GAME_INT_STORY_CLICKED;
         return_state=STATE_NOTHING;
     }
-    
+
     return return_state;
 }
 
@@ -363,7 +363,7 @@ void GameControl::cover_animation() {
 /// @param restart If the user requested a cave restart.
 GameControl::State GameControl::iterate_cave(int millisecs_elapsed, bool fast_forward, GdDirectionEnum player_move, bool fire, bool suicide, bool restart) {
     State return_state;
-    
+
     int irl_cavespeed;      // caveset in real life. if fast_forward is enabled, we ignore the speed of the cave (but it thinks it runs at normal speed)
     if (!fast_forward)
         irl_cavespeed=played_cave->speed;   /* cave speed in ms, like 175ms/frame */
@@ -433,13 +433,12 @@ GameControl::State GameControl::iterate_cave(int millisecs_elapsed, bool fast_fo
         if (type==TYPE_NORMAL && player_lives==0) {
             /* wait some time - this is a game over */
             state_counter=GAME_INT_WAIT_BEFORE_COVER;
-        }
-        else {
+        } else {
             /* start cover animation immediately */
             state_counter=GAME_INT_COVER_START;
         }
     }
-    
+
     return return_state;
 }
 
@@ -448,13 +447,13 @@ GameControl::State GameControl::iterate_cave(int millisecs_elapsed, bool fast_fo
 /// If no more lives, game is over.
 GameControl::State GameControl::wait_before_cover() {
     State return_state;
-    
+
     state_counter+=1; /* 40ms elapsed, advance counter */
     if (type==TYPE_NORMAL && player_lives==0)
         return_state=STATE_NO_MORE_LIVES;
     else
         return_state=STATE_NOTHING;
-        
+
     return return_state;
 }
 
@@ -462,7 +461,7 @@ GameControl::State GameControl::wait_before_cover() {
 /// This may advance the state, or not - depending on if there is still cave time left.
 GameControl::State GameControl::check_bonus_score() {
     State return_state;
-    
+
     /* player exited, but some time remained. now count bonus points. */
     /* if time remaining, bonus points are added. do not start animation yet. */
     if (played_cave->time>0) {
@@ -478,16 +477,15 @@ GameControl::State GameControl::check_bonus_score() {
         // maybe we we substracted too much (remaining time was fraction of a second)
         if (played_cave->time<0)
             played_cave->time=0;
-    }
-    else
-    /* if no more points, start waiting a bit, and later start covering. */
+    } else
+        /* if no more points, start waiting a bit, and later start covering. */
         state_counter=GAME_INT_WAIT_BEFORE_COVER;
 
     /* play bonus sound - which is the same as the seconds sound, when only <10 seconds left */
     played_cave->set_seconds_sound();
     gd_sound_play_sounds(played_cave->sound1, played_cave->sound2, played_cave->sound3);
     return_state=STATE_LABELS_CHANGED;
-    
+
     return return_state;
 }
 
@@ -507,7 +505,7 @@ GameControl::State GameControl::finished_covering() {
             caveset->cave(cave_num).replays.push_back(*replay_record);
         delete replay_record;
         replay_record=0;
-        
+
         switch (played_cave->player_state) {
             case GD_PL_EXITED:
                 // one life extra for completing intermission
@@ -521,7 +519,7 @@ GameControl::State GameControl::finished_covering() {
                 if (!played_cave->intermission && player_lives>0)  // normal cave, died -> lives decreased
                     player_lives--;
                 break;
-                
+
             case GD_PL_LIVING:
             case GD_PL_NOT_YET:
                 break;
@@ -535,13 +533,10 @@ GameControl::State GameControl::finished_covering() {
             return_state=STATE_NOTHING;
         else
             return_state=STATE_GAME_OVER;
-    }
-    else
-    if (type == TYPE_TEST) {
+    } else if (type == TYPE_TEST) {
         /* if testing, start again. do nothing, cave will be reloaded. */
         return_state = STATE_NOTHING;
-    }
-    else
+    } else
         /* for snapshots and replays and the like, this is the end. */
         return_state=STATE_STOP;
 
@@ -576,42 +571,30 @@ GameControl::State GameControl::main_int(int millisecs_elapsed, GdDirectionEnum 
     if (state_counter<GAME_INT_LOAD_CAVE) {
         /* cannot be less than uncover start. */
         g_assert_not_reached();
-    }
-    else
-    if (state_counter==GAME_INT_LOAD_CAVE) {
+    } else if (state_counter==GAME_INT_LOAD_CAVE) {
         /* do our tasks associated with loading a new cave. */
         /* the caller will not know about this yet */
         load_cave();
         return_state=STATE_CAVE_LOADED;
-    }
-    else
-    if (state_counter==GAME_INT_SHOW_STORY) {
+    } else if (state_counter==GAME_INT_SHOW_STORY) {
         /* for normal game, every cave can have a long string of description/story. show that. */
         return_state=show_story();
-    }
-    else
-    if (state_counter==GAME_INT_SHOW_STORY_WAIT) {
+    } else if (state_counter==GAME_INT_SHOW_STORY_WAIT) {
         /* if we are showing the story, we are waiting for the user to press fire. nothing else */
         /* if user presses fire (or maybe esc), proceed with loading the cave. */
         if (fire || restart)
             state_counter=GAME_INT_STORY_CLICKED;
         return_state=STATE_SHOW_STORY_WAIT;
-    }
-    else
-    if (state_counter==GAME_INT_STORY_CLICKED) {
+    } else if (state_counter==GAME_INT_STORY_CLICKED) {
         state_counter=GAME_INT_START_UNCOVER;
         return_state=STATE_PREPARE_FIRST_FRAME;
-    }
-    else
-    if (state_counter==GAME_INT_START_UNCOVER) {
+    } else if (state_counter==GAME_INT_START_UNCOVER) {
         /* the very beginning. this will be the first cave frame drawn by the caller. */
         start_uncover();
         /* very important: tell the caller that we loaded a new cave. */
         /* size of the cave might be new, colors might be new, and so on. */
         return_state=STATE_FIRST_FRAME;
-    }
-    else
-    if (state_counter<GAME_INT_UNCOVER_ALL) {
+    } else if (state_counter<GAME_INT_UNCOVER_ALL) {
         /* uncover animation */
         if (is_animation_frame)
             uncover_animation();
@@ -620,78 +603,62 @@ GameControl::State GameControl::main_int(int millisecs_elapsed, GdDirectionEnum 
             for (unsigned i = 0; i < 3 && state_counter<GAME_INT_UNCOVER_ALL; ++i)
                 uncover_animation();
         return_state=STATE_NOTHING;
-    }
-    else
-    if (state_counter==GAME_INT_UNCOVER_ALL) {
+    } else if (state_counter==GAME_INT_UNCOVER_ALL) {
         /* time to uncover the whole cave. */
         uncover_all();
         return_state=STATE_NOTHING;
-    }
-    else
-    if (state_counter==GAME_INT_CAVE_RUNNING) {
+    } else if (state_counter==GAME_INT_CAVE_RUNNING) {
         /* normal. */
         if (allow_iterate)
             return_state=iterate_cave(millisecs_elapsed, fast_forward, player_move, fire, suicide, restart);
         else
             return_state=STATE_NOTHING;
-    }
-    else
-    if (state_counter==GAME_INT_CHECK_BONUS_TIME) {
+    } else if (state_counter==GAME_INT_CHECK_BONUS_TIME) {
         /* before covering, we check for time bonus score */
         if (is_animation_frame) {
             check_bonus_score();
             return_state=STATE_LABELS_CHANGED;
-        }
-        else
+        } else
             return_state=STATE_NOTHING;
-    }
-    else
-    if (state_counter==GAME_INT_WAIT_BEFORE_COVER) {
+    } else if (state_counter==GAME_INT_WAIT_BEFORE_COVER) {
         /* after adding bonus points, we wait some time before starting to cover. this is the FIRST frame... so we check for game over and maybe jump there */
         /* if no more lives, game is over. */
         if (is_animation_frame)
             return_state=wait_before_cover();
         else
             return_state=STATE_NOTHING;
-    }
-    else
-    if (state_counter>GAME_INT_WAIT_BEFORE_COVER && state_counter<GAME_INT_COVER_START) {
+    } else if (state_counter>GAME_INT_WAIT_BEFORE_COVER && state_counter<GAME_INT_COVER_START) {
         /* after adding bonus points, we wait some time before starting to cover. ... and the other frames. */
         /* here we do nothing, but wait */
         if (is_animation_frame)
             state_counter+=1;       /* 40ms elapsed, advance counter */
         return_state=STATE_NOTHING;
-    }
-    else
-    /* starting to cover. start cover sound. */
-    if (state_counter==GAME_INT_COVER_START) {
+    } else
+        /* starting to cover. start cover sound. */
+        if (state_counter==GAME_INT_COVER_START) {
 
-        played_cave->clear_sounds();
-        played_cave->sound_play(GD_S_COVER, played_cave->player_x, played_cave->player_y);
-        /* to play cover sound */
-        gd_sound_play_sounds(played_cave->sound1, played_cave->sound2, played_cave->sound3);
+            played_cave->clear_sounds();
+            played_cave->sound_play(GD_S_COVER, played_cave->player_x, played_cave->player_y);
+            /* to play cover sound */
+            gd_sound_play_sounds(played_cave->sound1, played_cave->sound2, played_cave->sound3);
 
-        state_counter+=1;
-        return_state=STATE_NOTHING;
-    }
-    else
-    /* covering. */
-    if (state_counter>GAME_INT_COVER_START && state_counter<GAME_INT_COVER_ALL) {
-        if (is_animation_frame)
-            cover_animation();
-        return_state=STATE_NOTHING;
-    }
-    else
-    if (state_counter==GAME_INT_COVER_ALL) {
-        /* cover all */
-        covered.fill(true);
+            state_counter+=1;
+            return_state=STATE_NOTHING;
+        } else
+            /* covering. */
+            if (state_counter>GAME_INT_COVER_START && state_counter<GAME_INT_COVER_ALL) {
+                if (is_animation_frame)
+                    cover_animation();
+                return_state=STATE_NOTHING;
+            } else if (state_counter==GAME_INT_COVER_ALL) {
+                /* cover all */
+                covered.fill(true);
 
-        state_counter+=1;
-        return_state=STATE_NOTHING;
-    }
-    else {
-        return_state=finished_covering();
-    }
+                state_counter+=1;
+                return_state=STATE_NOTHING;
+            } else {
+                return_state=finished_covering();
+            }
 
     return return_state;
 }

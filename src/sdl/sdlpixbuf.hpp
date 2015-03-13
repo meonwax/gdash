@@ -27,22 +27,23 @@
 /// A class which represents a 32-bit RGBA image in memory.
 class SDLPixbuf: public Pixbuf {
 private:
-    SDL_Surface* surface;                       ///< SDL pixbuf data
-    
+    SDL_Surface *surface;                       ///< SDL pixbuf data
+
     void check_and_convert_to_rgba();
 
-    SDLPixbuf(const SDLPixbuf&);                // copy ctor not implemented
-    SDLPixbuf& operator=(const SDLPixbuf&);     // operator= not implemented
+    SDLPixbuf(const SDLPixbuf &);               // copy ctor not implemented
+    SDLPixbuf &operator=(const SDLPixbuf &);    // operator= not implemented
     SDLPixbuf(SDL_Surface *surface_);
     
     friend class SDLPixbufFactory;
-    friend class SDLScreen;
 
 public:
     SDLPixbuf(const char *filename);
     SDLPixbuf(int w, int h);
-    SDLPixbuf(int length, unsigned char const *data);   // should be a friend
-
+    SDLPixbuf(int length, unsigned char const *data);
+    
+    SDL_Surface *get_surface() const { return surface; }
+    
     ~SDLPixbuf();
 
     virtual int get_width() const;
@@ -52,7 +53,7 @@ public:
     virtual void copy_full(int x, int y, int w, int h, Pixbuf &dest, int dx, int dy) const;
 
     virtual bool has_alpha() const;
-    virtual void fill_rect(int x, int y, int w, int h, const GdColor& c);
+    virtual void fill_rect(int x, int y, int w, int h, const GdColor &c);
 
     virtual unsigned char *get_pixels() const;
     virtual int get_pitch() const;

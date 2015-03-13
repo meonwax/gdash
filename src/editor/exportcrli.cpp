@@ -62,7 +62,7 @@ static int element_to_crli(GdElementEnum e, std::set<GdElementEnum>& unknown) {
 
 /**
  * Convert a probability to c64 representation.
- * 
+ *
  * Probability values that could be exactly expressed using
  * the c64 6-bit scheme:
  * 1000000  -> 0x03
@@ -72,19 +72,26 @@ static int element_to_crli(GdElementEnum e, std::set<GdElementEnum>& unknown) {
  *   62500  -> 0x3f
  *   31250  -> 0x7f
  *   15625  -> 0xff
- * 
+ *
  * Also check C64Import.
  */
 static unsigned char amoeba_probability(GdProbability input) {
     // these values can be converted exactly.
     switch (int(input)) {
-        case 1000000: return 0x03;
-        case  500000: return 0x07;
-        case  250000: return 0x0f;
-        case  125000: return 0x1f;
-        case   62500: return 0x3f;
-        case   31250: return 0x7f;
-        case   15625: return 0xff;
+        case 1000000:
+            return 0x03;
+        case  500000:
+            return 0x07;
+        case  250000:
+            return 0x0f;
+        case  125000:
+            return 0x1f;
+        case   62500:
+            return 0x3f;
+        case   31250:
+            return 0x7f;
+        case   15625:
+            return 0xff;
     }
     // otherwise, report and convert non-exactly
     gd_warning(CPrintf("Cannot convert amoeba probability %g%% exactly") % visible_name(input));
@@ -256,11 +263,11 @@ static int crli_export(CaveStored const &to_convert, const int level, guint8 *co
     output[0x39e]=element_to_crli(to_convert.slime_eats_1, unknown);
     if (element_to_crli(to_convert.slime_eats_1, unknown)+3!=element_to_crli(scanned_pair(to_convert.slime_converts_1), unknown))
         gd_warning(CPrintf("cannot convert slime setting: %s to %s")
-            % visible_name(to_convert.slime_eats_1) % visible_name(to_convert.slime_converts_1));
+                   % visible_name(to_convert.slime_eats_1) % visible_name(to_convert.slime_converts_1));
     output[0x39f]=element_to_crli(to_convert.slime_eats_2, unknown);
     if (element_to_crli(to_convert.slime_eats_2, unknown)+3!=element_to_crli(scanned_pair(to_convert.slime_converts_2), unknown))
         gd_warning(CPrintf("cannot convert slime setting: %s to %s")
-            % visible_name(to_convert.slime_eats_2) % visible_name(to_convert.slime_converts_2));
+                   % visible_name(to_convert.slime_eats_2) % visible_name(to_convert.slime_converts_2));
 
     output[0x3a0]='V';  /* version number */
     output[0x3a1]='3';
@@ -417,8 +424,7 @@ void gd_export_caves_to_crli_cavepack(const std::vector<CaveStored *> &caves, in
             out[pos-start-14+c]=' ';    /* space is default, also for unknown characters */
             if (ch==' ')        /* treat space as different, as bd_internal_character_encoding has lots of spaces at unknown character positions */
                 succ=true;
-            else
-            if (ch<256) {
+            else if (ch<256) {
                 for (int j=0; C64Import::bd_internal_character_encoding[j]!=0; j++)
                     if (C64Import::bd_internal_character_encoding[j]==g_ascii_toupper(ch)) { /* search for the character */
                         out[pos-start-14+c]=j;

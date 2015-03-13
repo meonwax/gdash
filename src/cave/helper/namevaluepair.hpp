@@ -28,44 +28,33 @@ class NameValuePair {
 private:
     /** Class for std::map to compare strings case insensitively. */
     struct StringAsciiCaseCompare {
-        bool operator() (const std::string& s1, const std::string& s2) const;
+        bool operator()(const std::string &s1, const std::string &s2) const {
+            return gd_str_ascii_casecmp(s1, s2)<0;
+        }
     };
     typedef std::map<std::string, T, StringAsciiCaseCompare> NameToValueMap;
     NameToValueMap name_to_value;
 
 public:
-    bool has_name(const std::string& name) const;
-    T const& lookup_name(const std::string& name) const;
-    void erase(const std::string& name);
-    void add(const std::string& name, const T& value);
+    bool has_name(const std::string &name) const {
+        return name_to_value.find(name)!=name_to_value.end();
+    }
+    T const &lookup_name(const std::string &name) const;
+    void erase(const std::string &name) {
+        name_to_value.erase(name);
+    }
+    void add(const std::string &name, const T &value) {
+        name_to_value[name]=value;
+    }
 };
 
-template <typename T>
-bool NameValuePair<T>::StringAsciiCaseCompare::operator()(const std::string& s1, const std::string& s2) const {
-    return gd_str_ascii_casecmp(s1, s2)<0;
-}
 
 template <typename T>
-bool NameValuePair<T>::has_name(const std::string& name) const {
-    return name_to_value.find(name)!=name_to_value.end();
-}
-
-template <typename T>
-T const& NameValuePair<T>::lookup_name(const std::string& name) const {
+T const &NameValuePair<T>::lookup_name(const std::string &name) const {
     typename NameToValueMap::const_iterator it = name_to_value.find(name);
     if (it==name_to_value.end())
         throw std::runtime_error(std::string("Cannot interpret name ")+name);
     return it->second;
-}
-
-template <typename T>
-void NameValuePair<T>::add(const std::string& name, const T& value) {
-    name_to_value[name]=value;
-}
-
-template <typename T>
-void NameValuePair<T>::erase(const std::string& name) {
-    name_to_value.erase(name);
 }
 
 #endif

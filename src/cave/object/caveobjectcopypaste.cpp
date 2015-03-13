@@ -26,13 +26,11 @@
 #include "misc/logger.hpp"
 #include "misc/util.hpp"
 
-std::string CaveCopyPaste::get_bdcff() const
-{
+std::string CaveCopyPaste::get_bdcff() const {
     return BdcffFormat("CopyPaste") << p1 << p2 << dest << (mirror?"mirror":"nomirror") << (flip?"flip":"noflip");
 }
 
-CaveCopyPaste* CaveCopyPaste::clone_from_bdcff(const std::string &name, std::istream &is) const
-{
+CaveCopyPaste *CaveCopyPaste::clone_from_bdcff(const std::string &name, std::istream &is) const {
     Coordinate p1, p2, dest;
     std::string mirror="nomirror", flip="noflip";
     bool bmirror, bflip;
@@ -42,8 +40,7 @@ CaveCopyPaste* CaveCopyPaste::clone_from_bdcff(const std::string &name, std::ist
     is >> mirror >> flip;
     if (gd_str_ascii_caseequal(mirror, "mirror"))
         bmirror=true;
-    else
-    if (gd_str_ascii_caseequal(mirror, "nomirror"))
+    else if (gd_str_ascii_caseequal(mirror, "nomirror"))
         bmirror=false;
     else {
         bmirror=false;
@@ -51,8 +48,7 @@ CaveCopyPaste* CaveCopyPaste::clone_from_bdcff(const std::string &name, std::ist
     }
     if (gd_str_ascii_caseequal(flip, "flip"))
         bflip=true;
-    else
-    if (gd_str_ascii_caseequal(flip, "noflip"))
+    else if (gd_str_ascii_caseequal(flip, "noflip"))
         bflip=false;
     else {
         bflip=false;
@@ -71,25 +67,22 @@ CaveCopyPaste* CaveCopyPaste::clone_from_bdcff(const std::string &name, std::ist
 /// @param _p2 Other corner of source area
 /// @param _dest Upper left corner of destination area.
 CaveCopyPaste::CaveCopyPaste(Coordinate _p1, Coordinate _p2, Coordinate _dest)
-:   CaveObject(GD_COPY_PASTE),
-    p1(_p1),
-    p2(_p2),
-    dest(_dest),
-    mirror(false),
-    flip(false)
-{
+    :   CaveObject(GD_COPY_PASTE),
+        p1(_p1),
+        p2(_p2),
+        dest(_dest),
+        mirror(false),
+        flip(false) {
 }
 
 /// Set mirror and flip coordinates.
 /// They are initialized to false by the default constructor.
-void CaveCopyPaste::set_mirror_flip(bool _mirror, bool _flip)
-{
+void CaveCopyPaste::set_mirror_flip(bool _mirror, bool _flip) {
     mirror=_mirror;
     flip=_flip;
 }
 
-void CaveCopyPaste::draw(CaveRendered &cave) const
-{
+void CaveCopyPaste::draw(CaveRendered &cave) const {
     int x1=p1.x, y1=p1.y, x2=p2.x, y2=p2.y;
     int w, h;
 
@@ -129,18 +122,15 @@ PropertyDescription const CaveCopyPaste::descriptor[] = {
     {NULL},
 };
 
-PropertyDescription const* CaveCopyPaste::get_description_array() const
-{
+PropertyDescription const *CaveCopyPaste::get_description_array() const {
     return descriptor;
 }
 
-std::string CaveCopyPaste::get_coordinates_text() const
-{
+std::string CaveCopyPaste::get_coordinates_text() const {
     return SPrintf("%d,%d-%d,%d (%d,%d)") % p1.x % p1.y % p2.x % p2.y % dest.x % dest.y;
 }
 
-void CaveCopyPaste::create_drag(Coordinate current, Coordinate displacement)
-{
+void CaveCopyPaste::create_drag(Coordinate current, Coordinate displacement) {
     /* p1 is set fixed. now set p2. displacement is ignored. */
     p2=current;
     /* set the destination to be the same area as the source; so the user can move it. */
@@ -148,20 +138,17 @@ void CaveCopyPaste::create_drag(Coordinate current, Coordinate displacement)
     dest.y=std::min(p1.y, p2.y);
 }
 
-void CaveCopyPaste::move(Coordinate current, Coordinate displacement)
-{
+void CaveCopyPaste::move(Coordinate current, Coordinate displacement) {
     /* source area is unchanged; move only destination. */
     dest+=displacement;
 }
 
-void CaveCopyPaste::move(Coordinate displacement)
-{
+void CaveCopyPaste::move(Coordinate displacement) {
     /* source area is unchanged; move only destination. */
     dest+=displacement;
 }
 
-std::string CaveCopyPaste::get_description_markup() const
-{
+std::string CaveCopyPaste::get_description_markup() const {
     return SPrintf(_("Copy from %d,%d-%d,%d, paste to %d,%d"))
-        % p1.x % p1.y % p2.x % p2.y % dest.x % dest.y;
+           % p1.x % p1.y % p2.x % p2.y % dest.x % dest.y;
 }

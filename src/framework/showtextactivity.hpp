@@ -29,7 +29,7 @@ class ShowTextActivity: public Activity {
 public:
     ShowTextActivity(App *app, char const *title_line, std::string const &text, SmartPtr<Command> command_after_exit = SmartPtr<Command>());
     ~ShowTextActivity();
-    
+
     virtual void redraw_event();
     virtual void keypress_event(KeyCode keycode, int gfxlib_keycode);
 

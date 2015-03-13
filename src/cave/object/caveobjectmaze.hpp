@@ -69,21 +69,27 @@ private:
 public:
     CaveMaze(Coordinate _p1, Coordinate _p2, GdElementEnum _wall, GdElementEnum _path, MazeType _type);
     CaveMaze(): CaveRectangular(GD_MAZE), maze_type(Perfect) {}
-    virtual CaveMaze *clone() const { return new CaveMaze(*this); };
+    virtual CaveMaze *clone() const {
+        return new CaveMaze(*this);
+    };
     virtual void draw(CaveRendered &cave) const;
-    void set_horiz(int _horiz) { horiz=_horiz; }
+    void set_horiz(int _horiz) {
+        horiz=_horiz;
+    }
     void set_widths(int wall, int path);
     void set_seed(int s1, int s2, int s3, int s4, int s5);
     virtual std::string get_bdcff() const;
-    virtual CaveMaze* clone_from_bdcff(const std::string &name, std::istream &is) const;
+    virtual CaveMaze *clone_from_bdcff(const std::string &name, std::istream &is) const;
 
 private:
     static PropertyDescription const descriptor[];
 
 public:
-    virtual PropertyDescription const* get_description_array() const;
+    virtual PropertyDescription const *get_description_array() const;
 
-    virtual GdElementEnum get_characteristic_element() const { return path_element; }
+    virtual GdElementEnum get_characteristic_element() const {
+        return path_element;
+    }
     virtual std::string get_description_markup() const;
 };
 

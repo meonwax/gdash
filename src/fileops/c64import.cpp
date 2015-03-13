@@ -53,7 +53,7 @@
  * no one's boulder 31, cave b, cave d
  * 2f = glued dirt (non eatable)
  */
- 
+
 char const *C64Import::gd_format_strings[GD_FORMAT_UNKNOWN+1] = {
     /* these strings should come in the same order as the enum */
     "GDashBD1",
@@ -70,7 +70,7 @@ char const *C64Import::gd_format_strings[GD_FORMAT_UNKNOWN+1] = {
 };
 
 /// conversion table for imported bd1 caves.
-GdElement const C64Import::import_table_bd1[0x40]={
+GdElement const C64Import::import_table_bd1[0x40]= {
     /*  0 */ O_SPACE, O_DIRT, O_BRICK, O_MAGIC_WALL,
     /*  4 */ O_PRE_OUTBOX, O_OUTBOX, O_STEEL_EXPLODABLE, O_STEEL,
     /*  8 */ O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
@@ -90,7 +90,7 @@ GdElement const C64Import::import_table_bd1[0x40]={
 };
 
 /// conversion table for imported plck caves.
-GdElement const C64Import::import_table_plck[0x10]={
+GdElement const C64Import::import_table_plck[0x10]= {
     /*  0 */ O_STONE, O_DIAMOND, O_MAGIC_WALL, O_BRICK,
     /*  4 */ O_STEEL, O_H_EXPANDING_WALL, O_VOODOO, O_DIRT,
     /*  8 */ O_FIREFLY_1, O_BUTTER_4, O_AMOEBA, O_SLIME,
@@ -98,7 +98,7 @@ GdElement const C64Import::import_table_plck[0x10]={
 };
 
 /// conversion table for imported 1stb caves.
-GdElement const C64Import::import_table_1stb[0x80]={
+GdElement const C64Import::import_table_1stb[0x80]= {
     /*  0 */ O_SPACE, O_DIRT, O_BRICK, O_MAGIC_WALL,
     /*  4 */ O_PRE_OUTBOX, O_OUTBOX, O_PRE_INVIS_OUTBOX, O_INVIS_OUTBOX,
     /*  8 */ O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
@@ -134,7 +134,7 @@ GdElement const C64Import::import_table_1stb[0x80]={
 };
 
 /// conversion table for imported crazy dream caves.
-GdElement const C64Import::import_table_crdr[0x100]={
+GdElement const C64Import::import_table_crdr[0x100]= {
     /*  0 */ O_SPACE, O_DIRT, O_BRICK, O_MAGIC_WALL,
     /*  4 */ O_PRE_OUTBOX, O_OUTBOX, O_PRE_INVIS_OUTBOX, O_INVIS_OUTBOX,
     /*  8 */ O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
@@ -204,7 +204,7 @@ GdElement const C64Import::import_table_crdr[0x100]={
 
 /// conversion table for imported 1stb caves.
 /// @todo check O_PRE_DIA_0 and O_EXPLODE_0
-GdElement const C64Import::import_table_crli[0x80]={
+GdElement const C64Import::import_table_crli[0x80]= {
     /*  0 */ O_SPACE, O_DIRT, O_BRICK, O_MAGIC_WALL,
     /*  4 */ O_PRE_OUTBOX, O_OUTBOX, O_PRE_INVIS_OUTBOX, O_INVIS_OUTBOX,
     /*  8 */ O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
@@ -245,40 +245,40 @@ GdElement const C64Import::import_table_crli[0x80]={
 const char C64Import::bd_internal_character_encoding[]="            ,!./0123456789:*<=>  ABCDEFGHIJKLMNOPQRSTUVWXYZ( ) _";
 
 /// Set engine parameters to BD1 defaults in cave.
-void C64Import::cave_set_bd1_defaults(CaveStored &cave)
-{
+void C64Import::cave_set_bd1_defaults(CaveStored &cave) {
     for (unsigned i=0; i<5; ++i)
         cave.level_amoeba_threshold[i]=200;
     cave.amoeba_growth_prob=31250;
     cave.amoeba_fast_growth_prob=250000;
-    cave.amoeba_timer_started_immediately=true; 
-    cave.amoeba_timer_wait_for_hatching=false; 
-    cave.lineshift=true; 
+    cave.amoeba_timer_started_immediately=true;
+    cave.amoeba_timer_wait_for_hatching=false;
+    cave.lineshift=true;
     cave.wraparound_objects=true;
-    cave.diagonal_movements=false; 
-    cave.voodoo_collects_diamonds=false; 
-    cave.voodoo_dies_by_stone=false; 
+    cave.diagonal_movements=false;
+    cave.voodoo_collects_diamonds=false;
+    cave.voodoo_dies_by_stone=false;
     cave.voodoo_disappear_in_explosion=true;
     cave.voodoo_any_hurt_kills_player=false;
-    cave.creatures_backwards=false; 
-    cave.creatures_direction_auto_change_on_start=false; 
-    cave.creatures_direction_auto_change_time=0; 
+    cave.creatures_backwards=false;
+    cave.creatures_direction_auto_change_on_start=false;
+    cave.creatures_direction_auto_change_time=0;
     for (unsigned i=0; i<5; ++i)
-        cave.level_hatching_delay_time[i]=2; 
-    cave.intermission_instantlife=true; 
-    cave.intermission_rewardlife=false; 
-    cave.magic_wall_stops_amoeba=true; 
-    cave.magic_timer_wait_for_hatching=false; 
+        cave.level_hatching_delay_time[i]=2;
+    cave.intermission_instantlife=true;
+    cave.intermission_rewardlife=false;
+    cave.magic_wall_stops_amoeba=false;
+    cave.magic_wall_breakscan=true;
+    cave.magic_timer_wait_for_hatching=false;
     cave.pushing_stone_prob=250000;
     cave.pushing_stone_prob_sweet=1000000;
-    cave.active_is_first_found=false; 
-    cave.short_explosions=true; 
-    cave.slime_predictable=true; 
+    cave.active_is_first_found=false;
+    cave.short_explosions=true;
+    cave.slime_predictable=true;
     cave.snap_element=O_SPACE;
     cave.max_time=999;
 
-    cave.scheduling=GD_SCHEDULING_BD1; 
-    cave.pal_timing=true; 
+    cave.scheduling=GD_SCHEDULING_BD1;
+    cave.pal_timing=true;
     cave.level_ckdelay[0]=12;
     cave.level_ckdelay[1]=6;
     cave.level_ckdelay[2]=3;
@@ -287,8 +287,7 @@ void C64Import::cave_set_bd1_defaults(CaveStored &cave)
 };
 
 /// Set engine parameters to BD2 defaults in cave.
-void C64Import::cave_set_bd2_defaults(CaveStored &cave)
-{
+void C64Import::cave_set_bd2_defaults(CaveStored &cave) {
     for (unsigned i=0; i<5; ++i)
         cave.level_amoeba_threshold[i]=200;
     cave.amoeba_growth_prob=31250;
@@ -329,8 +328,7 @@ void C64Import::cave_set_bd2_defaults(CaveStored &cave)
 };
 
 /// Set engine parameters to Construction Kit defaults in cave.
-void C64Import::cave_set_plck_defaults(CaveStored &cave)
-{
+void C64Import::cave_set_plck_defaults(CaveStored &cave) {
     cave.amoeba_growth_prob=31250;
     cave.amoeba_fast_growth_prob=250000;
     cave.amoeba_timer_started_immediately=false;
@@ -364,8 +362,7 @@ void C64Import::cave_set_plck_defaults(CaveStored &cave)
 };
 
 /// Set engine parameters to 1stB defaults in cave.
-void C64Import::cave_set_1stb_defaults(CaveStored &cave)
-{
+void C64Import::cave_set_1stb_defaults(CaveStored &cave) {
     cave.amoeba_growth_prob=31250;
     cave.amoeba_fast_growth_prob=250000;
     cave.amoeba_timer_started_immediately=false;
@@ -397,8 +394,7 @@ void C64Import::cave_set_1stb_defaults(CaveStored &cave)
 };
 
 /// Set engine parameters to Crazy Dream 7 defaults in cave.
-void C64Import::cave_set_crdr_7_defaults(CaveStored &cave)
-{
+void C64Import::cave_set_crdr_7_defaults(CaveStored &cave) {
     cave.amoeba_growth_prob=31250;
     cave.amoeba_fast_growth_prob=250000;
     cave.amoeba_timer_started_immediately=false;
@@ -432,8 +428,7 @@ void C64Import::cave_set_crdr_7_defaults(CaveStored &cave)
 };
 
 /// Set engine parameters to Crazy Light defaults in cave.
-void C64Import::cave_set_crli_defaults(CaveStored &cave)
-{
+void C64Import::cave_set_crli_defaults(CaveStored &cave) {
     cave.amoeba_growth_prob=31250;
     cave.amoeba_fast_growth_prob=250000;
     cave.amoeba_timer_started_immediately=false;
@@ -463,17 +458,30 @@ void C64Import::cave_set_crli_defaults(CaveStored &cave)
 };
 
 /// Set engine parameters to some defaults in cave.
-void C64Import::cave_set_engine_defaults(CaveStored &cave, GdEngineEnum engine)
-{
+void C64Import::cave_set_engine_defaults(CaveStored &cave, GdEngineEnum engine) {
     switch (engine) {
-        case GD_ENGINE_BD1:     cave_set_bd1_defaults(cave); break;
-        case GD_ENGINE_BD2:     cave_set_bd2_defaults(cave); break;
-        case GD_ENGINE_PLCK:    cave_set_plck_defaults(cave); break;
-        case GD_ENGINE_1STB:    cave_set_1stb_defaults(cave); break;
-        case GD_ENGINE_CRDR7:   cave_set_crdr_7_defaults(cave); break;
-        case GD_ENGINE_CRLI:    cave_set_crli_defaults(cave); break;
+        case GD_ENGINE_BD1:
+            cave_set_bd1_defaults(cave);
+            break;
+        case GD_ENGINE_BD2:
+            cave_set_bd2_defaults(cave);
+            break;
+        case GD_ENGINE_PLCK:
+            cave_set_plck_defaults(cave);
+            break;
+        case GD_ENGINE_1STB:
+            cave_set_1stb_defaults(cave);
+            break;
+        case GD_ENGINE_CRDR7:
+            cave_set_crdr_7_defaults(cave);
+            break;
+        case GD_ENGINE_CRLI:
+            cave_set_crli_defaults(cave);
+            break;
 
-        case GD_ENGINE_MAX:     g_assert_not_reached(); break;
+        case GD_ENGINE_MAX:
+            g_assert_not_reached();
+            break;
     }
 }
 
@@ -481,8 +489,7 @@ void C64Import::cave_set_engine_defaults(CaveStored &cave, GdEngineEnum engine)
 /// @param c The code byte used in BD1
 /// @param i Index in the array, from which the byte was read. Only to be able to report the error correctly
 /// @return The GDash element.
-GdElementEnum C64Import::bd1_import_byte(unsigned char const c, unsigned i)
-{
+GdElementEnum C64Import::bd1_import_byte(unsigned char const c, unsigned i) {
     GdElementEnum e=O_UNKNOWN;
     if (c<G_N_ELEMENTS(import_table_bd1))
         e=import_table_bd1[c];
@@ -491,8 +498,7 @@ GdElementEnum C64Import::bd1_import_byte(unsigned char const c, unsigned i)
     return nonscanned_pair(e);
 }
 
-GdElementEnum C64Import::bd1_import(unsigned char const data[], unsigned i)
-{
+GdElementEnum C64Import::bd1_import(unsigned char const data[], unsigned i) {
     return bd1_import_byte(data[i], i);
 }
 
@@ -501,15 +507,13 @@ GdElementEnum C64Import::bd1_import(unsigned char const data[], unsigned i)
 /// @param c The code byte used in the imported cave data.
 /// @param i Index in the array, from which the byte was read. Only to be able to report the error correctly
 /// @return The GDash element.
-GdElementEnum C64Import::deluxecaves_1_import_byte(unsigned char const c, unsigned i)
-{
+GdElementEnum C64Import::deluxecaves_1_import_byte(unsigned char const c, unsigned i) {
     if (c==0x2a)
         return O_BRICK_NON_SLOPED;
     return bd1_import_byte(c, i);
 }
 
-GdElementEnum C64Import::deluxecaves_1_import(unsigned char const data[], unsigned i)
-{
+GdElementEnum C64Import::deluxecaves_1_import(unsigned char const data[], unsigned i) {
     return deluxecaves_1_import_byte(data[i], i);
 }
 
@@ -518,19 +522,21 @@ GdElementEnum C64Import::deluxecaves_1_import(unsigned char const data[], unsign
 /// @param c The code byte used in the imported cave data.
 /// @param i Index in the array, from which the byte was read. Only to be able to report the error correctly
 /// @return The GDash element.
-GdElementEnum C64Import::deluxecaves_3_import_byte(unsigned char const c, unsigned i)
-{
+GdElementEnum C64Import::deluxecaves_3_import_byte(unsigned char const c, unsigned i) {
     switch (c) {
-        case 0x2a: return O_BRICK_NON_SLOPED;
-        case 0x18: return O_DIRT_GLUED;
-        case 0x19: return O_DIAMOND_GLUED;
-        case 0x1a: return O_STONE_GLUED;
+        case 0x2a:
+            return O_BRICK_NON_SLOPED;
+        case 0x18:
+            return O_DIRT_GLUED;
+        case 0x19:
+            return O_DIAMOND_GLUED;
+        case 0x1a:
+            return O_STONE_GLUED;
     }
     return bd1_import_byte(c, i);
 }
 
-GdElementEnum C64Import::deluxecaves_3_import(unsigned char const data[], unsigned i)
-{
+GdElementEnum C64Import::deluxecaves_3_import(unsigned char const data[], unsigned i) {
     return deluxecaves_3_import_byte(data[i], i);
 }
 
@@ -538,8 +544,7 @@ GdElementEnum C64Import::deluxecaves_3_import(unsigned char const data[], unsign
 /// @param c The code byte used in the original data file
 /// @param i Index in the array, from which the byte was read. Only to be able to report the error correctly
 /// @return The GDash element.
-GdElementEnum C64Import::firstboulder_import_byte(unsigned char const c, unsigned i)
-{
+GdElementEnum C64Import::firstboulder_import_byte(unsigned char const c, unsigned i) {
     GdElementEnum e=O_UNKNOWN;
     if (c<G_N_ELEMENTS(import_table_1stb))
         e=import_table_1stb[c];
@@ -548,8 +553,7 @@ GdElementEnum C64Import::firstboulder_import_byte(unsigned char const c, unsigne
     return nonscanned_pair(e);
 }
 
-GdElementEnum C64Import::firstboulder_import(unsigned char const data[], unsigned i)
-{
+GdElementEnum C64Import::firstboulder_import(unsigned char const data[], unsigned i) {
     return firstboulder_import_byte(data[i], i);
 }
 
@@ -557,8 +561,7 @@ GdElementEnum C64Import::firstboulder_import(unsigned char const data[], unsigne
 /// @param c The code byte used in the original data file
 /// @param i Index in the array, from which the byte was read. Only to be able to report the error correctly
 /// @return The GDash element.
-GdElementEnum C64Import::crazylight_import_byte(unsigned char const c, unsigned i)
-{
+GdElementEnum C64Import::crazylight_import_byte(unsigned char const c, unsigned i) {
     GdElementEnum e=O_UNKNOWN;
     if (c<G_N_ELEMENTS(import_table_crli))
         return import_table_crli[c];
@@ -567,8 +570,7 @@ GdElementEnum C64Import::crazylight_import_byte(unsigned char const c, unsigned 
     return nonscanned_pair(e);
 }
 
-GdElementEnum C64Import::crazylight_import(unsigned char const data[], unsigned i)
-{
+GdElementEnum C64Import::crazylight_import(unsigned char const data[], unsigned i) {
     return crazylight_import_byte(data[i], i);
 }
 
@@ -589,8 +591,7 @@ GdElementEnum C64Import::crazylight_import(unsigned char const data[], unsigned 
  * @param length The size
  * @return 16-bit checksum
  */
-static guint checksum(unsigned char const data[], size_t length)
-{
+static guint checksum(unsigned char const data[], size_t length) {
     guint a=1, b=0;
     for (size_t i=0; i<length; i++) {
         a=(a+data[i])%251;      // the prime closest to (and less than) 256
@@ -608,36 +609,32 @@ static guint checksum(unsigned char const data[], size_t length)
   0, you had to collect 100. (also check crazy light 8 cave "1000")
 
   also do this with the time values.
-  
+
   http://www.boulder-dash.nl/forum/viewtopic.php?t=88
 */
 
 /// Import bd1 cave data into our format.
-int C64Import::cave_copy_from_bd1(CaveStored &cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format, ImportHack hack)
-{
+int C64Import::cave_copy_from_bd1(CaveStored &cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format, ImportHack hack) {
     guint8 code;
 
     SetLoggerContextForFunction scf(cave.name);
 
-    /* some checks */   
+    /* some checks */
     g_assert(format==GD_FORMAT_BD1 || format==GD_FORMAT_BD1_ATARI);
     /* cant be shorted than this: header + no objects + delimiter */
     if (remaining_bytes<33) {
         gd_critical(CPrintf("truncated BD1 cave data, %d bytes") % remaining_bytes);
         return -1;
     }
-    
+
     cave_set_engine_defaults(cave, GD_ENGINE_BD1);
     if (format==GD_FORMAT_BD1_ATARI)
         cave.scheduling=GD_SCHEDULING_BD1_ATARI;
-    
+
     /* set import func */
     ImportFuncArray import_func = bd1_import;
     ImportFuncByte import_func_byte = bd1_import_byte;
     switch (hack) {
-        case Crazy_Dream_7:
-        case Crazy_Dream_9:
-            g_assert_not_reached();
         case Deluxe_Caves_1:
             import_func=deluxecaves_1_import;
             import_func_byte=deluxecaves_1_import_byte;
@@ -646,18 +643,21 @@ int C64Import::cave_copy_from_bd1(CaveStored &cave, const guint8 *data, int rema
             import_func=deluxecaves_3_import;
             import_func_byte=deluxecaves_3_import_byte;
             break;
+        case Crazy_Dream_7:
+        case Crazy_Dream_9:
+            g_assert_not_reached();
         case Crazy_Dream_1: /* avoid warning */
         case None:
             /* original bd1 */
             break;
     }
-    
+
     /* set visible size for intermission */
     if (cave.intermission) {
         cave.x2=19;
         cave.y2=11;
     }
-    
+
     /* cave number data[0] */
     cave.diamond_value=data[2];
     cave.extra_diamond_value=data[3];
@@ -680,7 +680,7 @@ int C64Import::cave_copy_from_bd1(CaveStored &cave, const guint8 *data, int rema
         $16 Acid speed (unused in the original BD1)
         $17 Bit 2: if set, Acid's original position converts to explosion puff during spreading. Otherwise, Acid remains intact, ie. it's just growing. (unused in the original BD1)
         $1C Acid eats this element. (also Probability of element 1)
-        
+
         there is no problem importing these; as other bd1 caves did not contain acid at all, so it does not matter
         how we set the values.
     */
@@ -693,7 +693,7 @@ int C64Import::cave_copy_from_bd1(CaveStored &cave, const guint8 *data, int rema
     }
     cave.acid_spread_ratio=data[0x16]*1000000.0/255.0;    /* acid speed */
     cave.acid_turns_to=(data[0x17]&(1<<2))?O_EXPLODE_3:O_ACID;
-    
+
     if (format==GD_FORMAT_BD1_ATARI) {
         /* atari colors */
         cave.color1=GdColor::from_atari(data[0x13]);
@@ -713,7 +713,7 @@ int C64Import::cave_copy_from_bd1(CaveStored &cave, const guint8 *data, int rema
         cave.color4=cave.color3;    /* in bd1, amoeba was color3 */
         cave.color5=cave.color3;    /* no slime, but let it be color 3 */
     }
-    
+
     /* random fill */
     cave.random_fill_1=import_func(data, 24+0);
     cave.random_fill_2=import_func(data, 24+1);
@@ -725,10 +725,10 @@ int C64Import::cave_copy_from_bd1(CaveStored &cave, const guint8 *data, int rema
     cave.random_fill_probability_4=data[28+3];
 
     /*
-     * Decode the explicit cave data 
+     * Decode the explicit cave data
      */
     int index=32;
-    while(data[index]!=0xFF && index<remaining_bytes && index<255) {
+    while (data[index]!=0xFF && index<remaining_bytes && index<255) {
         code=data[index];
 
         /* crazy dream 3 extension: */
@@ -741,7 +741,7 @@ int C64Import::cave_copy_from_bd1(CaveStored &cave, const guint8 *data, int rema
             int dx=data[index+6];
             int dy=data[index+7]+1;
             GdElementEnum element=import_func(data, index+1);
-            
+
             for (int y=0; y<ny; y++)
                 for (int x=0; x<nx; x++) {
                     int pos=x1+y1*40+y*dy*40+x*dx;
@@ -754,8 +754,8 @@ int C64Import::cave_copy_from_bd1(CaveStored &cave, const guint8 *data, int rema
 
             /* 2bits MSB determine object type */
             switch ((code>>6)&3) {
-            case 0:
-                {               /* 00: POINT */
+                case 0: {
+                    /* 00: POINT */
                     Coordinate p(data[index+1], data[index+2]-2);
                     cave.push_back_adopt(new CavePoint(p, element));
                     // if (object.x1>=cave.w || object.y1>=cave.h)
@@ -763,8 +763,8 @@ int C64Import::cave_copy_from_bd1(CaveStored &cave, const guint8 *data, int rema
                     index+=3;
                 }
                 break;
-            case 1:
-                {           /* 01: LINE */
+                case 1: {
+                    /* 01: LINE */
                     Coordinate p1(data[index+1], data[index+2]-2);
                     int length=(gint8) data[index+3]-1;
                     int direction=data[index+4];
@@ -783,20 +783,20 @@ int C64Import::cave_copy_from_bd1(CaveStored &cave, const guint8 *data, int rema
                     index+=5;
                 }
                 break;
-            case 2:
-                {               /* 10: FILLED RECTANGLE */
+                case 2: {
+                    /* 10: FILLED RECTANGLE */
                     Coordinate p1(data[index+1], data[index+2]-2);
                     Coordinate p2(p1.x+data[index+3]-1, p1.y+data[index+4]-1);  /* stored width and height, not coordinates */
 
                     cave.push_back_adopt(new CaveFillRect(p1, p2, element, import_func(data, index+5)));
                     // if (object.x1>=cave.w || object.y1>=cave.h || object.x2>=cave.w || object.y2>=cave.h)
                     //  gd_warning("invalid filled rectangle coordinates %d,%d %d,%d at byte %d", object.x1, object.y1, object.x2, object.y2, index);
-                    
+
                     index+=6;
                 }
                 break;
-            case 3:
-                {               /* 11: OPEN RECTANGLE (OUTLINE) */
+                case 3: {
+                    /* 11: OPEN RECTANGLE (OUTLINE) */
                     Coordinate p1(data[index+1], data[index+2]-2);
                     Coordinate p2(p1.x+data[index+3]-1, p1.y+data[index+4]-1);  /* stored width and height, not coordinates */
 
@@ -820,8 +820,7 @@ int C64Import::cave_copy_from_bd1(CaveStored &cave, const guint8 *data, int rema
 
 /// Import bd2 cave data into our format.
 /// Very similar to the bd1 importer, only the encoding was different.
-int C64Import::cave_copy_from_bd2(CaveStored &cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
-{
+int C64Import::cave_copy_from_bd2(CaveStored &cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format) {
     g_assert(format==GD_FORMAT_BD2 || format==GD_FORMAT_BD2_ATARI);
 
     SetLoggerContextForFunction scf(cave.name);
@@ -862,15 +861,15 @@ int C64Import::cave_copy_from_bd2(CaveStored &cave, const guint8 *data, int rema
     cave.random_fill_probability_4=data[0x12+3];
 
     /*
-     * Decode the explicit cave data 
+     * Decode the explicit cave data
      */
     int index=0x1A;
     while (data[index]!=0xFF && index<remaining_bytes) {
         /* EXTREME CARE HERE! coordinates are in "wrong" order, first y then x. */
 
         switch (data[index]) {
-        case 0:
-            {   /* LINE */
+            case 0: {
+                /* LINE */
                 GdElementEnum element=bd1_import(data, index+1);
                 Coordinate p1(data[index+3], data[index+2]);
                 int direction=data[index+4]/2;  /* they are multiplied by two - 0 is up, 2 is upright, 4 is right... */
@@ -886,8 +885,8 @@ int C64Import::cave_copy_from_bd2(CaveStored &cave, const guint8 *data, int rema
                 index+=6;
             }
             break;
-        case 1:
-            {               /* OPEN RECTANGLE */
+            case 1: {
+                /* OPEN RECTANGLE */
                 GdElementEnum element=bd1_import(data, index+1);
                 Coordinate p1(data[index+3], data[index+2]);
                 Coordinate p2(p1.x+data[index+5]-1, p1.y+data[index+4]-1);  /* were stored as width&height */
@@ -897,8 +896,8 @@ int C64Import::cave_copy_from_bd2(CaveStored &cave, const guint8 *data, int rema
                 index+=6;
             }
             break;
-        case 2:
-            {               /* FILLED RECTANGLE */
+            case 2: {
+                /* FILLED RECTANGLE */
                 GdElementEnum element=bd1_import(data, index+1);
                 Coordinate p1(data[index+3], data[index+2]);
                 Coordinate p2(p1.x+data[index+5]-1, p1.y+data[index+4]-1);  /* were stored as width&height */
@@ -909,8 +908,8 @@ int C64Import::cave_copy_from_bd2(CaveStored &cave, const guint8 *data, int rema
                 index+=7;
             }
             break;
-        case 3:
-            {               /* POINT */
+            case 3: {
+                /* POINT */
                 GdElementEnum element=bd1_import(data, index+1);
                 Coordinate p(data[index+3], data[index+2]);
                 cave.push_back_adopt(new CavePoint(p, element));
@@ -919,8 +918,8 @@ int C64Import::cave_copy_from_bd2(CaveStored &cave, const guint8 *data, int rema
                 index+=4;
             }
             break;
-        case 4:
-            {               /* RASTER */
+            case 4: {
+                /* RASTER */
                 GdElementEnum element=bd1_import(data, index+1);
                 Coordinate p1(data[index+3], data[index+2]);
                 int ny=data[index+4]-1;
@@ -933,8 +932,7 @@ int C64Import::cave_copy_from_bd2(CaveStored &cave, const guint8 *data, int rema
                 index+=8;
             }
             break;
-        case 5:
-            {
+            case 5: {
                 /* profi boulder extension: bitmap */
                 GdElementEnum element=bd1_import(data, index+1);
                 int bytes=data[index+2];    /* number of bytes in bitmap */
@@ -965,8 +963,8 @@ int C64Import::cave_copy_from_bd2(CaveStored &cave, const guint8 *data, int rema
                 index+=5+bytes; /* 5 description bytes and "bytes" data bytes */
             }
             break;
-        case 6:
-            {               /* JOIN */
+            case 6: {
+                /* JOIN */
                 GdElementEnum search_element=bd1_import(data, index+1);
                 GdElementEnum put_element=bd1_import(data, index+2);
                 Coordinate dist(data[index+3]%40, data[index+3]/40); /* they are stored in the same byte! */
@@ -974,14 +972,13 @@ int C64Import::cave_copy_from_bd2(CaveStored &cave, const guint8 *data, int rema
                 index+=4;
             }
             break;
-        case 7:
-            /* interesting this is set here, and not in the cave header */
-            for (int i=0; i<5; i++)
-                cave.level_slime_permeability_c64[i]=data[index+1];
-            index+=2;
-            break;
-        case 9:
-            {
+            case 7:
+                /* interesting this is set here, and not in the cave header */
+                for (int i=0; i<5; i++)
+                    cave.level_slime_permeability_c64[i]=data[index+1];
+                index+=2;
+                break;
+            case 9: {
                 /* profi boulder extension by player: plck-like cave map. the import routine inserts it here. */
                 if (!cave.map.empty()) {
                     gd_warning("contains more than one PLCK map");
@@ -1006,9 +1003,9 @@ int C64Import::cave_copy_from_bd2(CaveStored &cave, const guint8 *data, int rema
                 index+=3+n;
             }
             break;
-        default:
-            gd_warning(CPrintf("unknown bd2 extension no. %02x at byte %d") % unsigned(data[index]) % index);
-            index+=1;   /* skip that byte */
+            default:
+                gd_warning(CPrintf("unknown bd2 extension no. %02x at byte %d") % unsigned(data[index]) % index);
+                index+=1;   /* skip that byte */
         }
     }
     if (data[index]!=0xFF) {
@@ -1040,44 +1037,42 @@ int C64Import::cave_copy_from_bd2(CaveStored &cave, const guint8 *data, int rema
         cave.color0=GdColor::from_atari(data[index+4]);
         index+=5;
     }
-    
+
     return index;
 }
 
 /// Take a slime predictability byte, and convert it to a bitmask.
 /// Used for caves created with the original construction kit.
-int C64Import::slime_plck(unsigned c64_data)
-{
-    const int values[]={0x00, 0x10, 0x18, 0x38, 0x3c, 0x7c, 0x7e, 0xfe, 0xff};
+int C64Import::slime_plck(unsigned c64_data) {
+    const int values[]= {0x00, 0x10, 0x18, 0x38, 0x3c, 0x7c, 0x7e, 0xfe, 0xff};
     if (c64_data>G_N_ELEMENTS(values)) {
         gd_warning(CPrintf("Invalid PLCK slime permeability value %x") % c64_data);
         return 0xff;
     }
-    
+
     return values[c64_data];
 }
 
 /// Import plck cave data into our format.
 /// Length is always 512 bytes, and contains if it is an intermission cave.
-int C64Import::cave_copy_from_plck(CaveStored &cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
-{
+int C64Import::cave_copy_from_plck(CaveStored &cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format) {
     /* i don't really think that all this table is needed, but included to be complete. */
     /* this is for the dirt and expanding wall looks like effect. */
     /* it also contains the individual frames */
-    static GdElementEnum plck_graphic_table[]={
+    static GdElementEnum plck_graphic_table[]= {
         /* 3000 */ O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN,
         /* 3100 */ O_BUTTER_1, O_MAGIC_WALL, O_PRE_DIA_1, O_PRE_DIA_2, O_PRE_DIA_3, O_PRE_DIA_4, O_PRE_DIA_5, O_OUTBOX_CLOSED,
         /* 3200 */ O_AMOEBA, O_VOODOO, O_STONE, O_DIRT, O_DIAMOND, O_STEEL, O_PLAYER, O_BRICK,
-        /* 3300 */ O_SPACE, O_OUTBOX_OPEN, O_FIREFLY_1, O_EXPLODE_1, O_EXPLODE_2, O_EXPLODE_3, O_MAGIC_WALL, O_MAGIC_WALL, 
-        /* 3400 */ O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, 
-        /* 3500 */ O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, 
-        /* 3600 */ O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, 
-        /* 3700 */ O_BUTTER_1, O_BUTTER_1, O_BUTTER_1, O_BUTTER_1, O_BUTTER_1, O_BUTTER_1, O_BUTTER_1, O_BUTTER_1, 
-        /* 3800 */ O_AMOEBA, O_AMOEBA, O_AMOEBA, O_AMOEBA, O_AMOEBA, O_AMOEBA, O_AMOEBA, O_AMOEBA, 
+        /* 3300 */ O_SPACE, O_OUTBOX_OPEN, O_FIREFLY_1, O_EXPLODE_1, O_EXPLODE_2, O_EXPLODE_3, O_MAGIC_WALL, O_MAGIC_WALL,
+        /* 3400 */ O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK,
+        /* 3500 */ O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT,
+        /* 3600 */ O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT,
+        /* 3700 */ O_BUTTER_1, O_BUTTER_1, O_BUTTER_1, O_BUTTER_1, O_BUTTER_1, O_BUTTER_1, O_BUTTER_1, O_BUTTER_1,
+        /* 3800 */ O_AMOEBA, O_AMOEBA, O_AMOEBA, O_AMOEBA, O_AMOEBA, O_AMOEBA, O_AMOEBA, O_AMOEBA,
     };
-        
+
     g_assert(format==GD_FORMAT_PLC || format==GD_FORMAT_PLC_ATARI);
-    
+
     if (remaining_bytes<512) {
         gd_critical("truncated plck cave data!");
         return -1;
@@ -1185,14 +1180,13 @@ int C64Import::cave_copy_from_plck(CaveStored &cave, const guint8 *data, int rem
         for (int i=0; i<5; i++)
             cave.level_amoeba_threshold[i]=data[0x1ef];
     }
-    
+
     return 512;
 }
 
 /// No one's delight boulder dash importer.
 /// essentially rle compressed plck maps.
-int C64Import::cave_copy_from_dlb(CaveStored &cave, const guint8 *data, int remaining_bytes)
-{
+int C64Import::cave_copy_from_dlb(CaveStored &cave, const guint8 *data, int remaining_bytes) {
     SetLoggerContextForFunction scf(cave.name);
     cave_set_engine_defaults(cave, GD_ENGINE_PLCK); /* essentially the plck engine */
 
@@ -1204,7 +1198,8 @@ int C64Import::cave_copy_from_dlb(CaveStored &cave, const guint8 *data, int rema
         if (cave.level_diamonds[i]==0)      /* gate opening is checked AFTER adding to diamonds collected, so 0 here is 1000 needed */
             cave.level_diamonds[i]=1000;
         cave.level_ckdelay[i]=data[0];
-        cave.level_amoeba_time[i]=data[6];        if (cave.level_amoeba_time[i]==0)   /* 0 immediately underflowed to 999, so we use 999. example: sendydash 3, cave 02. */
+        cave.level_amoeba_time[i]=data[6];
+        if (cave.level_amoeba_time[i]==0)   /* 0 immediately underflowed to 999, so we use 999. example: sendydash 3, cave 02. */
             cave.level_amoeba_time[i]=999;
         cave.level_magic_wall_time[i]=data[7];
         cave.level_slime_permeability_c64[i]=slime_perm_c64;
@@ -1237,46 +1232,46 @@ int C64Import::cave_copy_from_dlb(CaveStored &cave, const guint8 *data, int rema
     state=START;
     while (cavepos<400 && pos<remaining_bytes) {
         switch (state) {
-        case START:
-            /* first byte is a separator. remember it */
-            separator=data[pos];
-            /* after the first separator, no rle data, just copy. */
-            state=NORMAL;
-            break;
-        case SEPARATOR:
-            /* we had a separator. remember this byte, as this will be duplicated (or more) */
-            byte=data[pos];
-            state=RLE;
-            break;
-        case RLE:
-            /* we had the first byte, duplicate this n times. */
-            if (data[pos]==0xff) {
-                /* if it is a 0xff, we will have another byte, which is also a length specifier. */
-                /* and for this one, duplicate only 254 times */
-                if (cavepos+254>400) {
-                    gd_critical("DLB import error: RLE data overflows buffer");
-                    return -1;
-                }
-                for (int i=0; i<254; i++)
-                    decomp[cavepos++]=byte;
-            } else {
-                /* if not 0xff, duplicate n times and back to copy mode */
-                if (cavepos+data[pos]>400) {
-                    gd_critical("DLB import error: RLE data overflows buffer");
-                    return -1;
-                }
-                for (int i=0; i<data[pos]; i++)
-                    decomp[cavepos++]=byte;
+            case START:
+                /* first byte is a separator. remember it */
+                separator=data[pos];
+                /* after the first separator, no rle data, just copy. */
                 state=NORMAL;
-            }
-            break;
-        case NORMAL:
-            /* bytes duplicated; now only copy the remaining, till the next separator. */
-            if (data[pos]==separator)
-                state=SEPARATOR;
-            else
-                decomp[cavepos++]=data[pos];    /* copy this byte and state is still NORMAL */
-            break;
+                break;
+            case SEPARATOR:
+                /* we had a separator. remember this byte, as this will be duplicated (or more) */
+                byte=data[pos];
+                state=RLE;
+                break;
+            case RLE:
+                /* we had the first byte, duplicate this n times. */
+                if (data[pos]==0xff) {
+                    /* if it is a 0xff, we will have another byte, which is also a length specifier. */
+                    /* and for this one, duplicate only 254 times */
+                    if (cavepos+254>400) {
+                        gd_critical("DLB import error: RLE data overflows buffer");
+                        return -1;
+                    }
+                    for (int i=0; i<254; i++)
+                        decomp[cavepos++]=byte;
+                } else {
+                    /* if not 0xff, duplicate n times and back to copy mode */
+                    if (cavepos+data[pos]>400) {
+                        gd_critical("DLB import error: RLE data overflows buffer");
+                        return -1;
+                    }
+                    for (int i=0; i<data[pos]; i++)
+                        decomp[cavepos++]=byte;
+                    state=NORMAL;
+                }
+                break;
+            case NORMAL:
+                /* bytes duplicated; now only copy the remaining, till the next separator. */
+                if (data[pos]==separator)
+                    state=SEPARATOR;
+                else
+                    decomp[cavepos++]=data[pos];    /* copy this byte and state is still NORMAL */
+                break;
         }
         pos++;
     }
@@ -1302,13 +1297,12 @@ int C64Import::cave_copy_from_dlb(CaveStored &cave, const guint8 *data, int rema
     return pos;
 }
 
-GdString C64Import::name_from_c64_bin(const unsigned char *data)
-{
+GdString C64Import::name_from_c64_bin(const unsigned char *data) {
     GdString name;
-    
+
     for (unsigned i=0; i<14; i++) {
         int c=data[i];
-        
+
         /* import cave name; a conversion table is used for each character */
         if (c<0x40)
             c=bd_internal_character_encoding[c];
@@ -1320,7 +1314,7 @@ GdString C64Import::name_from_c64_bin(const unsigned char *data)
             c=' ';
         if (i>0)    /* from the second one, change to lowercase */
             c=g_ascii_tolower(c);
-        
+
         name+=c;
     }
     gd_strchomp(name); /* remove trailing and leading spaces */
@@ -1333,11 +1327,10 @@ GdString C64Import::name_from_c64_bin(const unsigned char *data)
  * @param input The byte read from the file
  * @return The GDash probability
  */
-static GdProbability amoeba_probability(unsigned char input)
-{
+static GdProbability amoeba_probability(unsigned char input) {
     // drop lower 2 bits
     input=input>>2;
-    
+
     // count the number of '1' bits
     int bits=0;
     // while has any more bits
@@ -1348,7 +1341,7 @@ static GdProbability amoeba_probability(unsigned char input)
         // and drop the lowest one.
         input=input>>1;
     }
-    
+
     // here we have the number of 1 bits in the upper six bits.
     // The order does not count. The probability of all being
     // zero (thus the amoeba growing) is 1/2^bits.
@@ -1356,8 +1349,7 @@ static GdProbability amoeba_probability(unsigned char input)
 }
 
 /// Import a 1stB encoded cave.
-int C64Import::cave_copy_from_1stb(CaveStored &cave, const guint8 *data, int remaining_bytes)
-{
+int C64Import::cave_copy_from_1stb(CaveStored &cave, const guint8 *data, int remaining_bytes) {
     if (remaining_bytes<1024) {
         gd_critical("truncated 1stb cave data!");
         return -1;
@@ -1375,7 +1367,7 @@ int C64Import::cave_copy_from_1stb(CaveStored &cave, const guint8 *data, int rem
         cave.x2=19;
         cave.y2=11;
     }
-        
+
     cave.diamond_value=100*data[0x379] + 10*data[0x379+1] + data[0x379+2];
     cave.extra_diamond_value=100*data[0x376] + 10*data[0x376+1] + data[0x376+2];
     for (int i=0; i<5; i++) {
@@ -1408,7 +1400,7 @@ int C64Import::cave_copy_from_1stb(CaveStored &cave, const guint8 *data, int rem
 
     cave.amoeba_growth_prob=amoeba_probability(data[0x382]);
     cave.amoeba_fast_growth_prob=amoeba_probability(data[0x383]);
-    
+
     if (data[0x380]!=0)
         cave.creatures_direction_auto_change_time=data[0x381];
     else
@@ -1447,27 +1439,26 @@ int C64Import::cave_copy_from_1stb(CaveStored &cave, const guint8 *data, int rem
     cave.slime_converts_2=firstboulder_import_byte(data[0x39f]+3, 0x39e);
 
     cave.magic_diamond_to=firstboulder_import(data, 0x39a);
-    
+
     /* length is always 1024 bytes */
     return 1024;
 }
 
 /// Import a crazy dream 7 cave.
-int C64Import::cave_copy_from_crdr_7(CaveStored &cave, const guint8 *data, int remaining_bytes)
-{
+int C64Import::cave_copy_from_crdr_7(CaveStored &cave, const guint8 *data, int remaining_bytes) {
     /* if we have name, convert */
     cave.name=name_from_c64_bin(data+0);
     SetLoggerContextForFunction scf(cave.name);
 
     cave.selectable=data[14]!=0;
-    
+
     /* jump 15 bytes, 14 was the name and 15 selectability */
     data+=15;
     if (memcmp((char *)data+0x30, "V4\0020", 4)!=0)
         gd_warning(CPrintf("unknown crdr version %c%c%c%c") % data[0x30] % data[0x31] % data[0x32] % data[0x33]);
 
     cave_set_engine_defaults(cave, GD_ENGINE_CRDR7);
-    
+
     for (int i=0; i<5; i++) {
         cave.level_time[i]=(int)data[0x0]*100 + data[0x1]*10 + data[0x2];
         if (cave.level_time[i]==0)      /* same as gate opening after 0 diamonds */
@@ -1538,16 +1529,24 @@ int C64Import::cave_copy_from_crdr_7(CaveStored &cave, const guint8 *data, int r
         jsr $2500   ; true random
         cmp $03a8   ; compare to ratio
         bcs out     ; if it was smaller, forget it for now.
-        
+
         ie. random<=ratio, then acid grows.
     */
     cave.acid_spread_ratio=data[0x38]*1000000.0/255.0;
     cave.acid_eats_this=import_table_crdr[data[0x39]];
-    switch(data[0x3a]&3) {
-        case 0: cave.gravity=MV_UP; break;
-        case 1: cave.gravity=MV_DOWN; break;
-        case 2: cave.gravity=MV_LEFT; break;
-        case 3: cave.gravity=MV_RIGHT; break;
+    switch (data[0x3a]&3) {
+        case 0:
+            cave.gravity=MV_UP;
+            break;
+        case 1:
+            cave.gravity=MV_DOWN;
+            break;
+        case 2:
+            cave.gravity=MV_LEFT;
+            break;
+        case 3:
+            cave.gravity=MV_RIGHT;
+            break;
     }
     cave.snap_element=((data[0x3a]&4)!=0)?O_EXPLODE_1:O_SPACE;
     /* we do not know the values for these, so do not import */
@@ -1562,72 +1561,68 @@ int C64Import::cave_copy_from_crdr_7(CaveStored &cave, const guint8 *data, int r
     cave.random_fill_probability_2=data[0x45+1];
     cave.random_fill_probability_3=data[0x45+2];
     cave.random_fill_probability_4=data[0x45+3];
-    
+
     data+=0x49;
     int index=0;
     Coordinate copy_p1, copy_p2;
     while (data[index]!=0xff) {
-        switch(data[index]) {
-            case 1: /* point */
-                {
-                    GdElementEnum element=import_table_crdr[data[index+1]];
-                    Coordinate p(data[index+2], data[index+3]);
-                    cave.push_back_adopt(new CavePoint(p, element));
-                    // if (object.x1>=cave.w || object.y1>=cave.h)
-                    //  gd_warning("invalid point coordinates %d,%d at byte %d", object.x1, object.y1, index);
-                    index+=4;
-                }
-                break;
-            case 2: /* rectangle */
-                {
-                    GdElementEnum element=import_table_crdr[data[index+1]];
-                    Coordinate p1(data[index+2], data[index+3]);
-                    Coordinate p2(p1.x+data[index+4]-1, p1.y+data[index+5]-1);  /* stored as width and height, so calculate p2 */
-                    cave.push_back_adopt(new CaveRectangle(p1, p2, element));
-                    // if (object.x1>=cave.w || object.y1>=cave.h || object.x2>=cave.w || object.y2 >=cave.h)
-                    //  gd_warning("invalid rectangle coordinates %d,%d %d,%d at byte %d", object.x1, object.y1, object.x2, object.y2, index);
-                    index+=6;
-                }
-                break;
-            case 3: /* fillrect */
-                {
-                    GdElementEnum element=import_table_crdr[data[index+1]];
-                    Coordinate p1(data[index+2], data[index+3]);
-                    Coordinate p2(p1.x+data[index+4]-1, p1.y+data[index+5]-1);  /* stored as width and height, so calculate p2 */
-                    cave.push_back_adopt(new CaveFillRect(p1, p2, element, element));
-                    // if (object.x1>=cave.w || object.y1>=cave.h || object.x2>=cave.w || object.y2 >=cave.h)
-                    //  gd_warning("invalid filled rectangle coordinates %d,%d %d,%d at byte %d", object.x1, object.y1, object.x2, object.y2, index);
-                    index+=6;
-                }
-                break;
+        switch (data[index]) {
+            case 1: { /* point */
+                GdElementEnum element=import_table_crdr[data[index+1]];
+                Coordinate p(data[index+2], data[index+3]);
+                cave.push_back_adopt(new CavePoint(p, element));
+                // if (object.x1>=cave.w || object.y1>=cave.h)
+                //  gd_warning("invalid point coordinates %d,%d at byte %d", object.x1, object.y1, index);
+                index+=4;
+            }
+            break;
+            case 2: { /* rectangle */
+                GdElementEnum element=import_table_crdr[data[index+1]];
+                Coordinate p1(data[index+2], data[index+3]);
+                Coordinate p2(p1.x+data[index+4]-1, p1.y+data[index+5]-1);  /* stored as width and height, so calculate p2 */
+                cave.push_back_adopt(new CaveRectangle(p1, p2, element));
+                // if (object.x1>=cave.w || object.y1>=cave.h || object.x2>=cave.w || object.y2 >=cave.h)
+                //  gd_warning("invalid rectangle coordinates %d,%d %d,%d at byte %d", object.x1, object.y1, object.x2, object.y2, index);
+                index+=6;
+            }
+            break;
+            case 3: { /* fillrect */
+                GdElementEnum element=import_table_crdr[data[index+1]];
+                Coordinate p1(data[index+2], data[index+3]);
+                Coordinate p2(p1.x+data[index+4]-1, p1.y+data[index+5]-1);  /* stored as width and height, so calculate p2 */
+                cave.push_back_adopt(new CaveFillRect(p1, p2, element, element));
+                // if (object.x1>=cave.w || object.y1>=cave.h || object.x2>=cave.w || object.y2 >=cave.h)
+                //  gd_warning("invalid filled rectangle coordinates %d,%d %d,%d at byte %d", object.x1, object.y1, object.x2, object.y2, index);
+                index+=6;
+            }
+            break;
 
-            case 4: /* line */
-                {
-                    GdElementEnum element=import_table_crdr[data[index+1]];
-                    Coordinate p1(data[index+2], data[index+3]);
-                    int length=data[index+4];
-                    int direction=data[index+5];
-                    int nx=(direction-128)%40;
-                    int ny=(direction-128)/40;
+            case 4: { /* line */
+                GdElementEnum element=import_table_crdr[data[index+1]];
+                Coordinate p1(data[index+2], data[index+3]);
+                int length=data[index+4];
+                int direction=data[index+5];
+                int nx=(direction-128)%40;
+                int ny=(direction-128)/40;
 
-                    /* if either is bigger than one, we cannot treat this as a line. create points instead */
-                    if (abs(nx)>1 || abs(ny>1)) {
-                        for (int i=0; i<length; i++) {
-                            cave.push_back_adopt(new CavePoint(Coordinate(p1), element));
-                            p1.x+=nx;
-                            p1.y+=ny;
-                        }
-                    } else {
-                        Coordinate p2(p1.x+(length-1)*nx, p1.y+(length-1)*ny);
-
-                        cave.push_back_adopt(new CaveLine(p1, p2, element));
-                        /* this is a normal line, and will be appended. only do the checking here */
-                        // if (object.x1>=cave.w || object.y1>=cave.h || object.x2>=cave.w || object.y2>=cave.h)
-                        //  gd_warning("invalid line coordinates %d,%d %d,%d at byte %d", object.x1, object.y1, object.x2, object.y2, index-5);
+                /* if either is bigger than one, we cannot treat this as a line. create points instead */
+                if (abs(nx)>1 || abs(ny>1)) {
+                    for (int i=0; i<length; i++) {
+                        cave.push_back_adopt(new CavePoint(Coordinate(p1), element));
+                        p1.x+=nx;
+                        p1.y+=ny;
                     }
-                    index+=6;
+                } else {
+                    Coordinate p2(p1.x+(length-1)*nx, p1.y+(length-1)*ny);
+
+                    cave.push_back_adopt(new CaveLine(p1, p2, element));
+                    /* this is a normal line, and will be appended. only do the checking here */
+                    // if (object.x1>=cave.w || object.y1>=cave.h || object.x2>=cave.w || object.y2>=cave.h)
+                    //  gd_warning("invalid line coordinates %d,%d %d,%d at byte %d", object.x1, object.y1, object.x2, object.y2, index-5);
                 }
-                break;
+                index+=6;
+            }
+            break;
             case 6: /* copy */
                 copy_p1=Coordinate(data[index+1], data[index+2]);
                 copy_p2=Coordinate(copy_p1.x+data[index+3]-1, copy_p1.y+data[index+4]-1);
@@ -1641,20 +1636,19 @@ int C64Import::cave_copy_from_crdr_7(CaveStored &cave, const guint8 *data, int r
                 //  gd_warning("invalid paste coordinates %d,%d at byte %d", data[index+1], data[index+2], index);
                 index+=3;
                 break;
-            case 11: /* raster */
-                {
-                    GdElementEnum element=import_table_crdr[data[index+1]];
-                    Coordinate p1(data[index+2], data[index+3]);
-                    Coordinate dist(data[index+4], data[index+5]);
-                    int nx=data[index+6]-1;
-                    int ny=data[index+7]-1;
-                    Coordinate p2(p1.x+dist.x*nx, p1.y+dist.y*ny);  /* we use endpoints rather than count */
-                    cave.push_back_adopt(new CaveRaster(p1, p2, dist, element));
-                    // if (object.x1>=cave.w || object.y1>=cave.h || object.x2>=cave.w || object.y2 >=cave.h)
-                    //  gd_warning("invalid raster coordinates %d,%d %d,%d at byte %d", object.x1, object.y1, object.x2, object.y2, index);
-                    index+=8;
-                }
-                break;
+            case 11: { /* raster */
+                GdElementEnum element=import_table_crdr[data[index+1]];
+                Coordinate p1(data[index+2], data[index+3]);
+                Coordinate dist(data[index+4], data[index+5]);
+                int nx=data[index+6]-1;
+                int ny=data[index+7]-1;
+                Coordinate p2(p1.x+dist.x*nx, p1.y+dist.y*ny);  /* we use endpoints rather than count */
+                cave.push_back_adopt(new CaveRaster(p1, p2, dist, element));
+                // if (object.x1>=cave.w || object.y1>=cave.h || object.x2>=cave.w || object.y2 >=cave.h)
+                //  gd_warning("invalid raster coordinates %d,%d %d,%d at byte %d", object.x1, object.y1, object.x2, object.y2, index);
+                index+=8;
+            }
+            break;
             default:
                 gd_warning(CPrintf("unknown crdr extension no. %02x at byte %d") % data[index] % index);
                 index+=1;   /* skip that byte */
@@ -1668,12 +1662,11 @@ int C64Import::cave_copy_from_crdr_7(CaveStored &cave, const guint8 *data, int r
 
 
 /// Import a Crazy Light cave.
-int C64Import::cave_copy_from_crli(CaveStored &cave, const guint8 *data, int remaining_bytes)
-{
+int C64Import::cave_copy_from_crli(CaveStored &cave, const guint8 *data, int remaining_bytes) {
     guint8 uncompressed[1024];
-    unsigned datapos, cavepos;
+    int datapos, cavepos;
     bool cavefile;
-    const char *versions[]={"V2.2", "V2.6", "V3.0"};
+    const char *versions[]= {"V2.2", "V2.6", "V3.0"};
     enum _versions {
         none,
         V2_2,   /*XXX whats the difference between 2.2 and 2.6?*/
@@ -1682,13 +1675,12 @@ int C64Import::cave_copy_from_crli(CaveStored &cave, const guint8 *data, int rem
     } version=none;
 
     cave_set_engine_defaults(cave, GD_ENGINE_CRLI);
-    
+
     /* detect if this is a cavefile */
     if (data[0]==0 && data[1]==0xc4 && data[2] == 'D' && data[3] == 'L' && data[4] == 'P') {
         datapos=5;  /* cavefile, skipping 0x00 0xc4 D L P */
         cavefile=true;
-    }
-    else {
+    } else {
         datapos=15; /* converted from snapshot, skip "selectable" and 14byte name */
         cavefile=false;
     }
@@ -1710,7 +1702,7 @@ int C64Import::cave_copy_from_crli(CaveStored &cave, const guint8 *data, int rem
                 gd_critical("truncated crli cave data");
                 return -1;
             }
-            if(data[datapos+2]+datapos>=sizeof(uncompressed)) {
+            if (data[datapos+2]+datapos >= (int) sizeof(uncompressed)) {
                 /* we would run out of buffer, this must be some error */
                 gd_critical("invalid crli cave data - RLE length value is too big");
                 return -1;
@@ -1718,14 +1710,13 @@ int C64Import::cave_copy_from_crli(CaveStored &cave, const guint8 *data, int rem
             /* 0xbf, number, byte to dup */
             for (unsigned i=0; i<data[datapos+2]; i++)
                 uncompressed[cavepos++]=data[datapos+1];
-                
+
             datapos+=3;
-        }
-        else
+        } else
             uncompressed[cavepos++]=data[datapos++];
     }
 
-    /* check crli version */    
+    /* check crli version */
     for (unsigned i=0; i<G_N_ELEMENTS(versions); i++)
         if (memcmp((char *)uncompressed+0x3a0, versions[i], 4)==0)
             version=_versions(i+1);
@@ -1745,11 +1736,11 @@ int C64Import::cave_copy_from_crli(CaveStored &cave, const guint8 *data, int rem
     for (int y=0; y<cave.h; y++)
         for (int x=0; x<cave.w; x++) {
             int index=y*cave.w+x;
-            
+
             cave.map(x, y)=import(uncompressed, index);
         }
 
-    /* crli has no levels */    
+    /* crli has no levels */
     for (unsigned i=0; i<5; i++) {
         cave.level_time[i]=(int)uncompressed[0x370] * 100 + uncompressed[0x371] * 10 + uncompressed[0x372];
         if (cave.level_time[i]==0)      /* same as gate opening after 0 diamonds */
@@ -1823,7 +1814,7 @@ int C64Import::cave_copy_from_crli(CaveStored &cave, const guint8 *data, int rem
             jsr $2500   ; true random
             cmp $03a8   ; compare to ratio
             bcs out     ; if it was smaller, forget it for now.
-            
+
             ie. random<=ratio, then acid grows.
         */
         cave.acid_spread_ratio=uncompressed[0x3a8]*1000000.0/255.0;
@@ -1856,7 +1847,7 @@ static void deluxe_caves_3_add_specials(std::vector<CaveStored *> & caveset) {
 
         cave.snap_element=O_EXPLODE_1;
         cave.diagonal_movements=true;
-        
+
         switch (i) {
             case 6:  /* cave f */
                 cave.stone_bouncing_effect=O_BUTTER_1;
@@ -1880,7 +1871,7 @@ static void deluxe_caves_3_add_specials(std::vector<CaveStored *> & caveset) {
 static void crazy_dream_7_add_specials(std::vector<CaveStored *> & caveset) {
     for (size_t i = 0; i < caveset.size(); ++i) {
         CaveStored &cave = *caveset[i];
-        
+
         if (cave.name=="Crazy maze")
             cave.skeletons_needed_for_pot=0;
     }
@@ -1893,8 +1884,8 @@ static void crazy_dream_7_add_specials(std::vector<CaveStored *> & caveset) {
 static void crazy_dream_9_add_specials(std::vector<CaveStored *> & caveset) {
     for (size_t i = 0; i < caveset.size(); ++i) {
         CaveStored &cave = *caveset[i];
-        
-        /* check cave name and the checksum. both are hardcoded here */ 
+
+        /* check cave name and the checksum. both are hardcoded here */
         if (cave.name=="Rockfall") {
             CaveRandomFill *o;
             o=new CaveRandomFill(Coordinate(0, 0), Coordinate(39, 21));
@@ -1903,7 +1894,7 @@ static void crazy_dream_9_add_specials(std::vector<CaveStored *> & caveset) {
             o->set_random_prob(37, 32, 2, 0);
             cave.push_back_adopt(o);
         }
-        
+
         if (cave.name=="Roll dice now!") {
             CaveRandomFill *o;
             o=new CaveRandomFill(Coordinate(0, 0), Coordinate(39, 21));
@@ -1913,7 +1904,7 @@ static void crazy_dream_9_add_specials(std::vector<CaveStored *> & caveset) {
 
             cave.objects.push_back_adopt(o);
         }
-        
+
         if (cave.name=="Random maze") {
             cave.push_back_adopt(new CaveMaze(Coordinate(1, 4), Coordinate(35, 20), O_NONE, O_DIRT, CaveMaze::Perfect));
         }
@@ -1923,7 +1914,7 @@ static void crazy_dream_9_add_specials(std::vector<CaveStored *> & caveset) {
             m=new CaveMaze(Coordinate(4, 1), Coordinate(38, 19), O_NONE, O_BLADDER_SPENDER, CaveMaze::Perfect);    /* paths=spender */
             m->set_widths(1, 3);
             cave.push_back_adopt(m);
-            
+
             CaveRandomFill *r;
             r=new CaveRandomFill(Coordinate(4, 1), Coordinate(38, 19));
             r->set_replace_only(O_BLADDER_SPENDER);  /* replace spenders drawn */
@@ -1933,10 +1924,10 @@ static void crazy_dream_9_add_specials(std::vector<CaveStored *> & caveset) {
 
             cave.creatures_backwards=true;  /* XXX why? where is it stored? */
         }
-        
+
         if (cave.name=="All the way") {
             cave.push_back_adopt(new CaveMaze(Coordinate(1, 1), Coordinate(35, 19), O_BRICK, O_PRE_DIA_1, CaveMaze::Unicursal));
-            /* a point which "breaks" the unicursal maze */ 
+            /* a point which "breaks" the unicursal maze */
             cave.push_back_adopt(new CavePoint(Coordinate(35, 18), O_BRICK));
         }
     }
@@ -1944,13 +1935,12 @@ static void crazy_dream_9_add_specials(std::vector<CaveStored *> & caveset) {
 
 
 /// Detect the file format of a GDash data file created by any2gdash.
-C64Import::GdCavefileFormat C64Import::imported_get_format(const guint8 *buf)
-{
+C64Import::GdCavefileFormat C64Import::imported_get_format(const guint8 *buf) {
     /* compare first 8 bytes of data - no strcmp! and case sensitive. */
     for (int i = 0; gd_format_strings[i] != NULL; ++i)
         if (memcmp((char *)buf, gd_format_strings[i], strlen(gd_format_strings[i]))==0)
             return GdCavefileFormat(i);
-    
+
     return GD_FORMAT_UNKNOWN;
 }
 
@@ -1958,13 +1948,12 @@ C64Import::GdCavefileFormat C64Import::imported_get_format(const guint8 *buf)
 /// Load caveset from memory buffer.
 /// Loads the caveset from a memory buffer.
 /// @return a vector of newly created caves.
-std::vector<CaveStored *> C64Import::caves_import_from_buffer(const guint8 *buf, int length)
-{
+std::vector<CaveStored *> C64Import::caves_import_from_buffer(const guint8 *buf, int length) {
     gboolean numbering;
     int intermissionnum, num;
     int cavelength;
     std::vector<CaveStored *> caveset;
-    
+
     if (length!=-1 && length<12) {
         gd_critical("buffer too short to be a GDash datafile");
         return caveset; /* empty */
@@ -1982,7 +1971,7 @@ std::vector<CaveStored *> C64Import::caves_import_from_buffer(const guint8 *buf,
 
     buf+=12;        /* first 12 bytes are cave type. skip that */
     length=encodedlength;
-    
+
     // check for hacks.
     ImportHack hack = None;
     guint cs=checksum(buf, length);
@@ -1998,58 +1987,57 @@ std::vector<CaveStored *> C64Import::caves_import_from_buffer(const guint8 *buf,
     if (format==GD_FORMAT_CRDR_7 && length==3759 && cs==0x16b5)
         hack=Crazy_Dream_7;
 
-    unsigned bufp=0;
+    int bufp=0;
     int cavenum=0;
     while (bufp<length) {
         int insertpos=-1;   /* default is to append cave to caveset */
-        
+
         CaveStored *new_cave_p=new CaveStored;
         CaveStored &newcave=*new_cave_p;
-        
+
         cavelength=0;   /* to avoid compiler warning */
 
         switch (format) {
-        case GD_FORMAT_BD1:             /* boulder dash 1 */
-        case GD_FORMAT_BD1_ATARI:       /* boulder dash 1, atari version */
-        case GD_FORMAT_BD2:             /* boulder dash 2 */
-        case GD_FORMAT_BD2_ATARI:       /* boulder dash 2 */
-            /* these are not in the data so we guess */
-            newcave.selectable=(cavenum<16) && (cavenum%4 == 0);
-            newcave.intermission=cavenum>15;
-            /* no name, so we make up one */
-            if (newcave.intermission)
-                newcave.name = SPrintf(_("Intermission %d")) % (cavenum-15);
-            else
-                newcave.name = SPrintf(_("Cave %c")) % char('A'+cavenum);
+            case GD_FORMAT_BD1:             /* boulder dash 1 */
+            case GD_FORMAT_BD1_ATARI:       /* boulder dash 1, atari version */
+            case GD_FORMAT_BD2:             /* boulder dash 2 */
+            case GD_FORMAT_BD2_ATARI:       /* boulder dash 2 */
+                /* these are not in the data so we guess */
+                newcave.selectable=(cavenum<16) && (cavenum%4 == 0);
+                newcave.intermission=cavenum>15;
+                /* no name, so we make up one */
+                if (newcave.intermission)
+                    newcave.name = SPrintf(_("Intermission %d")) % (cavenum-15);
+                else
+                    newcave.name = SPrintf(_("Cave %c")) % char('A'+cavenum);
 
-            switch(format) {
-                case GD_FORMAT_BD1:
-                case GD_FORMAT_BD1_ATARI:
-                    cavelength=cave_copy_from_bd1(newcave, buf+bufp, length-bufp, format, hack);
-                    break;
-                case GD_FORMAT_BD2:
-                case GD_FORMAT_BD2_ATARI:
-                    cavelength=cave_copy_from_bd2(newcave, buf+bufp, length-bufp, format);
-                    break;
-                default:
-                    g_assert_not_reached();
-            };
+                switch (format) {
+                    case GD_FORMAT_BD1:
+                    case GD_FORMAT_BD1_ATARI:
+                        cavelength=cave_copy_from_bd1(newcave, buf+bufp, length-bufp, format, hack);
+                        break;
+                    case GD_FORMAT_BD2:
+                    case GD_FORMAT_BD2_ATARI:
+                        cavelength=cave_copy_from_bd2(newcave, buf+bufp, length-bufp, format);
+                        break;
+                    default:
+                        g_assert_not_reached();
+                };
 
-            /* original bd1 had level order ABCDEFGH... and then the last four were the intermissions.
-             * those should be inserted between D-E, H-I... caves. */
-            if (cavenum>15)
-                insertpos=(cavenum-15)*5-1;
-            break;
+                /* original bd1 had level order ABCDEFGH... and then the last four were the intermissions.
+                 * those should be inserted between D-E, H-I... caves. */
+                if (cavenum>15)
+                    insertpos=(cavenum-15)*5-1;
+                break;
 
-        case GD_FORMAT_FIRSTB:
-            cavelength=cave_copy_from_1stb(newcave, buf+bufp, length-bufp);
-            /* every fifth cave (4+1 intermission) is selectable. */
-            newcave.selectable=cavenum%5==0;
-            break;
+            case GD_FORMAT_FIRSTB:
+                cavelength=cave_copy_from_1stb(newcave, buf+bufp, length-bufp);
+                /* every fifth cave (4+1 intermission) is selectable. */
+                newcave.selectable=cavenum%5==0;
+                break;
 
-        case GD_FORMAT_PLC:             /* peter liepa construction kit */
-        case GD_FORMAT_PLC_ATARI:               /* peter liepa construction kit, atari version */
-            {
+            case GD_FORMAT_PLC:             /* peter liepa construction kit */
+            case GD_FORMAT_PLC_ATARI: {             /* peter liepa construction kit, atari version */
                 SetLoggerContextForFunction scf(SPrintf("Cave %02d") % cavenum);
                 cavelength=cave_copy_from_plck(newcave, buf+bufp, length-bufp, format);
             }
@@ -2057,36 +2045,36 @@ std::vector<CaveStored *> C64Import::caves_import_from_buffer(const guint8 *buf,
                 newcave.diagonal_movements = true;
             break;
 
-        case GD_FORMAT_DLB: /* no one's delight boulder dash, something like rle compressed plck caves */
-            /* but there are 20 of them, as if it was a bd1 or bd2 game. also num%5=4 is intermission. */
-            /* we have to set intermission flag on our own, as the file did not contain the info explicitly */
-            newcave.intermission=(cavenum%5)==4;
-            if(newcave.intermission) {  /* also set visible size */
-                newcave.x2=19;
-                newcave.y2=11;
-            }
-            newcave.selectable=cavenum % 5 == 0;    /* original selection scheme */
-            if (newcave.intermission)
-                newcave.name = SPrintf(_("Intermission %d")) % (cavenum/5+1);
-            else
-                newcave.name = SPrintf(_("Cave %c")) % char('A'+(cavenum%5+cavenum/5*4));
+            case GD_FORMAT_DLB: /* no one's delight boulder dash, something like rle compressed plck caves */
+                /* but there are 20 of them, as if it was a bd1 or bd2 game. also num%5=4 is intermission. */
+                /* we have to set intermission flag on our own, as the file did not contain the info explicitly */
+                newcave.intermission=(cavenum%5)==4;
+                if (newcave.intermission) { /* also set visible size */
+                    newcave.x2=19;
+                    newcave.y2=11;
+                }
+                newcave.selectable=cavenum % 5 == 0;    /* original selection scheme */
+                if (newcave.intermission)
+                    newcave.name = SPrintf(_("Intermission %d")) % (cavenum/5+1);
+                else
+                    newcave.name = SPrintf(_("Cave %c")) % char('A'+(cavenum%5+cavenum/5*4));
 
-            cavelength=cave_copy_from_dlb(newcave, buf+bufp, length-bufp);
-            break;
+                cavelength=cave_copy_from_dlb(newcave, buf+bufp, length-bufp);
+                break;
 
-        case GD_FORMAT_CRLI:
-            cavelength=cave_copy_from_crli(newcave, buf+bufp, length-bufp);
-            break;
+            case GD_FORMAT_CRLI:
+                cavelength=cave_copy_from_crli(newcave, buf+bufp, length-bufp);
+                break;
 
-        case GD_FORMAT_CRDR_7:
-            cavelength=cave_copy_from_crdr_7(newcave, buf+bufp, length-bufp);
-            break;
+            case GD_FORMAT_CRDR_7:
+                cavelength=cave_copy_from_crdr_7(newcave, buf+bufp, length-bufp);
+                break;
 
-        case GD_FORMAT_UNKNOWN:
-            g_assert_not_reached();
-            break;
+            case GD_FORMAT_UNKNOWN:
+                g_assert_not_reached();
+                break;
         }
-        
+
         if (cavelength==-1) {
             delete new_cave_p;
             gd_critical("Aborting cave import.");
@@ -2098,7 +2086,7 @@ std::vector<CaveStored *> C64Import::caves_import_from_buffer(const guint8 *buf,
             caveset.insert(caveset.begin()+insertpos, new_cave_p);
         cavenum++;
         bufp+=cavelength;
-        
+
         /* hack: some dlb files contain junk data after 20 caves. */
         if (format==GD_FORMAT_DLB && cavenum==20) {
             if (bufp<length)
@@ -2116,14 +2104,14 @@ std::vector<CaveStored *> C64Import::caves_import_from_buffer(const guint8 *buf,
             for (unsigned n=0; standard && n<caveset.size(); ++n)
                 if ((n%5==4 && !caveset[n]->intermission) || (n%5!=4 && caveset[n]->intermission))
                     standard=false; /* 4 cave, 1 intermission */
-            
+
             /* if test passed, update selectability */
             if (standard)
                 for (unsigned n=0; n<caveset.size(); ++n)
                     caveset[n]->selectable=(n%5)==0;
         }
 
-    /* try to give some names for the caves */  
+    /* try to give some names for the caves */
     cavenum=1;
     intermissionnum=1;
     num=1;
@@ -2132,7 +2120,7 @@ std::vector<CaveStored *> C64Import::caves_import_from_buffer(const guint8 *buf,
     for (unsigned n=0; n<caveset.size(); ++n) {
         if (caveset[n]->name!="")   /* if it already has a name, skip */
             continue;
-        
+
         if (caveset[n]->intermission) {
             /* intermission */
             if (numbering)
@@ -2146,21 +2134,21 @@ std::vector<CaveStored *> C64Import::caves_import_from_buffer(const guint8 *buf,
             else
                 caveset[n]->name = SPrintf(_("Cave %c")) % char('A'-1+cavenum);
         }
-        
+
         num++;
         if (caveset[n]->intermission)
             intermissionnum++;
         else
             cavenum++;
-    }   
-    
-    /* if the uses requests, we make all caves selectable. intermissions not. */    
+    }
+
+    /* if the uses requests, we make all caves selectable. intermissions not. */
     if (gd_import_as_all_caves_selectable)
         for (unsigned n=0; n<caveset.size(); ++n)
             /* make selectable if not an intermission. */
             /* also selectable, if it was selectable originally, for some reason. */
             caveset[n]->selectable=caveset[n]->selectable || !caveset[n]->intermission;
-    
+
     /* add hacks */
     if (hack == Deluxe_Caves_3)
         deluxe_caves_3_add_specials(caveset);
@@ -2168,7 +2156,7 @@ std::vector<CaveStored *> C64Import::caves_import_from_buffer(const guint8 *buf,
         crazy_dream_7_add_specials(caveset);
     if (hack == Crazy_Dream_9)
         crazy_dream_9_add_specials(caveset);
-    
+
     return caveset;
 }
 

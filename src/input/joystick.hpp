@@ -19,6 +19,7 @@
 class Joystick {
 public:
     static void init();
+    static bool have_joystick();
     static bool up();
     static bool down();
     static bool left();

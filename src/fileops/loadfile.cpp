@@ -32,7 +32,7 @@
 CaveSet create_from_buffer(const unsigned char *buffer, int length, char const *filename) {
     /* set logging context to filename */
     SetLoggerContextForFunction finally(gd_tostring_free(g_filename_display_basename(filename)));
-    
+
     /* try to load as a .GDS file */
     if ((length >= 12 || length == -1) && C64Import::imported_get_format(buffer) != C64Import::GD_FORMAT_UNKNOWN) {
         std::vector<CaveStored *> new_caveset = C64Import::caves_import_from_buffer(buffer, length);
@@ -47,36 +47,45 @@ CaveSet create_from_buffer(const unsigned char *buffer, int length, char const *
         newcaves.set_name_from_filename(filename);
         return newcaves;
     }
-    
+
     /* try to load as a BRC file (boulder remake) */
     if (g_str_has_suffix(filename, ".brc") || g_str_has_suffix(filename, "*.BRC")) {
         if (length != 96000) {
             throw std::runtime_error(_("BRC files must be 96000 bytes long."));
         }
         CaveSet newcaves;
-        brc_import(newcaves, (guint8*) buffer);
+        brc_import(newcaves, (guint8 *) buffer);
         newcaves.last_selected_cave = newcaves.first_selectable_cave_index();
         newcaves.set_name_from_filename(filename);
         return newcaves;
     }
-    
+
     /* try to load as BDCFF */
     if (g_str_has_suffix(filename, ".bd") || g_str_has_suffix(filename, ".BD")) {
         CaveSet newcaves = load_from_bdcff((char const *) buffer);
         newcaves.last_selected_cave = newcaves.first_selectable_cave_index();
         /* remember filename, as the input is a bdcff file */
-        newcaves.filename = filename;
+        if (g_path_is_absolute(filename)) {
+            newcaves.filename = filename;
+        } else {
+            /* make an absolute filename if needed */
+            char *currentdir = g_get_current_dir();
+            char *absolute = g_build_path(G_DIR_SEPARATOR_S, currentdir, filename, NULL);
+            newcaves.filename = absolute;
+            g_free(currentdir);
+            g_free(absolute);
+        }
         return newcaves;
     }
-    
+
     /* if could not determine file format so far, try to load as a snapshot file */
     if (g_str_has_suffix(filename, ".vsf") || g_str_has_suffix(filename, ".VSF")
-        || length == 65536 || length == 65538) {
+            || length == 65536 || length == 65538) {
         std::vector<unsigned char> memory = load_memory_dump(buffer, length);
         std::vector<unsigned char> imported = gdash_binary_import(memory);
         return create_from_buffer(&imported[0], imported.size(), filename);
     }
-    
+
     throw std::runtime_error(_("Cannot determine file format."));
 }
 
@@ -86,7 +95,7 @@ CaveSet create_from_buffer(const unsigned char *buffer, int length, char const *
  * @param filename The name of the file, which can be BDCFF or other binary formats.
  * @return The caveset loaded. If impossible to load, throws an exception.
  */
-CaveSet create_from_file(const char *filename) throw (std::runtime_error) {
+CaveSet create_from_file(const char *filename) throw(std::runtime_error) {
     std::vector<unsigned char> contents = load_file_to_vector(filename);
     /* -1 because the loader adds a terminating zero */
     return create_from_buffer(&contents[0], contents.size()-1, filename);
@@ -116,6 +125,6 @@ std::vector<unsigned char> load_file_to_vector(char const *filename) {
         throw std::runtime_error(_("Unable to read file."));
     is.close();
     contents[filesize] = '\0';
-    
+
     return contents;
 }

@@ -19,12 +19,12 @@
 #include "cave/particle.hpp"
 
 ParticleSet::ParticleSet(int count, float size, float opacity, float p0x, float p0y, float dp0x, float dp0y, float v0x, float v0y, float dvx, float dvy, const GdColor &color)
-  : color(color)
-  , life(1000)
-  , is_new(true)
-  , size(size)
-  , opacity(opacity)
-  , particles(count) {
+    : color(color)
+    , life(1000)
+    , is_new(true)
+    , size(size)
+    , opacity(opacity)
+    , particles(count) {
     for (size_t i = 0; i < particles.size(); ++i) {
         Particle &p = particles[i];
         p.px = p0x + g_random_double_range(-dp0x, dp0x);
@@ -37,13 +37,13 @@ ParticleSet::ParticleSet(int count, float size, float opacity, float p0x, float 
 
 void ParticleSet::move(int dt_ms) {
     float dt = dt_ms/1000.0;
-    
+
     for (size_t i = 0; i < particles.size(); ++i) {
         Particle &p = particles[i];
         p.px += p.vx * dt;
         p.py += p.vy * dt;
     }
-    
+
     life -= dt_ms;
 }
 

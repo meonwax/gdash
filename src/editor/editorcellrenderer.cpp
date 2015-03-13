@@ -24,8 +24,8 @@
 #include "gtk/gtkpixbuffactory.hpp"
 #include "editor/editorcellrenderer.hpp"
 
-EditorCellRenderer::EditorCellRenderer(GTKPixbufFactory& pixbuf_factory_, const std::string& theme_file)
-:
+EditorCellRenderer::EditorCellRenderer(GTKPixbufFactory &pixbuf_factory_, const std::string &theme_file)
+    :
     CellRenderer(pixbuf_factory_, theme_file),
     combo_pixbufs() {
     draw_editor_pixbufs();
@@ -78,11 +78,11 @@ void EditorCellRenderer::copy_cell(int dest, int src) {
 */
 void EditorCellRenderer::create_composite_cell_pixbuf(GdElementEnum dest, GdElementEnum src1, GdElementEnum src2) {
     int dimg=gd_element_properties[dest].image;
-    
+
     g_assert(dimg<NUM_OF_CELLS);
     if (cells_pixbufs[dimg]!=NULL)      // if already drawn
         return;
-    
+
     // destination image=source1
     copy_cell(dimg, abs(gd_element_properties[src1].image_game));
     // composite source2 to destination
@@ -239,20 +239,20 @@ GdkPixbuf *EditorCellRenderer::combo_pixbuf_simple(GdElementEnum element) {
 
 /**
  * @brief Creates a pixbuf, which shows the cave.
- * 
+ *
  * If width and height are given (nonzero),
  * scales pixbuf proportionally, so it fits in width*height
  * pixels. Itherwise return in original size.
  * Up to the caller to unref the returned pixbuf.
- * 
+ *
  * @param cave The cave to draw
  * @param width The width of the pixbuf to draw (scales down to this)
  * @param height The height of the pixbuf to draw (scales down to this)
  * @param game_view If true, a more simplistic view is generated (no arrows on creatures)
  * @param border If true, a 2pixel black border is added
  */
-GdkPixbuf *gd_drawcave_to_pixbuf(const CaveRendered *cave, EditorCellRenderer& cr, int width, int height, bool game_view, bool border) {
-    
+GdkPixbuf *gd_drawcave_to_pixbuf(const CaveRendered *cave, EditorCellRenderer &cr, int width, int height, bool game_view, bool border) {
+
     int x1, y1, x2, y2;
     int borderadd=border?4:0, borderpos=border?2:0;
 
@@ -289,7 +289,7 @@ GdkPixbuf *gd_drawcave_to_pixbuf(const CaveRendered *cave, EditorCellRenderer& c
 
             if (game_view) {
                 /* visual effects */
-                switch(element) {
+                switch (element) {
                     case O_DIRT:
                         element=cave->dirt_looks_like;
                         break;
@@ -312,8 +312,7 @@ GdkPixbuf *gd_drawcave_to_pixbuf(const CaveRendered *cave, EditorCellRenderer& c
                         break;
                 }
                 draw=abs(gd_element_properties[element].image_simple);                /* pixbuf like in the editor */
-            }
-            else
+            } else
                 draw=gd_element_properties[element].image;                /* pixbuf like in the editor */
             gdk_pixbuf_copy_area(cr.cell_gdk_pixbuf(draw), 0, 0, cell_size, cell_size, pixbuf, (x-x1)*cell_size+borderpos, (y-y1)*cell_size+borderpos);
         }

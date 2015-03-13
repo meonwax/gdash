@@ -49,8 +49,8 @@ PropertyDescription const CaveStored::descriptor[] = {
     {"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, right"), GetterBase::create_new(&CaveStored::x2), N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
     {"Size", GD_TYPE_INT, GD_ALWAYS_SAVE|GD_DONT_SHOW_IN_EDITOR, N_("Visible, lower"), GetterBase::create_new(&CaveStored::y2), N_("Visible parts of the cave, upper left and lower right corner."), 0, 127},
 
-    {"Charset", GD_TYPE_STRING, 0, N_("Character set"), GetterBase::create_new(&CaveStored::charset), N_("Theme used for displaying the game.")},
-    {"Fontset", GD_TYPE_STRING, 0, N_("Font set"), GetterBase::create_new(&CaveStored::fontset), N_("Font used during the game.")},
+    {"Charset", GD_TYPE_STRING, 0, N_("Character set"), GetterBase::create_new(&CaveStored::charset), N_("Theme used for displaying the game. Informative, not used by GDash.")},
+    {"Fontset", GD_TYPE_STRING, 0, N_("Font set"), GetterBase::create_new(&CaveStored::fontset), N_("Font used during the game. Informative, not used by GDash.")},
 
     /* story - a tab on its own */
     {"", GD_TAB, 0, N_("Story")},
@@ -113,6 +113,10 @@ PropertyDescription const CaveStored::descriptor[] = {
     {"", GD_LABEL, 0, N_("Sweet")},
     {"PushingBoulderProb", GD_TYPE_PROBABILITY, 0, N_("Probability of pushing (%)"), GetterBase::create_new(&CaveStored::pushing_stone_prob_sweet), N_("Chance of player managing to push a stone, every game cycle he tries. This is used after eating sweet.")},
     {"PushingMegaStonesAfterSweet", GD_TYPE_BOOLEAN, 0, N_("Mega stones pushable"), GetterBase::create_new(&CaveStored::mega_stones_pushable_with_sweet), N_("If it is true, mega stones can be pushed after eating sweet.")},
+    /* rocket launcher */
+    {"", GD_LABEL, 0, N_("Rocket launcher")},
+    {"RocketLauncher.infinite", GD_TYPE_BOOLEAN, 0, N_("Infinite rockets"), GetterBase::create_new(&CaveStored::infinite_rockets), N_("If it is true, the player is able to launch an infinite number of rockets. Otherwise every rocket launcher contains only a single rocket.")},
+    
     /* pneumatic hammer */
     {"", GD_LABEL, 0, N_("Pneumatic hammer")},
     {"PneumaticHammer.frames", GD_TYPE_INT, 0, N_("Time for hammer (frames)"), GetterBase::create_new(&CaveStored::pneumatic_hammer_frame), N_("This is the number of game frames, a pneumatic hammer is required to break a wall."), 1, 100},
@@ -131,6 +135,7 @@ PropertyDescription const CaveStored::descriptor[] = {
 
     /* AMOEBA */
     {"", GD_TAB, 0, N_("Amoeba")},
+    {"", GD_LABEL, 0, N_("Timing")},
     {"AmoebaProperties.immediately", GD_TYPE_BOOLEAN, 0, N_("Timer started immediately"), GetterBase::create_new(&CaveStored::amoeba_timer_started_immediately), N_("If this flag is enabled, the amoeba slow growth timer will start at the beginning of the cave, regardless of the amoeba being let free or not. This can make a big difference when playing the cave!")},
     {"AmoebaProperties.waitforhatching", GD_TYPE_BOOLEAN, 0, N_("Timer waits for hatching"), GetterBase::create_new(&CaveStored::amoeba_timer_wait_for_hatching), N_("This determines if the amoeba timer starts before the player appearing. Amoeba can always be activated before that; but if this is set to true, the timer will not start. This setting is for compatiblity for some old imported caves. As the player is usually born within a few seconds, changing this setting makes not much difference. It is not advised to change it, set the slow growth time to fit your needs instead.")},
     /* amoeba */
@@ -157,7 +162,6 @@ PropertyDescription const CaveStored::descriptor[] = {
     {"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("Timing")},
     {"MagicWallTime", GD_TYPE_INT_LEVELS, 0, N_("Milling time (s)"), GetterBase::create_new(&CaveStored::level_magic_wall_time), N_("Magic wall will stop after this time, and it cannot be activated again."), 0, 999},
     {"MagicWallProperties.waitforhatching", GD_TYPE_BOOLEAN, 0, N_("Timer waits for hatching"), GetterBase::create_new(&CaveStored::magic_timer_wait_for_hatching), N_("This determines if the magic wall timer starts before the player appearing. Magic can always be activated before that; but if this is set to true, the timer will not start.")},
-    {"MagicWallProperties.convertamoeba", GD_TYPE_BOOLEAN, 0, N_("Stops amoeba"), GetterBase::create_new(&CaveStored::magic_wall_stops_amoeba), N_("When the magic wall is activated, it can convert amoeba into diamonds.")},
     {"", GD_LABEL, 0, N_("Conversions")},
     {"MagicWallProperties", GD_TYPE_ELEMENT, 0, N_("Diamond to"), GetterBase::create_new(&CaveStored::magic_diamond_to), N_("As a special effect, magic walls can convert diamonds to any other element.")},
     {"MagicWallProperties", GD_TYPE_ELEMENT, 0, N_("Stone to"), GetterBase::create_new(&CaveStored::magic_stone_to), N_("As a special effect, magic walls can convert stones to any other element.")},
@@ -166,6 +170,9 @@ PropertyDescription const CaveStored::descriptor[] = {
     {"MagicWallProperties.nutto", GD_TYPE_ELEMENT, 0, N_("Nut to"), GetterBase::create_new(&CaveStored::magic_nut_to), N_("As a special effect, magic walls can convert nuts to any other element.")},
     {"MagicWallProperties.flyingstoneto", GD_TYPE_ELEMENT, 0, N_("Flying stone to"), GetterBase::create_new(&CaveStored::magic_flying_stone_to), N_("If a flying stone climbs up into the magic wall, it will be turned to this element. Remember that flying stones enter the magic wall from its bottom, not from the top!")},
     {"MagicWallProperties.flyingdiamondto", GD_TYPE_ELEMENT, 0, N_("Flying diamonds to"), GetterBase::create_new(&CaveStored::magic_flying_diamond_to), N_("If a flying diamond enters the magic wall, it will be turned to this element. Remember that flying diamonds enter the magic wall from its bottom, not from the top!")},
+    {"", GD_LABEL, 0, N_("With amoeba")},
+    {"MagicWallProperties.convertamoeba", GD_TYPE_BOOLEAN, 0, N_("Stops amoeba"), GetterBase::create_new(&CaveStored::magic_wall_stops_amoeba), N_("When the magic wall is activated, it can convert amoeba into diamonds.")},
+    {"MagicWallProperties.breakscan", GD_TYPE_BOOLEAN, 0, N_("BD1 amoeba bug"), GetterBase::create_new(&CaveStored::magic_wall_breakscan), N_("This setting emulates the BD1 bug, where a stone or a diamond falling into a magic wall sometimes caused the active amoeba to convert into a diamond. The rule is: if all amoeba cells above or left to the point where the stone or the diamond falls into the magic wall are enclosed, the amoeba is converted. The timing implications of the bug are not emulated.")},
 
     /* slime */
     {"", GD_TAB, 0, N_("Slime")},
@@ -317,8 +324,10 @@ PropertyDescription const CaveStored::color_dialog[] = {
 PropertyDescription const CaveStored::random_dialog[] = {
     {"", GD_TAB, 0, N_("Random fill")},
     /* initial fill */
-    {"", GD_TYPE_INT_LEVELS, 0, N_("Random seed"), GetterBase::create_new(&CaveStored::level_rand),
-        N_("Random seed value controls the predictable random number generator, which fills the cave initially. If set to -1, cave is totally random every time it is played."), -1, GD_CAVE_SEED_MAX},
+    {
+        "", GD_TYPE_INT_LEVELS, 0, N_("Random seed"), GetterBase::create_new(&CaveStored::level_rand),
+        N_("Random seed value controls the predictable random number generator, which fills the cave initially. If set to -1, cave is totally random every time it is played."), -1, GD_CAVE_SEED_MAX
+    },
     {"", GD_TYPE_ELEMENT, 0, N_("Initial fill"), GetterBase::create_new(&CaveStored::initial_fill), NULL},
     {"", GD_TYPE_INT, GD_BD_PROBABILITY, N_("Probability 1"), GetterBase::create_new(&CaveStored::random_fill_probability_1), NULL, 0, 255},
     {"", GD_TYPE_ELEMENT, 0, N_("Random fill 1"), GetterBase::create_new(&CaveStored::random_fill_1), NULL},

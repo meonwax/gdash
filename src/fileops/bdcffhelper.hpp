@@ -30,8 +30,7 @@
  *  eg, it will return true for "SlimePermeability=0.1" begins with "SlimePermeability"
  *  The check is case-insensitive!
  */
-class HasAttrib
-{
+class HasAttrib {
     std::string attrib;
 public:
     explicit HasAttrib(const std::string &attrib_);
@@ -57,7 +56,7 @@ typedef BdcffSection::const_iterator BdcffSectionConstIterator;
 /**
  * A structure, which stores the lines of text in a bdcff file; and has a list
  * of these strings for each section.
- * 
+ *
  * The main format of the bdcff file.
  * Contains: bdcff section; highscore for caveset, map codes, caveset properties, and caves data.
  * Caves data contains: highscore for cave, cave properties, maybe map, maybe objects, maybe replays, maybe demo (=legacy replay).
@@ -81,7 +80,7 @@ struct BdcffFile {
 
 
 /** A class which helps outputting BDCFF lines like "Point=x y z".
- * 
+ *
  * It stores a name (Point), and can be fed with parameters
  * using a standard operator<<.
  * If conversion is ready, the str() member function can be
@@ -95,11 +94,13 @@ private:
 
 public:
     explicit BdcffFormat(const std::string &f="");
-    template <typename T> BdcffFormat& operator<<(const T& param);
+    template <typename T> BdcffFormat &operator<<(const T &param);
     void start_new(const std::string &f);
     std::string str() const;
     /** cast to string - return the string. */
-    operator std::string() const { return str(); }
+    operator std::string() const {
+        return str();
+    }
 };
 
 /**
@@ -108,8 +109,7 @@ public:
  * @return Itself, for linking << a << b << c.
  */
 template <typename T>
-BdcffFormat& BdcffFormat::operator<<(const T& param)
-{
+BdcffFormat &BdcffFormat::operator<<(const T &param) {
     /* if this is not the first parameter, add a space */
     if (!firstparam)
         os << ' ';

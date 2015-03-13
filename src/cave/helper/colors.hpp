@@ -21,7 +21,7 @@
 #include <iostream>
 
 #include "misc/printf.hpp"
- 
+
 /// @brief A class which stores a color in a cave.
 ///
 /// Can store different kind of colors:
@@ -42,13 +42,11 @@ public:
         TypeC64DTV,
         TypeAtari,
         TypeHSV,
+        TypeInvalid,
     };
-    enum TypeInvalid {
-        Invalid=int(TypeAtari)+1
-    };
-    /// Constructor, which created a color object, initialized to black.
+    /// Constructor, which created a color object, initialized to invalid.
     /// For convenience only; any color which is to be used must be initialized.
-    GdColor() : type(TypeRGB) { rgb.r = 0; rgb.b = 0; rgb.b = 0; }
+    GdColor() : type(TypeInvalid) { }
     static GdColor from_rgb(unsigned r, unsigned g, unsigned b);
     static GdColor from_hsv(unsigned short h, unsigned char s, unsigned char v);
     static GdColor from_c64(unsigned index);
@@ -61,7 +59,9 @@ public:
     bool operator==(const GdColor &rhs) const;
     /// Compare two color objects for inequality.
     /// @return True, if they are not equal.
-    bool operator!=(const GdColor &rhs) const { return !(*this==rhs); }
+    bool operator!=(const GdColor &rhs) const {
+        return !(*this==rhs);
+    }
 
     unsigned int get_r() const;
     unsigned int get_g() const;
@@ -76,11 +76,11 @@ public:
     bool is_c64() const;
 
     int get_c64_index() const;
-    
-    static const char ** get_c64_palette_names();
-    static const char ** get_atari_palette_names();
-    static const char ** get_c64dtv_palette_names();
-    static const char ** get_palette_types_names();
+
+    static const char **get_c64_palette_names();
+    static const char **get_atari_palette_names();
+    static const char **get_c64dtv_palette_names();
+    static const char **get_palette_types_names();
 
 private:
     Type type;
@@ -97,21 +97,27 @@ private:
             unsigned char v;   /* [0;100] */
         } hsv;
     };
-    
+
     GdColor(unsigned char r, unsigned char g, unsigned char b) :
-        type(TypeRGB) { rgb.r = r; rgb.g = g; rgb.b = b; }
+        type(TypeRGB) {
+        rgb.r = r;
+        rgb.g = g;
+        rgb.b = b;
+    }
     GdColor(Type _type, int i) :
-        type(_type) { index = i; }
+        type(_type) {
+        index = i;
+    }
     GdColor(unsigned int rgb);
 
-    friend std::string visible_name(const GdColor& c);
-    friend std::ostream& operator<<(std::ostream& os, const GdColor& c);
+    friend std::string visible_name(const GdColor &c);
+    friend std::ostream &operator<<(std::ostream &os, const GdColor &c);
 };
 
 /* i/o operators and functions like for all other cave types */
-std::ostream& operator<<(std::ostream& os, const GdColor& c);
-std::string visible_name(const GdColor& c);
-bool read_from_string(std::string const& s, GdColor &c);
+std::ostream &operator<<(std::ostream &os, const GdColor &c);
+std::string visible_name(const GdColor &c);
+bool read_from_string(std::string const &s, GdColor &c);
 
 
 /// Traditional C64 color indexes, plus one GDash special color.
@@ -140,7 +146,7 @@ enum GdColorIndexHelper {
 
 // specialized for color codes for font manager
 template <>
-inline Printf const& Printf::operator%(GdColorIndex const &colorindex) const {
+inline Printf const &Printf::operator%(GdColorIndex const &colorindex) const {
     /* +64 is needed so it is a normal ascii char in the encoding, not a string limiter \0
      * or a \n or whatever */
     char s[3] = { GD_COLOR_SETCOLOR, char(colorindex+64), 0 };

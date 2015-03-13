@@ -39,17 +39,21 @@ private:
 public:
     /* reflective */
     static PropertyDescription const descriptor[];
-    virtual PropertyDescription const *get_description_array() const { return descriptor; }
+    virtual PropertyDescription const *get_description_array() const {
+        return descriptor;
+    }
 
     CaveReplay();
 
     /* i/o */
     std::string movements_to_bdcff() const;
-    bool load_from_bdcff(const std::string& str);
+    bool load_from_bdcff(const std::string &str);
     void store_movement(GdDirectionEnum player_move, bool player_fire, bool suicide);
     bool get_next_movement(GdDirectionEnum &player_move, bool &player_fire, bool &suicide);
     void rewind();
-    unsigned int length() { return movements.size(); }
+    unsigned int length() {
+        return movements.size();
+    }
 
     GdInt level;            ///< replay for level n
     GdInt seed;                ///< seed the cave is to be rendered with

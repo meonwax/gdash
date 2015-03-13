@@ -23,7 +23,7 @@
 
 /// find file, looking in user directory and install directory
 /// @return full path of file if found, "" if not
-std::string gd_find_data_file(const std::string& filename, const std::vector<std::string>& dirs);
+std::string gd_find_data_file(const std::string &filename, const std::vector<std::string>& dirs);
 
 /// create a string form a char*, and free it with g_free
 std::string gd_tostring_free(char *str);

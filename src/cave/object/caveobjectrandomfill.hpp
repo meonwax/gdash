@@ -41,22 +41,30 @@ public:
     CaveRandomFill(Coordinate _p1, Coordinate _p2);
     CaveRandomFill(): CaveRectangular(GD_RANDOM_FILL) {}
     virtual void draw(CaveRendered &cave) const;
-    virtual CaveRandomFill *clone() const { return new CaveRandomFill(*this); };
+    virtual CaveRandomFill *clone() const {
+        return new CaveRandomFill(*this);
+    };
     void set_random_fill(GdElementEnum initial, GdElementEnum e1, GdElementEnum e2, GdElementEnum e3, GdElementEnum e4);
     void set_random_prob(int i1, int i2, int i3, int i4);
     void set_seed(int s1, int s2, int s3, int s4, int s5);
-    void set_c64_random(bool rand) { c64_random=rand; }
-    void set_replace_only(GdElementEnum repl) { replace_only=repl; }
+    void set_c64_random(bool rand) {
+        c64_random=rand;
+    }
+    void set_replace_only(GdElementEnum repl) {
+        replace_only=repl;
+    }
     virtual std::string get_bdcff() const;
-    virtual CaveRandomFill* clone_from_bdcff(const std::string &name, std::istream &is) const;
+    virtual CaveRandomFill *clone_from_bdcff(const std::string &name, std::istream &is) const;
 
 private:
     static PropertyDescription const descriptor[];
 
 public:
-    virtual PropertyDescription const* get_description_array() const;
+    virtual PropertyDescription const *get_description_array() const;
 
-    virtual GdElementEnum get_characteristic_element() const { return O_NONE; }
+    virtual GdElementEnum get_characteristic_element() const {
+        return O_NONE;
+    }
     virtual std::string get_description_markup() const;
 };
 

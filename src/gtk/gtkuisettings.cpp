@@ -17,14 +17,17 @@
 #include "config.h"
 
 #include <gtk/gtk.h>
+#include <glib/gi18n.h>
 #include "gtk/gtkui.hpp"
 #include "framework/thememanager.hpp"
 #include "gtk/gtkuisettings.hpp"
-
-
+#include "settings.hpp"
+#include "misc/printf.hpp"
 
 #define GDASH_KEYSIM_WHAT_FOR "gdash-keysim-what-for"
-gboolean SettingsWindow::keysim_button_keypress_event(GtkWidget* widget, GdkEventKey* event, gpointer data) {
+#define GDASH_RESTAT_BOOL "gdash-restart-bool"
+
+gboolean SettingsWindow::keysim_button_keypress_event(GtkWidget *widget, GdkEventKey *event, gpointer data) {
     g_assert(event->type==GDK_KEY_PRESS);   /* must be true. */
     gtk_dialog_response(GTK_DIALOG(widget), event->keyval);
     return TRUE;    /* and say that we processed the key. */
@@ -36,8 +39,8 @@ void SettingsWindow::keysim_button_clicked_cb(GtkWidget *button, gpointer data) 
 
     /* dialog which has its keypress event connected to the handler above */
     GtkWidget *dialog=gtk_dialog_new_with_buttons(_("Select Key"), GTK_WINDOW(gtk_widget_get_toplevel(button)),
-        GtkDialogFlags(GTK_DIALOG_MODAL | GTK_DIALOG_NO_SEPARATOR),
-        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+                      GtkDialogFlags(GTK_DIALOG_MODAL | GTK_DIALOG_NO_SEPARATOR),
+                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
     GtkWidget *table = gtk_table_new(1,1, FALSE);
     gtk_table_set_row_spacings(GTK_TABLE(table), 6);
     gtk_table_set_col_spacings(GTK_TABLE(table), 6);
@@ -58,8 +61,9 @@ void SettingsWindow::keysim_button_clicked_cb(GtkWidget *button, gpointer data) 
     gtk_widget_destroy(dialog);
 }
 
-GtkWidget *SettingsWindow::gd_keysim_button(const char *what_for, int *keyval)
-{
+GtkWidget *SettingsWindow::gd_keysim_button(Setting *setting) {
+    char const *what_for = setting->name;
+    int *keyval = (int *) setting->var;
     g_assert(keyval!=NULL);
 
     /* the button shows the current value in its name */
@@ -70,28 +74,52 @@ GtkWidget *SettingsWindow::gd_keysim_button(const char *what_for, int *keyval)
 
     return button;
 }
-#undef GDASH_KEYSIM_WHAT_FOR
 
 
 /* settings window */
 void SettingsWindow::bool_toggle(GtkWidget *widget, gpointer data) {
-    bool *bl = (bool *) data;
+    bool *restart_bool = (bool *)g_object_get_data(G_OBJECT(widget), GDASH_RESTAT_BOOL);
+    Setting *setting = static_cast<Setting *>(data);
+    bool *bl = (bool *) setting->var;
+
     *bl = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+    if (setting->restart && restart_bool)
+        *restart_bool = true;
 }
 
 
 void SettingsWindow::int_change(GtkWidget *widget, gpointer data) {
-    int *value = (int *) data;
+    bool *restart_bool = (bool *)g_object_get_data(G_OBJECT(widget), GDASH_RESTAT_BOOL);
+    Setting *setting = static_cast<Setting *>(data);
+    int *value = (int *) setting->var;
     *value = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(widget));
+    if (setting->restart && restart_bool)
+        *restart_bool = true;
 }
 
 
 void SettingsWindow::stringv_change(GtkWidget *widget, gpointer data) {
+    bool *restart_bool = (bool *)g_object_get_data(G_OBJECT(widget), GDASH_RESTAT_BOOL);
+    Setting *setting = static_cast<Setting *>(data);
+    int *ptr = (int *) setting->var;
+    *ptr = gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
+    /* if nothing selected (for some reason), set to zero. */
+    if (*ptr==-1)
+        *ptr=0;
+    if (setting->restart && restart_bool)
+        *restart_bool = true;
+}
+
+
+void SettingsWindow::theme_change(GtkWidget *widget, gpointer data) {
+    bool *restart_bool = (bool *)g_object_get_data(G_OBJECT(widget), GDASH_RESTAT_BOOL);
     int *ptr = (int *) data;
     *ptr = gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
     /* if nothing selected (for some reason), set to zero. */
     if (*ptr==-1)
         *ptr=0;
+    if (restart_bool)
+        *restart_bool = true;
 }
 
 
@@ -120,14 +148,19 @@ GtkWidget *SettingsWindow::combo_box_new_from_themelist(std::vector<std::string>
 }
 
 
-void SettingsWindow::do_settings_dialog(Setting *settings, PixbufFactory &pf) {
+/**
+ * @return true, if a restart is required by some setting changed
+ */
+bool SettingsWindow::do_settings_dialog(Setting *settings, PixbufFactory &pf) {
+    bool request_restart = false;
+
     GtkWidget *dialog=gtk_dialog_new_with_buttons(_("GDash Preferences"), guess_active_toplevel(),
-        GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE, GTK_RESPONSE_ACCEPT, NULL);
+                      GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE, GTK_RESPONSE_ACCEPT, NULL);
     gtk_dialog_set_has_separator(GTK_DIALOG(dialog), FALSE);
 
     GtkWidget *notebook=gtk_notebook_new();
     gtk_container_set_border_width(GTK_CONTAINER(notebook), 9);
-    gtk_box_pack_start_defaults(GTK_BOX (GTK_DIALOG (dialog)->vbox), notebook);
+    gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), notebook);
 
     std::vector<std::string> themes;
     int themenum;
@@ -142,7 +175,7 @@ void SettingsWindow::do_settings_dialog(Setting *settings, PixbufFactory &pf) {
         switch (settings[i].type) {
             case TypePage:
                 table = gtk_table_new(1, 1, FALSE);
-                gtk_container_set_border_width(GTK_CONTAINER (table), 9);
+                gtk_container_set_border_width(GTK_CONTAINER(table), 9);
                 gtk_table_set_row_spacings(GTK_TABLE(table), 6);
                 gtk_table_set_col_spacings(GTK_TABLE(table), 12);
                 gtk_notebook_append_page(GTK_NOTEBOOK(notebook), table, gd_label_new_leftaligned(settings[i].name));
@@ -154,14 +187,14 @@ void SettingsWindow::do_settings_dialog(Setting *settings, PixbufFactory &pf) {
                 gtk_widget_set_tooltip_text(widget, _(settings[i].description));
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), *(bool *)settings[i].var);
                 gtk_table_attach(GTK_TABLE(table), widget, 1, 2, row, row+1, GtkAttachOptions(GTK_EXPAND|GTK_FILL), GtkAttachOptions(0), 0, 0);
-                g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(SettingsWindow::bool_toggle), settings[i].var);
+                g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(SettingsWindow::bool_toggle), &settings[i]);
                 break;
 
             case TypePercent:
                 widget = gtk_spin_button_new_with_range(0, 100, 5);
                 gtk_widget_set_tooltip_text(widget, _(settings[i].description));
                 gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), *(int *)settings[i].var);
-                g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(SettingsWindow::int_change), settings[i].var);
+                g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(SettingsWindow::int_change), &settings[i]);
                 gtk_table_attach(GTK_TABLE(table), widget, 1, 2, row, row+1, GtkAttachOptions(GTK_EXPAND|GTK_FILL), GtkAttachOptions(0), 0, 0);
                 break;
 
@@ -169,26 +202,27 @@ void SettingsWindow::do_settings_dialog(Setting *settings, PixbufFactory &pf) {
                 widget=SettingsWindow::combo_box_new_from_stringv(settings[i].stringv);
                 gtk_widget_set_tooltip_text(widget, _(settings[i].description));
                 gtk_combo_box_set_active(GTK_COMBO_BOX(widget), *(int *)settings[i].var);
-                g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(SettingsWindow::stringv_change), settings[i].var);
+                g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(SettingsWindow::stringv_change), &settings[i]);
                 gtk_table_attach(GTK_TABLE(table), widget, 1, 2, row, row+1, GtkAttachOptions(GTK_EXPAND|GTK_FILL), GtkAttachOptions(0), 0, 0);
                 break;
-            
+
             case TypeTheme:
                 widget=SettingsWindow::combo_box_new_from_themelist(themes);
                 gtk_widget_set_tooltip_text(widget, _(settings[i].description));
                 gtk_combo_box_set_active(GTK_COMBO_BOX(widget), themenum);
-                g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(SettingsWindow::stringv_change), &themenum);
+                g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(SettingsWindow::theme_change), &themenum);
                 gtk_table_attach(GTK_TABLE(table), widget, 1, 2, row, row+1, GtkAttachOptions(GTK_EXPAND|GTK_FILL), GtkAttachOptions(0), 0, 0);
                 break;
-            
+
             case TypeKey:
-                widget = gd_keysim_button(settings[i].name, (int *) settings[i].var);
+                widget = gd_keysim_button(&settings[i]);
                 gtk_widget_set_tooltip_text(widget, _(settings[i].description));
                 gtk_table_attach(GTK_TABLE(table), widget, 1, 2, row, row+1, GtkAttachOptions(GTK_EXPAND|GTK_FILL), GtkAttachOptions(0), 0, 0);
                 break;
         }
-        
+
         if (widget) {
+            g_object_set_data(G_OBJECT(widget), GDASH_RESTAT_BOOL, &request_restart);
             GtkWidget *label = gd_label_new_leftaligned(_(settings[i].name));
             gtk_table_attach(GTK_TABLE(table), label, 0, 1, row, row+1, GtkAttachOptions(GTK_EXPAND|GTK_FILL), GtkAttachOptions(0), 0, 0);
             gtk_label_set_mnemonic_widget(GTK_LABEL(label), widget);
@@ -196,12 +230,13 @@ void SettingsWindow::do_settings_dialog(Setting *settings, PixbufFactory &pf) {
 
         row ++;
     }
-    
+
     gtk_widget_show_all(dialog);
     gtk_dialog_run(GTK_DIALOG(dialog));
-    
+
     gtk_widget_destroy(dialog);
 
     gd_theme = themes[themenum];
-    /** @todo possible restart */
+
+    return request_restart;
 }

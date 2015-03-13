@@ -29,14 +29,18 @@ protected:
 public:
     CaveFill(CaveObject::Type type, Coordinate _start, GdElementEnum _fill_element);
     CaveFill(CaveObject::Type type): CaveObject(type) {}
-    Coordinate get_start_coordinate() const { return start; }
+    Coordinate get_start_coordinate() const {
+        return start;
+    }
 
 public:
     virtual void create_drag(Coordinate current, Coordinate displacement);
     virtual void move(Coordinate current, Coordinate displacement);
     virtual void move(Coordinate displacement);
     virtual std::string get_coordinates_text() const;
-    virtual GdElementEnum get_characteristic_element() const { return fill_element; }
+    virtual GdElementEnum get_characteristic_element() const {
+        return fill_element;
+    }
 };
 
 #endif

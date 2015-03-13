@@ -27,12 +27,18 @@ std::vector<Logger *> Logger::loggers;
 
 static char severity_char(ErrorMessage::Severity sev) {
     switch (sev) {
-        case ErrorMessage::Error: return 'E';
-        case ErrorMessage::Warning: return 'W';
-        case ErrorMessage::Debug: return 'D';
-        case ErrorMessage::Info: return 'I';
-        case ErrorMessage::Message: return 'M';
-        case ErrorMessage::Critical: return 'C';
+        case ErrorMessage::Error:
+            return 'E';
+        case ErrorMessage::Warning:
+            return 'W';
+        case ErrorMessage::Debug:
+            return 'D';
+        case ErrorMessage::Info:
+            return 'I';
+        case ErrorMessage::Message:
+            return 'M';
+        case ErrorMessage::Critical:
+            return 'C';
     }
     return '?';
 }
@@ -47,7 +53,7 @@ static ErrorMessage::Severity severity_glog(int flag) {
     return ErrorMessage::Warning;
 }
 
-std::ostream& operator<<(std::ostream& os, const ErrorMessage& em) {
+std::ostream &operator<<(std::ostream &os, const ErrorMessage &em) {
     os<<severity_char(em.sev)<<':'<<em.message;
     return os;
 }
@@ -64,7 +70,7 @@ static void log_func(const gchar *log_domain, GLogLevelFlags log_level, const gc
 /// Creates a new misc/logger.
 /// Adds it to the static list of loggers.
 Logger::Logger(bool ignore_)
-:
+    :
     ignore(ignore_),
     read(true),
     context() {
@@ -100,18 +106,18 @@ void Logger::clear() {
 bool Logger::empty() const {
     return messages.empty();
 }
-    
-void Logger::set_context(std::string const& new_context) {
+
+void Logger::set_context(std::string const &new_context) {
     context=new_context;
 }
 
-std::string const& Logger::get_context() const {
+std::string const &Logger::get_context() const {
     return context;
 }
 
 /// Get the messages.
 /// @return Container of messages.
-Logger::Container const& Logger::get_messages() const {
+Logger::Container const &Logger::get_messages() const {
     return messages;
 }
 
@@ -127,13 +133,13 @@ std::string Logger::get_messages_in_one_string() const {
         }
         s+=it->message;
     }
-    
+
     return s;
 }
 
 /// Log a new message.
 /// If a context is set, it will also be noted.
-void Logger::log(ErrorMessage::Severity sev, std::string const& message) {
+void Logger::log(ErrorMessage::Severity sev, std::string const &message) {
     // if ignoring messages, do nothing
     if (ignore)
         return;
@@ -146,7 +152,7 @@ void Logger::log(ErrorMessage::Severity sev, std::string const& message) {
     read=false;
 }
 
-void log(ErrorMessage::Severity sev, std::string const& message) {
+void log(ErrorMessage::Severity sev, std::string const &message) {
     /* check if at least one logger exists */
     if (!Logger::loggers.empty()) {
         Logger::loggers.back()->log(sev, message);
@@ -155,7 +161,7 @@ void log(ErrorMessage::Severity sev, std::string const& message) {
     }
 }
 
-Logger& get_active_logger() {
+Logger &get_active_logger() {
     /* check if at least one logger exists */
     assert(!Logger::loggers.empty());
     return *Logger::loggers.back();

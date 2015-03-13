@@ -70,21 +70,21 @@ class GameRenderer {
     CellRenderer &cells;
     FontManager &font_manager;
     GameControl &game;
-    
+
     int play_area_w;
     int play_area_h;
     int statusbar_height;
     int statusbar_y1;
     int statusbar_y2;
     int statusbar_mid;
-    
+
     bool out_of_window;
-    
+
     bool show_replay_sign;
 
     int scroll_x, scroll_y;
     int scroll_desired_x, scroll_desired_y;
-    
+
     // for showing the story
     std::vector<std::string> wrapped_story;
     int story_y, story_max_y;
@@ -104,10 +104,10 @@ class GameRenderer {
     void showheader_game(bool alternate_status_bar, bool fast_forward);
     void showheader_gameover();
     void showheader_pause();
-    
+
     void set_colors_from_cave();
     void select_status_bar_colors();
-    
+
     struct StatusBarColors {
         GdColor background;
         GdColor diamond_needed;
@@ -117,13 +117,13 @@ class GameRenderer {
         GdColor default_color;
     };
     StatusBarColors cols;
-    
+
 public:
     int statusbar_since;
 
     GameRenderer(Screen &screen_, CellRenderer &cells_, FontManager &font_manager_, GameControl &game_);
     ~GameRenderer();
-    
+
     enum State {
         CaveLoaded,
         Nothing,
@@ -131,9 +131,9 @@ public:
         Stop,
         GameOver
     };
-    
+
     State main_int(int ms, GdDirectionEnum player_move, bool fire, bool &suicide, bool &restart, bool paused, bool alternate_status, bool fast_forward);
-    
+
     /**
      * Show replay sign means that for non-real-game game types,
      * the status bar can show the type ("PLAYING REPLAY" or "TESTING CAVE").

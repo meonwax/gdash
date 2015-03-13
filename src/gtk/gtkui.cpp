@@ -38,7 +38,6 @@
 /* title image and icon */
 #include "gdash_icon_48.cpp"
 
-static char *caveset_filename=NULL;
 static char *last_folder=NULL;
 
 void gd_register_stock_icons() {
@@ -46,7 +45,7 @@ void gd_register_stock_icons() {
     static struct {
         const guint8 *data;
         const char *stock_id;
-    } icons[]={
+    } icons[]= {
         { cave_editor, GD_ICON_CAVE_EDITOR },
         { move, GD_ICON_EDITOR_MOVE },
         { add_join, GD_ICON_EDITOR_JOIN },
@@ -78,7 +77,7 @@ void gd_register_stock_icons() {
     GtkIconFactory *factory=gtk_icon_factory_new();
     for (unsigned i=0; i<G_N_ELEMENTS(icons); ++i) {
         /* 3rd param: copy pixels = false */
-        GdkPixbuf *pixbuf=gdk_pixbuf_new_from_inline (-1, icons[i].data, FALSE, NULL);
+        GdkPixbuf *pixbuf=gdk_pixbuf_new_from_inline(-1, icons[i].data, FALSE, NULL);
         GtkIconSet *iconset=gtk_icon_set_new_from_pixbuf(pixbuf);
         g_object_unref(pixbuf);
         gtk_icon_factory_add(factory, icons[i].stock_id, iconset);
@@ -149,8 +148,8 @@ char *gd_select_image_file(const char *title) {
     int result;
     char *filename;
 
-    dialog=gtk_file_chooser_dialog_new (title, guess_active_toplevel(), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
-    gtk_dialog_set_default_response(GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
+    dialog=gtk_file_chooser_dialog_new(title, guess_active_toplevel(), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT);
 
     /* obtain list of image filters, and add all to the window */
     filters=image_load_filters();
@@ -169,7 +168,7 @@ char *gd_select_image_file(const char *title) {
 }
 
 
-/** 
+/**
  * Try to guess which window is active.
  */
 GtkWindow *guess_active_toplevel() {
@@ -204,20 +203,20 @@ GtkWindow *guess_active_toplevel() {
 
 /**
  * Show a message dialog, with the specified message type (warning, error, info) and texts.
- * 
+ *
  * @param type GtkMessageType - sets icon to show.
  * @param primary Primary text.
  * @param secondary Secondary (small) text - may be null.
  */
 static void show_message(GtkMessageType type, const char *primary, const char *secondary) {
     GtkWidget *dialog=gtk_message_dialog_new(guess_active_toplevel(),
-        GtkDialogFlags(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
-        type, GTK_BUTTONS_OK,
-        "%s", primary);
+                      GtkDialogFlags(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
+                      type, GTK_BUTTONS_OK,
+                      "%s", primary);
     gtk_window_set_title(GTK_WINDOW(dialog), "GDash");
     /* secondary message exists an is not empty string: */
     if (secondary && secondary[0]!=0)
-        gtk_message_dialog_format_secondary_markup(GTK_MESSAGE_DIALOG (dialog), "%s", secondary);
+        gtk_message_dialog_format_secondary_markup(GTK_MESSAGE_DIALOG(dialog), "%s", secondary);
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
 }
@@ -240,10 +239,10 @@ void gd_infomessage(const char *primary, const char *secondary) {
 
 /**
  * If necessary, ask the user if he doesn't want to save changes to cave.
- * 
+ *
  * If the caveset has no modification, this function simply returns true.
  */
-bool gd_discard_changes(CaveSet const& caveset) {
+bool gd_discard_changes(CaveSet const &caveset) {
     /* save highscore on every ocassion when the caveset is to be removed from memory */
     caveset.save_highscore(gd_user_config_dir);
 
@@ -252,16 +251,16 @@ bool gd_discard_changes(CaveSet const& caveset) {
         return TRUE;
 
     GtkWidget *dialog=gtk_message_dialog_new(guess_active_toplevel(), GtkDialogFlags(0), GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, _("Caveset \"%s\" is edited or new replays are added. Discard changes?"), caveset.name.c_str());
-    gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG (dialog), _("If you discard the caveset, all changes and new replays will be lost."));
-    gtk_dialog_add_button(GTK_DIALOG (dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
+    gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), _("If you discard the caveset, all changes and new replays will be lost."));
+    gtk_dialog_add_button(GTK_DIALOG(dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
     /* create a discard button with a trash icon and Discard text */
     GtkWidget *button=gtk_button_new_with_mnemonic(_("_Discard"));
-    gtk_button_set_image(GTK_BUTTON (button), gtk_image_new_from_stock(GTK_STOCK_DELETE, GTK_ICON_SIZE_BUTTON));
-    gtk_widget_show (button);
-    gtk_dialog_add_action_widget(GTK_DIALOG (dialog), button, GTK_RESPONSE_YES);
+    gtk_button_set_image(GTK_BUTTON(button), gtk_image_new_from_stock(GTK_STOCK_DELETE, GTK_ICON_SIZE_BUTTON));
+    gtk_widget_show(button);
+    gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_YES);
 
-    bool discard=gtk_dialog_run(GTK_DIALOG (dialog))==GTK_RESPONSE_YES;
+    bool discard=gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_YES;
     gtk_widget_destroy(dialog);
 
     /* return button pressed */
@@ -269,35 +268,11 @@ bool gd_discard_changes(CaveSet const& caveset) {
 }
 
 
+/* file operation was successful, put it into the recent manager */
 static void caveset_file_operation_successful(const char *filename) {
-    /* save successful, so remember filename */
-    /* first we make a copy, as it is possible that filename==caveset_filename (the pointers!) */
-    char *uri;
-
-    /* add to recent chooser */
-    if (g_path_is_absolute(filename))
-        uri=g_filename_to_uri(filename, NULL, NULL);
-    else {
-        /* make an absolute filename if needed */
-        char *currentdir=g_get_current_dir();
-        char *absolute=g_build_path(G_DIR_SEPARATOR_S, currentdir, filename, NULL);
-        uri=g_filename_to_uri(absolute, NULL, NULL);
-        g_free(currentdir);
-        g_free(absolute);
-    }
+    char *uri = g_filename_to_uri(filename, NULL, NULL);
     gtk_recent_manager_add_item(gtk_recent_manager_get_default(), uri);
     g_free(uri);
-
-    /* if it is a bd file, remember new filename */
-    if (g_str_has_suffix(filename, ".bd")) {
-        /* first make copy, then free and set pointer. we might be called with filename=caveset_filename */
-        char *stored=g_strdup(filename);
-        g_free(caveset_filename);
-        caveset_filename=stored;
-    } else {
-        g_free(caveset_filename);
-        caveset_filename=NULL;
-    }
 }
 
 
@@ -308,7 +283,7 @@ static void caveset_save(const gchar *filename, CaveSet &caveset) {
     try {
         caveset.save_to_file(filename);
         caveset_file_operation_successful(filename);
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         gd_errormessage(e.what(), filename);
     }
 }
@@ -317,13 +292,13 @@ static void caveset_save(const gchar *filename, CaveSet &caveset) {
 /**
  * Pops up a "save file as" dialog to the user, to select a file to save the caveset to.
  * If selected, saves the file.
- * 
+ *
  * @param parent Parent window for the dialog.
  * @param caveset The caveset to save.
  */
 void gd_save_caveset_as(CaveSet &caveset) {
-    GtkWidget *dialog=gtk_file_chooser_dialog_new (_("Save File As"), guess_active_toplevel(), GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
-    gtk_dialog_set_default_response(GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
+    GtkWidget *dialog=gtk_file_chooser_dialog_new(_("Save File As"), guess_active_toplevel(), GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT);
     gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), TRUE);
 
     GtkFileFilter *filter=gtk_file_filter_new();
@@ -339,21 +314,17 @@ void gd_save_caveset_as(CaveSet &caveset) {
     gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), CPrintf("%s.bd") % caveset.name);
 
     char *filename=NULL;
-    if (gtk_dialog_run(GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
-        filename=gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+        filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 
-    /* check if .bd extension should be added */
-    if (filename) {
+    /* if we have a filename, do the save */
+    if (filename != NULL) {
         /* if it has no .bd extension, add one */
         if (!g_str_has_suffix(filename, ".bd")) {
             char *suffixed=g_strdup_printf("%s.bd", filename);
             g_free(filename);
             filename=suffixed;
         }
-    }
-
-    /* if we have a filename, do the save */
-    if (filename) {
         caveset_save(filename, caveset);
     }
     g_free(filename);
@@ -363,23 +334,23 @@ void gd_save_caveset_as(CaveSet &caveset) {
 
 /**
  * Save the current caveset. If no filename is stored, asks the user for a new filename before proceeding.
- * 
+ *
  * @param parent Parent window for dialogs.
  * @param caveset Caveset to save.
  */
 void gd_save_caveset(CaveSet &caveset) {
-    if (!caveset_filename)
+    if (caveset.filename == "")
         /* if no filename remembered, rather start the save_as function, which asks for one. */
         gd_save_caveset_as(caveset);
     else
         /* if given, save. */
-        caveset_save(caveset_filename, caveset);
+        caveset_save(caveset.filename.c_str(), caveset);
 }
 
 
 /**
  * Pops up a file selection dialog; and loads the caveset selected.
- * 
+ *
  * Before doing anything, asks the user if he wants to save the current caveset.
  * If it is edited and not saved, this function will do nothing.
  */
@@ -390,8 +361,8 @@ void gd_open_caveset(const char *directory, CaveSet &caveset) {
     if (!gd_discard_changes(caveset))
         return;
 
-    GtkWidget *dialog=gtk_file_chooser_dialog_new (_("Open File"), guess_active_toplevel(), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
-    gtk_dialog_set_default_response(GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
+    GtkWidget *dialog=gtk_file_chooser_dialog_new(_("Open File"), guess_active_toplevel(), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT);
 
     GtkFileFilter *filter=gtk_file_filter_new();
     gtk_file_filter_set_name(filter, _("GDash cave sets"));
@@ -401,20 +372,19 @@ void gd_open_caveset(const char *directory, CaveSet &caveset) {
 
     /* if callback shipped with a directory name, show that directory by default */
     if (directory)
-        gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER(dialog), directory);
-    else
-    if (last_folder)
+        gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), directory);
+    else if (last_folder)
         /* if we previously had an open command, the directory was remembered */
-        gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER(dialog), last_folder);
+        gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), last_folder);
     else
         /* otherwise user home */
-        gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER(dialog), g_get_home_dir());
+        gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), g_get_home_dir());
 
-    int result=gtk_dialog_run(GTK_DIALOG (dialog));
+    int result=gtk_dialog_run(GTK_DIALOG(dialog));
     if (result==GTK_RESPONSE_ACCEPT) {
-        filename=gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+        filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
         g_free(last_folder);
-        last_folder=gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER(dialog));
+        last_folder=gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(dialog));
     }
 
     /* WINDOWS GTK+ 20080926 HACK */
@@ -431,12 +401,15 @@ void gd_open_caveset(const char *directory, CaveSet &caveset) {
         l.clear();
     }
 
-    try {
-        caveset = create_from_file(filename);
-    } catch (std::exception &e) {
-        gd_errormessage(_("Error loading caveset."), e.what());
+    /* if got a filename, load the file */
+    if (filename != NULL) {
+        try {
+            caveset = create_from_file(filename);
+        } catch (std::exception &e) {
+            gd_errormessage(_("Error loading caveset."), e.what());
+        }
+        g_free(filename);
     }
-    g_free(filename);
 }
 
 
@@ -477,22 +450,22 @@ void gd_show_errors(Logger &l, const char *title, bool always_show) {
 
     GtkWidget *dialog=gtk_dialog_new_with_buttons(title, guess_active_toplevel(), GTK_DIALOG_NO_SEPARATOR, GTK_STOCK_CLOSE, GTK_RESPONSE_OK, NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-    gtk_window_set_default_size (GTK_WINDOW(dialog), 512, 384);
-    GtkWidget *sw = gtk_scrolled_window_new (NULL, NULL);
-    gtk_box_pack_start_defaults(GTK_BOX (GTK_DIALOG (dialog)->vbox), sw);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (sw), GTK_SHADOW_IN);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_window_set_default_size(GTK_WINDOW(dialog), 512, 384);
+    GtkWidget *sw = gtk_scrolled_window_new(NULL, NULL);
+    gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), sw);
+    gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(sw), GTK_SHADOW_IN);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
     /* get text and show it */
     GtkTextBuffer *buffer=gtk_text_buffer_new(NULL);
-    GtkWidget *view=gtk_text_view_new_with_buffer (buffer);
+    GtkWidget *view=gtk_text_view_new_with_buffer(buffer);
     gtk_container_add(GTK_CONTAINER(sw), view);
     g_object_unref(buffer);
 
     pixbuf_error=gtk_widget_render_icon(view, GTK_STOCK_DIALOG_ERROR, GTK_ICON_SIZE_MENU, NULL);
     pixbuf_warning=gtk_widget_render_icon(view, GTK_STOCK_DIALOG_WARNING, GTK_ICON_SIZE_MENU, NULL);
     pixbuf_info=gtk_widget_render_icon(view, GTK_STOCK_DIALOG_INFO, GTK_ICON_SIZE_MENU, NULL);
-    Logger::Container const& messages=l.get_messages();
+    Logger::Container const &messages=l.get_messages();
     for (Logger::ConstIterator error=messages.begin(); error!=messages.end(); ++error) {
         gtk_text_buffer_get_iter_at_offset(buffer, &iter, -1);
         if (error->sev<=ErrorMessage::Message)
@@ -515,7 +488,7 @@ void gd_show_errors(Logger &l, const char *title, bool always_show) {
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(view), 6);
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(view), 6);
     gtk_widget_show_all(dialog);
-    gtk_dialog_run(GTK_DIALOG (dialog));
+    gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
 
     /* shown to the users - forget them. */
@@ -533,7 +506,7 @@ bool gd_question_yesno(const char *primary, const char *secondary) {
     GtkWidget *dialog=gtk_message_dialog_new(guess_active_toplevel(), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", primary);
     if (secondary && !g_str_equal(secondary, ""))
         gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "%s", secondary);
-    int response=gtk_dialog_run(GTK_DIALOG (dialog));
+    int response=gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
 
     return response==GTK_RESPONSE_YES;

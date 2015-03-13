@@ -28,11 +28,10 @@
 
 
 ShowTextActivity::ShowTextActivity(App *app, char const *title_line, std::string const &text, SmartPtr<Command> command_after_exit)
-:
+    :
     Activity(app),
     command_after_exit(command_after_exit),
-    title_line(title_line)
-{
+    title_line(title_line) {
     wrapped_text = gd_wrap_text(text.c_str(), app->screen->get_width() / app->font_manager->get_font_width_narrow()-4);
     linesavailable = app->screen->get_height() / app->font_manager->get_line_height()-4;
     if ((int)wrapped_text.size() < linesavailable)
@@ -54,15 +53,15 @@ void ShowTextActivity::redraw_event() {
     app->set_color(GD_GDASH_GRAY2);
     if (scroll_y<scroll_max_y)
         app->blittext_n(app->screen->get_width() - app->font_manager->get_font_width_narrow(),
-            app->screen->get_height()-3*app->font_manager->get_line_height(), CPrintf("%c") % GD_DOWN_CHAR);
+                        app->screen->get_height()-3*app->font_manager->get_line_height(), CPrintf("%c") % GD_DOWN_CHAR);
     if (scroll_y>0)
         app->blittext_n(app->screen->get_width() - app->font_manager->get_font_width_narrow(),
-            app->font_manager->get_line_height()*2, CPrintf("%c") % GD_UP_CHAR);
+                        app->font_manager->get_line_height()*2, CPrintf("%c") % GD_UP_CHAR);
     // text
     app->set_color(GD_GDASH_LIGHTBLUE);
     for (int l=0; l<linesavailable && scroll_y + l<(int)wrapped_text.size(); ++l)
         app->blittext_n(app->font_manager->get_font_width_narrow()*2,
-            l*app->font_manager->get_line_height()+app->font_manager->get_line_height()*2, wrapped_text[scroll_y+l].c_str());
+                        l*app->font_manager->get_line_height()+app->font_manager->get_line_height()*2, wrapped_text[scroll_y+l].c_str());
 
     app->screen->flip();
 }

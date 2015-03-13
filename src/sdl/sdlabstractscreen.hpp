@@ -1,8 +1,5 @@
 /*
  * Copyright (c) 2007-2013, Czirkos Zoltan http://code.google.com/p/gdash/
- * 
- * These are modified versions of some functions originating from SDL_gfx.
- * See the comment below.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,7 +14,33 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#ifndef GD_SDLABSTRACTSCREEN
+#define GD_SDLABSTRACTSCREEN
+
+#include "config.h"
+
 #include <SDL.h>
 
-int filledDiamondColor(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rad, Uint32 color);
-int filledCircleColor(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rad, Uint32 color);
+#include "gfx/screen.hpp"
+
+class ParticleSet;
+class GdColor;
+
+class SDLAbstractScreen: public Screen {
+protected:
+    SDL_Surface *surface;
+
+public:
+    SDLAbstractScreen(): surface(NULL) {}
+    virtual void fill_rect(int x, int y, int w, int h, const GdColor &c);
+    virtual void blit_full(Pixmap const &src, int dx, int dy, int x, int y, int w, int h) const;
+    virtual void set_clip_rect(int x1, int y1, int w, int h);
+    virtual void remove_clip_rect();
+    virtual void draw_particle_set(int dx, int dy, ParticleSet const &ps);
+
+    SDL_Surface *get_surface() const {
+        return surface;
+    }
+};
+
+#endif

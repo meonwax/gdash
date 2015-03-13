@@ -30,7 +30,7 @@
  * ..._update_changed(GtkWidget *widget, gpointer data)
  * data=pointer to gdash property
  * g_object_get_data(GDASH_DATA_POINTER) -> pointer to EditorAutoUpdate
- * 
+ *
  */
 #define GDASH_AUTOUPDATE_POINTER "gdash-autoupdate-pointer"
 static void set_eau(GtkWidget *widget, EditorAutoUpdate *eau) {
@@ -217,13 +217,13 @@ static GtkWidget *gddirection_editwidget_new(EditorAutoUpdate *eau, GdDirection 
  */
 static void gdstring_editwidget_inserted_cb(GtkEntryBuffer *buffer, guint arg1, gchar *arg2, guint arg3, gpointer data) {
     GdString *ps=static_cast<GdString *>(data);
-    
+
     *ps=gtk_entry_buffer_get_text(buffer);
 }
 
 static void gdstring_editwidget_deleted_cb(GtkEntryBuffer *buffer, guint arg1, guint arg2, gpointer data) {
     GdString *ps=static_cast<GdString *>(data);
-    
+
     *ps=gtk_entry_buffer_get_text(buffer);
 }
 
@@ -318,16 +318,16 @@ void EditorAutoUpdate::reload() const {
 }
 
 EditorAutoUpdate::EditorAutoUpdate(Reflective *r, Reflective *def, PropertyDescription const *descr, void (*cave_update_cb)())
-:   r(r),
-    def(def),
-    descr(descr),
-    widget(0),
-    expand_vertically(false),
-    cave_update_cb(cave_update_cb),
-    reload_cb(0) {
+    :   r(r),
+        def(def),
+        descr(descr),
+        widget(0),
+        expand_vertically(false),
+        cave_update_cb(cave_update_cb),
+        reload_cb(0) {
     std::auto_ptr<GetterBase> const &prop = descr->prop;
     std::string defval;
-    
+
     switch (descr->type) {
         case GD_TAB:
             // this is only for the gui, so we must not be called for this one
@@ -412,7 +412,7 @@ EditorAutoUpdate::EditorAutoUpdate(Reflective *r, Reflective *def, PropertyDescr
             defval=visible_name(def->get<Coordinate>(prop));
             break;
     };
-    
+
     std::string tip;
 
     if (descr->tooltip) {

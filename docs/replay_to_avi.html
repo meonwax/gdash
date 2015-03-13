@@ -123,7 +123,7 @@ As simple as that. Optionally, if your mencoder does not support x264 encoding, 
 libavcodec mpeg4. The command line to be used is:
 
 <div class="command">
-<span class="param">mencoder mf://out_*.png -fps 25 -ovc lavc -lavc vcodec=mpeg4:vbitrate=512 -ffourcc DIVX
+<span class="param">mencoder mf://out_*.png -fps 25 -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=512 -ffourcc DIVX
 -audiofile out.wav -oac mp3lame -lameopts preset=64 -o out.avi</span>
 </div>
 

@@ -28,11 +28,11 @@ class SelectFileActivity: public Activity {
 public:
     SelectFileActivity(App *app, const char *title, const char *start_dir, const char *glob, bool for_save, const char *defaultname, SmartPtr<Command1Param<std::string> > command_when_successful);
     ~SelectFileActivity();
-    
+
     virtual void keypress_event(KeyCode keycode, int gfxlib_keycode);
     virtual void redraw_event();
     virtual void pushed_event();
-    
+
     void jump_to_directory(char const *jump_to);
     void file_selected(char const *filename);
     void file_selected_do_command();

@@ -46,15 +46,23 @@ public:
     void move(int dt_ms);
     /// Start using screen cordinates, if is_new is true.
     void normalize(double factor);
-    
+
     typedef std::vector<Particle>::iterator iterator;
     typedef std::vector<Particle>::const_iterator const_iterator;
-    
-    iterator begin() { return particles.begin(); }
-    iterator end() { return particles.end(); }
-    const_iterator begin() const { return particles.begin(); }
-    const_iterator end() const { return particles.end(); }
-    
+
+    iterator begin() {
+        return particles.begin();
+    }
+    iterator end() {
+        return particles.end();
+    }
+    const_iterator begin() const {
+        return particles.begin();
+    }
+    const_iterator end() const {
+        return particles.end();
+    }
+
     GdColor color;
     int life;           ///< lifetime. starts from 1000, goes to 0.
     bool is_new;        ///< New particle set, the coordinates of which must be "normalized" to the cave screen coordinates

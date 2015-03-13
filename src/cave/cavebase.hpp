@@ -31,8 +31,12 @@
 /// one by one.
 class CaveBase {
 public:
-    int height() const { return h; }
-    int width() const { return w; }
+    int height() const {
+        return h;
+    }
+    int width() const {
+        return w;
+    }
 
     GdString name;            ///< Name of cave
     GdString description;     ///< Some words about the cave
@@ -90,7 +94,8 @@ public:
     GdBool pneumatic_hammer_sound;
     GdBool nut_sound;
 
-    GdBool magic_wall_stops_amoeba; ///< Turning on magic wall changes amoeba to diamonds. Original BD: yes, constkit: no
+    GdBool magic_wall_stops_amoeba; ///< Turning on magic wall changes amoeba to diamonds.
+    GdBool magic_wall_breakscan;    ///< Currently this setting enabled will turn the amoeba to an enclosed state. To implement buggy BD1 behaviour.
     GdBool magic_timer_wait_for_hatching;   ///< magic wall timer does not start before player's birth
 
     GdProbability amoeba_growth_prob;       ///< Amoeba slow growth probability
@@ -187,6 +192,8 @@ public:
     GdBool hammered_walls_reappear; ///< if true, hammered walls will reappear some time after hammering
     GdInt pneumatic_hammer_frame;   ///< number of frames it takes to hammer a wall
     GdInt hammered_wall_reappear_frame; ///< number of frames, after which a hammered wall will reappear
+    
+    GdBool infinite_rockets;        ///< If true, the player which got a rocket launcher will be able to launch an infinite number of rockets
 };
 
 /* cave manipulation */
@@ -202,8 +209,8 @@ void gd_cave_set_random_colors(CaveBase &cave, GdColor::Type type);
 /* also no1 and bd2 cave data import helpers; line direction coordinates */
 //~ extern const int gd_dx[], gd_dy[];
 /* arrays for movements. also no1 and bd2 cave data import helpers; line direction coordinates */
-static const int gd_dx[]={ 0, 0, 1, 1, 1, 0, -1, -1, -1, 0, 2, 2, 2, 0, -2, -2, -2 };
-static const int gd_dy[]={ 0, -1, -1, 0, 1, 1, 1, 0, -1, -2, -2, 0, 2, 2, 2, 0, -2 };
+static const int gd_dx[]= { 0, 0, 1, 1, 1, 0, -1, -1, -1, 0, 2, 2, 2, 0, -2, -2, -2 };
+static const int gd_dy[]= { 0, -1, -1, 0, 1, 1, 1, 0, -1, -2, -2, 0, 2, 2, 2, 0, -2 };
 
 GdDirectionEnum gd_direction_from_keypress(bool up, bool down, bool left, bool right);
 

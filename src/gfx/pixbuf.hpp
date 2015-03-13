@@ -34,30 +34,30 @@ public:
        that is what gdk-pixbuf uses, and also what sdl uses.
        no BGR, no ABGR.
      */
-    #if G_BYTE_ORDER == G_BIG_ENDIAN
-        static const guint32 rmask = 0xff000000;
-        static const guint32 gmask = 0x00ff0000;
-        static const guint32 bmask = 0x0000ff00;
-        static const guint32 amask = 0x000000ff;
+#if G_BYTE_ORDER == G_BIG_ENDIAN
+    static const guint32 rmask = 0xff000000;
+    static const guint32 gmask = 0x00ff0000;
+    static const guint32 bmask = 0x0000ff00;
+    static const guint32 amask = 0x000000ff;
 
-        static const guint32 rshift = 24;
-        static const guint32 gshift = 16;
-        static const guint32 bshift = 8;
-        static const guint32 ashift = 0;
-    #else
-        static const guint32 rmask = 0x000000ff;
-        static const guint32 gmask = 0x0000ff00;
-        static const guint32 bmask = 0x00ff0000;
-        static const guint32 amask = 0xff000000;
+    static const guint32 rshift = 24;
+    static const guint32 gshift = 16;
+    static const guint32 bshift = 8;
+    static const guint32 ashift = 0;
+#else
+    static const guint32 rmask = 0x000000ff;
+    static const guint32 gmask = 0x0000ff00;
+    static const guint32 bmask = 0x00ff0000;
+    static const guint32 amask = 0xff000000;
 
-        static const guint32 rshift = 0;
-        static const guint32 gshift = 8;
-        static const guint32 bshift = 16;
-        static const guint32 ashift = 24;
-    #endif
+    static const guint32 rshift = 0;
+    static const guint32 gshift = 8;
+    static const guint32 bshift = 16;
+    static const guint32 ashift = 24;
+#endif
 
     /// Creates a guint32 value, which can be raw-written to a pixbuf memory area.
-    static guint32 rgba_pixel_from_color(const GdColor& col, unsigned a);
+    static guint32 rgba_pixel_from_color(const GdColor &col, unsigned a);
 
     /// Get the width of the pixbuf in pixels.
     virtual int get_width() const=0;
@@ -93,7 +93,7 @@ public:
     /// @param dest The destination pixbuf.
     /// @param dx Destination coordinate, upper left corner.
     /// @param dy Destination coordinate, upper left corner.
-    void blit(Pixbuf& dest, int dx, int dy) const {
+    void blit(Pixbuf &dest, int dx, int dy) const {
         blit_full(0, 0, get_width(), get_height(), dest, dx, dy);
     }
 
@@ -125,7 +125,7 @@ public:
     /// @param dest The destination pixbuf.
     /// @param dx Destination coordinate, upper left corner.
     /// @param dy Destination coordinate, upper left corner.
-    void copy(Pixbuf& dest, int dx, int dy) const {
+    void copy(Pixbuf &dest, int dx, int dy) const {
         copy_full(0, 0, get_width(), get_height(), dest, dx, dy);
     }
 
@@ -135,7 +135,7 @@ public:
 
     /// @brief Fill the given area of the pixbuf with the specified color.
     /// No blending takes place!
-    virtual void fill_rect(int x, int y, int w, int h, const GdColor& c)=0;
+    virtual void fill_rect(int x, int y, int w, int h, const GdColor &c)=0;
     void fill(const GdColor &c) {
         fill_rect(0, 0, get_width(), get_height(), c);
     }
@@ -145,13 +145,21 @@ public:
 
     /// Get pointer to row number n, cast to a 32-bit unsigned integer.
     /// Using this, one can: pixbuf.get_row(y)[x]=0xRRGGBBAA or 0xAABBGGRR;
-    guint32* get_row(int y) { return reinterpret_cast<guint32*>(get_pixels()+y*get_pitch()); }
-    const guint32* get_row(int y) const { return reinterpret_cast<guint32*>(get_pixels()+y*get_pitch()); }
+    guint32 *get_row(int y) {
+        return reinterpret_cast<guint32 *>(get_pixels()+y*get_pitch());
+    }
+    const guint32 *get_row(int y) const {
+        return reinterpret_cast<guint32 *>(get_pixels()+y*get_pitch());
+    }
     /// Generic get/putpixel.
-    guint32& operator()(int x, int y) { return get_row(y)[x]; }
+    guint32 &operator()(int x, int y) {
+        return get_row(y)[x];
+    }
     /// Generic getpixel.
-    guint32 const& operator()(int x, int y) const { return get_row(y)[x]; }
-    
+    guint32 const &operator()(int x, int y) const {
+        return get_row(y)[x];
+    }
+
     /// Lock a surface - enable only the current thread to access the pixbuf.
     virtual void lock() const {}
 
@@ -160,7 +168,7 @@ public:
 
     virtual ~Pixbuf() {}
 
-    static std::vector<unsigned char> c64_gfx_data_from_pixbuf(Pixbuf const& image);
+    static std::vector<unsigned char> c64_gfx_data_from_pixbuf(Pixbuf const &image);
 };
 
 #endif

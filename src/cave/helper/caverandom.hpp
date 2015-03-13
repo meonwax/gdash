@@ -26,7 +26,7 @@ enum { GD_CAVE_SEED_MAX=65535 };
 
 /**
  * @brief Wraps a GLib random generator to make it a C++ class.
- * 
+ *
  * This is the main random generator, which is used during
  * playing the cave. The C64 random generator is only used when
  * creating the cave.
@@ -40,9 +40,9 @@ public:
     RandomGenerator();
     explicit RandomGenerator(unsigned int seed);
     RandomGenerator(const RandomGenerator &other);
-    RandomGenerator& operator=(const RandomGenerator &rhs);
+    RandomGenerator &operator=(const RandomGenerator &rhs);
     ~RandomGenerator();
-    
+
     void set_seed(unsigned int seed);
     bool rand_boolean();
     int rand_int_range(int begin, int end);
@@ -51,7 +51,7 @@ public:
 
 /**
  * @brief Random number generator, which is compatible with the original game.
- * 
+ *
  * C64 BD predictable random number generator.
  * Used to load the original caves imported from c64 files.
  * Also by the predictable slime.
@@ -62,10 +62,10 @@ private:
     int rand_seed_1;
     /// Internal state of random number generator.
     int rand_seed_2;
-    
+
 public:
     C64RandomGenerator();
-    
+
     void set_seed(int seed);
     void set_seed(int seed1, int seed2);
     unsigned int random();

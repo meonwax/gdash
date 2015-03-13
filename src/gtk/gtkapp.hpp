@@ -24,7 +24,7 @@ class GTKApp: public App {
 private:
     GThread *timer_thread;
     GtkWidget *toplevel, *drawing_area;
-	gulong focus_handler, keypress_handler, keyrelease_handler, expose_handler;
+    gulong focus_handler, keypress_handler, keyrelease_handler, expose_handler;
     GtkActionGroup *actions_game;
     bool quit_thread;
     int timer_events;
