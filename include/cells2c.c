@@ -16,6 +16,7 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <stdlib.h>
+#include <string.h>
 
 #if 0
 static void
@@ -100,7 +101,12 @@ main(int argc, char *argv[])
 	int w, h, x, y;
 	
 	gtk_init(&argc, &argv);
-	pixbuf=gdk_pixbuf_new_from_file("cells_c64.png", NULL);
+	if (argc!=2) {
+		g_critical("Usage: %s <filename.png>", argv[0]);
+
+		return -1;
+	}
+	pixbuf=gdk_pixbuf_new_from_file(argv[1], NULL);
 	g_assert (gdk_pixbuf_get_colorspace (pixbuf) == GDK_COLORSPACE_RGB);
 	g_assert (gdk_pixbuf_get_bits_per_sample (pixbuf) == 8);
 	g_assert (gdk_pixbuf_get_has_alpha (pixbuf));
@@ -118,7 +124,11 @@ main(int argc, char *argv[])
 	g_assert (w % 16 == 0);
 	g_assert (h % 16 == 0);
 	
-	g_print("static const guchar c64_gfx[]={\n");
+	if (strchr(argv[1], '.'))
+		*strchr(argv[1], '.')=0;
+	
+	g_print("static const guchar %s[]={\n", argv[1]);
+	/* magic number 8 is NUM_OF_CELLS_X, the number of cells in a row */
 	g_print("/* cell size %d */\n", w/8);
 	g_print("%d, \n", w/8);
 	g_print("/* image data */\n");

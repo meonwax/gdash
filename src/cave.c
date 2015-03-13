@@ -17,6 +17,7 @@
 #include <glib/gi18n.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "cave.h"
 #include "caveset.h"
@@ -27,6 +28,8 @@
 const int gd_dx[]={ 0, 0, 1, 1, 1, 0, -1, -1, -1, 0, 2, 2, 2, 0, -2, -2, -2 };
 const int gd_dy[]={ 0, -1, -1, 0, 1, 1, 1, 0, -1, -2, -2, 0, 2, 2, 2, 0, -2 };
 const char* gd_direction_name[]={ N_("None"), N_("Up"), N_("Up+right"), N_("Right"), N_("Down+right"), N_("Down"), N_("Down+left"), N_("Left"), N_("Up+left") };
+const char* gd_scheduling_name[]={ N_("Milliseconds"), N_("BD1"), N_("Construction Kit"), N_("Crazy Dream 7") };
+const char* gd_scheduling_filename[]={ "ms", "bd1", "plck", "crdr7" };
 
 const GdColor gd_flash_color=0xFFFFC0;
 const GdColor gd_select_color=0x8080FF;
@@ -80,42 +83,56 @@ GDC64Color gd_c64_colors[16]= {
 */
 GdElements gd_elements[] = {
 	{O_SPACE, N_("Space"), P_AMOEBA_CONSUMES, "SPACE", ' ', 0, 0, 0},
-	{O_DIRT, N_("Dirt"), P_AMOEBA_CONSUMES|P_VISUAL_EFFECT, "DIRT", '.', 2, 2, 2},
-	{O_DIRT2, N_("Dirt 2"), P_AMOEBA_CONSUMES, "DIRT2", 0, 3, 3, 3},
-	{O_BRICK, N_("Brick wall"), P_ROUNDED|P_CAN_BE_HAMMERED, "WALL", 'w', 5, 5, 5},
+	{O_DIRT, N_("Dirt"), P_AMOEBA_CONSUMES|P_VISUAL_EFFECT|P_DIRT, "DIRT", '.', 2, 2, 2},
+	{O_DIRT_SLOPED_UP_RIGHT, N_("Sloped dirt (up & right)"), P_DIRT|P_SLOPED_UP|P_SLOPED_RIGHT|P_AMOEBA_CONSUMES, "DIRTSLOPEDUPRIGHT", 0, 280, 280, 280},
+	{O_DIRT_SLOPED_UP_LEFT, N_("Sloped dirt (up & left)"), P_DIRT|P_SLOPED_UP|P_SLOPED_LEFT|P_AMOEBA_CONSUMES, "DIRTSLOPEDUPLEFT", 0, 281, 281, 281},
+	{O_DIRT_SLOPED_DOWN_LEFT, N_("Sloped dirt (down & left)"), P_DIRT|P_SLOPED_DOWN|P_SLOPED_LEFT|P_AMOEBA_CONSUMES, "DIRTSLOPEDDOWNLEFT", 0, 282, 282, 282},
+	{O_DIRT_SLOPED_DOWN_RIGHT, N_("Sloped dirt (down & right)"), P_DIRT|P_SLOPED_DOWN|P_SLOPED_RIGHT|P_AMOEBA_CONSUMES, "DIRTSLOPEDDOWNRIGHT", 0, 283, 283, 283},
+	{O_DIRT2, N_("Dirt 2"), P_DIRT|P_AMOEBA_CONSUMES, "DIRT2", 0, 3, 3, 3},
+	{O_BRICK, N_("Brick wall"), P_SLOPED|P_CAN_BE_HAMMERED, "WALL", 'w', 5, 5, 5},
+	{O_BRICK_SLOPED_UP_RIGHT, N_("Brick wall (up & right)"), P_SLOPED_UP|P_SLOPED_RIGHT|P_CAN_BE_HAMMERED, "WALLSLOPEDUPRIGHT", 0, 276, 276, 276},
+	{O_BRICK_SLOPED_UP_LEFT, N_("Brick wall (up & left)"), P_SLOPED_UP|P_SLOPED_LEFT|P_CAN_BE_HAMMERED, "WALLSLOPEDUPLEFT", 0, 277, 277, 277},
+	{O_BRICK_SLOPED_DOWN_LEFT, N_("Brick wall (down & left)"), P_SLOPED_DOWN|P_SLOPED_LEFT|P_CAN_BE_HAMMERED, "WALLSLOPEDDOWNLEFT", 0, 278, 278, 278},
+	{O_BRICK_SLOPED_DOWN_RIGHT, N_("Brick wall (down & right)"), P_SLOPED_DOWN|P_SLOPED_RIGHT|P_CAN_BE_HAMMERED, "WALLSLOPEDDOWNRIGHT", 0, 279, 279, 279},
 	{O_MAGIC_WALL, N_("Magic wall"), 0, "MAGICWALL", 'M', 184, -184, -184},
-	{O_PRE_OUTBOX, N_("Outbox"), 0, "OUTBOX", 'X', 284, -291, 22},	/* 291, 292, 293, 294, 295, 296, 297, 298 */
+	{O_PRE_OUTBOX, N_("Outbox"), 0, "OUTBOX", 'X', 351, -291, 22},	/* 291, 292, 293, 294, 295, 296, 297, 298 */
 	{O_OUTBOX, N_("Outbox (open)"), 0, "OUTBOXopen", 0, 299, 299, 22},
-	{O_PRE_INVIS_OUTBOX, N_("Invisible outbox"), 0, "HIDDENOUTBOX", 'H', 283, 283, 22},
+	{O_PRE_INVIS_OUTBOX, N_("Invisible outbox"), 0, "HIDDENOUTBOX", 'H', 288, 288, 22},
 	{O_INVIS_OUTBOX, N_("Invisible outbox (open)"), 0, "HIDDENOUTBOXopen", 0, 300, 300, 22},
 	{O_STEEL, N_("Steel wall"), P_NON_EXPLODABLE, "STEELWALL", 'W', 4, 4, 4},
+	{O_STEEL_SLOPED_UP_RIGHT, N_("Steel wall (up & right)"), P_SLOPED_UP|P_SLOPED_RIGHT|P_NON_EXPLODABLE, "STEELWALLSLOPEDUPRIGHT", 0, 284, 284, 284},
+	{O_STEEL_SLOPED_UP_LEFT, N_("Steel wall (up & left)"), P_SLOPED_UP|P_SLOPED_LEFT|P_NON_EXPLODABLE, "STEELWALLSLOPEDUPLEFT", 0, 285, 285, 285},
+	{O_STEEL_SLOPED_DOWN_LEFT, N_("Steel wall (down & left)"), P_SLOPED_DOWN|P_SLOPED_LEFT|P_NON_EXPLODABLE, "STEELWALLSLOPEDDOWNLEFT", 0, 286, 286, 286},
+	{O_STEEL_SLOPED_DOWN_RIGHT, N_("Steel wall (down & right)"), P_SLOPED_DOWN|P_SLOPED_RIGHT|P_NON_EXPLODABLE, "STEELWALLSLOPEDDOWNRIGHT", 0, 287, 287, 287},
 	{O_STEEL_EXPLODABLE, N_("Explodable steel wall"), 0, "STEELWALLDESTRUCTABLE", 'E', 309, 309, 4},
-	{O_STEEL_EATABLE, N_("Eatable steel wall"), 0, "STEELWALLEATABLE", 0, 281, 281, 4},
-	{O_BRICK_EATABLE, N_("Eatable brick wall"), 0, "WALLEATABLE", 0, 282, 282, 5},
-	{O_STONE, N_("Stone"), P_ROUNDED, "BOULDER", 'r', 1, 1, 1, 156},	/* has ckdelay */
+	{O_STEEL_EATABLE, N_("Eatable steel wall"), 0, "STEELWALLEATABLE", 0, 339, 339, 4},
+	{O_BRICK_EATABLE, N_("Eatable brick wall"), 0, "WALLEATABLE", 0, 340, 340, 5},
+	{O_STONE, N_("Stone"), P_SLOPED, "BOULDER", 'r', 1, 1, 1, 156},	/* has ckdelay */
 	{O_STONE_F, N_("Stone, falling"), 0, "BOULDERf", 'R', 314, 314, 1, 156},	/* has ckdelay */
-	{O_DIAMOND, N_("Diamond"), P_ROUNDED, "DIAMOND", 'd', 248, -248, -248, 156},	/* has ckdelay */
+	{O_MEGA_STONE, N_("Mega stone"), P_SLOPED, "MEGABOULDER", 0, 272, 272, 272, 156},	/* has ckdelay */
+	{O_MEGA_STONE_F, N_("Mega stone, falling"), 0, "MEGABOULDERf", 0, 345, 345, 272, 156},	/* has ckdelay */
+	{O_DIAMOND, N_("Diamond"), P_SLOPED, "DIAMOND", 'd', 248, -248, -248, 156},	/* has ckdelay */
 	{O_DIAMOND_F, N_("Diamond, falling"), 0, "DIAMONDf", 'D', 315, 315, -248, 156},	/* has ckdelay */
 	{O_BLADDER_SPENDER, N_("Bladder Spender"), 0, "BLADDERSPENDER", 0, 6, 6, 6, 20},	/* has ckdelay */
 	{O_INBOX, N_("Inbox"), 0, "INBOX", 'P', 35, 35, 22},
 	{O_H_GROWING_WALL, N_("Expanding wall, horizontal"), P_VISUAL_EFFECT, "HEXPANDINGWALL", 'x', 316, 316, 5, 111},	/* has ckdelay */
 	{O_V_GROWING_WALL, N_("Expanding wall, vertical"), P_VISUAL_EFFECT, "VEXPANDINGWALL", 'v', 326, 326, 5, 111},	/* has ckdelay */
-	{O_GROWING_WALL, N_("Expanding wall"), P_VISUAL_EFFECT, "EXPANDINGWALL", 'e', 277, 277, 5, 111},	/* has ckdelay */
+	{O_GROWING_WALL, N_("Expanding wall"), P_VISUAL_EFFECT, "EXPANDINGWALL", 'e', 343, 343, 5, 111},	/* has ckdelay */
 	{O_GROWING_WALL_SWITCH, N_("Expanding wall switch"), 0, "EXPANDINGWALLSWITCH", 0, 40, 40, 40},
 	{O_CREATURE_SWITCH, N_("Creature direction switch"), 0, "FIREFLYBUTTERFLYSWITCH", 0, 18, 18, 18},
 	{O_BITER_SWITCH, N_("Biter switch"), 0, "BITERSWITCH", 0, 12, 12, 12},
 	{O_ACID, N_("Acid"), 0, "ACID", 0, 20, 20, 20, 128},	/* has ckdelay */
-	{O_FALLING_WALL, N_("Falling wall"), 0, "FALLINGWALL", 0, 278, 278, 5, 80},	/* has ckdelay */
-	{O_FALLING_WALL_F, N_("Falling wall, falling"), 0, "FALLINGWALLf", 0, 279, 279, 5, 80},	/* has ckdelay */
-	{O_BOX, N_("Box"), 0, "BOX", 0, 21, 21, 21},
-	{O_TIME_PENALTY, N_("Time penalty"), P_NON_EXPLODABLE, "TIMEPENALTY", 0, 9, 9, 9},
+	{O_FALLING_WALL, N_("Falling wall"), 0, "FALLINGWALL", 0, 342, 342, 5, 80},	/* has ckdelay */
+	{O_FALLING_WALL_F, N_("Falling wall, falling"), 0, "FALLINGWALLf", 0, 344, 344, 5, 80},	/* has ckdelay */
+	{O_BOX, N_("Box"), 0, "SOKOBANBOX", 0, 21, 21, 21},
+	{O_TIME_PENALTY, N_("Time penalty"), P_NON_EXPLODABLE, "TIMEPENALTY", 0, 346, 346, 9},
 	{O_GRAVESTONE, N_("Gravestone"), P_NON_EXPLODABLE, "GRAVESTONE", 'G', 9, 9, 9},
-	{O_STONE_GLUED, N_("Glued stone"), P_ROUNDED, "GLUEDBOULDER", 0, 334, 334, 1},
-	{O_DIAMOND_GLUED, N_("Glued diamond"), P_ROUNDED, "GLUEDDIAMOND", 0, 272, 272, -248},
+	{O_STONE_GLUED, N_("Glued stone"), P_SLOPED, "GLUEDBOULDER", 0, 334, 334, 1},
+	{O_DIAMOND_GLUED, N_("Glued diamond"), P_SLOPED, "GLUEDDIAMOND", 0, 341, 341, -248},
 	{O_DIAMOND_KEY, N_("Diamond key"), 0, "DIAMONDRELEASEKEY", 0, 11, 11, 11},
 	{O_TRAPPED_DIAMOND, N_("Trapped diamond"), P_NON_EXPLODABLE, "TRAPPEDDIAMOND", 0, 10, 10, 10},
 	{O_CLOCK, N_("Clock"), 0, "CLOCK", 0, 16, 16, 16},
-	{O_DIRT_GLUED, N_("Glued dirt"), 0, "GLUEDDIRT", 0, 280, 280, 2},
+	{O_DIRT_GLUED, N_("Glued dirt"), 0, "GLUEDDIRT", 0, 321, 321, 2},
 	{O_KEY_1, N_("Key 1"), 0, "KEY1", 0, 67, 67, 67},
 	{O_KEY_2, N_("Key 2"), 0, "KEY2", 0, 68, 68, 68},
 	{O_KEY_3, N_("Key 3"), 0, "KEY3", 0, 69, 69, 69},
@@ -128,7 +145,7 @@ GdElements gd_elements[] = {
 	{O_PNEUMATIC_HAMMER, N_("Pneumatic hammer"), 0, "PNEUMATIC_HAMMER", 0, 62, 62, 62},
 	{O_TELEPORTER, N_("Teleporter"), 0, "TELEPORTER", 0, 61, 61, 61},
 	{O_SKELETON, N_("Skeleton"), 0, "SKELETON", 0, 72, 72, 72},
-	{O_WATER, N_("Water"), 0, "WATER", 0, 96, -96, -96, 160},	/* has ckdelay - not exact */
+	{O_WATER, N_("Water"), 0, "WATER", 0, 96, -96, -96, 100},	/* has ckdelay */
 	{O_WATER_1, N_("Water (1)"), 0, "WATER1", 0, 96, -96, -96},
 	{O_WATER_2, N_("Water (2)"), 0, "WATER2", 0, 96, -96, -96},
 	{O_WATER_3, N_("Water (3)"), 0, "WATER3", 0, 96, -96, -96},
@@ -145,17 +162,17 @@ GdElements gd_elements[] = {
 	{O_WATER_14, N_("Water (14)"), 0, "WATER14", 0, 96, -96, -96},
 	{O_WATER_15, N_("Water (15)"), 0, "WATER15", 0, 96, -96, -96},
 	{O_WATER_16, N_("Water (16)"), 0, "WATER16", 0, 96, -96, -96},
-	{O_COW_1, N_("Cow (left)"), P_CCW, "COWl", 0, 317, -88, -88, 260},	/* has ckdelay - not exact */
-	{O_COW_2, N_("Cow (up)"), P_CCW, "COWu", 0, 318, -88, -88, 260},	/* has ckdelay - not exact */
-	{O_COW_3, N_("Cow (right)"), P_CCW, "COWr", 0, 319, -88, -88, 260},	/* has ckdelay - not exact */
-	{O_COW_4, N_("Cow (down)"), P_CCW, "COWd", 0, 320, -88, -88, 260},	/* has ckdelay - not exact */
-	{O_COW_ENCLOSED_1, N_("Cow (enclosed, 1)"), 0, "COW_ENCLOSED1", 0, 327, -88, -88, 160},	/* has ckdelay - not exact */
-	{O_COW_ENCLOSED_2, N_("Cow (enclosed, 2)"), 0, "COW_ENCLOSED2", 0, 327, -88, -88, 160},	/* has ckdelay - not exact */
-	{O_COW_ENCLOSED_3, N_("Cow (enclosed, 3)"), 0, "COW_ENCLOSED3", 0, 327, -88, -88, 160},	/* has ckdelay - not exact */
-	{O_COW_ENCLOSED_4, N_("Cow (enclosed, 4)"), 0, "COW_ENCLOSED4", 0, 327, -88, -88, 160},	/* has ckdelay - not exact */
-	{O_COW_ENCLOSED_5, N_("Cow (enclosed, 5)"), 0, "COW_ENCLOSED5", 0, 327, -88, -88, 160},	/* has ckdelay - not exact */
-	{O_COW_ENCLOSED_6, N_("Cow (enclosed, 6)"), 0, "COW_ENCLOSED6", 0, 327, -88, -88, 160},	/* has ckdelay - not exact */
-	{O_COW_ENCLOSED_7, N_("Cow (enclosed, 7)"), 0, "COW_ENCLOSED7", 0, 327, -88, -88, 160},	/* has ckdelay - not exact */
+	{O_COW_1, N_("Cow (left)"), P_CCW, "COWl", 0, 317, -88, -88, 384},	/* has ckdelay */
+	{O_COW_2, N_("Cow (up)"), P_CCW, "COWu", 0, 318, -88, -88, 384},	/* has ckdelay */
+	{O_COW_3, N_("Cow (right)"), P_CCW, "COWr", 0, 319, -88, -88, 384},	/* has ckdelay */
+	{O_COW_4, N_("Cow (down)"), P_CCW, "COWd", 0, 320, -88, -88, 384},	/* has ckdelay */
+	{O_COW_ENCLOSED_1, N_("Cow (enclosed, 1)"), 0, "COW_ENCLOSED1", 0, 327, -88, -88, 120},	/* has ckdelay */
+	{O_COW_ENCLOSED_2, N_("Cow (enclosed, 2)"), 0, "COW_ENCLOSED2", 0, 327, -88, -88, 120},	/* has ckdelay */
+	{O_COW_ENCLOSED_3, N_("Cow (enclosed, 3)"), 0, "COW_ENCLOSED3", 0, 327, -88, -88, 120},	/* has ckdelay */
+	{O_COW_ENCLOSED_4, N_("Cow (enclosed, 4)"), 0, "COW_ENCLOSED4", 0, 327, -88, -88, 120},	/* has ckdelay */
+	{O_COW_ENCLOSED_5, N_("Cow (enclosed, 5)"), 0, "COW_ENCLOSED5", 0, 327, -88, -88, 120},	/* has ckdelay */
+	{O_COW_ENCLOSED_6, N_("Cow (enclosed, 6)"), 0, "COW_ENCLOSED6", 0, 327, -88, -88, 120},	/* has ckdelay */
+	{O_COW_ENCLOSED_7, N_("Cow (enclosed, 7)"), 0, "COW_ENCLOSED7", 0, 327, -88, -88, 120},	/* has ckdelay */
 	{O_WALLED_DIAMOND, N_("Walled diamond"), P_CAN_BE_HAMMERED, "WALLED_DIAMOND", 0, 322, 322, 5},
 	{O_WALLED_KEY_1, N_("Walled key 1"), P_CAN_BE_HAMMERED, "WALLED_KEY1", 0, 323, 323, 5},
 	{O_WALLED_KEY_2, N_("Walled key 2"), P_CAN_BE_HAMMERED, "WALLED_KEY2", 0, 324, 324, 5},
@@ -176,8 +193,8 @@ GdElements gd_elements[] = {
 	{O_BLADDER_8, N_("Bladder (8)"), 0, "BLADDERd8", 0, 176, -176, -176},
 	{O_BLADDER_9, N_("Bladder (9)"), 0, "BLADDERd9", 0, 176, -176, -176},
 
-	{O_WAITING_STONE, N_("Waiting stone"), P_ROUNDED, "WAITINGBOULDER", 0, 290, 290, 1, 176},	/* has ckdelay */
-	{O_CHASING_STONE, N_("Chasing stone"), P_ROUNDED, "CHASINGBOULDER", 0, 17, 17, 17, 269},	/* has ckdelay */
+	{O_WAITING_STONE, N_("Waiting stone"), P_SLOPED, "WAITINGBOULDER", 0, 290, 290, 1, 176},	/* has ckdelay */
+	{O_CHASING_STONE, N_("Chasing stone"), P_SLOPED, "CHASINGBOULDER", 0, 17, 17, 17, 269},	/* has ckdelay */
 	{O_GHOST, N_("Ghost"), 0, "GHOST", 'g', 160, -160, -160, 50},	/* has ckdelay */
 	{O_GUARD_1, N_("Guard, left"), P_EXPLODES_TO_SPACE | P_CCW, "FIREFLYl", 'Q', 310, -136, -136, 384},	/* has ckdelay */
 	{O_GUARD_2, N_("Guard, up"), P_EXPLODES_TO_SPACE | P_CCW, "FIREFLYu", 'o', 311, -136, -136, 384},	/* has ckdelay */
@@ -195,14 +212,14 @@ GdElements gd_elements[] = {
 	{O_ALT_BUTTER_2, N_("Alternative butterfly, up"), P_EXPLODES_TO_DIAMONDS | P_CCW, "A_BUTTERFLYu", 0, 306, -112, -112, 384},	/* has ckdelay */
 	{O_ALT_BUTTER_3, N_("Alternative butterfly, right"), P_EXPLODES_TO_DIAMONDS | P_CCW, "A_BUTTERFLYr", 0, 307, -112, -112, 384},	/* has ckdelay */
 	{O_ALT_BUTTER_4, N_("Alternative butterfly, down"), P_EXPLODES_TO_DIAMONDS | P_CCW, "A_BUTTERFLYd", 0, 308, -112, -112, 384},	/* has ckdelay */
-	{O_STONEFLY_1, N_("Stonefly, left"), P_EXPLODES_TO_STONES, "STONEFLYl", 0, 273, -152, -152, 384},	/* has ckdelay */
-	{O_STONEFLY_2, N_("Stonefly, up"), P_EXPLODES_TO_STONES, "STONEFLYu", 0, 274, -152, -152, 384},	/* has ckdelay */
-	{O_STONEFLY_3, N_("Stonefly, right"), P_EXPLODES_TO_STONES, "STONEFLYr", 0, 275, -152, -152, 384},	/* has ckdelay */
-	{O_STONEFLY_4, N_("Stonefly, down"), P_EXPLODES_TO_STONES, "STONEFLYd", 0, 276, -152, -152, 384},	/* has ckdelay */
-	{O_BITER_1, N_("Biter, up"), 0, "BITERu", 0, 285, -168, -168, 518},	/* has ckdelay */
-	{O_BITER_2, N_("Biter, right"), 0, "BITERr", 0, 286, -168, -168, 518},	/* has ckdelay */
-	{O_BITER_3, N_("Biter, down"), 0, "BITERd", 0, 287, -168, -168, 518},	/* has ckdelay */
-	{O_BITER_4, N_("Biter, left"), 0, "BITERl", 0, 288, -168, -168, 518},	/* has ckdelay */
+	{O_STONEFLY_1, N_("Stonefly, left"), P_EXPLODES_TO_STONES, "STONEFLYl", 0, 335, -152, -152, 384},	/* has ckdelay */
+	{O_STONEFLY_2, N_("Stonefly, up"), P_EXPLODES_TO_STONES, "STONEFLYu", 0, 336, -152, -152, 384},	/* has ckdelay */
+	{O_STONEFLY_3, N_("Stonefly, right"), P_EXPLODES_TO_STONES, "STONEFLYr", 0, 337, -152, -152, 384},	/* has ckdelay */
+	{O_STONEFLY_4, N_("Stonefly, down"), P_EXPLODES_TO_STONES, "STONEFLYd", 0, 338, -152, -152, 384},	/* has ckdelay */
+	{O_BITER_1, N_("Biter, up"), 0, "BITERu", 0, 347, -168, -168, 518},	/* has ckdelay */
+	{O_BITER_2, N_("Biter, right"), 0, "BITERr", 0, 348, -168, -168, 518},	/* has ckdelay */
+	{O_BITER_3, N_("Biter, down"), 0, "BITERd", 0, 349, -168, -168, 518},	/* has ckdelay */
+	{O_BITER_4, N_("Biter, left"), 0, "BITERl", 0, 350, -168, -168, 518},	/* has ckdelay */
 
 	{O_PRE_PL_1, N_("Player birth (1)"), 0, "GUYBIRTH1", 0, 32, 32, 32},
 	{O_PRE_PL_2, N_("Player birth (2)"), 0, "GUYBIRTH2", 0, 33, 33, 33},
@@ -338,11 +355,10 @@ const GdCaveProperties gd_cave_properties[] = {
 	{"PALTiming", GD_TYPE_BOOLEAN, 0, N_("   PAL timing (slower seconds)"), G_STRUCT_OFFSET(Cave, pal_timing), 1, N_("On the PAL version of the C64 computer, the timer was "
 	"actually slower than normal seconds. This flag is used to compensate for this. Most original games are authored for the PAL version."), FALSE},
 	{"TimeValue", GD_TYPE_INT, 0, N_("Score for time"), G_STRUCT_OFFSET(Cave, level_timevalue[0]), 5, N_("Points for each seconds remaining, when the player exits the level."), 1, 0, 50},
-	{"C64Scheduling", GD_TYPE_BOOLEAN, GD_DONT_SAVE, N_("C64 scheduling"), G_STRUCT_OFFSET(Cave, c64_scheduling), 1, N_("This flag sets whether the game uses an emulation of the original timing (c64-style), or a more modern milliseconds-based timing."), FALSE},
-	{"BD1Scheduling", GD_TYPE_BOOLEAN, 0, N_("   BD1 scheduling"), G_STRUCT_OFFSET(Cave, bd1_scheduling), 1, N_("The original game used a delay (empty loop) based timing of caves; this is selected by enabling this check box. The timing of the construction kit and later versions were more exact; emulation of that mode is selected by unchecking the box. This flag is ignored, when milliseconds-based timing is used for a cave."), FALSE},
-	{"CaveDelay", GD_TYPE_INT, GD_DONT_SAVE, N_("Delay (c64-style)"), G_STRUCT_OFFSET(Cave, level_ckdelay[0]), 5, N_("The length of the delay loop between game frames. Used when milliseconds-based timing is inactive, ie. C64 scheduling is on."), 0, 0, 32},
-	{"FrameTime", GD_TYPE_INT, GD_DONT_SAVE, N_("Speed (ms)"), G_STRUCT_OFFSET(Cave, level_speed[0]), 5, N_("Number of milliseconds between game frames. Used when milliseconds-based timing is active, ie. C64 scheduling is off."), 200, 50, 500},
-	{"HatchingDelay", GD_TYPE_INT, 0, N_("Hatching delay"), G_STRUCT_OFFSET(Cave, hatching_delay), 1, N_("This value sets how much the cave will move until the player enters the cave. If C64 scheduling is used, then this is in seconds; if not, then it is in frames."), 2, 1, 40},
+	{"CaveScheduling", GD_TYPE_SCHEDULING, GD_DONT_SAVE, N_("Scheduling type"), G_STRUCT_OFFSET(Cave, scheduling), 1, N_("This flag sets whether the game uses an emulation of the original timing (c64-style), or a more modern milliseconds-based timing. The original game used a delay (empty loop) based timing of caves; this is selected by setting this to BD1, Construction Kit or Crazy Dream 7."), GD_SCHEDULING_MILLISECONDS},
+	{"CaveDelay", GD_TYPE_INT, GD_DONT_SAVE, N_("   Delay (c64-style)"), G_STRUCT_OFFSET(Cave, level_ckdelay[0]), 5, N_("The length of the delay loop between game frames. Used when milliseconds-based timing is inactive, ie. C64 scheduling is on."), 0, 0, 32},
+	{"FrameTime", GD_TYPE_INT, GD_DONT_SAVE, N_("   Speed (ms)"), G_STRUCT_OFFSET(Cave, level_speed[0]), 5, N_("Number of milliseconds between game frames. Used when milliseconds-based timing is active, ie. C64 scheduling is off."), 200, 50, 500},
+	{"HatchingDelay", GD_TYPE_INT, 0, N_("Hatching delay"), G_STRUCT_OFFSET(Cave, hatching_delay), 1, N_("This value sets how much the cave will move until the player enters the cave. If C64 scheduling is used, then this is in seconds; if not, then it is in frames."), 21, 1, 40},
 	{"", GD_LABEL, 0, N_("<b>Elements</b>")},
 	{"RandSeed", GD_TYPE_INT, 0, N_("Random seed value"), G_STRUCT_OFFSET(Cave, level_rand[0]), 5, N_("Random seed value controls the predictable random number generator, which fills the cave initially. If set to -1, cave is totally random every time it is played."), 0, -1, 255},
 
@@ -459,6 +475,7 @@ const GdCaveProperties gd_cave_properties[] = {
 	{"BorderProperties.lineshift", GD_TYPE_BOOLEAN, 0, N_("Line shifting border"), G_STRUCT_OFFSET(Cave, lineshift), 1, N_("If this is set to true, the player exiting on either side will appear one row lower or upper on the other side."), FALSE},
 	{"ShortExplosions", GD_TYPE_BOOLEAN, 0, N_("Short explosions"), G_STRUCT_OFFSET(Cave, short_explosions), 1, N_("In 1stB, explosions were longer, took five cave frames to complete, as opposed to four in the original."), TRUE},
 	{"SkeletonsWorthDiamonds", GD_TYPE_INT, 0, N_("Skeletons worth diamonds"), G_STRUCT_OFFSET(Cave, skeletons_worth_diamonds), 1, N_("The number of diamonds each skeleton is worth."), 0, 0, 10},
+	{"GravityAffectsAll", GD_TYPE_BOOLEAN, 0, N_("Gravity change affects everything"), G_STRUCT_OFFSET(Cave, gravity_affects_all), 1, N_("If this is enabled, changing the gravity will also affect bladders (moving and pushing), bladder spenders, falling walls and waiting stones. Otherwise, those elements behave as gravity was always pointing downwards."), TRUE},
 	{NULL}
 };
 
@@ -482,14 +499,34 @@ int gd_highscore_compare(gconstpointer a, gconstpointer b)
 }
 
 /* return true if score achieved is a highscore */
-gboolean gd_score_is_highscore(GList *highscore, int score)
+gboolean gd_cave_is_highscore(Cave *cave, int score)
 {
-	/* is highscore list is short OR score is inside list */
-	if (score > 0
-	    && (g_list_length(highscore) < GD_HIGHSCORE_NUM || score > ((GdHighScore *)(g_list_last(highscore)->data))->score))
+	/* if score is above zero AND bigger than the last one */
+	if (score>0 && score>cave->highscore[G_N_ELEMENTS(cave->highscore)-1].score)
 		return TRUE;
 
 	return FALSE;
+}
+
+int
+gd_cave_add_highscore(Cave *cave, GdHighScore hs)
+{
+	int i;
+	
+	if (!gd_cave_is_highscore(cave, hs.score))
+		return -1;
+		
+	/* overwrite the last one */
+	g_memmove(&cave->highscore[G_N_ELEMENTS(cave->highscore)-1], &hs, sizeof(hs));
+	/* and sort */
+	qsort(cave->highscore, G_N_ELEMENTS(cave->highscore), sizeof(GdHighScore), gd_highscore_compare);
+	
+	for (i=0; i<G_N_ELEMENTS(cave->highscore); i++)
+		if (g_str_equal(cave->highscore[i].name, hs.name) && cave->highscore[i].score==hs.score)
+			return i;
+			
+	g_assert_not_reached();
+	return -1;
 }
 
 
@@ -550,14 +587,24 @@ void
 gd_cave_init ()
 {
 	int i;
+	gboolean cells[NUM_OF_CELLS];
+	
+	for (i=0; i<NUM_OF_CELLS; i++)
+		cells[i]=FALSE;
+		
+	g_assert(GD_SCHEDULING_MAX==G_N_ELEMENTS(gd_scheduling_filename));
+	g_assert(GD_SCHEDULING_MAX==G_N_ELEMENTS(gd_scheduling_name));
 
 	/* check element database for faults. */
-	for (i = 0; i < G_N_ELEMENTS (gd_elements); i++) {
+	for (i=0; i < G_N_ELEMENTS (gd_elements); i++) {
+		int j, m;
+		
 		if (gd_elements[i].element!=i)
 			g_critical ("element: i:0x%x!=0x%x", i, gd_elements[i].element);
 		/* if it has a name, create a lowercase name (of the translated one). will be used by the editor */
 		if (gd_elements[i].name)
-			gd_elements[i].lowercase_name = g_utf8_strdown (gettext (gd_elements[i].name), -1);
+			/* the function allocates a new string, but it is needed as long as the app is running */
+			gd_elements[i].lowercase_name=g_utf8_strdown(gettext(gd_elements[i].name), -1);
 		
 		/* we do not like generated pixbufs for games. only those that are in the png. */
 		if (ABS(gd_elements[i].image_game)>NUM_OF_CELLS_X*NUM_OF_CELLS_Y)
@@ -565,7 +612,37 @@ gd_cave_init ()
 	
 		if (gd_elements[i].image<0)
 			g_critical ("editor pixbuf for element %x (%s) should not be animated", i, gd_elements[i].name);
+			
+		m=gd_elements[i].image<0?8:1;
+		for (j=0; j<m; j++)
+			cells[ABS(gd_elements[i].image)+j]=TRUE;
+		m=gd_elements[i].image_simple<0?8:1;
+		for (j=0; j<m; j++)
+			cells[ABS(gd_elements[i].image_simple)+j]=TRUE;
+		m=gd_elements[i].image_game<0?8:1;
+		for (j=0; j<m; j++)
+			cells[ABS(gd_elements[i].image_game)+j]=TRUE;
 	}
+
+	/* uncomment this, to print free indexes in cells array */
+	/*
+	g_print("Free pixbuf indexes: ");
+	for (i=NUM_OF_CELLS_X*NUM_OF_CELLS_Y; i<NUM_OF_CELLS; i++) {
+		if (cells[i]==FALSE)
+			g_print("%d ", i);
+	}
+	g_print("\n");
+	*/
+	
+	/* uncomment this, to show free element->character characters. */
+	/*
+	gd_create_char_to_element_table();
+	g_print("Free characters: ");
+	for (i=32; i<128; i++)
+		if (gd_char_to_element[i]==O_UNKNOWN)
+			g_print("%c", i);
+	g_print("\n");
+	*/
 
 	/* check if any of the properties are designated as string arrays. they are not supported in
 	 * file read/write and operations, also they do not even make any sense! */
@@ -685,6 +762,7 @@ gd_cave_set_defaults (Cave* cave)
 		int *ivalue=pvalue;	/* these point to the same, but to avoid the awkward cast syntax */
 		GdElement *evalue=pvalue;
 		GdDirection *dvalue=pvalue;
+		GdScheduling *svalue=pvalue;
 		gboolean *bvalue=pvalue;
 		GdColor *cvalue=pvalue;
 		double *fvalue=pvalue;
@@ -722,6 +800,9 @@ gd_cave_set_defaults (Cave* cave)
 				break;
 			case GD_TYPE_DIRECTION:
 				dvalue[j]=(GdDirection) gd_cave_properties[i].defval;
+				break;
+			case GD_TYPE_SCHEDULING:
+				svalue[j]=(GdScheduling) gd_cave_properties[i].defval;
 				break;
 			}
 	}
@@ -877,6 +958,61 @@ gd_cave_set_ckdelay_extra_for_animation(Cave *cave)
 		cave->ckdelay_extra_for_animation+=2600;
 }
 
+
+/* do some init - setup some cave variables before the game. */
+void
+gd_cave_setup_for_game(Cave *cave)
+{
+	int x, y;
+	
+	gd_cave_set_ckdelay_extra_for_animation(cave);
+
+	/* find the player which will be the one to scroll to at the beginning of the game (before the player's birth) */
+	if (cave->active_is_first_found) {
+		/* uppermost player is active */
+		for (y=cave->h-1; y>=0; y--)
+			for (x=cave->w-1; x>=0; x--)
+				if (cave->map[y][x]==O_INBOX) {
+					cave->player_x=x;
+					cave->player_y=y;
+				}
+	} else {
+		/* lowermost player is active */
+		for (y=0; y<cave->h; y++)
+			for (x=0; x<cave->w; x++)
+				if (cave->map[y][x]==O_INBOX) {
+					cave->player_x=x;
+					cave->player_y=y;
+				}
+	}
+		
+	/* if automatically counting diamonds. if this was negative,
+	 * the sum will be this less than the number of all the diamonds in the cave */
+	if (cave->diamonds_needed<=0) {
+		for (y=0; y<cave->h; y++)
+			for (x=0; x<cave->w; x++)
+				if (cave->map[y][x]==O_DIAMOND)
+					cave->diamonds_needed++;
+		if (cave->diamonds_needed<0)
+			/* if still below zero, let this be 0, so gate will be open immediately */
+			cave->diamonds_needed=0;
+	}
+
+	gd_cave_correct_visible_size(cave);
+
+	/* select number of milliseconds (for pal and ntsc) */
+	cave->timing_factor=cave->pal_timing?1200:1000;
+	cave->time*=cave->timing_factor;
+	cave->magic_wall_milling_time*=cave->timing_factor;
+	cave->amoeba_slow_growth_time*=cave->timing_factor;
+	/* for all c64-type scheduling types, hatching delay means seconds. otherwise, it means frames, so we do not touch it. */
+	if (cave->scheduling!=GD_SCHEDULING_MILLISECONDS)
+		cave->hatching_delay*=cave->timing_factor;
+	if (cave->hammered_walls_reappear)
+		cave->hammered_reappear=gd_cave_map_new(cave, int);
+}
+
+
 /**
 	Put an object to the specified position.
 	Performs range checking.
@@ -898,7 +1034,21 @@ gd_cave_store_rc (Cave *cave, const int x, const int y, const GdElement element,
 
 
 
-
+/* cave maps.
+   cave maps are continuous areas in memory. the allocated memory
+   is width*height*bytes_per_cell long.
+   the cave map[0] stores the pointer given by g_malloc().
+   the map itself is also an allocated array of pointers to the
+   beginning of rows.
+   therefore:
+   		rows=new (pointers to rows);
+		rows[0]=new map
+		rows[1..h-1]=rows[0]+width*bytes
+		
+	freeing this:
+		free(rows[0])
+		free(rows)
+*/
 
 /**
 	allocate a cave map-like array, and initialize to zero.
@@ -910,8 +1060,8 @@ gd_cave_map_new_for_cave(const Cave *cave, const int cell_size)
 	gpointer *rows;				/* this is void**, pointer to array of ... */
 	int y;
 
-	rows=g_new (gpointer, cave->h);
-	rows[0]=g_malloc0 (cell_size * cave->w * cave->h);
+	rows=g_new(gpointer, cave->h);
+	rows[0]=g_malloc0 (cell_size*cave->w*cave->h);
 	for (y=1; y<cave->h; y++)
 		/* base pointer+num_of_bytes_per_element*width*number_of_row; as sizeof(char)=1 */
 		rows[y]=(char *)rows[0]+cell_size*cave->w*y;
@@ -957,10 +1107,11 @@ gd_cave_map_free(gpointer map)
 void
 gd_cave_clear_highscore(Cave *cave)
 {
-	if (cave->highscore) {
-		g_list_foreach(cave->highscore, (GFunc) g_free, NULL);
-		g_list_free(cave->highscore);
-		cave->highscore=NULL;
+	int i;
+	
+	for (i=0; i<G_N_ELEMENTS(cave->highscore); i++) {
+		strcpy(cave->highscore[i].name, "");
+		cave->highscore[i].score=0;
 	}
 }
 
@@ -1000,8 +1151,7 @@ gd_cave_free (Cave *cave)
 	g_list_free (cave->objects);
 
 	/* hammered walls to reappear data */
-	g_list_foreach(cave->hammered_walls, (GFunc) g_free, NULL);
-	g_list_free(cave->hammered_walls);
+	gd_cave_map_free(cave->hammered_reappear);
 
 	/* freeing main pointer */
 	g_free (cave);
@@ -1024,6 +1174,7 @@ gd_cave_copy(Cave *dest, const Cave *src)
 	if (src->tags)
 		g_hash_table_foreach(src->tags, (GHFunc) hash_copy_foreach, dest->tags);
 	dest->map=gd_cave_map_dup (src, map);
+	dest->hammered_reappear=gd_cave_map_dup(src, hammered_reappear);
 
 	/* no reason to copy this */
 	dest->objects_order=NULL;
@@ -1037,24 +1188,6 @@ gd_cave_copy(Cave *dest, const Cave *src)
 			dest->objects=g_list_append (dest->objects, g_memdup (iter->data, sizeof (GdObject)));
 	}
 
-	/* copy highscore */
-	if (src->highscore) {
-		GList *iter;
-
-		dest->highscore=NULL;	/* new empty list */
-		for (iter=src->highscore; iter!=NULL; iter=iter->next)	/* deep copy list */
-			dest->highscore=g_list_append(dest->highscore, g_memdup(iter->data, sizeof(GdHighScore)));
-	}
-
-	/* copy hammered walls data */
-	if (src->hammered_walls) {
-		GList *iter;
-
-		dest->hammered_walls=NULL;	/* new empty list */
-		for (iter=src->hammered_walls; iter!=NULL; iter=iter->next)	/* deep copy list */
-			dest->hammered_walls=g_list_append(dest->hammered_walls, g_memdup(iter->data, sizeof(HammeredWall)));
-	}
-	
 	/* copy random number generator */
 	if (src->random)
 		dest->random=g_rand_copy(src->random);

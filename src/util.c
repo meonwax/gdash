@@ -156,6 +156,7 @@ gd_find_file(const char *filename)
 		return result;
 		
 	g_critical("cannot find file: %s", gd_filename_to_utf8(filename));
+	return NULL;
 }
 
 char *gd_wrap_text(const char *orig, int width)

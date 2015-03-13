@@ -78,10 +78,10 @@ extern GdObjectDescription gd_object_description[];
 void gd_cave_draw_object (Cave *cave, const GdObject *object, int level);
 char *gd_object_to_bdcff(const GdObject *object);
 char *gd_get_object_coordinates_text (GdObject *selected);
-char *gd_get_object_description_text (GdObject *selected);
+char *gd_get_object_description_markup (GdObject *selected);
 GdObject *gd_object_new_from_string(char *str);
 
-Cave *gd_cave_new_rendered (const Cave * data, const int level);
+Cave *gd_cave_new_rendered(const Cave * data, const int level, guint32 seed);
 void gd_flatten_cave (Cave * cave, const int level);
 
 #endif	/* CAVEOBJECT.H */

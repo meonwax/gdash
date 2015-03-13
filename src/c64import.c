@@ -294,8 +294,8 @@ set_dirt_mod (Cave *cave, DirtModType mod_type)
 void
 gd_cave_set_bd1_defaults(Cave *cave)
 {
-	cave->c64_scheduling=TRUE;
-	cave->bd1_scheduling=TRUE;
+	cave->scheduling=GD_SCHEDULING_BD1;
+	cave->hatching_delay=2;
 	cave->lineshift=TRUE;
 	cave->pal_timing=TRUE;
 	cave->level_ckdelay[0]=12;	/* original ckdelay values as documented by peter broadribb. */
@@ -303,6 +303,7 @@ gd_cave_set_bd1_defaults(Cave *cave)
 	cave->level_ckdelay[2]=3;
 	cave->level_ckdelay[3]=1;
 	cave->level_ckdelay[4]=0;
+	cave->gravity_affects_all=FALSE;
 
 	/* set visible size for intermission */
 	if (cave->intermission) {
@@ -323,8 +324,8 @@ gd_cave_set_bd2_defaults(Cave *cave)
 {
 	cave->lineshift=TRUE;
 	cave->pal_timing=TRUE;
-	cave->c64_scheduling=TRUE;
-	cave->bd1_scheduling=TRUE;
+	cave->hatching_delay=2;
+	cave->scheduling=GD_SCHEDULING_BD1;
 	cave->magic_wall_stops_amoeba=FALSE;	/* marek roth bd inside faq 3.0 */
 	cave->amoeba_timer_started_immediately=FALSE;
 	cave->level_ckdelay[0]=12;	/* original ckdelay values as documented by peter broadribb. */
@@ -332,6 +333,7 @@ gd_cave_set_bd2_defaults(Cave *cave)
 	cave->level_ckdelay[2]=3;
 	cave->level_ckdelay[3]=1;
 	cave->level_ckdelay[4]=0;
+	cave->gravity_affects_all=FALSE;
 
 	/* set visible size for intermission */
 	if (cave->intermission) {
@@ -352,12 +354,13 @@ gd_cave_set_plck_defaults(Cave *cave)
 {
 	cave->lineshift=TRUE;
 	cave->pal_timing=TRUE;
-	cave->c64_scheduling=TRUE;
-	cave->bd1_scheduling=FALSE;
+	cave->scheduling=GD_SCHEDULING_PLCK;
+	cave->hatching_delay=2;
 	cave->magic_wall_stops_amoeba=FALSE;	/* different from bd1 */
 	cave->active_is_first_found=FALSE;
 	cave->intermission_instantlife=TRUE;
 	cave->intermission_rewardlife=FALSE;
+	cave->gravity_affects_all=FALSE;
 }
 
 void
@@ -365,8 +368,8 @@ gd_cave_set_1stb_defaults(Cave *cave)
 {
 	cave->lineshift=TRUE;
 	cave->pal_timing=TRUE;
-	cave->c64_scheduling=TRUE;
-	cave->bd1_scheduling=FALSE;
+	cave->hatching_delay=2;
+	cave->scheduling=GD_SCHEDULING_PLCK;
 	cave->amoeba_timer_started_immediately=FALSE;
 	cave->amoeba_timer_wait_for_hatching=TRUE;
 	cave->voodoo_dies_by_stone=TRUE;
@@ -380,6 +383,7 @@ gd_cave_set_1stb_defaults(Cave *cave)
 	cave->dirt_looks_like=O_DIRT2;
 	cave->intermission_instantlife=FALSE;
 	cave->intermission_rewardlife=TRUE;
+	cave->gravity_affects_all=FALSE;
 }
 
 void
@@ -387,8 +391,8 @@ gd_cave_set_crdr_defaults(Cave *cave)
 {
 	cave->lineshift=TRUE;
 	cave->pal_timing=TRUE;
-	cave->c64_scheduling=TRUE;
-	cave->bd1_scheduling=FALSE;
+	cave->scheduling=GD_SCHEDULING_CRDR;
+	cave->hatching_delay=2;
 	cave->amoeba_timer_started_immediately=FALSE;
 	cave->amoeba_timer_wait_for_hatching=TRUE;
 	cave->voodoo_dies_by_stone=TRUE;
@@ -402,6 +406,7 @@ gd_cave_set_crdr_defaults(Cave *cave)
 	cave->intermission_instantlife=FALSE;
 	cave->intermission_rewardlife=TRUE;
 	cave->skeletons_worth_diamonds=1;	/* in crdr, skeletons can also be used to open the gate */
+	cave->gravity_affects_all=FALSE;
 }
 
 void
@@ -409,8 +414,8 @@ gd_cave_set_crli_defaults(Cave *cave)
 {
 	cave->lineshift=TRUE;
 	cave->pal_timing=TRUE;
-	cave->c64_scheduling=TRUE;
-	cave->bd1_scheduling=FALSE;
+	cave->hatching_delay=2;
+	cave->scheduling=GD_SCHEDULING_PLCK;
 	cave->amoeba_timer_started_immediately=FALSE;
 	cave->amoeba_timer_wait_for_hatching=TRUE;
 	cave->voodoo_dies_by_stone=TRUE;
@@ -422,6 +427,7 @@ gd_cave_set_crli_defaults(Cave *cave)
 	cave->enclosed_amoeba_to=O_PRE_DIA_1;	/* not immediately to diamond, but with animation */
 	cave->intermission_instantlife=FALSE;
 	cave->intermission_rewardlife=TRUE;
+	cave->gravity_affects_all=FALSE;
 }
 
 

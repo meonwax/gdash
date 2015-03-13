@@ -52,12 +52,17 @@ add_arrow_to_cell(GdElement dest, GdElement src, GdElement arrow, GdkPixbufRotat
 	int pixbuf_cell_size=gdk_pixbuf_get_height(cells_pb[0]);
 	GdkPixbuf *arrow_pb=gdk_pixbuf_rotate_simple(cells_pb[gd_elements[arrow].image], rotation);	/* arrow */
 
+	if (gd_elements[dest].image<NUM_OF_CELLS_X*NUM_OF_CELLS_Y) {
+		g_critical("destination index %d<NUM_OF_CELLS_X*NUM_OF_CELLS_Y, element %s", dest, gd_elements[dest].name);
+		g_assert_not_reached();
+	}
+
 	if (gd_elements[dest].image>=NUM_OF_CELLS) {
-		g_critical("destination index %d>=NUM_OF_CELLS", dest);
+		g_critical("destination index %d>=NUM_OF_CELLS, element %s", dest, gd_elements[dest].name);
 		g_assert_not_reached();
 	}
 	if (cells_pb[gd_elements[dest].image]!=NULL) {
-		g_critical("destination index %d!=NULL", dest);
+		g_critical("destination index %d!=NULL, element %s", dest, gd_elements[dest].name);
 		g_assert_not_reached();
 	}
 
@@ -262,9 +267,11 @@ loadcells(GdkPixbuf *cells_pixbuf)
 	add_arrow_to_cell(O_DIAMOND_GLUED, O_DIAMOND, O_GLUED, 0);
 	add_arrow_to_cell(O_DIRT_GLUED, O_DIRT, O_GLUED, 0);
 	add_arrow_to_cell(O_STONE_F, O_STONE, O_DOWN_ARROW, 0);
+	add_arrow_to_cell(O_MEGA_STONE_F, O_MEGA_STONE, O_DOWN_ARROW, 0);
 	add_arrow_to_cell(O_DIAMOND_F, O_DIAMOND, O_DOWN_ARROW, 0);
 	add_arrow_to_cell(O_FALLING_WALL, O_BRICK, O_EXCLAMATION_MARK, 0);
 	add_arrow_to_cell(O_FALLING_WALL_F, O_BRICK, O_DOWN_ARROW, 0);
+	add_arrow_to_cell(O_TIME_PENALTY, O_GRAVESTONE, O_EXCLAMATION_MARK, 0);
 
 	add_arrow_to_cell(O_STONEFLY_1, O_STONEFLY_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_CLOCKWISE);
 	add_arrow_to_cell(O_STONEFLY_2, O_STONEFLY_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_UPSIDEDOWN);
@@ -642,6 +649,7 @@ gd_drawcave_to_pixbuf(const Cave * cave, const int width, const int height, cons
 						break;
 					default:
 						/* we check that this element has no visual effect. */
+						/* otherwise, we should have handled the element explicitely above! */
 						g_assert((gd_elements[element].properties & P_VISUAL_EFFECT) == 0);
 						break;
 				}

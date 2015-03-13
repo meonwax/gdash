@@ -89,7 +89,7 @@ loadsound(GdSound which, const char *filename)
 static gboolean
 is_sound_looped(GdSound sound)
 {
-	if (sound==GD_S_COVER || sound==GD_S_AMOEBA || sound==GD_S_COVER)
+	if (sound==GD_S_COVER || sound==GD_S_AMOEBA || sound==GD_S_MAGIC_WALL || sound==GD_S_COVER || sound==GD_S_PNEUMATIC_HAMMER)
 		return TRUE;
 	else
 		return FALSE;
@@ -110,6 +110,31 @@ play_sound(int channel, GdSound sound)
 {
 	/* channel 1 and channel 4 are used alternating */
 	static gboolean channel1_alter=FALSE;
+	static const GdSound diamond_sounds[]={
+		GD_S_DIAMOND_1,
+		GD_S_DIAMOND_2,
+		GD_S_DIAMOND_3,
+		GD_S_DIAMOND_4,
+		GD_S_DIAMOND_5,
+		GD_S_DIAMOND_6,
+		GD_S_DIAMOND_7,
+		GD_S_DIAMOND_8,
+	};
+
+	/* change diamond falling random to a selected diamond falling sound. */
+	/* others are hack! */
+	switch (sound) {
+		case GD_S_DIAMOND_RANDOM:
+		case GD_S_BOMB_COLLECT:
+		case GD_S_KEY_COLLECT:
+		case GD_S_SWITCH_CHANGE:
+		case GD_S_BLADDER_SPENDER:
+			sound=diamond_sounds[g_random_int_range(0, G_N_ELEMENTS(diamond_sounds))];
+			break;
+
+		default:
+			break;
+	}
 
 	if (channel==1) {
 		int other_channel;
@@ -126,6 +151,7 @@ play_sound(int channel, GdSound sound)
 
 	/* channel 2 and 3 sounds are started immediately; channel 1 may have been changed to channel 4 above. */
 	Mix_PlayChannel(channel, sounds[sound], is_sound_looped(sound)?-1:0);
+	Mix_Volume(channel, MIX_MAX_VOLUME);
 	sound_playing[channel]=sound;
 }
 #endif
@@ -151,43 +177,50 @@ gd_sound_init()
 	for (i=0; i<G_N_ELEMENTS(sound_playing); i++)
 		sound_playing[i]=GD_S_NONE;
 	
-	if(Mix_OpenAudio(22050, gd_sdl_16bit_mixing?AUDIO_S16:AUDIO_U8, 1, 1024)==-1) {
+	if(Mix_OpenAudio(gd_sdl_44khz_mixing?44100:22050, gd_sdl_16bit_mixing?AUDIO_S16:AUDIO_U8, 1, 1024)==-1) {
 		g_warning("%s", Mix_GetError());
 		return FALSE;
 	}
 	mixer_started=TRUE;
 	Mix_ChannelFinished(channel_done);
 	
-	loadsound(GD_S_AMOEBA, "amoeba.wav");
-	loadsound(GD_S_MAGIC_WALL, "magic_wall.wav");
-	loadsound(GD_S_CRACK, "crack.wav");
-	loadsound(GD_S_COVER, "cover.wav");
+	loadsound(GD_S_AMOEBA, "amoeba.ogg");
+	loadsound(GD_S_MAGIC_WALL, "magic_wall.ogg");
+	loadsound(GD_S_CRACK, "crack.ogg");
+	loadsound(GD_S_COVER, "cover.ogg");
 
-	loadsound(GD_S_TIMEOUT_1, "timeout_1.wav");
-	loadsound(GD_S_TIMEOUT_2, "timeout_2.wav");
-	loadsound(GD_S_TIMEOUT_3, "timeout_3.wav");
-	loadsound(GD_S_TIMEOUT_4, "timeout_4.wav");
-	loadsound(GD_S_TIMEOUT_5, "timeout_5.wav");
-	loadsound(GD_S_TIMEOUT_6, "timeout_6.wav");
-	loadsound(GD_S_TIMEOUT_7, "timeout_7.wav");
-	loadsound(GD_S_TIMEOUT_8, "timeout_8.wav");
-	loadsound(GD_S_TIMEOUT_9, "timeout_9.wav");
-	loadsound(GD_S_FINISHED, "finished.wav");
+	loadsound(GD_S_TIMEOUT_1, "timeout_1.ogg");
+	loadsound(GD_S_TIMEOUT_2, "timeout_2.ogg");
+	loadsound(GD_S_TIMEOUT_3, "timeout_3.ogg");
+	loadsound(GD_S_TIMEOUT_4, "timeout_4.ogg");
+	loadsound(GD_S_TIMEOUT_5, "timeout_5.ogg");
+	loadsound(GD_S_TIMEOUT_6, "timeout_6.ogg");
+	loadsound(GD_S_TIMEOUT_7, "timeout_7.ogg");
+	loadsound(GD_S_TIMEOUT_8, "timeout_8.ogg");
+	loadsound(GD_S_TIMEOUT_9, "timeout_9.ogg");
+	loadsound(GD_S_FINISHED, "finished.ogg");
 
-	loadsound(GD_S_EXPLOSION, "explosion.wav");
-	loadsound(GD_S_WALK_EARTH, "walk_earth.wav");
-	loadsound(GD_S_WALK_EMPTY, "walk_empty.wav");
-	loadsound(GD_S_DIAMOND_COLLECT, "diamond_collect.wav");
+	loadsound(GD_S_EXPLOSION, "explosion.ogg");
+	loadsound(GD_S_WALK_EARTH, "walk_earth.ogg");
+	loadsound(GD_S_WALK_EMPTY, "walk_empty.ogg");
+	loadsound(GD_S_PNEUMATIC_HAMMER, "pneumatic.ogg");
+	loadsound(GD_S_DOOR_OPEN, "door_open.ogg");
+	loadsound(GD_S_STIRRING, "stirring.ogg");
+	loadsound(GD_S_DIAMOND_COLLECT, "diamond_collect.ogg");
+	loadsound(GD_S_SKELETON_COLLECT, "skeleton_collect.ogg");
+	loadsound(GD_S_TELEPORTER, "teleporter.ogg");
 
-	loadsound(GD_S_STONE, "stone.wav");
-	loadsound(GD_S_DIAMOND_1, "diamond_1.wav");
-	loadsound(GD_S_DIAMOND_2, "diamond_2.wav");
-	loadsound(GD_S_DIAMOND_3, "diamond_3.wav");
-	loadsound(GD_S_DIAMOND_4, "diamond_4.wav");
-	loadsound(GD_S_DIAMOND_5, "diamond_5.wav");
-	loadsound(GD_S_DIAMOND_6, "diamond_6.wav");
-	loadsound(GD_S_DIAMOND_7, "diamond_7.wav");
-	loadsound(GD_S_DIAMOND_8, "diamond_8.wav");
+	loadsound(GD_S_STONE, "stone.ogg");
+	loadsound(GD_S_FALLING_WALL, "falling_wall.ogg");
+	loadsound(GD_S_GROWING_WALL, "growing_wall.ogg");
+	loadsound(GD_S_DIAMOND_1, "diamond_1.ogg");
+	loadsound(GD_S_DIAMOND_2, "diamond_2.ogg");
+	loadsound(GD_S_DIAMOND_3, "diamond_3.ogg");
+	loadsound(GD_S_DIAMOND_4, "diamond_4.ogg");
+	loadsound(GD_S_DIAMOND_5, "diamond_5.ogg");
+	loadsound(GD_S_DIAMOND_6, "diamond_6.ogg");
+	loadsound(GD_S_DIAMOND_7, "diamond_7.ogg");
+	loadsound(GD_S_DIAMOND_8, "diamond_8.ogg");
 
 	return TRUE;
 #else
@@ -218,24 +251,9 @@ void
 gd_play_sounds(GdSound sound1, GdSound sound2, GdSound sound3)
 {
 #ifdef GD_SOUND
-	static const GdSound diamond_sounds[]={
-		GD_S_DIAMOND_1,
-		GD_S_DIAMOND_2,
-		GD_S_DIAMOND_3,
-		GD_S_DIAMOND_4,
-		GD_S_DIAMOND_5,
-		GD_S_DIAMOND_6,
-		GD_S_DIAMOND_7,
-		GD_S_DIAMOND_8,
-	};
-	
 	if (!mixer_started || !gd_sdl_sound)
 		return;
 	
-	if (sound1==GD_S_DIAMOND_RANDOM)
-		sound1=diamond_sounds[g_random_int_range(0, G_N_ELEMENTS(diamond_sounds))];
-
-
 	/* CHANNEL 3 is for crack sound, amoeba and magic wall. */
 	if (sound3!=GD_S_NONE) {
 		if (sound3==GD_S_CRACK) /* crack sound */
@@ -256,18 +274,18 @@ gd_play_sounds(GdSound sound1, GdSound sound2, GdSound sound3)
 	/* CHANNEL 2 is for walking, explosions */
 	/* if no sound requested, do nothing. */
 	if (sound2!=GD_S_NONE) {
-		/* always (re)start the explosion sound if requested. */
-		/* also, always start the finished sound if requested. */
-		if (sound2==GD_S_EXPLOSION || sound2==GD_S_FINISHED)
+		/* 1) always restart explosion sound. */
+		/* 2) play other sound only if not currently playing an explosion */
+		if (sound2==GD_S_EXPLOSION || sound_playing[2]!=GD_S_EXPLOSION)
 			play_sound(2, sound2);
-		else
-		/* do not play any other sound, if an explosion is still to be heard. */
-		if (sound_playing[2]!=GD_S_EXPLOSION)
-			play_sound(2, sound2);
+	} else {
+		/* pneumatic hammer is looped. stop it, if requested. */
+		if (sound_playing[2]==GD_S_PNEUMATIC_HAMMER)
+			halt_channel(2);
 	}
 
 	
-	/* CHANNEL 1 is for small sounds, which are always restarted */
+	/* CHANNEL 1 is for small sounds */
 	if (sound1!=GD_S_NONE)
 		play_sound(1, sound1);
 #endif

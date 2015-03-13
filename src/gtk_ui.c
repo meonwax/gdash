@@ -342,6 +342,7 @@ gd_preferences (GtkWidget *parent)
 		{N_("<b>Sound options</b>"), NULL, NULL},
 		{N_("Sound"), N_("Play sounds. Enabling this setting requires a restart!"), &gd_sdl_sound, FALSE},
 		{N_("16-bit mixing"), N_("Use 16-bit mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_16bit_mixing, FALSE},
+		{N_("44kHz mixing"), N_("Use 44kHz mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_44khz_mixing, FALSE},
 #endif
 	};
 
@@ -506,14 +507,15 @@ enum {
 
 /* a cave name is selected, update the list store with highscore data */
 #define GD_LISTSTORE "gd-liststore-for-combo"
-#define GD_HIGHLIGHT "gd-highlight"
+#define GD_HIGHLIGHT_CAVE "gd-highlight-cave"
+#define GD_HIGHLIGHT_RANK "gd-highlight-rank"
 static void
 hs_cave_combo_changed(GtkComboBox *widget, gpointer data)
 {
 	Cave *cave;
 	GtkListStore *store=GTK_LIST_STORE(g_object_get_data(G_OBJECT(widget), GD_LISTSTORE));
-	GdHighScore *to_highlight=(GdHighScore *)g_object_get_data(G_OBJECT(widget), GD_HIGHLIGHT);
-	GList *hiter;
+	Cave *highlight_cave=(Cave *)g_object_get_data(G_OBJECT(widget), GD_HIGHLIGHT_CAVE);
+	int highlight_rank=GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), GD_HIGHLIGHT_RANK));
 	int i;
 	
 	gtk_list_store_clear(store);
@@ -522,15 +524,15 @@ hs_cave_combo_changed(GtkComboBox *widget, gpointer data)
 		cave=gd_default_cave;
 	else
 		cave=gd_return_nth_cave(i-1);
-	
-	for(hiter=cave->highscore, i=1; hiter!=NULL; hiter=hiter->next, i++) {
-		GtkTreeIter iter;
-		GdHighScore *hs=hiter->data;
-		
-		gtk_list_store_append(store, &iter);
-		gtk_list_store_set(store, &iter, HS_COLUMN_RANK, i, HS_COLUMN_NAME, hs->name, HS_COLUMN_SCORE, hs->score,
-			HS_COLUMN_BOLD, hs==to_highlight?PANGO_WEIGHT_BOLD:PANGO_WEIGHT_NORMAL, -1);
-	}
+
+	for (i=0; i<G_N_ELEMENTS(cave->highscore); i++)
+		if (cave->highscore[i].score>0) {
+			GtkTreeIter iter;
+			
+			gtk_list_store_append(store, &iter);
+			gtk_list_store_set(store, &iter, HS_COLUMN_RANK, i+1, HS_COLUMN_NAME, cave->highscore[i].name, HS_COLUMN_SCORE, cave->highscore[i].score,
+				HS_COLUMN_BOLD, (cave==highlight_cave && i==highlight_rank)?PANGO_WEIGHT_BOLD:PANGO_WEIGHT_NORMAL, -1);
+		}
 }
 
 static void
@@ -554,7 +556,7 @@ hs_clear_highscore(GtkWidget *widget, gpointer data)
 }
 	
 void
-gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, gpointer highlight)
+gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, Cave *highlight_cave, int highlight_rank)
 {
 	GtkWidget *dialog;
 	int i;
@@ -587,7 +589,8 @@ gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, gpo
 
 	combo=gtk_combo_box_new_text();
 	g_object_set_data(G_OBJECT(combo), GD_LISTSTORE, store);
-	g_object_set_data(G_OBJECT(combo), GD_HIGHLIGHT, highlight);
+	g_object_set_data(G_OBJECT(combo), GD_HIGHLIGHT_CAVE, highlight_cave);
+	g_object_set_data(G_OBJECT(combo), GD_HIGHLIGHT_RANK, GINT_TO_POINTER(highlight_rank));
 	g_signal_connect(G_OBJECT(combo), "changed", G_CALLBACK(hs_cave_combo_changed), NULL);
 	text=g_strdup_printf("[%s]", gd_default_cave->name);
 	gtk_combo_box_append_text(GTK_COMBO_BOX(combo), text);
@@ -631,7 +634,8 @@ gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, gpo
 	gtk_widget_destroy(dialog);
 }
 #undef GD_LISTSTORE
-#undef GD_HIGHLIGHT
+#undef GD_HIGHLIGHT_CAVE
+#undef GD_HIGHLIGHT_RANK
 
 /*
  * show a warning window
@@ -1003,7 +1007,9 @@ gd_show_errors ()
 	result=gtk_dialog_run (GTK_DIALOG (dialog));
 	gtk_widget_destroy (dialog);
 	
-	/* clear errors */
+	/* the user has seen the errors, clear the "has new error" flag */
+	gd_clear_error_flag();
+	/* maybe clearing the whole error list requested? */
 	if (result==1)
 		gd_clear_errors();
 }

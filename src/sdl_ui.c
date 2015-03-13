@@ -46,6 +46,18 @@ enum {
 	
 };
 
+int clamp(int val, int min, int max)
+{
+	g_assert(min<=max);
+	
+	if (val<min)
+		return min;
+	if (val>max)
+		return max;
+	return val;
+}
+
+
 char *
 gd_select_file(const char *title, const char *start_dir, const char *glob)
 {
@@ -146,7 +158,6 @@ gd_select_file(const char *title, const char *start_dir, const char *glob)
 		redraw=TRUE;
 		while (state==GD_NOT_YET) {
 			int page, i, cur;
-			SDL_Event event;
 			
 			page=sel/names_per_page;
 			
@@ -164,25 +175,25 @@ gd_select_file(const char *title, const char *start_dir, const char *glob)
 				
 				redraw=FALSE;
 			}
-			
-			while(SDL_PollEvent(&event)) {
-				switch(event.type) {
-					case SDL_QUIT:
-						gd_quit=TRUE;
-						state=GD_QUIT;
-						break;
-				}
-			}
+
+			/* check for incoming events */			
+			gd_process_pending_events();
+			if (gd_quit)
+				state=GD_QUIT;
 			
 			/* cursor movement */
-			if (gd_up())
-				sel=CLAMP(sel-1, 0, files->len-1), redraw=TRUE;
-			if (gd_down())
-				sel=CLAMP(sel+1, 0, files->len-1), redraw=TRUE;
+			if (gd_up()) {
+				sel=clamp(sel-1, 0, files->len-1);
+				redraw=TRUE;
+			}
+			if (gd_down()) {
+				sel=clamp(sel+1, 0, files->len-1);
+				redraw=TRUE;
+			}
 			if (gd_keystate[SDLK_PAGEUP])
-				sel=CLAMP(sel-names_per_page, 0, files->len-1), redraw=TRUE;
+				sel=clamp(sel-names_per_page, 0, files->len-1), redraw=TRUE;
 			if (gd_keystate[SDLK_PAGEDOWN])
-				sel=CLAMP(sel+names_per_page, 0, files->len-1), redraw=TRUE;
+				sel=clamp(sel+names_per_page, 0, files->len-1), redraw=TRUE;
 			if (gd_keystate[SDLK_HOME])
 				sel=0, redraw=TRUE;
 			if (gd_keystate[SDLK_END])
@@ -191,7 +202,7 @@ gd_select_file(const char *title, const char *start_dir, const char *glob)
 			if (gd_keystate[SDLK_j])
 				state=GD_JUMP;
 
-			if (gd_space_or_fire())
+			if (gd_space_or_enter_or_fire())
 				state=GD_YES;
 
 			if (gd_keystate[SDLK_ESCAPE])
@@ -276,6 +287,7 @@ gd_settings_menu()
 		{ "Fullscreen", &gd_sdl_fullscreen },
 		{ "Sound", &gd_sdl_sound },
 		{ "16-bit mixing", &gd_sdl_16bit_mixing },
+		{ "44khz mixing", &gd_sdl_44khz_mixing },
 		{ "Easy play", &gd_easy_play },
 		{ "Use BDCFF highscore", &gd_use_bdcff_highscore },
 		{ "All caves selectable", &gd_all_caves_selectable },
@@ -298,8 +310,6 @@ gd_settings_menu()
 	current=0;
 	finished=FALSE;
 	while (!finished && !gd_quit) {
-		SDL_Event event;
-
 		/* show settings */
 		for (n=0; n<G_N_ELEMENTS(settings); n++) {
 			int x;
@@ -312,21 +322,19 @@ gd_settings_menu()
 		}
 		SDL_Flip(gd_screen);
 		
-		/* do events; but here we only care the quit event, keys will be processed below */
-		while(SDL_PollEvent(&event))
-			if (event.type==SDL_QUIT)
-				gd_quit=TRUE;
+		/* do events; keys will be processed below */
+		gd_process_pending_events();
 
 		/* cursor movement */
 		if (gd_up())
-			current=CLAMP(current-1, 0, G_N_ELEMENTS(settings)-1);
+			current=clamp(current-1, 0, G_N_ELEMENTS(settings)-1);
 		if (gd_down())
-			current=CLAMP(current+1, 0, G_N_ELEMENTS(settings)-1);
+			current=clamp(current+1, 0, G_N_ELEMENTS(settings)-1);
 		if (gd_left())
 			*settings[current].var=FALSE;
 		if (gd_right())
 			*settings[current].var=TRUE;
-		if (gd_space_or_fire())
+		if (gd_space_or_enter_or_fire())
 			*settings[current].var=!*settings[current].var;
 		if (gd_keystate[SDLK_ESCAPE])
 			finished=TRUE;
@@ -339,21 +347,19 @@ gd_settings_menu()
 
 
 void
-gd_show_highscore(gpointer highlight)
+gd_show_highscore(Cave *highlight_cave, int highlight_line)
 {
 	gboolean finished;
 	GList *current=NULL;	/* current cave to view */
 	
 	gd_backup_and_dark_screen();
 	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, "THE HALL OF FAME");
-	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "CRSR: CAVE   FIRE: EXIT");
+	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "CRSR: CAVE   SPACE: EXIT");
 	
 	current=NULL;
 	finished=FALSE;
 	while (!finished && !gd_quit) {
-		SDL_Event event;
 		Cave *cave;
-		GList *iter;
 		int i;
 		
 		/* current cave or game */
@@ -369,21 +375,19 @@ gd_show_highscore(gpointer highlight)
 			gd_clear_line(gd_screen, (i+2)*8);
 
 		/* show scores */		
-		for (iter=cave->highscore, i=0; iter!=NULL && i<GD_HIGHSCORE_NUM && i<20; iter=iter->next, i++) {
+		for (i=0; i<G_N_ELEMENTS(cave->highscore); i++) {
 			int c;
-			GdHighScore *hs=(GdHighScore *)iter->data;
 			
 			c=i/5%2?GD_C64_PURPLE:GD_C64_GREEN;
-			if (hs==highlight)
+			if (cave==highlight_cave && i==highlight_line)
 				c=GD_C64_WHITE;
-			gd_blittext_printf_n(gd_screen, 0, (i+3)*8, c, "%2d %6d %s", i+1, hs->score, hs->name);
+			if (cave->highscore[i].score!=0)
+				gd_blittext_printf_n(gd_screen, 0, (i+3)*8, c, "%2d %6d %s", i+1, cave->highscore[i].score, cave->highscore[i].name);
 		}
 		SDL_Flip(gd_screen);
 
-		/* do events; but here we only care the quit event, keys will be processed below */
-		while(SDL_PollEvent(&event))
-			if (event.type==SDL_QUIT)
-				gd_quit=TRUE;
+		/* do events; keys will be processed below */
+		gd_process_pending_events();
 
 		/* cursor movement */
 		if (gd_left() || gd_up()) {
@@ -402,7 +406,7 @@ gd_show_highscore(gpointer highlight)
 				current=gd_caveset;
 			}
 		}
-		if (gd_space_or_fire() || gd_keystate[SDLK_ESCAPE])
+		if (gd_space_or_enter_or_fire() || gd_keystate[SDLK_ESCAPE])
 			finished=TRUE;
 			
 		SDL_Delay(150);
@@ -576,7 +580,6 @@ gd_input_string(const char *title, const char *current)
 }
 
 
-
 void
 gd_error_console()
 {
@@ -591,6 +594,9 @@ gd_error_console()
 	err=g_ptr_array_new();	
 	for (iter=gd_errors; iter!=NULL; iter=iter->next)
 		g_ptr_array_add(err, iter->data);
+
+	/* the user has seen the errors, clear the "has new error" flag */
+	gd_clear_error_flag();
 	
 	gd_backup_and_dark_screen();
 	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, "GDASH ERRORS");
@@ -604,7 +610,6 @@ gd_error_console()
 	redraw=TRUE;
 	while (!gd_quit && !exit && !clear) {
 		int page, i, cur;
-		SDL_Event event;
 		
 		page=sel/names_per_page;
 		
@@ -626,31 +631,29 @@ gd_error_console()
 			redraw=FALSE;
 		}
 
-		while(SDL_PollEvent(&event)) {
-			switch(event.type) {
-				case SDL_QUIT:
-					gd_quit=TRUE;
-					break;
-			}
-		}
+		gd_process_pending_events();
 
 		/* cursor movement */
 		if (gd_up())
-			sel=CLAMP(sel-1, 0, err->len-1), redraw=TRUE;
+			sel=clamp(sel-1, 0, err->len-1), redraw=TRUE;
 		if (gd_down())
-			sel=CLAMP(sel+1, 0, err->len-1), redraw=TRUE;
+			sel=clamp(sel+1, 0, err->len-1), redraw=TRUE;
 		if (gd_keystate[SDLK_PAGEUP])
-			sel=CLAMP(sel-names_per_page, 0, err->len-1), redraw=TRUE;
+			sel=clamp(sel-names_per_page, 0, err->len-1), redraw=TRUE;
 		if (gd_keystate[SDLK_PAGEDOWN])
-			sel=CLAMP(sel+names_per_page, 0, err->len-1), redraw=TRUE;
+			sel=clamp(sel+names_per_page, 0, err->len-1), redraw=TRUE;
 		if (gd_keystate[SDLK_HOME])
 			sel=0, redraw=TRUE;
 		if (gd_keystate[SDLK_END])
 			sel=err->len-1, redraw=TRUE;
+
+		if (gd_fire() || gd_keystate[SDLK_RETURN] || gd_keystate[SDLK_SPACE])
+			/* show one error */
+			if (err->len!=0) {
+				gd_wait_for_key_releases();
+				gd_show_error(g_ptr_array_index(err, sel));
+			}
 			
-		if (gd_fire())
-			gd_show_error(g_ptr_array_index(err, sel));
-	
 		if (gd_keystate[SDLK_c])
 			clear=TRUE;
 			
@@ -767,29 +770,31 @@ gd_show_error(GdErrorMessage *error)
 	char **lines;
 	int linenum;
 	int y1, i;
-	SDL_Rect rect;
 
-	wrapped=gd_wrap_text(error->message, 78);	/* FIXME */
+	wrapped=gd_wrap_text(error->message, 38);	/* FIXME */
 	gd_backup_and_dark_screen();
 	lines=g_strsplit_set(wrapped, "\n", -1);
 	linenum=g_strv_length(lines);
 
-	y1=gd_screen->h/2-(linenum+2)*10/2;
+	y1=gd_screen->h/2-(linenum+1)*10/2;
+#if 0
 	rect.x=8;
 	rect.w=gd_screen->w-16;
 	rect.y=y1;
-	rect.h=(linenum+2)*10/2;
+	rect.h=(linenum+1)*10;
 	SDL_FillRect(gd_screen, &rect, SDL_MapRGB(gd_screen->format, 0, 0, 0));
+#endif
 
-	gd_blittext_n(gd_screen, -1, 0, GD_C64_LIGHTRED, "GDASH ERROR");
-	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_LIGHTRED, "ANY KEY: CONTINUE");
+	gd_blittext_n(gd_screen, -1, 0, GD_C64_WHITE, "GDASH ERROR");
+	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "ANY KEY: CONTINUE");
 	for (i=0; lines[i]!=NULL; i++)
-		gd_blittext_n(gd_screen, 8, y1+(1+i)*10, GD_C64_WHITE, lines[i]);
+		gd_blittext_n(gd_screen, 8, y1+(i+1)*10, GD_C64_WHITE, lines[i]);
 	SDL_Flip(gd_screen);
 	
 	wait_for_keypress();
 	
 	gd_restore_screen();
 	g_free(wrapped);
+	g_strfreev(lines);
 }
 

@@ -1,0 +1,31 @@
+Boulder Dash 1 and the Construction Kit are a different engine. The Construction Kit is noticeably faster! Newer versions of the engine, I think starting from 1stB are even faster.
+
+
+Therefore, for BD1 and BD2 games, I use:
+	88ms + 3.66ms*delay_value + delay_by_elements + delay_by_animation.
+
+	delay_value is 12 for level 1, 6 for level 2, ...
+	delay_by_elements is what you can see from the table in the xls.
+	delay_by_animation: caves were slower, if there were more elements to animate. (For example, if the cave contained amoeba.) i add 2.6ms for each animated type (amoeba, slime, butterfly, firefly) found.
+
+
+For PLCK and above, I use:
+	65ms + delay_by_elements OR 20ms*delay_value, whichever is greater.
+That is, a totally empty cave has the same speed for delay values 0, 1, 2, 3, and it is only slower for delay value 4 and above.
+
+Elements were sometimes fast, sometimes slow to process. For example, a firefly which can move is processed quickly. A blocked firefly is slower to process. The xls table contains an estimated average for each element.
+
+Also, explosions were very slow. For creature explosions (3x3=9 cells), I add 1.2ms. For cross-shaped explosions (ghosts, bombs, 5 cells) I add 0.65ms. For the voodoo explosion, I add 1ms to the delay_by_elements explained above.
+
+All these values are rounded up to n*20ms during the game. The 20ms value comes from the 25fps PAL signal, which is interlaced, so 50Hz screen refresh. The processing of the cave does not always take the same time interval, so delays change frame to frame. For BD1, cave A/1, I have measured 140ms, 160ms; and also 120ms (relatively rare). The above expressions give an average to work with: for that cave, the result is 150ms.
+
+
+
+Crazy Dream 7 is somewhat different. It has a lot of elements, so it is slower than the construction kit. For that one, I use
+	130ms + delay_by_elements OR 20ms*delay_value.
+If the cave contains a pneumatic hammer, and the hammered-walls-reappear flag is set to true, caves become very slow. I add 60ms for that. Check the cave "Buddel" for an example, which runs at 240ms/frame.
+
+
+
+Measuring cave speeds in the VICE emulator is very simple. Load BD in VICE, select saving sound output to a .wav file. Start the cave, step a few cells with the player. Exit VICE. Open the wav file in a sound editor; select the noise of one step and the silence after it. The wave editor tells you the length of the selection: which was exactly one frame in the game. Beware, that frame times sometimes differ from each other; see above.
+

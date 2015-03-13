@@ -18,7 +18,7 @@
 
 char *gd_select_file(const char *title, const char *start_dir, const char *glob);
 void gd_settings_menu();
-void gd_show_highscore(gpointer highlight);
+void gd_show_highscore(Cave *highlight_cave, int highlight_line);
 void gd_help(const char **strings);
 
 void gd_error_console();

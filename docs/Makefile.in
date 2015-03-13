@@ -169,7 +169,7 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-EXTRA_DIST = c64_internals.txt ckdelay.xls
+EXTRA_DIST = c64_internals.txt ckdelay.xls cd7_speeds.xls ckdelay.txt
 all: all-am
 
 .SUFFIXES:

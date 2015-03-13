@@ -50,8 +50,10 @@ N_("To play the game, press the New Game button. You can select which level you 
 		{NULL, NULL, O_DIRT2, N_("This is also dirt, but has a different colour. In any other sense, it is identical to the above one.")},
 		{NULL, NULL, O_DIAMOND, N_("The main object of the game is to collect required number of diamonds.")},
 		{NULL, NULL, O_STONE, N_("Stones can be pushed by the player, and he can drop them on flies to make an explosion.")},
+		{NULL, NULL, O_MEGA_STONE, N_("Like ordinary stones, but these are so heavy, that you cannot push them.")},
 		{NULL, NULL, O_BRICK, N_("The wall can't be moved but an explosion destroys it. You can't pass through the wall - instead try to blow it up.")},
 		{NULL, NULL, O_STEEL, N_("This is rock stable wall. It's impossible to move or blow it up.")},
+		{NULL, N_("Sloped steel wall"), O_STEEL_SLOPED_UP_RIGHT, N_("Acts like an ordinary steel wall, but it is sloped: stones and diamonds will roll down on it in some direction. Brick walls and dirt also have sloped variations.")},
 		{NULL, NULL, O_PRE_OUTBOX, N_("After collecting the required number of diamonds, look for a flashing out box to exit the cave. "
 "Closed out box looks like steel wall, but beware of explosions near the out box: "
 "you could accidentally destroy an exit. This prevents you from successfully finishing the cave.")},

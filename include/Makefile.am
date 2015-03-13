@@ -41,6 +41,7 @@ TITLE = \
 noinst_HEADERS = \
 	icons.h \
 	c64_gfx.h \
+	c64_font.h \
 	title.h \
 	levels.h \
 	chargen.h
@@ -48,7 +49,7 @@ noinst_HEADERS = \
 icondir = $(datadir)/pixmaps
 icon_DATA = gdash.png
 
-pkgdata_DATA = boulder_rush.png cells_c64.png
+pkgdata_DATA = boulder_rush.png c64_gfx.png c64_font.png
 
 EXTRA_DIST = $(ICONS) $(TITLE) $(icon_DATA) \
 	icons.list title.list \
@@ -96,12 +97,27 @@ cells2c_LDADD =  @GTK_LIBS@
 cells2c_SOURCES = \
 	cells2c.c
 
-c64_gfx.h: cells_c64.png $(CELLS2C)
-	( if test x$(CELLS2C) = x; then \
-		echo; echo; echo "*** GTK+ is needed to regenerate $@"; \
-		false; \
-	  fi )
-	./cells2c >c64_gfx.h
+
+
+if GTK
+c64_font.h: c64_font.png $(CELLS2C)
+	./cells2c c64_font.png >$@
+else
+c64_font.h: c64_font.png $(CELLS2C)
+	echo; echo; echo "*** GTK+ is needed to regenerate $@"
+	false
+endif
+
+
+if GTK
+c64_gfx.h: c64_gfx.png $(CELLS2C)
+	./cells2c c64_gfx.png >$@
+else
+c64_gfx.h: c64_gfx.png $(CELLS2C)
+	echo; echo; echo "*** GTK+ is needed to regenerate $@"
+	false
+endif
+
 
 # this utility creates an include file for any datafile
 file2c_SOURCES = \

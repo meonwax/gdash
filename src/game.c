@@ -46,14 +46,13 @@ GdGame game;
 static void
 cave_finished_highscore()
 {
-	GdHighScore *hs=g_new0(GdHighScore, 1);
+	GdHighScore hs;
 	
-	g_strlcpy(hs->name, game.player_name, sizeof(hs->name));
-	hs->score=game.cave_score;
+	g_strlcpy(hs.name, game.player_name, sizeof(hs.name));
+	hs.score=game.cave_score;
 
 	/* enter to highscore table */
-	game.original_cave->highscore=g_list_insert_sorted(game.original_cave->highscore, hs, gd_highscore_compare);
-	/* we do not show the cave highscore table here... but it can be viewed from the menu. */
+	gd_cave_add_highscore(game.original_cave, hs);
 }
 
 
@@ -78,7 +77,7 @@ gd_stop_game()
 
 /* returns TRUE on success */
 gboolean
-gd_game_start_level (const Cave *snapshot_cave)
+gd_game_start_level(const Cave *snapshot_cave)
 {
 	int x, y;
 	
@@ -104,7 +103,7 @@ gd_game_start_level (const Cave *snapshot_cave)
 	if (!snapshot_cave) {
 		/* specified cave from memory */
 		game.original_cave=gd_return_nth_cave(game.cave_num);
-		game.cave=gd_cave_new_rendered(game.original_cave, game.level_num);
+		game.cave=gd_cave_new_rendered(game.original_cave, game.level_num, g_random_int());	/* for playing: seed=random */
 		gd_cave_setup_for_game(game.cave);
 		if (gd_random_colors)	/* new cave-recolor if requested. game.cave is a copy only! */
 			gd_cave_set_random_colors(game.cave);
@@ -189,12 +188,12 @@ next_level ()
 	flash screen if bonus life
 */
 static void
-increment_score (const int increment)
+increment_score(int increment)
 {
-	int i=game.player_score / 500;
+	int i=game.player_score/500;
 	game.player_score+=increment;
 	game.cave_score+=increment;
-	if (game.player_score / 500 > i) {	/* if score crossed 500point boundary, */
+	if (game.player_score/500>i) {	/* if score crossed 500point boundary, */
 		if (game.player_lives)
 			game.player_lives++;	/* player gets an extra life, but only if no test or snapshot. */
 		game.bonus_life_flash=100;	/* also flash the screen for 100 frames=4 secs */
@@ -204,11 +203,11 @@ increment_score (const int increment)
 
 
 gboolean
-gd_game_iterate_cave(gboolean up, gboolean down, gboolean left, gboolean right, gboolean fire, gboolean key_suicide, gboolean key_restart)
+gd_game_iterate_cave(GdDirection player_move, gboolean fire, gboolean key_suicide, gboolean key_restart)
 {
 	/* if already time=0, skip iterating */
 	if (game.cave->player_state!=PL_TIMEOUT) {
-		gd_cave_iterate (game.cave, up, down, left, right, fire, key_suicide);
+		gd_cave_iterate (game.cave, player_move, fire, key_suicide);
 		gd_play_sounds(game.cave->sound1, game.cave->sound2, game.cave->sound3);
 	} else
 		gd_no_sound();

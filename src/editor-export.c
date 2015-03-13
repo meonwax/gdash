@@ -32,7 +32,12 @@ static int element_to_crli(GdElement e, GHashTable *unknown)
 {
 	int i;
 	int code=-1;
-	
+
+	/* hack: there is no separate horizontal and vertical growing wall in crli. */
+	/* only the switch can determine the direction. */
+	if (e==O_V_GROWING_WALL)
+		e=O_H_GROWING_WALL;
+			
 	/* 128 is the number of elements in gd_crazylight_import_table */
 	for (i=0; i<128; i++)
 		if (gd_crazylight_import_table[i]==e) {
@@ -78,15 +83,16 @@ crli_export (Cave *to_convert, const int level, guint8 *compressed)
 	GHashTable *unknown;
 	gboolean has_horizontal, has_vertical;
 	
-	cave=gd_cave_new_rendered(to_convert, level);
+	/* render cave with seed=0 */
+	cave=gd_cave_new_rendered(to_convert, level, 0);
 	gd_error_set_context(to_convert->name);
 	unknown=g_hash_table_new(g_direct_hash, g_direct_equal);	/* hash table to remember unconvertable elements */
 
 	/* do some checks */
 	if (!cave->lineshift)
 		g_warning("crli only supports line shifting map wraparound");
-	if (!cave->pal_timing || !cave->c64_scheduling || cave->bd1_scheduling)
-		g_warning("only applicable timing settings for crli are pal timing=true, c64 scheduling=true, bd1 scheduling=false");
+	if (!cave->pal_timing || cave->scheduling!=GD_SCHEDULING_PLCK)
+		g_warning("only applicable timing settings for crli are pal timing=true, scheduling=plck");
 	if (cave->amoeba_timer_started_immediately)
 		g_warning("crli amoeba timer is only started when the amoeba is let free!");
 	if (!cave->amoeba_timer_wait_for_hatching) {
@@ -129,6 +135,7 @@ crli_export (Cave *to_convert, const int level, guint8 *compressed)
 	for (y=0; y<cave->h && y<22; y++)
 		for (x=0; x<cave->w && x<40; x++) {
 			output[y*40+x]=element_to_crli(cave->map[y][x], unknown);
+
 			if (cave->map[y][x]==O_H_GROWING_WALL)
 				has_horizontal=TRUE;
 			if (cave->map[y][x]==O_V_GROWING_WALL)
@@ -187,7 +194,9 @@ crli_export (Cave *to_convert, const int level, guint8 *compressed)
 	output[0x38c]=0;	/* always "normal" intermission, scrolling intermission is said to be buggy */
 	output[0x38d]=0xf1;	/* magic wall sound on */
 	
-	output[0x38e]=has_horizontal?0x2e:0x2f;
+	output[0x38e]=0x2e;
+	if (has_vertical && !has_horizontal)
+		output[0x38e]=0x2f;
 	if (has_horizontal && has_vertical)
 		g_warning("a crli map cannot contain horizontal and vertical growing walls at the same time");
 	output[0x38f]=cave->creatures_backwards?0x2d:0x2c;
@@ -489,7 +498,8 @@ gd_save_html (char *htmlname, GtkWidget *window)
 			gdk_window_process_all_updates ();
 		}
 
-		cave=gd_cave_new_from_caveset (i, 0);
+		/* rendering cave for png: seed=0 */
+		cave=gd_cave_new_from_caveset (i, 0, 0);
 		pixbuf=gd_drawcave_to_pixbuf (cave, 0, 0, TRUE);
 		
 		/* check cave to see if we have amoeba or magic wall. properties will be shown in html, if so. */

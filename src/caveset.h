@@ -38,8 +38,7 @@ Cave *gd_return_nth_cave(const int cave);
 int gd_caveset_first_selectable ();
 
 
-Cave *gd_cave_new_from_caveset(const int cave, const int level);
-void gd_cave_setup_for_game(Cave *cave);
+Cave *gd_cave_new_from_caveset(const int cave, const int level, guint32 seed);
 
 
 void gd_save_highscore(const char* directory);

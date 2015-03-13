@@ -20,7 +20,8 @@
 #include "cave.h"
 
 /* the game itself */
-void gd_cave_iterate(Cave *cave, const gboolean up, const gboolean down, const gboolean left, const gboolean right, const gboolean player_fire, const gboolean suicide);
+GdDirection gd_direction_from_keypress(gboolean up, gboolean down, gboolean left, gboolean right);
+void gd_cave_iterate(Cave *cave, GdDirection player_move, gboolean player_fire, gboolean suicide);
 gboolean gd_cave_set_seconds_sound(Cave *cave);
 
 #endif

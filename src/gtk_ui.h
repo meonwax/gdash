@@ -49,7 +49,7 @@ GdkPixbuf *gd_title (void);
 
 void gd_preferences (GtkWidget *parent);
 
-void gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, gpointer highlight);
+void gd_show_highscore(GtkWidget *parent, Cave *cave, gboolean show_clear_button, Cave *highlight_cave, int highlight_rank);
 void gd_save_caveset_as_cb (GtkWidget *widget, gpointer data);
 void gd_save_caveset_cb (GtkWidget *widget, gpointer data);
 void gd_open_caveset (GtkWidget *window, const char *directory);

@@ -56,7 +56,7 @@ void gd_create_snapshot();
 gboolean gd_game_start_level(const Cave *snapshot_cave);
 void gd_new_game (const char *player_name, const int cave, const int level);
 
-gboolean gd_game_iterate_cave(gboolean up, gboolean down, gboolean left, gboolean right, gboolean fire, gboolean key_suicide, gboolean key_restart);
+gboolean gd_game_iterate_cave(GdDirection player_move, gboolean fire, gboolean key_suicide, gboolean key_restart);
 GdGameState gd_game_main_int();
 gboolean gd_game_scroll(int width, int visible, int center, gboolean exact, int start, int to, int *current, int *desired, int *speed);
 

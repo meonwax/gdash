@@ -61,6 +61,8 @@ gboolean gd_use_bdcff_highscore=FALSE;
 gboolean gd_sdl_sound=TRUE;
 #define SETTING_SDL_16BIT_MIXING "sdl_16bit_mixing"
 gboolean gd_sdl_16bit_mixing=FALSE;
+#define SETTING_SDL_44KHZ_MIXING "sdl_44khz_mixing"
+gboolean gd_sdl_44khz_mixing=FALSE;
 
 
 /* sdl game settings */
@@ -115,10 +117,15 @@ void gd_settings_init_with_language()
 	/* on win32, use the glib function. */
 	gd_system_data_dir=g_win32_get_package_installation_directory (NULL, NULL);
 	gd_system_caves_dir=g_build_path (G_DIR_SEPARATOR_S, gd_system_data_dir, "caves", NULL);
-	bindtextdomain (PACKAGE, gd_system_data_dir);
 	/* these would not be needed for the sdl version, but they do not hurt */
 	bindtextdomain ("gtk20-properties", gd_system_data_dir);
 	bindtextdomain ("gtk20", gd_system_data_dir);
+	bindtextdomain ("glib20", gd_system_data_dir);
+	/* gdash strings */
+	bindtextdomain (PACKAGE, gd_system_data_dir);
+	bind_textdomain_codeset ("gtk20-properties", "UTF-8");
+	bind_textdomain_codeset ("gtk20", "UTF-8");
+	bind_textdomain_codeset ("glib20", "UTF-8");
 #else
 	/* on linux, this is a defined, built-in string, $perfix/share/locale */
 	gd_system_data_dir=PKGDATADIR;
@@ -187,6 +194,7 @@ gd_load_settings()
     gd_sdl_fullscreen=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_FULLSCREEN, gd_sdl_fullscreen);
     gd_sdl_sound=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_SOUND, gd_sdl_sound);
     gd_sdl_16bit_mixing=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_16BIT_MIXING, gd_sdl_16bit_mixing);
+    gd_sdl_44khz_mixing=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_44KHZ_MIXING, gd_sdl_44khz_mixing);
     gd_cell_scale=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_CELL_SCALE, gd_cell_scale);
 	gd_theme=g_key_file_get_string(ini, SETTINGS_GDASH_GROUP, SETTING_THEME, NULL);
 
@@ -222,6 +230,7 @@ gd_save_settings()
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_FULLSCREEN, gd_sdl_fullscreen);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_SOUND, gd_sdl_sound);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_16BIT_MIXING, gd_sdl_16bit_mixing);
+    g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_44KHZ_MIXING, gd_sdl_44khz_mixing);
     if (gd_theme)
 	    g_key_file_set_string(ini, SETTINGS_GDASH_GROUP, SETTING_THEME, gd_theme);
     data=g_key_file_to_data(ini, NULL, &error);

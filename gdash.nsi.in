@@ -41,11 +41,11 @@ Section "GDash (required)"
   File "src\gdash.exe"
   File "src\sdash.exe"
   File "include\boulder_rush.png"
-  File "include\cells_c64.png"
+  File "include\c64_gfx.png"
   File "gdash.ico"
   File /oname=README.txt "README"
   
-  File "sound\*.wav"
+  File "sound\*.ogg"
 
   ; Profram files, Glib dlls
   SetOutPath $INSTDIR
@@ -76,6 +76,9 @@ Section "GDash (required)"
   SetOutPath $INSTDIR
   File ${MINGWDIR}\bin\SDL.dll
   File ${MINGWDIR}\bin\SDL_mixer.dll
+  File ${MINGWDIR}\bin\libvorbis-0.dll
+  File ${MINGWDIR}\bin\libvorbisfile-3.dll
+  File ${MINGWDIR}\bin\libogg-0.dll
   
   ; Translations
   SetOutPath $INSTDIR\hu\LC_MESSAGES

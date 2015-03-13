@@ -22,7 +22,7 @@
 #include "util.h"
 #include "c64_gfx.h"	/* char c64_gfx[] with (almost) original graphics */
 #include "title.h"
-#include "chargen.h"	/* c64 font */
+#include "c64_font.h"
 
 #define GD_NUM_OF_CHARS 128
 
@@ -31,8 +31,8 @@
 #define GD_BACKSLASH_CHAR 64
 
 static SDL_Surface *cells[2*NUM_OF_CELLS];
-static guchar *font;
-static SDL_Surface *font_w[16][GD_NUM_OF_CHARS], *font_n[16][GD_NUM_OF_CHARS];	/* 16 colors, 128 characters */
+static const guchar *font;
+static GHashTable *font_w, *font_n;
 static GdColor color0, color1, color2, color3, color4, color5;	/* currently used cell colors */
 static guint8 *c64_custom_gfx=NULL;
 static gboolean using_png_gfx;
@@ -60,16 +60,16 @@ const int statusbar_y1=1;
 const int statusbar_y2=10;
 const int statusbar_height=20;
 const int statusbar_mid=(20-8)/2;
+static int scroll_x, scroll_y;
 
-/* quit */
+
+/* quit, global variable which is set to true if the application should quit */
 gboolean gd_quit=FALSE;
-
-int cell_size=16;
 
 Uint8 *gd_keystate;
 SDL_Joystick *gd_joy;
 
-static int scroll_x, scroll_y;
+static int cell_size=16;
 
 
 
@@ -93,17 +93,31 @@ surface_from_gdk_pixbuf_data(guint32 *data)
 	if (GUINT32_FROM_BE(data[2])==0x1010001)	/* 24-bit rgb */
 		surface=SDL_CreateRGBSurfaceFrom(data+6, GUINT32_FROM_BE(data[4]), GUINT32_FROM_BE(data[5]), 24, GUINT32_FROM_BE(data[3]), rmask, gmask, bmask, 0);
 	else
+		/* unknown pixel format */
 		g_assert_not_reached();
 	g_assert(surface!=NULL);
 	
 	return surface;
 }
 
+/* returns the gdash title screen as an sdl surface. */
 SDL_Surface *
 gd_get_titleimage()
 {
 	return surface_from_gdk_pixbuf_data((guint32 *) gdash_screen);
 }
+
+static void
+rendered_font_free(gpointer font)
+{
+	SDL_Surface **p;
+
+	/* null-terminated list of pointers to sdl_surfaces */	
+	for(p=font; p!=NULL; p++)
+		SDL_FreeSurface(*p);
+	g_free(font);
+}
+
 
 gboolean
 gd_sdl_init()
@@ -126,6 +140,9 @@ gd_sdl_init()
 	SDL_WM_SetIcon(icon, NULL);
 	SDL_WM_SetCaption("GDash", NULL);
 	SDL_FreeSurface(icon);
+	
+	font_n=g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, rendered_font_free);
+	font_w=g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, rendered_font_free);
 	
 	return TRUE;
 }
@@ -201,17 +218,10 @@ gd_fire()
 
 /* like the above one, but used in the main menu */
 gboolean
-gd_space_or_fire()
+gd_space_or_enter_or_fire()
 {
-	gboolean fire;
-	
-	fire=gd_keystate[SDLK_SPACE] || gd_keystate[SDLK_RETURN];
 	/* set these to zero, so each keypress is reported only once */
-	gd_keystate[SDLK_SPACE]=0;
-	gd_keystate[SDLK_RETURN]=0;
-	if (gd_joy && (SDL_JoystickGetButton(gd_joy, 0) || SDL_JoystickGetButton(gd_joy, 1)))
-		fire=TRUE;
-	return fire;
+	return gd_joy_fire() || gd_keystate[SDLK_SPACE] || gd_keystate[SDLK_RETURN];
 }
 
 
@@ -265,6 +275,14 @@ gd_scroll(const Cave *cave, gboolean exact_scroll)
 	return out_of_window;
 }
 
+
+/* just set current viewport to upper left. */
+void
+gd_scroll_to_origin()
+{
+	scroll_x=0;
+	scroll_y=0;
+}
 
 
 
@@ -336,8 +354,8 @@ loadcells(SDL_Surface *image)
 
 	/* 8 (NUM_OF_CELLS_X) cells in a row, so divide by it and we get the size of a cell in pixels */
 	pixbuf_cell_size=image->w/NUM_OF_CELLS_X;
-	g_assert(pixbuf_cell_size==16);
-	cell_size=pixbuf_cell_size;
+	g_assert(pixbuf_cell_size==16);	/* FIXME currently only this is supported */
+	cell_size=pixbuf_cell_size;	/* FIXME no scaling supported yet */
 
 	rect=SDL_CreateRGBSurface(0, pixbuf_cell_size, pixbuf_cell_size, 32, 0, 0, 0, 0);
 	SDL_FillRect(rect, NULL, SDL_MapRGB(rect->format, (gd_flash_color>>16)&0xff, (gd_flash_color>>8)&0xff, gd_flash_color&0xff));
@@ -363,6 +381,8 @@ loadcells(SDL_Surface *image)
 	SDL_FreeSurface(rect);
 }
 
+/* creates a guint32 value, which can be raw-written to a sdl_surface memory area. */
+/* takes the pixel format of the surface into consideration. */
 static guint32
 rgba_pixel_from_color(SDL_PixelFormat *format, GdColor col, guint8 a)
 {
@@ -373,6 +393,7 @@ rgba_pixel_from_color(SDL_PixelFormat *format, GdColor col, guint8 a)
 	return (r<<format->Rshift)+(g<<format->Gshift)+(b<<format->Bshift)+(a<<format->Ashift);
 }
 
+/* sets one of the colors in the indexed palette of an sdl surface to a GdColor. */
 static void
 setpalette(SDL_Surface *image, int index, GdColor col)
 {
@@ -396,6 +417,7 @@ loadcells_c64(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColo
 	/* gfx[0] is the pixel width and height of one cell. */
 	/* from gfx[1], we have the color data, one byte/pixel. so this is an indexed color image: 8bit/pixel. */
 	image=SDL_CreateRGBSurfaceFrom((void *)(gfx+1), NUM_OF_CELLS_X*gfx[0], NUM_OF_CELLS_Y*gfx[0], 8, NUM_OF_CELLS_X*gfx[0], 0, 0, 0, 0);
+	/* sdl supports paletted images, so this is very easy: */
 	setpalette(image, 0, 0);
 	setpalette(image, 1, c0);
 	setpalette(image, 2, c1);
@@ -411,6 +433,7 @@ loadcells_c64(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColo
 	SDL_FreeSurface(image);
 }
 
+/* takes a c64_gfx.png-coded 32-bit pixbuf, and creates a paletted pixbuf in our internal format. */
 guchar *
 c64_gfx_data_from_pixbuf(SDL_Surface *image)
 {
@@ -527,70 +550,124 @@ gd_loadcells_file(const char *filename)
 	return TRUE;
 }
 
-void
-renderfont_color(int color)
+
+
+/* C64 FONT HANDLING */
+
+/* FIXME fixed font size: 8x8 */
+/* renders the fonts for a specific color. */
+/* the wide font draws black pixels, the narrow (normal) font does not! */
+static void
+renderfont_color(GdColor color)
 {
 	int j, x, y;
 	guint32 col, black;
 	SDL_Surface *image, *image_n;
+	SDL_Surface **fn, **fw;
 	
-	if (font_w[color][0])
+	/* if already rendered, return now */
+	if (g_hash_table_lookup(font_w, GUINT_TO_POINTER(color)))
 		return;
-
+		
+	fn=g_new0(SDL_Surface *, GD_NUM_OF_CHARS+1);
+	fw=g_new0(SDL_Surface *, GD_NUM_OF_CHARS+1);
+	
 	/* colors data into memory */
 	image=SDL_CreateRGBSurface(0, 16, 8, 32, rmask, gmask, bmask, amask);
 	image_n=SDL_CreateRGBSurface(0, 8, 8, 32, rmask, gmask, bmask, amask);
 
-	col=rgba_pixel_from_color(image->format, gd_c64_colors[color].rgb, 0xff);
+	col=rgba_pixel_from_color(image->format, color, 0xff);
 	black=rgba_pixel_from_color(image->format, 0, 0xff);
 	
 	/* for all characters */
 	/* render character in "image", then do a displayformat(image) to generate the resulting one */
-	for (j=0; j<G_N_ELEMENTS(font_w[0]); j++) {
+	for (j=0; j<GD_NUM_OF_CHARS; j++) {
+		int x1, y1;
+		
+		y1=(j/16)*8;	/* 16 characters in a row */
+		x1=(j%16)*8;
+		
 		for (y=0; y<8; y++) {
 			guint32 *p=(guint32*) ((char *)image->pixels + y*image->pitch);
 			guint32 *p_n=(guint32*) ((char *)image_n->pixels + y*image_n->pitch);
 
-			for (x=7; x>=0; x--) {
-				if (font[j*8+y]&(1<<x)) {
-					p[0]=col;
+			for (x=0; x<8; x++) {
+				if (font[(y1+y)*128+x1+x]) {
+					p[0]=col;	/* wide */
 					p[1]=col;
-					p_n[0]=col;
+					p_n[0]=col;	/* normal */
 				} else {
-					p[0]=black;
+					p[0]=black;	/* wide */
 					p[1]=black;
-					p_n[0]=black;
+					p_n[0]=black;	/* normal */
 				}
 				p+=2;
 				p_n++;
 			}
 		}
-		font_w[color][j]=SDL_DisplayFormat(image);
+		fw[j]=SDL_DisplayFormat(image);
+		fn[j]=SDL_DisplayFormat(image_n);
 		/* small font does not draw black background */
-		font_n[color][j]=SDL_DisplayFormat(image_n);
-		SDL_SetColorKey(font_n[color][j], SDL_SRCCOLORKEY, SDL_MapRGB(font_n[color][j]->format, 0, 0, 0));
+		SDL_SetColorKey(fn[j], SDL_SRCCOLORKEY, SDL_MapRGB(fn[j]->format, 0, 0, 0));
 	}
 	SDL_FreeSurface(image);
+	SDL_FreeSurface(image_n);
+	
+	g_hash_table_insert(font_w, GINT_TO_POINTER(color), fw);
+	g_hash_table_insert(font_n, GINT_TO_POINTER(color), fn);
 }
 
+/* XXX these functions are not really implemented */
+static void
+loadfont_buffer()
+{
+	/* forget all previously rendered chars */
+	g_hash_table_remove_all(font_w);
+	g_hash_table_remove_all(font_n);
+}
+
+
+/* loads a font from a file */
+void
+gd_loadfont_file(const char *filename)
+{
+	g_assert_not_reached();
+}
+
+/* loads inlined c64 font */
+void
+gd_loadfont_default()
+{
+	font=c64_font+1;	/* first byte in c64_gfx[] is the "cell size", we ignore that */
+	loadfont_buffer();
+}
+
+
+
+
+
+/* clears one line on the screen. takes dark screen or totally black screen into consideration. */
 void
 gd_clear_line(SDL_Surface *screen, int y)
 {
 	SDL_Rect rect;
 	
-	renderfont_color(GD_C64_WHITE);	/* hack */
 	rect.x=0;
 	rect.y=y;
 	rect.w=screen->w;
-	rect.h=font_w[GD_C64_WHITE][0]->h;
+	rect.h=8;	/* FIXME HACK */
 	if (dark_screens!=NULL && dark_screens->data!=NULL)
 		SDL_BlitSurface(dark_screens->data, &rect, screen, &rect);
 	else
 		SDL_FillRect(screen, &rect, SDL_MapRGB(screen->format, 0, 0, 0));	/* fill rectangle with black */
 }
 
+
+
+/* function which draws characters on the screen. used internally. */
+/* x=-1 -> center horizontally */
 static int
-gd_blittext_font(SDL_Surface *screen, SDL_Surface *font[16][GD_NUM_OF_CHARS], int x1, int y, int color, const char *text)
+gd_blittext_font(SDL_Surface *screen, SDL_Surface **font, int x1, int y, const char *text)
 {
 	const char *p=text;
 	SDL_Rect destrect;
@@ -598,11 +675,8 @@ gd_blittext_font(SDL_Surface *screen, SDL_Surface *font[16][GD_NUM_OF_CHARS], in
 	int x;
 	gunichar c;
 
-	g_assert(color>=0 && color<G_N_ELEMENTS(font_w));
-	renderfont_color(color);
-	
 	if (x1==-1)
-		x1=screen->w/2 - (font[color][0]->w*strlen(text))/2;
+		x1=screen->w/2 - (font[0]->w*g_utf8_strlen(text, -1))/2;
 	
 	x=x1;
 	c=g_utf8_get_char(p);
@@ -610,13 +684,13 @@ gd_blittext_font(SDL_Surface *screen, SDL_Surface *font[16][GD_NUM_OF_CHARS], in
 		if (c=='\n') {
 			/* if it is an enter */
 			if (x==x1) 
-				y+=font[color][0]->h/2;
+				y+=font[0]->h/2;
 			else
-				y+=font[color][0]->h;
+				y+=font[0]->h;
 			x=x1;
 		} else {
 			/* it is a normal character */
-			if (c==GD_PLAYER_CHAR || c==GD_DIAMOND_CHAR)	/* special, by gdash */
+			if (c==GD_PLAYER_CHAR || c==GD_DIAMOND_CHAR || c==GD_KEY_CHAR)	/* special, by gdash */
 				i=c;
 			else
 			if (c=='@')
@@ -638,32 +712,40 @@ gd_blittext_font(SDL_Surface *screen, SDL_Surface *font[16][GD_NUM_OF_CHARS], in
 			
 			destrect.x=x;
 			destrect.y=y;
-			SDL_BlitSurface(font[color][i], NULL, screen, &destrect);
+			SDL_BlitSurface(font[i], NULL, screen, &destrect);
 			
-			x+=font[color][i]->w;
+			x+=font[i]->w;
 		}
 				
 		p=g_utf8_next_char(p);	/* next character */
 		c=g_utf8_get_char(p);
 	}
-	
+		
 	return x;
 }
 
+/* write something to the screen, with wide characters. */
+/* x=-1 -> center horizontally */
 int
-gd_blittext(SDL_Surface *screen, int x, int y, int color, const char *text)
+gd_blittext(SDL_Surface *screen, int x, int y, GdColor color, const char *text)
 {
-	return gd_blittext_font(screen, font_w, x, y, color, text);
+	renderfont_color(color);
+	return gd_blittext_font(screen, g_hash_table_lookup(font_w, GUINT_TO_POINTER(color)), x, y, text);
 }
 
+/* write something to the screen, with normal characters. */
+/* x=-1 -> center horizontally */
 int
-gd_blittext_n(SDL_Surface *screen, int x, int y, int color, const char *text)
+gd_blittext_n(SDL_Surface *screen, int x, int y, GdColor color, const char *text)
 {
-	return gd_blittext_font(screen, font_n, x, y, color, text);
+	renderfont_color(color);
+	return gd_blittext_font(screen, g_hash_table_lookup(font_n, GUINT_TO_POINTER(color)), x, y, text);
 }
 
+/* write something to the screen, with wide characters. */
+/* x=-1 -> center horizontally */
 int
-gd_blittext_printf(SDL_Surface *screen, int x, int y, int color, const char *format, ...)
+gd_blittext_printf(SDL_Surface *screen, int x, int y, GdColor color, const char *format, ...)
 {
 	va_list args;
 	char *text;
@@ -677,8 +759,10 @@ gd_blittext_printf(SDL_Surface *screen, int x, int y, int color, const char *for
 	return x;
 }
 
+/* write something to the screen, with normal characters. */
+/* x=-1 -> center horizontally */
 int
-gd_blittext_printf_n(SDL_Surface *screen, int x, int y, int color, const char *format, ...)
+gd_blittext_printf_n(SDL_Surface *screen, int x, int y, GdColor color, const char *format, ...)
 {
 	va_list args;
 	char *text;
@@ -692,130 +776,11 @@ gd_blittext_printf_n(SDL_Surface *screen, int x, int y, int color, const char *f
 	return x;
 }
 
-/* loads a font from the memory address. it should be 1024 bytes (128 chars * 8 bytes/char) */
-static void
-loadfont_buffer(guint8 *buffer)
-{
-	char *p[]={
-		"  x  x  ",
-		"  xxxx  ",
-		" x xx x ",
-		" x xx x ",
-		"  xxxx  ",
-		"   xx   ",
-		"  xxxx  ",
-		"        ",
-	};
-	char *d[]={
-		"    x   ",
-		"   x x  ",
-		"  xxxxx ",
-		" x     x",
-		"  xxxxx ",
-		"   x x  ",
-		"    x   ",
-		"        ",
-	};
-	char *q[]={
-		"   xx   ",
-		" xx  xx ",
-		"xx xx xx",
-		"xxxxx xx",
-		"xxxx xxx",
-		"xxxxxxxx",
-		" xxx xx ",
-		"   xx   ",
-	};
-	char *b[]={
-		"        ",
-		"xx      ",
-		" xx     ",
-		"  xx    ",
-		"   xx   ",
-		"    xx  ",
-		"     xx ",
-		"        ",
-	};
-
-	int i,j;
-	int x,y;
-	
-	g_free(font);
-	font=g_memdup(buffer, 1024);
-
-	/* internally coded characters */
-	for (y=0; y<8; y++) {
-		font[GD_PLAYER_CHAR*8+y]=0;
-		for (x=7; x>=0; x--)
-			if (p[y][7-x]!=' ')
-				font[GD_PLAYER_CHAR*8+y] |= 1<<x;
-	}
-
-	for (y=0; y<8; y++) {
-		font[GD_DIAMOND_CHAR*8+y]=0;
-		for (x=7; x>=0; x--)
-			if (d[y][7-x]!=' ')
-				font[GD_DIAMOND_CHAR*8+y] |= 1<<x;
-	}
-
-	for (y=0; y<8; y++) {
-		font[GD_UNKNOWN_CHAR*8+y]=0;
-		for (x=7; x>=0; x--)
-			if (q[y][7-x]!=' ')
-				font[GD_UNKNOWN_CHAR*8+y] |= 1<<x;
-	}
-
-	for (y=0; y<8; y++) {
-		font[GD_BACKSLASH_CHAR*8+y]=0;
-		for (x=7; x>=0; x--)
-			if (b[y][7-x]!=' ')
-				font[GD_BACKSLASH_CHAR*8+y] |= 1<<x;
-	}
-
-	/* forget all previously rendered chars */
-	for (i=0; i<G_N_ELEMENTS(font_w); i++)
-		for (j=0; j<G_N_ELEMENTS(font_w[0]); j++) {
-			if (font_w[i][j])
-				SDL_FreeSurface(font_w[i][j]);
-			font_w[i][j]=NULL;
-			if (font_n[i][j])
-				SDL_FreeSurface(font_n[i][j]);
-			font_n[i][j]=NULL;
-		}
-}
 
 
-/* loads a font from a file */
-void
-gd_loadfont_file(const char *filename)
-{
-	gchar *contents;
-	gsize length;
-	
-	if (!g_file_get_contents(filename, &contents, &length, NULL)) {
-		g_warning("unable to load font image: %s", gd_filename_to_utf8(filename));
-		return;
-	}
-	
-	if (length<1024) {
-		g_warning("invalid font file size: %s", gd_filename_to_utf8(filename));
-		return;
-	}
-	
-	loadfont_buffer((guint8 *) contents);
-
-	g_free(contents);
-}
-
-/* loads inlined c64 font */
-void
-gd_loadfont_default()
-{
-	loadfont_buffer(chargen);
-}
 
 void
-gd_select_pixbuf_colors (GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5)
+gd_select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5)
 {
 	/* if non-c64 gfx, nothing to do */
 	if (using_png_gfx) {
@@ -833,7 +798,8 @@ gd_select_pixbuf_colors (GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor
 		loadcells_c64(c0, c1, c2, c3, c4, c5);
 	}
 }
-	
+
+/* selects built-in graphics */
 void
 gd_loadcells_default()
 {
@@ -844,6 +810,11 @@ gd_loadcells_default()
 	color0=0xffffffff;	/* this is an invalid gdash color; so redraw is forced */
 }
 
+/* after loading the cells, the dark gray background - which is
+   a tiled steel wall - can be created.
+   this function is to be called after initializing the application
+   and having done gd_loadcells_default.
+ */
 void
 gd_create_dark_background()
 {
@@ -869,9 +840,15 @@ gd_create_dark_background()
 
 
 
-
-
-void gd_backup_and_dark_screen()
+/*
+ * screen backup and restore functions. these are used by menus, help screens
+ * and the like. backups and restores can be nested.
+ *
+ */
+/* backups the current screen contents, and darkens it. */
+/* later, gd_restore_screen can be called. */
+void
+gd_backup_and_dark_screen()
 {
 	SDL_Surface *backup_screen, *dark_screen;
 	
@@ -886,7 +863,10 @@ void gd_backup_and_dark_screen()
 	dark_screens=g_list_prepend(dark_screens, dark_screen);
 }
 
-void gd_backup_and_black_screen()
+/* backups the current screen contents, and clears it. */
+/* later, gd_restore_screen can be called. */
+void
+gd_backup_and_black_screen()
 {
 	SDL_Surface *backup_screen;
 	
@@ -897,7 +877,9 @@ void gd_backup_and_black_screen()
 	dark_screens=g_list_prepend(dark_screens, NULL);
 }
 
-void gd_restore_screen()
+/* restores a backed up screen. */
+void
+gd_restore_screen()
 {
 	SDL_Surface *backup_screen, *dark_screen;
 
@@ -919,15 +901,34 @@ void gd_restore_screen()
 
 
 
-
-/* this function waits until ENTER and ESCAPE are both released */
-void gd_wait_for_key_releases()
+/* process pending events, so presses and releases are applied */
+/* also check for quit event */
+void
+gd_process_pending_events()
 {
-	/* wait until the user releases return and escape, as it might be passed to the caller accidentally */
-	while (gd_keystate[SDLK_RETURN]!=0 || gd_keystate[SDLK_ESCAPE]!=0 || gd_keystate[SDLK_SPACE]!=0) {
+	SDL_Event event;
+	
+	/* process pending events, so presses and releases are applied */
+	while (SDL_PollEvent(&event)) {
+		/* meanwhile, if we receive a quit event, we set the global variable. */
+		if (event.type==SDL_QUIT)
+			gd_quit=TRUE;
+	}
+}
+
+
+
+/* this function waits until SPACE, ENTER and ESCAPE are released */
+void
+gd_wait_for_key_releases()
+{
+	/* wait until the user releases return and escape */
+	while (gd_keystate[SDLK_RETURN]!=0 || gd_keystate[SDLK_ESCAPE]!=0 || gd_keystate[SDLK_SPACE]!=0 || gd_fire()) {
 		SDL_Event event;
-		
+
+		/* process pending events, so presses and releases are applied */
 		while (SDL_PollEvent(&event)) {
+			/* meanwhile, if we receive a quit event, we set the global variable. */
 			if (event.type==SDL_QUIT)
 				gd_quit=TRUE;
 		}

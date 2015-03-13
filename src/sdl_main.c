@@ -97,7 +97,7 @@ showheader_gameover()
 static void
 showheader_game()
 {
-	int x=0;
+	int x;
 
 	SDL_Rect r;
 	
@@ -107,17 +107,42 @@ showheader_game()
 	r.h=statusbar_height;
 	SDL_FillRect(gd_screen, &r, SDL_MapRGB(gd_screen->format, 0, 0, 0));
 
-	if (game.cave->diamonds_needed>game.cave->diamonds_collected)	
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_RED, "%03d", game.cave->diamonds_needed);
-	else
-		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, " %c%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
-	x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%c%02d", GD_DIAMOND_CHAR, game.cave->diamond_value);
-	x+=10;
-	x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_GREEN, "%03d", game.cave->diamonds_collected);
-	x+=10;
-	x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%03d", game.cave->time/game.cave->timing_factor);
-	x+=10;
-	x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%06d", game.player_score);
+	if (gd_keystate[SDLK_LSHIFT] || gd_keystate[SDLK_RSHIFT]) {
+		/* ALTERNATIVE STATUS BAR BY PRESSING SHIFT */
+		x=14;
+		
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%c%02d", GD_PLAYER_CHAR, game.player_lives);
+		x+=24;
+		/* color numbers are not the same as key numbers! c3->k1, c2->k2, c1->k3 */
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, game.cave->color3, "%c%02d", GD_KEY_CHAR, game.cave->key1);
+		x+=10;
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, game.cave->color2, "%c%02d", GD_KEY_CHAR, game.cave->key2);
+		x+=10;
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, game.cave->color1, "%c%02d", GD_KEY_CHAR, game.cave->key3);
+		x+=24;
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%02d", game.cave->gravity_will_change/game.cave->timing_factor);
+	} else {
+		/* NORMAL STATUS BAR */
+		x=0;
+
+		if (gd_keystate[SDLK_f]) {
+			/* fast forward mode - show "FAST" */
+			x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_YELLOW, "%cFAST%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
+		} else {
+			/* normal speed mode - show diamonds needed and value */
+			if (game.cave->diamonds_needed>game.cave->diamonds_collected)	
+				x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_RED, "%03d", game.cave->diamonds_needed);
+			else
+				x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, " %c%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
+			x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%c%02d", GD_DIAMOND_CHAR, game.cave->diamond_value);
+		}
+		x+=10;
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_GREEN, "%03d", game.cave->diamonds_collected);
+		x+=10;
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%03d", game.cave->time/game.cave->timing_factor);
+		x+=10;
+		x=gd_blittext_printf(gd_screen, x, statusbar_mid, GD_C64_WHITE, "%06d", game.player_score);
+	}
 }
 
 static void
@@ -127,6 +152,8 @@ game_help()
 		"CURSOR", "MOVE",
 		"CTRL", "FIRE",
 		"F2", "SUICIDE",
+		"F", "FASH FORWARD (HOLD)",
+		"SHIFT", "STATUS BAR (HOLD)",
 		"ESC", "RESTART LEVEL",
 		"", "",
 		"SPACE", "PAUSE",
@@ -173,6 +200,7 @@ play_game(int start_cave, int start_level)
 			break;
 
 		gd_select_pixbuf_colors(game.cave->color0, game.cave->color1, game.cave->color2, game.cave->color3, game.cave->color4, game.cave->color5);
+		gd_scroll_to_origin();
 		SDL_FillRect(gd_screen, NULL, SDL_MapRGB(gd_screen->format, 0, 0, 0));	/* fill whole gd_screen with black */
 
 		last_draw=SDL_GetTicks()-40;	/* -40 ensures that drawing starts immediately */
@@ -185,6 +213,11 @@ play_game(int start_cave, int start_level)
 		while (caveloop) {
 			SDL_Event event;
 			int wait;
+			int speed_div;
+			
+			speed_div=1;
+			if (gd_keystate[SDLK_f])
+				speed_div=5;
 
 			while (SDL_PollEvent(&event)) {
 				switch(event.type) {
@@ -230,13 +263,17 @@ play_game(int start_cave, int start_level)
 			}
 			
 			/* CAVE ITERATE ********************************************************************* */
-			while (iterate && SDL_GetTicks()>=last_iterate+game.cave->speed) {
+			while (iterate && SDL_GetTicks()>=last_iterate+game.cave->speed/speed_div) {
 				if (!paused && !game.out_of_window) {
 					PLAYER_STATE pl;
-
+					GdDirection player_move;
+					
 					/* returns true if cave is finished. if false, we will continue */
+					player_move=gd_direction_from_keypress(gd_up(), gd_down(), gd_left(), gd_right());
 					pl=game.cave->player_state;
-					iterate=!gd_game_iterate_cave(gd_up(), gd_down(), gd_left(), gd_right(), gd_fire(), suicide, gd_keystate[SDLK_ESCAPE]);
+
+					iterate=!gd_game_iterate_cave(player_move, gd_fire(), suicide, gd_keystate[SDLK_ESCAPE]);
+
 					if (pl!=PL_TIMEOUT && game.cave->player_state==PL_TIMEOUT)
 						/* cave did timeout at this moment */
 						outoftime_since=SDL_GetTicks();
@@ -250,7 +287,7 @@ play_game(int start_cave, int start_level)
 				suicide=FALSE;
 				
 				/* we do not do last_iterate=getticks, as do not want to miss iterate cycles */
-				last_iterate+=game.cave->speed;
+				last_iterate+=game.cave->speed/speed_div;
 			}
 			
 			/* CAVE DRAWING, BONUS POINTS, ... ********************************************************************* */
@@ -260,8 +297,7 @@ play_game(int start_cave, int start_level)
 				
 				state=gd_game_main_int();
 				switch(state) {
-					case GD_GAME_NOTHING:
-						/* nothing to do */
+					case GD_GAME_NOTHING:						/* nothing to do */
 						break;
 					case GD_GAME_BONUS_SCORE:
 						break;
@@ -274,7 +310,6 @@ play_game(int start_cave, int start_level)
 						break;
 					case GD_GAME_START_ITERATE:
 						iterate=TRUE;	/* start cave movements */
-							/* XXX delete conver header */
 						last_iterate=SDL_GetTicks();
 						break;
 					case GD_GAME_NEXT_LEVEL:
@@ -331,15 +366,16 @@ play_game(int start_cave, int start_level)
 	gd_stop_game();
 
 	/* (if stopped because of a quit event, do not bother highscore at all) */
-	if (!gd_quit && show_highscore && gd_score_is_highscore(gd_default_cave->highscore, game.player_score)) {
-		GdHighScore *hs=g_new0(GdHighScore, 1);
+	if (!gd_quit && show_highscore && gd_cave_is_highscore(gd_default_cave, game.player_score)) {
+		GdHighScore hs;
+		int rank;
 
 		/* enter to highscore table */
-		g_strlcpy(hs->name, game.player_name, sizeof(hs->name));
-		hs->score=game.player_score;
-
-		gd_default_cave->highscore=g_list_insert_sorted(gd_default_cave->highscore, hs, gd_highscore_compare);
-		gd_show_highscore(hs);
+		g_strlcpy(hs.name, game.player_name, sizeof(hs.name));
+		hs.score=game.player_score;
+		
+		rank=gd_cave_add_highscore(gd_default_cave, hs);
+		gd_show_highscore(gd_default_cave, rank);
 	}
 	else {
 		/* no high score */
@@ -398,6 +434,10 @@ main_menu()
 	x=gd_blittext_n(gd_screen, x, 172, GD_C64_YELLOW, gd_default_cave->name);
 
 	gd_blittext_n(gd_screen, -1, gd_screen->h-8, GD_C64_GRAY2, "CRSR: SELECT   SPACE: PLAY   H: KEYS");	/* FIXME 8 */
+	
+	if (gd_has_new_error())
+		/* show error flag */
+		gd_blittext_n(gd_screen, gd_screen->w-8, gd_screen->h-8, GD_C64_RED, "E");	/* FIXME 8 */
 
 	s=M_NONE;
 	cavenum=gd_caveset_first_selectable();
@@ -497,7 +537,7 @@ main_menu()
 		if (gd_right() && i==0)
 			cavenum=next_selectable_cave(cavenum);
 
-		if (gd_space_or_fire())
+		if (gd_space_or_enter_or_fire())
 			s=M_PLAY;
 					
 		SDL_Delay(75);
@@ -584,10 +624,11 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	gd_cave_init();
 	gd_settings_init_with_language();
 
 	gd_install_log_handler();
+
+	gd_cave_init();
 	
 	gd_load_settings();
 
@@ -602,7 +643,7 @@ int main(int argc, char *argv[])
 	if (gd_param_cavenames && gd_param_cavenames[0]) {
 		/* load caveset, "ignore" errors. */
 		if (!gd_caveset_load_from_file (gd_param_cavenames[0], gd_user_config_dir))
-			g_critical (_("Errors during loading caveset from file %s"), gd_param_cavenames[0]);
+			g_critical (_("Errors during loading caveset from file '%s'"), gd_param_cavenames[0]);
 	}
 	else if (gd_param_internal) {
 		/* if specified an internal caveset */
@@ -624,7 +665,7 @@ int main(int argc, char *argv[])
 
 	gd_sdl_init();
 	gd_sound_init();
-
+	
 	gd_loadfont_default();
 
 	gd_loadcells_default();
@@ -674,7 +715,7 @@ int main(int argc, char *argv[])
 				break;
 				
 			case M_HIGHSCORE:
-				gd_show_highscore(NULL);
+				gd_show_highscore(NULL, 0);
 				break;
 			
 			case M_HELP:

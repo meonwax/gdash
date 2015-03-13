@@ -42,6 +42,7 @@ extern gboolean gd_use_bdcff_highscore;
 extern gboolean gd_sdl_fullscreen;
 extern gboolean gd_sdl_sound;
 extern gboolean gd_sdl_16bit_mixing;
+extern gboolean gd_sdl_44khz_mixing;
 extern int gd_cell_scale;
 extern char *gd_theme;
 

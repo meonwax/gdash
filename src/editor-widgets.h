@@ -32,5 +32,8 @@ void gd_element_button_update_pixbuf(GtkWidget *button);
 GtkWidget *gd_direction_combo_new(const GdDirection initial);
 GdDirection gd_direction_combo_get(GtkWidget *combo);
 
+GtkWidget *gd_scheduling_combo_new(const GdScheduling initial);
+GdScheduling gd_scheduling_combo_get(GtkWidget *combo);
+
 
 #endif

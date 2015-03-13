@@ -1,32 +1,38 @@
 ## Process this file with automake to produce Makefile.in
 sounddata = \
-	amoeba.wav \
-	cover.wav \
-	crack.wav \
-	diamond_1.wav \
-	diamond_2.wav \
-	diamond_3.wav \
-	diamond_4.wav \
-	diamond_5.wav \
-	diamond_6.wav \
-	diamond_7.wav \
-	diamond_8.wav \
-	diamond_collect.wav \
-	explosion.wav \
-	magic_wall.wav \
-	stone.wav \
-	timeout_1.wav \
-	timeout_2.wav \
-	timeout_3.wav \
-	timeout_4.wav \
-	timeout_5.wav \
-	timeout_6.wav \
-	timeout_7.wav \
-	timeout_8.wav \
-	timeout_9.wav \
-	walk_earth.wav \
-	walk_empty.wav \
-	finished.wav
+    amoeba.ogg \
+    cover.ogg \
+    crack.ogg \
+    diamond_1.ogg \
+    diamond_2.ogg \
+    diamond_3.ogg \
+    diamond_4.ogg \
+    diamond_5.ogg \
+    diamond_6.ogg \
+    diamond_7.ogg \
+    diamond_8.ogg \
+    diamond_collect.ogg \
+    door_open.ogg \
+    explosion.ogg \
+    falling_wall.ogg \
+    finished.ogg \
+    magic_wall.ogg \
+    pneumatic.ogg \
+    skeleton_collect.ogg \
+    stirring.ogg \
+    stone.ogg \
+    teleporter.ogg \
+    timeout_1.ogg \
+    timeout_2.ogg \
+    timeout_3.ogg \
+    timeout_4.ogg \
+    timeout_5.ogg \
+    timeout_6.ogg \
+    timeout_7.ogg \
+    timeout_8.ogg \
+    timeout_9.ogg \
+    walk_earth.ogg \
+    walk_empty.ogg
 
 if SOUND
   pkgdata_DATA = $(sounddata)

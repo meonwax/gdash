@@ -279,7 +279,7 @@ object_list_selection_changed_signal (GtkTreeSelection *selection, gpointer data
 		char *text;
 		GdObject *object=object_list_first_selected();
 
-		text=gd_get_object_description_text (object);	/* to be g_freed */
+		text=gd_get_object_description_markup (object);	/* to be g_freed */
 		gtk_label_set_markup (GTK_LABEL (label_object), text);
 		g_free (text);
 	}
@@ -640,6 +640,12 @@ cave_properties (Cave *cave, gboolean caveset_only)
 					widget=gd_direction_combo_new(*(GdDirection *) value);
 					defval=g_strdup_printf("%s", gd_direction_name[*(GdDirection *)defpoint]);
 					break;
+				case GD_TYPE_SCHEDULING:
+					value=((GdScheduling *) value)+j;
+					defpoint=((GdScheduling *) defpoint) + j;
+					widget=gd_scheduling_combo_new(*(GdScheduling *) value);
+					defval=g_strdup_printf("%s", gd_scheduling_name[*(GdScheduling *)defpoint]);
+					break;
 				}
 				/* put widget into list so values can be extracted later */
 				widgets=g_list_prepend (widgets, widget);
@@ -748,6 +754,10 @@ cave_properties (Cave *cave, gboolean caveset_only)
 				break;
 			case GD_TYPE_DIRECTION:
 				*(GdDirection *) value=gd_direction_combo_get(iter->data);
+				break;
+			case GD_TYPE_SCHEDULING:
+				*(GdScheduling *) value=gd_scheduling_combo_get(iter->data);
+				break;
 			}
 		}
 
@@ -812,7 +822,8 @@ render_cave ()
 	g_return_if_fail (edited_cave!=NULL);
 
 	gd_cave_free (rendered_cave);
-	rendered_cave=gd_cave_new_rendered (edited_cave, edit_level);
+	/* rendering cave for editor: seed=random, so the user sees which elements are truly random */
+	rendered_cave=gd_cave_new_rendered (edited_cave, edit_level, g_random_int());
 	/* create a gfx buffer for displaying */
 	gd_cave_map_free(gfx_buffer);
 	gd_cave_map_free(object_highlight);
@@ -2107,6 +2118,50 @@ motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpoint
  *
  */
 
+static void
+icon_view_update_pixbufs()
+{
+	GtkTreePath *path;
+	GtkTreeModel *model;
+	GtkTreeIter iter;
+
+	model=gtk_icon_view_get_model(GTK_ICON_VIEW(iconview_cavelist));
+	path=gtk_tree_path_new_first();
+	while (gtk_tree_model_get_iter (model, &iter, path)) {
+		Cave *cave;
+		GdkPixbuf *pixbuf, *pixbuf_in_icon_view;
+
+		gtk_tree_model_get (model, &iter, CAVE_COLUMN, &cave, PIXBUF_COLUMN, &pixbuf_in_icon_view, -1);
+		pixbuf=g_hash_table_lookup(cave_pixbufs, cave);
+
+		/* if we have no pixbuf, generate one. */
+		if (!pixbuf) {
+			Cave *rendered;
+
+			pixbuf_in_icon_view=NULL;	/* to force update below */			
+			rendered=gd_cave_new_rendered (cave, 0, 0);	/* render at level 1, seed=0 */
+			pixbuf=gd_drawcave_to_pixbuf (rendered, 128, 128, TRUE);					/* draw 128x128 icons at max */
+			if (!cave->selectable) {
+				GdkPixbuf *colored;
+				
+				colored=gdk_pixbuf_composite_color_simple(pixbuf, gdk_pixbuf_get_width(pixbuf), gdk_pixbuf_get_height(pixbuf), GDK_INTERP_NEAREST, 160, 1, gd_flash_color, gd_flash_color);
+				g_object_unref(pixbuf);	/* forget original */
+				pixbuf=colored;
+			}
+			gd_cave_free (rendered);
+			g_hash_table_insert(cave_pixbufs, cave, pixbuf);
+		}
+
+		/* if generated a new pixbuf, or the icon view does not contain the pixbuf: */
+		if (pixbuf!=pixbuf_in_icon_view)
+			gtk_list_store_set(GTK_LIST_STORE(model), &iter, PIXBUF_COLUMN, pixbuf, -1);
+
+		gtk_tree_path_next (path);
+	}
+	gtk_tree_path_free (path);
+}
+
+
 /* this is also called as an item activated signal.
 	so don't use data! that function has another parameters.
 	also do not use widget, as it is once an icon view, once a gtkmenu */
@@ -2186,10 +2241,8 @@ cave_make_selectable_cb (GtkWidget *widget, gpointer data)
 	if (!cave->selectable) {
 		cave->selectable=TRUE;
 		g_hash_table_remove(cave_pixbufs, cave);
-		/* regenerate icon view */
-		gtk_widget_destroy (iconview_cavelist);
-		select_cave_for_edit(NULL);
 	}
+	icon_view_update_pixbufs();
 }
 
 static void
@@ -2211,10 +2264,8 @@ cave_make_unselectable_cb (GtkWidget *widget, gpointer data)
 	if (cave->selectable) {
 		cave->selectable=FALSE;
 		g_hash_table_remove(cave_pixbufs, cave);
-		/* regenerate icon view */
-		gtk_widget_destroy (iconview_cavelist);
-		select_cave_for_edit(NULL);
 	}
+	icon_view_update_pixbufs();
 }
 
 static void
@@ -2229,12 +2280,16 @@ icon_view_selection_changed_cb (GtkWidget *widget, gpointer data)
 	if (list!=NULL) {
 		GtkTreeIter iter;
 		Cave *cave;
+		char *name_escaped;
 
 		model=gtk_icon_view_get_model (GTK_ICON_VIEW (widget));
 
 		gtk_tree_model_get_iter (model, &iter, list->data);
 		gtk_tree_model_get (model, &iter, CAVE_COLUMN, &cave, -1);
-		gd_label_set_markup_printf (GTK_LABEL (label_object), _("<b>%s</b>, %s, %dx%d, time %d:%02d, diamonds %d"), cave->name, cave->selectable?_("selectable"):_("not selectable"), cave->w, cave->h, cave->level_time[0]/60, cave->level_time[0] % 60, cave->level_diamonds[0]);
+
+		name_escaped=g_markup_escape_text(cave->name, -1);
+		gd_label_set_markup_printf (GTK_LABEL (label_object), _("<b>%s</b>, %s, %dx%d, time %d:%02d, diamonds %d"), name_escaped, cave->selectable?_("selectable"):_("not selectable"), cave->w, cave->h, cave->level_time[0]/60, cave->level_time[0] % 60, cave->level_diamonds[0]);
+		g_free(name_escaped);
 	}
 	g_list_foreach (list, (GFunc) gtk_tree_path_free, NULL);
 	g_list_free (list);
@@ -2267,30 +2322,13 @@ caveset_icon_view_destroyed (GtkIconView * icon_view, gpointer data)
 }
 
 
+
 static void
 add_cave_to_icon_view(GtkListStore *store, Cave *cave)
 {
 	GtkTreeIter treeiter;
-	GdkPixbuf *pixbuf;
 	
-	pixbuf=g_hash_table_lookup(cave_pixbufs, cave);
-	if (!pixbuf) {
-		Cave *rendered;
-		
-		rendered=gd_cave_new_rendered (cave, 0);	/* render at level 1 */
-		pixbuf=gd_drawcave_to_pixbuf (rendered, 128, 128, TRUE);					/* draw 128x128 icons at max */
-		if (!cave->selectable) {
-			GdkPixbuf *colored;
-			
-			colored=gdk_pixbuf_composite_color_simple(pixbuf, gdk_pixbuf_get_width(pixbuf), gdk_pixbuf_get_height(pixbuf), GDK_INTERP_NEAREST, 160, 1, gd_flash_color, gd_flash_color);
-			g_object_unref(pixbuf);	/* forget original */
-			pixbuf=colored;
-		}
-		gd_cave_free (rendered);
-		g_hash_table_insert(cave_pixbufs, cave, pixbuf);
-	}
-
-	gtk_list_store_insert_with_values (store, &treeiter, -1, CAVE_COLUMN, cave, NAME_COLUMN, cave->name, PIXBUF_COLUMN, pixbuf, -1);
+	gtk_list_store_insert_with_values (store, &treeiter, -1, CAVE_COLUMN, cave, NAME_COLUMN, cave->name, -1);
 }
 
 /* does nothing else but sets caveset_edited to true. called by "reordering" (drag&drop), which is implemented by gtk+ by inserting and deleting */
@@ -2434,6 +2472,7 @@ select_cave_for_edit (Cave * cave)
 
 			iconview_cavelist=gtk_icon_view_new_with_model (GTK_TREE_MODEL (cave_list));
 			g_object_unref(cave_list);	/* now the icon view holds the reference */
+			icon_view_update_pixbufs();	/* create icons */
 			g_signal_connect(G_OBJECT(iconview_cavelist), "destroy", G_CALLBACK(caveset_icon_view_destroyed), &iconview_cavelist);
 			g_signal_connect(G_OBJECT(iconview_cavelist), "destroy", G_CALLBACK(gtk_widget_destroyed), &iconview_cavelist);
 			g_signal_connect(G_OBJECT(iconview_cavelist), "popup-menu", G_CALLBACK(iconview_popup_menu), NULL);
@@ -2936,6 +2975,7 @@ paste_clipboard_cb (GtkWidget *widget, gpointer data)
 			
 			add_cave_to_icon_view(store, gd_cave_new_from_cave(cave));
 		}
+		icon_view_update_pixbufs();
 		
 		/* this modified the caveset */
 		gd_caveset_edited=TRUE;
@@ -3386,13 +3426,9 @@ new_caveset_cb (GtkWidget *widget, gpointer data)
 static void
 selectable_all_cb(GtkWidget *widget, gpointer data)
 {
-	Cave *edited;
 	GList *iter;
-	
-	edited=edited_cave;
-	/* destroy icon view so it does not interfere with the cave order, and the order of caves is saved */
-	if (iconview_cavelist)
-		gtk_widget_destroy(iconview_cavelist);
+
+	gtk_widget_destroy(iconview_cavelist);	/* to generate gd_caveset */
 	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
 		Cave *cave=(Cave *)iter->data;
 		
@@ -3401,20 +3437,16 @@ selectable_all_cb(GtkWidget *widget, gpointer data)
 			g_hash_table_remove(cave_pixbufs, cave);
 		}
 	}
-	select_cave_for_edit(edited);	/* go back to edited cave or recreate icon view */
+	select_cave_for_edit(NULL);
 }
 
 /* make all but intermissions selectable */
 static void
 selectable_all_but_intermissions_cb(GtkWidget *widget, gpointer data)
 {
-	Cave *edited;
 	GList *iter;
 	
-	edited=edited_cave;
-	/* destroy icon view so it does not interfere with the cave order, and the order of caves is saved */
-	if (iconview_cavelist)
-		gtk_widget_destroy(iconview_cavelist);
+	gtk_widget_destroy(iconview_cavelist);	/* to generate gd_caveset */
 	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
 		Cave *cave=(Cave *)iter->data;
 		gboolean desired=!cave->intermission;
@@ -3424,7 +3456,7 @@ selectable_all_but_intermissions_cb(GtkWidget *widget, gpointer data)
 			g_hash_table_remove(cave_pixbufs, cave);
 		}
 	}
-	select_cave_for_edit(edited);	/* go back to edited cave or recreate icon view */
+	select_cave_for_edit(NULL);
 }
 
 
@@ -3433,13 +3465,9 @@ static void
 selectable_all_after_intermissions_cb(GtkWidget *widget, gpointer data)
 {
 	gboolean was_intermission=TRUE;	/* treat the 'zeroth' cave as intermission, so the very first cave will be selectable */
-	Cave *edited;
 	GList *iter;
 	
-	edited=edited_cave;
-	/* destroy icon view so it does not interfere with the cave order, and the order of caves is saved */
-	if (iconview_cavelist)
-		gtk_widget_destroy(iconview_cavelist);
+	gtk_widget_destroy(iconview_cavelist);	/* to generate gd_caveset */
 	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
 		Cave *cave=(Cave *)iter->data;
 		gboolean desired;
@@ -3452,7 +3480,7 @@ selectable_all_after_intermissions_cb(GtkWidget *widget, gpointer data)
 
 		was_intermission=cave->intermission;	/* remember for next iteration */
 	}
-	select_cave_for_edit(edited);	/* go back to edited cave or recreate icon view */
+	select_cave_for_edit(NULL);
 }
 
 
@@ -3563,7 +3591,7 @@ highscore_cb(GtkWidget *widget, gpointer data)
 	
 	if (has_iconview)
 		gtk_widget_destroy(iconview_cavelist);
-	gd_show_highscore(editor_window, edited_cave?edited_cave:gd_default_cave, TRUE, NULL);
+	gd_show_highscore(editor_window, edited_cave?edited_cave:gd_default_cave, TRUE, NULL, -1);
 	if (has_iconview)
 		select_cave_for_edit(NULL);
 }

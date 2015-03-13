@@ -61,7 +61,7 @@ caveset_checksum()
 	GList *iter;
 	
 	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
-		Cave *rendered=gd_cave_new_rendered(iter->data, 0);
+		Cave *rendered=gd_cave_new_rendered(iter->data, 0, 0);	/* seed=0 */
 		int x, y;
 		
 		for (y=0; y<rendered->h; y++)
@@ -88,8 +88,7 @@ cave_highscore_to_keyfile_func(gpointer cav, gpointer userdat)
 	GKeyFile *keyfile=(GKeyFile *)userdat;
 	int index, i;
 	char cavstr[10];
-	GList *hiter;
-	
+
 	/* here we guess the number... */
 	if (cav==gd_default_cave)
 		index=0;
@@ -97,16 +96,16 @@ cave_highscore_to_keyfile_func(gpointer cav, gpointer userdat)
 		index=g_list_index(gd_caveset, cave)+1;
 	g_snprintf(cavstr, sizeof(cavstr), "%d", index);
 
-	for (i=1, hiter=cave->highscore; hiter!=NULL && i<=GD_HIGHSCORE_NUM; hiter=hiter->next, i++) {
-		GdHighScore *hs=hiter->data;
-		char rankstr[10];
-		char *str;
-		
-		g_snprintf(rankstr, sizeof(rankstr), "%d", i);
-		str=g_strdup_printf("%d %s", hs->score, hs->name);
-		g_key_file_set_string(keyfile, cavstr, rankstr, str);
-		g_free(str);
-	}
+	for (i=0; i<G_N_ELEMENTS(cave->highscore); i++)
+		if (cave->highscore[i].score>0) {	/* only save, if score is not zero */
+			char rankstr[10];
+			char *str;
+			
+			g_snprintf(rankstr, sizeof(rankstr), "%d", i+1);
+			str=g_strdup_printf("%d %s", cave->highscore[i].score, cave->highscore[i].name);
+			g_key_file_set_string(keyfile, cavstr, rankstr, str);
+			g_free(str);
+		}
 	g_key_file_set_comment(keyfile, cavstr, NULL, cave->name, NULL);
 }
 
@@ -156,9 +155,9 @@ gd_save_highscore(const char *directory)
     g_free(data);
 }
 
-GList *highscore_list_new_from_keyfile(GKeyFile *keyfile, int i)
+gboolean
+cave_highscores_load_from_keyfile(Cave *cave, GKeyFile *keyfile, int i)
 {
-	GList *list=NULL;
 	char cavstr[10];
 	char **keys;
 	int j;
@@ -167,7 +166,7 @@ GList *highscore_list_new_from_keyfile(GKeyFile *keyfile, int i)
 	g_snprintf(cavstr, sizeof(cavstr), "%d", i);
 	if (!g_key_file_has_group(keyfile, cavstr))
 		/* if the cave had no highscore, there is no group. this is normal! */
-		return NULL;
+		return FALSE;
 
 	/* for all keys... we ignore the keys itself, as rebuilding the sorted list is more simple */
 	keys=g_key_file_get_keys(keyfile, cavstr, NULL, NULL);
@@ -176,23 +175,22 @@ GList *highscore_list_new_from_keyfile(GKeyFile *keyfile, int i)
 		char *str;
 		
 		str=g_key_file_get_string(keyfile, cavstr, keys[j], NULL);
-		if (!str)	/* ?! not really possible */
+		if (!str)	/* ?! not really possible but who knows */
 			continue;
 		
-		if (strchr(str, ' ')!=NULL && sscanf(str, "%d", &score)==1) {
-			GdHighScore *hs;
+		if (strchr(str, ' ')!=NULL && sscanf(str, "%d", &score)==1)	{
+			GdHighScore hs;
 			
-			hs=g_new0(GdHighScore, 1);
-			hs->score=score;
-			g_strlcpy(hs->name, strchr(str, ' ')+1, sizeof(hs->name));
-			list=g_list_insert_sorted(list, hs, gd_highscore_compare);
+			hs.score=score;
+			g_strlcpy(hs.name, strchr(str, ' ')+1, sizeof(hs.name));
+			gd_cave_add_highscore(cave, hs);
 		} else
 			g_warning("Invalid line in highscore file: %s", str);
 		g_free(str);
 	}
 	g_strfreev(keys);
 	
-	return list;
+	return TRUE;
 }
 
 
@@ -224,14 +222,14 @@ gd_load_highscore(const char *directory)
 	}
 	
 	gd_cave_clear_highscore(gd_default_cave);
-	/* try to load for game */
-	gd_default_cave->highscore=highscore_list_new_from_keyfile(keyfile, 0);
+	cave_highscores_load_from_keyfile(gd_default_cave, keyfile, 0);	/* try to load for game */
+
 	/* try to load for all caves */
 	for (iter=gd_caveset, i=1; iter!=NULL; iter=iter->next, i++) {
 		Cave *cave=iter->data;
 		
 		gd_cave_clear_highscore(cave);
-		cave->highscore=highscore_list_new_from_keyfile(keyfile, i);
+		cave_highscores_load_from_keyfile(cave, keyfile, i);
 	}
 	
 	g_key_file_free(keyfile);
@@ -242,18 +240,16 @@ gd_load_highscore(const char *directory)
 static void
 write_highscore_func(Cave *cave, GString *fout)
 {
-	if (cave->highscore) {
-		GList *iter;
-		int i;
-		
-		g_string_append(fout, "[highscore]\n");
-		for (i=1, iter=cave->highscore; iter!=NULL && i<=GD_HIGHSCORE_NUM; iter=iter->next, i++) {
-			GdHighScore *hs=(GdHighScore *)iter->data;
-			
-			g_string_append_printf(fout, "%d %s %d\n", i, hs->name, hs->score);
+	int i, hs;
+	
+	g_string_append(fout, "[highscore]\n");
+	hs=0;
+	for (i=0; i<G_N_ELEMENTS(cave->highscore); i++)
+		if (cave->highscore[i].score>0) {	/* only save, if score is not zero */
+			g_string_append_printf(fout, "%d %s %d\n", hs+1, cave->highscore[i].name, cave->highscore[i].score);
+			hs++;
 		}
-		g_string_append(fout, "[/highscore]\n\n");
-	}
+	g_string_append(fout, "[/highscore]\n\n");
 }
 
 
@@ -402,6 +398,7 @@ cave_process_tags_func(char *attrib, char *param, Cave *cave)
 				int *ivalue=value;	/* these point to the same, but to avoid the awkward cast syntax */
 				GdElement *evalue=value;
 				GdDirection *dvalue=value;
+				GdScheduling *svalue=value;
 				gboolean *bvalue=value;
 				double *fvalue=value;
 				int j;
@@ -419,6 +416,7 @@ cave_process_tags_func(char *attrib, char *param, Cave *cave)
 				for (j=0; j<gd_cave_properties[i].count && params[paramindex]!=NULL; j++) {
 					gboolean success=FALSE;
 					gdouble res;
+					int n;
 
 					switch (gd_cave_properties[i].type) {
 					case GD_TYPE_STRING:
@@ -476,6 +474,14 @@ cave_process_tags_func(char *attrib, char *param, Cave *cave)
 							dvalue[j]=MV_RIGHT;
 							success=TRUE;
 						}
+						break;
+					case GD_TYPE_SCHEDULING:
+						for (n=0; n<GD_SCHEDULING_MAX; n++)
+							if (g_ascii_strcasecmp(params[paramindex], gd_scheduling_filename[n])==0) {
+								svalue[j]=(GdScheduling)n;
+								success=TRUE;
+							}
+						break;
 					case GD_TYPE_COLOR:
 					case GD_TYPE_EFFECT:
 						/* shoud have handled this elsewhere */
@@ -567,9 +573,9 @@ cave_process_tags(Cave *cave, GHashTable *tags, GList *maplines)
 		cave->slime_predictable=TRUE;
 	/* these set scheduling type. framedelay takes precedence, if there are both, so we check it later. */
 	if (g_hash_table_lookup(tags, "CaveDelay"))
-		cave->c64_scheduling=TRUE;
+		cave->scheduling=GD_SCHEDULING_PLCK;
 	if (g_hash_table_lookup(tags, "FrameTime"))
-		cave->c64_scheduling=FALSE;
+		cave->scheduling=GD_SCHEDULING_MILLISECONDS;
 	
 	/* process all tags */
 	g_hash_table_foreach_remove(tags, (GHRFunc) cave_process_tags_func, cave);
@@ -716,9 +722,6 @@ caveset_load_from_bdcff (const char *contents)
 				reading_highscore=TRUE;
 			}
 			else if (g_ascii_strcasecmp (line, "[/highscore]")==0) {
-				/* sort the highscore list, as they might not be in order in the bdcff */
-				cave->highscore=g_list_sort(cave->highscore, gd_highscore_compare);
-
 				reading_highscore=FALSE;
 			}
 			else if (g_ascii_strcasecmp (line, "[objects]")==0) {
@@ -792,7 +795,8 @@ caveset_load_from_bdcff (const char *contents)
 				g_strlcat(hs.name, " ", sizeof(GdString));	/* space and... */
 				g_strlcat(hs.name, split[i], sizeof(GdString)); /* ... next word */
 			}
-			cave->highscore=g_list_append(cave->highscore, g_memdup(&hs, sizeof(hs)));
+			
+			gd_cave_add_highscore(cave, hs);
 			
 			continue;
 		}
@@ -1102,9 +1106,9 @@ gd_return_nth_cave(const int cave)
 
 /* pick a cave, identified by a number, and render it with level number. */
 Cave *
-gd_cave_new_from_caveset (const int cave, const int level)
+gd_cave_new_from_caveset (const int cave, const int level, guint32 seed)
 {
-	return gd_cave_new_rendered (gd_return_nth_cave(cave), level);
+	return gd_cave_new_rendered (gd_return_nth_cave(cave), level, seed);
 }
 
 const gchar **
@@ -1256,10 +1260,14 @@ caveset_save_cave_func (Cave *cave, GString *fout)
 				if (((GdDirection *) value)[j]!=((GdDirection *) default_value)[j])
 					should_write=TRUE;
 				break;
-				
-			default:
-				/* unknown type! */
-				g_assert_not_reached ();
+			case GD_TYPE_SCHEDULING:
+				g_assert_not_reached();
+				break;
+			case GD_TAB:
+			case GD_LABEL:
+			case GD_LEVEL_LABEL:
+			case GD_TYPE_STRING:
+				break;
 			}
 		}
 	}
@@ -1285,10 +1293,13 @@ caveset_save_cave_func (Cave *cave, GString *fout)
 	else
 		g_string_append_printf(fout, "SlimePermeabilityC64=%d\n", cave->slime_permeability_c64);
 	/* same for cavedelay and frametime */
-	if (cave->c64_scheduling)
-		g_string_append_printf(fout, "CaveDelay=%d %d %d %d %d\n", cave->level_ckdelay[0], cave->level_ckdelay[1], cave->level_ckdelay[2], cave->level_ckdelay[3], cave->level_ckdelay[4]);
-	else
+	if (cave->scheduling==GD_SCHEDULING_MILLISECONDS)
 		g_string_append_printf(fout, "FrameTime=%d %d %d %d %d\n", cave->level_speed[0], cave->level_speed[1], cave->level_speed[2], cave->level_speed[3], cave->level_speed[4]);
+	else {
+		g_string_append_printf(fout, "CaveDelay=%d %d %d %d %d\n", cave->level_ckdelay[0], cave->level_ckdelay[1], cave->level_ckdelay[2], cave->level_ckdelay[3], cave->level_ckdelay[4]);
+		if (cave->scheduling!=GD_SCHEDULING_PLCK) /* plck is the default, if not milliseconds */
+			g_string_append_printf(fout, "CaveScheduling=%s\n", gd_scheduling_filename[cave->scheduling]);
+	}
 
 	/* save unknown tags as they are */
 	if (cave->tags) {
@@ -1405,10 +1416,12 @@ gd_caveset_save (const char *filename)
 						write_mapcodes=TRUE;
 						
 						/* find a character which is not yet used for any element */
-						for (j=32; j<128; j++)
-							if (gd_char_to_element[j]==O_UNKNOWN)
+						for (j=32; j<128; j++) {
+							/* the string contains the characters which should not be used. */
+							if (strchr("<>&[]/=\\", j)==NULL && gd_char_to_element[j]==O_UNKNOWN)
 								break;
-						/* if no more space... */
+						}
+						/* if no more space... XXX */
 						g_assert(j!=128);
 						
 						gd_elements[e].character_new=j;
@@ -1470,53 +1483,5 @@ gd_caveset_save (const char *filename)
 	gd_caveset_edited=FALSE;
 	g_string_free(contents, TRUE);
 	return TRUE;
-}
-void
-gd_cave_setup_for_game(Cave *cave)
-{
-	int x, y;
-	
-	gd_cave_set_ckdelay_extra_for_animation(cave);
-
-	/* find the player which will be the one to scroll to at the beginning of the game (before the player's birth) */
-	if (cave->active_is_first_found) {
-		/* uppermost player is active */
-		for (y=cave->h-1; y>=0; y--)
-			for (x=cave->w-1; x>=0; x--)
-				if (cave->map[y][x]==O_INBOX) {
-					cave->player_x=x;
-					cave->player_y=y;
-				}
-	} else {
-		/* lowermost player is active */
-		for (y=0; y<cave->h; y++)
-			for (x=0; x<cave->w; x++)
-				if (cave->map[y][x]==O_INBOX) {
-					cave->player_x=x;
-					cave->player_y=y;
-				}
-	}
-		
-	/* if automatically counting diamonds. if this was negative,
-	 * the sum will be this less than the number of all the diamonds in the cave */
-	if (cave->diamonds_needed<=0) {
-		for (y=0; y<cave->h; y++)
-			for (x=0; x<cave->w; x++)
-				if (cave->map[y][x]==O_DIAMOND)
-					cave->diamonds_needed++;
-		if (cave->diamonds_needed<0)
-			/* if still below zero, let this be 0, so gate will be open immediately */
-			cave->diamonds_needed=0;
-	}
-
-	gd_cave_correct_visible_size(cave);
-
-	/* select number of milliseconds (for pal and ntsc) */
-	cave->timing_factor=cave->pal_timing?1200:1000;
-	cave->time*=cave->timing_factor;
-	cave->magic_wall_milling_time*=cave->timing_factor;
-	cave->amoeba_slow_growth_time*=cave->timing_factor;
-	if (cave->c64_scheduling)
-		cave->hatching_delay*=cave->timing_factor;
 }
 

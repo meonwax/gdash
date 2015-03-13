@@ -293,46 +293,46 @@ gd_object_new_from_string(char *str)
 
 
 char *
-gd_get_object_description_text (GdObject * selected)
+gd_get_object_description_markup (GdObject *selected)
 {
 	g_return_val_if_fail (selected != NULL, NULL);
 
 	switch (selected->type) {
 	case POINT:
-		return g_strdup_printf (_("Point of <b>%s</b> at %d,%d"), gd_elements[selected->element].lowercase_name, selected->x1, selected->y1);
+		return g_markup_printf_escaped (_("Point of <b>%s</b> at %d,%d"), gd_elements[selected->element].lowercase_name, selected->x1, selected->y1);
 
 	case LINE:
-		return g_strdup_printf (_("Line from %d,%d to %d,%d of <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
+		return g_markup_printf_escaped (_("Line from %d,%d to %d,%d of <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
 
 	case RECTANGLE:
-		return g_strdup_printf (_("Rectangle from %d,%d to %d,%d of <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
+		return g_markup_printf_escaped (_("Rectangle from %d,%d to %d,%d of <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
 
 	case FILLED_RECTANGLE:
-		return g_strdup_printf (_("Rectangle from %d,%d to %d,%d of <b>%s</b>, filled with <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
+		return g_markup_printf_escaped (_("Rectangle from %d,%d to %d,%d of <b>%s</b>, filled with <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
 
 	case RASTER:
-		return g_strdup_printf (_("Raster from %d,%d to %d,%d of <b>%s</b>, distance %+d,%+d"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, selected->dx, selected->dy);
+		return g_markup_printf_escaped (_("Raster from %d,%d to %d,%d of <b>%s</b>, distance %+d,%+d"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, selected->dx, selected->dy);
 
 	case JOIN:
-		return g_strdup_printf (_("Join <b>%s</b> to every <b>%s</b>, distance %+d,%+d"), gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name, selected->dx, selected->dy);
+		return g_markup_printf_escaped (_("Join <b>%s</b> to every <b>%s</b>, distance %+d,%+d"), gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name, selected->dx, selected->dy);
 
 	case FLOODFILL_BORDER:
-		return g_strdup_printf (_("Floodfill from %d,%d of <b>%s</b>, border <b>%s</b>"), selected->x1, selected->y1, gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name);
+		return g_markup_printf_escaped (_("Floodfill from %d,%d of <b>%s</b>, border <b>%s</b>"), selected->x1, selected->y1, gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name);
 
 	case FLOODFILL_REPLACE:
-		return g_strdup_printf (_("Floodfill from %d,%d of <b>%s</b>, replacing <b>%s</b>"), selected->x1, selected->y1, gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name);
+		return g_markup_printf_escaped (_("Floodfill from %d,%d of <b>%s</b>, replacing <b>%s</b>"), selected->x1, selected->y1, gd_elements[selected->fill_element].lowercase_name, gd_elements[selected->element].lowercase_name);
 
 	case MAZE:
-		return g_strdup_printf (_("Maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
+		return g_markup_printf_escaped (_("Maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
 
 	case MAZE_UNICURSAL:
-		return g_strdup_printf (_("Unicursal maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
+		return g_markup_printf_escaped (_("Unicursal maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
 
 	case MAZE_BRAID:
-		return g_strdup_printf (_("Braid maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
+		return g_markup_printf_escaped (_("Braid maze from %d,%d to %d,%d, wall <b>%s</b>, path <b>%s</b>"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name, gd_elements[selected->fill_element].lowercase_name);
 
 	case RANDOM_FILL:
-		return g_strdup_printf (_("Random fill from %d,%d to %d,%d, replacing %s"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
+		return g_markup_printf_escaped (_("Random fill from %d,%d to %d,%d, replacing %s"), selected->x1, selected->y1, selected->x2, selected->y2, gd_elements[selected->element].lowercase_name);
 		
 	case NONE:
 		g_assert_not_reached();
@@ -1148,7 +1148,7 @@ gd_cave_draw_object (Cave * cave, const GdObject *object, int level)
 
 /* load cave to play... also can be called rendering the cave elements */
 Cave *
-gd_cave_new_rendered (const Cave *data, const int level)
+gd_cave_new_rendered (const Cave *data, const int level, const guint32 seed)
 {
 	Cave *cave;
 	GdElement element;
@@ -1159,7 +1159,8 @@ gd_cave_new_rendered (const Cave *data, const int level)
 	cave=gd_cave_new_from_cave (data);
 	cave->rendered=level+1;
 	
-	cave->random=g_rand_new();	/* XXX seed value goes here */
+	cave->render_seed=seed;
+	cave->random=g_rand_new_with_seed(cave->render_seed);
 
 	/* maps needed during drawing and gameplay */
 	cave->objects_order=gd_cave_map_new(cave, gpointer);
@@ -1237,7 +1238,7 @@ gd_cave_new_rendered (const Cave *data, const int level)
 	}
 
 	/* check if we use c64 ckdelay or milliseconds for timing */
-	if (!data->c64_scheduling)
+	if (cave->scheduling==GD_SCHEDULING_MILLISECONDS)
 		cave->speed=data->level_speed[level];		/* exact timing */
 	else {
 		cave->speed=120;	/* delay loop based timing... set something for first iteration, the later it will be calculated */
@@ -1255,8 +1256,8 @@ gd_flatten_cave (Cave *cave, const int level)
 
 	g_return_if_fail (cave != NULL);
 
-	/* render cave at specified level to obtain map */
-	rendered=gd_cave_new_rendered (cave, level);
+	/* render cave at specified level to obtain map. seed=0 */
+	rendered=gd_cave_new_rendered (cave, level, 0);
 	/* forget old map without objects */
 	gd_cave_map_free (cave->map);
 	/* copy new map */

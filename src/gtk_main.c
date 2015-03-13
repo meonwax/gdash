@@ -52,6 +52,7 @@ typedef struct _gd_main_window {
 	GtkWidget *label_score, *label_value, *label_time, *label_cave_name, *label_diamonds, *label_skeletons, *label_lives;		/**< different text labels in main window */
 	GtkWidget *label_key1, *label_key2, *label_key3, *label_gravity_will_change;
 	GtkWidget *label_variables;
+	GtkWidget *error_hbox, *error_label;
 	GtkWidget *menubar, *toolbar;
 } GDMainWindow;
 
@@ -136,19 +137,20 @@ main_window_set_title()
 static void
 game_over_highscore()
 {
-	GdHighScore *hs=g_new0(GdHighScore, 1);
+	GdHighScore hs;
 	char *text;
+	int rank;
 
 	text=g_strdup_printf(_("You have %d points, and achieved a highscore."), game.player_score);
 	gd_infomessage(_("Game over!"), text);
 	g_free(text);
 
 	/* enter to highscore table */
-	g_strlcpy(hs->name, game.player_name, sizeof(hs->name));
-	hs->score=game.player_score;
+	g_strlcpy(hs.name, game.player_name, sizeof(hs.name));
+	hs.score=game.player_score;
 
-	gd_default_cave->highscore=g_list_insert_sorted(gd_default_cave->highscore, hs, gd_highscore_compare);
-	gd_show_highscore(main_window.window, gd_default_cave, FALSE, hs);
+	rank=gd_cave_add_highscore(gd_default_cave, hs);
+	gd_show_highscore(main_window.window, gd_default_cave, FALSE, gd_default_cave, rank);
 }
 
 static void
@@ -467,6 +469,8 @@ init_mainwindow (Cave *cave)
 {
 
 	if (cave) {
+		char *name_escaped;
+		
 		/* cave drawing */
 		if (main_window.title_image)
 			gtk_widget_destroy (main_window.title_image->parent);	/* bit tricky, destroy the viewport which was automatically added */
@@ -489,9 +493,9 @@ init_mainwindow (Cave *cave)
 			gtk_container_add (GTK_CONTAINER (align), main_window.drawing_area);
 			if (gd_mouse_play)
 				gdk_window_set_cursor (main_window.drawing_area->window, gdk_cursor_new (GDK_CROSSHAIR));
-			/* set the minimum size of the viewport */
+			/* set the minimum size of the viewport: 20*12 cells */
 			/* XXX adding some pixels for the scrollbars-here we add 20 */
-			gtk_widget_set_size_request(main_window.drawing_area->parent->parent, 20 * cell_size + 20, 12 * cell_size + 20);
+			gtk_widget_set_size_request(main_window.drawing_area->parent->parent, 20*cell_size + 20, 12*cell_size + 20);
 		}
 		gtk_widget_set_size_request (main_window.drawing_area, (cave->x2-cave->x1+1) * cell_size, (cave->y2-cave->y1+1) * cell_size);
 
@@ -501,8 +505,11 @@ init_mainwindow (Cave *cave)
 			gtk_widget_show (main_window.label_variables);
 		else
 			gtk_widget_hide (main_window.label_variables);
+		gtk_widget_hide(main_window.error_hbox);
 
-		gd_label_set_markup_printf(GTK_LABEL(main_window.label_cave_name), _("<b>%s</b>, level %d"), cave->name, cave->rendered);
+		name_escaped=g_markup_escape_text(cave->name, -1);
+		gd_label_set_markup_printf(GTK_LABEL(main_window.label_cave_name), _("<b>%s</b>, level %d"), name_escaped, cave->rendered);
+		g_free(name_escaped);
 	}
 	else {
 		if (main_window.drawing_area)
@@ -523,6 +530,12 @@ init_mainwindow (Cave *cave)
 		/* hide cave data */
 		gtk_widget_hide (main_window.labels);
 		gtk_widget_hide (main_window.label_variables);
+		if (gd_has_new_error()) {
+			gtk_widget_show(main_window.error_hbox);
+			gtk_label_set(GTK_LABEL(main_window.error_label), ((GdErrorMessage *)(g_list_last(gd_errors)->data))->message);
+		} else {
+			gtk_widget_hide(main_window.error_hbox);
+		}
 	}
 
 	/* show newly created widgets */
@@ -757,8 +770,8 @@ jump_cave_changed_signal (const GtkWidget *widget, const GDJumpDialog * jump_dia
 	GdkPixbuf *cave_image;
 	Cave *cave;
 
-	/* loading cave, draw cave and scale to specified size */
-	cave=gd_cave_new_from_caveset (gtk_combo_box_get_active (GTK_COMBO_BOX (jump_dialog->combo_cave)), gtk_range_get_value (GTK_RANGE (jump_dialog->spin_level))-1);
+	/* loading cave, draw cave and scale to specified size. seed=0 */
+	cave=gd_cave_new_from_caveset(gtk_combo_box_get_active (GTK_COMBO_BOX (jump_dialog->combo_cave)), gtk_range_get_value (GTK_RANGE (jump_dialog->spin_level))-1, 0);
 	cave_image=gd_drawcave_to_pixbuf (cave, 320, 240, TRUE);
 	gtk_image_set_from_pixbuf (GTK_IMAGE (jump_dialog->image), cave_image);
 	g_object_unref (cave_image);
@@ -894,7 +907,10 @@ iterate_int (const gpointer data)
 
 	/* iterate cave if needed */
 	if (!paused && !game.out_of_window) {
-		no_more=gd_game_iterate_cave(up, down, left, right, fire, key_suicide, restart);
+		GdDirection player_move;
+		
+		player_move=gd_direction_from_keypress(up, down, left, right);
+		no_more=gd_game_iterate_cave(player_move, fire, key_suicide, restart);
 		gd_play_sounds(game.cave->sound1, game.cave->sound2, game.cave->sound3);
 		showheader();
 	} else
@@ -937,7 +953,7 @@ main_int (const gpointer data)
 
 		case GD_GAME_GAME_OVER:
 			gd_main_stop_game();
-			if (gd_score_is_highscore(gd_default_cave->highscore, game.player_score))
+			if (gd_cave_is_highscore(gd_default_cave, game.player_score))
 				game_over_highscore();			/* achieved a high score! */
 			else
 				game_over_without_highscore();			/* no high score */
@@ -958,7 +974,7 @@ main_int (const gpointer data)
 static void
 highscore_cb(GtkWidget *widget, gpointer data)
 {
-	gd_show_highscore(main_window.window, gd_default_cave, FALSE, NULL);
+	gd_show_highscore(main_window.window, gd_default_cave, FALSE, NULL, -1);
 }
 
 void
@@ -994,6 +1010,7 @@ gd_main_start_level(const Cave *snapshot_cave)
 static void
 show_errors_cb(GtkWidget *widget, gpointer data)
 {
+	gtk_widget_hide(main_window.error_hbox);	/* if the user is presented the error list, the label is to be hidden */
 	gd_show_errors();
 }
 
@@ -1136,7 +1153,7 @@ gd_create_main_window (void)
 	gtk_action_group_add_actions (main_window.actions_snapshot, action_entries_snapshot, G_N_ELEMENTS (action_entries_snapshot), &main_window);
 
 	/* build the ui */
-	ui=gtk_ui_manager_new ();
+	ui=gtk_ui_manager_new();
 	gtk_ui_manager_insert_action_group (ui, main_window.actions_normal, 0);
 	gtk_ui_manager_insert_action_group (ui, main_window.actions_title, 0);
 	gtk_ui_manager_insert_action_group (ui, main_window.actions_game, 0);
@@ -1169,8 +1186,8 @@ gd_create_main_window (void)
 	main_window.labels=gtk_vbox_new(FALSE, 0);
 	gtk_box_pack_start (GTK_BOX(vbox), main_window.labels, FALSE, FALSE, 0);
 
-	/* hbox for labels ABOVE drawing */
-	hbox=gtk_hbox_new (FALSE, 12);
+	/* first hbox for labels ABOVE drawing */
+	hbox=gtk_hbox_new(FALSE, 12);
 	gtk_box_pack_start (GTK_BOX (main_window.labels), hbox, FALSE, FALSE, 0);
 	main_window.label_cave_name=gtk_label_new(NULL);	/* NAME label */
 	gtk_label_set_ellipsize (GTK_LABEL(main_window.label_cave_name), PANGO_ELLIPSIZE_END);
@@ -1179,8 +1196,8 @@ gd_create_main_window (void)
 	gtk_box_pack_end (GTK_BOX (hbox), main_window.label_diamonds=gtk_label_new(NULL), FALSE, FALSE, 0);	/* DIAMONDS label */
 	gtk_box_pack_end (GTK_BOX (hbox), main_window.label_skeletons=gtk_label_new(NULL), FALSE, FALSE, 0);	/* DIAMONDS label */
 
-	/* hbox for labels BELOW drawing */
-	hbox=gtk_hbox_new (FALSE, 12);
+	/* second row of labels */
+	hbox=gtk_hbox_new(FALSE, 12);
 	gtk_box_pack_start(GTK_BOX(main_window.labels), hbox, FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox), main_window.label_lives=gtk_label_new(NULL), FALSE, FALSE, 0);	/* LIVES label */
 	gtk_box_pack_start(GTK_BOX(hbox), main_window.label_score=gtk_label_new(NULL), FALSE, FALSE, 0);	/* SCORE label */
@@ -1188,13 +1205,12 @@ gd_create_main_window (void)
 	gtk_box_pack_end (GTK_BOX (hbox), main_window.label_value=gtk_label_new(NULL), FALSE, FALSE, 0);	/* VALUE label */
 
 	/* third row */
-	hbox=gtk_hbox_new (FALSE, 12);
-	gtk_box_pack_start(GTK_BOX(main_window.labels),hbox, FALSE, FALSE, 0);
+	hbox=gtk_hbox_new(FALSE, 12);
+	gtk_box_pack_start(GTK_BOX(main_window.labels), hbox, FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox), main_window.label_key1=gtk_label_new(NULL), FALSE, FALSE, 0);	/* key1 label */
 	gtk_box_pack_start(GTK_BOX(hbox), main_window.label_key2=gtk_label_new(NULL), FALSE, FALSE, 0);	/* key2 label */
 	gtk_box_pack_start(GTK_BOX(hbox), main_window.label_key3=gtk_label_new(NULL), FALSE, FALSE, 0);	/* key3 label */
 	gtk_box_pack_end(GTK_BOX(hbox), main_window.label_gravity_will_change=gtk_label_new(NULL), FALSE, FALSE, 0);	/* gravity label */
-
 
 	main_window.scroll_window=gtk_scrolled_window_new (NULL, NULL);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (main_window.scroll_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -1202,6 +1218,12 @@ gd_create_main_window (void)
 
 	main_window.label_variables=gtk_label_new(NULL);
 	gtk_box_pack_start (GTK_BOX (vbox), main_window.label_variables, FALSE, FALSE, 0);
+	
+	hbox=gtk_hbox_new(FALSE, 6);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_image_new_from_stock(GTK_STOCK_DIALOG_ERROR, GTK_ICON_SIZE_MENU), FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), main_window.error_label=gtk_label_new(NULL), FALSE, FALSE, 0);	/* error label */
+	main_window.error_hbox=hbox;
 
 	gtk_widget_show_all (main_window.window);
 }
@@ -1272,7 +1294,7 @@ main (int argc, char *argv[])
 	if (gd_param_cavenames && gd_param_cavenames[0]) {
 		/* load caveset, "ignore" errors. */
 		if (!gd_caveset_load_from_file (gd_param_cavenames[0], gd_user_config_dir))
-			g_critical (_("Errors during loading caveset from file %s"), gd_param_cavenames[0]);
+			g_critical (_("Errors during loading caveset from file '%s'"), gd_param_cavenames[0]);
 	}
 	else if (gd_param_internal) {
 		/* if specified an internal caveset; if error, halt now */
@@ -1325,7 +1347,8 @@ main (int argc, char *argv[])
 			size_y=0;
 		}
 
-		renderedcave=gd_cave_new_from_caveset (gd_param_cave-1, gd_param_level-1);
+		/* rendering cave for png: seed=0 */
+		renderedcave=gd_cave_new_from_caveset (gd_param_cave-1, gd_param_level-1, 0);
 		pixbuf=gd_drawcave_to_pixbuf (renderedcave, size_x, size_y, TRUE);
 		if (!gdk_pixbuf_save (pixbuf, png_filename, "png", &error, "compression", "9", NULL))
 			g_critical ("Error saving PNG image %s: %s", png_filename, error->message);

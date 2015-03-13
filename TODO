@@ -1,0 +1,47 @@
+DONE
+----
+
+
+WILLNOT
+-------
+When opening the "cave settings" dialog while the editor window is rather small, it opens higher than the editor window, which can be off screen.
+	the problem is in gtk+; bug reported. http://bugzilla.gnome.org/show_bug.cgi?id=314084
+
+
+TO DO
+-----
+
+There is a reproduceable bug: After loading Crazy Dream 7, selecting cave "Push", eating the sweet and pushing the stone to the very right so it falls through the magic wall, GDash crashes, in my case GDash quits immediately and leaves no crash log. It behaves like this every time I try it that way.
+
+One problem I'm noticing is that BDCFF files saved in an older version that loaded up fine [in that version] are now said to have errors all of a sudden.
+Also, the Inbox has been taking an inordinately long time to open in those BDCFF-saved games, when it was also fine before.
+
+g_markup_printf_escaped
+
+shabanak new sounds: water, box, creature switch
+
+But I recommend to do separate samples: néhány hangot szétszedni
+	- robbanások?
+	- diamond random helyett több féle dolog
+
+sdash bd1 intermissions scroll?
+valami hack kene vagy szarjuk le?
+
+extensive commenting
+
+cow not perfect
+
+window parents
+
+record and playback of games
+
+option "More than 1 bomb" in the cave settings
+
+I think the way you implemented the Maze and RandomFill is okay. I assume the engine will expect as many seed values as there are levels, right? This is a very important detail which has to be documented in the BDCFF specs. 
+
+copy&paste objects?
+
+cavepack import?
+
+magicwall breakscan; De Luxe Caves 1 Cave L, De Luxe Caves 2 Cave A, Deluxe Caves 3 Cave A 
+
