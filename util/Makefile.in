@@ -36,7 +36,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = any2gdash$(EXEEXT) oldbin2gdash$(EXEEXT)
+noinst_PROGRAMS = any2gdash$(EXEEXT) oldbin2gdash$(EXEEXT) \
+	palette2c$(EXEEXT)
 subdir = util
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -59,6 +60,10 @@ am_oldbin2gdash_OBJECTS = oldbin2gdash.$(OBJEXT)
 oldbin2gdash_OBJECTS = $(am_oldbin2gdash_OBJECTS)
 oldbin2gdash_LDADD = $(LDADD)
 oldbin2gdash_DEPENDENCIES =
+am_palette2c_OBJECTS = palette2c.$(OBJEXT)
+palette2c_OBJECTS = $(am_palette2c_OBJECTS)
+palette2c_LDADD = $(LDADD)
+palette2c_DEPENDENCIES =
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -66,8 +71,10 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(any2gdash_SOURCES) $(oldbin2gdash_SOURCES)
-DIST_SOURCES = $(any2gdash_SOURCES) $(oldbin2gdash_SOURCES)
+SOURCES = $(any2gdash_SOURCES) $(oldbin2gdash_SOURCES) \
+	$(palette2c_SOURCES)
+DIST_SOURCES = $(any2gdash_SOURCES) $(oldbin2gdash_SOURCES) \
+	$(palette2c_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -197,6 +204,9 @@ any2gdash_SOURCES = \
 oldbin2gdash_SOURCES = \
 	oldbin2gdash.c
 
+palette2c_SOURCES = \
+	palette2c.c
+
 all: all-am
 
 .SUFFIXES:
@@ -239,6 +249,9 @@ any2gdash$(EXEEXT): $(any2gdash_OBJECTS) $(any2gdash_DEPENDENCIES)
 oldbin2gdash$(EXEEXT): $(oldbin2gdash_OBJECTS) $(oldbin2gdash_DEPENDENCIES) 
 	@rm -f oldbin2gdash$(EXEEXT)
 	$(LINK) $(oldbin2gdash_LDFLAGS) $(oldbin2gdash_OBJECTS) $(oldbin2gdash_LDADD) $(LIBS)
+palette2c$(EXEEXT): $(palette2c_OBJECTS) $(palette2c_DEPENDENCIES) 
+	@rm -f palette2c$(EXEEXT)
+	$(LINK) $(palette2c_LDFLAGS) $(palette2c_OBJECTS) $(palette2c_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -248,6 +261,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/any2gdash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/oldbin2gdash.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/palette2c.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

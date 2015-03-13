@@ -24,14 +24,15 @@ sounddata = \
 	diamond_8.ogg \
 	diamond_collect.ogg \
 	door_open.ogg \
+	expanding_wall.ogg \
 	explosion.ogg \
 	falling_wall.ogg \
 	finished.ogg \
 	ghost_explosion.ogg \
 	gravity_change.ogg \
-	growing_wall.ogg \
 	key_collect.ogg \
 	magic_wall.ogg \
+	nitro_explosion.ogg \
 	pneumatic_collect.ogg \
 	pneumatic.ogg \
 	skeleton_collect.ogg \
@@ -42,7 +43,7 @@ sounddata = \
 	switch_biter.ogg \
 	switch_creatures.ogg \
 	switch_gravity.ogg \
-	switch_growing.ogg \
+	switch_expanding.ogg \
 	teleporter.ogg \
 	timeout_1.ogg \
 	timeout_2.ogg \
@@ -57,6 +58,7 @@ sounddata = \
 	voodoo_explosion.ogg \
 	walk_earth.ogg \
 	walk_empty.ogg \
+	wall_reappear.ogg \
 	water.ogg
 
 if SOUND

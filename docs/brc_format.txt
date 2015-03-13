@@ -1,0 +1,41 @@
+  [CAVEA] [CAVEB] [CAVEC]
+00. 78 de   78 00   78 00	OK	time, BRC VERSION?
+01. 0a 00   0a 00   0a 00	OK	diamond, ??
+02. 05 00   05 00   05 00	OK	value, ??
+03. 0a 00   0a 00   0a 00	OK	extra value
+04. 14 00   14 00   14 00	OK	magic time, ??
+05. 32 00   32 00   32 00	OK	amoeba time, ??
+06. c8 00   c8 00   c8 00	OK	amoeba size, ??
+07. 20 00   20 00   20 00	OK	amoeba prob slow, ??
+08. 04 00   04 00   04 00	OK	amoeba prob fast, ??
+09. 12 00   12 00   12 00	OK	slime perm (1.., ??
+10. 15 20   15 20   15 20	OK	hatching delay, ACID SPEED
+11. 04 69   04 69   04 69	OK	pushing stone prob (1..8), (0x69=105) extra time+100
+12. 00 00   00 00   00 00		??, magic stops amoeba ff=true
+13. 50 00   50 00   50 00		??, cave helyett big intermission ff=true
+14. 3c 06   3c 06   3c 06		??, enclosed amoeba: diamond helyett diamond glued=6 helyett 8			/* effects */
+15. 28 03   28 03   28 03       ??, too big amoeba: stone helyett falling stone = 3 helyett 4
+16. 14 02   14 02   14 02       ??, regular explosion: space helyett diamond birth = 2 helyett 9
+17. 01 02   01 02   01 02       ??, bomb explosion
+18. 02 02   02 02   02 02       ??, solid bomb explosion
+19. 03 06   03 06   03 06       ??, butterfly explosion
+20. 06 03   06 03   06 03       ??, falling boulder to
+21. 13 06   13 06   13 06       ??, falling diamond to
+22. 00 04   00 04   00 04       ??, diamond in magic wall to
+23. 00 01   00 01   00 01       ??, acid eats dirt
+24. 00 00   00 00   00 00		??, slime eats: (diamond,boulder,bomb), (diamond,boulder), (diamond,bomb), (boulder,bomb)
+25. 00 00   00 00   00 00
+26. 00 00   00 00   00 00
+27. 00 00   00 00   00 00
+28. 00 00   00 00   00 00
+29. 00 00   00 00   00 00
+30. 04 00   04 00   04 00
+31. 00 00   01 00   02 00		dirt color
+32. 00 00   01 00   02 00		... color
+33. 00 00   01 00   00 00		... color
+34. 00 00   01 00   02 00		... color
+35. 00 00   01 00   02 00		... color
+36. 00 00   01 00   02 00		... color
+37. 00 00   01 00   02 00		... color
+38. 00 00   01 00   02 00		... color
+39. 00 00   00 00   00 00

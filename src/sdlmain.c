@@ -471,10 +471,8 @@ main_menu()
 		gd_blittext_n(gd_screen, gd_screen->w-gd_font_width(), gd_screen->h-gd_font_height(), GD_C64_RED, "E");
 
 	s=M_NONE;
-	cavenum=gd_caveset_first_selectable();
-	if (gd_all_caves_selectable)
-		cavenum=0;
-	levelnum=0;
+	cavenum=gd_caveset_last_selected;
+	levelnum=gd_caveset_last_selected_level;
 
 	while(!gd_quit && s==M_NONE) {
 		SDL_Event event;
@@ -628,11 +626,14 @@ load_file(const char *directory)
 {
 	static char *last_directory=NULL;
 	char *filename;
+	char *filter;
 	
 	if (!last_directory)
 		last_directory=g_strdup(g_get_home_dir());
 	
-	filename=gd_select_file("SELECT CAVESET TO LOAD", directory?directory:last_directory, "*.bd;*.gds");
+	filter=g_strjoinv(";", gd_caveset_extensions);
+	filename=gd_select_file("SELECT CAVESET TO LOAD", directory?directory:last_directory, filter);
+	g_free(filter);
 
 	/* if file selected */	
 	if (filename) {
@@ -728,7 +729,38 @@ int main(int argc, char *argv[])
 	gd_create_dark_background();
 	
 	username=g_strdup(g_get_real_name());
-
+	
+#if 0
+	{
+		int x, y;
+		SDL_Surface *image;
+		
+		image=SDL_CreateRGBSurface(0, 16*24, 16*24, 32, 0, 0, 0, 0);
+		
+		for (y=0; y<16; y++) {
+			int bg;
+			GdColor c=gd_c64_colors[y].rgb;
+			SDL_Rect r;
+			
+			bg=SDL_MapRGB(image->format, (c>>16)&0xff, (c>>8)&0xff, c&0xff);
+			r.x=0;
+			r.y=y*24;
+			r.w=16*24;
+			r.h=24;
+			SDL_FillRect(image, &r, bg);
+			
+			for (x=0; x<16; x++) {
+				gd_blittext_n(image, x*24+4, y*24+4, gd_c64_colors[x].rgb, "A");
+			}
+				
+		}
+		gd_pal_emu(image->pixels, image->w, image->h, image->pitch, image->format->Rshift, image->format->Gshift, image->format->Bshift, image->format->Ashift);
+		SDL_SaveBMP(image, "a.bmp");
+		SDL_BlitSurface(image, NULL, gd_screen, NULL);
+//		return 0;
+	}
+#endif
+	
 	while (!gd_quit) {
 		/* if a cavenum was given on the command line */
 		if (gd_param_cave) {
@@ -747,6 +779,8 @@ int main(int argc, char *argv[])
 				break;
 				
 			case M_PLAY:
+				gd_caveset_last_selected=cavenum;
+				gd_caveset_last_selected_level=levelnum;
 				play_game(cavenum, levelnum);	
 				break;
 				

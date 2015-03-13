@@ -1,14 +1,86 @@
+DONE
+----- 
+brc colors
+any2gdash: firefox2 bd1 tests pass
+amoeba to effect	- compat
+*) Just a little thing in Cave Properties: I think it would be better visible to put the Amoeba 2 option "Explodes by amoeba" right above "Explodes to". Would make more sense.
+Bug: when I saved BD2, the slime permeability wasn't saved.
+
+
 TO DO
 -----
+TESZT
+	Bug: when I saved BD2, the slime permeability wasn't saved.
+	HatchingDelay
+
+
+bd1 atari intermission timing?
+	atari800ban megnezni a bd1-et!
+	
+Also, it doesn't correctly remember the path from where the file was loaded. It always goes back to /Gdash.
+
+The thing with left-click and right-click for the element box is really good. But maybe you take left-click for closing it after selecting an element and right-click for letting it open. Maybe most cave designers would like it more that way?
+
+- If the scrolling is authentic, I'd like to have the option to "fast scroll" so that Rockford doesn't catch up with the edge of the screen. It's the one aspect of the original that I just can't bring myself to like. What does everyone think? I know that compared to the Atari original, the scrolling is too slow anyway. 
+
+But there could be done nice effects when having the possibility to turn off each possible element sound. Why not turning off falling stones? Is it so much work to put all elements with sound in the list? 
+
+*) Display resolutions are getting higher and higher - so please add Scale4x. Is this possible?
+
+*) It would be nice to have a separate folder in usr/local/share/gdash/sounds for the gdash sounds. Just not to look so messed up... ;)
+
+*) Concerning Cave Properties: I would recommend to put all sound concerning things into a tab called sound (as in previous version) but putting all elements with sound there (not only some) - this would make more sense. At least I think so. Or is there a specific reason why only some sounds are there?
+
+*) Are the colors of the Atari games imported correct, too? I mean from the 256 color palette of the Atari version? 
+
+open cave remembering directory?
+
+deluxe caves 1 - wraparound miatt néhány cucc?
+
+editor objects - checkbox hogy lathato-e?
+
+check plck caves
+
+bottom border for plck caves
+
+There is one key routine at 5dce in every PLCK based game, except for DLP1.55:
+.C:5dce   A9 07      LDA #$07
+.C:5dd0   A0 27      LDY #$27
+.C:5dd2   99 98 0B   STA $0B98,Y
+.C:5dd5   88         DEY
+.C:5dd6   10 FA      BPL $5DD2
+.C:5dd8   60         RTS
+
+design tips?
+
+surprise element
+
+amoeba state typed variable
+
+nitro pack start fall sound
+nitro pack test
+
+do_push(Cave *cave, int x, int y, GdDirection player_move, gboolean player_fire)
+
+random fill object - to be the same as on c64?
+
+loading imported caves with the default struct?
+
+
+apply the current cave timing settings to all the caves at once
+
+sound:
+	option to choose between C64 and Atari sound sets. 
+	Sound themes would make sense
+	music theme at the title picture
+
 language button
 
 All drawing objects should wraparound, at least when lineshifted borders are activated.
 
 As the name of the game can be hidden in sdash, maybe you can also use the real Boulder Dash font for the status line before hatching? 
 
-Scheduling:	different settings for clck, 1stb?
-
-music theme at the title picture?
+Scheduling:	different settings for clck, 1stb? atari?
 	
 sdash bd1 intermissions scroll. maybe screen should be larger? or disable scrolling for these somehow?
 
@@ -27,4 +99,5 @@ copy&paste objects?
 compat:
 	*) magicwall breakscan; De Luxe Caves 1 Cave L, De Luxe Caves 2 Cave A, Deluxe Caves 3 Cave A 
 	*) frustidash
+	*) boulder dash 1-2-3 plus
 

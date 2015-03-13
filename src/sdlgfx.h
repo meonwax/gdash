@@ -21,8 +21,8 @@
 
 /* these can't be larger than 127, or they mess up with utf8 coding */
 #define GD_PLAYER_CHAR 28
+#define GD_KEY_CHAR 29
 #define GD_DIAMOND_CHAR 30
-#define GD_KEY_CHAR 92
 
 extern SDL_Surface *gd_screen;
 extern int gd_scale;

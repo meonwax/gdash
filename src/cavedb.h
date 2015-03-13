@@ -49,6 +49,7 @@ extern GdC64Color gd_c64_colors[16];
 
 /* do some checks on the cave db */
 void gd_cave_db_init();
+GdElement gd_get_hammered_element(GdElement elem);
 
 #endif
 

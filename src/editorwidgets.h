@@ -20,13 +20,15 @@
 #include <gtk/gtkcombobox.h>
 #include "cave.h"
 
-GtkWidget *gd_color_combo_new (const GdColor color);
+GtkWidget *gd_color_combo_new(const GdColor color);
 GdColor gd_color_combo_get_color(GtkWidget *widget);
-void gd_color_combo_set (GtkComboBox *combo, GdColor color);
+void gd_color_combo_set(GtkComboBox *combo, GdColor color);
 
-GdElement gd_element_button_get (GtkWidget *button);
-GtkWidget *gd_element_button_new (const GdElement initial_element);
-void gd_element_button_set (GtkWidget *button, const GdElement element);
+void gd_element_button_set_dialog_title(GtkWidget *button, const char *title);
+void gd_element_button_set_dialog_sensitive(GtkWidget *button, gboolean sens);
+GdElement gd_element_button_get(GtkWidget *button);
+GtkWidget *gd_element_button_new(GdElement initial_element, gboolean stays_open, const char *special_title);
+void gd_element_button_set(GtkWidget *button, const GdElement element);
 void gd_element_button_update_pixbuf(GtkWidget *button);
 
 GtkWidget *gd_direction_combo_new(const GdDirection initial);

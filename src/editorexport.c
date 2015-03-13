@@ -36,8 +36,8 @@ static int element_to_crli(GdElement e, GHashTable *unknown)
 
 	/* hack: there is no separate horizontal and vertical growing wall in crli. */
 	/* only the switch can determine the direction. */
-	if (e==O_V_GROWING_WALL)
-		e=O_H_GROWING_WALL;
+	if (e==O_V_EXPANDING_WALL)
+		e=O_H_EXPANDING_WALL;
 			
 	/* 128 is the number of elements in gd_crazylight_import_table */
 	for (i=0; i<128; i++)
@@ -97,7 +97,7 @@ crli_export (Cave *to_convert, const int level, guint8 *compressed)
 	if (cave->amoeba_timer_started_immediately)
 		g_warning("crli amoeba timer is only started when the amoeba is let free!");
 	if (!cave->amoeba_timer_wait_for_hatching) {
-		cave->amoeba_slow_growth_time+=2;
+		cave->amoeba_time+=2;
 		g_message("crli amoeba timer waits for hatching; added 2 seconds for correction");
 	}
 	if (!cave->voodoo_dies_by_stone || !cave->voodoo_collects_diamonds || cave->voodoo_can_be_destroyed)
@@ -105,7 +105,7 @@ crli_export (Cave *to_convert, const int level, guint8 *compressed)
 	if (cave->short_explosions)
 		g_warning("crli explosions are slower than original");
 	if (!cave->magic_timer_wait_for_hatching) {
-		cave->magic_wall_milling_time+=2;
+		cave->magic_wall_time+=2;
 		g_message("crli magic wall timer waits for hatching; added 2 seconds for correction");
 	}
 	if (!cave->slime_predictable)
@@ -137,9 +137,9 @@ crli_export (Cave *to_convert, const int level, guint8 *compressed)
 		for (x=0; x<cave->w && x<40; x++) {
 			output[y*40+x]=element_to_crli(cave->map[y][x], unknown);
 
-			if (cave->map[y][x]==O_H_GROWING_WALL)
+			if (cave->map[y][x]==O_H_EXPANDING_WALL)
 				has_horizontal=TRUE;
-			if (cave->map[y][x]==O_V_GROWING_WALL)
+			if (cave->map[y][x]==O_V_EXPANDING_WALL)
 				has_vertical=TRUE;
 		}
 
@@ -159,11 +159,11 @@ crli_export (Cave *to_convert, const int level, guint8 *compressed)
 	output[0x37a]=cave->diamond_value/10%10;
 	output[0x37b]=cave->diamond_value/1%10;
 	
-	output[0x37c]=cave->amoeba_slow_growth_time/256;
-	output[0x37d]=cave->amoeba_slow_growth_time%256;
+	output[0x37c]=cave->amoeba_time/256;
+	output[0x37d]=cave->amoeba_time%256;
 
-	output[0x37e]=cave->magic_wall_milling_time/256;
-	output[0x37f]=cave->magic_wall_milling_time%256;
+	output[0x37e]=cave->magic_wall_time/256;
+	output[0x37f]=cave->magic_wall_time%256;
 	
 	if (cave->creatures_direction_auto_change_time) {
 		output[0x380]=1;
@@ -202,11 +202,11 @@ crli_export (Cave *to_convert, const int level, guint8 *compressed)
 		g_warning("a crli map cannot contain horizontal and vertical growing walls at the same time");
 	output[0x38f]=cave->creatures_backwards?0x2d:0x2c;
 	
-	output[0x390]=cave->amoeba_threshold/256;
-	output[0x391]=cave->amoeba_threshold%256;
+	output[0x390]=cave->amoeba_max_count/256;
+	output[0x391]=cave->amoeba_max_count%256;
 	
-	output[0x392]=cave->bonus_time;
-	output[0x393]=cave->penalty_time;
+	output[0x392]=cave->time_bonus;
+	output[0x393]=cave->time_penalty;
 	output[0x394]=cave->biter_delay_frame;
 	output[0x395]=cave->magic_wall_stops_amoeba?0:1;	/* inverted! */
 	
@@ -528,7 +528,7 @@ gd_save_html (char *htmlname, GtkWidget *window)
 
 		g_string_append_printf (contents, "<P>\n");
 		g_string_append_printf (contents, "<H2>%s</H2>\n", cave->name);
-		g_string_append_printf (contents, "<IMAGE SRC=\"%s_%03d.png\" WIDTH=%d HEIGHT=%d>\n", pngbasename, i + 1, gdk_pixbuf_get_width (pixbuf), gdk_pixbuf_get_height (pixbuf));
+		g_string_append_printf (contents, "<IMAGE SRC=\"%s_%03d.png\" WIDTH=%d HEIGHT=%d>\n", pngbasename, i+1, gdk_pixbuf_get_width (pixbuf), gdk_pixbuf_get_height (pixbuf));
 		g_string_append_printf (contents, "<BR>\n");
 		g_string_append_printf (contents, "<TABLE>\n");
 		if (!g_str_equal(cave->author, ""))
@@ -542,9 +542,9 @@ gd_save_html (char *htmlname, GtkWidget *window)
 		g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%d</TD></TR>\n", _("Extra diamond value"), cave->extra_diamond_value);
 		g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%d</TD></TR>\n", _("Time (s)"), cave->time);
 		if (has_amoeba)
-			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%d, %d</TD></TR>\n", _("Amoeba threshold and time (s)"), cave->amoeba_threshold, cave->amoeba_slow_growth_time);
+			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%d, %d</TD></TR>\n", _("Amoeba threshold and time (s)"), cave->amoeba_max_count, cave->amoeba_time);
 		if (has_magic)
-			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%d</TD></TR>\n", _("Magic wall milling time (s)"), cave->magic_wall_milling_time);
+			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%d</TD></TR>\n", _("Magic wall milling time (s)"), cave->magic_wall_time);
 		g_string_append_printf (contents, "</TABLE>\n");
 
 		g_string_append_printf (contents, "</P>\n");

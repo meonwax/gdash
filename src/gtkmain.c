@@ -461,13 +461,15 @@ showheader()
 
 	if (editor_window && gd_show_test_label) {
 		gd_label_set_markup_printf(GTK_LABEL(main_window.label_variables),
-								"Speed: %dms, Amoeba timer: %ds, %s, Magic wall timer: %ds\n"
+								"Speed: %dms, Amoeba timer: %ds (%s), %ds (%s), Magic wall timer: %ds\n"
 								"Expanding wall: %s, Creatures: %ds, %s, Gravity: %s\n"
 								"Kill player: %s, Sweet eaten: %s, Diamond key: %s",
 								cave->speed,
-								gd_cave_time_show(cave, cave->amoeba_slow_growth_time),
+								gd_cave_time_show(cave, cave->amoeba_time),
 								cave->amoeba_started?"alive":"sleeping",
-								gd_cave_time_show(cave, cave->magic_wall_milling_time),
+								gd_cave_time_show(cave, cave->amoeba_2_time),
+								cave->amoeba_2_started?"alive":"sleeping",
+								gd_cave_time_show(cave, cave->magic_wall_time),
 // XXX							cave->magic_wall_state,
 								cave->expanding_wall_changed?"vertical":"horizontal",
 								gd_cave_time_show(cave, cave->creatures_direction_will_change),
@@ -922,12 +924,14 @@ new_game_cb (const GtkWidget * widget, const gpointer data)
 	gtk_widget_grab_focus(jump_dialog.combo_cave);
 	gtk_editable_select_region(GTK_EDITABLE(jump_dialog.entry_name), 0, 0);
 	/* set default and also trigger redrawing */
-	gtk_combo_box_set_active(GTK_COMBO_BOX(jump_dialog.combo_cave), gd_all_caves_selectable?0:gd_caveset_first_selectable());
+	gtk_combo_box_set_active(GTK_COMBO_BOX(jump_dialog.combo_cave), gd_caveset_last_selected);
 	gtk_range_set_value(GTK_RANGE(jump_dialog.spin_level), 1);
 
 	if (gtk_dialog_run (GTK_DIALOG (jump_dialog.dialog)) == GTK_RESPONSE_ACCEPT) {
 		gd_strcpy(player_name, gtk_entry_get_text(GTK_ENTRY(jump_dialog.entry_name)));
-		new_game (player_name, gtk_combo_box_get_active(GTK_COMBO_BOX(jump_dialog.combo_cave)), gtk_range_get_value(GTK_RANGE(jump_dialog.spin_level))-1);
+		gd_caveset_last_selected=gtk_combo_box_get_active(GTK_COMBO_BOX(jump_dialog.combo_cave));
+		gd_caveset_last_selected_level=gtk_range_get_value(GTK_RANGE(jump_dialog.spin_level))-1;
+		new_game (player_name, gd_caveset_last_selected, gd_caveset_last_selected_level);
 	}
 	gd_show_preview=gtk_expander_get_expanded(GTK_EXPANDER (expander));	/* remember expander state-even if cancel pressed */
 	gtk_widget_destroy(jump_dialog.dialog);
@@ -1077,6 +1081,44 @@ cave_editor_cb()
 	init_mainwindow(NULL);
 }
 
+/* called from the menu when a recent file is activated. */
+static void
+recent_chooser_activated_cb(GtkRecentChooser *chooser, gpointer data)
+{
+	GtkRecentInfo *current;
+	char *filename_utf8, *filename;
+	
+	current=gtk_recent_chooser_get_current_item(chooser);
+	/* we do not support non-local files */
+	if (!gtk_recent_info_is_local(current)) {
+		char *display_name;
+
+		display_name=gtk_recent_info_get_uri_display(current);
+		gd_errormessage(_("Cannot load non-local file."), display_name);
+		g_free(display_name);
+		return;
+	}
+
+	/* if the edited caveset is to be saved, but user cancels */	
+	if (!gd_discard_changes(main_window.window))
+		return;
+	
+	filename_utf8=gtk_recent_info_get_uri_display(current);
+	filename=g_filename_from_utf8(filename_utf8, -1, NULL, NULL, NULL);
+	/* ask for save first? */
+	gd_open_caveset_in_ui(filename, gd_use_bdcff_highscore);
+	
+	/* things to do after loading. */
+	gd_main_window_set_title();
+	if (gd_has_new_error())
+		gd_show_last_error(main_window.window);
+	else
+		gd_infomessage(_("Loaded caveset from file:"), filename_utf8);
+
+	g_free(filename);
+	g_free(filename_utf8);
+}
+
 
 /*
  *
@@ -1105,6 +1147,7 @@ gd_create_main_window (void)
 		{"CaveEditor", GD_ICON_CAVE_EDITOR, N_("Cave _editor"), NULL, NULL, G_CALLBACK(cave_editor_cb)},
 		{"OpenFile", GTK_STOCK_OPEN, NULL, NULL, NULL, G_CALLBACK(open_caveset_cb)},
 		{"LoadInternal", GTK_STOCK_INDEX, N_("Load _internal game")},
+		{"LoadRecent", GTK_STOCK_DIALOG_INFO, N_("Open _recent")},
 		{"OpenCavesDir", GTK_STOCK_CDROM, N_("O_pen shipped"), NULL, NULL, G_CALLBACK(open_caveset_dir_cb)},
 		{"SaveFile", GTK_STOCK_SAVE, NULL, NULL, NULL, G_CALLBACK(save_caveset_cb)},
 		{"SaveAsFile", GTK_STOCK_SAVE_AS, NULL, NULL, NULL, G_CALLBACK(save_caveset_as_cb)},
@@ -1133,6 +1176,7 @@ gd_create_main_window (void)
 		"<menu action='FileMenu'>"
 		"<separator/>"
 		"<menuitem action='OpenFile'/>"
+		"<menuitem action='LoadRecent'/>"
 		"<menuitem action='OpenCavesDir'/>"
 		"<menuitem action='LoadInternal'/>"
 		"<separator/>"
@@ -1176,7 +1220,8 @@ gd_create_main_window (void)
 		"</toolbar>"
 		"</ui>";
 
-	GtkWidget *vbox, *hbox;
+	GtkWidget *vbox, *hbox, *recent_chooser;
+	GtkRecentFilter *recent_filter;
 	GdkPixbuf *logo;
 	GtkUIManager *ui;
 	int i;
@@ -1243,6 +1288,16 @@ gd_create_main_window (void)
 		g_signal_connect (G_OBJECT (menuitem), "activate", G_CALLBACK(load_internal_cb), GINT_TO_POINTER (i));
 		i++;
 	}
+
+	/* recent file chooser */
+	recent_chooser=gtk_recent_chooser_menu_new();
+	recent_filter=gtk_recent_filter_new();
+	/* gdash file extensions */
+	for (i=0; gd_caveset_extensions[i]!=NULL; i++)
+		gtk_recent_filter_add_pattern(recent_filter, gd_caveset_extensions[i]);
+	gtk_recent_chooser_add_filter(GTK_RECENT_CHOOSER(recent_chooser), recent_filter);
+	gtk_menu_item_set_submenu (GTK_MENU_ITEM (gtk_ui_manager_get_widget (ui, "/MenuBar/FileMenu/LoadRecent")), recent_chooser);
+	g_signal_connect(G_OBJECT(recent_chooser), "item-activated", G_CALLBACK(recent_chooser_activated_cb), NULL);
 
 	g_object_unref (ui);
 	
@@ -1341,6 +1396,7 @@ main (int argc, char *argv[])
 	gtk_init (&argc, &argv);
 	
 	gd_settings_init_with_language();
+	textdomain(PACKAGE);
 	
 	gd_install_log_handler();	
 
@@ -1439,7 +1495,7 @@ main (int argc, char *argv[])
 	gd_main_window_set_title ();
 
 	gd_sound_init();
-
+	
 	init_mainwindow (NULL);
 
 	if (gd_param_cave) {
@@ -1455,7 +1511,6 @@ main (int argc, char *argv[])
 
 	gd_save_settings();
 	
-	g_print("%d", sizeof(Cave));
 	return 0;
 }
 

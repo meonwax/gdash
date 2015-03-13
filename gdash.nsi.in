@@ -78,18 +78,6 @@ Section "GDash (required)"
   File ${MINGWDIR}\bin\libvorbisfile-3.dll
   File ${MINGWDIR}\bin\libogg-0.dll
   
-  ; Translations
-  SetOutPath $INSTDIR\hu\LC_MESSAGES
-  File /r ${MINGWDIR}\share\locale\hu\LC_MESSAGES\gtk20.mo
-  File /r ${MINGWDIR}\share\locale\hu\LC_MESSAGES\glib20.mo
-  SetOutPath $INSTDIR\de\LC_MESSAGES
-  File /r ${MINGWDIR}\share\locale\de\LC_MESSAGES\gtk20.mo
-  File /r ${MINGWDIR}\share\locale\de\LC_MESSAGES\glib20.mo
-
-  SetOutPath $INSTDIR\hu\LC_MESSAGES
-  File /oname=gdash.mo "po\hu.gmo"
-  SetOutPath $INSTDIR\de\LC_MESSAGES
-  File /oname=gdash.mo "po\de.gmo"
 
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\GDash "Install_Dir" "$INSTDIR"
@@ -115,6 +103,20 @@ Section "Cave sets"
 
 SectionEnd
 
+Section "Translations"
+  ; Translations
+  SetOutPath $INSTDIR\hu\LC_MESSAGES
+  File /r ${MINGWDIR}\share\locale\hu\LC_MESSAGES\gtk20.mo
+  File /r ${MINGWDIR}\share\locale\hu\LC_MESSAGES\glib20.mo
+  SetOutPath $INSTDIR\de\LC_MESSAGES
+  File /r ${MINGWDIR}\share\locale\de\LC_MESSAGES\gtk20.mo
+  File /r ${MINGWDIR}\share\locale\de\LC_MESSAGES\glib20.mo
+
+  SetOutPath $INSTDIR\hu\LC_MESSAGES
+  File /oname=gdash.mo "po\hu.gmo"
+  SetOutPath $INSTDIR\de\LC_MESSAGES
+  File /oname=gdash.mo "po\de.gmo"
+SectionEnd
 
 
 ; Optional section (can be disabled by the user)

@@ -112,8 +112,8 @@ noinst_HEADERS = \
 
 
 gdash_CFLAGS = -g -Wall @GTK_CFLAGS@ @SDL_CFLAGS@
-gdash_LDFLAGS = -g -Wall -lSDL_mixer
-gdash_LDADD = @GTK_LIBS@ @LIBINTL@ @SDL_LIBS@
+gdash_LDFLAGS = -g -Wall
+gdash_LDADD = @GTK_LIBS@ @LIBINTL@ @SDL_LIBS@ -lSDL_mixer
 gdash_SOURCES = \
 	$(base_sources) \
 	$(gtksources) \
@@ -125,8 +125,8 @@ gdash_SOURCES = \
 
 
 sdash_CFLAGS = -g -Wall @GLIB_CFLAGS@ @SDL_CFLAGS@
-sdash_LDFLAGS = -g -Wall -lSDL_mixer
-sdash_LDADD = @GLIB_LIBS@ @SDL_LIBS@
+sdash_LDFLAGS = -g -Wall
+sdash_LDADD = @GLIB_LIBS@ @SDL_LIBS@ -lSDL_mixer
 sdash_SOURCES = \
 	$(base_sources) \
 	$(sdlsources) \

@@ -363,9 +363,9 @@ loadcells(GdkPixbuf *cells_pixbuf)
 	add_arrow_to_cell(O_ALT_GUARD_3, O_ALT_GUARD_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_COUNTERCLOCKWISE);
 	add_arrow_to_cell(O_ALT_GUARD_4, O_ALT_GUARD_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_NONE);
 
-	add_arrow_to_cell(O_H_GROWING_WALL, O_GROWING_WALL, O_LEFTRIGHT_ARROW, GDK_PIXBUF_ROTATE_NONE);
-	add_arrow_to_cell(O_V_GROWING_WALL, O_GROWING_WALL, O_LEFTRIGHT_ARROW, GDK_PIXBUF_ROTATE_CLOCKWISE);
-	add_arrow_to_cell(O_GROWING_WALL, O_GROWING_WALL, O_EVERYDIR_ARROW, GDK_PIXBUF_ROTATE_NONE);
+	add_arrow_to_cell(O_H_EXPANDING_WALL, O_EXPANDING_WALL, O_LEFTRIGHT_ARROW, GDK_PIXBUF_ROTATE_NONE);
+	add_arrow_to_cell(O_V_EXPANDING_WALL, O_EXPANDING_WALL, O_LEFTRIGHT_ARROW, GDK_PIXBUF_ROTATE_CLOCKWISE);
+	add_arrow_to_cell(O_EXPANDING_WALL, O_EXPANDING_WALL, O_EVERYDIR_ARROW, GDK_PIXBUF_ROTATE_NONE);
 
 	add_arrow_to_cell(O_BUTTER_1, O_BUTTER_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_CLOCKWISE);
 	add_arrow_to_cell(O_BUTTER_2, O_BUTTER_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_UPSIDEDOWN);
@@ -394,6 +394,8 @@ loadcells(GdkPixbuf *cells_pixbuf)
 	add_arrow_to_cell(O_FALLING_WALL, O_BRICK, O_EXCLAMATION_MARK, 0);
 	add_arrow_to_cell(O_FALLING_WALL_F, O_BRICK, O_DOWN_ARROW, 0);
 	add_arrow_to_cell(O_TIME_PENALTY, O_GRAVESTONE, O_EXCLAMATION_MARK, 0);
+	add_arrow_to_cell(O_NITRO_PACK_F, O_NITRO_PACK, O_DOWN_ARROW, 0);
+	add_arrow_to_cell(O_NITRO_PACK_EXPLODE, O_NITRO_PACK, O_EXCLAMATION_MARK, 0);
 
 	add_arrow_to_cell(O_STONEFLY_1, O_STONEFLY_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_CLOCKWISE);
 	add_arrow_to_cell(O_STONEFLY_2, O_STONEFLY_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_UPSIDEDOWN);
@@ -750,7 +752,7 @@ gd_get_element_pixbuf_simple_with_border (GdElement element)
 	return get_element_pixbuf_with_border(index);
 }
 
-/** 
+/*
 	creates a pixbuf, which shows the cave.
 	if width and height are given (nonzero),
 	scale pixbuf proportionally, so it fits in width*height
@@ -803,10 +805,13 @@ gd_drawcave_to_pixbuf(const Cave * cave, const int width, const int height, cons
 					case O_DIRT:
 						element=cave->dirt_looks_like;
 						break;
-					case O_GROWING_WALL:
-					case O_H_GROWING_WALL:
-					case O_V_GROWING_WALL:
+					case O_EXPANDING_WALL:
+					case O_H_EXPANDING_WALL:
+					case O_V_EXPANDING_WALL:
 						element=cave->expanding_wall_looks_like;
+						break;
+					case O_AMOEBA_2:
+						element=cave->amoeba_2_looks_like;
 						break;
 					default:
 						/* we check that this element has no visual effect. */

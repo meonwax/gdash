@@ -63,7 +63,7 @@ gd_direction_from_string(const char *str)
 {
 	int i;
 
-	g_assert(str!=NULL);	
+	g_assert(str!=NULL);
 	for (i=1; i<G_N_ELEMENTS(gd_direction_filename); i++)
 		if (g_ascii_strcasecmp(str, gd_direction_filename[i])==0)
 			return (GdDirection) i;
@@ -82,7 +82,7 @@ void
 gd_create_char_to_element_table()
 {
 	int i;
-	
+
 	/* fill all with unknown */
 	for (i=0; i<G_N_ELEMENTS(gd_char_to_element); i++)
 		gd_char_to_element[i]=O_UNKNOWN;
@@ -126,7 +126,7 @@ gd_cave_init()
 	g_assert(MV_MAX==G_N_ELEMENTS(gd_dy));
 	g_assert(GD_SCHEDULING_MAX==G_N_ELEMENTS(gd_scheduling_filename));
 	g_assert(GD_SCHEDULING_MAX==G_N_ELEMENTS(gd_scheduling_name));
-	
+
 	/* put names to a hash table */
 	/* this is a helper for file read operations */
 	/* maps g_strdupped strings to elemenets (integers) */
@@ -147,7 +147,7 @@ gd_cave_init()
 		/* once again, do not free "key" ^^^ */
 	}
 	/* for compatibility with tim stridmann's memorydump->bdcff converter... .... ... */
-	g_hash_table_insert(name_to_element, "HEXPANDING_WALL", GINT_TO_POINTER(O_H_GROWING_WALL));
+	g_hash_table_insert(name_to_element, "HEXPANDING_WALL", GINT_TO_POINTER(O_H_EXPANDING_WALL));
 	g_hash_table_insert(name_to_element, "FALLING_DIAMOND", GINT_TO_POINTER(O_DIAMOND_F));
 	g_hash_table_insert(name_to_element, "FALLING_BOULDER", GINT_TO_POINTER(O_STONE_F));
 	g_hash_table_insert(name_to_element, "EXPLOSION1S", GINT_TO_POINTER(O_EXPLODE_1));
@@ -174,6 +174,11 @@ gd_get_element_from_string (const char *string)
 	char *upper=g_ascii_strup(string, -1);
 	gpointer value;
 	gboolean found;
+	
+	if (!string) {
+		g_warning("Invalid string representing element: (null)");
+		return O_UNKNOWN;
+	}
 
 	found=g_hash_table_lookup_extended(name_to_element, upper, NULL, &value);
 	g_free(upper);
@@ -191,7 +196,7 @@ void
 gd_struct_set_defaults_from_array(gpointer str, const GdStructDescriptor *properties, GdPropertyDefault *defaults)
 {
 	int i;
-	
+
 	for (i=0; defaults[i].offset!=-1; i++) {
 		gpointer pvalue=G_STRUCT_MEMBER_P(str, defaults[i].offset);
 		int *ivalue=pvalue;	/* these point to the same, but to avoid the awkward cast syntax */
@@ -202,7 +207,7 @@ gd_struct_set_defaults_from_array(gpointer str, const GdStructDescriptor *proper
 		GdColor *cvalue=pvalue;
 		double *fvalue=pvalue;
 		int j, n;
-		
+
 		/* check which property we are talking about: find it in gd_cave_properties. */
 		n=defaults[i].property_index;
 		if (n==0) {
@@ -210,24 +215,26 @@ gd_struct_set_defaults_from_array(gpointer str, const GdStructDescriptor *proper
 				n++;
 			/* make sure we found it. */
 			g_assert(properties[n].identifier!=NULL);
-			
+
 			/* remember so we will be fast later*/
 			defaults[i].property_index=n;
 		}
-		
+
+		/* some properties are arrays. this loop fills all with the same values */
 		for (j=0; j<properties[n].count; j++)
 			switch (properties[n].type) {
 			/* these are for the gui; do nothing */
 			case GD_TAB:
 			case GD_LABEL:
-			case GD_LEVEL_LABEL:
 			/* no default value for strings */
 			case GD_TYPE_STRING:
 				g_assert_not_reached();
 				break;
 
+			case GD_TYPE_RATIO:	/* this is also an integer, difference is only when saving to bdcff */
 			case GD_TYPE_INT:
-			case GD_TYPE_RATIO:	/* this is also an integer */
+				if (defaults[i].defval<properties[n].min || defaults[i].defval>properties[n].max)
+					g_warning("integer property %s out of range", properties[n].identifier);
 				ivalue[j]=defaults[i].defval;
 				break;
 			case GD_TYPE_PROBABILITY:	/* floats are stored as integer, /million */
@@ -259,12 +266,12 @@ gd_struct_explain_defaults_in_string(const GdStructDescriptor *properties, GdPro
 {
 	GString *defs;
 	int i;
-	
+
 	defs=g_string_new(NULL);
-	
+
 	for (i=0; defaults[i].offset!=-1; i++) {
 		int j, n;
-		
+
 		/* check which property we are talking about: find it in gd_cave_properties. */
 		n=defaults[i].property_index;
 		if (n==0) {
@@ -272,13 +279,13 @@ gd_struct_explain_defaults_in_string(const GdStructDescriptor *properties, GdPro
 				n++;
 			/* make sure we found it. */
 			g_assert(properties[n].identifier!=NULL);
-			
+
 			/* remember so we will be fast later*/
 			defaults[i].property_index=n;
 		}
-		
+
 		g_string_append_printf(defs, "%s: ", _(properties[n].name));
-		
+
 		for (j=0; j<properties[n].count; j++)
 			switch (properties[n].type) {
 			/* these are for the gui; should not be in the defaults array */
@@ -317,7 +324,7 @@ gd_struct_explain_defaults_in_string(const GdStructDescriptor *properties, GdPro
 
 		g_string_append_printf(defs, "\n");
 	}
-	
+
 	/* return char * data */
 	return g_string_free(defs, FALSE);
 }
@@ -363,7 +370,7 @@ void
 gd_clear_highscore(GdHighScore *hs)
 {
 	int i;
-	
+
 	for (i=0; i<GD_HIGHSCORE_NUM; i++) {
 		strcpy(hs[i].name, "");
 		hs[i].score=0;
@@ -397,19 +404,19 @@ int
 gd_add_highscore(GdHighScore *scores, GdHighScore hs)
 {
 	int i;
-	
+
 	if (!gd_is_highscore(scores, hs.score))
 		return -1;
-		
+
 	/* overwrite the last one */
 	scores[GD_HIGHSCORE_NUM-1]=hs;
 	/* and sort */
 	qsort(scores, GD_HIGHSCORE_NUM, sizeof(GdHighScore), gd_highscore_compare);
-	
+
 	for (i=0; i<GD_HIGHSCORE_NUM; i++)
 		if (g_str_equal(scores[i].name, hs.name) && scores[i].score==hs.score)
 			return i;
-			
+
 	g_assert_not_reached();
 	return -1;
 }
@@ -522,7 +529,7 @@ gd_cave_new(void)
    		rows=new (pointers to rows);
 		rows[0]=new map
 		rows[1..h-1]=rows[0]+width*bytes
-		
+
 	freeing this:
 		free(rows[0])
 		free(rows)
@@ -593,7 +600,7 @@ gd_cave_free (Cave *cave)
 
 	if (cave->tags)
 		g_hash_table_destroy(cave->tags);
-	
+
 	if (cave->random)
 		g_rand_free(cave->random);
 
@@ -684,7 +691,7 @@ gd_cave_store_rc (Cave *cave, const int x, const int y, const GdElement element,
 
 
 
-/* 
+/*
 	C64 BD predictable random number generator.
 	Used to load the original caves imported from c64 files.
 	Also by the predictable slime.
@@ -893,7 +900,7 @@ gd_cave_correct_visible_size(Cave *cave)
 	}
 	if (cave->x1<0)
 		cave->x1=0;
-	if (cave->y1<0)	
+	if (cave->y1<0)
 		cave->y1=0;
 	if (cave->x2>cave->w-1)
 		cave->x2=cave->w-1;
@@ -924,7 +931,7 @@ void
 gd_cave_easy (Cave *cave)
 {
 	int x, y;
-	
+
 	g_assert(cave->map!=NULL);
 
 	for (x=0; x<cave->w; x++)
@@ -936,9 +943,9 @@ gd_cave_easy (Cave *cave)
 			case O_INVIS_OUTBOX:
 				cave->map[x][x]=O_OUTBOX;
 				break;
-			case O_H_GROWING_WALL:
-			case O_V_GROWING_WALL:
-			case O_GROWING_WALL:
+			case O_H_EXPANDING_WALL:
+			case O_V_EXPANDING_WALL:
+			case O_EXPANDING_WALL:
 				cave->map[y][x]=O_BRICK;
 				break;
 			default:
@@ -1001,7 +1008,7 @@ void
 gd_cave_setup_for_game(Cave *cave)
 {
 	int x, y;
-	
+
 	cave_set_ckdelay_extra_for_animation(cave);
 
 	/* find the player which will be the one to scroll to at the beginning of the game (before the player's birth) */
@@ -1022,14 +1029,13 @@ gd_cave_setup_for_game(Cave *cave)
 					cave->player_y=y;
 				}
 	}
-		
-	gd_cave_correct_visible_size(cave);
 
 	/* select number of milliseconds (for pal and ntsc) */
 	cave->timing_factor=cave->pal_timing?1200:1000;
 	cave->time*=cave->timing_factor;
-	cave->magic_wall_milling_time*=cave->timing_factor;
-	cave->amoeba_slow_growth_time*=cave->timing_factor;
+	cave->magic_wall_time*=cave->timing_factor;
+	cave->amoeba_time*=cave->timing_factor;
+	cave->amoeba_2_time*=cave->timing_factor;
 	cave->hatching_delay_time*=cave->timing_factor;
 	if (cave->hammered_walls_reappear)
 		cave->hammered_reappear=gd_cave_map_new(cave, int);
@@ -1043,7 +1049,7 @@ void
 gd_cave_count_diamonds(Cave *cave)
 {
 	int x, y;
-	
+
 	/* if automatically counting diamonds. if this was negative,
 	 * the sum will be this less than the number of all the diamonds in the cave */
 	if (cave->diamonds_needed<=0) {
@@ -1077,7 +1083,7 @@ gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, 
 	g_assert(cave!=NULL);
 	g_assert(cave->map!=NULL);
 	g_assert(gfx_buffer!=NULL);
-	
+
 	animcycle=(animcycle+1) & 7;
 	if (cave->last_direction) {	/* he is moving, so stop blinking and tapping. */
 		player_blinking=0;
@@ -1097,7 +1103,7 @@ gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, 
 		elemdrawing[O_SPACE]=gd_elements[O_FAKE_BONUS].image_game;
 	elemdrawing[O_MAGIC_WALL]=gd_elements[cave->magic_wall_state == GD_MW_ACTIVE ? O_MAGIC_WALL : O_BRICK].image_game;
 	elemdrawing[O_CREATURE_SWITCH]=gd_elements[cave->creatures_backwards ? O_CREATURE_SWITCH_ON : O_CREATURE_SWITCH].image_game;
-	elemdrawing[O_GROWING_WALL_SWITCH]=gd_elements[cave->expanding_wall_changed ? O_GROWING_WALL_SWITCH_VERT : O_GROWING_WALL_SWITCH_HORIZ].image_game;
+	elemdrawing[O_EXPANDING_WALL_SWITCH]=gd_elements[cave->expanding_wall_changed ? O_EXPANDING_WALL_SWITCH_VERT : O_EXPANDING_WALL_SWITCH_HORIZ].image_game;
 	elemdrawing[O_GRAVITY_SWITCH]=gd_elements[cave->gravity_switch_active?O_GRAVITY_SWITCH_ACTIVE:O_GRAVITY_SWITCH].image_game;
 	if (animcycle&2) {
 		elemdrawing[O_PNEUMATIC_ACTIVE_LEFT]+=2;	/* also a hack, like biter_switch */
@@ -1105,7 +1111,7 @@ gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, 
 		elemdrawing[O_PLAYER_PNEUMATIC_LEFT]+=2;
 		elemdrawing[O_PLAYER_PNEUMATIC_RIGHT]+=2;
 	}
-	
+
 	if ((cave->last_direction) == MV_STILL) {	/* player is idle. */
 		if (player_blinking && player_tapping)
 			draw=gd_elements[O_PLAYER_TAP_BLINK].image_game;
@@ -1131,9 +1137,10 @@ gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, 
 	elemdrawing[O_BITER_SWITCH]=gd_elements[O_BITER_SWITCH].image_game+cave->biter_delay_frame;	/* XXX hack, not fit into gd_elements */
 	/* visual effects */
 	elemdrawing[O_DIRT]=elemdrawing[cave->dirt_looks_like];
-	elemdrawing[O_GROWING_WALL]=elemdrawing[cave->expanding_wall_looks_like];
-	elemdrawing[O_V_GROWING_WALL]=elemdrawing[cave->expanding_wall_looks_like];
-	elemdrawing[O_H_GROWING_WALL]=elemdrawing[cave->expanding_wall_looks_like];
+	elemdrawing[O_EXPANDING_WALL]=elemdrawing[cave->expanding_wall_looks_like];
+	elemdrawing[O_V_EXPANDING_WALL]=elemdrawing[cave->expanding_wall_looks_like];
+	elemdrawing[O_H_EXPANDING_WALL]=elemdrawing[cave->expanding_wall_looks_like];
+	elemdrawing[O_AMOEBA_2]=elemdrawing[cave->amoeba_2_looks_like];
 
 	for (y=cave->y1; y<=cave->y2; y++) {
 		for (x=cave->x1; x<=cave->x2; x++) {
@@ -1162,7 +1169,7 @@ gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, 
 /*
 	width: width of playfield.
 	visible: visible part. (remember: player_x-x1!)
-	
+
 	center: the coordinates to scroll to.
 	exact: scroll exactly
 	start: start scrolling
@@ -1170,14 +1177,14 @@ gd_drawcave_game(const Cave *cave, int **gfx_buffer, gboolean bonus_life_flash, 
 	current
 
 	desired: the function stores its data here
-	speed: the function stores its data here	
+	speed: the function stores its data here
 */
 gboolean
 gd_cave_scroll(int width, int visible, int center, gboolean exact, int start, int to, int *current, int *desired, int *speed)
 {
 	int i;
 	gboolean changed;
-	
+
 	changed=FALSE;
 
 	/* HORIZONTAL */
@@ -1191,10 +1198,10 @@ gd_cave_scroll(int width, int visible, int center, gboolean exact, int start, in
 			*current=0;
 			changed=TRUE;
 		}
-		
+
 		return changed;
 	}
-	
+
 	if (exact)
 		*desired=center;
 	else {
@@ -1225,7 +1232,7 @@ gd_cave_scroll(int width, int visible, int center, gboolean exact, int start, in
 				(*current)--;
 		changed=TRUE;
 	}
-	
+
 	return changed;
 }
 

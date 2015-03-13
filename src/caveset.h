@@ -45,6 +45,10 @@ extern const GdStructDescriptor gd_caveset_properties[];
 extern GdCavesetData *gd_caveset_data;
 extern GList *gd_caveset;
 extern gboolean gd_caveset_edited;
+extern int gd_caveset_last_selected;
+extern int gd_caveset_last_selected_level;
+
+extern char *gd_caveset_extensions[];
 
 /* #included cavesets; configdir passed to look for .hsc file */
 gboolean gd_caveset_load_from_internal(int caveset, const char *configdir);
@@ -59,7 +63,6 @@ gboolean gd_caveset_save(const char *filename);
 int gd_caveset_count(void);
 void gd_caveset_clear(void);
 Cave *gd_return_nth_cave(const int cave);
-int gd_caveset_first_selectable();
 Cave *gd_cave_new_from_caveset(const int cave, const int level, guint32 seed);
 
 /* highscore in config directory */

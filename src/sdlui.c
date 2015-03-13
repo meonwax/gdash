@@ -419,6 +419,7 @@ gd_settings_menu()
 		TypeBoolean,
 		TypeScale,
 		TypeTheme,
+		TypePercent,
 	} SettingType;
 	struct _setting {
 		SettingType type;
@@ -429,6 +430,7 @@ gd_settings_menu()
 		{ TypeTheme,   "Theme", NULL },
 		{ TypeScale,   "Scale", &gd_sdl_scale },
 		{ TypeBoolean, "PAL emulation", &gd_sdl_pal_emulation },
+		{ TypePercent, "PAL scanline shade", &gd_pal_emu_scanline_shade },
 		{ TypeBoolean, "Sound", &gd_sdl_sound },
 		{ TypeBoolean, "Classic sounds only", &gd_classic_sound },
 		{ TypeBoolean, "16-bit mixing", &gd_sdl_16bit_mixing },
@@ -459,7 +461,7 @@ gd_settings_menu()
 	for (n=0; n<G_N_ELEMENTS(settings); n++)
 		width=MAX(width, (strlen(settings[n].name)+1+strlen(yes))*gd_font_width());
 	x1=(gd_screen->w-width)/2;
-	yd=gd_line_height();
+	yd=gd_font_height()+1;
 	y1=(gd_screen->h-(G_N_ELEMENTS(settings)+2)*yd)/2;
 		
 	gd_backup_and_dark_screen();
@@ -485,6 +487,9 @@ gd_settings_menu()
 					break;
 				case TypeScale:
 					x=gd_blittext_n(gd_screen, x, y1+n*yd, GD_C64_YELLOW, gd_scaling_name[*(GdScalingType *)settings[n].var]);
+					break;
+				case TypePercent:
+					x=gd_blittext_printf_n(gd_screen, x, y1+n*yd, GD_C64_YELLOW, "%d%%", *(int *)settings[n].var);
 					break;
 				case TypeTheme:
 					if (themenum==0)
@@ -528,6 +533,14 @@ gd_settings_menu()
 					*(int *)settings[current].var=MIN(GD_SCALING_MAX-1,(*(int *)settings[current].var)+1);
 				if (gd_space_or_enter_or_fire())
 					*(int *)settings[current].var=(*(int *)settings[current].var+1)%GD_SCALING_MAX;
+				break;
+			case TypePercent:
+				if (gd_left())
+					*(int *)settings[current].var=MAX(0,(*(int *)settings[current].var)-5);
+				if (gd_right())
+					*(int *)settings[current].var=MIN(100,(*(int *)settings[current].var)+5);
+				if (gd_space_or_enter_or_fire())
+					*(int *)settings[current].var=CLAMP((*(int *)settings[current].var+5), 0, 100);
 				break;
 			case TypeTheme:
 				if (gd_left())

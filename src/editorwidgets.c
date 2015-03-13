@@ -13,6 +13,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+#include "config.h"
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include "cave.h"
@@ -234,6 +235,12 @@ gd_color_combo_get_color(GtkWidget *widget)
 #define GDASH_CELL "gdash-cell"
 #define GDASH_ELEMENT "gdash-element"
 #define GDASH_HOVER "gdash-hover"
+#define GDASH_BUTTON "gdash-button"
+
+#define GDASH_DIALOG "gdash-dialog"
+#define GDASH_WINDOW_TITLE "gdash-window-title"
+#define GDASH_DIALOG_VBOX "gdash-dialog-vbox"
+
 static int button_animcycle;
 
 static gboolean
@@ -305,17 +312,54 @@ gd_element_button_set (GtkWidget *button, const GdElement element)
 }
 
 static void
-element_button_da_clicked(GtkWidget *da, GdkEvent *event, gpointer data)
+element_button_da_clicked(GtkWidget *da, GdkEventButton *event, gpointer data)
 {
 	GtkDialog *dialog=GTK_DIALOG(data);
+	GtkWidget *button;
 	GdElement element;
 
-	element=(GdElement)GPOINTER_TO_INT(g_object_get_data (G_OBJECT(da), GDASH_ELEMENT));
-	gtk_dialog_response(dialog, element);
+	/* set the corresponding button to the element selected */
+	element=(GdElement)GPOINTER_TO_INT(g_object_get_data(G_OBJECT(da), GDASH_ELEMENT));
+	button=GTK_WIDGET(g_object_get_data(G_OBJECT(da), GDASH_BUTTON));
+	gd_element_button_set(button, element);
+
+	/* if this is a modal window, then it is a does-not-stay-open element box. */
+	/* so we issue a dialog response. */
+	if (gtk_window_get_modal(GTK_WINDOW(dialog)))
+		gtk_dialog_response(dialog, element);
+	else {
+		/* if not modal, it is a stay-open element box. */
+		/* close if right mouse button; stay open for others. */
+		if (event->button==3)
+			gtk_widget_destroy(GTK_WIDGET(dialog));
+	}
 }
 
 static void
-element_button_clicked(GtkWidget *button, gpointer data)
+element_button_dialog_destroyed_free_list(GtkWidget *dialog, gpointer data)
+{
+	GList *areas=(GList *) data;
+
+    g_source_remove_by_user_data(areas);
+    g_list_free(areas);
+}
+
+static void
+element_button_dialog_destroyed_null_pointer(GtkWidget *dialog, gpointer data)
+{
+	g_object_set_data(G_OBJECT(data), GDASH_DIALOG, NULL);
+	g_object_set_data(G_OBJECT(data), GDASH_DIALOG_VBOX, NULL);
+}
+
+static void
+element_button_dialog_close_button_clicked(GtkWidget *button, gpointer data)
+{
+	/* data is the dialog */
+	gtk_widget_destroy(GTK_WIDGET(data));
+}
+
+static void
+element_button_clicked_func(GtkWidget *button, gboolean stay_open)
 {
 	static const GdElement elements[]= {
 		/* normal */
@@ -325,21 +369,21 @@ element_button_clicked(GtkWidget *button, gpointer data)
 		O_INBOX, O_PRE_OUTBOX, O_PRE_INVIS_OUTBOX, O_PLAYER_GLUED, O_VOODOO, O_SPACE, O_SPACE, O_SPACE,
 		O_WALLED_KEY_1, O_WALLED_KEY_2, O_WALLED_KEY_3, O_WALLED_DIAMOND, O_STEEL_SLOPED_UP_RIGHT, O_STEEL_SLOPED_UP_LEFT, O_STEEL_SLOPED_DOWN_LEFT, O_STEEL_SLOPED_DOWN_RIGHT,
 		
-		O_AMOEBA, O_SLIME, O_ACID, O_MAGIC_WALL, O_WATER, O_BLADDER_SPENDER, O_FALLING_WALL, O_SPACE,
+		O_AMOEBA, O_AMOEBA_2, O_SLIME, O_ACID, O_MAGIC_WALL, O_WATER, O_BLADDER_SPENDER, O_FALLING_WALL,
 		O_KEY_1, O_KEY_2, O_KEY_3, O_DIAMOND_KEY, O_BRICK_SLOPED_DOWN_RIGHT, O_BRICK_SLOPED_DOWN_LEFT, O_BRICK_SLOPED_UP_LEFT, O_BRICK_SLOPED_UP_RIGHT,
 
 		O_BOMB, O_CLOCK, O_TELEPORTER, O_POT, O_SKELETON, O_BOX, O_SWEET, O_PNEUMATIC_HAMMER, 
 		O_DOOR_1, O_DOOR_2, O_DOOR_3, O_TRAPPED_DIAMOND, O_DIRT_SLOPED_UP_RIGHT, O_DIRT_SLOPED_UP_LEFT, O_DIRT_SLOPED_DOWN_LEFT, O_DIRT_SLOPED_DOWN_RIGHT, 
 
-		O_GRAVITY_SWITCH, O_CREATURE_SWITCH, O_BITER_SWITCH, O_GROWING_WALL_SWITCH, O_SPACE, O_SPACE, O_SPACE, O_SPACE,
-		O_H_GROWING_WALL, O_V_GROWING_WALL, O_GROWING_WALL, O_SPACE, O_SPACE, O_SPACE, O_SPACE, O_NONE,
+		O_GRAVITY_SWITCH, O_CREATURE_SWITCH, O_BITER_SWITCH, O_EXPANDING_WALL_SWITCH, O_NITRO_PACK, O_SPACE, O_SPACE, O_SPACE,
+		O_H_EXPANDING_WALL, O_V_EXPANDING_WALL, O_EXPANDING_WALL, O_SPACE, O_SPACE, O_SPACE, O_SPACE, O_NONE,
 
 		O_SPACE, O_GUARD_2, O_ALT_GUARD_2, O_SPACE, O_SPACE, O_BUTTER_2, O_ALT_BUTTER_2, O_SPACE, O_SPACE, O_STONEFLY_2, O_COW_2, O_SPACE, O_SPACE, O_SPACE, O_SPACE, O_SPACE,
 		O_GUARD_1, O_GUARD_3, O_ALT_GUARD_1, O_ALT_GUARD_3, O_BUTTER_1, O_BUTTER_3, O_ALT_BUTTER_1, O_ALT_BUTTER_3, O_STONEFLY_1, O_STONEFLY_3, O_COW_1, O_COW_3, O_BITER_1, O_BITER_2, O_BITER_3, O_BITER_4,
 		O_SPACE, O_GUARD_4, O_ALT_GUARD_4, O_SPACE, O_SPACE, O_BUTTER_4, O_ALT_BUTTER_4, O_SPACE, O_SPACE, O_STONEFLY_4, O_COW_4, O_SPACE, O_BLADDER, O_GHOST, O_WAITING_STONE, O_CHASING_STONE,
 
 		/* for effects */		
-		O_DIRT2, O_DIAMOND_F, O_STONE_F, O_MEGA_STONE_F, O_FALLING_WALL_F, O_UNKNOWN, O_PRE_PL_1, O_PRE_PL_2, O_PRE_PL_3, O_PLAYER, O_PLAYER_BOMB, O_PLAYER_STIRRING, O_OUTBOX, O_INVIS_OUTBOX, O_TIME_PENALTY, O_GRAVESTONE,
+		O_DIRT2, O_DIAMOND_F, O_STONE_F, O_MEGA_STONE_F, O_FALLING_WALL_F, O_NITRO_PACK_F, O_PRE_PL_1, O_PRE_PL_2, O_PRE_PL_3, O_PLAYER, O_PLAYER_BOMB, O_PLAYER_STIRRING, O_OUTBOX, O_INVIS_OUTBOX, O_TIME_PENALTY, O_GRAVESTONE,
 
 		O_BLADDER_1, O_BLADDER_2, O_BLADDER_3, O_BLADDER_4, O_BLADDER_5, O_BLADDER_6, O_BLADDER_7, O_BLADDER_8, O_BLADDER_9,
 		O_COW_ENCLOSED_1, O_COW_ENCLOSED_2, O_COW_ENCLOSED_3, O_COW_ENCLOSED_4, O_COW_ENCLOSED_5, O_COW_ENCLOSED_6, O_COW_ENCLOSED_7,
@@ -347,11 +391,11 @@ element_button_clicked(GtkWidget *button, gpointer data)
 		O_WATER_1, O_WATER_2, O_WATER_3, O_WATER_4, O_WATER_5, O_WATER_6, O_WATER_7, O_WATER_8,
 		O_WATER_9, O_WATER_10, O_WATER_11, O_WATER_12, O_WATER_13, O_WATER_14, O_WATER_15, O_WATER_16,
 
-		O_BOMB_TICK_1, O_BOMB_TICK_2, O_BOMB_TICK_3, O_BOMB_TICK_4, O_BOMB_TICK_5, O_BOMB_TICK_6, O_BOMB_TICK_7, O_SPACE,
-		O_BOMB_EXPL_1, O_BOMB_EXPL_2, O_BOMB_EXPL_3, O_BOMB_EXPL_4, O_SPACE, O_SPACE, O_SPACE, O_SPACE,
+		O_BOMB_TICK_1, O_BOMB_TICK_2, O_BOMB_TICK_3, O_BOMB_TICK_4, O_BOMB_TICK_5, O_BOMB_TICK_6, O_BOMB_TICK_7,
+		O_BOMB_EXPL_1, O_BOMB_EXPL_2, O_BOMB_EXPL_3, O_BOMB_EXPL_4, O_AMOEBA_2_EXPL_1, O_AMOEBA_2_EXPL_2, O_AMOEBA_2_EXPL_3, O_AMOEBA_2_EXPL_4, O_UNKNOWN,
 		
 		O_EXPLODE_1, O_EXPLODE_2, O_EXPLODE_3, O_EXPLODE_4, O_EXPLODE_5, O_SPACE,
-		O_PRE_DIA_1, O_PRE_DIA_2, O_PRE_DIA_3, O_PRE_DIA_4, O_PRE_DIA_5, O_SPACE, O_SPACE, O_SPACE, O_SPACE, O_SPACE,
+		O_PRE_DIA_1, O_PRE_DIA_2, O_PRE_DIA_3, O_PRE_DIA_4, O_PRE_DIA_5, O_NITRO_PACK_EXPLODE, O_NITRO_EXPL_1, O_NITRO_EXPL_2, O_NITRO_EXPL_3, O_NITRO_EXPL_4,
 		O_PRE_STONE_1, O_PRE_STONE_2, O_PRE_STONE_3, O_PRE_STONE_4, O_PRE_STEEL_1, O_PRE_STEEL_2, O_PRE_STEEL_3, O_PRE_STEEL_4,
 		O_PRE_CLOCK_1, O_PRE_CLOCK_2, O_PRE_CLOCK_3, O_PRE_CLOCK_4, O_GHOST_EXPL_1, O_GHOST_EXPL_2, O_GHOST_EXPL_3, O_GHOST_EXPL_4,
 
@@ -359,33 +403,46 @@ element_button_clicked(GtkWidget *button, gpointer data)
 	};
 		
 	int cols=16;
-	int i, result;
+	int i;
 	GList *areas=NULL;
-	GtkWidget *dialog, *expander, *table, *table2, *align;
+	GtkWidget *dialog, *expander, *table, *table2, *align, *vbox;
 	int into_second=0;
+	
+	dialog=(GtkWidget *)(g_object_get_data(G_OBJECT(button), GDASH_DIALOG));
+	if (dialog) {
+		/* if the dialog is already open, only show it. */
+		gtk_window_present(GTK_WINDOW(dialog));
+
+		return;
+	}
 
 	/* elements dialog with no buttons; clicking on an element will do the trick. */
     dialog=gtk_dialog_new();
     gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(gtk_widget_get_toplevel(button)));
-    gtk_window_set_title(GTK_WINDOW(dialog), _("Elements"));
+    gtk_window_set_title(GTK_WINDOW(dialog), g_object_get_data(G_OBJECT(button), GDASH_WINDOW_TITLE));
     gtk_dialog_set_has_separator(GTK_DIALOG(dialog), FALSE);
-    gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
     gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
     gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
+    /* associate the dialog with the button, so we know that it is open */
+    g_object_set_data(G_OBJECT(button), GDASH_DIALOG, dialog);
+    
+    vbox=gtk_vbox_new(FALSE, 0);
+    gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), vbox);
+    g_object_set_data(G_OBJECT(button), GDASH_DIALOG_VBOX, vbox);
 
 	align=gtk_alignment_new(0, 0.5, 0, 0);
 	gtk_container_add(GTK_CONTAINER(align), gtk_label_new(_("Normal elements")));
-	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), align);
+	gtk_box_pack_start_defaults(GTK_BOX(vbox), align);
 	
     table=gtk_table_new(0, 0, TRUE);
     gtk_container_set_border_width(GTK_CONTAINER(table), 6);
-    gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), table);
+    gtk_box_pack_start_defaults(GTK_BOX(vbox), table);
     
     expander=gtk_expander_new(_("For effects"));
     table2=gtk_table_new(0, 0, TRUE);
     gtk_container_set_border_width(GTK_CONTAINER(table2), 6);
     gtk_container_add(GTK_CONTAINER(expander), table2);
-    gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), expander);
+    gtk_box_pack_start_defaults(GTK_BOX(vbox), expander);
 
     /* create drawing areas */
     for (i=0; i<G_N_ELEMENTS(elements); i++) {
@@ -395,6 +452,7 @@ element_button_clicked(GtkWidget *button, gpointer data)
 		areas=g_list_prepend(areas, da);	/* put in list for animation timeout, that one will request redraw on them */
 		gtk_widget_add_events(da, GDK_BUTTON_PRESS_MASK|GDK_LEAVE_NOTIFY_MASK|GDK_ENTER_NOTIFY_MASK);
         g_object_set_data(G_OBJECT(da), GDASH_ELEMENT, GINT_TO_POINTER(elements[i]));
+        g_object_set_data(G_OBJECT(da), GDASH_BUTTON, button);	/* button to update on click */
 		gtk_widget_set_size_request(da, gd_cell_size_editor+4, gd_cell_size_editor+4);
         gtk_widget_set_tooltip_text(da, _(gd_elements[elements[i]].name));
 		g_signal_connect(G_OBJECT(da), "expose-event", G_CALLBACK(button_drawing_area_expose_event), GINT_TO_POINTER(elements[i]));
@@ -413,17 +471,30 @@ element_button_clicked(GtkWidget *button, gpointer data)
 	    }
 	    
     }
-    gtk_widget_show_all(dialog);
-    g_timeout_add(40, redraw_timeout, areas);
-	gtk_window_present_with_time(GTK_WINDOW(dialog), gtk_get_current_event_time());
 
-    result=gtk_dialog_run(GTK_DIALOG(dialog));
-    g_source_remove_by_user_data(areas);
-    gtk_widget_destroy(dialog);
-    g_list_free(areas);
-    /* (if esc or delete event, do not change state) */
-    if (result>=0)
-		gd_element_button_set(button, (GdElement) result);
+	/* add a timeout which animates the drawing areas */
+    g_timeout_add(40, redraw_timeout, areas);
+    /* if the dialog is destroyed, we must free the list which contains the drawing areas */
+    g_signal_connect(G_OBJECT(dialog), "destroy", G_CALLBACK(element_button_dialog_destroyed_free_list), areas);
+    /* also remember that the button no longer has its own dialog open */
+    g_signal_connect(G_OBJECT(dialog), "destroy", G_CALLBACK(element_button_dialog_destroyed_null_pointer), button);
+
+
+	if (!stay_open) {
+	    gtk_widget_show_all(dialog);
+		gtk_dialog_run(GTK_DIALOG(dialog));
+		gtk_widget_destroy(dialog);
+	} else {
+		/* if it is a stay-open element box, add a button which (also) closes it */
+		GtkWidget *close_button;
+		
+		close_button=gtk_button_new_from_stock(GTK_STOCK_CLOSE);
+		gtk_box_pack_end(GTK_BOX(GTK_DIALOG(dialog)->action_area), close_button, FALSE, FALSE, 0);
+		g_signal_connect(G_OBJECT(close_button), "clicked", (GCallback) element_button_dialog_close_button_clicked, dialog);
+
+	    gtk_widget_show_all(dialog);
+		gtk_window_present_with_time(GTK_WINDOW(dialog), gtk_get_current_event_time());
+	}
 }
 
 GdElement
@@ -440,23 +511,109 @@ gd_element_button_update_pixbuf(GtkWidget *button)
 	gd_element_button_set(button, gd_element_button_get(button));
 }
 
+static void
+element_button_clicked_stay_open(GtkWidget *button, gpointer data)
+{
+	element_button_clicked_func(button, TRUE);
+}
+
+static void
+element_button_clicked_modal(GtkWidget *button, gpointer data)
+{
+	element_button_clicked_func(button, FALSE);
+}
+
+/* set the title of the window associated with this element button. */
+/* if the window is already open, also set the title there. */
+void
+gd_element_button_set_dialog_title(GtkWidget *button, const char *title)
+{
+	char *old_title;
+	GtkWidget *dialog;
+
+	/* get original title, and free if needed */	
+	old_title=g_object_get_data(G_OBJECT(button), GDASH_WINDOW_TITLE);
+	g_free(old_title);
+	/* remember new title */
+	g_object_set_data(G_OBJECT(button), GDASH_WINDOW_TITLE, title?g_strdup(title):g_strdup(_("Elements")));
+
+	/* if it has its own window open at the moment, also set it */	
+	dialog=g_object_get_data(G_OBJECT(button), GDASH_DIALOG);
+	if (dialog)
+		gtk_window_set_title(GTK_WINDOW(dialog), title);
+	
+}
+
+void
+gd_element_button_set_dialog_sensitive(GtkWidget *button, gboolean sens)
+{
+	GtkWidget *vbox;
+
+	vbox=g_object_get_data(G_OBJECT(button), GDASH_DIALOG_VBOX);
+	if (vbox)
+		gtk_widget_set_sensitive(vbox, sens);
+}
+
+static void
+element_button_destroyed(GtkWidget *button, gpointer data)
+{
+	char *title;
+	GtkWidget *dialog;
+	
+	title=g_object_get_data(G_OBJECT(button), GDASH_WINDOW_TITLE);
+	g_free(title);
+	/* if it has a dialog open for any reason, close that also */
+	dialog=g_object_get_data(G_OBJECT(button), GDASH_DIALOG);
+	if (dialog)
+		gtk_widget_destroy(dialog);
+}
+
 
 GtkWidget *
-gd_element_button_new (const GdElement initial_element)
+gd_element_button_new(GdElement initial_element, gboolean stays_open, const char *special_title)
 {
 	GtkWidget *button;
 
 	button=gtk_button_new();
+	g_signal_connect(G_OBJECT(button), "destroy", (GCallback) element_button_destroyed, NULL);
+	/* minimum width 128pix */
 	gtk_widget_set_size_request(button, 128, -1);
-	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(element_button_clicked), NULL);
+	if (stays_open)
+		g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(element_button_clicked_stay_open), NULL);
+	else
+		g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(element_button_clicked_modal), NULL);
+
+	/* set the associated string which will be the title of the element box window opened */
+	gd_element_button_set_dialog_title(button, special_title);
+
 	gd_element_button_set(button, initial_element);
 	gtk_button_set_alignment(GTK_BUTTON(button), 0, 0.5);
 	return button;
 }
 
+#undef GDASH_WINDOW_TITLE
+#undef GDASH_DIALOG_VBOX
+#undef GDASH_DIALOG
 #undef GDASH_CELL
 #undef GDASH_ELEMENT
 #undef GDASH_HOVER
+#undef GDASH_BUTTON
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 enum 
 {
@@ -520,6 +677,9 @@ gd_direction_combo_get(GtkWidget *combo)
 
 
 /*****************************************************/
+
+
+
 
 
 

@@ -25,11 +25,13 @@ extern const GdElement gd_crazylight_import_table[];
 typedef enum _gd_cavefile_format {
 	GD_FORMAT_UNKNOWN,	/* unknown format */
 	GD_FORMAT_BD1,	/* boulder dash 1 */
+	GD_FORMAT_BD1_ATARI,	/* boulder dash 1 atari version */
 	GD_FORMAT_DC1,	/* boulder dash 1, deluxe caves 1 extension - non-sloped brick wall. */
 	GD_FORMAT_BD2,	/* boulder dash 2 with rockford's extensions */
+	GD_FORMAT_BD2_ATARI,	/* boulder dash 2, atari version */
 	GD_FORMAT_PLC,	/* peter liepa construction kit */
+	GD_FORMAT_PLC_ATARI,	/* peter liepa construction kit, atari version */
 	GD_FORMAT_DLB,	/* no one's delight boulder dash */
-	GD_FORMAT_ATG,	/* atari game */
 	GD_FORMAT_CRLI,	/* crazy light construction kit */
 	GD_FORMAT_CRDR_7,	/* crazy dream 7 */
 	GD_FORMAT_CRDR_9,	/* crazy dream 9 - is a crli caveset with hardcoded mazes */

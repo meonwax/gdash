@@ -73,6 +73,9 @@ gboolean gd_use_bdcff_highscore=FALSE;
 #define SETTING_SHOW_NAME_OF_GAME "show_name_of_game"
 gboolean gd_show_name_of_game=TRUE;
 
+#define SETTING_PAL_EMU_SCANLINE_SHADE "pal_emu_scanline_shade"
+int gd_pal_emu_scanline_shade=85;
+
 /* sound settings */
 #define SETTING_SDL_SOUND "sdl_sound"
 gboolean gd_sdl_sound=TRUE;
@@ -147,21 +150,24 @@ void gd_settings_init_with_language()
 	bindtextdomain ("gtk20-properties", gd_system_data_dir);
 	bindtextdomain ("gtk20", gd_system_data_dir);
 	bindtextdomain ("glib20", gd_system_data_dir);
-	/* gdash strings */
-	bindtextdomain (PACKAGE, gd_system_data_dir);
 	bind_textdomain_codeset ("gtk20-properties", "UTF-8");
 	bind_textdomain_codeset ("gtk20", "UTF-8");
 	bind_textdomain_codeset ("glib20", "UTF-8");
+	/* gdash strings */
+	bindtextdomain (PACKAGE, gd_system_data_dir);
+	/* gtk always uses utf8, so convert translated strings to utf8 if needed */
+	bind_textdomain_codeset (PACKAGE, "UTF-8");
 #else
 	/* on linux, this is a defined, built-in string, $perfix/share/locale */
 	gd_system_data_dir=PKGDATADIR;
 	gd_system_caves_dir=PKGDATADIR;
 	/* and translated strings here. */
 	bindtextdomain (PACKAGE, LOCALEDIR);
+	bind_textdomain_codeset (PACKAGE, "UTF-8");
 #endif
 	gd_user_config_dir=g_build_path(G_DIR_SEPARATOR_S, g_get_user_config_dir(), PACKAGE, NULL);
-	/* gtk always uses utf8, so convert translated strings to utf8 if needed */
-	bind_textdomain_codeset (PACKAGE, "UTF-8");
+	
+	/* do not call textdomain() here. it is needed only for the gdash (gtk) version, not sdash (sdl) */
 }
 
 
@@ -227,6 +233,7 @@ gd_load_settings()
     gd_cell_scale_game=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_CELL_SCALE_GAME, gd_cell_scale_game);
     if (gd_cell_scale_game<0 || gd_cell_scale_game>=GD_SCALING_MAX)
     	gd_cell_scale_game=0;
+    gd_pal_emu_scanline_shade=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMU_SCANLINE_SHADE, gd_pal_emu_scanline_shade);
     gd_pal_emulation_game=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_GAME, gd_pal_emulation_game);
     gd_cell_scale_editor=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_CELL_SCALE_EDITOR, gd_cell_scale_editor);
     if (gd_cell_scale_editor<0 || gd_cell_scale_editor>=GD_SCALING_MAX)
@@ -267,6 +274,7 @@ gd_save_settings()
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_ALLOW_DIRT_MOD, gd_allow_dirt_mod);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_RANDOM_COLORS, gd_random_colors);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_GAME, gd_pal_emulation_game);
+    g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMU_SCANLINE_SHADE, gd_pal_emu_scanline_shade);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_PAL_EMULATION_EDITOR, gd_pal_emulation_editor);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_PREVIEW, gd_show_preview);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SHOW_NAME_OF_GAME, gd_show_name_of_game);

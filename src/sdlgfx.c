@@ -28,12 +28,12 @@
 #define GD_NUM_OF_CHARS 128
 
 /* these can't be larger than 127, or they mess up with utf8 coding */
-#define GD_UNKNOWN_CHAR 31
-#define GD_BACKSLASH_CHAR 64
-#define GD_TILDE_CHAR 95
-#define GD_UNDERSCORE_CHAR 100
-#define GD_OPEN_BRACKET_CHAR 27
-#define GD_CLOSE_BRACKET_CHAR 29
+#define UNKNOWN_CHAR_INDEX 31
+#define BACKSLASH_CHAR_INDEX 64
+#define TILDE_CHAR_INDEX 95
+#define UNDERSCORE_CHAR_INDEX 100
+#define OPEN_BRACKET_CHAR_INDEX 27
+#define CLOSE_BRACKET_CHAR_INDEX 29
 
 int gd_scale=1;	/* a graphics scale things which sets EVERYTHING. it is set with gd_sdl_init, and cannot be modified later. */
 int gd_scale_type=GD_SCALING_ORIGINAL;
@@ -1122,8 +1122,11 @@ gd_blittext_font(SDL_Surface *screen, SDL_Surface **font, int x1, int y, const c
 			x=x1;
 		} else {
 			/* it is a normal character */
-			if (c==GD_PLAYER_CHAR || c==GD_DIAMOND_CHAR || c==GD_KEY_CHAR)	/* special, by gdash */
+			if (c==GD_PLAYER_CHAR || c==GD_DIAMOND_CHAR)	/* special, by gdash */
 				i=c;
+			else
+			if (c==GD_KEY_CHAR)
+				i=92;
 			else
 			if (c=='@')
 				i=0;
@@ -1135,21 +1138,21 @@ gd_blittext_font(SDL_Surface *screen, SDL_Surface **font, int x1, int y, const c
 				i=c-'a'+1;
 			else
 			if (c=='\\')
-				i=GD_BACKSLASH_CHAR;
+				i=BACKSLASH_CHAR_INDEX;
 			else
 			if (c=='_')
-				i=GD_UNDERSCORE_CHAR;
+				i=UNDERSCORE_CHAR_INDEX;
 			else
 			if (c=='~')
-				i=GD_TILDE_CHAR;
+				i=TILDE_CHAR_INDEX;
 			else
 			if (c=='[')
-				i=GD_OPEN_BRACKET_CHAR;
+				i=OPEN_BRACKET_CHAR_INDEX;
 			else
 			if (c==']')
-				i=GD_CLOSE_BRACKET_CHAR;
+				i=CLOSE_BRACKET_CHAR_INDEX;
 			else
-				i=GD_UNKNOWN_CHAR;
+				i=UNKNOWN_CHAR_INDEX;
 			
 			destrect.x=x;
 			destrect.y=y;

@@ -1170,6 +1170,17 @@ gd_cave_new_rendered (const Cave *data, const int level, const guint32 seed)
 	cave->time=data->level_time[level];
 	cave->timevalue=data->level_timevalue[level];
 	cave->diamonds_needed=data->level_diamonds[level];
+	cave->magic_wall_time=data->level_magic_wall_time[level];
+	cave->slime_permeability=data->level_slime_permeability[level];
+	cave->slime_permeability_c64=data->level_slime_permeability_c64[level];
+	cave->time_bonus=data->level_bonus_time[level];
+	cave->time_penalty=data->level_penalty_time[level];
+	cave->amoeba_time=data->level_amoeba_time[level];
+	cave->amoeba_max_count=data->level_amoeba_threshold[level];
+	cave->amoeba_2_time=data->level_amoeba_2_time[level];
+	cave->amoeba_2_max_count=data->level_amoeba_2_threshold[level];
+	cave->hatching_delay_time=data->level_hatching_delay_time[level];
+	cave->hatching_delay_frame=data->level_hatching_delay_frame[level];
 
 	if (!cave->map) {
 		/* if we have no map, fill with predictable random generator. */
@@ -1231,6 +1242,13 @@ gd_cave_new_rendered (const Cave *data, const int level, const guint32 seed)
 		cave->rand_seed_2=0x1e;
 	}
 	
+	if (data->level_slime_seed_c64[level]!=-1) {
+		/* if a specific slime seed is requested, change it now. */
+		
+		cave->rand_seed_1=data->level_slime_seed_c64[level]/256;
+		cave->rand_seed_2=data->level_slime_seed_c64[level]%256;
+	}
+	
 	/* render cave objects above random data or map */
 	for (iter=data->objects; iter; iter=g_list_next (iter)) {
 		GdObject *object=(GdObject *)iter->data;
@@ -1246,6 +1264,8 @@ gd_cave_new_rendered (const Cave *data, const int level, const guint32 seed)
 		cave->speed=120;	/* delay loop based timing... set something for first iteration, then later it will be calculated */
 		cave->c64_timing=data->level_ckdelay[level];	/* this one may be used by iterate routine to calculate actual delay if c64scheduling is selected */
 	}
+	
+	gd_cave_correct_visible_size(cave);
 
 	return cave;
 }

@@ -32,7 +32,6 @@ typedef enum _gd_type {
 	/* not real types, only used by editor to build ui */
 	GD_TAB,
 	GD_LABEL,
-	GD_LEVEL_LABEL,
 	
 	/* gd types */
 	GD_TYPE_STRING,
@@ -51,6 +50,7 @@ enum _gd_property_flags {
 	GD_ALWAYS_SAVE=1<<0,
 	GD_DONT_SAVE=1<<1,
 	GD_DONT_SHOW_IN_EDITOR=1<<2,
+	GD_SHOW_LEVEL_LABEL=1<<3,
 };
 
 typedef struct {
@@ -75,7 +75,7 @@ typedef struct _gd_property_default {
 
 /* these define the number of the cells in the png file */
 #define NUM_OF_CELLS_X 8
-#define NUM_OF_CELLS_Y 36
+#define NUM_OF_CELLS_Y 38
 
 /* +64: placeholder for cells which are rendered by the game; for example diamond+arrow = falling diamond */
 #define NUM_OF_CELLS (NUM_OF_CELLS_X*NUM_OF_CELLS_Y+72)
@@ -140,10 +140,10 @@ typedef enum _element {
 	O_DIAMOND_F,
 	O_BLADDER_SPENDER,
 	O_INBOX,
-	O_H_GROWING_WALL,
-	O_V_GROWING_WALL,
-	O_GROWING_WALL,
-	O_GROWING_WALL_SWITCH,
+	O_H_EXPANDING_WALL,
+	O_V_EXPANDING_WALL,
+	O_EXPANDING_WALL,
+	O_EXPANDING_WALL_SWITCH,
 	O_CREATURE_SWITCH,
 	O_BITER_SWITCH,
 	O_ACID,
@@ -204,6 +204,7 @@ typedef enum _element {
 	O_WALLED_KEY_3,
 
 	O_AMOEBA,
+	O_AMOEBA_2,
 	O_SWEET,
 	O_VOODOO,
 	O_SLIME,
@@ -262,7 +263,11 @@ typedef enum _element {
 	O_BOMB_TICK_5,
 	O_BOMB_TICK_6,
 	O_BOMB_TICK_7,
-
+	
+	O_NITRO_PACK,
+	O_NITRO_PACK_F,
+	O_NITRO_PACK_EXPLODE,
+	
 	O_PRE_CLOCK_1,
 	O_PRE_CLOCK_2,
 	O_PRE_CLOCK_3,
@@ -293,6 +298,14 @@ typedef enum _element {
 	O_BOMB_EXPL_2,
 	O_BOMB_EXPL_3,
 	O_BOMB_EXPL_4,
+	O_NITRO_EXPL_1,
+	O_NITRO_EXPL_2,
+	O_NITRO_EXPL_3,
+	O_NITRO_EXPL_4,
+	O_AMOEBA_2_EXPL_1,
+	O_AMOEBA_2_EXPL_2,
+	O_AMOEBA_2_EXPL_3,
+	O_AMOEBA_2_EXPL_4,
 
 	/* these are used internally for the pneumatic hammer, and should not be used in the editor! */
 	/* (not even as an effect destination or something like that) */
@@ -300,7 +313,7 @@ typedef enum _element {
 	O_PLAYER_PNEUMATIC_RIGHT,
 	O_PNEUMATIC_ACTIVE_LEFT,
 	O_PNEUMATIC_ACTIVE_RIGHT,
-
+	
 	O_UNKNOWN,	/* unknown element imported or read from bdcff */
 	O_NONE,		/* do not draw this element when creating cave; can be used, for example, to skip drawing a maze's path */
 
@@ -317,8 +330,8 @@ typedef enum _element {
 	O_PLAYER_BLINK,
 	O_PLAYER_TAP_BLINK,
 	O_CREATURE_SWITCH_ON,
-	O_GROWING_WALL_SWITCH_HORIZ,
-	O_GROWING_WALL_SWITCH_VERT,
+	O_EXPANDING_WALL_SWITCH_HORIZ,
+	O_EXPANDING_WALL_SWITCH_VERT,
 	O_GRAVITY_SWITCH_ACTIVE,
 
 	O_QUESTION_MARK,
@@ -356,12 +369,13 @@ typedef enum _element_property {
 	P_EXPLODES_TO_SPACE = 1 << 7,			/* explodes if hit by a rock */
 	P_EXPLODES_TO_DIAMONDS = 1 << 8,/* explodes to diamonds if hit by a rock */
 	P_EXPLODES_TO_STONES = 1 << 9,		/* explodes to rocks if hit by a rock */
-	P_EXPLODES=P_EXPLODES_TO_SPACE|P_EXPLODES_TO_DIAMONDS|P_EXPLODES_TO_STONES,	/* explodes to something if hit */
+	P_EXPLODES_AS_NITRO = 1 << 10,		/* explodes as nitro pack */
+	P_EXPLODES=P_EXPLODES_TO_SPACE|P_EXPLODES_TO_DIAMONDS|P_EXPLODES_TO_STONES|P_EXPLODES_AS_NITRO,	/* explodes to something if hit */
 
-	P_NON_EXPLODABLE = 1 << 10,		/* selfexplaining */
-	P_CCW = 1 << 11,			/* this creature has a default counterclockwise rotation (for example, o_fire_1) */
-	P_CAN_BE_HAMMERED = 1 << 12,	/* can be broken by pneumatic hammer */
-	P_VISUAL_EFFECT = 1 << 13,
+	P_NON_EXPLODABLE = 1 << 11,		/* selfexplaining */
+	P_CCW = 1 << 12,			/* this creature has a default counterclockwise rotation (for example, o_fire_1) */
+	P_CAN_BE_HAMMERED = 1 << 13,	/* can be broken by pneumatic hammer */
+	P_VISUAL_EFFECT = 1 << 14,		/* if the element can use a visual effect. used to check consistency of the code */
 } GdElementProperties;
 
 
@@ -422,7 +436,8 @@ typedef enum _sound {
 
 	GD_S_STONE,
 	GD_S_FALLING_WALL,
-	GD_S_GROWING_WALL,
+	GD_S_EXPANDING_WALL,
+	GD_S_WALL_REAPPEAR,
 	GD_S_DIAMOND_RANDOM,	/* randomly select a diamond sound */
 	GD_S_DIAMOND_1,
 	GD_S_DIAMOND_2,
@@ -466,12 +481,13 @@ typedef enum _sound {
 	GD_S_BOMB_EXPLOSION,
 	GD_S_GHOST_EXPLOSION,
 	GD_S_VOODOO_EXPLOSION,
+	GD_S_NITRO_EXPLOSION,
 	GD_S_BOMB_PLACE,
 	GD_S_FINISHED,
 	GD_S_SWITCH_BITER,
 	GD_S_SWITCH_CREATURES,
 	GD_S_SWITCH_GRAVITY,
-	GD_S_SWITCH_GROWING,
+	GD_S_SWITCH_EXPANDING,
 
 	GD_S_AMOEBA,			/* loop */
 	GD_S_MAGIC_WALL,		/* loop */
@@ -572,6 +588,7 @@ typedef struct _cave {
 
 	gboolean active_is_first_found;	/* active player is the uppermost. */
 	gboolean lineshift;				/* true is line shifting emulation, false is perfect borders emulation */
+	gboolean border_scan_first_and_last;	/* if true, scans the first and last line of the border. false for plck */
 
 	GdElement initial_fill;
 	GdElement initial_border;
@@ -595,15 +612,28 @@ typedef struct _cave {
 	int diamond_value;			/* Score for a diamond. */
 	int extra_diamond_value;	/* Score for a diamond, when gate is open. */
 
-	int magic_wall_milling_time;	/* magic wall 'on' state for seconds */
+	int level_magic_wall_time[5];	/* magic wall 'on' state for each level (seconds) */
 	gboolean magic_wall_stops_amoeba;	/* Turning on magic wall changes amoeba to diamonds. Original BD: yes, constkit: no */
 	gboolean magic_timer_wait_for_hatching;	/* magic wall timer does not start before player's birth */
 	gboolean magic_wall_sound;	/* magic wall has sound */
 	
-	int amoeba_slow_growth_time;	/* Amoeba growing slow (low probability, default 3%) for seconds. After that, fast growth default (25%) */
+	int level_amoeba_time[5];		/* amoeba time for each level */
 	double amoeba_growth_prob;		/* Amoeba slow growth probability */
 	double amoeba_fast_growth_prob;	/* Amoeba fast growth probability */
-	int amoeba_threshold;			/* amoeba to stones ratio */
+	int level_amoeba_threshold[5];		/* amoeba turns to stones; if count is bigger than this (number of cells) */
+	GdElement enclosed_amoeba_to;	/* an enclosed amoeba converts to this element */
+	GdElement too_big_amoeba_to;	/* an amoeba grown too big converts to this element */
+
+	int level_amoeba_2_time[5];		/* amoeba time for each level */
+	double amoeba_2_growth_prob;		/* Amoeba slow growth probability */
+	double amoeba_2_fast_growth_prob;	/* Amoeba fast growth probability */
+	int level_amoeba_2_threshold[5];		/* amoeba turns to stones; if count is bigger than this (number of cells) */
+	GdElement enclosed_amoeba_2_to;	/* an enclosed amoeba converts to this element */
+	GdElement too_big_amoeba_2_to;	/* an amoeba grown too big converts to this element */
+	GdElement amoeba_2_looks_like;	/* an amoeba 2 looks like this element */
+	GdElement amoeba_2_explodes_to;	/* amoeba 2 explodes to element, when touched by amoeba1 */
+	gboolean amoeba_2_explodes_by_amoeba;	/* amoeba 2 will explode if touched by amoeba1 */
+
 	gboolean amoeba_timer_started_immediately;	/* FALSE: amoeba will start life at the first possibility of growing. */
 	gboolean amoeba_timer_wait_for_hatching;	/* amoeba timer does not start before player's birth */
 	gboolean amoeba_sound;			/* if the living amoeba has sound. */
@@ -613,18 +643,19 @@ typedef struct _cave {
 	gboolean acid_spread_sound;		/* acid has sound */
 	GdElement acid_turns_to;		/* whether acid converts to explosion on spreading or other */
 
-	double slime_permeability;		/* true random slime */
-	int slime_permeability_c64;		/* Appearing in bd 2 */
-	gboolean slime_predictable;		/* predictable random start for slime. yes for plck. */
+	double level_slime_permeability[5];		/* true random slime */
+	int level_slime_permeability_c64[5];	/* Appearing in bd 2 */
+	int level_slime_seed_c64[5];			/* predictable slime random seed */
+	gboolean slime_predictable;				/* predictable random start for slime. yes for plck. */
 	GdElement slime_eats_1, slime_converts_1;	/* slime eats element x and converts to element x; for example diamond -> falling diamond */
 	GdElement slime_eats_2, slime_converts_2;
 	gboolean slime_sound;			/* slime has sound */
 
-	int bonus_time;					/* bonus time for clock collected. */
-	int hatching_delay_frame;		/* Scan frames before Player's birth. */
-	int hatching_delay_time;		/* Scan frames before Player's birth. */
-
-	int penalty_time;				/* Time penalty when voodoo destroyed. */
+	int level_hatching_delay_frame[5];		/* Scan frames before Player's birth. */
+	int level_hatching_delay_time[5];		/* Scan frames before Player's birth. */
+	
+	int level_bonus_time[5];		/* bonus time for clock collected. */
+	int level_penalty_time[5];				/* Time penalty when voodoo destroyed. */
 	gboolean voodoo_collects_diamonds;	/* Voodoo can collect diamonds */
 	gboolean voodoo_dies_by_stone;		/* Voodoo can be killed by a falling stone */
 	gboolean voodoo_can_be_destroyed;	/* Voodoo can be destroyed by and explosion */
@@ -646,8 +677,6 @@ typedef struct _cave {
 	GdElement falling_diamond_to;	/* a falling diamond converts to this element */
 	GdElement bouncing_stone_to;	/* a bouncing stone converts to this element */
 	GdElement bouncing_diamond_to;	/* a bouncing diamond converts to this element */
-	GdElement enclosed_amoeba_to;	/* an enclosed amoeba converts to this element */
-	GdElement too_big_amoeba_to;	/* an amoeba grown too big converts to this element */
 
 	GdElement expanding_wall_looks_like;	/* an expanding wall looks like this element */
 	GdElement dirt_looks_like;			/* dirt looks like this element */
@@ -659,6 +688,7 @@ typedef struct _cave {
 
 	double pushing_stone_prob;		/* probability of pushing stone */
 	double pushing_stone_prob_sweet;	/* probability of pushing, after eating sweet */
+	gboolean mega_stones_pushable_with_sweet;	/* mega stones may be pushed with sweet */
 
 	gboolean creatures_backwards;	/* creatures changed direction */
 	gboolean creatures_direction_auto_change_on_start;	/* the change occurs also at the start signal */
@@ -693,6 +723,10 @@ typedef struct _cave {
 	int ckdelay_extra_for_animation;	/* bd1 and similar engines had animation bits in cave data, to set which elements to animate (firefly, butterfly, amoeba).
 											animating an element also caused some delay each frame; according to my measurements, around 2.6 ms/element. */
 
+	int hatching_delay_frame;
+	int hatching_delay_time;
+	int time_bonus;				/* bonus time for clock collected. */
+	int time_penalty;			/* Time penalty when voodoo destroyed. */
 	int time;					/* seconds remaining to finish cave */
 	int timevalue;				/* points for remaining seconds - for current level */
 	int diamonds_needed;		/* diamonds needed to open outbox */
@@ -700,20 +734,29 @@ typedef struct _cave {
 	int skeletons_collected;	/* number of skeletons collected */
 	int gate_open_flash;		/* flashing of screen when gate opens */
 	int score;					/* Score got this frame. */
+	int amoeba_time;			/* Amoeba growing slow (low probability, default 3%) for seconds. After that, fast growth default (25%) */
+	int amoeba_2_time;			/* Amoeba growing slow (low probability, default 3%) for seconds. After that, fast growth default (25%) */
 	gboolean amoeba_too_big;	/* Too much amoeba found, and amoeba will convert into stones next frame. */
 	gboolean amoeba_enclosed;		/* Amoeba closed, so will convert into diamonds next frame */
+	gboolean amoeba_started;		/* amoeba started. */
+	int amoeba_max_count;			/* selected amoeba threshold for this level */
+	gboolean amoeba_2_too_big;	/* Too much amoeba found, and amoeba will convert into stones next frame. */
+	gboolean amoeba_2_enclosed;		/* Amoeba closed, so will convert into diamonds next frame */
+	gboolean amoeba_2_started;		/* amoeba started. */
+	int amoeba_2_max_count;			/* selected amoeba threshold for this level */
+	int magic_wall_time;			/* magic wall 'on' state for seconds */
+	double slime_permeability;		/* true random slime */
+	int slime_permeability_c64;		/* Appearing in bd 2 */
 	GdMagicWallState magic_wall_state;		/* State of magic wall */
 	GdPlayerState player_state;		/* Player state. not yet living, living, exited... */
 	int player_seen_ago;			/* player was seen this number of scans ago */
 	gboolean kill_player;			/* Voodoo died, or used pressed escape to restart level. */
-	gboolean amoeba_started;		/* amoeba started. */
 	gboolean sweet_eaten;			/* player ate sweet, he's strong. prob_sweet applies, and also able to push chasing stones */
 	int player_x, player_y;			/* Coordinates of player (for scrolling) */
 	int px[16], py[16];				/* coordinates of player, for chasing stone */
 	int key1, key2, key3;			/* The player is holding this number of keys of each color */
 	gboolean diamond_key_collected;	/* Key collected, so trapped diamonds convert to diamonds */
-	gboolean expanding_wall_changed;	/* growing wall direction is changed */
-	int time_decrement;				/* time to subtract after destroying voodoo (time penalties converting to gravestones) */
+	gboolean expanding_wall_changed;	/* expanding wall direction is changed */
 
 	gboolean inbox_flash_toggle;	/* negated every scan. helps drawing inboxes, and making players be born at different times. */
 	GdDirection last_direction;		/* last direction player moved. used by draw routines */

@@ -1,6 +1,96 @@
 some notes about the internal workings of the original games.
 
 
+
+atari internals
+---------------
+
+Boulder dash 1 engine on atari:
+	first cave from 0x3528
+	second cave from 0x3559    delta=0x31
+	third from 35b2     delta=8a
+
+	CAVE POINTERS (relative to 0x3528) at 0x3500
+	
+	cave data:
+		$16     amoeba color		(couldn't set in c64 - so there unused)
+		$17		background color	(was always black in c64 - so there unused)
+
+
+Boulder dash 2 engine on atari:
+cavepointers at 0x86b0
+color pointers at 0x86d8
+
+colors: 5 bytes for each, color1, 2, 3, amoeba, background.
+
+
+
+
+construction kit: works the same way as on c64.
+caves from 0x7000
+
+in atari plck, slime and amoeba could not coexist in the same cave.
+if amoeba was used, the graphics turned to green, and data at 0x1e1 was set to 0xd4.
+if slime was used, graphics to blue, and data at 0x1e1 was set to 0x72.
+these two colors could not be changed in the editor at all.
+(maybe they could have been changed in a hex editor)
+
+
+looks like:
+	6FE0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+	6FF0: AB AB AB AB 4A 41 49 4C 2E 43 41 56 9B 20 20 20  ....JAIL.CAV.   
+	7000: 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44  DDDDDDDDDDDDDDDD
+	7010: 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44  DDDDDDDDDDDDDDDD
+	7020: 44 44 44 44 44 44 44 44 4E 77 77 77 77 77 77 77  DDDDDDDDNwwwwwww
+	7030: 77 77 77 77 77 77 77 77 77 77 77 74 47 77 77 77  wwwwwwwwwwwtGwww
+always there is the name before it.
+also 0xAB sequences seem to be fixed.
+
+
+
+if it has a selection table:
+	6030: E6 1E E8 18 69 34 9D E6 1E E8 C8 C0 08 D0 E6 A4  ....i4..........
+	6040: 66 60 4A 41 49 4C 20 20 20 20 2E 43 41 56 59 53  f.JAIL    .CAVYS
+	6050: 41 46 45 20 20 20 20 2E 43 41 56 59 52 41 49 4E  AFE    .CAVYRAIN
+	6060: 20 20 20 20 2E 43 41 56 59 45 53 43 41 50 41 44      .CAVYESCAPAD
+	6070: 45 2E 43 41 56 59 43 48 41 53 45 20 20 20 2E 49  E.CAVYCHASE   .I
+	6080: 4E 54 4E 52 45 53 43 55 45 20 20 2E 43 41 56 59  NTNRESCUE  .CAVY
+	6090: 47 59 52 4F 20 20 20 20 2E 43 41 56 59 50 55 53  GYRO    .CAVYPUS
+	60A0: 48 20 20 20 20 2E 43 41 56 59 52 41 4D 42 4F 20  H    .CAVYRAMBO 
+	60B0: 20 20 2E 43 41 56 59 44 52 4F 50 20 20 20 20 2E    .CAVYDROP    .
+0x604e+13*i = selectable 'Y' or not 'N'
+
+
+
+
+
+plck selection table
+--------------------
+cave selectable = 0x1e, stands for Y in petscii
+not selectable = 0x09, stands for N in petscii
+
+
+
+plck maps
+---------
+the top row is always stored.
+before that, there is a row filled with $44, steel walls.
+it is not used in any game, yet.
+the bottom row is always filled with steel wall, as
+LogicDeLuxe pointed out:
+.C:5dce   A9 07      LDA #$07
+.C:5dd0   A0 27      LDY #$27
+.C:5dd2   99 98 0B   STA $0B98,Y
+.C:5dd5   88         DEY
+.C:5dd6   10 FA      BPL $5DD2
+.C:5dd8   60         RTS
+
+
+dlp 1.55 is changed so it supports elements on the bottom row,
+too. the very first row (data[0..19]) is copied to the bottom row.
+
+
+
 crazy dream object codes
 ------------------------
 object code 6: copy x1 y1 width height

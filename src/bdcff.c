@@ -35,12 +35,16 @@ gboolean
 attrib_is_valid_for_cave(const char *attrib)
 {
 	int i;
-	
+
+	/* bdcff engine flag............ */
 	if (g_ascii_strcasecmp(attrib, "Engine")==0)
 		return TRUE;
+	/* old flags - for compatibility */
 	if (g_ascii_strcasecmp(attrib, "BD1Scheduling")==0)
 		return TRUE;
 	if (g_ascii_strcasecmp(attrib, "SnapExplosions")==0)
+		return TRUE;
+	if (g_ascii_strcasecmp(attrib, "AmoebaProperties")==0)
 		return TRUE;
 	
 	/* search in property database */
@@ -74,6 +78,7 @@ struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const cha
 	gboolean identifier_found;
 	int paramindex=0;
 	int i;
+	gboolean was_string;
 	
 	params=g_strsplit_set(param, " ", -1);
 	paramcount=g_strv_length(params);
@@ -81,6 +86,7 @@ struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const cha
 	
 	/* check all known tags. do not exit this loop if identifier_found==true...
 	   as there are more lines in the array which have the same identifier. */
+	was_string=FALSE;
 	for (i=0; prop_desc[i].identifier!=NULL; i++)
 		if (g_ascii_strcasecmp(prop_desc[i].identifier, attrib)==0) {
 			/* found the identifier */
@@ -91,18 +97,19 @@ struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const cha
 			GdScheduling *svalue=value;
 			gboolean *bvalue=value;
 			double *fvalue=value;
-			int j;
+			int j, k;
 
 			identifier_found=TRUE;
 			
 			if (prop_desc[i].type==GD_TYPE_STRING) {
 				/* strings are treated different, as occupy the whole length of the line */
 				gd_strcpy(value, param);
+				was_string=TRUE;	/* remember this to skip checking the number of parameters at the end of the function */
 				continue;
 			}
 
 			/* not a string, so use scanf calls */
-			/* ALSO, if no more parameters, skip */
+			/* ALSO, if no more parameters to process, exit loop */
 			for (j=0; j<prop_desc[i].count && params[paramindex]!=NULL; j++) {
 				gboolean success=FALSE;
 				gdouble res;
@@ -113,11 +120,10 @@ struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const cha
 					/* handled above */
 				case GD_TAB:
 				case GD_LABEL:
-				case GD_LEVEL_LABEL:
 					/* do nothing */
 					break;
 				case GD_TYPE_BOOLEAN:
-					success=sscanf(params[paramindex], "%d", bvalue+j)==1;
+					success=sscanf(params[paramindex], "%d", &bvalue[j])==1;
 					if (!success) {
 						if (g_ascii_strcasecmp(params[paramindex], "true")==0 || g_ascii_strcasecmp(params[paramindex], "on")==0 || g_ascii_strcasecmp(params[paramindex], "yes")==0) {
 							bvalue[j]=TRUE;
@@ -128,36 +134,56 @@ struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const cha
 							success=TRUE;
 						}
 					}
+					/* if we are processing an array, fill other values with these. if there are other values specified,
+					   those will be overwritten. */
+					if (success)
+						for (k=j+1; k<prop_desc[i].count; k++)
+							bvalue[k]=bvalue[j];
 					break;
 				case GD_TYPE_INT:
-					success=sscanf (params[paramindex], "%d", ivalue+j)==1;
+					success=sscanf(params[paramindex], "%d", &ivalue[j])==1;
+					if (success)
+						/* copy to other if array */
+						for (k=j+1; k<prop_desc[i].count; k++)
+							ivalue[k]=ivalue[j];
 					break;
 				case GD_TYPE_PROBABILITY:
 					res=g_ascii_strtod (params[paramindex], NULL);
 					if (errno==0 && res >= 0 && res <= 1) {
-						fvalue[j]=res;
+						/* fill all remaining items in array - may be only one */
+						for (k=j; k<prop_desc[i].count; k++)
+							fvalue[k]=res;
 						success=TRUE;
 					}
 					break;
 				case GD_TYPE_RATIO:
 					res=g_ascii_strtod (params[paramindex], NULL);
 					if (errno==0 && res >= 0 && res <= 1) {
-						ivalue[j]=(int)(res*ratio+0.5);
+						for (k=j; k<prop_desc[i].count; k++)
+							ivalue[k]=(int)(res*ratio+0.5);
 						success=TRUE;
 					}
 					break;
 				case GD_TYPE_ELEMENT:
 					evalue[j]=gd_get_element_from_string (params[paramindex]);
+					/* copy to all remaining elements in array */
+					for (k=j+1; k<prop_desc[i].count; k++)
+						evalue[k]=evalue[j];
 					success=TRUE;	/* this shows error message on its own, do treat as always succeeded */
 					break;
 				case GD_TYPE_DIRECTION:
 					dvalue[j]=gd_direction_from_string(params[paramindex]);
+					/* copy to all remaining items in array */
+					for (k=j+1; k<prop_desc[i].count; k++)
+						dvalue[k]=dvalue[j];
 					success=TRUE;
 					break;
 				case GD_TYPE_SCHEDULING:
 					for (n=0; n<GD_SCHEDULING_MAX; n++)
 						if (g_ascii_strcasecmp(params[paramindex], gd_scheduling_filename[n])==0) {
-							svalue[j]=(GdScheduling)n;
+							/* copy to all remaining items in array */
+							for (k=j; k<prop_desc[i].count; k++)
+								svalue[k]=(GdScheduling)n;
 							success=TRUE;
 						}
 					break;
@@ -167,12 +193,14 @@ struct_set_property(gpointer str, const GdStructDescriptor *prop_desc, const cha
 					break;
 				}
 
-				if (!success)
-					g_warning("invalid parameter '%s' for attribute %s", params[paramindex], attrib);
+				if (success)
+					paramindex++;	/* go to next parameter to process */
 				else
-					paramindex++;
+					g_warning("invalid parameter '%s' for attribute %s", params[paramindex], attrib);
 			}
 		}
+	if (!was_string && paramindex<paramcount)
+		g_warning("excess parameters for attribute '%s': '%s'", attrib, params[paramindex]);
 	g_strfreev(params);
 	
 	return identifier_found;
@@ -231,6 +259,18 @@ cave_process_tags_func(const char *attrib, const char *param, Cave *cave)
 			g_warning(_("invalid parameter \"%s\" for attribute %s"), param, attrib);
 		else
 			gd_cave_set_engine_defaults(cave, engine);
+	}
+	else
+	/* compatibility with old AmoebaProperties flag */
+	if (g_ascii_strcasecmp(attrib, "AmoebaProperties")==0) {
+		GdElement elem1=O_STONE, elem2=O_DIAMOND;
+
+		identifier_found=TRUE;
+		elem1=gd_get_element_from_string(params[0]);
+		elem2=gd_get_element_from_string(params[1]);
+		cave->too_big_amoeba_to=elem1;
+		cave->enclosed_amoeba_to=elem2;
+		
 	}
 	else
 	/* colors attribute is a mess, have to process explicitly */
@@ -800,11 +840,7 @@ gd_caveset_load_from_bdcff(const char *contents)
 	if (!g_str_equal(version_read, BDCFF_VERSION))
 		g_warning("BDCFF version %s, loaded caveset may have errors.", version_read);
 
-	/* newly loaded file is not edited. */
-	gd_caveset_edited=FALSE;
-	/* if there was some error message */
-	if (gd_has_new_error())
-		g_warning("The BDCFF file contained errors.");
+	/* if there was some error message - return fail */
 	return !gd_has_new_error();
 }
 
@@ -867,7 +903,7 @@ save_properties(GPtrArray *out, gpointer str, gpointer str_def, const GdStructDe
 	for (i=0; prop_desc[i].identifier!=NULL; i++) {
 		gpointer value, default_value;
 
-		if (prop_desc[i].type==GD_TAB || prop_desc[i].type==GD_LABEL || prop_desc[i].type==GD_LEVEL_LABEL)
+		if (prop_desc[i].type==GD_TAB || prop_desc[i].type==GD_LABEL)
 			/* used only by the gui */
 			continue;
 		
@@ -875,9 +911,6 @@ save_properties(GPtrArray *out, gpointer str, gpointer str_def, const GdStructDe
 		if (prop_desc[i].flags & GD_DONT_SAVE)
 			continue;
 			
-		if (prop_desc[i].flags & GD_ALWAYS_SAVE)
-			should_write=TRUE;
-
 		/* string data */
 		/* write together with identifier, as one string per line. */
 		if (prop_desc[i].type==GD_TYPE_STRING) {
@@ -888,7 +921,6 @@ save_properties(GPtrArray *out, gpointer str, gpointer str_def, const GdStructDe
 				g_ptr_array_add(out, g_strdup_printf("%s=%s", prop_desc[i].identifier, value));
 			continue;
 		}
-		
 
 		/* if identifier differs from the previous, write out the line collected, and start a new one */
 		if (!identifier || strcmp(prop_desc[i].identifier, identifier)!=0) {
@@ -907,6 +939,10 @@ save_properties(GPtrArray *out, gpointer str, gpointer str_def, const GdStructDe
 			/* remember identifier */
 			identifier=prop_desc[i].identifier;
 		}
+
+		/* if we always save this identifier, remember now */
+		if (prop_desc[i].flags & GD_ALWAYS_SAVE)
+			should_write=TRUE;
 
 		value=G_STRUCT_MEMBER_P(str, prop_desc[i].offset);
 		default_value=G_STRUCT_MEMBER_P(str_def, prop_desc[i].offset);
@@ -962,11 +998,12 @@ save_properties(GPtrArray *out, gpointer str, gpointer str_def, const GdStructDe
 					should_write=TRUE;
 				break;
 			case GD_TYPE_SCHEDULING:
-				g_assert_not_reached();
+				g_string_append_printf(line, "%s", gd_scheduling_filename[((GdScheduling *) value)[j]]);
+				if (((GdScheduling *) value)[j]!=((GdScheduling *) default_value)[j])
+					should_write=TRUE;
 				break;
 			case GD_TAB:
 			case GD_LABEL:
-			case GD_LEVEL_LABEL:
 			case GD_TYPE_STRING:
 				break;
 			}
@@ -979,6 +1016,29 @@ save_properties(GPtrArray *out, gpointer str, gpointer str_def, const GdStructDe
 	g_string_free(line, TRUE);
 }
 
+/* remove a line from the list of strings. */
+/* the prefix should be a property; add an equal sign! so properties which have names like
+   "slime" and "slimeproperties" won't match each other. */
+static void
+cave_properties_remove(GPtrArray *out, const char *prefix)
+{
+	int i;
+	
+	g_assert(g_str_has_suffix(prefix, "="));
+	
+	/* search for strings which match, and set them to NULL. */
+	/* also free them. */
+	for (i=0; i<out->len; i++) {
+		if (g_str_has_prefix(g_ptr_array_index(out, i), prefix)) {
+			g_free(g_ptr_array_index(out, i));
+			g_ptr_array_index(out, i)=NULL;
+		}
+	}
+	
+	/* remove all "null" occurrences */
+	while (g_ptr_array_remove(out, NULL)) ;
+}
+
 /* output properties of a structure to a file. */
 /* g_list_foreach func, so "out" is the last parameter! */
 static void
@@ -986,6 +1046,8 @@ caveset_save_cave_func (Cave *cave, GPtrArray *out)
 {
 	Cave *default_cave;
 	GString *line;	/* used for various purposes */
+	GPtrArray *this_out;
+	int i;
 
 	line=g_string_new(NULL);
 	
@@ -993,33 +1055,31 @@ caveset_save_cave_func (Cave *cave, GPtrArray *out)
 	g_ptr_array_add(out, g_strdup("[cave]"));
 	write_highscore_func(out, cave->highscore);
 	
+	/* first add the properties to a local ptr array. */
+	/* later, some are deleted (slime permeability, for example) - this is needed because of the inconsistencies of the bdcff. */
+	/* finally, remaining will be added to the normal "out" array. */
+	this_out=g_ptr_array_new();
+	
 	default_cave=gd_cave_new();
-	save_properties(out, cave, default_cave, gd_cave_properties, cave->w*cave->h);
+	save_properties(this_out, cave, default_cave, gd_cave_properties, cave->w*cave->h);
 	gd_cave_free(default_cave);
 	
-
-	/* properties which are handled explicitly. these cannot be handled with the loop above,
+	/* properties which are handled explicitly. these cannot be handled easily above,
 	   as they have some special meaning. for example, slime_permeability=x sets permeability to
-	   x, and sets predictable to false. bdcff format is simply inconsistent in these aspects.
-	   */
-	/* slime permeability is always set explicitly, as it also sets predictability. */
-	if (!cave->slime_predictable) {
-		char buf[G_ASCII_DTOSTR_BUF_SIZE];
-		
-		g_ascii_formatd (buf, sizeof (buf), "%6.4f", cave->slime_permeability);
-		g_ptr_array_add(out, g_strdup_printf("SlimePermeability=%s", buf));
-	}
-	else
-		g_ptr_array_add(out, g_strdup_printf("SlimePermeabilityC64=%d", cave->slime_permeability_c64));
+	   x, and sets predictable to false. bdcff format is simply inconsistent in these aspects. */
 
-	/* same for cavedelay and frametime */
-	if (cave->scheduling==GD_SCHEDULING_MILLISECONDS)
-		g_ptr_array_add(out, g_strdup_printf("FrameTime=%d %d %d %d %d", cave->level_speed[0], cave->level_speed[1], cave->level_speed[2], cave->level_speed[3], cave->level_speed[4]));
-	else {
-		g_ptr_array_add(out, g_strdup_printf("CaveDelay=%d %d %d %d %d", cave->level_ckdelay[0], cave->level_ckdelay[1], cave->level_ckdelay[2], cave->level_ckdelay[3], cave->level_ckdelay[4]));
-		if (cave->scheduling!=GD_SCHEDULING_PLCK) /* plck is the default, if not milliseconds */
-			g_ptr_array_add(out, g_strdup_printf("CaveScheduling=%s", gd_scheduling_filename[cave->scheduling]));
-	}
+	/* slime permeability is always set explicitly, as it also sets predictability. */
+	if (cave->slime_predictable)
+		/* if slime is predictable, remove permeab. flag, as that would imply unpredictable slime. */
+		cave_properties_remove(this_out, "SlimePermeability=");
+	else
+		/* if slime is UNpredictable, remove permeabc64 flag, as that would imply predictable slime. */
+		cave_properties_remove(this_out, "SlimePermeabilityC64=");
+	
+	/* add tags to output, and free local array */
+	for (i=0; i<this_out->len; i++)
+		g_ptr_array_add(out, g_ptr_array_index(this_out, i));
+	g_ptr_array_free(this_out, TRUE);
 
 	/* save unknown tags as they are */
 	if (cave->tags) {

@@ -58,6 +58,7 @@ extern gboolean gd_use_bdcff_highscore;
 extern gboolean gd_show_name_of_game;
 extern GdScalingType gd_cell_scale_game;
 extern gboolean gd_pal_emulation_game;
+extern int gd_pal_emu_scanline_shade;		/* in percent */
 extern GdScalingType gd_cell_scale_editor;
 extern gboolean gd_pal_emulation_editor;
 extern char *gd_theme;

@@ -21,9 +21,12 @@
 static const char *s_bd1="GDashBD1";
 static const char *s_bd2="GDashBD2";
 static const char *s_plc="GDashPLC";
+static const char *s_pca="GDashPCA";
 static const char *s_crl="GDashCRL";
 static const char *s_cd7="GDashCD7";
 static const char *s_1st="GDash1ST";
+static const char *s_b1a="GDashB1A";	/* boulder dash 1, atari version */
+static const char *s_b2a="GDashB2A";	/* boulder dash 2, atari version */
 
 /* loaded memory map */
 static unsigned char memory[65536];
@@ -79,63 +82,94 @@ static int loadfile(const char *filename)
 		fclose(fin);
 		return 1;
 	} else {
+		int filesize;
+		
 		/* image map */
 		/* check size */
 		fseek(fin, 0, SEEK_END);
-		if (ftell(fin)!=65536+2) {
-			fclose(fin);
-			printf("Memory map file should be 65536+2 bytes long.\n");
-			return 0;
-		}
+		filesize=ftell(fin);
 		fseek(fin, 0, SEEK_SET);
 		
-		/* check start address */
-		if (fgetc(fin)!=0 || fgetc(fin)!=0) {
+		/* 65538 bytes: we hope that this is a full-memory map saved by vice. check it. */
+		if (filesize==65538) {
+			/* check start address */
+			if (fgetc(fin)!=0 || fgetc(fin)!=0) {
+				fclose(fin);
+				printf("Memory map should begin from address 0000.\n");
+				printf("Use save \"filename\" 0 0000 ffff in vice monitor.\n");
+				return 0;
+			}
+			
+			readbytes=fread(memory, 1, 65536, fin);
+			if (readbytes!=65536) {
+				fclose(fin);
+				printf("Could not read 65536 bytes\n.\n");
+				return 0;
+			}
+			
+			printf("%s looks like a proper vice memory map.\n", filename);
 			fclose(fin);
-			printf("Memory map should begin from address 0000.\n");
+			return 1;
+		} else
+		/* or maybe a 64k map saved by atari800. read it. */
+		if (filesize==65536) {
+			readbytes=fread(memory, 1, 65536, fin);
+			if (readbytes!=65536) {
+				fclose(fin);
+				printf("Could not read 65536 bytes\n.\n");
+				return 0;
+			}
+			
+			printf("%s lookslike a proper atari800 memory map.\n", filename);
+			fclose(fin);
+			return 1;
+		} else {
+			/* if not 65536, not 65538: report error. */
+			fclose(fin);
+			printf("Memory map file should be 65536+2 bytes long or 65536 bytes long.\n");
 			printf("Use save \"filename\" 0 0000 ffff in vice monitor.\n");
+			printf("Use write 0000 ffff filename in atari800 monitor.\n");
 			return 0;
 		}
 		
-		readbytes=fread(memory, 1, 65536, fin);
-		if (readbytes!=65536) {
-			fclose(fin);
-			printf("Could not read 65536 bytes\n.\n");
-			return 0;
-		}
-		
-		printf("%s is a proper memory map.\n", filename);
-		fclose(fin);
-		return 1;
+		assert(0);
+		return 0;
 	}
 }
 
 
 /* save bd1 caves from memory map */
-static int try_bd1()
+/* atari: a boolean value, true if try atari map. */
+static int try_bd1(int atari)
 {
 	int i;
+	/* there are cave pointers at 0x5806. two byte entries pointing to caves. */
+	/* their value is relative to 0x582e. */
+	/* atari values are 3500 and 3528. */
+	int cavepointers=atari?0x3500:0x5806;
+	int cavestart=atari?0x3528:0x582e;
 
-	strcpy((char *)out, s_bd1);
+	strcpy((char *)out, atari?s_b1a:s_bd1);
 	outpos=12;
 	printf("\n*** Trying to interpret BD1(e) caves...\n");
 
 	/* try to autodetect */
-	/* there are cave pointers at 0x5806. two byte entries pointing to caves. */
-	/* their value is relative to 0x582e. */
-	/* first assumption: first cave starts at 582e, so pointer is 0000 */
-	if (memory[0x5f3a]!=0x44 || memory[0x5f3b]!=0x44 || memory[0x5f3c]!=0x48 || memory[0x5f3d]!=0x48) {
-		printf("Assumptions failed for BD1(e).\n");
-		return 0;
+
+	/* fixme what is this? */
+	if (!atari) {
+		if (memory[0x5f3a]!=0x44 || memory[0x5f3b]!=0x44 || memory[0x5f3c]!=0x48 || memory[0x5f3d]!=0x48) {
+			printf("Assumptions failed for BD1(e).\n");
+			return 0;
+		}
 	}
-	
+		
 	/* 4*5 (4 groups * 5 caves (4cave+1intermission)) */
 	for (i=0; i<4*5; i++) {
 		int lo, hi, j, pos, start;
 		
-		lo=memory[0x5806+i*2];
-		hi=memory[0x5806+i*2+1];
-		start=pos=hi*256+lo+0x582e;
+		lo=memory[cavepointers+i*2];
+		hi=memory[cavepointers+i*2+1];
+		start=pos=hi*256+lo+cavestart;
 		if (pos>(0xffff-0x0400)) {
 			printf("Cannot interpret memory contents as BD1(e) -- invalid cave pointer.\n");
 			return 0;
@@ -201,7 +235,7 @@ static int try_bd1()
 }
 
 
-/* save plck caves from memory map */
+/* save plck caves from c64 memory map */
 static int try_plck()
 {
 	int x, i;
@@ -241,20 +275,27 @@ static int try_plck()
 		return 0;
 	}
 
-	/* check selection table. 0x19=selectable; 0x0e=nonselect, 0x00=nonpresent. */
 	printf(has_names?"PLCK caves have names.\n":"PLCK caves have no names.\n");
 	
 	i=0;
 	/* while present and (selectable or nonselectable)   <- find any valid byte in cave selection table. */
 	while ((!has_names && (memory[0x5e8b+i]!=0 && (memory[0x5e8b+i]==0x0e || memory[0x5e8b+i]==0x19)))
 			|| (has_names && (memory[0x5e8b+i*13+12]!=0 && (memory[0x5e8b+i*13+12]==0x0e || memory[0x5e8b+i*13+12]==0x19)))) {
-		int j, pos;
+		int j, pos, zero;
 		
 		pos=0x7000+0x200*i;
+		
+		/* check if memory is not filled with zeroes. */
+		zero=1;
+		for (j=0; j<512 && zero; j++)
+			if (memory[pos+j]!=0)
+				zero=0;
+		if (zero)
+			break;
 
 		/* check for error */
 		if (i>71) {
-			/* bd1 caves cannot be this long */
+			/* caves cannot be this long */
 			printf("Data corrupt or detection failed for plck caves -- too many caves.\n");
 			return 0;
 		}
@@ -365,6 +406,128 @@ static int try_plck()
 	}
 	return 1;
 }
+
+
+
+/* save plck caves from atari memory map */
+static int try_atari_plck()
+{
+	int x, i;
+	int ok;
+	int has_diego=0;
+	int has_selection;
+	
+	strcpy((char *)out, s_pca);
+	outpos=12;
+	printf("\n*** Trying to interpret Atari PLCK caves...\n");
+	/* try plck */
+	ok=0;
+
+	/* try to detect the cave selection table. assume there are at least 5 caves. */
+	/* example:
+		6040: 66 60 4A 41 49 4C 20 20 20 20 2E 43 41 56 59 53  f.JAIL    .CAVYS
+		6050: 41 46 45 20 20 20 20 2E 43 41 56 59 52 41 49 4E  AFE    .CAVYRAIN
+		6060: 20 20 20 20 2E 43 41 56 59 45 53 43 41 50 41 44      .CAVYESCAPAD
+		6070: 45 2E 43 41 56 59 43 48 41 53 45 20 20 20 2E 49  E.CAVYCHASE   .I
+		6080: 4E 54 4E 52 45 53 43 55 45 20 20 2E 43 41 56 59  NTNRESCUE  .CAVY
+		we detect the Y's and N's after CAV or INT
+	*/
+	
+	/* caves are preceded with $ab $ab $ab $ab CAVENAME */
+	/*
+		6FF0: AB AB AB AB 4A 41 49 4C 2E 43 41 56 9B 20 20 20  ....JAIL.CAV.   
+		7000: 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44  DDDDDDDDDDDDDDDD
+		7010: 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44  DDDDDDDDDDDDDDDD
+	*/
+	/* try to detect this; assume at least 5 caves. */
+	ok=0;
+	for (x=0; x<5; x++) {
+		int pos=0x6ff0 + x*0x200;
+		if (memory[pos]==0xAB && memory[pos+1]==0xAB && memory[pos+2]==0xAB && memory[pos+3]==0xAB)
+			ok++;
+	}
+	if (ok!=5) {
+		printf("Assumptions failed for Atari PLCK - could not find $ab $ab $ab $ab before caves.\n");
+		return 0;
+	}
+	
+	/* check if it has a selection table */
+	ok=0;
+	for (x=0; x<5; x++) {
+		if (memory[0x604e + x*13]=='Y' || memory[0x604e + x*13]=='N')
+			ok++;
+	}
+	has_selection=(ok==5);
+	if (has_selection)
+		printf("Found selection table.\n");
+
+
+
+
+	i=0;
+	/* detect caves by $ab bytes before them */
+	while (memory[0x6ff0+i*0x200]==0xAB && memory[0x6ff1+i*0x200]==0xAB && memory[0x6ff2+i*0x200]==0xAB && memory[0x6ff3+i*0x200]==0xAB) {
+		int j, pos;
+		int selectable;
+		
+		pos=0x7000+0x200*i;
+		if (has_selection)
+			selectable=memory[0x604e + i*13]=='Y';
+		else
+			/* has no selection table... we make intermissions unselectable. */
+			selectable=memory[pos + 0x1da]==0;
+
+		/* check for error */
+		if (i>71) {
+			/* caves cannot be this long */
+			printf("Data corrupt or detection failed for plck caves -- too many caves.\n");
+			return 0;
+		}
+		
+		printf("Cave %d, addr: %04x, sel: %d", i+1, pos, selectable);
+		if (memory[pos+0x1e5]==0x20 && memory[pos+0x1e6]==0x90 && memory[pos+0x1e7]==0x46) {
+			printf("- has diego effects.");
+			has_diego=1;
+		}
+		printf("\n");
+		
+		/* copy 1f0 bytes for cave */
+		for (j=0; j<0x1f0; ++j)
+			out[outpos++]=memory[pos++];
+
+		/* and fill the rest with our own data. this way we stay compatible, as cave was always 1f0 bytes */
+		/* we have to stay compatible with c64 plck import routine above. */
+		/* so we use 0x19 for selectable caves, 0x0e for nonselectable. */
+		out[outpos++]=selectable?0x19:0x0e;
+		out[outpos++]=(selectable?0x19:0x0e)+1;	/* save twice, add +1 for second for detection in gdash */
+		/* copy cave name, which is:
+			6FE0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+			6FF0: AB AB AB AB 4A 41 49 4C 2E 43 41 56 9B 20 20 20  ....JAIL.CAV.   		... cave name
+			7000: 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44  DDDDDDDDDDDDDDDD		... cave data
+			7010: 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44  DDDDDDDDDDDDDDDD
+			7020: 44 44 44 44 44 44 44 44 4E 77 77 77 77 77 77 77  DDDDDDDDNwwwwwww
+		*/
+
+		pos=0x7000+0x200*i;
+		for (j=0; j<12; j++) {
+			unsigned char c=memory[pos-0x10+4+j];
+		
+			/* somehow this character set the end-of-string in atari version */
+			if (c==0x9b)
+				c=0x20;
+			out[outpos++]=c;
+		}
+		out[outpos++]=0;	/* fill the rest with zero */
+		out[outpos++]=0;
+
+        i++;
+    }
+	printf("Found %d PLCK caves in %d bytes!\n", i, outpos);
+	
+	return 1;
+}
+
+
 
 /* save crazy light caves from memory map */
 static int try_crli()
@@ -662,6 +825,151 @@ static int try_bd2()
 }
 
 
+
+/* save bd2 caves from memory map */
+static int try_bd2_atari()
+{
+	const int cavepointers=0x86b0;
+	const int cavecolors=0x86d8;
+	int i;
+	int unsupported=0, uns[256];
+
+	/* 256 counters for the 256 possible bytes (8bit). mark each unsupported extension found. */
+	/* if more than 5 types found, bail out with error */
+	for (i=0; i<256; ++i)
+		uns[i]=0;
+		
+	strcpy((char *)out, s_b2a);
+	outpos=12;
+	printf("\n*** Trying to interpret Atari BD2 caves...\n");
+	
+	/* 4*5 (4 groups * 5 caves (4cave+1intermission)) */
+	for (i=0; i<4*5; i++) {
+		int lo, hi, j, pos, start;
+		int amount, n, mappos;
+		
+		lo=cavepointers+i*2;
+		hi=cavepointers+i*2+1;
+		start=pos=memory[hi]*256L+memory[lo];
+		if (pos> (0xffff-0x0400)) {
+			printf("Cannot interpret memory contents as BD2 -- invalid cave pointer.\n");
+			return 0;
+		}
+		if (i<16)
+			printf("Cave %c, addr: %04x\n", i+'A', pos);
+		else
+			printf("Intermission %d, addr: %04x\n", i-15, pos);
+		
+		/* copy */
+		/* first bytes: cave options */
+		for (j=0; j<=0x19; j++)
+			out[outpos++]=memory[pos++];			/* cave options */
+
+		j=memory[pos++];
+		while (j!=0xFF) { /* végét jelenti; de kiírtuk ezt is */
+			if (pos-start > 0x400) {
+				/* bd1 caves cannot be this long */
+				printf("Data corrupt or detection failed for bd2 caves -- cave data too long.\n");
+				return 0;
+			}
+			out[outpos++]=j;
+			switch (j) {
+				case 0: /* line */
+					out[outpos++]=memory[pos++];	/* obj */
+					out[outpos++]=memory[pos++];	/* y */
+					out[outpos++]=memory[pos++];	/* x */
+					out[outpos++]=memory[pos++];	/* dir */
+					out[outpos++]=memory[pos++];	/* len */
+					break;
+				case 1: /* rectangle (outline) */
+					out[outpos++]=memory[pos++];	/* obj */
+					out[outpos++]=memory[pos++];	/* y */
+					out[outpos++]=memory[pos++];	/* x */
+					out[outpos++]=memory[pos++];	/* h */
+					out[outpos++]=memory[pos++];	/* w */
+					break;
+				case 2: /* fillrect */
+					out[outpos++]=memory[pos++];	/* obj */
+					out[outpos++]=memory[pos++];	/* y */
+					out[outpos++]=memory[pos++];	/* x */
+					out[outpos++]=memory[pos++];	/* h */
+					out[outpos++]=memory[pos++];	/* w */
+					out[outpos++]=memory[pos++];	/* fillobj */
+					break;
+				case 3: /* point */
+					out[outpos++]=memory[pos++];	/* obj */
+					out[outpos++]=memory[pos++];	/* y */
+					out[outpos++]=memory[pos++];	/* x */
+					break;
+				case 4: /* raster */
+					out[outpos++]=memory[pos++];	/* obj */
+					out[outpos++]=memory[pos++];	/* y */
+					out[outpos++]=memory[pos++];	/* x */
+					out[outpos++]=memory[pos++];	/* h */
+					out[outpos++]=memory[pos++];	/* w */
+					out[outpos++]=memory[pos++];	/* dy */
+					out[outpos++]=memory[pos++];	/* dx */
+					break;
+				case 5: /* profi boulder extension: bitmap */
+					out[outpos++]=memory[pos++];	/* obj */
+					amount=memory[pos++];
+					out[outpos++]=amount;	/* amount */
+					out[outpos++]=memory[pos++];	/* target msb */
+					out[outpos++]=memory[pos++];	/* target lsb */
+					for (n=0; n<amount; ++n)
+						out[outpos++]=memory[pos++];	/* data */
+					break;
+				case 6: /* join */
+					out[outpos++]=memory[pos++];	/* add to this */
+					out[outpos++]=memory[pos++];	/* add this */
+					out[outpos++]=memory[pos++];	/* dy*40+dx */
+					break;
+				case 7: /* slime permeabilty */
+					out[outpos++]=memory[pos++];	/* perm */
+					break;
+				case 9:	/* profi boulder extension: plck map */
+					lo=memory[pos++];
+					hi=memory[pos++];
+					mappos=hi*256+lo;
+					out[outpos++]=memory[pos++];	/* inbox y */
+					out[outpos++]=memory[pos++];	/* inbox x */
+					for (n=0; n<40*(22-2)/2; n++)	/* 40*20 caves, upper and lower row not contained, 1byte/2 elements */
+						out[outpos++]=memory[mappos+n];
+					break;
+				default: 
+					if (uns[j]==0) {
+						/* not seen this extension previously */
+						printf("  Found unsupported bd2 extension n.%d\n", j);	
+						unsupported++;
+						uns[j]=1;	/* mark the newly found unknown extension */
+					}
+					if (unsupported>5) {
+						/* found to many unsupported extensions - this can't be bd2 */
+						printf("Data corrupt or detection failed for bd2 caves --\n too many unknown extensions.\n");
+						return 0;
+					}
+					break;
+			}
+			j=memory[pos++];	/* read next */
+		}
+		out[outpos++]=j; /* closing 0xff */
+		out[outpos++]=memory[pos++];	/* animation bits */
+
+		/* color table */
+		lo=cavecolors+i*2;
+		hi=cavecolors+i*2+1;
+		pos=memory[hi]*256L+memory[lo];	/* pointer to the three colors */
+		out[outpos++]=memory[pos++];
+		out[outpos++]=memory[pos++];
+		out[outpos++]=memory[pos++];
+		out[outpos++]=memory[pos++];	/* slime and amoeba color */
+		out[outpos++]=memory[pos++];	/* background (and border) */
+	}
+	
+	return 1;
+}
+
+
 /* save plck caves from memory map */
 static int try_1stb()
 {
@@ -781,16 +1089,25 @@ int main(int argc, char* argv[])
 
 	/* interpreting */
 	strcat(outfilename, ".gds");
-	if (try_bd1()) {
+	if (try_plck()) {
 		result=!save(outfilename);
 	} else
-	if (try_bd2()) {
+	if (try_atari_plck()) {
+		result=!save(outfilename);
+	} else
+	if (try_bd1(0)) {	/* try c64 bd1 */
+		result=!save(outfilename);
+	} else
+	if (try_bd1(1)) {	/* try atari bd1 */
+		result=!save(outfilename);
+	} else
+	if (try_bd2()) {	/* try c64 bd2 */
+		result=!save(outfilename);
+	} else
+	if (try_bd2_atari()) {	/* try atari bd2 */
 		result=!save(outfilename);
 	} else
 	if (try_crli()) {
-		result=!save(outfilename);
-	} else
-	if (try_plck()) {
 		result=!save(outfilename);
 	} else
 	if (try_1stb()) {

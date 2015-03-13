@@ -194,6 +194,7 @@ gd_sound_init()
 	loadsound(GD_S_EXPLOSION, "explosion.ogg");
 	loadsound(GD_S_WALK_EARTH, "walk_earth.ogg");
 	loadsound(GD_S_WALK_EMPTY, "walk_empty.ogg");
+	loadsound(GD_S_WALL_REAPPEAR, "wall_reappear.ogg");
 	loadsound(GD_S_PNEUMATIC_HAMMER, "pneumatic.ogg");
 	loadsound(GD_S_DOOR_OPEN, "door_open.ogg");
 	loadsound(GD_S_STIRRING, "stirring.ogg");
@@ -203,7 +204,7 @@ gd_sound_init()
 
 	loadsound(GD_S_STONE, "stone.ogg");
 	loadsound(GD_S_FALLING_WALL, "falling_wall.ogg");
-	loadsound(GD_S_GROWING_WALL, "growing_wall.ogg");
+	loadsound(GD_S_EXPANDING_WALL, "expanding_wall.ogg");
 	loadsound(GD_S_DIAMOND_1, "diamond_1.ogg");
 	loadsound(GD_S_DIAMOND_2, "diamond_2.ogg");
 	loadsound(GD_S_DIAMOND_3, "diamond_3.ogg");
@@ -221,6 +222,7 @@ gd_sound_init()
 	loadsound(GD_S_BOMB_EXPLOSION, "bomb_explosion.ogg");
 	loadsound(GD_S_GHOST_EXPLOSION, "ghost_explosion.ogg");
 	loadsound(GD_S_VOODOO_EXPLOSION, "voodoo_explosion.ogg");
+	loadsound(GD_S_NITRO_EXPLOSION, "nitro_explosion.ogg");
 	loadsound(GD_S_BOMB_PLACE, "bomb_place.ogg");
 	
 	loadsound(GD_S_PNEUMATIC_COLLECT, "pneumatic_collect.ogg");
@@ -231,7 +233,7 @@ gd_sound_init()
 	loadsound(GD_S_SWITCH_BITER, "switch_biter.ogg");
 	loadsound(GD_S_SWITCH_CREATURES, "switch_creatures.ogg");
 	loadsound(GD_S_SWITCH_GRAVITY, "switch_gravity.ogg");
-	loadsound(GD_S_SWITCH_GROWING, "switch_growing.ogg");
+	loadsound(GD_S_SWITCH_EXPANDING, "switch_expanding.ogg");
 
 	loadsound(GD_S_ACID_SPREAD, "acid_spread.ogg");
 	loadsound(GD_S_BONUS_LIFE, "bonus_life.ogg");

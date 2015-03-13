@@ -36,7 +36,7 @@ static const GdElement bd1_import_table[]={
 	/* 1c */ O_EXPLODE_3, O_EXPLODE_4, O_EXPLODE_5, O_PRE_DIA_1,
 	/* 20 */ O_PRE_DIA_2, O_PRE_DIA_3, O_PRE_DIA_4, O_PRE_DIA_5,
 	/* 24 */ O_PRE_DIA_5, O_INBOX, O_PRE_PL_1, O_PRE_PL_2,
-	/* 28 */ O_PRE_PL_3, O_PRE_PL_3, O_H_GROWING_WALL, O_H_GROWING_WALL,
+	/* 28 */ O_PRE_PL_3, O_PRE_PL_3, O_H_EXPANDING_WALL, O_H_EXPANDING_WALL,
 	/* 2c */ O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN,
 	/* 30 */ O_BUTTER_4, O_BUTTER_1, O_BUTTER_2, O_BUTTER_3,
 	/* 34 */ O_BUTTER_4, O_BUTTER_1, O_BUTTER_2, O_BUTTER_3,
@@ -47,7 +47,7 @@ static const GdElement bd1_import_table[]={
 /* conversion table for imported plck caves. */
 static const GdElement plck_import_nybble[]={
 	/*  0 */ O_STONE, O_DIAMOND, O_MAGIC_WALL, O_BRICK,
-	/*  4 */ O_STEEL, O_H_GROWING_WALL, O_VOODOO, O_DIRT,
+	/*  4 */ O_STEEL, O_H_EXPANDING_WALL, O_VOODOO, O_DIRT,
 	/*  8 */ O_GUARD_1, O_BUTTER_4, O_AMOEBA, O_SLIME,
 	/* 12 */ O_PRE_INVIS_OUTBOX, O_PRE_OUTBOX, O_INBOX, O_SPACE
 };
@@ -64,8 +64,8 @@ static const GdElement firstboulder_import_table[]={
 	/* 1c */ O_BITER_SWITCH, O_BITER_SWITCH, O_BLADDER_SPENDER, O_PRE_DIA_1,
 	/* 20 */ O_PRE_DIA_1, O_PRE_DIA_2, O_PRE_DIA_3, O_PRE_DIA_4,
 	/* 24 */ O_PRE_DIA_5, O_INBOX, O_PRE_PL_1, O_PRE_PL_2,
-	/* 28 */ O_PRE_PL_3, O_CLOCK, O_H_GROWING_WALL, O_H_GROWING_WALL,	/* CLOCK: not mentioned in marek's bd inside faq */
-	/* 2c */ O_CREATURE_SWITCH, O_CREATURE_SWITCH, O_GROWING_WALL_SWITCH, O_GROWING_WALL_SWITCH,
+	/* 28 */ O_PRE_PL_3, O_CLOCK, O_H_EXPANDING_WALL, O_H_EXPANDING_WALL,	/* CLOCK: not mentioned in marek's bd inside faq */
+	/* 2c */ O_CREATURE_SWITCH, O_CREATURE_SWITCH, O_EXPANDING_WALL_SWITCH, O_EXPANDING_WALL_SWITCH,
 	/* 30 */ O_BUTTER_3, O_BUTTER_4, O_BUTTER_1, O_BUTTER_2,
 	/* 34 */ O_BUTTER_3, O_BUTTER_4, O_BUTTER_1, O_BUTTER_2,
 	/* 38 */ O_STEEL, O_SLIME, O_BOMB, O_SWEET,
@@ -100,8 +100,8 @@ static const GdElement crazydream_import_table[]={
 	/* 1c */ O_BITER_SWITCH, O_BITER_SWITCH, O_BLADDER_SPENDER, O_PRE_DIA_1,	/* 6 different stages */
 	/* 20 */ O_PRE_DIA_1, O_PRE_DIA_2, O_PRE_DIA_3, O_PRE_DIA_4,
 	/* 24 */ O_PRE_DIA_5, O_INBOX, O_PRE_PL_1, O_PRE_PL_2,
-	/* 28 */ O_PRE_PL_3, O_CLOCK, O_H_GROWING_WALL, O_H_GROWING_WALL,	/* CLOCK: not mentioned in marek's bd inside faq */
-	/* 2c */ O_CREATURE_SWITCH, O_CREATURE_SWITCH, O_GROWING_WALL_SWITCH, O_GROWING_WALL_SWITCH,
+	/* 28 */ O_PRE_PL_3, O_CLOCK, O_H_EXPANDING_WALL, O_H_EXPANDING_WALL,	/* CLOCK: not mentioned in marek's bd inside faq */
+	/* 2c */ O_CREATURE_SWITCH, O_CREATURE_SWITCH, O_EXPANDING_WALL_SWITCH, O_EXPANDING_WALL_SWITCH,
 	/* 30 */ O_BUTTER_3, O_BUTTER_4, O_BUTTER_1, O_BUTTER_2,
 	/* 34 */ O_BUTTER_3, O_BUTTER_4, O_BUTTER_1, O_BUTTER_2,
 	/* 38 */ O_STEEL, O_SLIME, O_BOMB, O_SWEET,
@@ -171,8 +171,8 @@ const GdElement gd_crazylight_import_table[]={
 	/* 1c */ O_BITER_SWITCH, O_BITER_SWITCH, O_BLADDER_SPENDER, O_PRE_DIA_1,	/* 6 different stages, the first is the pre_dia_0 */
 	/* 20 */ O_PRE_DIA_1, O_PRE_DIA_2, O_PRE_DIA_3, O_PRE_DIA_4,
 	/* 24 */ O_PRE_DIA_5, O_INBOX, O_PRE_PL_1, O_PRE_PL_2,
-	/* 28 */ O_PRE_PL_3, O_CLOCK, O_H_GROWING_WALL, O_H_GROWING_WALL|SCANNED,	/* CLOCK: not mentioned in marek's bd inside faq */
-	/* 2c */ O_CREATURE_SWITCH, O_CREATURE_SWITCH, O_GROWING_WALL_SWITCH, O_GROWING_WALL_SWITCH,
+	/* 28 */ O_PRE_PL_3, O_CLOCK, O_H_EXPANDING_WALL, O_H_EXPANDING_WALL|SCANNED,	/* CLOCK: not mentioned in marek's bd inside faq */
+	/* 2c */ O_CREATURE_SWITCH, O_CREATURE_SWITCH, O_EXPANDING_WALL_SWITCH, O_EXPANDING_WALL_SWITCH,
 	/* 30 */ O_BUTTER_3, O_BUTTER_4, O_BUTTER_1, O_BUTTER_2,
 	/* 34 */ O_BUTTER_3|SCANNED, O_BUTTER_4|SCANNED, O_BUTTER_1|SCANNED, O_BUTTER_2|SCANNED,
 	/* 38 */ O_STEEL, O_SLIME, O_BOMB, O_SWEET,
@@ -195,15 +195,84 @@ const GdElement gd_crazylight_import_table[]={
 	/* 7c */ O_BITER_1|SCANNED, O_BITER_2|SCANNED, O_BITER_3|SCANNED, O_BITER_4|SCANNED,
 };
 
+#if 0
 static guint8 no1_default_colors[]={
 	4, 10, 1, 8, 9, 3, 12, 11, 1, 6, 14, 7,	14, 3, 7,
 	5, 8, 7, 4, 9, 3, 10, 5, 1, 5, 4, 1, 9, 6, 1,
 	12, 11, 5, 4, 2, 7, 14, 4, 7, 10, 8, 1,	8, 5, 7,
 	14, 2, 3, 3, 11, 1, 7, 5, 1, 11, 10, 7, 9, 8, 1
 };
+#endif
+
+/* atari800 "real.act" palette */
+static GdColor atari_colortable[256] = {
+
+/* 0 */
+0x323132, 0x3f3e3f, 0x4d4c4d, 0x5b5b5b, 0x6a696a, 0x797879, 0x888788, 0x979797, 
+0xa1a0a1, 0xafafaf, 0xbebebe, 0xcecdce, 0xdbdbdb, 0xebeaeb, 0xfafafa, 0xffffff, 
+/* 1 */
+0x612e00, 0x6c3b00, 0x7a4a00, 0x885800, 0x94670c, 0xa5761b, 0xb2842a, 0xc1943a, 
+0xca9d43, 0xdaad53, 0xe8bb62, 0xf8cb72, 0xffd87f, 0xffe88f, 0xfff79f, 0xffffae, 
+/* 2 */
+0x6c2400, 0x773000, 0x844003, 0x924e11, 0x9e5d22, 0xaf6c31, 0xbc7b41, 0xcc8a50, 
+0xd5935b, 0xe4a369, 0xf2b179, 0xffc289, 0xffcf97, 0xffdfa6, 0xffedb5, 0xfffdc4, 
+/* 3 */
+0x751618, 0x812324, 0x8f3134, 0x9d4043, 0xaa4e50, 0xb85e60, 0xc66d6f, 0xd57d7f, 
+0xde8787, 0xed9596, 0xfca4a5, 0xffb4b5, 0xffc2c4, 0xffd1d3, 0xffe0e1, 0xffeff0, 
+/* 4 */
+0x620e71, 0x6e1b7c, 0x7b2a8a, 0x8a3998, 0x9647a5, 0xa557b5, 0xb365c3, 0xc375d1, 
+0xcd7eda, 0xdc8de9, 0xea97f7, 0xf9acff, 0xffbaff, 0xffc9ff, 0xffd9ff, 0xffe8ff, 
+/* 5 */
+0x560f87, 0x611d90, 0x712c9e, 0x7f3aac, 0x8d48ba, 0x9b58c7, 0xa967d5, 0xb877e5, 
+0xc280ed, 0xd090fc, 0xdf9fff, 0xeeafff, 0xfcbdff, 0xffccff, 0xffdbff, 0xffeaff, 
+/* 6 */
+0x461695, 0x5122a0, 0x6032ac, 0x6e41bb, 0x7c4fc8, 0x8a5ed6, 0x996de3, 0xa87cf2, 
+0xb185fb, 0xc095ff, 0xcfa3ff, 0xdfb3ff, 0xeec1ff, 0xfcd0ff, 0xffdfff, 0xffefff, 
+/* 7 */
+0x212994, 0x2d359f, 0x3d44ad, 0x4b53ba, 0x5961c7, 0x686fd5, 0x777ee2, 0x878ef2, 
+0x9097fa, 0x96a6ff, 0xaeb5ff, 0xbfc4ff, 0xcdd2ff, 0xdae3ff, 0xeaf1ff, 0xfafeff, 
+/* 8 */
+0x0f3584, 0x1c418d, 0x2c509b, 0x3a5eaa, 0x486cb7, 0x587bc5, 0x678ad2, 0x7699e2, 
+0x80a2eb, 0x8fb2f9, 0x9ec0ff, 0xadd0ff, 0xbdddff, 0xcbecff, 0xdbfcff, 0xeaffff, 
+/* 9 */
+0x043f70, 0x114b79, 0x215988, 0x2f6896, 0x3e75a4, 0x4d83b2, 0x5c92c1, 0x6ca1d2, 
+0x74abd9, 0x83bae7, 0x93c9f6, 0xa2d8ff, 0xb1e6ff, 0xc0f5ff, 0xd0ffff, 0xdeffff, 
+/* a */
+0x005918, 0x006526, 0x0f7235, 0x1d8144, 0x2c8e50, 0x3b9d60, 0x4aac6f, 0x59bb7e, 
+0x63c487, 0x72d396, 0x82e2a5, 0x92f1b5, 0x9ffec3, 0xaeffd2, 0xbeffe2, 0xcefff1, 
+/* b */
+0x075c00, 0x146800, 0x227500, 0x328300, 0x3f910b, 0x4fa01b, 0x5eae2a, 0x6ebd3b, 
+0x77c644, 0x87d553, 0x96e363, 0xa7f373, 0xb3fe80, 0xc3ff8f, 0xd3ffa0, 0xe3ffb0, 
+/* c */
+0x1a5600, 0x286200, 0x367000, 0x457e00, 0x538c00, 0x629b07, 0x70a916, 0x80b926, 
+0x89c22f, 0x99d13e, 0xa8df4d, 0xb7ef5c, 0xc5fc6b, 0xd5ff7b, 0xe3ff8b, 0xf3ff99, 
+/* d */
+0x334b00, 0x405700, 0x4d6500, 0x5d7300, 0x6a8200, 0x7a9100, 0x889e0f, 0x98ae1f, 
+0xa1b728, 0xbac638, 0xbfd548, 0xcee458, 0xdcf266, 0xebff75, 0xfaff85, 0xffff95, 
+/* e */
+0x4b3c00, 0x584900, 0x655700, 0x746500, 0x817400, 0x908307, 0x9f9116, 0xaea126, 
+0xb7aa2e, 0xc7ba3e, 0xd5c74d, 0xe5d75d, 0xf2e56b, 0xfef47a, 0xffff8b, 0xffff9a, 
+/* f */
+0x602e00, 0x6d3a00, 0x7a4900, 0x895800, 0x95670a, 0xa4761b, 0xb2832a, 0xc2943a, 
+0xcb9d44, 0xdaac53, 0xe8ba62, 0xf8cb73, 0xffd77f, 0xffe791, 0xfff69f, 0xffffaf,
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 GdPropertyDefault gd_defaults_bd1[] = {
-	{CAVE_OFFSET(amoeba_threshold), 200},
+	{CAVE_OFFSET(level_amoeba_threshold), 200},
 	{CAVE_OFFSET(amoeba_growth_prob), 31250},
 	{CAVE_OFFSET(amoeba_fast_growth_prob), 250000},
 	{CAVE_OFFSET(amoeba_timer_started_immediately), TRUE}, 
@@ -216,7 +285,7 @@ GdPropertyDefault gd_defaults_bd1[] = {
 	{CAVE_OFFSET(creatures_backwards), FALSE}, 
 	{CAVE_OFFSET(creatures_direction_auto_change_on_start), FALSE}, 
 	{CAVE_OFFSET(creatures_direction_auto_change_time), 0}, 
-	{CAVE_OFFSET(hatching_delay_time), 2}, 
+	{CAVE_OFFSET(level_hatching_delay_time[0]), 2}, 
 	{CAVE_OFFSET(intermission_instantlife), TRUE}, 
 	{CAVE_OFFSET(intermission_rewardlife), FALSE}, 
 	{CAVE_OFFSET(magic_wall_stops_amoeba), TRUE}, 
@@ -235,7 +304,7 @@ GdPropertyDefault gd_defaults_bd1[] = {
 };
 
 GdPropertyDefault gd_defaults_bd2[] = {
-	{CAVE_OFFSET(amoeba_threshold), 200},
+	{CAVE_OFFSET(level_amoeba_threshold), 200},
 	{CAVE_OFFSET(amoeba_growth_prob), 31250},
 	{CAVE_OFFSET(amoeba_fast_growth_prob), 250000},
 	{CAVE_OFFSET(amoeba_timer_started_immediately), FALSE},
@@ -248,7 +317,7 @@ GdPropertyDefault gd_defaults_bd2[] = {
 	{CAVE_OFFSET(creatures_backwards), FALSE},
 	{CAVE_OFFSET(creatures_direction_auto_change_on_start), FALSE},
 	{CAVE_OFFSET(creatures_direction_auto_change_time), 0},
-	{CAVE_OFFSET(hatching_delay_time), 2},
+	{CAVE_OFFSET(level_hatching_delay_time[0]), 2},
 	{CAVE_OFFSET(intermission_instantlife), TRUE},
 	{CAVE_OFFSET(intermission_rewardlife), FALSE},
 	{CAVE_OFFSET(magic_wall_stops_amoeba), FALSE},	/* marek roth bd inside faq 3.0 */
@@ -272,6 +341,7 @@ GdPropertyDefault gd_defaults_plck[] = {
 	{CAVE_OFFSET(amoeba_timer_started_immediately), FALSE},
 	{CAVE_OFFSET(amoeba_timer_wait_for_hatching), FALSE},
 	{CAVE_OFFSET(lineshift), TRUE},
+	{CAVE_OFFSET(border_scan_first_and_last), FALSE},
 	{CAVE_OFFSET(diagonal_movements), FALSE},
 	{CAVE_OFFSET(voodoo_collects_diamonds), FALSE},
 	{CAVE_OFFSET(voodoo_dies_by_stone), FALSE},
@@ -279,7 +349,7 @@ GdPropertyDefault gd_defaults_plck[] = {
 	{CAVE_OFFSET(creatures_backwards), FALSE},
 	{CAVE_OFFSET(creatures_direction_auto_change_on_start), FALSE},
 	{CAVE_OFFSET(creatures_direction_auto_change_time), 0},
-	{CAVE_OFFSET(hatching_delay_time), 2},
+	{CAVE_OFFSET(level_hatching_delay_time[0]), 2},
 	{CAVE_OFFSET(intermission_instantlife), TRUE},
 	{CAVE_OFFSET(intermission_rewardlife), FALSE},
 	{CAVE_OFFSET(magic_wall_stops_amoeba), FALSE},
@@ -306,7 +376,7 @@ GdPropertyDefault gd_defaults_1stb[] = {
 	{CAVE_OFFSET(voodoo_dies_by_stone), TRUE},
 	{CAVE_OFFSET(voodoo_can_be_destroyed), FALSE},
 	{CAVE_OFFSET(creatures_direction_auto_change_on_start), TRUE},
-	{CAVE_OFFSET(hatching_delay_time), 2},
+	{CAVE_OFFSET(level_hatching_delay_time[0]), 2},
 	{CAVE_OFFSET(intermission_instantlife), FALSE},
 	{CAVE_OFFSET(intermission_rewardlife), TRUE},
 	{CAVE_OFFSET(magic_timer_wait_for_hatching), TRUE},
@@ -335,6 +405,7 @@ GdPropertyDefault gd_defaults_crdr_7[] = {
 	{CAVE_OFFSET(voodoo_dies_by_stone), TRUE},
 	{CAVE_OFFSET(voodoo_can_be_destroyed), FALSE},
 	{CAVE_OFFSET(creatures_direction_auto_change_on_start), FALSE},
+	{CAVE_OFFSET(level_hatching_delay_time[0]), 2},
 	{CAVE_OFFSET(intermission_instantlife), FALSE},
 	{CAVE_OFFSET(intermission_rewardlife), TRUE},
 	{CAVE_OFFSET(magic_timer_wait_for_hatching), TRUE},
@@ -365,7 +436,7 @@ GdPropertyDefault gd_defaults_crli[] = {
 	{CAVE_OFFSET(voodoo_dies_by_stone), TRUE},
 	{CAVE_OFFSET(voodoo_can_be_destroyed), FALSE},
 	{CAVE_OFFSET(creatures_direction_auto_change_on_start), FALSE},
-	{CAVE_OFFSET(hatching_delay_time), 2},
+	{CAVE_OFFSET(level_hatching_delay_time[0]), 2},
 	{CAVE_OFFSET(intermission_instantlife), FALSE},
 	{CAVE_OFFSET(intermission_rewardlife), TRUE},
 	{CAVE_OFFSET(magic_timer_wait_for_hatching), TRUE},
@@ -393,7 +464,18 @@ const char *gd_engines[]={"BD1", "BD2", "PLCK", "1stB", "CrDr", "CrLi"};
 
 
 
-
+/* to convert predictable slime values to bit masks */
+static int
+slime_shift_msb(int c64_data)
+{
+	int i, perm;
+	
+	perm=0;
+	for (i=0; i<c64_data; i++)
+		/* shift in this many msb 1's */
+		perm=(0x100|perm)>>1;
+	return perm;
+}
 
 
 
@@ -412,7 +494,7 @@ deluxecaves_1_import(guint8 c, int i)
 {
 	GdElement e=bd1_import(c, i);
 	
-	if (e==O_H_GROWING_WALL)
+	if (e==O_H_EXPANDING_WALL)
 		e=O_BRICK_NON_SLOPED;
 	
 	return e;
@@ -587,7 +669,7 @@ gd_cave_get_engine_from_string(const char *param)
 
 /* import bd1 cave data into our format. */
 static int
-cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, gboolean is_deluxe_caves_1)
+cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
 {
 	int length, direction;
 	int index;
@@ -597,7 +679,9 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, gboolean
 	int i;
 	GdElement (* import_func) (guint8 c, int i);
 	
-	if (is_deluxe_caves_1)
+	g_assert(format==GD_FORMAT_BD1 || format==GD_FORMAT_DC1 || format==GD_FORMAT_BD1_ATARI);
+	
+	if (format==GD_FORMAT_DC1)
 		import_func=deluxecaves_1_import;
 	else
 		import_func=bd1_import;
@@ -620,12 +704,12 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, gboolean
 	}
 
 	/* cave number data[0] */
-	cave->amoeba_slow_growth_time=data[1];
-	cave->magic_wall_milling_time=data[1];
 	cave->diamond_value=data[2];
 	cave->extra_diamond_value=data[3];
 
-	for (level=0; level < 5; level++) {
+	for (level=0; level<5; level++) {
+		cave->level_amoeba_time[level]=data[1];
+		cave->level_magic_wall_time[level]=data[1];
 		cave->level_rand[level]=data[4 + level];
 		cave->level_diamonds[level]=data[9 + level] % 100;	/* check comment above */
 		if (cave->level_diamonds[level]==0)		/* gate opening is checked AFTER adding to diamonds collected, so 0 here means 100 to collect */
@@ -645,13 +729,26 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, gboolean
 	cave->acid_spread_ratio=data[0x16]/255.0;	/* acid speed */
 	cave->acid_turns_to=(data[0x17]&(1<<2))?O_EXPLODE_3:O_ACID;
 	
-	cave->color0=gd_c64_colors[0].rgb;	/* border - not important */
-	cave->color1=gd_c64_colors[data[19]&0xf].rgb;
-	cave->color2=gd_c64_colors[data[20]&0xf].rgb;
-	cave->color3=gd_c64_colors[data[21]&0x7].rgb; 	/* lower 3 bits only (vic-ii worked this way) */
-	cave->color4=cave->color3;	/* in bd1, amoeba was color3 */
-	cave->color5=cave->color3;	/* no slime, but let it be color 3 */
-
+	if (format==GD_FORMAT_BD1_ATARI) {
+		/* atari colors */
+		cave->color1=atari_colortable[data[0x13]];
+		cave->color2=atari_colortable[data[0x14]];
+		cave->color3=atari_colortable[data[0x15]];
+		cave->color4=atari_colortable[data[0x16]];	/* in atari, amoeba was green */
+		cave->color5=atari_colortable[data[0x16]];	/* in atari, slime was green */
+		cave->colorb=atari_colortable[data[0x17]];	/* border = background */
+		cave->color0=atari_colortable[data[0x17]];	/* background */
+	} else {
+		/* c64 colors */
+		cave->colorb=gd_c64_colors[0].rgb;	/* border = background, fixed color */
+		cave->color0=gd_c64_colors[0].rgb;	/* background, fixed color */
+		cave->color1=gd_c64_colors[data[0x13]&0xf].rgb;
+		cave->color2=gd_c64_colors[data[0x14]&0xf].rgb;
+		cave->color3=gd_c64_colors[data[0x15]&0x7].rgb; 	/* lower 3 bits only (vic-ii worked this way) */
+		cave->color4=cave->color3;	/* in bd1, amoeba was color3 */
+		cave->color5=cave->color3;	/* no slime, but let it be color 3 */
+	}
+	
 	/* random fill */
 	for (i=0; i < 4; i++) {
 		cave->random_fill[i]=import_func(data[24+i], 24+i);
@@ -757,12 +854,14 @@ cave_copy_from_bd1(Cave *cave, const guint8 *data, int remaining_bytes, gboolean
 /* import bd2 cave data into our format. return number of bytes if pointer passed.
 	this is pretty the same as above, only the encoding was different. */
 static int
-cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes)
+cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
 {
 	int index;
 	GdObject object;
 	int i;
 	int x, y, rx, ry;
+	
+	g_assert(format==GD_FORMAT_BD2 || format==GD_FORMAT_BD2_ATARI);
 
 	gd_error_set_context(cave->name);
 	if (remaining_bytes<0x1A+5) {
@@ -776,17 +875,17 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes)
 		cave->y2=11;
 	}
 
-	cave->amoeba_slow_growth_time=data[0];
-	cave->magic_wall_milling_time=data[0];
 	cave->diamond_value=data[1];
 	cave->extra_diamond_value=data[2];
 
 	for (i=0; i<5; i++) {
+		cave->level_amoeba_time[i]=data[0];
 		cave->level_rand[i]=data[13+i];
 		cave->level_diamonds[i]=data[8+i];
 		if (cave->level_diamonds[i]==0)		/* gate opening is checked AFTER adding to diamonds collected, so 0 here is 1000 needed */
 			cave->level_diamonds[i]=1000;
 		cave->level_time[i]=data[3+i];
+		cave->level_magic_wall_time[i]=data[0];
 	}
 
 	for (i=0; i<4; i++) {
@@ -916,7 +1015,8 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes)
 			break;
 		case 7:
 			/* interesting this is set here, and not in the cave header */
-			cave->slime_permeability_c64=data[index+1];
+			for (i=0; i<5; i++)
+				cave->level_slime_permeability_c64[i]=data[index+1];
 			index+=2;
 			break;
 		case 9:
@@ -963,13 +1063,26 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes)
 	index++;	/* animation byte - told the engine which objects to animate - to make game faster */
 
 	/* the colors from the memory dump are appended here */
-	cave->color0=gd_c64_colors[0].rgb;
-	cave->color1=gd_c64_colors[data[index+0]&0xf].rgb;
-	cave->color2=gd_c64_colors[data[index+1]&0xf].rgb;
-	cave->color3=gd_c64_colors[data[index+2]&0x7].rgb; 	/* lower 3 bits only! */
-	cave->color4=cave->color1;	/* in bd2, amoeba was color1 */
-	cave->color5=cave->color1;	/* slime too */
-	index+=3;
+	if (format==GD_FORMAT_BD2) {
+		/* c64 colors */
+		cave->color0=gd_c64_colors[0].rgb;
+		cave->color1=gd_c64_colors[data[index+0]&0xf].rgb;
+		cave->color2=gd_c64_colors[data[index+1]&0xf].rgb;
+		cave->color3=gd_c64_colors[data[index+2]&0x7].rgb; 	/* lower 3 bits only! */
+		cave->color4=cave->color1;	/* in bd2, amoeba was color1 */
+		cave->color5=cave->color1;	/* slime too */
+		index+=3;
+	} else {
+		/* atari colors */
+		cave->color1=atari_colortable[data[index+0]];
+		cave->color2=atari_colortable[data[index+1]];
+		cave->color3=atari_colortable[data[index+2]];
+		cave->color4=atari_colortable[data[index+3]];	/* amoeba and slime */
+		cave->color5=atari_colortable[data[index+3]];
+		cave->colorb=atari_colortable[data[index+4]];	/* background and border */
+		cave->color0=atari_colortable[data[index+4]];
+		index+=5;
+	}
 	
 	return index;
 }
@@ -977,7 +1090,7 @@ cave_copy_from_bd2 (Cave *cave, const guint8 *data, int remaining_bytes)
 /* import plck cave data into our format.
 	length is always 512 bytes, and contains if it is an intermission cave. */
 static int
-cave_copy_from_plck (Cave *cave, const guint8 *data, int remaining_bytes)
+cave_copy_from_plck (Cave *cave, const guint8 *data, int remaining_bytes, GdCavefileFormat format)
 {
 	/* i don't really think that all this table is needed, but included to be complete. */
 	/* this is for the dirt and expanding wall looks like effect. */
@@ -996,8 +1109,19 @@ cave_copy_from_plck (Cave *cave, const guint8 *data, int remaining_bytes)
 		
 	int i;
 	int x, y;
+	gboolean steels;
+
+	g_assert(format==GD_FORMAT_PLC || format==GD_FORMAT_PLC_ATARI);
+
+	/* hack: check that the "first" (really last - dlp 155) line of the cave is only steel wall. */	
+	/* check from SECOND byte; sometimes the really first byte was a $55, don't know why. that is ignored. */
+	steels=TRUE;
+	for (x=1; x<20; x++)
+		if (data[x]!=0x44)
+			steels=FALSE;
+	if (data[0]!=0x44 && data[0]!=0x55)
+		steels=FALSE;
 	
-	gd_error_set_context(cave->name);
 	if (remaining_bytes<512) {
 		g_critical("truncated plck cave data!");
 		return -1;
@@ -1030,42 +1154,65 @@ cave_copy_from_plck (Cave *cave, const guint8 *data, int remaining_bytes)
 	cave->extra_diamond_value=data[0x1c0];
 	for (i=0; i < 5; i++) {
 		/* plck doesnot really have levels, so just duplicate data five times */
+		cave->level_amoeba_time[i]=data[0x1c4];
 		cave->level_time[i]=data[0x1ba];
 		cave->level_diamonds[i]=data[0x1bc];
 		if (cave->level_diamonds[i]==0)		/* gate opening is checked AFTER adding to diamonds collected, so 0 here is 1000 needed */
 			cave->level_diamonds[i]=1000;
 		cave->level_ckdelay[i]=data[0x1b8];
+		cave->level_magic_wall_time[i]=data[0x1c6];
+		cave->level_slime_permeability_c64[i]=slime_shift_msb(data[0x1c2]);
 	}
 
-	cave->colorb=gd_c64_colors[data[0x1db]&0xf].rgb;	/* border */
-	cave->color0=gd_c64_colors[data[0x1dd]&0xf].rgb;
-	cave->color1=gd_c64_colors[data[0x1df]&0xf].rgb;
-	cave->color2=gd_c64_colors[data[0x1e1]&0xf].rgb;
-	cave->color3=gd_c64_colors[data[0x1e3]&0x7].rgb; 	/* lower 3 bits only! */
-	cave->color4=cave->color3;	/* in plck, amoeba was color3 */
-	cave->color5=cave->color3;	/* same for slime */
-
-	cave->magic_wall_milling_time=data[0x1c6];
-	cave->amoeba_slow_growth_time=data[0x1c4];
-	cave->slime_permeability_c64=0;
-	for (i=0; i < data[0x1c2]; i++)
-		/* shift in this many msb 1's */
-		cave->slime_permeability_c64=(0x100 | cave->slime_permeability_c64) >> 1;
+	if (format==GD_FORMAT_PLC_ATARI) {
+		/* use atari colors */
+		cave->colorb=atari_colortable[0];	/* border */
+		/* indexes in data are not the same order as on c64!!! */
+		cave->color0=atari_colortable[data[0x1e3]];	/* background */
+		cave->color1=atari_colortable[data[0x1db]];
+		cave->color2=atari_colortable[data[0x1dd]];
+		cave->color3=atari_colortable[data[0x1df]];
+		/* in atari plck, slime and amoeba could not coexist in the same cave. */
+		/* if amoeba was used, the graphics turned to green, and data at 0x1e1 was set to 0xd4. */
+		/* if slime was used, graphics to blue, and data at 0x1e1 was set to 0x72. */
+		/* these two colors could not be changed in the editor at all. */
+		/* (maybe they could have been changed in a hex editor) */
+		cave->color4=atari_colortable[data[0x1e1]];
+		cave->color5=atari_colortable[data[0x1e1]];
+	} else {
+		/* use c64 colors */
+		cave->colorb=gd_c64_colors[data[0x1db]&0xf].rgb;	/* border */
+		cave->color0=gd_c64_colors[data[0x1dd]&0xf].rgb;
+		cave->color1=gd_c64_colors[data[0x1df]&0xf].rgb;
+		cave->color2=gd_c64_colors[data[0x1e1]&0xf].rgb;
+		cave->color3=gd_c64_colors[data[0x1e3]&0x7].rgb; 	/* lower 3 bits only! */
+		cave->color4=cave->color3;	/* in plck, amoeba was color3 */
+		cave->color5=cave->color3;	/* same for slime */
+	}
 
 	/* ... the cave is stored like a map. */
 	cave->map=gd_cave_map_new(cave, GdElement);
-	for (x=0; x < cave->w; x++) {
-		/* fill the first and the last row with steel wall. */
-		cave->map[0][x]=O_STEEL;
-		cave->map[cave->h-1][x]=O_STEEL;
-	}
-	for (y=1; y < cave->h-1; y++)	/* two rows of steel wall. the second one is stored */
-		for (x=0; x < cave->w; x += 2) {
-			cave->map[y][x]=plck_import_nybble[data[(y+1)*20 + x/2] >> 4];	/* msb 4 bits: we do not check index ranges, as >>4 and %16 will result in 0..15 */
-			cave->map[y][x+1]=plck_import_nybble[data[(y+1)*20 + x/2] % 16];	/* lsb 4 bits */
+	/* cave map looked like this. */
+	/* two rows of steel wall ($44's), then cave description, 20 bytes (40 nybbles) for each line. */
+	/* the bottom and top lines were not stored... originally. */
+	/* some games write to the top line; so we import that, too. */
+	/* also dlp 155 allowed writing to the bottom line; the first 20 $44-s now store the bottom line. */
+	/* so the cave is essentially shifted one row down in the file: cave->map[y][x]=data[... y+1 mod height ][x] */
+	for (y=0; y<cave->h; y++)
+		for (x=0; x<cave->w; x+=2) {
+			cave->map[y][x]=plck_import_nybble[data[((y+1)%cave->h)*20 + x/2] >> 4];	/* msb 4 bits: we do not check index ranges, as >>4 and %16 will result in 0..15 */
+			cave->map[y][x+1]=plck_import_nybble[data[((y+1)%cave->h)*20 + x/2] % 16];	/* lsb 4 bits */
 		}
+	/* FOR NOW, WE DO NOT IMPORT THE BOTTOM BORDER */
+	for (x=0; x<cave->w; x++)
+		cave->map[cave->h-1][x]=O_STEEL;
+	/*	
+	if (steels && data[0]==0x55)
+		cave->map[cave->h-1][0]=cave->map[cave->h-1][1]=O_STEEL;
+	*/
 
 	/* check for diego-effects */
+	/* c64 magic values (byte sequences)  0x20 0x90 0x46, also 0xa9 0x1c 0x85 */
 	if ((data[0x1e5]==0x20 && data[0x1e6]==0x90 && data[0x1e7]==0x46) || (data[0x1e5]==0xa9 && data[0x1e6]==0x1c && data[0x1e7]==0x85)) {
 		/* diego effects enabled. */
 		cave->bouncing_stone_to=bd1_import(data[0x1ea], 0x1ea);
@@ -1081,72 +1228,11 @@ cave_copy_from_plck (Cave *cave, const guint8 *data, int remaining_bytes)
 		   so high nybble must be shifted right twice -> data[xxx]/16*4. */
 		cave->dirt_looks_like=plck_graphic_table[(data[0x1ed]/16)*4 + (data[0x1ed]%16)/2];
 		cave->expanding_wall_looks_like=plck_graphic_table[(data[0x1ee]/16)*4 + (data[0x1ee]%16)/2];
-		cave->amoeba_threshold=data[0x1ef];
+		for (i=0; i<5; i++)
+			cave->level_amoeba_threshold[i]=data[0x1ef];
 	}
 	
 	return 512;
-}
-
-/* import atg cave data into our format. */
-static int
-cave_copy_from_atg (Cave *cave, const guint8 *data, int remaining_bytes)
-{
-	int i, datapos;
-	int x, y;
-
-
-	/* cave name at start */
-	gd_strcpy(cave->name, (char *)data);
-	/* delete trailing spaces */
-	g_strchomp (cave->name);
-	gd_error_set_context(cave->name);
-
-	cave->intermission=data[0x10];
-	gd_cave_set_engine_defaults(cave, GD_ENGINE_BD1);
-	cave->magic_wall_stops_amoeba=FALSE;	/* as in plc - i guess the game did not have the same bug as c64 bd1 */
-	/* some cave data is stored after the cave map. and the map can have different sizes (but the size is fixed) */
-	datapos=cave->intermission?0x7f:0x1b5;
-	if (datapos+8>=remaining_bytes+1) {
-		g_critical("truncated atg cave data");
-		return -1;
-	}
-
-	cave->w=cave->intermission?20:40;
-	cave->h=cave->intermission?12:22;
-	if (cave->intermission) {
-		cave->x2=19;
-		cave->y2=11;
-	}
-
-	for (i=0; i < 5; i++) {
-		/* doesnot really have levels, so just duplicate data */
-		cave->level_time[i]=data[datapos+0];
-		cave->level_diamonds[i]=data[datapos+1];
-	}
-	cave->diamond_value=data[datapos+2];
-	cave->extra_diamond_value=data[datapos+3];
-	for (i=0; i < data[datapos+4]; i++)
-		/* shift in this many msb 1's */
-		cave->slime_permeability_c64=(0x100 | cave->slime_permeability_c64) >> 1;
-	/* datapos+5 is always 127 in the files, i assume it has no meaning */
-
-	cave->amoeba_slow_growth_time=data[datapos+6];
-	cave->magic_wall_milling_time=data[datapos+7];
-	
-	/* ... the cave is stored like a map. */
-	cave->map=gd_cave_map_new (cave, GdElement);
-	for (x=0; x<cave->w; x++) {
-		/* fill the first and the last row with steel wall. */
-		cave->map[0][x]=O_STEEL;
-		cave->map[cave->h-1][x]=O_STEEL;
-	}
-	for (y=1; y<cave->h-1; y++)
-		for (x=0; x<cave->w; x+=2) {
-			cave->map[y][x]=plck_import_nybble[data[17+(y*cave->w+x)/2] >> 4];	/* msb 4 bits */
-			cave->map[y][x+1]=plck_import_nybble[data[17+(y*cave->w+x)/2] % 16];	/* lsb 4 bits */
-		}
-
-	return datapos+8;
 }
 
 /* no one's delight boulder dash
@@ -1174,14 +1260,11 @@ cave_copy_from_dlb (Cave *cave, const guint8 *data, int remaining_bytes)
 		if (cave->level_diamonds[i]==0)		/* gate opening is checked AFTER adding to diamonds collected, so 0 here is 1000 needed */
 			cave->level_diamonds[i]=1000;
 		cave->level_ckdelay[i]=data[0];
+		cave->level_amoeba_time[i]=data[6];		cave->level_magic_wall_time[i]=data[7];
+		cave->level_slime_permeability_c64[i]=slime_shift_msb(data[5]);
 	}
 	cave->diamond_value=data[3];
 	cave->extra_diamond_value=data[4];
-	cave->slime_permeability_c64=0;
-	for (i=0; i < data[5]; i++)
-		/* shift in this many msb 1's */
-		cave->slime_permeability_c64=(0x100 | cave->slime_permeability_c64) >> 1;
-	cave->amoeba_slow_growth_time=data[6];	cave->magic_wall_milling_time=data[7];
 
 	/* then 5 color bytes follow */
 	cave->colorb=gd_c64_colors[data[8]&0xf].rgb;	/* border */
@@ -1274,7 +1357,6 @@ cave_copy_from_1stb (Cave *cave, const guint8 *data, int remaining_bytes)
 	int i;
 	int x, y;
 	
-	gd_error_set_context(cave->name);
 	if (remaining_bytes<1024) {
 		g_critical("truncated 1stb cave data!");
 		return -1;
@@ -1302,6 +1384,7 @@ cave_copy_from_1stb (Cave *cave, const guint8 *data, int remaining_bytes)
 		cave->name[i]=c;
 	}
 	g_strchomp(cave->name);
+	gd_error_set_context(cave->name);
 
 	cave->intermission=data[0x389]!=0;
 	/* if it is intermission but not scrollable */
@@ -1321,6 +1404,12 @@ cave_copy_from_1stb (Cave *cave, const guint8 *data, int remaining_bytes)
 		if (cave->level_diamonds[i]==0)		/* gate opening is checked AFTER adding to diamonds collected, so 0 here is 1000 (!) needed */
 			cave->level_diamonds[i]=1000;
 		cave->level_ckdelay[i]=data[0x38a];
+		cave->level_amoeba_time[i]=256*(int)data[0x37c]+data[0x37d];
+		cave->level_magic_wall_time[i]=256*(int)data[0x37e]+data[0x37f];
+		cave->level_slime_permeability_c64[i]=data[0x38b];
+		cave->level_bonus_time[i]=data[0x392];
+		cave->level_penalty_time[i]=data[0x393];
+		cave->level_amoeba_threshold[i]=256*(int)data[0x390] + data[0x390+1];
 	}
 	/* also has no random data... */
 
@@ -1332,9 +1421,6 @@ cave_copy_from_1stb (Cave *cave, const guint8 *data, int remaining_bytes)
 	cave->color4=cave->color1;
 	cave->color5=cave->color1;
 
-	cave->magic_wall_milling_time=256*(int)data[0x37e]+data[0x37f];
-	cave->amoeba_slow_growth_time=256*(int)data[0x37c]+data[0x37d];
-	cave->slime_permeability_c64=data[0x38b];
 	cave->amoeba_growth_prob=4.0/(data[0x382]+1);
 	if (cave->amoeba_growth_prob>1)
 		cave->amoeba_growth_prob=1;
@@ -1360,13 +1446,10 @@ cave_copy_from_1stb (Cave *cave, const guint8 *data, int remaining_bytes)
 	if (data[0x38e]==0x2f)
 		for (y=0; y<cave->h; y++)
 			for (x=0; x<cave->w; x++) {
-				if (cave->map[y][x]==O_H_GROWING_WALL)
-					cave->map[y][x]=O_V_GROWING_WALL;
+				if (cave->map[y][x]==O_H_EXPANDING_WALL)
+					cave->map[y][x]=O_V_EXPANDING_WALL;
 			}
 
-	cave->amoeba_threshold=256*(int)data[0x390] + data[0x390+1];
-	cave->bonus_time=data[0x392];
-	cave->penalty_time=data[0x393];
 	cave->biter_delay_frame=data[0x394];
 	cave->magic_wall_stops_amoeba=data[0x395]==0;	/* negated!! */
 	cave->bomb_explode_to=firstboulder_import(data[0x396], 0x396);
@@ -1418,6 +1501,8 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 		cave->name[i]=c;
 	}
 	g_strchomp(cave->name);	/* remove trailing and leading spaces */
+	gd_error_set_context(cave->name);
+
 	cave->selectable=data[14]!=0;
 	
 	/* jump 15 bytes, 14 was the name and 15 selectability */
@@ -1425,7 +1510,6 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 	if (memcmp((char *)data+0x30, "V4\0020", 4)!=0)
 		g_warning("unknown crdr version %c%c%c%c", data[0x30], data[0x31], data[0x32], data[0x33]);
 
-	gd_error_set_context(cave->name);
 	gd_cave_set_engine_defaults(cave, GD_ENGINE_CRDR7);
 	
 	for (i=0; i<5; i++) {
@@ -1437,11 +1521,17 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 			cave->level_diamonds[i]=1000;
 		cave->level_ckdelay[i]=data[0x1A];
 		cave->level_rand[i]=data[0x40];
+		cave->level_amoeba_time[i]=(int)data[0xC] * 256 + data[0xD];
+		cave->level_magic_wall_time[i]=(int)data[0xE] * 256 + data[0xF];
+		cave->level_slime_permeability_c64[i]=data[0x1B];
+		cave->level_bonus_time[i]=data[0x22];
+		cave->level_penalty_time[i]=data[0x23];
+		cave->level_bonus_time[i]=data[0x22];
+		cave->level_penalty_time[i]=data[0x23];
+		cave->level_amoeba_threshold[i]=256*(int)data[0x20]+data[0x21];
 	}
 	cave->extra_diamond_value=(int)data[0x6] * 100 + data[0x7] * 10 + data[0x8];
 	cave->diamond_value=(int)data[0x9] * 100 + data[0xA] * 10 + data[0xB];
-	cave->amoeba_slow_growth_time=(int)data[0xC] * 256 + data[0xD];
-	cave->magic_wall_milling_time=(int)data[0xE] * 256 + data[0xF];
 	if (data[0x10])
 		cave->creatures_direction_auto_change_time=data[0x11];
 	cave->colorb=gd_c64_colors[data[0x14]&0xf].rgb;	/* border */
@@ -1457,7 +1547,6 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 		cave->x2=19;
 		cave->y2=11;
 	}
-	cave->slime_permeability_c64=data[0x1B];
 
 	/* AMOEBA in crazy dash 8:
 		jsr $2500		; generate true random
@@ -1480,9 +1569,6 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 	growing_wall_dir_change=data[0x1e]==0x2f;
 	/* 2c was a normal switch, 2d a changed one. */
 	cave->creatures_backwards=data[0x1f]==0x2d;
-	cave->amoeba_threshold=256*(int)data[0x20]+data[0x21];
-	cave->bonus_time=data[0x22];
-	cave->penalty_time=data[0x23];
 	cave->biter_delay_frame=data[0x24];
 	cave->magic_wall_stops_amoeba=data[0x25]==0;	/* negated!! */
 	cave->bomb_explode_to=crazydream_import_table[data[0x26]];
@@ -1660,17 +1746,17 @@ cave_copy_from_crdr_7 (Cave *cave, const guint8 *data, int remaining_bytes)
 		if (cave->map)
 			for (y=0; y<cave->h; y++)
 				for (x=0; x<cave->w; x++) {
-					if (cave->map[y][x]==O_H_GROWING_WALL)
-						cave->map[y][x]=O_V_GROWING_WALL;
+					if (cave->map[y][x]==O_H_EXPANDING_WALL)
+						cave->map[y][x]=O_V_EXPANDING_WALL;
 				}
 				
 		for (iter=cave->objects; iter!=NULL; iter=iter->next) {
 			GdObject *object=(GdObject *)iter->data;
 
-			if (object->element==O_H_GROWING_WALL)
-				object->element=O_V_GROWING_WALL;
-			if (object->fill_element==O_H_GROWING_WALL)
-				object->fill_element=O_V_GROWING_WALL;
+			if (object->element==O_H_EXPANDING_WALL)
+				object->element=O_V_EXPANDING_WALL;
+			if (object->fill_element==O_H_EXPANDING_WALL)
+				object->fill_element=O_V_EXPANDING_WALL;
 		}
 	}
 
@@ -1952,11 +2038,15 @@ cave_copy_from_crli (Cave *cave, const guint8 *data, int remaining_bytes)
 		if (cave->level_diamonds[i]==0)		/* gate opening is checked AFTER adding to diamonds collected, so 0 here is 1000 (!) needed */
 			cave->level_diamonds[i]=1000;
 		cave->level_ckdelay[i]=uncompressed[0x38A];
+		cave->level_amoeba_time[i]=(int)uncompressed[0x37C] * 256 + uncompressed[0x37D];
+		cave->level_magic_wall_time[i]=(int)uncompressed[0x37E] * 256 + uncompressed[0x37F];
+		cave->level_slime_permeability_c64[i]=uncompressed[0x38B];
+		cave->level_bonus_time[i]=uncompressed[0x392];
+		cave->level_penalty_time[i]=uncompressed[0x393];
+		cave->level_amoeba_threshold[i]=256*(int)uncompressed[0x390]+uncompressed[0x390+1];
 	}
 	cave->extra_diamond_value=(int)uncompressed[0x376] * 100 + uncompressed[0x377] * 10 + uncompressed[0x378];
 	cave->diamond_value=(int)uncompressed[0x379] * 100 + uncompressed[0x37A] * 10 + uncompressed[0x37B];
-	cave->amoeba_slow_growth_time=(int)uncompressed[0x37C] * 256 + uncompressed[0x37D];
-	cave->magic_wall_milling_time=(int)uncompressed[0x37E] * 256 + uncompressed[0x37F];
 	if (uncompressed[0x380])
 		cave->creatures_direction_auto_change_time=uncompressed[0x381];
 	cave->colorb=gd_c64_colors[uncompressed[0x384]&0xf].rgb;	/* border */
@@ -1972,7 +2062,6 @@ cave_copy_from_crli (Cave *cave, const guint8 *data, int remaining_bytes)
 		cave->x2=19;
 		cave->y2=11;
 	}
-	cave->slime_permeability_c64=uncompressed[0x38B];
 
 	/* AMOEBA in crazy dash 8:
 		jsr $2500		; generate true random
@@ -1997,12 +2086,9 @@ cave_copy_from_crli (Cave *cave, const guint8 *data, int remaining_bytes)
 	if (uncompressed[0x38e]==0x2f)
 		for (y=0; y<cave->h; y++)
 			for (x=0; x<cave->w; x++) {
-				if (cave->map[y][x]==O_H_GROWING_WALL)
-					cave->map[y][x]=O_V_GROWING_WALL;
+				if (cave->map[y][x]==O_H_EXPANDING_WALL)
+					cave->map[y][x]=O_V_EXPANDING_WALL;
 			}
-	cave->amoeba_threshold=256*(int)uncompressed[0x390]+uncompressed[0x390+1];
-	cave->bonus_time=uncompressed[0x392];
-	cave->penalty_time=uncompressed[0x393];
 	cave->biter_delay_frame=uncompressed[0x394];
 	cave->magic_wall_stops_amoeba=uncompressed[0x395]==0;	/* negated!! */
 	cave->bomb_explode_to=import(uncompressed[0x396], 0x396);
@@ -2058,11 +2144,13 @@ GdCavefileFormat
 gd_caveset_imported_format(const guint8 *buf)
 {
 	const char *s_bd1="GDashBD1";
+	const char *s_bd1_atari="GDashB1A";
 	const char *s_dc1="GDashDC1";
 	const char *s_bd2="GDashBD2";
+	const char *s_bd2_atari="GDashB2A";
 	const char *s_plc="GDashPLC";
+	const char *s_plc_atari="GDashPCA";
 	const char *s_dlb="GDashDLB";
-	const char *s_atg="GDashATG";
 	const char *s_crl="GDashCRL";
 	const char *s_cd7="GDashCD7";
 	const char *s_cd9="GDashCD9";
@@ -2070,12 +2158,18 @@ gd_caveset_imported_format(const guint8 *buf)
 
 	if (memcmp((char *)buf, s_bd1, strlen(s_bd1))==0)
 		return GD_FORMAT_BD1;
+	if (memcmp((char *)buf, s_bd1_atari, strlen(s_bd1_atari))==0)
+		return GD_FORMAT_BD1_ATARI;
 	if (memcmp((char *)buf, s_dc1, strlen(s_dc1))==0)
 		return GD_FORMAT_DC1;
 	if (memcmp((char *)buf, s_bd2, strlen(s_bd2))==0)
 		return GD_FORMAT_BD2;
+	if (memcmp((char *)buf, s_bd2_atari, strlen(s_bd2_atari))==0)
+		return GD_FORMAT_BD2_ATARI;
 	if (memcmp((char *)buf, s_plc, strlen(s_plc))==0)
 		return GD_FORMAT_PLC;
+	if (memcmp((char *)buf, s_plc_atari, strlen(s_plc_atari))==0)
+		return GD_FORMAT_PLC_ATARI;
 	if (memcmp((char *)buf, s_dlb, strlen(s_dlb))==0)
 		return GD_FORMAT_DLB;
 	if (memcmp((char *)buf, s_crl, strlen(s_crl))==0)
@@ -2084,8 +2178,6 @@ gd_caveset_imported_format(const guint8 *buf)
 		return GD_FORMAT_CRDR_7;
 	if (memcmp((char *)buf, s_cd9, strlen(s_cd9))==0)
 		return GD_FORMAT_CRDR_9;
-	if (memcmp((char *)buf, s_atg, strlen(s_atg))==0)
-		return GD_FORMAT_ATG;
 	if (memcmp((char *)buf, s_1st, strlen(s_1st))==0)
 		return GD_FORMAT_FIRSTB;
 
@@ -2139,8 +2231,10 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 
 		switch (format) {
 		case GD_FORMAT_BD1:				/* boulder dash 1 */
+		case GD_FORMAT_BD1_ATARI:		/* boulder dash 1, atari version */
 		case GD_FORMAT_DC1:				/* deluxe caves 1 */
 		case GD_FORMAT_BD2:				/* boulder dash 2 */
+		case GD_FORMAT_BD2_ATARI:				/* boulder dash 2 */
 			/* these are not in the data so we guess */
 			newcave->selectable=(cavenum<16) && (cavenum%4 == 0);
 			newcave->intermission=cavenum>15;
@@ -2151,9 +2245,15 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 				g_snprintf(newcave->name, sizeof(newcave->name), _("Cave %c"), 'A'+cavenum);
 
 			switch(format) {
-				case GD_FORMAT_BD1: cavelength=cave_copy_from_bd1 (newcave, buf+bufp, length-bufp, FALSE); break;
-				case GD_FORMAT_DC1: cavelength=cave_copy_from_bd1 (newcave, buf+bufp, length-bufp, TRUE); break;
-				case GD_FORMAT_BD2: cavelength=cave_copy_from_bd2 (newcave, buf+bufp, length-bufp); break;
+				case GD_FORMAT_BD1:
+				case GD_FORMAT_BD1_ATARI:
+				case GD_FORMAT_DC1:
+					cavelength=cave_copy_from_bd1(newcave, buf+bufp, length-bufp, format);
+					break;
+				case GD_FORMAT_BD2:
+				case GD_FORMAT_BD2_ATARI:
+					cavelength=cave_copy_from_bd2(newcave, buf+bufp, length-bufp, format);
+					break;
 				default:
 					g_assert_not_reached();
 			};
@@ -2171,7 +2271,9 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 			break;
 
 		case GD_FORMAT_PLC:				/* peter liepa construction kit */
-			cavelength=cave_copy_from_plck (newcave, buf+bufp, length-bufp);
+		case GD_FORMAT_PLC_ATARI:				/* peter liepa construction kit, atari version */
+			gd_error_set_context("cave %d", cavenum);
+			cavelength=cave_copy_from_plck(newcave, buf+bufp, length-bufp, format);
 			break;
 
 		case GD_FORMAT_DLB:	/* no one's delight boulder dash, something like rle compressed plck caves */
@@ -2189,18 +2291,6 @@ gd_caveset_import_from_buffer (const guint8 *buf, gsize length)
 				g_snprintf(newcave->name, sizeof(newcave->name), _("Cave %c"), 'A'+(cavenum%5+cavenum/5*4));
 
 			cavelength=cave_copy_from_dlb (newcave, buf+bufp, length-bufp);
-			break;
-
-		case GD_FORMAT_ATG:				/* atari games, imported from boulder rush */
-			cavelength=cave_copy_from_atg(newcave, buf+bufp, length-bufp);	/* this also sets name */
-			newcave->selectable=cavenum%5 == 0;
-			/* atg games have no color info - use the no1 color table so they are different */
-			newcave->color1=gd_c64_colors[0].rgb;
-			newcave->color1=gd_c64_colors[no1_default_colors[cavenum*3+0]].rgb;
-			newcave->color2=gd_c64_colors[no1_default_colors[cavenum*3+1]].rgb;
-			newcave->color3=gd_c64_colors[no1_default_colors[cavenum*3+2]].rgb;
-			newcave->color4=newcave->color3;
-			newcave->color5=newcave->color3;
 			break;
 
 		case GD_FORMAT_CRLI:

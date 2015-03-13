@@ -345,6 +345,15 @@ settings_window_toggle(GtkWidget *widget, gpointer data)
 	*bl=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
 }
 
+/* callback for a spin button. data is a pointer to a gboolean. */
+static void
+settings_window_value_change(GtkWidget *widget, gpointer data)
+{
+	int *value=(int *) data;
+	
+	*value=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(widget));
+}
+
 /* return a list of image gtk_image_filter's. */
 /* they have floating reference. */
 /* the list is to be freed by the caller. */
@@ -413,7 +422,7 @@ add_theme_cb(GtkWidget *widget, gpointer data)
 
 	result=gtk_dialog_run (GTK_DIALOG (dialog));
 	if (result==GTK_RESPONSE_ACCEPT)
-		filename=gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+		filename=gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(dialog));
 
 	if (filename) {
 		const char *error_msg;
@@ -496,34 +505,41 @@ remove_theme_cb(GtkWidget *widget, gpointer data)
 void
 gd_preferences (GtkWidget *parent)
 {
+	typedef enum _settingtype {
+		TypeLabel,
+		TypeBoolean,
+		TypeByte,
+	} SettingType;
 	static struct {
+		SettingType type;
 		char *name;
 		char *description;
-		gboolean *value;
-		gboolean update;			/* if sample pixbuf should be updated when clicking this option */
+		gpointer value;
+		gboolean update;			/* if sample pixbuf should be updated when changing this option */
 	} check_buttons[]={
-		{N_("<b>Cave options</b>"), NULL, NULL},
-		{N_("Ease levels"), N_("Make caves easier to play. Only one diamonds to collect, more time available, no expanding walls... This might render some caves unplayable!"), &gd_easy_play},
-		{N_("Mouse play (experimental!)"), N_("Use the mouse to play. The player will follow the cursor!"), &gd_mouse_play, FALSE},
-		{N_("All caves selectable"), N_("All caves and intermissions can be selected at game start."), &gd_all_caves_selectable, FALSE},
-		{N_("Import as all caves selectable"), N_("Original, C64 games are imported not with A, E, I, M caves selectable, but all caves (ABCD, EFGH... excluding intermissions). This does not affect BDCFF caves."), &gd_import_as_all_caves_selectable, FALSE},
-		{N_("Use BDCFF highscore"), N_("Use BDCFF highscores. GDash rather stores highscores in its own configuration directory, instead of saving them in "
+		{TypeLabel, N_("<b>Cave options</b>"), NULL, NULL},
+		{TypeBoolean, N_("Ease levels"), N_("Make caves easier to play. Only one diamonds to collect, more time available, no expanding walls... This might render some caves unplayable!"), &gd_easy_play},
+		{TypeBoolean, N_("Mouse play (experimental!)"), N_("Use the mouse to play. The player will follow the cursor!"), &gd_mouse_play, FALSE},
+		{TypeBoolean, N_("All caves selectable"), N_("All caves and intermissions can be selected at game start."), &gd_all_caves_selectable, FALSE},
+		{TypeBoolean, N_("Import as all caves selectable"), N_("Original, C64 games are imported not with A, E, I, M caves selectable, but all caves (ABCD, EFGH... excluding intermissions). This does not affect BDCFF caves."), &gd_import_as_all_caves_selectable, FALSE},
+		{TypeBoolean, N_("Use BDCFF highscore"), N_("Use BDCFF highscores. GDash rather stores highscores in its own configuration directory, instead of saving them in "
 			" the *.bd file."), &gd_use_bdcff_highscore, FALSE},
-		{N_("<b>Display options</b>"), NULL, NULL},
-		{N_("Time as min:sec"), N_("Show times in minutes and seconds, instead of seconds only."), &gd_time_min_sec, FALSE},
-		{N_("Random colors"), N_("Use randomly selected colors for C64 graphics."), &gd_random_colors, FALSE},
+		{TypeLabel, N_("<b>Display options</b>"), NULL, NULL},
+		{TypeBoolean, N_("Time as min:sec"), N_("Show times in minutes and seconds, instead of seconds only."), &gd_time_min_sec, FALSE},
+		{TypeBoolean, N_("Random colors"), N_("Use randomly selected colors for C64 graphics."), &gd_random_colors, FALSE},
 /*
    XXX currently dirt mod is not shown to the user.
 		{N_("Allow dirt mod"), N_("Enable caves to use alternative dirt graphics. This applies only to imported caves, not BDCFF (*.bd) files."), &allow_dirt_mod, FALSE},
 */
-		{N_("PAL emulation for game"), N_("Use PAL emulated graphics, ie. lines are striped."), &gd_pal_emulation_game, TRUE},
-		{N_("PAL emulation for editor"), N_("Use PAL emulated graphics, ie. lines are striped."), &gd_pal_emulation_editor, TRUE},
+		{TypeBoolean, N_("PAL emulation for game"), N_("Use PAL emulated graphics, ie. lines are striped."), &gd_pal_emulation_game, TRUE},
+		{TypeBoolean, N_("PAL emulation for editor"), N_("Use PAL emulated graphics, ie. lines are striped."), &gd_pal_emulation_editor, TRUE},
+		{TypeByte,    N_("PAL scanline shade (%)"), N_("Darker rows for PAL emulation."), &gd_pal_emu_scanline_shade, TRUE},
 #ifdef GD_SOUND
-		{N_("<b>Sound options</b> (require restart)"), NULL, NULL},
-		{N_("Sound"), N_("Play sounds. Enabling this setting requires a restart!"), &gd_sdl_sound, FALSE},
-		{N_("Classic sounds only"), N_("Play only classic sounds taken from the original game."), &gd_classic_sound, FALSE},
-		{N_("16-bit mixing"), N_("Use 16-bit mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_16bit_mixing, FALSE},
-		{N_("44kHz mixing"), N_("Use 44kHz mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_44khz_mixing, FALSE},
+		{TypeLabel, N_("<b>Sound options</b> (require restart)"), NULL, NULL},
+		{TypeBoolean, N_("Sound"), N_("Play sounds. Enabling this setting requires a restart!"), &gd_sdl_sound, FALSE},
+		{TypeBoolean, N_("Classic sounds only"), N_("Play only classic sounds taken from the original game."), &gd_classic_sound, FALSE},
+		{TypeBoolean, N_("16-bit mixing"), N_("Use 16-bit mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_16bit_mixing, FALSE},
+		{TypeBoolean, N_("44kHz mixing"), N_("Use 44kHz mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_44khz_mixing, FALSE},
 #endif
 	};
 
@@ -565,22 +581,40 @@ gd_preferences (GtkWidget *parent)
 	/* game booleans */
 	row=0;
 	for (i=0; i<G_N_ELEMENTS(check_buttons); i++) {
-		if (check_buttons[i].value) {
-			GtkWidget *widget;
+		GtkWidget *widget, *hbox;
 			
-			widget=gtk_check_button_new_with_label (_(check_buttons[i].name));
-			gtk_widget_set_tooltip_text(widget, _(check_buttons[i].description));
-			gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), *check_buttons[i].value);
-			gtk_table_attach_defaults (GTK_TABLE (table), widget, 1, 2, row, row + 1);
-			g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(settings_window_toggle), check_buttons[i].value);
-			/* if sample pixbuf should be updated */
-			if (check_buttons[i].update)
-				g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(settings_window_changed), &info);
-		} else {
-			label=gtk_label_new (NULL);
-			gtk_label_set_markup(GTK_LABEL(label), _(check_buttons[i].name));
-			gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
-			gtk_table_attach_defaults (GTK_TABLE (table), label, 0, 2, row, row + 1);
+		switch (check_buttons[i].type) {
+			case TypeLabel:
+				label=gtk_label_new(NULL);
+				gtk_label_set_markup(GTK_LABEL(label), _(check_buttons[i].name));
+				gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+				gtk_table_attach_defaults (GTK_TABLE (table), label, 0, 2, row, row + 1);
+				break;
+				
+			case TypeBoolean:
+				widget=gtk_check_button_new_with_label(_(check_buttons[i].name));
+				gtk_widget_set_tooltip_text(widget, _(check_buttons[i].description));
+				gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), *(gboolean *)check_buttons[i].value);
+				gtk_table_attach_defaults (GTK_TABLE (table), widget, 1, 2, row, row + 1);
+				g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(settings_window_toggle), check_buttons[i].value);
+				/* if sample pixbuf should be updated */
+				if (check_buttons[i].update)
+					g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(settings_window_changed), &info);
+				break;
+		
+			case TypeByte:
+				hbox=gtk_hbox_new(FALSE, 6);
+				widget=gtk_spin_button_new_with_range(0, 100, 5);
+				gtk_widget_set_tooltip_text(widget, _(check_buttons[i].description));
+				gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), *(int *)check_buttons[i].value);
+				g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(settings_window_value_change), check_buttons[i].value);
+				if (check_buttons[i].update)
+					g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(settings_window_changed), &info);
+				gtk_box_pack_start(GTK_BOX(hbox), widget, FALSE, FALSE, 0);
+				gtk_box_pack_start_defaults(GTK_BOX(hbox), gd_label_new_printf(_(check_buttons[i].name)));
+
+				gtk_table_attach_defaults (GTK_TABLE (table), hbox, 1, 2, row, row + 1);
+				break;
 		}		
 		row ++;
 	}
@@ -947,6 +981,45 @@ gd_ask_overwrite(const char *filename)
 
 
 
+static void
+caveset_file_operation_successful(const char *filename)
+{
+	/* save successful, so remember filename */
+	/* first we make a copy, as it is possible that filename==caveset_filename (the pointers!) */
+	char *uri;
+
+	/* add to recent chooser */
+	if (g_path_is_absolute(filename))
+		uri=g_filename_to_uri(filename, NULL, NULL);
+	else {
+		/* make an absolute filename if needed */
+		char *absolute;
+		char *currentdir;
+		
+		currentdir=g_get_current_dir();
+		absolute=g_build_path(G_DIR_SEPARATOR_S, currentdir, filename, NULL);
+		g_free(currentdir);
+		uri=g_filename_to_uri(absolute, NULL, NULL);
+		g_free(absolute);
+	}
+	gtk_recent_manager_add_item(gtk_recent_manager_get_default(), uri);
+	g_free(uri);
+
+	/* if it is a bd file, remember new filename */
+	if (g_str_has_suffix(filename, ".bd")) {
+		char *stored;
+
+		/* first make copy, then free and set pointer. we might be called with filename=caveset_filename */
+		stored=g_strdup(filename);
+		g_free(caveset_filename);
+		caveset_filename=stored;
+	} else {
+		g_free(caveset_filename);
+		caveset_filename=NULL;
+	}
+}
+
+
 /* save caveset to specified directory, and pop up error message if failed */
 static void
 caveset_save (const gchar *filename)
@@ -956,14 +1029,8 @@ caveset_save (const gchar *filename)
 	saved=gd_caveset_save(filename);
 	if (!saved)
 		gd_show_last_error(guess_active_toplevel());
-	else {
-		/* save successful, so remember filename */
-		/* first we make a copy, as it is possible that filename==caveset_filename (the pointers!) */
-		char *stored=g_strdup(filename);
-		g_free(caveset_filename);
-		caveset_filename=stored;
-	}
-	
+	else
+		caveset_file_operation_successful(filename);
 }
 
 
@@ -980,19 +1047,19 @@ gd_save_caveset_as (GtkWidget *parent)
 	filter=gtk_file_filter_new ();
 	gtk_file_filter_set_name (filter, _("BDCFF cave sets (*.bd)"));
 	gtk_file_filter_add_pattern (filter, "*.bd");
-	gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), filter);
+	gtk_file_chooser_add_filter (GTK_FILE_CHOOSER(dialog), filter);
 
 	filter=gtk_file_filter_new ();
 	gtk_file_filter_set_name (filter, _("All files (*)"));
 	gtk_file_filter_add_pattern (filter, "*");
-	gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), filter);
+	gtk_file_chooser_add_filter (GTK_FILE_CHOOSER(dialog), filter);
 	
 	suggested_name=g_strdup_printf("%s.bd", gd_caveset_data->name);
 	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), suggested_name);
 	g_free(suggested_name);
 
 	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
-		filename=gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+		filename=gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(dialog));
 
 	/* check if .bd extension should be added */
 	if (filename) {
@@ -1040,14 +1107,13 @@ gd_save_caveset(GtkWidget *parent)
 gboolean
 gd_open_caveset_in_ui(const char *filename, gboolean highscore_load_from_bdcff)
 {
+	gboolean loaded;
+	
 	gd_clear_error_flag();
 	
-	g_free(caveset_filename);
-	caveset_filename=NULL;
-	if (g_str_has_suffix(filename, ".bd"))
-		caveset_filename=g_strdup(filename);
-
-	gd_caveset_load_from_file (filename, gd_user_config_dir);
+	loaded=gd_caveset_load_from_file (filename, gd_user_config_dir);
+	if (loaded)
+		caveset_file_operation_successful(filename);
 
 	/* if successful loading and this is a bd file, and we load highscores from our own config dir */
 	if (!gd_has_new_error() && g_str_has_suffix(filename, ".bd") && !highscore_load_from_bdcff)
@@ -1068,8 +1134,9 @@ gd_open_caveset (GtkWidget *parent, const char *directory)
 	int result;
 	char *filename=NULL;
 	gboolean highscore_load_from_bdcff;
+	int i;
 	
-	/* if caveset is edited, and user does not want to forget it */
+	/* if caveset is edited, and user does not want to discard changes */
 	if (!gd_discard_changes(parent))
 		return;
 
@@ -1081,33 +1148,40 @@ gd_open_caveset (GtkWidget *parent, const char *directory)
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), gd_use_bdcff_highscore);
 	gtk_widget_show(check);
 
-	filter=gtk_file_filter_new ();
-	gtk_file_filter_set_name (filter, _("GDash cave sets"));
-	gtk_file_filter_add_pattern (filter, "*.bd");
-	gtk_file_filter_add_pattern (filter, "*.gds");
-	gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), filter);
+	filter=gtk_file_filter_new();
+	gtk_file_filter_set_name(filter, _("GDash cave sets"));
+	for (i=0; gd_caveset_extensions[i]!=NULL; i++)
+		gtk_file_filter_add_pattern(filter, gd_caveset_extensions[i]);
+	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
 
 	/* if callback shipped with a directory name, show that directory by default */
 	if (directory)
-		gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (dialog), directory);
+		gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER(dialog), directory);
 	else
 	if (last_folder)
 		/* if we previously had an open command, the directory was remembered */
-		gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (dialog), last_folder);
+		gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER(dialog), last_folder);
 	else
 		/* otherwise user home */
-		gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (dialog), g_get_home_dir());
+		gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER(dialog), g_get_home_dir());
 
-	result=gtk_dialog_run (GTK_DIALOG (dialog));
+	result=gtk_dialog_run(GTK_DIALOG (dialog));
 	if (result==GTK_RESPONSE_ACCEPT) {
-		filename=gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+		filename=gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(dialog));
 		g_free (last_folder);
-		last_folder=gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER (dialog));
+		last_folder=gtk_file_chooser_get_current_folder (GTK_FILE_CHOOSER(dialog));
 	}
 	/* read the state of the check button */
 	highscore_load_from_bdcff=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check));
 	gtk_widget_destroy (dialog);
 
+	/* WINDOWS GTK+ 20080926 HACK XXX XXX XXX XXX */
+	/* gtk bug - sometimes the above widget destroy creates an error message. */
+	/* so we delete the error flag here. */
+#ifdef G_OS_WIN32
+	gd_clear_error_flag();
+#endif
+	
 	if (filename)
 		gd_open_caveset_in_ui(filename, highscore_load_from_bdcff);
 	g_free (filename);
