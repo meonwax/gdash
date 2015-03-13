@@ -4,6 +4,54 @@ An Emerald Mine-like game for GTK+.
 Use the cursor keys and Ctrl to move.
 
 
+Compiling
+---------
+Compiling the game goes the usual way. After uncompressing, you can
+use the 'configure' script to detect libraries and create makefiles,
+then use 'make' and maybe 'make install', if needed:
+
+	./configure [parameters]
+	make
+	make install
+
+The game uses the glib library. For compiling, headers and development
+libraries are also needed from the glib package.
+The program comes in two versions, the GTK+-based 'gdash', which has
+a cave editor, too. The other one is the SDL-based 'sdash', which is
+very similar to the original C64 game, and has joystick support, and
+a very nice fullscreen support.
+Sound support can also be enabled, if SDL is available. (It is enabled
+by default.)
+The switches to control the libraries are:
+
+	--with-gtk and --without-gtk, to compile or to skip the menu-driven
+	gdash version.
+	
+	--with-sdl and --without-sdl, to control the build of the sdl
+	version. 
+	
+	--enable-sound and --disable-sound, to use sounds or not. For sounds,
+	SDL is needed, so --enable-sound --without-sdl is an invalid
+	combination.
+	
+For example, if you do not have GTK+, and plan to build only the C64-like
+sdash, you can use:
+
+	./configure --without-gtk
+	make
+
+Remember that glib is needed in either case. Also, some icons and
+pictures are inlined in the executables. The include/ directory comes
+with these .h files readily generated, but if you change one of the .png
+files, the gdk-pixbuf-csource application is needed to regenerate them,
+which is part of the GTK+ development package.
+
+To build the Windows installer, you can use MinGW and the Msys environment.
+Type 'make gdash.nsi' in the shell, and open the resulting 'gdash.nsi' file
+in NSIS.
+
+
+
 util/any2gdash
 --------------
 You can use the any2gdash tool to convert caves found in snapshot files.

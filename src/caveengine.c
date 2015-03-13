@@ -28,9 +28,16 @@ static const GdDirection right_eighth[]={ MV_STILL, MV_UP_RIGHT, MV_RIGHT, MV_DO
 static const GdDirection right_fourth[]={ MV_STILL, MV_RIGHT, MV_DOWN_RIGHT, MV_DOWN, MV_DOWN_LEFT, MV_LEFT, MV_UP_LEFT, MV_UP, MV_UP_RIGHT };
 
 
+/* sets timeout sound. returns true, if the sound was set, false if not. */
 gboolean
 gd_cave_set_seconds_sound(Cave *cave)
 {
+	/* only set timeout sound, if we do not have and explosion sound playing. */
+	if (cave->sound2==GD_S_EXPLOSION) {
+		/* did not set sound. */
+		return FALSE;
+	}
+
 	switch(cave->time/cave->timing_factor) {
 		case 9: cave->sound2=GD_S_TIMEOUT_1; break;
 		case 8: cave->sound2=GD_S_TIMEOUT_2; break;
@@ -43,9 +50,11 @@ gd_cave_set_seconds_sound(Cave *cave)
 		case 1: cave->sound2=GD_S_TIMEOUT_9; break;
 		default:
 			/* no sound */
-			return FALSE;	/* did not set. */
+			return FALSE;	/* did not set */
 	}
-	return TRUE;	/* did set. */
+
+	/* did set the sound */	
+	return TRUE;
 }
 
 
@@ -435,8 +444,7 @@ player_get_element (Cave* cave, const GdElement object)
 		/* no space, rather a dirt remains there... */
 		return O_DIRT;
 	case O_DIAMOND:
-		if (cave->sound2!=GD_S_EXPLOSION)
-			cave->sound2=GD_S_DIAMOND_COLLECT;
+		cave->sound1=GD_S_DIAMOND_COLLECT;
 		cave->score+=cave->diamond_value;
 		cave->diamonds_collected++;
 		if (cave->diamonds_needed==cave->diamonds_collected) {
@@ -506,6 +514,10 @@ do_teleporter(Cave *cave, int px, int py, GdDirection player_move)
 static void
 diamond_stone_sound(Cave *cave, GdElement element)
 {
+	/* diamond collect sound has precedence */
+	if (cave->sound1==GD_S_DIAMOND_COLLECT)
+		return;
+
 	switch(element) {
 		case O_STONE:
 		case O_STONE_F:
@@ -953,7 +965,7 @@ gd_cave_iterate(Cave *cave, const gboolean up, const gboolean down, const gboole
 									if (is_space_dir(cave, x, y, MV_TWICE + player_move)) {
 										store_dir(cave, x, y, MV_TWICE + player_move, what);
 										remains=O_SPACE;
-										cave->sound1=GD_S_STONE;
+										diamond_stone_sound(cave, O_STONE);
 									}
 								}
 						}
@@ -1128,7 +1140,7 @@ gd_cave_iterate(Cave *cave, const gboolean up, const gboolean down, const gboole
 									if (is_space_dir(cave, x, y, MV_TWICE + player_move)) {
 										store_dir(cave, x, y, MV_TWICE + player_move, what);
 										remains=O_SPACE;
-										cave->sound1=GD_S_STONE;
+										diamond_stone_sound(cave, GD_S_STONE);
 									}
 								}
 						}
@@ -1771,7 +1783,7 @@ gd_cave_iterate(Cave *cave, const gboolean up, const gboolean down, const gboole
 		/* we so not set it, if a gate open triggered the crack sound already */
 		if (cave->magic_wall_state==MW_ACTIVE && cave->magic_wall_sound)
 			cave->sound3=GD_S_MAGIC_WALL;
-		if (amoeba_count>0)
+		if (amoeba_count>0 && cave->amoeba_started && cave->hatching_delay==0)
 			cave->sound3=GD_S_AMOEBA;	/* amoeba sound takes precedence over magic wall sound */
 	}
 	
@@ -1807,10 +1819,14 @@ gd_cave_iterate(Cave *cave, const gboolean up, const gboolean down, const gboole
 		
 		secondsbefore=cave->time/cave->timing_factor;
 		cave->time-=cave->speed;
-		if (cave->time<0)
+		if (cave->time<=0)
 			cave->time=0;
 		secondsafter=cave->time/cave->timing_factor;
-		if (secondsbefore && secondsafter)
+		if (cave->time/cave->timing_factor<10)
+			/* if less than 10 seconds, no walking sound, but play explosion sound */
+				if (cave->sound2!=GD_S_EXPLOSION)
+					cave->sound2=GD_S_NONE;
+		if (secondsbefore!=secondsafter)
 			gd_cave_set_seconds_sound(cave);
 	}
 	/* a gravity switch was activated; seconds counting down */

@@ -43,6 +43,9 @@ Section "GDash (required)"
   File "include\boulder_rush.png"
   File "include\cells_c64.png"
   File "gdash.ico"
+  File /oname=README.txt "README"
+  
+  File "sound\*.wav"
 
   ; Profram files, Glib dlls
   SetOutPath $INSTDIR
@@ -121,6 +124,7 @@ Section "Start Menu Shortcuts"
   CreateShortCut "$SMPROGRAMS\GDash\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\GDash\GDash.lnk" "$INSTDIR\gdash.exe" "" "$INSTDIR\gdash.ico" 0
   CreateShortCut "$SMPROGRAMS\GDash\GDash (C64-like).lnk" "$INSTDIR\sdash.exe" "" "$INSTDIR\gdash.ico" 0
+  CreateShortCut "$SMPROGRAMS\GDash\README.lnk" "$INSTDIR\README.txt" "" "" 0
   
 SectionEnd
 

@@ -207,10 +207,11 @@ gboolean
 gd_game_iterate_cave(gboolean up, gboolean down, gboolean left, gboolean right, gboolean fire, gboolean key_suicide, gboolean key_restart)
 {
 	/* if already time=0, skip iterating */
-	if (game.cave->player_state!=PL_TIMEOUT)
+	if (game.cave->player_state!=PL_TIMEOUT) {
 		gd_cave_iterate (game.cave, up, down, left, right, fire, key_suicide);
-
-	gd_play_sounds(game.cave->sound1, game.cave->sound2, game.cave->sound3);
+		gd_play_sounds(game.cave->sound1, game.cave->sound2, game.cave->sound3);
+	} else
+		gd_no_sound();
 		
 	if (game.cave->score)
 		increment_score (game.cave->score);
@@ -223,9 +224,10 @@ gd_game_iterate_cave(gboolean up, gboolean down, gboolean left, gboolean right, 
 
 		/* start adding points for remaining time */
 		game.cover_counter=GAME_INT_CHECK_BONUS_TIME;
-		game.cave->sound1=GD_S_NONE;
-		game.cave->sound2=GD_S_FINISHED;	/* cave finished sound */
+		game.cave->sound1=GD_S_NONE;	/* forget cave sounds */
+		game.cave->sound2=GD_S_NONE;
 		game.cave->sound3=GD_S_NONE;
+		gd_play_sounds(GD_S_NONE, GD_S_FINISHED, GD_S_NONE);	/* play cave finished sound */
 		next_level();
 		return TRUE;	/* nothing to do with this cave anymore */
 	}

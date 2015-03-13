@@ -1819,7 +1819,7 @@ cave_copy_from_crli (Cave *cave, const guint8 *data, int remaining_bytes)
 		object.x2=35;
 		object.y2=20;
 		object.element=O_NONE;
-		object.fill_element=O_SPACE;
+		object.fill_element=O_DIRT;
 		object.dx=1;
 		object.dy=1;
 

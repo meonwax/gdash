@@ -382,6 +382,9 @@ static void
 toggle_pause_cb (GtkWidget * widget, gpointer data)
 {
 	paused=gtk_toggle_action_get_active (GTK_TOGGLE_ACTION (widget));
+	
+	if (paused)
+		gd_no_sound();
 }
 
 static void

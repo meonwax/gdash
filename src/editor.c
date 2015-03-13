@@ -2111,7 +2111,7 @@ motion_event (const GtkWidget *widget, const GdkEventMotion *event, const gpoint
 	so don't use data! that function has another parameters.
 	also do not use widget, as it is once an icon view, once a gtkmenu */
 static void
-edit_cave_cb (const gpointer dontuse, const gpointer dontuse2)
+edit_cave_cb ()
 {
 	GList *list;
 	GtkTreeIter iter;
@@ -2165,6 +2165,56 @@ rename_cave_cb (GtkWidget *widget, gpointer data)
 		gtk_list_store_set(GTK_LIST_STORE(model), &iter, NAME_COLUMN, cave->name, -1);
 	}
 	gtk_widget_destroy(dialog);
+}
+
+static void
+cave_make_selectable_cb (GtkWidget *widget, gpointer data)
+{
+	GList *list;
+	GtkTreeIter iter;
+	GtkTreeModel *model;
+	Cave *cave;
+
+	list=gtk_icon_view_get_selected_items (GTK_ICON_VIEW(iconview_cavelist));
+	g_return_if_fail (list!=NULL);
+
+	model=gtk_icon_view_get_model (GTK_ICON_VIEW (iconview_cavelist));
+	gtk_tree_model_get_iter (model, &iter, list->data);
+	gtk_tree_model_get (model, &iter, CAVE_COLUMN, &cave, -1);
+	g_list_foreach (list, (GFunc) gtk_tree_path_free, NULL);	/* free the list of paths */
+	g_list_free (list);
+	if (!cave->selectable) {
+		cave->selectable=TRUE;
+		g_hash_table_remove(cave_pixbufs, cave);
+		/* regenerate icon view */
+		gtk_widget_destroy (iconview_cavelist);
+		select_cave_for_edit(NULL);
+	}
+}
+
+static void
+cave_make_unselectable_cb (GtkWidget *widget, gpointer data)
+{
+	GList *list;
+	GtkTreeIter iter;
+	GtkTreeModel *model;
+	Cave *cave;
+
+	list=gtk_icon_view_get_selected_items (GTK_ICON_VIEW(iconview_cavelist));
+	g_return_if_fail (list!=NULL);
+
+	model=gtk_icon_view_get_model (GTK_ICON_VIEW (iconview_cavelist));
+	gtk_tree_model_get_iter (model, &iter, list->data);
+	gtk_tree_model_get (model, &iter, CAVE_COLUMN, &cave, -1);
+	g_list_foreach (list, (GFunc) gtk_tree_path_free, NULL);	/* free the list of paths */
+	g_list_free (list);
+	if (cave->selectable) {
+		cave->selectable=FALSE;
+		g_hash_table_remove(cave_pixbufs, cave);
+		/* regenerate icon view */
+		gtk_widget_destroy (iconview_cavelist);
+		select_cave_for_edit(NULL);
+	}
 }
 
 static void
@@ -3332,6 +3382,83 @@ new_caveset_cb (GtkWidget *widget, gpointer data)
 
 
 
+/* make all caves selectable */
+static void
+selectable_all_cb(GtkWidget *widget, gpointer data)
+{
+	Cave *edited;
+	GList *iter;
+	
+	edited=edited_cave;
+	/* destroy icon view so it does not interfere with the cave order, and the order of caves is saved */
+	if (iconview_cavelist)
+		gtk_widget_destroy(iconview_cavelist);
+	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
+		Cave *cave=(Cave *)iter->data;
+		
+		if (!cave->selectable) {
+			cave->selectable=TRUE;
+			g_hash_table_remove(cave_pixbufs, cave);
+		}
+	}
+	select_cave_for_edit(edited);	/* go back to edited cave or recreate icon view */
+}
+
+/* make all but intermissions selectable */
+static void
+selectable_all_but_intermissions_cb(GtkWidget *widget, gpointer data)
+{
+	Cave *edited;
+	GList *iter;
+	
+	edited=edited_cave;
+	/* destroy icon view so it does not interfere with the cave order, and the order of caves is saved */
+	if (iconview_cavelist)
+		gtk_widget_destroy(iconview_cavelist);
+	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
+		Cave *cave=(Cave *)iter->data;
+		gboolean desired=!cave->intermission;
+		
+		if (cave->selectable!=desired) {
+			cave->selectable=desired;
+			g_hash_table_remove(cave_pixbufs, cave);
+		}
+	}
+	select_cave_for_edit(edited);	/* go back to edited cave or recreate icon view */
+}
+
+
+/* make all after intermissions selectable */
+static void
+selectable_all_after_intermissions_cb(GtkWidget *widget, gpointer data)
+{
+	gboolean was_intermission=TRUE;	/* treat the 'zeroth' cave as intermission, so the very first cave will be selectable */
+	Cave *edited;
+	GList *iter;
+	
+	edited=edited_cave;
+	/* destroy icon view so it does not interfere with the cave order, and the order of caves is saved */
+	if (iconview_cavelist)
+		gtk_widget_destroy(iconview_cavelist);
+	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
+		Cave *cave=(Cave *)iter->data;
+		gboolean desired;
+		
+		desired=!cave->intermission && was_intermission;	/* selectable if this is a normal cave, and the previous one was an interm. */
+		if (cave->selectable!=desired) {
+			cave->selectable=desired;
+			g_hash_table_remove(cave_pixbufs, cave);
+		}
+
+		was_intermission=cave->intermission;	/* remember for next iteration */
+	}
+	select_cave_for_edit(edited);	/* go back to edited cave or recreate icon view */
+}
+
+
+
+
+
 /******************************************************
  *
  * some necessary callbacks for the editor
@@ -3649,6 +3776,8 @@ cave_editor_cb (GtkWidget *widget, gpointer data)
 	static const GtkActionEntry action_entries_cave_selector[]={
 		{"EditCave", GD_ICON_CAVE_EDITOR, N_("_Edit cave"), NULL, N_("Edit selected cave"), G_CALLBACK(edit_cave_cb)},
 		{"RenameCave", NULL, N_("_Rename cave"), NULL, N_("Rename selected cave"), G_CALLBACK(rename_cave_cb)},
+		{"MakeSelectable", NULL, N_("Make cave _selectable"), NULL, N_("Make the cave selectable as game start"), G_CALLBACK(cave_make_selectable_cb)},
+		{"MakeUnselectable", NULL, N_("Make cave _unselectable"), NULL, N_("Make the cave unselectable as game start"), G_CALLBACK(cave_make_unselectable_cb)},
 	};
 
 	/* caveset editing */
@@ -3656,6 +3785,10 @@ cave_editor_cb (GtkWidget *widget, gpointer data)
 		{"NewCaveset", GTK_STOCK_NEW, N_("_New cave set"), "", N_("Create new cave set with no caves"), G_CALLBACK(new_caveset_cb)},
 		{"SaveHTML", GTK_STOCK_FILE, N_("Save _HTML gallery"), NULL, N_("Save game in a HTML gallery"), G_CALLBACK(save_html_cb)},
 		{"ExportCavePack", GTK_STOCK_CONVERT, N_("Export _CrLi cave pack"), NULL, NULL, G_CALLBACK(export_cavepack_cb)},
+		{"SelectMenu", NULL, N_("_Make caves selectable")},
+		{"AllCavesSelectable", NULL, N_("All _caves"), NULL, N_("Make all caves selectable as game start"), G_CALLBACK(selectable_all_cb)},
+		{"AllButIntermissionsSelectable", NULL, N_("All _but intermissions"), NULL, N_("Make all caves but intermissions selectable as game start"), G_CALLBACK(selectable_all_but_intermissions_cb)},
+		{"AllAfterIntermissionsSelectable", NULL, N_("All _after intermissions"), NULL, N_("Make all caves after intermissions selectable as game start"), G_CALLBACK(selectable_all_after_intermissions_cb)},
 	};
 
 	/* normal menu items */
@@ -3758,6 +3891,8 @@ cave_editor_cb (GtkWidget *widget, gpointer data)
 			"<menuitem action='NewCave'/>"
 			"<menuitem action='EditCave'/>"
 			"<menuitem action='RenameCave'/>"
+			"<menuitem action='MakeSelectable'/>"
+			"<menuitem action='MakeUnselectable'/>"
 		"</popup>"
 
 		"<popup name='ObjectListPopup'>"
@@ -3777,6 +3912,8 @@ cave_editor_cb (GtkWidget *widget, gpointer data)
 				"<menuitem action='NewCaveset'/>"
 				"<menuitem action='EditCave'/>"
 				"<menuitem action='RenameCave'/>"
+				"<menuitem action='MakeSelectable'/>"
+				"<menuitem action='MakeUnselectable'/>"
 				"<separator/>"
 				"<menuitem action='OpenFile'/>"
 				"<separator/>"
@@ -3785,6 +3922,11 @@ cave_editor_cb (GtkWidget *widget, gpointer data)
 				"<separator/>"
 				"<menuitem action='CaveSelector'/>"
 				"<menuitem action='CaveSetProps'/>"
+				"<menu action='SelectMenu'>"
+					"<menuitem action='AllCavesSelectable'/>"
+					"<menuitem action='AllButIntermissionsSelectable'/>"
+					"<menuitem action='AllAfterIntermissionsSelectable'/>"
+				"</menu>"
 				"<separator/>"
 				"<menuitem action='ExportCavePack'/>"
 				"<menuitem action='ExportAsCrLiCave'/>"
@@ -3853,7 +3995,6 @@ cave_editor_cb (GtkWidget *widget, gpointer data)
 					"<menuitem action='RemoveMap'/>"
 				"</menu>"
 				"<menuitem action='RemoveObjects'/>"
-				"<separator/>"
 			"</menu>"
 			"<menu action='HelpMenu'>"
 				"<menuitem action='Help'/>"
