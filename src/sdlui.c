@@ -25,8 +25,72 @@
 #include "settings.h"
 #include "util.h"
 #include "about.h"
+#include "sound.h"
 
 #include "sdlui.h"
+
+
+char *gd_last_folder=NULL;
+char *gd_caveset_filename=NULL;
+
+
+/* operation successful, so we should remember file name. */
+void
+gd_caveset_file_operation_successful(const char *filename)
+{
+	/* if it is a bd file, remember new filename */
+	if (g_str_has_suffix(filename, ".bd")) {
+		char *stored;
+
+		/* first make copy, then free and set pointer. we might be called with filename=caveset_filename */
+		stored=g_strdup(filename);
+		g_free(gd_caveset_filename);
+		gd_caveset_filename=stored;
+	} else {
+		g_free(gd_caveset_filename);
+		gd_caveset_filename=NULL;
+	}
+}
+
+void
+gd_open_caveset(const char *directory)
+{
+	char *filename;
+	char *filter;
+	
+	/* if the caveset is edited, ask the user if to save. */
+	/* if does not want to discard, get out here */
+	if (!gd_discard_changes())
+		return;
+	
+	if (!gd_last_folder)
+		gd_last_folder=g_strdup(g_get_home_dir());
+		
+	filter=g_strjoinv(";", gd_caveset_extensions);
+	filename=gd_select_file("SELECT CAVESET TO LOAD", directory?directory:gd_last_folder, filter, FALSE);
+	g_free(filter);
+
+	/* if file selected */	
+	if (filename) {
+		/* remember last directory */
+		g_free(gd_last_folder);
+		gd_last_folder=g_path_get_dirname(filename);
+
+		gd_save_highscore(gd_user_config_dir);
+		
+		gd_caveset_load_from_file(filename, gd_user_config_dir);
+
+		/* if successful loading and this is a bd file, and we load highscores from our own config dir */
+		if (!gd_has_new_error() && g_str_has_suffix(filename, ".bd") && !gd_use_bdcff_highscore)
+			gd_load_highscore(gd_user_config_dir);
+		
+		g_free(filename);
+	} 
+}
+
+
+
+
 
 static int
 filenamesort(gconstpointer a, gconstpointer b)
@@ -516,6 +580,8 @@ gd_settings_menu()
 		{ 0, TypeStringv, "Preferred palette", &gd_preferred_palette, gd_color_get_palette_types_names() },
 
 		{ 1, TypeBoolean, "Sound", &gd_sdl_sound },
+		{ 1, TypePercent, "Music volume", &gd_sound_music_volume_percent },
+		{ 1, TypePercent, "Cave volume", &gd_sound_chunks_volume_percent },
 		{ 1, TypeBoolean, "Classic sounds only", &gd_classic_sound },
 		{ 1, TypeBoolean, "16-bit mixing", &gd_sdl_16bit_mixing },
 		{ 1, TypeBoolean, "44kHz mixing", &gd_sdl_44khz_mixing },
@@ -764,6 +830,9 @@ gd_settings_menu()
 	g_ptr_array_free(themes, TRUE);
 
 	gd_restore_screen();
+
+	gd_sound_set_music_volume(gd_sound_music_volume_percent);
+	gd_sound_set_chunk_volumes(gd_sound_chunks_volume_percent);
 }
 
 
@@ -1144,11 +1213,19 @@ void
 gd_message(const char *message)
 {
 	SDL_Rect rect;
-	const int height=5*gd_line_height();
+	int height, lines;
 	int y1;
+	char *wrapped;
+	int x;
+	
+	wrapped=gd_wrap_text(message, 38);
+	/* wrapped always has a \n on the end, so this returns at least 2 */
+	lines=gd_lines_in_text(wrapped);
 
+	height=(1+lines)*gd_font_height();
+	g_print("%d", lines);
 	gd_backup_and_dark_screen();
-	gd_status_line("SPACE: EXIT");
+	gd_status_line("SPACE: CONTINUE");
 	
 	y1=(gd_screen->h-height)/2;
 	rect.x=gd_font_width();
@@ -1157,13 +1234,20 @@ gd_message(const char *message)
 	rect.h=height;
 	draw_window(&rect);
 	SDL_SetClipRect(gd_screen, &rect);
+	
+	/* lines is at least 2. so 3 and above means multiple lines */
+	if (lines>2)
+		x=rect.x;
+	else
+		x=-1;
 
-	gd_blittext_n(gd_screen, -1, y1+2*gd_line_height(), GD_GDASH_WHITE, message);
+	gd_blittext_n(gd_screen, x, y1+gd_font_height(), GD_GDASH_WHITE, wrapped);
 	SDL_Flip(gd_screen);
 	wait_for_keypress();
 
 	SDL_SetClipRect(gd_screen, NULL);
 	gd_restore_screen();
+	g_free(wrapped);
 }
 
 char *
@@ -1494,7 +1578,7 @@ gd_discard_changes()
 		return TRUE;
 
 	/* if the caveset is edited, ask the user if to save. */
-	answered=gd_ask_yes_no("Caveset edited. Discard changes?", "Cancel", "Discard", &result);
+	answered=gd_ask_yes_no("New replays are added. Discard them?", "Cancel", "Discard", &result);
 	if (!answered || !result)
 		/* if does not want to discard, say false */
 		return FALSE;
@@ -1574,7 +1658,7 @@ gd_about()
 	gd_title_line("GDASH " PACKAGE_VERSION);
 	gd_status_line("SPACE: EXIT");
 
-	y=20;
+	y=10;
 
 	y=help_writeattrib(-1, y, "", gd_about_comments);
 	y=help_writeattrib(10, y, "WEBSITE", gd_about_website);
@@ -1619,4 +1703,203 @@ gd_show_error(GdErrorMessage *error)
 	g_free(wrapped);
 	g_strfreev(lines);
 }
+
+
+
+/*
+ *   SDASH REPLAYS MENU
+ */
+void
+gd_replays_menu(void (*play_func) (GdCave *cave, GdReplay *replay), gboolean for_game)
+{
+	gboolean finished;
+	/* an item stores a cave (to see its name) or a cave+replay */
+	typedef struct _item {
+		GdCave *cave;
+		GdReplay *replay;
+	} Item;
+	int n, page;
+	int current;
+	const int lines_per_page=gd_screen->h/gd_line_height()-5;
+	GList *citer;
+	GPtrArray *items=NULL;
+	GdCave *cave;
+	Item i;
+	
+	items=g_ptr_array_new();
+	/* for all caves */
+	for (citer=gd_caveset; citer!=NULL; citer=citer->next) {
+		GList *riter;
+		
+		cave=citer->data;
+		/* if cave has replays... */
+		if (cave->replays!=NULL) {
+			/* add cave data */
+			i.cave=cave;
+			i.replay=NULL;
+			g_ptr_array_add(items, g_memdup(&i, sizeof(i)));
+			
+			/* add replays, too */
+			for (riter=cave->replays; riter!=NULL; riter=riter->next) {
+				i.replay=(GdReplay *)riter->data;
+				g_ptr_array_add(items, g_memdup(&i, sizeof(i)));
+			}
+		}
+	}
+	
+	if (items->len==0) {
+		gd_message("No replays.");
+	} else {
+		
+		gd_backup_and_dark_screen();
+		if (for_game)
+			gd_status_line("CRSR:MOVE  SPACE:PLAY  S:SAVED  ESC:EXIT");
+		else
+			gd_status_line("CRSR: MOVE   SPACE: SAVE   ESC: EXIT");
+		
+		current=1;
+		finished=FALSE;
+		while (!finished && !gd_quit) {
+			page=current/lines_per_page;	/* show 18 lines per page */
+			SDL_Event event;
+			
+			/* show lines */
+			gd_clear_line(gd_screen, 0);	/* for empty top row */
+			for (n=0; n<lines_per_page; n++) {	/* for empty caves&replays rows */
+				int y=(n+2)*gd_line_height();
+				
+				gd_clear_line(gd_screen, y);
+			}
+
+			gd_title_line("GDASH REPLAYS, PAGE %d/%d", page+1, items->len/lines_per_page+1);
+			for (n=0; n<lines_per_page && page*lines_per_page+n<items->len; n++) {
+				int pos=page*lines_per_page+n;
+				GdColor col_cave=current==pos?GD_GDASH_YELLOW:GD_GDASH_LIGHTBLUE;	/* selected=yellow, otherwise blue */
+				GdColor col=current==pos?GD_GDASH_YELLOW:GD_GDASH_GRAY3;	/* selected=yellow, otherwise blue */
+				Item *i;
+				int x, y;
+				
+				i=(Item *) g_ptr_array_index(items, pos);
+
+				x=0;
+				y=(n+2)*gd_line_height();
+				
+				if (!i->replay) {
+					/* no replay pointer: this is a cave, so write its name. */
+					x=gd_blittext_n(gd_screen, x, y, col_cave, i->cave->name);
+				} else {
+					const char *comm;
+					int c;
+					char buffer[100];
+					
+					/* successful or not */
+					x=gd_blittext_printf_n(gd_screen, x, y, i->replay->success?GD_GDASH_GREEN:GD_GDASH_RED, " %c ", GD_BALL_CHAR);
+
+					/* player name */
+					g_utf8_strncpy(buffer, i->replay->player_name, 15);	/* name: maximum 15 characters */
+					x=gd_blittext_n(gd_screen, x, y, col, buffer);
+					/* put 16-length spaces */
+					for (c=g_utf8_strlen(buffer, -1); c<16; c++)
+						x=gd_blittext_n(gd_screen, x, y, col, " ");
+
+					/* write comment */
+					if (!g_str_equal(i->replay->comment, ""))
+						comm=i->replay->comment;
+					else
+					/* or date */
+					if (!g_str_equal(i->replay->date, ""))
+						comm=i->replay->date;
+					else
+					/* or nothing */
+						comm="-";
+					g_utf8_strncpy(buffer, comm, 17);	/* comment or data: maximum 18 characters */
+					x=gd_blittext_n(gd_screen, x, y, col, comm);
+					/* put 20-length spaces */
+					for (c=g_utf8_strlen(buffer, -1); c<17; c++)
+						x=gd_blittext_n(gd_screen, x, y, col, " ");
+
+					/* level */				
+					x=gd_blittext_printf_n(gd_screen, x, y, col, " %d", i->replay->level+1);
+					/* saved - check box */				
+					x=gd_blittext_printf_n(gd_screen, x, y, col, " %c", i->replay->saved?GD_CHECKED_BOX_CHAR:GD_UNCHECKED_BOX_CHAR);
+				}
+			}
+			SDL_Flip(gd_screen);	/* draw to usere's screen */
+			
+			SDL_WaitEvent(&event);
+			switch (event.type) {
+				case SDL_QUIT:
+					gd_quit=TRUE;
+					break;
+					
+				case SDL_KEYDOWN:
+					switch (event.key.keysym.sym) {
+						case SDLK_UP:
+							do {
+								current=gd_clamp(current-1, 1, items->len-1);
+							} while (((Item *)g_ptr_array_index(items, current))->replay==NULL && current>=1);
+							break;
+						case SDLK_DOWN:
+							do {
+								current=gd_clamp(current+1, 1, items->len-1);
+							} while (((Item *)g_ptr_array_index(items, current))->replay==NULL && current<items->len);
+							break;
+						case SDLK_s:
+							/* only allow toggling the "saved" flag, if we are in a game. not in the replay->video converter app. */
+							if (for_game) {
+								Item *i=(Item *)g_ptr_array_index(items, current);
+								
+								if (i->replay) {
+									i->replay->saved=!i->replay->saved;
+									gd_caveset_edited=TRUE;
+								}
+							}
+							break;
+						case SDLK_SPACE:
+						case SDLK_RETURN:
+							{
+								Item *i=(Item *)g_ptr_array_index(items, current);
+								
+								if (i->replay) {
+									gd_backup_and_black_screen();
+									SDL_Flip(gd_screen);
+									play_func(i->cave, i->replay);
+									gd_restore_screen();
+								}
+							}
+							break;
+						case SDLK_ESCAPE:
+							finished=TRUE;
+							break;
+						
+						case SDLK_PAGEUP:
+							current=gd_clamp(current-lines_per_page, 0, items->len-1);
+							break;
+							
+						case SDLK_PAGEDOWN:
+							current=gd_clamp(current+lines_per_page, 0, items->len-1);
+							break;
+							
+						default:
+							/* other keys do nothing */
+							break;
+					}
+					break;
+				
+				default:
+					/* other events do nothing */
+					break;
+			}
+		}
+		
+		gd_restore_screen();
+	}
+	
+	/* set the theme. other variables are already set by the above code. */
+	/* forget list of themes */
+	g_ptr_array_foreach(items, (GFunc) g_free, NULL);
+	g_ptr_array_free(items, TRUE);
+	
+}
+
 

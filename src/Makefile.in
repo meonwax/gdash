@@ -49,7 +49,7 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 @GTK_TRUE@am__EXEEXT_1 = gdash$(EXEEXT)
-@SDL_TRUE@am__EXEEXT_2 = sdash$(EXEEXT)
+@SDL_TRUE@am__EXEEXT_2 = sdash$(EXEEXT) sreplay$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
@@ -78,13 +78,31 @@ am__objects_4 = sdash-colors.$(OBJEXT) sdash-cave.$(OBJEXT) \
 	sdash-c64import.$(OBJEXT) sdash-gameplay.$(OBJEXT) \
 	sdash-settings.$(OBJEXT) sdash-util.$(OBJEXT) \
 	sdash-about.$(OBJEXT) sdash-gfxutil.$(OBJEXT)
-am__objects_5 = sdash-sdlgfx.$(OBJEXT) sdash-sdlmain.$(OBJEXT) \
-	sdash-sdlui.$(OBJEXT)
-am__objects_6 = sdash-sound.$(OBJEXT)
-am_sdash_OBJECTS = $(am__objects_4) $(am__objects_5) $(am__objects_6)
+am__objects_5 = sdash-sdlgfx.$(OBJEXT) sdash-sdlui.$(OBJEXT)
+am__objects_6 = sdash-sdlmain.$(OBJEXT)
+am__objects_7 = sdash-sound.$(OBJEXT)
+am_sdash_OBJECTS = $(am__objects_4) $(am__objects_5) $(am__objects_6) \
+	$(am__objects_7)
 sdash_OBJECTS = $(am_sdash_OBJECTS)
 sdash_DEPENDENCIES = $(am__DEPENDENCIES_1)
 sdash_LINK = $(CCLD) $(sdash_CFLAGS) $(CFLAGS) $(sdash_LDFLAGS) \
+	$(LDFLAGS) -o $@
+am__objects_8 = sreplay-colors.$(OBJEXT) sreplay-cave.$(OBJEXT) \
+	sreplay-cavedb.$(OBJEXT) sreplay-caveengine.$(OBJEXT) \
+	sreplay-caveobject.$(OBJEXT) sreplay-cavesound.$(OBJEXT) \
+	sreplay-bdcff.$(OBJEXT) sreplay-caveset.$(OBJEXT) \
+	sreplay-c64import.$(OBJEXT) sreplay-gameplay.$(OBJEXT) \
+	sreplay-settings.$(OBJEXT) sreplay-util.$(OBJEXT) \
+	sreplay-about.$(OBJEXT) sreplay-gfxutil.$(OBJEXT)
+am__objects_9 = sreplay-sdlgfx.$(OBJEXT) sreplay-sdlui.$(OBJEXT)
+am__objects_10 = sreplay-sdlreplay.$(OBJEXT) \
+	sreplay-IMG_savepng.$(OBJEXT)
+am__objects_11 = sreplay-sound.$(OBJEXT)
+am_sreplay_OBJECTS = $(am__objects_8) $(am__objects_9) \
+	$(am__objects_10) $(am__objects_11)
+sreplay_OBJECTS = $(am_sreplay_OBJECTS)
+sreplay_DEPENDENCIES = $(am__DEPENDENCIES_1)
+sreplay_LINK = $(CCLD) $(sreplay_CFLAGS) $(CFLAGS) $(sreplay_LDFLAGS) \
 	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -93,8 +111,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(gdash_SOURCES) $(sdash_SOURCES)
-DIST_SOURCES = $(gdash_SOURCES) $(sdash_SOURCES)
+SOURCES = $(gdash_SOURCES) $(sdash_SOURCES) $(sreplay_SOURCES)
+DIST_SOURCES = $(gdash_SOURCES) $(sdash_SOURCES) $(sreplay_SOURCES)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -140,6 +158,8 @@ LDFLAGS = @LDFLAGS@
 LIBICONV = @LIBICONV@
 LIBINTL = @LIBINTL@
 LIBOBJS = @LIBOBJS@
+LIBPNG_CFLAGS = @LIBPNG_CFLAGS@
+LIBPNG_LIBS = @LIBPNG_LIBS@
 LIBS = @LIBS@
 LTLIBICONV = @LTLIBICONV@
 LTLIBINTL = @LTLIBINTL@
@@ -229,7 +249,7 @@ INCLUDES = \
 @SDL_FALSE@SDASH = 
 
 # if sdl is enabled, build sdash.
-@SDL_TRUE@SDASH = sdash
+@SDL_TRUE@SDASH = sdash sreplay
 
 # base sources and headers:
 #   the gdash engine.
@@ -298,20 +318,38 @@ gtkheaders = \
 
 # sdl sources and headers:
 #   the gdash sdl ui with sounds.
-sdlsources = \
+sdlbasesources = \
 	sdlgfx.c \
-	sdlmain.c \
 	sdlui.c
 
-sdlheaders = \
+sdlbaseheaders = \
 	sdlgfx.h \
 	sdlui.h
+
+
+# sdl sources and headers:
+#   the gdash sdl ui with sounds.
+sdashsources = \
+	sdlmain.c
+
+sdashheaders = 
+
+# sdl sources and headers:
+#   the gdash sdl ui with sounds.
+sreplaysources = \
+	sdlreplay.c \
+	IMG_savepng.c
+
+sreplayheaders = \
+	IMG_savepng.h
 
 noinst_HEADERS = \
 	$(base_headers) \
 	$(gtkheaders) \
-	$(sdlheaders) \
-	$(sound_headers)
+	$(sdlbaseheaders) \
+	$(sound_headers) \
+	$(sdashheaders) \
+	$(sreplayheaders)
 
 
 # gtk cflags also for the sdl version - for settings.c
@@ -334,7 +372,21 @@ sdash_LDFLAGS = -g -Wall
 sdash_LDADD = @GLIB_LIBS@ @SDL_LIBS@ $(SDASH_LIBADD)
 sdash_SOURCES = \
 	$(base_sources) \
-	$(sdlsources) \
+	$(sdlbasesources) \
+	$(sdashsources) \
+	$(sound_sources)
+
+
+# gtk cflags also for the sdl version - for settings.c
+# sdl is needed for gfx and sound.
+sreplay_CFLAGS = -g -Wall @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@ @LIBPNG_CFLAGS@
+sreplay_LDFLAGS = -g -Wall
+@SDL_TRUE@SREPLAY_LIBADD = -lSDL_mixer -lSDL_image
+sreplay_LDADD = @GLIB_LIBS@ @SDL_LIBS@ @LIBPNG_LIBS@ $(SREPLAY_LIBADD)
+sreplay_SOURCES = \
+	$(base_sources) \
+	$(sdlbasesources) \
+	$(sreplaysources) \
 	$(sound_sources)
 
 all: all-am
@@ -399,6 +451,9 @@ gdash$(EXEEXT): $(gdash_OBJECTS) $(gdash_DEPENDENCIES)
 sdash$(EXEEXT): $(sdash_OBJECTS) $(sdash_DEPENDENCIES) 
 	@rm -f sdash$(EXEEXT)
 	$(sdash_LINK) $(sdash_OBJECTS) $(sdash_LDADD) $(LIBS)
+sreplay$(EXEEXT): $(sreplay_OBJECTS) $(sreplay_DEPENDENCIES) 
+	@rm -f sreplay$(EXEEXT)
+	$(sreplay_LINK) $(sreplay_OBJECTS) $(sreplay_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -446,6 +501,25 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-settings.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-sound.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdash-util.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-IMG_savepng.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-about.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-bdcff.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-c64import.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-cave.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-cavedb.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-caveengine.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-caveobject.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-caveset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-cavesound.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-colors.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-gameplay.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-gfxutil.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-sdlgfx.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-sdlreplay.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-sdlui.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-settings.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-sound.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sreplay-util.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -979,20 +1053,6 @@ sdash-sdlgfx.obj: sdlgfx.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdlgfx.obj `if test -f 'sdlgfx.c'; then $(CYGPATH_W) 'sdlgfx.c'; else $(CYGPATH_W) '$(srcdir)/sdlgfx.c'; fi`
 
-sdash-sdlmain.o: sdlmain.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdlmain.o -MD -MP -MF $(DEPDIR)/sdash-sdlmain.Tpo -c -o sdash-sdlmain.o `test -f 'sdlmain.c' || echo '$(srcdir)/'`sdlmain.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sdash-sdlmain.Tpo $(DEPDIR)/sdash-sdlmain.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlmain.c' object='sdash-sdlmain.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdlmain.o `test -f 'sdlmain.c' || echo '$(srcdir)/'`sdlmain.c
-
-sdash-sdlmain.obj: sdlmain.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdlmain.obj -MD -MP -MF $(DEPDIR)/sdash-sdlmain.Tpo -c -o sdash-sdlmain.obj `if test -f 'sdlmain.c'; then $(CYGPATH_W) 'sdlmain.c'; else $(CYGPATH_W) '$(srcdir)/sdlmain.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sdash-sdlmain.Tpo $(DEPDIR)/sdash-sdlmain.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlmain.c' object='sdash-sdlmain.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdlmain.obj `if test -f 'sdlmain.c'; then $(CYGPATH_W) 'sdlmain.c'; else $(CYGPATH_W) '$(srcdir)/sdlmain.c'; fi`
-
 sdash-sdlui.o: sdlui.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdlui.o -MD -MP -MF $(DEPDIR)/sdash-sdlui.Tpo -c -o sdash-sdlui.o `test -f 'sdlui.c' || echo '$(srcdir)/'`sdlui.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sdash-sdlui.Tpo $(DEPDIR)/sdash-sdlui.Po
@@ -1007,6 +1067,20 @@ sdash-sdlui.obj: sdlui.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdlui.obj `if test -f 'sdlui.c'; then $(CYGPATH_W) 'sdlui.c'; else $(CYGPATH_W) '$(srcdir)/sdlui.c'; fi`
 
+sdash-sdlmain.o: sdlmain.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdlmain.o -MD -MP -MF $(DEPDIR)/sdash-sdlmain.Tpo -c -o sdash-sdlmain.o `test -f 'sdlmain.c' || echo '$(srcdir)/'`sdlmain.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sdash-sdlmain.Tpo $(DEPDIR)/sdash-sdlmain.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlmain.c' object='sdash-sdlmain.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdlmain.o `test -f 'sdlmain.c' || echo '$(srcdir)/'`sdlmain.c
+
+sdash-sdlmain.obj: sdlmain.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sdlmain.obj -MD -MP -MF $(DEPDIR)/sdash-sdlmain.Tpo -c -o sdash-sdlmain.obj `if test -f 'sdlmain.c'; then $(CYGPATH_W) 'sdlmain.c'; else $(CYGPATH_W) '$(srcdir)/sdlmain.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sdash-sdlmain.Tpo $(DEPDIR)/sdash-sdlmain.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlmain.c' object='sdash-sdlmain.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sdlmain.obj `if test -f 'sdlmain.c'; then $(CYGPATH_W) 'sdlmain.c'; else $(CYGPATH_W) '$(srcdir)/sdlmain.c'; fi`
+
 sdash-sound.o: sound.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -MT sdash-sound.o -MD -MP -MF $(DEPDIR)/sdash-sound.Tpo -c -o sdash-sound.o `test -f 'sound.c' || echo '$(srcdir)/'`sound.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sdash-sound.Tpo $(DEPDIR)/sdash-sound.Po
@@ -1020,6 +1094,272 @@ sdash-sound.obj: sound.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sound.c' object='sdash-sound.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdash_CFLAGS) $(CFLAGS) -c -o sdash-sound.obj `if test -f 'sound.c'; then $(CYGPATH_W) 'sound.c'; else $(CYGPATH_W) '$(srcdir)/sound.c'; fi`
+
+sreplay-colors.o: colors.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-colors.o -MD -MP -MF $(DEPDIR)/sreplay-colors.Tpo -c -o sreplay-colors.o `test -f 'colors.c' || echo '$(srcdir)/'`colors.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-colors.Tpo $(DEPDIR)/sreplay-colors.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='colors.c' object='sreplay-colors.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-colors.o `test -f 'colors.c' || echo '$(srcdir)/'`colors.c
+
+sreplay-colors.obj: colors.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-colors.obj -MD -MP -MF $(DEPDIR)/sreplay-colors.Tpo -c -o sreplay-colors.obj `if test -f 'colors.c'; then $(CYGPATH_W) 'colors.c'; else $(CYGPATH_W) '$(srcdir)/colors.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-colors.Tpo $(DEPDIR)/sreplay-colors.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='colors.c' object='sreplay-colors.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-colors.obj `if test -f 'colors.c'; then $(CYGPATH_W) 'colors.c'; else $(CYGPATH_W) '$(srcdir)/colors.c'; fi`
+
+sreplay-cave.o: cave.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-cave.o -MD -MP -MF $(DEPDIR)/sreplay-cave.Tpo -c -o sreplay-cave.o `test -f 'cave.c' || echo '$(srcdir)/'`cave.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-cave.Tpo $(DEPDIR)/sreplay-cave.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cave.c' object='sreplay-cave.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-cave.o `test -f 'cave.c' || echo '$(srcdir)/'`cave.c
+
+sreplay-cave.obj: cave.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-cave.obj -MD -MP -MF $(DEPDIR)/sreplay-cave.Tpo -c -o sreplay-cave.obj `if test -f 'cave.c'; then $(CYGPATH_W) 'cave.c'; else $(CYGPATH_W) '$(srcdir)/cave.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-cave.Tpo $(DEPDIR)/sreplay-cave.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cave.c' object='sreplay-cave.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-cave.obj `if test -f 'cave.c'; then $(CYGPATH_W) 'cave.c'; else $(CYGPATH_W) '$(srcdir)/cave.c'; fi`
+
+sreplay-cavedb.o: cavedb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-cavedb.o -MD -MP -MF $(DEPDIR)/sreplay-cavedb.Tpo -c -o sreplay-cavedb.o `test -f 'cavedb.c' || echo '$(srcdir)/'`cavedb.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-cavedb.Tpo $(DEPDIR)/sreplay-cavedb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cavedb.c' object='sreplay-cavedb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-cavedb.o `test -f 'cavedb.c' || echo '$(srcdir)/'`cavedb.c
+
+sreplay-cavedb.obj: cavedb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-cavedb.obj -MD -MP -MF $(DEPDIR)/sreplay-cavedb.Tpo -c -o sreplay-cavedb.obj `if test -f 'cavedb.c'; then $(CYGPATH_W) 'cavedb.c'; else $(CYGPATH_W) '$(srcdir)/cavedb.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-cavedb.Tpo $(DEPDIR)/sreplay-cavedb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cavedb.c' object='sreplay-cavedb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-cavedb.obj `if test -f 'cavedb.c'; then $(CYGPATH_W) 'cavedb.c'; else $(CYGPATH_W) '$(srcdir)/cavedb.c'; fi`
+
+sreplay-caveengine.o: caveengine.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-caveengine.o -MD -MP -MF $(DEPDIR)/sreplay-caveengine.Tpo -c -o sreplay-caveengine.o `test -f 'caveengine.c' || echo '$(srcdir)/'`caveengine.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-caveengine.Tpo $(DEPDIR)/sreplay-caveengine.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='caveengine.c' object='sreplay-caveengine.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-caveengine.o `test -f 'caveengine.c' || echo '$(srcdir)/'`caveengine.c
+
+sreplay-caveengine.obj: caveengine.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-caveengine.obj -MD -MP -MF $(DEPDIR)/sreplay-caveengine.Tpo -c -o sreplay-caveengine.obj `if test -f 'caveengine.c'; then $(CYGPATH_W) 'caveengine.c'; else $(CYGPATH_W) '$(srcdir)/caveengine.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-caveengine.Tpo $(DEPDIR)/sreplay-caveengine.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='caveengine.c' object='sreplay-caveengine.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-caveengine.obj `if test -f 'caveengine.c'; then $(CYGPATH_W) 'caveengine.c'; else $(CYGPATH_W) '$(srcdir)/caveengine.c'; fi`
+
+sreplay-caveobject.o: caveobject.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-caveobject.o -MD -MP -MF $(DEPDIR)/sreplay-caveobject.Tpo -c -o sreplay-caveobject.o `test -f 'caveobject.c' || echo '$(srcdir)/'`caveobject.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-caveobject.Tpo $(DEPDIR)/sreplay-caveobject.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='caveobject.c' object='sreplay-caveobject.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-caveobject.o `test -f 'caveobject.c' || echo '$(srcdir)/'`caveobject.c
+
+sreplay-caveobject.obj: caveobject.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-caveobject.obj -MD -MP -MF $(DEPDIR)/sreplay-caveobject.Tpo -c -o sreplay-caveobject.obj `if test -f 'caveobject.c'; then $(CYGPATH_W) 'caveobject.c'; else $(CYGPATH_W) '$(srcdir)/caveobject.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-caveobject.Tpo $(DEPDIR)/sreplay-caveobject.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='caveobject.c' object='sreplay-caveobject.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-caveobject.obj `if test -f 'caveobject.c'; then $(CYGPATH_W) 'caveobject.c'; else $(CYGPATH_W) '$(srcdir)/caveobject.c'; fi`
+
+sreplay-cavesound.o: cavesound.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-cavesound.o -MD -MP -MF $(DEPDIR)/sreplay-cavesound.Tpo -c -o sreplay-cavesound.o `test -f 'cavesound.c' || echo '$(srcdir)/'`cavesound.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-cavesound.Tpo $(DEPDIR)/sreplay-cavesound.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cavesound.c' object='sreplay-cavesound.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-cavesound.o `test -f 'cavesound.c' || echo '$(srcdir)/'`cavesound.c
+
+sreplay-cavesound.obj: cavesound.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-cavesound.obj -MD -MP -MF $(DEPDIR)/sreplay-cavesound.Tpo -c -o sreplay-cavesound.obj `if test -f 'cavesound.c'; then $(CYGPATH_W) 'cavesound.c'; else $(CYGPATH_W) '$(srcdir)/cavesound.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-cavesound.Tpo $(DEPDIR)/sreplay-cavesound.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cavesound.c' object='sreplay-cavesound.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-cavesound.obj `if test -f 'cavesound.c'; then $(CYGPATH_W) 'cavesound.c'; else $(CYGPATH_W) '$(srcdir)/cavesound.c'; fi`
+
+sreplay-bdcff.o: bdcff.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-bdcff.o -MD -MP -MF $(DEPDIR)/sreplay-bdcff.Tpo -c -o sreplay-bdcff.o `test -f 'bdcff.c' || echo '$(srcdir)/'`bdcff.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-bdcff.Tpo $(DEPDIR)/sreplay-bdcff.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bdcff.c' object='sreplay-bdcff.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-bdcff.o `test -f 'bdcff.c' || echo '$(srcdir)/'`bdcff.c
+
+sreplay-bdcff.obj: bdcff.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-bdcff.obj -MD -MP -MF $(DEPDIR)/sreplay-bdcff.Tpo -c -o sreplay-bdcff.obj `if test -f 'bdcff.c'; then $(CYGPATH_W) 'bdcff.c'; else $(CYGPATH_W) '$(srcdir)/bdcff.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-bdcff.Tpo $(DEPDIR)/sreplay-bdcff.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bdcff.c' object='sreplay-bdcff.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-bdcff.obj `if test -f 'bdcff.c'; then $(CYGPATH_W) 'bdcff.c'; else $(CYGPATH_W) '$(srcdir)/bdcff.c'; fi`
+
+sreplay-caveset.o: caveset.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-caveset.o -MD -MP -MF $(DEPDIR)/sreplay-caveset.Tpo -c -o sreplay-caveset.o `test -f 'caveset.c' || echo '$(srcdir)/'`caveset.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-caveset.Tpo $(DEPDIR)/sreplay-caveset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='caveset.c' object='sreplay-caveset.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-caveset.o `test -f 'caveset.c' || echo '$(srcdir)/'`caveset.c
+
+sreplay-caveset.obj: caveset.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-caveset.obj -MD -MP -MF $(DEPDIR)/sreplay-caveset.Tpo -c -o sreplay-caveset.obj `if test -f 'caveset.c'; then $(CYGPATH_W) 'caveset.c'; else $(CYGPATH_W) '$(srcdir)/caveset.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-caveset.Tpo $(DEPDIR)/sreplay-caveset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='caveset.c' object='sreplay-caveset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-caveset.obj `if test -f 'caveset.c'; then $(CYGPATH_W) 'caveset.c'; else $(CYGPATH_W) '$(srcdir)/caveset.c'; fi`
+
+sreplay-c64import.o: c64import.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-c64import.o -MD -MP -MF $(DEPDIR)/sreplay-c64import.Tpo -c -o sreplay-c64import.o `test -f 'c64import.c' || echo '$(srcdir)/'`c64import.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-c64import.Tpo $(DEPDIR)/sreplay-c64import.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='c64import.c' object='sreplay-c64import.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-c64import.o `test -f 'c64import.c' || echo '$(srcdir)/'`c64import.c
+
+sreplay-c64import.obj: c64import.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-c64import.obj -MD -MP -MF $(DEPDIR)/sreplay-c64import.Tpo -c -o sreplay-c64import.obj `if test -f 'c64import.c'; then $(CYGPATH_W) 'c64import.c'; else $(CYGPATH_W) '$(srcdir)/c64import.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-c64import.Tpo $(DEPDIR)/sreplay-c64import.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='c64import.c' object='sreplay-c64import.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-c64import.obj `if test -f 'c64import.c'; then $(CYGPATH_W) 'c64import.c'; else $(CYGPATH_W) '$(srcdir)/c64import.c'; fi`
+
+sreplay-gameplay.o: gameplay.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-gameplay.o -MD -MP -MF $(DEPDIR)/sreplay-gameplay.Tpo -c -o sreplay-gameplay.o `test -f 'gameplay.c' || echo '$(srcdir)/'`gameplay.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-gameplay.Tpo $(DEPDIR)/sreplay-gameplay.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gameplay.c' object='sreplay-gameplay.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-gameplay.o `test -f 'gameplay.c' || echo '$(srcdir)/'`gameplay.c
+
+sreplay-gameplay.obj: gameplay.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-gameplay.obj -MD -MP -MF $(DEPDIR)/sreplay-gameplay.Tpo -c -o sreplay-gameplay.obj `if test -f 'gameplay.c'; then $(CYGPATH_W) 'gameplay.c'; else $(CYGPATH_W) '$(srcdir)/gameplay.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-gameplay.Tpo $(DEPDIR)/sreplay-gameplay.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gameplay.c' object='sreplay-gameplay.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-gameplay.obj `if test -f 'gameplay.c'; then $(CYGPATH_W) 'gameplay.c'; else $(CYGPATH_W) '$(srcdir)/gameplay.c'; fi`
+
+sreplay-settings.o: settings.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-settings.o -MD -MP -MF $(DEPDIR)/sreplay-settings.Tpo -c -o sreplay-settings.o `test -f 'settings.c' || echo '$(srcdir)/'`settings.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-settings.Tpo $(DEPDIR)/sreplay-settings.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='settings.c' object='sreplay-settings.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-settings.o `test -f 'settings.c' || echo '$(srcdir)/'`settings.c
+
+sreplay-settings.obj: settings.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-settings.obj -MD -MP -MF $(DEPDIR)/sreplay-settings.Tpo -c -o sreplay-settings.obj `if test -f 'settings.c'; then $(CYGPATH_W) 'settings.c'; else $(CYGPATH_W) '$(srcdir)/settings.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-settings.Tpo $(DEPDIR)/sreplay-settings.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='settings.c' object='sreplay-settings.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-settings.obj `if test -f 'settings.c'; then $(CYGPATH_W) 'settings.c'; else $(CYGPATH_W) '$(srcdir)/settings.c'; fi`
+
+sreplay-util.o: util.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-util.o -MD -MP -MF $(DEPDIR)/sreplay-util.Tpo -c -o sreplay-util.o `test -f 'util.c' || echo '$(srcdir)/'`util.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-util.Tpo $(DEPDIR)/sreplay-util.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='util.c' object='sreplay-util.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-util.o `test -f 'util.c' || echo '$(srcdir)/'`util.c
+
+sreplay-util.obj: util.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-util.obj -MD -MP -MF $(DEPDIR)/sreplay-util.Tpo -c -o sreplay-util.obj `if test -f 'util.c'; then $(CYGPATH_W) 'util.c'; else $(CYGPATH_W) '$(srcdir)/util.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-util.Tpo $(DEPDIR)/sreplay-util.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='util.c' object='sreplay-util.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-util.obj `if test -f 'util.c'; then $(CYGPATH_W) 'util.c'; else $(CYGPATH_W) '$(srcdir)/util.c'; fi`
+
+sreplay-about.o: about.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-about.o -MD -MP -MF $(DEPDIR)/sreplay-about.Tpo -c -o sreplay-about.o `test -f 'about.c' || echo '$(srcdir)/'`about.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-about.Tpo $(DEPDIR)/sreplay-about.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='about.c' object='sreplay-about.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-about.o `test -f 'about.c' || echo '$(srcdir)/'`about.c
+
+sreplay-about.obj: about.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-about.obj -MD -MP -MF $(DEPDIR)/sreplay-about.Tpo -c -o sreplay-about.obj `if test -f 'about.c'; then $(CYGPATH_W) 'about.c'; else $(CYGPATH_W) '$(srcdir)/about.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-about.Tpo $(DEPDIR)/sreplay-about.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='about.c' object='sreplay-about.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-about.obj `if test -f 'about.c'; then $(CYGPATH_W) 'about.c'; else $(CYGPATH_W) '$(srcdir)/about.c'; fi`
+
+sreplay-gfxutil.o: gfxutil.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-gfxutil.o -MD -MP -MF $(DEPDIR)/sreplay-gfxutil.Tpo -c -o sreplay-gfxutil.o `test -f 'gfxutil.c' || echo '$(srcdir)/'`gfxutil.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-gfxutil.Tpo $(DEPDIR)/sreplay-gfxutil.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gfxutil.c' object='sreplay-gfxutil.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-gfxutil.o `test -f 'gfxutil.c' || echo '$(srcdir)/'`gfxutil.c
+
+sreplay-gfxutil.obj: gfxutil.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-gfxutil.obj -MD -MP -MF $(DEPDIR)/sreplay-gfxutil.Tpo -c -o sreplay-gfxutil.obj `if test -f 'gfxutil.c'; then $(CYGPATH_W) 'gfxutil.c'; else $(CYGPATH_W) '$(srcdir)/gfxutil.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-gfxutil.Tpo $(DEPDIR)/sreplay-gfxutil.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gfxutil.c' object='sreplay-gfxutil.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-gfxutil.obj `if test -f 'gfxutil.c'; then $(CYGPATH_W) 'gfxutil.c'; else $(CYGPATH_W) '$(srcdir)/gfxutil.c'; fi`
+
+sreplay-sdlgfx.o: sdlgfx.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-sdlgfx.o -MD -MP -MF $(DEPDIR)/sreplay-sdlgfx.Tpo -c -o sreplay-sdlgfx.o `test -f 'sdlgfx.c' || echo '$(srcdir)/'`sdlgfx.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-sdlgfx.Tpo $(DEPDIR)/sreplay-sdlgfx.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlgfx.c' object='sreplay-sdlgfx.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-sdlgfx.o `test -f 'sdlgfx.c' || echo '$(srcdir)/'`sdlgfx.c
+
+sreplay-sdlgfx.obj: sdlgfx.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-sdlgfx.obj -MD -MP -MF $(DEPDIR)/sreplay-sdlgfx.Tpo -c -o sreplay-sdlgfx.obj `if test -f 'sdlgfx.c'; then $(CYGPATH_W) 'sdlgfx.c'; else $(CYGPATH_W) '$(srcdir)/sdlgfx.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-sdlgfx.Tpo $(DEPDIR)/sreplay-sdlgfx.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlgfx.c' object='sreplay-sdlgfx.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-sdlgfx.obj `if test -f 'sdlgfx.c'; then $(CYGPATH_W) 'sdlgfx.c'; else $(CYGPATH_W) '$(srcdir)/sdlgfx.c'; fi`
+
+sreplay-sdlui.o: sdlui.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-sdlui.o -MD -MP -MF $(DEPDIR)/sreplay-sdlui.Tpo -c -o sreplay-sdlui.o `test -f 'sdlui.c' || echo '$(srcdir)/'`sdlui.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-sdlui.Tpo $(DEPDIR)/sreplay-sdlui.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlui.c' object='sreplay-sdlui.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-sdlui.o `test -f 'sdlui.c' || echo '$(srcdir)/'`sdlui.c
+
+sreplay-sdlui.obj: sdlui.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-sdlui.obj -MD -MP -MF $(DEPDIR)/sreplay-sdlui.Tpo -c -o sreplay-sdlui.obj `if test -f 'sdlui.c'; then $(CYGPATH_W) 'sdlui.c'; else $(CYGPATH_W) '$(srcdir)/sdlui.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-sdlui.Tpo $(DEPDIR)/sreplay-sdlui.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlui.c' object='sreplay-sdlui.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-sdlui.obj `if test -f 'sdlui.c'; then $(CYGPATH_W) 'sdlui.c'; else $(CYGPATH_W) '$(srcdir)/sdlui.c'; fi`
+
+sreplay-sdlreplay.o: sdlreplay.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-sdlreplay.o -MD -MP -MF $(DEPDIR)/sreplay-sdlreplay.Tpo -c -o sreplay-sdlreplay.o `test -f 'sdlreplay.c' || echo '$(srcdir)/'`sdlreplay.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-sdlreplay.Tpo $(DEPDIR)/sreplay-sdlreplay.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlreplay.c' object='sreplay-sdlreplay.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-sdlreplay.o `test -f 'sdlreplay.c' || echo '$(srcdir)/'`sdlreplay.c
+
+sreplay-sdlreplay.obj: sdlreplay.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-sdlreplay.obj -MD -MP -MF $(DEPDIR)/sreplay-sdlreplay.Tpo -c -o sreplay-sdlreplay.obj `if test -f 'sdlreplay.c'; then $(CYGPATH_W) 'sdlreplay.c'; else $(CYGPATH_W) '$(srcdir)/sdlreplay.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-sdlreplay.Tpo $(DEPDIR)/sreplay-sdlreplay.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdlreplay.c' object='sreplay-sdlreplay.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-sdlreplay.obj `if test -f 'sdlreplay.c'; then $(CYGPATH_W) 'sdlreplay.c'; else $(CYGPATH_W) '$(srcdir)/sdlreplay.c'; fi`
+
+sreplay-IMG_savepng.o: IMG_savepng.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-IMG_savepng.o -MD -MP -MF $(DEPDIR)/sreplay-IMG_savepng.Tpo -c -o sreplay-IMG_savepng.o `test -f 'IMG_savepng.c' || echo '$(srcdir)/'`IMG_savepng.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-IMG_savepng.Tpo $(DEPDIR)/sreplay-IMG_savepng.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='IMG_savepng.c' object='sreplay-IMG_savepng.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-IMG_savepng.o `test -f 'IMG_savepng.c' || echo '$(srcdir)/'`IMG_savepng.c
+
+sreplay-IMG_savepng.obj: IMG_savepng.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-IMG_savepng.obj -MD -MP -MF $(DEPDIR)/sreplay-IMG_savepng.Tpo -c -o sreplay-IMG_savepng.obj `if test -f 'IMG_savepng.c'; then $(CYGPATH_W) 'IMG_savepng.c'; else $(CYGPATH_W) '$(srcdir)/IMG_savepng.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-IMG_savepng.Tpo $(DEPDIR)/sreplay-IMG_savepng.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='IMG_savepng.c' object='sreplay-IMG_savepng.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-IMG_savepng.obj `if test -f 'IMG_savepng.c'; then $(CYGPATH_W) 'IMG_savepng.c'; else $(CYGPATH_W) '$(srcdir)/IMG_savepng.c'; fi`
+
+sreplay-sound.o: sound.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-sound.o -MD -MP -MF $(DEPDIR)/sreplay-sound.Tpo -c -o sreplay-sound.o `test -f 'sound.c' || echo '$(srcdir)/'`sound.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-sound.Tpo $(DEPDIR)/sreplay-sound.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sound.c' object='sreplay-sound.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-sound.o `test -f 'sound.c' || echo '$(srcdir)/'`sound.c
+
+sreplay-sound.obj: sound.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -MT sreplay-sound.obj -MD -MP -MF $(DEPDIR)/sreplay-sound.Tpo -c -o sreplay-sound.obj `if test -f 'sound.c'; then $(CYGPATH_W) 'sound.c'; else $(CYGPATH_W) '$(srcdir)/sound.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sreplay-sound.Tpo $(DEPDIR)/sreplay-sound.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sound.c' object='sreplay-sound.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sreplay_CFLAGS) $(CFLAGS) -c -o sreplay-sound.obj `if test -f 'sound.c'; then $(CYGPATH_W) 'sound.c'; else $(CYGPATH_W) '$(srcdir)/sound.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

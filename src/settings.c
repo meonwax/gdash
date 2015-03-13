@@ -136,6 +136,11 @@ guint gd_gtk_key_fire_2=GDK_Control_R;
 #define SETTING_GTK_KEY_SUICIDE "gtk_key_suicide"
 guint gd_gtk_key_suicide=GDK_F2;
 
+/* html output option */
+/* CURRENTLY ONLY FROM THE COMMAND LINE */
+char *gd_html_stylesheet_filename=NULL;
+char *gd_html_favicon_filename=NULL;
+
 #endif	/* only if having gtk */
 
 
@@ -214,7 +219,13 @@ gboolean gd_sdl_16bit_mixing=FALSE;
 gboolean gd_sdl_44khz_mixing=TRUE;
 #define SETTING_CLASSIC_SOUND "classic_sound"
 gboolean gd_classic_sound=FALSE;
+#define SETTING_SOUND_CHUNKS_VOLUME_PERCENT "sound_chunks_volume_percent"
+int gd_sound_chunks_volume_percent=75;
+#define SETTING_SOUND_MUSIC_VOLUME_PERCENT "sound_music_volume_percent"
+int gd_sound_music_volume_percent=75;
 #endif	/* if gd_sound */
+
+
 
 
 
@@ -484,6 +495,8 @@ gd_load_settings()
     gd_sdl_16bit_mixing=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_16BIT_MIXING, gd_sdl_16bit_mixing);
     gd_sdl_44khz_mixing=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_44KHZ_MIXING, gd_sdl_44khz_mixing);
     gd_classic_sound=keyfile_get_boolean_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_CLASSIC_SOUND, gd_classic_sound);
+	gd_sound_chunks_volume_percent=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SOUND_CHUNKS_VOLUME_PERCENT, gd_sound_chunks_volume_percent);
+	gd_sound_music_volume_percent=keyfile_get_integer_with_default(ini, SETTINGS_GDASH_GROUP, SETTING_SOUND_MUSIC_VOLUME_PERCENT, gd_sound_music_volume_percent);
 #endif	/* if gd_sound */
 
     g_key_file_free(ini);
@@ -575,6 +588,8 @@ gd_save_settings()
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_16BIT_MIXING, gd_sdl_16bit_mixing);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_SDL_44KHZ_MIXING, gd_sdl_44khz_mixing);
     g_key_file_set_boolean(ini, SETTINGS_GDASH_GROUP, SETTING_CLASSIC_SOUND, gd_classic_sound);
+    g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_SOUND_CHUNKS_VOLUME_PERCENT, gd_sound_chunks_volume_percent);
+    g_key_file_set_integer(ini, SETTINGS_GDASH_GROUP, SETTING_SOUND_MUSIC_VOLUME_PERCENT, gd_sound_music_volume_percent);
 #endif	/* if gd_sound */
 
 	/* convert to string and free */

@@ -2500,10 +2500,14 @@ static gboolean
 editor_window_destroy_event(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
 	/* remove drawing interrupt. */
-	g_source_remove_by_user_data (drawing_area_draw_timeout);
+	g_source_remove_by_user_data(drawing_area_draw_timeout);
 	/* if cave is drawn, free. */
-	gd_cave_free (rendered_cave);
+	gd_cave_free(rendered_cave);
 	rendered_cave=NULL;
+	
+	/* we destroy the icon view explicitly. so the caveset gets recreated... gd_main_stop_game will need that, as it checks all caves for replay. */
+	if (iconview_cavelist)
+		gtk_widget_destroy(iconview_cavelist);
 	
 	g_hash_table_destroy(cave_pixbufs);
 	/* stop test is running. this also restores main window action sensitized states */
@@ -2558,7 +2562,7 @@ icon_view_update_pixbufs_timeout(gpointer data)
 
 			pixbuf_in_icon_view=NULL;	/* to force update below */			
 			rendered=gd_cave_new_rendered (cave, 0, 0);	/* render at level 1, seed=0 */
-			pixbuf=gd_drawcave_to_pixbuf (rendered, 128, 128, TRUE);					/* draw 128x128 icons at max */
+			pixbuf=gd_drawcave_to_pixbuf(rendered, 128, 128, TRUE, TRUE);					/* draw 128x128 icons at max */
 			if (!cave->selectable) {
 				GdkPixbuf *colored;
 				
@@ -3033,10 +3037,10 @@ save_cave_png (GdkPixbuf *pixbuf)
    this creates a pixbuf of the cave, and scales it down to fit the screen if needed.
    it is then presented to the user, with the option to save it in png */
 static void
-cave_overview (gboolean simple_view)
+cave_overview(gboolean simple_view)
 {
 	/* view the RENDERED one, and the entire cave */
-	GdkPixbuf *pixbuf=gd_drawcave_to_pixbuf (rendered_cave, 0, 0, simple_view), *scaled;
+	GdkPixbuf *pixbuf=gd_drawcave_to_pixbuf(rendered_cave, 0, 0, simple_view, TRUE), *scaled;
 	GtkWidget *dialog, *button;
 	int sx, sy;
 	double fx, fy;

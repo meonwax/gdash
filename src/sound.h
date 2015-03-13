@@ -17,13 +17,18 @@
 #define _GD_SOUND_H
 #include "cave.h"
 
-void gd_sound_init();
+/* init sound. allows setting buffer size (for replays saving), 0 for default. */
+void gd_sound_init(unsigned int bufsize);
 void gd_sound_off();
 void gd_sound_play_cave(GdCave *cave);
 void gd_sound_play_bonus_life();
 
 void gd_music_play_random();
 void gd_music_stop();
+
+void gd_sound_set_music_volume(int percent);
+void gd_sound_set_chunk_volumes(int percent);
+
 
 #endif
 

@@ -46,10 +46,30 @@ extern Uint8 *gd_keystate;
 
 extern gboolean gd_quit;
 
+
+
+/* color sets for different status bar types. */
+typedef struct _status_bar_colors {
+	GdColor background;
+	GdColor diamond_needed;
+	GdColor diamond_value;
+	GdColor diamond_collected;
+	GdColor score;
+	GdColor default_color;
+} GdStatusBarColors;
+
 int gd_drawcave(SDL_Surface *dest, GdGame *gameplay);
 gboolean gd_sdl_init(GdScalingType scaling_type);
 gboolean gd_scroll(GdGame *gameplay, gboolean exact_scroll);
 void gd_scroll_to_origin();
+
+void gd_clear_header(GdColor c);
+void gd_showheader_uncover(const GdGame *game, const GdStatusBarColors *cols, gboolean show_replay_sign);
+void gd_showheader_game(const GdGame *game, int timeout_since, const GdStatusBarColors *cols, gboolean show_replay_sign);
+void gd_play_game_select_status_bar_colors(GdStatusBarColors *cols, const GdCave *cave);
+
+
+
 
 void gd_select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor c4, GdColor c5);
 gboolean gd_is_surface_ok_for_theme(SDL_Surface *surface);
@@ -59,7 +79,7 @@ gboolean gd_loadcells_file(const char *filename);
 void gd_loadfont_file(const char *filename);
 void gd_loadfont_default();
 
-SDL_Surface **gd_get_title_animation();
+SDL_Surface **gd_get_title_animation(gboolean one_frame_only);
 
 /* write text to gd_screen. return the next usable x coordinate */
 /* pass x=-1 to center on screen */

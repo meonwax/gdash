@@ -69,7 +69,7 @@ static int play_area_h=180;
 int gd_statusbar_height=20;
 int gd_statusbar_y1=1;
 int gd_statusbar_y2=10;
-int gd_statusbar_mid=(20-8)/2;
+int gd_statusbar_mid=(20-8)/2;	/* (height-fontheight)/2 */
 static int scroll_x, scroll_y;
 
 
@@ -755,7 +755,7 @@ copy_alpha(SDL_Surface *src, SDL_Surface *dst)
    up to the caller to free.
  */
 SDL_Surface **
-gd_get_title_animation()
+gd_get_title_animation(gboolean one_frame_only)
 {
 	SDL_Surface *screen;
 	SDL_Surface *tile;
@@ -763,6 +763,7 @@ gd_get_title_animation()
 	SDL_Surface *frame;
 	SDL_Surface **animation;
 	int x, y, i;
+	int framenum;
 	
 	screen=NULL;
 	tile=NULL;
@@ -807,7 +808,11 @@ gd_get_title_animation()
 
 	/* do not allow more than 40 frames of animation */
 	g_assert(tile->h<40);
-	animation=g_new0(SDL_Surface *, tile->h+1);
+	if (one_frame_only)
+		framenum=1;
+	else
+		framenum=tile->h;
+	animation=g_new0(SDL_Surface *, framenum+1);
 	
 	/* create a big image, which is one tile larger than the title image size */
 	bigone=SDL_CreateRGBSurface(0, screen->w, screen->h+tile->h, 32, 0, 0, 0, 0);
@@ -822,7 +827,7 @@ gd_get_title_animation()
 		}
 	
 	frame=SDL_CreateRGBSurface(0, screen->w, screen->h, 32, rmask, gmask, bmask, amask);	/* must be same *mask so copy_alpha works correctly */
-	for (i=0; i<tile->h; i++) {
+	for (i=0; i<framenum; i++) {
 		SDL_Rect src;
 		
 		/* copy part of the big tiled image */
@@ -1268,6 +1273,9 @@ gd_loadcells_default()
 	using_png_gfx=FALSE;
 	/* just to set some default */
 	color0=GD_COLOR_INVALID; /* this is an invalid gdash color; so redraw is forced */
+
+	/* size of array (in bytes), -1 which is the cell size */
+	g_assert(sizeof(c64_gfx)-1 == NUM_OF_CELLS_X*NUM_OF_CELLS_Y*c64_gfx[0]*c64_gfx[0]);
 }
 
 
@@ -1573,6 +1581,9 @@ gd_select_pixbuf_colors(GdColor c0, GdColor c1, GdColor c2, GdColor c3, GdColor 
 
 
 
+
+
+
 /*
 	logical_size: logical pixel size of playfield, usually larger than the screen.
 	physical_size: visible part. (remember: player_x-x1!)
@@ -1645,9 +1656,6 @@ cave_scroll(int logical_size, int physical_size, int center, gboolean exact, int
 	
 	return changed;
 }
-
-
-
 
 
 /* just set current viewport to upper left. */
@@ -1743,12 +1751,11 @@ gd_drawcave(SDL_Surface *dest, GdGame *game)
 	cliprect.h=play_area_h;
 	SDL_SetClipRect(dest, &cliprect);
 
-	/* for the paused parameter, we set FALSE here, as the sdl version does not color the playfield when paused */
 	if (gd_sdl_pal_emulation && gd_even_line_pal_emu_vertical_scroll)
-		/* make it even (dividable by two) */
-		scroll_y_aligned=scroll_y/2*2;
+		scroll_y_aligned=scroll_y/2*2;		/* make it even (dividable by two) */
 	else
 		scroll_y_aligned=scroll_y;
+
 	/* here we draw all cells to be redrawn. we do not take scrolling area into consideration - sdl will do the clipping. */
 	for (y=game->cave->y1, yd=0; y<=game->cave->y2; y++, yd++) {
 		for (x=game->cave->x1, xd=0; x<=game->cave->x2; x++, xd++) {
@@ -1769,6 +1776,240 @@ gd_drawcave(SDL_Surface *dest, GdGame *game)
 	SDL_SetClipRect(dest, NULL);
 	return 0;
 }
+
+void
+gd_play_game_select_status_bar_colors(GdStatusBarColors *cols, const GdCave *cave)
+{
+	GdColor (*color_indexer) (int i);
+	int c64_col;
+	
+	/* first, count the number of c64 colors the cave uses. */
+	/* if it uses mostly c64 colors, we will use c64 colors for the status bar. */
+	/* otherwise we will use gdash colors. */
+	/* note that the atari original status bar color setting only uses the game colors. */
+	c64_col=0;
+	if (gd_color_is_c64(cave->color0)) c64_col++;
+	if (gd_color_is_c64(cave->color1)) c64_col++;
+	if (gd_color_is_c64(cave->color2)) c64_col++;
+	if (gd_color_is_c64(cave->color3)) c64_col++;
+	if (gd_color_is_c64(cave->color4)) c64_col++;
+	if (gd_color_is_c64(cave->color5)) c64_col++;
+	if (c64_col>4)
+		color_indexer=gd_c64_color;
+	else
+		color_indexer=gd_gdash_color;
+	
+	switch (gd_status_bar_type) {
+		case GD_STATUS_BAR_ORIGINAL:
+			cols->background=color_indexer(GD_COLOR_INDEX_BLACK);
+			cols->diamond_needed=cols->diamond_collected=color_indexer(GD_COLOR_INDEX_YELLOW);
+			cols->diamond_value=cols->score=cols->default_color=color_indexer(GD_COLOR_INDEX_WHITE);
+			break;
+		case GD_STATUS_BAR_1STB:
+			cols->background=color_indexer(GD_COLOR_INDEX_BLACK);
+			cols->diamond_needed=cols->diamond_collected=cols->score=color_indexer(GD_COLOR_INDEX_YELLOW);
+			cols->diamond_value=cols->default_color=color_indexer(GD_COLOR_INDEX_WHITE);
+			break;
+		case GD_STATUS_BAR_CRLI:
+			cols->background=color_indexer(GD_COLOR_INDEX_BLACK);
+			cols->diamond_needed=color_indexer(GD_COLOR_INDEX_RED);
+			cols->diamond_collected=color_indexer(GD_COLOR_INDEX_GREEN);
+			cols->diamond_value=color_indexer(GD_COLOR_INDEX_CYAN);
+			cols->score=color_indexer(GD_COLOR_INDEX_YELLOW);
+			cols->default_color=color_indexer(GD_COLOR_INDEX_WHITE);
+			break;
+		case GD_STATUS_BAR_FINAL:
+			cols->background=color_indexer(GD_COLOR_INDEX_BLACK);
+			cols->diamond_needed=color_indexer(GD_COLOR_INDEX_RED);
+			cols->diamond_collected=color_indexer(GD_COLOR_INDEX_GREEN);
+			cols->diamond_value=cols->score=cols->default_color=color_indexer(GD_COLOR_INDEX_WHITE);
+			break;
+		case GD_STATUS_BAR_ATARI_ORIGINAL:
+			cols->background=cave->color0;
+			cols->diamond_needed=cols->diamond_collected=cave->color2;
+			cols->diamond_value=cols->score=cols->default_color=cave->color3;
+			break;
+		default:
+			g_assert_not_reached();
+	}
+}
+
+
+void
+gd_clear_header(GdColor c)
+{
+	SDL_Rect r;
+	
+	r.x=0;
+	r.y=0;
+	r.w=gd_screen->w;
+	r.h=gd_statusbar_height;
+	SDL_FillRect(gd_screen, &r, SDL_MapRGB(gd_screen->format, gd_color_get_r(c), gd_color_get_g(c), gd_color_get_b(c)));
+}
+
+void
+gd_showheader_uncover(const GdGame *game, const GdStatusBarColors *cols, gboolean show_replay_sign)
+{
+	int cavename_y;
+	int len;
+	char *str;
+	gboolean first_line;
+
+	gd_clear_header(cols->background);
+	first_line=FALSE;	/* will be set to TRUE, if we draw in the next few code lines. so the y coordinate of the second status line can be decided. */
+
+	/* if playing a replay, tell the user! */
+	if (game->type==GD_GAMETYPE_REPLAY && show_replay_sign) {
+		gd_blittext(gd_screen, -1, gd_statusbar_y1, GD_GDASH_YELLOW, "PLAYING REPLAY");
+		first_line=TRUE;
+	}
+	else {
+		/* also inform about intermission, but not if playing a replay. also the replay saver should not show it! f */
+		if (game->cave->intermission && !game->type==GD_GAMETYPE_REPLAY) {
+			gd_blittext(gd_screen, -1, gd_statusbar_y1, cols->default_color, "ONE LIFE EXTRA");
+			first_line=TRUE;
+		}
+		else
+			/* if not an intermission, we may show the name of the game (caveset) */
+			if (gd_show_name_of_game) {		/* if showing the name of the cave... */
+				len=g_utf8_strlen(gd_caveset_data->name, -1);
+				if (gd_screen->w/gd_font_width()/2>=len)	/* if have place for double-width font */
+					gd_blittext(gd_screen, -1, gd_statusbar_y1, cols->default_color, gd_caveset_data->name);
+				else
+					gd_blittext_n(gd_screen, -1, gd_statusbar_y1, cols->default_color, gd_caveset_data->name);
+				first_line=TRUE;
+			}
+	}
+
+	cavename_y=first_line?gd_statusbar_y2:gd_statusbar_mid;
+	/* "xy players, cave ab/3" */
+	if (game->type==GD_GAMETYPE_NORMAL)
+		str=g_strdup_printf("%d%c, %s/%d", game->player_lives, GD_PLAYER_CHAR, game->cave->name, game->cave->rendered);
+	else
+		/* if not a normal game, do not show number of remaining lives */
+		str=g_strdup_printf("%s/%d", game->cave->name, game->cave->rendered);
+	len=g_utf8_strlen(str, -1);
+	if (gd_screen->w/gd_font_width()/2>=len)	/* if have place for double-width font */
+		gd_blittext(gd_screen, -1, cavename_y, cols->default_color, str);
+	else
+		gd_blittext_n(gd_screen, -1, cavename_y, cols->default_color, str);
+	g_free(str);
+}
+
+void
+gd_showheader_game(const GdGame *game, int timeout_since, const GdStatusBarColors *cols, gboolean show_replay_sign)
+{
+	int x, y;
+	gboolean first_line;
+	first_line=FALSE;	/* will be set to TRUE, if we draw in the next few code lines. so the y coordinate of the second status line can be decided. */
+
+	gd_clear_header(cols->background);
+
+	/* if playing a replay, tell the user! */
+	if (game->type==GD_GAMETYPE_REPLAY && show_replay_sign) {
+		gd_blittext(gd_screen, -1, gd_statusbar_y1, GD_GDASH_YELLOW, "PLAYING REPLAY");
+		first_line=TRUE;
+	}
+
+	/* y position of status bar */
+	y=first_line?gd_statusbar_y2:gd_statusbar_mid;
+
+	if (game->cave->player_state==GD_PL_TIMEOUT && timeout_since/50%4==0) {
+		gd_clear_header(cols->background);
+		gd_blittext(gd_screen, -1, y, GD_GDASH_WHITE, "OUT OF TIME");
+		return;
+	}
+	if (game->cave->player_state==GD_PL_NOT_YET) {
+		/* ... if the player is not yet born, we should rather show the uncover bar. */
+		gd_showheader_uncover(game, cols, show_replay_sign);
+		return;
+	}
+
+	if (gd_keystate[SDLK_LSHIFT] || gd_keystate[SDLK_RSHIFT]) {
+		/* ALTERNATIVE STATUS BAR BY PRESSING SHIFT */
+		x=10*gd_scale;
+		
+		x=gd_blittext_printf(gd_screen, x, y, cols->default_color, "%c%02d", GD_PLAYER_CHAR, MIN(game->player_lives, 99));	/* max 99 in %2d */
+		x+=14*gd_scale;
+		/* color numbers are not the same as key numbers! c3->k1, c2->k2, c1->k3 */
+		/* this is how it was implemented in crdr7. */
+		x=gd_blittext_printf(gd_screen, x, y, game->cave->color3, "%c%1d", GD_KEY_CHAR, MIN(game->cave->key1, 9));	/* max 9 in %1d */
+		x+=10*gd_scale;
+		x=gd_blittext_printf(gd_screen, x, y, game->cave->color2, "%c%1d", GD_KEY_CHAR, MIN(game->cave->key2, 9));
+		x+=10*gd_scale;
+		x=gd_blittext_printf(gd_screen, x, y, game->cave->color1, "%c%1d", GD_KEY_CHAR, MIN(game->cave->key3, 9));
+		x+=12*gd_scale;
+		if (game->cave->gravity_will_change>0) {
+			int gravity_char;
+			
+			switch(game->cave->gravity_next_direction) {
+				case MV_DOWN: gravity_char=GD_DOWN_CHAR; break;
+				case MV_LEFT: gravity_char=GD_LEFT_CHAR; break;
+				case MV_RIGHT: gravity_char=GD_RIGHT_CHAR; break;
+				case MV_UP: gravity_char=GD_UP_CHAR; break;
+				default: gravity_char='?'; break;				
+			}
+			x=gd_blittext_printf(gd_screen, x, y, cols->default_color, "%c%02d", gravity_char, MIN(gd_cave_time_show(game->cave, game->cave->gravity_will_change), 99));
+		} else {
+			int gravity_char;
+			
+			switch(game->cave->gravity) {
+				case MV_DOWN: gravity_char=GD_DOWN_CHAR; break;
+				case MV_LEFT: gravity_char=GD_LEFT_CHAR; break;
+				case MV_RIGHT: gravity_char=GD_RIGHT_CHAR; break;
+				case MV_UP: gravity_char=GD_UP_CHAR; break;
+				default: gravity_char='?'; break;				
+			}
+			x=gd_blittext_printf(gd_screen, x, y, cols->default_color, "%c%02d", gravity_char, 0);
+		}
+		x+=10*gd_scale;
+		x=gd_blittext_printf(gd_screen, x, y, cols->diamond_collected, "%c%02d", GD_SKELETON_CHAR, MIN(game->cave->skeletons_collected, 99));
+	} else {
+		/* NORMAL STATUS BAR */
+		x=1*gd_scale;
+		int time_secs;
+		
+		/* cave time is rounded _UP_ to seconds. so at the exact moment when it changes from
+		   2sec remaining to 1sec remaining, the player has exactly one second. when it changes
+		   to zero, it is the exact moment of timeout. */
+		time_secs=gd_cave_time_show(game->cave, game->cave->time);
+
+		if (gd_keystate[SDLK_f]) {
+			/* fast forward mode - show "FAST" */
+			x=gd_blittext_printf(gd_screen, x, y, cols->default_color, "%cFAST%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
+		} else {
+			/* normal speed mode - show diamonds NEEDED <> VALUE */
+			/* or if collected enough diamonds,   <><><> VALUE */
+			if (game->cave->diamonds_needed>game->cave->diamonds_collected) {
+				if (game->cave->diamonds_needed>0)
+					x=gd_blittext_printf(gd_screen, x, y, cols->diamond_needed, "%03d", game->cave->diamonds_needed);
+				else
+					/* did not already count diamonds needed */
+					x=gd_blittext_printf(gd_screen, x, y, cols->diamond_needed, "%c%c%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
+			}
+			else
+				x=gd_blittext_printf(gd_screen, x, y, cols->default_color, " %c%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
+			x=gd_blittext_printf(gd_screen, x, y, cols->default_color, "%c", GD_DIAMOND_CHAR, GD_DIAMOND_CHAR);
+			x=gd_blittext_printf(gd_screen, x, y, cols->diamond_value, "%02d", game->cave->diamond_value);
+		}
+		x+=10*gd_scale;
+		x=gd_blittext_printf(gd_screen, x, y, cols->diamond_collected, "%03d", game->cave->diamonds_collected);
+		x+=11*gd_scale;
+		x=gd_blittext_printf(gd_screen, x, y, cols->default_color, "%03d", time_secs);
+		x+=10*gd_scale;
+		x=gd_blittext_printf(gd_screen, x, y, cols->score, "%06d", game->player_score);
+	}
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

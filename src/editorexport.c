@@ -71,7 +71,7 @@ static int element_to_crli(GdElement e, GHashTable *unknown)
 }
 
 static int
-crli_export (GdCave *to_convert, const int level, guint8 *compressed)
+crli_export(GdCave *to_convert, const int level, guint8 *compressed)
 {
 	guint8 output[0x3b0];
 	int x, y, i;
@@ -219,18 +219,18 @@ crli_export (GdCave *to_convert, const int level, guint8 *compressed)
 	output[0x394]=cave->biter_delay_frame;
 	output[0x395]=cave->magic_wall_stops_amoeba?0:1;	/* inverted! */
 	
-	output[0x396]=element_to_crli(cave->bomb_explode_to|SCANNED, unknown);
-	output[0x397]=element_to_crli(cave->explosion_to|SCANNED, unknown);
-	if (cave->falling_stone_to!=O_STONE_F)
+	output[0x396]=element_to_crli(cave->bomb_explosion_effect|SCANNED, unknown);
+	output[0x397]=element_to_crli(cave->explosion_effect|SCANNED, unknown);
+	if (cave->stone_falling_effect!=O_STONE_F)
 		g_warning("crli does not support 'falling stone to' effect");
-	output[0x398]=element_to_crli(cave->bouncing_stone_to|SCANNED, unknown);
-	output[0x399]=element_to_crli(cave->diamond_birth_to|SCANNED, unknown);
+	output[0x398]=element_to_crli(cave->stone_bouncing_effect|SCANNED, unknown);
+	output[0x399]=element_to_crli(cave->diamond_birth_effect|SCANNED, unknown);
 	output[0x39a]=element_to_crli(cave->magic_diamond_to|SCANNED, unknown);
-	if (cave->bouncing_diamond_to!=O_DIAMOND)
+	if (cave->diamond_bouncing_effect!=O_DIAMOND)
 		g_warning("crli does not support 'bouncing diamond turns to' effect");
 	output[0x39b]=element_to_crli(cave->bladder_converts_by, unknown);
-	output[0x39c]=element_to_crli(cave->falling_diamond_to|SCANNED, unknown);
-	if (cave->bouncing_diamond_to!=O_DIAMOND)
+	output[0x39c]=element_to_crli(cave->diamond_falling_effect|SCANNED, unknown);
+	if (cave->diamond_bouncing_effect!=O_DIAMOND)
 		g_warning("crli does not support 'bouncing diamond turns to' effect");
 	output[0x39d]=element_to_crli(cave->biter_eat, unknown);
 	output[0x39e]=element_to_crli(cave->slime_eats_1, unknown);
@@ -246,8 +246,8 @@ crli_export (GdCave *to_convert, const int level, guint8 *compressed)
 	output[0x3a3]='0';
 	
 	output[0x3a4]=cave->diagonal_movements?1:0;
-	output[0x3a6]=element_to_crli(cave->too_big_amoeba_to|SCANNED, unknown);
-	output[0x3a7]=element_to_crli(cave->enclosed_amoeba_to|SCANNED, unknown);
+	output[0x3a6]=element_to_crli(cave->amoeba_too_big_effect|SCANNED, unknown);
+	output[0x3a7]=element_to_crli(cave->amoeba_enclosed_effect|SCANNED, unknown);
 	output[0x3a8]=cave->acid_spread_ratio*255.0;
 	output[0x3a9]=element_to_crli(cave->acid_eats_this, unknown);
 	output[0x3ab]=element_to_crli(cave->expanding_wall_looks_like, unknown);
@@ -436,8 +436,18 @@ gd_export_cave_list_to_crli_cavepack(GList *caveset, int level, const char *file
 }
 
 
+static void
+string_printf_markup(GString *string, const char *format, ...)
+{
+	char *text;
+	va_list ap;
 
-
+	va_start(ap, format);
+	text=g_markup_vprintf_escaped(format, ap);
+	va_end(ap);
+	g_string_append(string, text);
+	g_free(text);
+}
 
 /* save caveset as html gallery.
    htmlname: filename
@@ -476,26 +486,65 @@ gd_save_html(char *htmlname, GtkWidget *window)
 	}
 	pngbasename=g_path_get_basename(pngoutbasename);
 
-	g_string_append_printf (contents, "<HTML>\n");
-	g_string_append_printf (contents, "<TITLE>%s</TITLE>", gd_caveset_data->name);
-	g_string_append_printf (contents, "<BODY>\n");
+	g_string_append(contents, "<HTML>\n");
+	g_string_append(contents, "<HEAD>\n");
+	string_printf_markup(contents, "<TITLE>%s</TITLE>\n", gd_caveset_data->name);
+	g_string_append(contents, "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n");
+	if (gd_html_stylesheet_filename)
+		g_string_append_printf(contents, "<link rel=\"stylesheet\" href=\"%s\">\n", gd_html_stylesheet_filename);
+	if (gd_html_favicon_filename)
+		g_string_append_printf(contents, "<link rel=\"shortcut icon\" href=\"%s\">\n", gd_html_favicon_filename);
+	g_string_append(contents, "</HEAD>\n\n");
 
-	g_string_append_printf (contents, "<H1>%s</H1>", gd_caveset_data->name);
-	g_string_append_printf (contents, _("Caves: %d<BR>\n"), gd_caveset_count ());
+	g_string_append(contents, "<BODY>\n");
+
+	string_printf_markup(contents, "<H1>%s</H1>\n", gd_caveset_data->name);
+	/* if the game has its own title screen */
+	if (gd_caveset_data->title_screen->len!=0) {
+		GdkPixbuf *title_image;
+		char *pngname;
+
+		/* create the title image and save it */		
+		title_image=gd_create_title_image();
+		pngname=g_strdup_printf("%s_%03d.png", pngoutbasename, 0);	/* it is the "zeroth" image */
+		gdk_pixbuf_save(title_image, pngname, "png", &error, "compression", "9", NULL);
+		if (error) {
+			g_warning("%s", error->message);
+			g_error_free(error);
+			error=NULL;
+		}
+		g_free (pngname);
+
+		g_string_append_printf(contents, "<IMAGE SRC=\"%s_%03d.png\" WIDTH=\"%d\" HEIGHT=\"%d\">\n", pngbasename, 0, gdk_pixbuf_get_width(title_image), gdk_pixbuf_get_height (title_image));
+		g_string_append_printf(contents, "<BR>\n");
+		
+		g_object_unref(title_image);
+	}
+	g_string_append(contents, "<TABLE>\n");
+	string_printf_markup(contents, "<TR><TH>%s<TD>%d\n", _("Caves"), gd_caveset_count());
 	if (!g_str_equal(gd_caveset_data->author, ""))
-		g_string_append_printf (contents, _("Author: %s<BR>\n"), gd_caveset_data->author);
+		string_printf_markup(contents, "<TR><TH>%s<TD>%s\n", _("Author"), gd_caveset_data->author);
 	if (!g_str_equal(gd_caveset_data->description, ""))
-		g_string_append_printf (contents, _("Description: %s<BR>\n"), gd_caveset_data->description);
+		string_printf_markup(contents, "<TR><TH>%s<TD>%s\n", _("Description"), gd_caveset_data->description);
 	if (!g_str_equal(gd_caveset_data->www, ""))
-		g_string_append_printf (contents, _("WWW: %s<BR>\n"), gd_caveset_data->www);
+		string_printf_markup(contents, "<TR><TH>%s<TD>%s\n", _("WWW"), gd_caveset_data->www);
 	if (!g_str_equal(gd_caveset_data->remark->str, ""))
-		g_string_append_printf (contents, _("Remark: %s<BR>\n"), gd_caveset_data->remark->str);
+		string_printf_markup(contents, "<TR><TH>%s<TD>%s\n", _("Remark"), gd_caveset_data->remark->str);
 	if (!g_str_equal(gd_caveset_data->story->str, ""))
-		g_string_append_printf (contents, _("Story:<BR>%s<BR>\n"), gd_caveset_data->story->str);
+		string_printf_markup(contents, "<TR><TH>%s<TD>%s\n", _("Story"), gd_caveset_data->story->str);
+	g_string_append(contents, "</TABLE>\n");
 
-	g_string_append_printf (contents, "<HR>\n");
+	/* cave names, descriptions, hrefs */
+	g_string_append(contents, "<DL>\n");
+	for (i=0; i<gd_caveset_count(); i++) {
+		GdCave *cave;
+		
+		cave=gd_return_nth_cave(i);
+		string_printf_markup(contents, "<DT><A HREF=\"#cave%03d\">%s</A></DT>\n<DD>%s</DD>\n", i+1, cave->name, cave->description);
+	}
+	g_string_append(contents, "</DL>\n\n");
 
-	for (i=0; i < gd_caveset_count (); i++) {
+	for (i=0; i<gd_caveset_count(); i++) {
 		GdkPixbuf *pixbuf;
 		GdCave *cave;
 		char *pngname;
@@ -505,16 +554,16 @@ gd_save_html(char *htmlname, GtkWidget *window)
 		GError *error=NULL;
 
 		if (progress) {
-			gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), (float) i / gd_caveset_count ());
-			text=g_strdup_printf ("%d/%d", i, gd_caveset_count ());
-			gtk_progress_bar_set_text (GTK_PROGRESS_BAR (progress), text);
-			g_free (text);
-			gdk_window_process_all_updates ();
+			gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR (progress), (float) i/gd_caveset_count());
+			text=g_strdup_printf("%d/%d", i, gd_caveset_count());
+			gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress), text);
+			g_free(text);
+			gdk_window_process_all_updates();
 		}
 
 		/* rendering cave for png: seed=0 */
-		cave=gd_cave_new_from_caveset (i, 0, 0);
-		pixbuf=gd_drawcave_to_pixbuf (cave, 0, 0, TRUE);
+		cave=gd_cave_new_from_caveset(i, 0, 0);
+		pixbuf=gd_drawcave_to_pixbuf(cave, 0, 0, TRUE, FALSE);
 		
 		/* check cave to see if we have amoeba or magic wall. properties will be shown in html, if so. */
 		for (y=0; y<cave->h; y++)
@@ -529,66 +578,75 @@ gd_save_html(char *htmlname, GtkWidget *window)
 					has_magic=TRUE;
 					break;
 				}
-					
 
-		pngname=g_strdup_printf ("%s_%03d.png", pngoutbasename, i + 1);
-		gdk_pixbuf_save (pixbuf, pngname, "png", &error, "compression", "9", NULL);
+		/* save image */		
+		pngname=g_strdup_printf("%s_%03d.png", pngoutbasename, i + 1);
+		gdk_pixbuf_save(pixbuf, pngname, "png", &error, "compression", "9", NULL);
 		if (error) {
 			g_warning("%s", error->message);
 			g_error_free(error);
+			error=NULL;
 		}
 		g_free (pngname);
 
-		g_string_append_printf (contents, "<P>\n");
-		g_string_append_printf (contents, "<H2>%s</H2>\n", cave->name);
-		g_string_append_printf (contents, "<IMAGE SRC=\"%s_%03d.png\" WIDTH=%d HEIGHT=%d>\n", pngbasename, i+1, gdk_pixbuf_get_width (pixbuf), gdk_pixbuf_get_height (pixbuf));
-		g_string_append_printf (contents, "<BR>\n");
-		g_string_append_printf (contents, "<TABLE>\n");
+		/* cave header */		
+		string_printf_markup(contents, "<A NAME=\"cave%03d\"></A>\n<H2>%s</H2>\n", i+1, cave->name);
+		g_string_append_printf(contents, "<IMAGE SRC=\"%s_%03d.png\" WIDTH=\"%d\" HEIGHT=\"%d\">\n", pngbasename, i+1, gdk_pixbuf_get_width (pixbuf), gdk_pixbuf_get_height (pixbuf));
+		g_string_append(contents, "<BR>\n");
+		g_string_append(contents, "<TABLE>\n");
 		if (!g_str_equal(cave->author, ""))
-			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Author"), cave->author);
+			string_printf_markup(contents, "<TR><TH>%s<TD>%s\n", _("Author"), cave->author);
 		if (!g_str_equal(cave->description, ""))
-			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Description"), cave->description);
+			string_printf_markup(contents, "<TR><TH>%s<TD>%s\n", _("Description"), cave->description);
 		if (!g_str_equal(cave->remark->str, "")) {
 			/* we must split the story into lines, and join them with html <br> */
 			char **spl;
 			char *join;
+			char *escaped;
 			
-			spl=g_strsplit_set(cave->remark->str, "\n", -1);
-			join=g_strjoinv("<br>\n", spl);
+			escaped=g_markup_escape_text(cave->remark->str, -1);
+			spl=g_strsplit_set(escaped, "\n", -1);
+			g_free(escaped);
+			/* maintain line breaks */
+			join=g_strjoinv("<BR>\n", spl);
 			g_strfreev(spl);
-			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Remark"), join);
+			g_string_append_printf(contents, "<TR><TH>%s<TD>%s\n", _("Remark"), join);	/* string already escaped! */
 			g_free(join);
 		}
 		if (!g_str_equal(cave->story->str, "")) {
 			/* we must split the story into lines, and join them with html <br> */
 			char **spl;
 			char *join;
+			char *escaped;
 			
-			spl=g_strsplit_set(cave->story->str, "\n", -1);
-			join=g_strjoinv("<br>\n", spl);
+			escaped=g_markup_escape_text(cave->story->str, -1);
+			spl=g_strsplit_set(escaped, "\n", -1);
+			g_free(escaped);
+			/* maintain line breaks */
+			join=g_strjoinv("<BR>\n", spl);
 			g_strfreev(spl);
-			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Story"), join);
+			g_string_append_printf(contents, "<TR><TH>%s<TD>%s\n", _("Story"), join);	/* string already escaped! */
 			g_free(join);
 		}
-		g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Type"), cave->intermission ? _("Intermission") : _("Normal cave"));
-		g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%s</TD></TR>\n", _("Selectable as start"), cave->selectable ? _("Yes") : _("No"));
-		g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%d</TD></TR>\n", _("Diamonds needed"), cave->diamonds_needed);
-		g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%d</TD></TR>\n", _("Diamond value"), cave->diamond_value);
-		g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%d</TD></TR>\n", _("Extra diamond value"), cave->extra_diamond_value);
-		g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%d</TD></TR>\n", _("Time (s)"), cave->time);
+		string_printf_markup(contents, "<TR><TH>%s<TD>%s\n", _("Type"), cave->intermission ? _("Intermission") : _("Normal cave"));
+		string_printf_markup(contents, "<TR><TH>%s<TD>%s\n", _("Selectable as start"), cave->selectable ? _("Yes") : _("No"));
+		string_printf_markup(contents, "<TR><TH>%s<TD>%d\n", _("Diamonds needed"), cave->diamonds_needed);
+		string_printf_markup(contents, "<TR><TH>%s<TD>%d\n", _("Diamond value"), cave->diamond_value);
+		string_printf_markup(contents, "<TR><TH>%s<TD>%d\n", _("Extra diamond value"), cave->extra_diamond_value);
+		string_printf_markup(contents, "<TR><TH>%s<TD>%d\n", _("Time (s)"), cave->time);
 		if (has_amoeba)
-			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%d, %d</TD></TR>\n", _("Amoeba threshold and time (s)"), cave->amoeba_max_count, cave->amoeba_time);
+			string_printf_markup(contents, "<TR><TH>%s<TD>%d, %d\n", _("Amoeba threshold and time (s)"), cave->amoeba_max_count, cave->amoeba_time);
 		if (has_magic)
-			g_string_append_printf (contents, "<TR><TD>%s</TD><TD>%d</TD></TR>\n", _("Magic wall milling time (s)"), cave->magic_wall_time);
-		g_string_append_printf (contents, "</TABLE>\n");
+			string_printf_markup(contents, "<TR><TH>%s<TD>%d\n", _("Magic wall milling time (s)"), cave->magic_wall_time);
+		g_string_append(contents, "</TABLE>\n");
 
-		g_string_append_printf (contents, "</P>\n");
+		g_string_append(contents, "\n");
 
 		gd_cave_free (cave);
 		g_object_unref (pixbuf);
 	}
-	g_string_append_printf (contents, "</BODY>\n");
-	g_string_append_printf (contents, "</HTML>\n");
+	g_string_append(contents, "</BODY>\n");
+	g_string_append(contents, "</HTML>\n");
 	g_free (pngoutbasename);
 	g_free (pngbasename);
 

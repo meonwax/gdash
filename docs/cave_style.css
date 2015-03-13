@@ -1,0 +1,25 @@
+* {
+    border: 0;
+    padding: 0;
+    text-decoration: none;
+    font: sans-serif;
+}
+
+body {
+    background: url(background.png);
+    font: 13px/18px sans-serif;
+    color: #222;
+    margin: 1em;
+}
+
+a { color: #5555aa; }
+a:hover { color: #e33939; }
+
+h1 { font: 800 36px/48px sans-serif; }
+h2 { margin-bottom: 5px; }
+h3 { margin-bottom: 3px; }
+
+img { border: 1px solid #222; }
+
+table th { text-align: left; vertical-align: top; padding-right: 0.5em; }
+

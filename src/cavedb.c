@@ -73,8 +73,9 @@ enum _generated_cells_indexes {
 	i_brick_non_sloped,
 	i_outbox,
 	i_stone_f,
+	i_flying_stone_f,
 	i_diamond_f,
-//	i_dirt_ball_f,
+	i_flying_diamond_f,
 	i_pre_invis_outbox,
 	i_unknown,
 	i_waiting_stone,
@@ -100,7 +101,7 @@ enum _generated_cells_indexes {
 	i_walled_key_3,
 	i_player,
 	i_player_glued,
-	
+
 	i_max_cell_num
 };
 
@@ -109,7 +110,7 @@ enum _generated_cells_indexes {
 	the game will check if one is missing and stop the game.
 	the identifier in the saved file might also not match, reading an "outbox" from
 	the file should store an O_PRE_OUTBOX.
-	
+
    images are: image in editor, image in editor - animated, game image
    indexes which are in the png have to be given as numeric constants.
    for generated cells (ie. guard + an arrow), use the above enum
@@ -121,9 +122,9 @@ GdElements gd_elements[] = {
 	{O_DIRT_SLOPED_UP_LEFT, N_("Sloped dirt (up & left)"), P_DIRT|P_SLOPED_UP|P_SLOPED_LEFT|P_AMOEBA_CONSUMES, "DIRTSLOPEDUPLEFT", 0, 281, 281, 281},
 	{O_DIRT_SLOPED_DOWN_LEFT, N_("Sloped dirt (down & left)"), P_DIRT|P_SLOPED_DOWN|P_SLOPED_LEFT|P_AMOEBA_CONSUMES, "DIRTSLOPEDDOWNLEFT", 0, 282, 282, 282},
 	{O_DIRT_SLOPED_DOWN_RIGHT, N_("Sloped dirt (down & right)"), P_DIRT|P_SLOPED_DOWN|P_SLOPED_RIGHT|P_AMOEBA_CONSUMES, "DIRTSLOPEDDOWNRIGHT", 0, 283, 283, 283},
-	{O_DIRT_BALL, N_("Dirt ball"), P_DIRT|P_SLOPED|P_AMOEBA_CONSUMES|P_MOVED_BY_CONVEYOR, "DIRTBALL", 0, 289, 289, 289, 120},	/* has ckdelay */
+	{O_DIRT_BALL, N_("Dirt ball"), P_DIRT|P_SLOPED|P_AMOEBA_CONSUMES|P_MOVED_BY_CONVEYOR_TOP, "DIRTBALL", 0, 289, 289, 289, 120},	/* has ckdelay */
 	{O_DIRT_BALL_F, N_("Dirt ball (falling)"), 0, "DIRTBALLf", 0, 289, 289, 289, 120},	/* has ckdelay */
-	{O_DIRT_LOOSE, N_("Loose dirt"), P_DIRT|P_AMOEBA_CONSUMES|P_MOVED_BY_CONVEYOR, "DIRTLOOSE", 0, 352, 352, 352, 60},	/* has ckdelay */
+	{O_DIRT_LOOSE, N_("Loose dirt"), P_DIRT|P_AMOEBA_CONSUMES|P_MOVED_BY_CONVEYOR_TOP, "DIRTLOOSE", 0, 352, 352, 352, 60},	/* has ckdelay */
 	{O_DIRT_LOOSE_F, N_("Loose dirt (falling)"), 0, "DIRTLOOSEf", 0, 352, 352, 352, 60},	/* has ckdelay */
 	{O_DIRT2, N_("Dirt 2"), P_DIRT|P_AMOEBA_CONSUMES, "DIRT2", 0, 3, 3, 3},
 	{O_BRICK, N_("Brick wall"), P_SLOPED|P_BLADDER_SLOPED|P_CAN_BE_HAMMERED, "WALL", 'w', 5, 5, 5},
@@ -145,12 +146,16 @@ GdElements gd_elements[] = {
 	{O_STEEL_EXPLODABLE, N_("Explodable steel wall"), P_CAN_BE_HAMMERED, "STEELWALLDESTRUCTABLE", 'E', 72, 72, 4},
 	{O_STEEL_EATABLE, N_("Eatable steel wall"), 0, "STEELWALLEATABLE", 0, i_steel_eatable, i_steel_eatable, 4},
 	{O_BRICK_EATABLE, N_("Eatable brick wall"), 0, "WALLEATABLE", 0, i_brick_eatable, i_brick_eatable, 5},
-	{O_STONE, N_("Stone"), P_SLOPED|P_MOVED_BY_CONVEYOR, "BOULDER", 'r', 1, 1, 1, 156},	/* has ckdelay */
+	{O_STONE, N_("Stone"), P_SLOPED|P_MOVED_BY_CONVEYOR_TOP, "BOULDER", 'r', 1, 1, 1, 156},	/* has ckdelay */
 	{O_STONE_F, N_("Stone, falling"), 0, "BOULDERf", 'R', i_stone_f, i_stone_f, 1, 156},	/* has ckdelay */
-	{O_MEGA_STONE, N_("Mega stone"), P_SLOPED|P_MOVED_BY_CONVEYOR, "MEGABOULDER", 0, 272, 272, 272, 156},	/* has ckdelay */
+	{O_FLYING_STONE, N_("Flying stone"), P_SLOPED|P_MOVED_BY_CONVEYOR_BOTTOM, "FLYINGBOULDER", 0, 357, 357, 357, 156},	/* has ckdelay */
+	{O_FLYING_STONE_F, N_("Flying stone, flying"), 0, "FLYINGBOULDERf", 0, i_flying_stone_f, i_flying_stone_f, 357, 156},	/* has ckdelay */
+	{O_MEGA_STONE, N_("Mega stone"), P_SLOPED|P_MOVED_BY_CONVEYOR_TOP, "MEGABOULDER", 0, 272, 272, 272, 156},	/* has ckdelay */
 	{O_MEGA_STONE_F, N_("Mega stone, falling"), 0, "MEGABOULDERf", 0, i_mega_stone_falling, i_mega_stone_falling, 272, 156},	/* has ckdelay */
-	{O_DIAMOND, N_("Diamond"), P_SLOPED|P_MOVED_BY_CONVEYOR, "DIAMOND", 'd', 248, -248, -248, 156},	/* has ckdelay */
+	{O_DIAMOND, N_("Diamond"), P_SLOPED|P_MOVED_BY_CONVEYOR_TOP, "DIAMOND", 'd', 248, -248, -248, 156},	/* has ckdelay */
 	{O_DIAMOND_F, N_("Diamond, falling"), 0, "DIAMONDf", 'D', i_diamond_f, i_diamond_f, -248, 156},	/* has ckdelay */
+	{O_FLYING_DIAMOND, N_("Flying diamond"), P_SLOPED|P_MOVED_BY_CONVEYOR_BOTTOM, "FLYINGDIAMOND", 0, 344, -344, -344, 156},	/* has ckdelay */
+	{O_FLYING_DIAMOND_F, N_("Flying diamond, flying"), 0, "FLYINGDIAMONDf", 0, i_flying_diamond_f, i_flying_diamond_f, -344, 156},	/* has ckdelay */
 	{O_BLADDER_SPENDER, N_("Bladder Spender"), 0, "BLADDERSPENDER", 0, 6, 6, 6, 20},	/* has ckdelay */
 	{O_INBOX, N_("Inbox"), 0, "INBOX", 'P', 35, 35, 22},
 	{O_H_EXPANDING_WALL, N_("Expanding wall, horizontal"), P_VISUAL_EFFECT | P_CAN_BE_HAMMERED, "HEXPANDINGWALL", 'x', i_h_expanding_wall, i_h_expanding_wall, 5, 111},	/* has ckdelay */
@@ -244,42 +249,42 @@ GdElements gd_elements[] = {
 	{O_WAITING_STONE, N_("Waiting stone"), P_SLOPED, "WAITINGBOULDER", 0, i_waiting_stone, i_waiting_stone, 1, 176},	/* has ckdelay */
 	{O_CHASING_STONE, N_("Chasing stone"), P_SLOPED, "CHASINGBOULDER", 0, 17, 17, 17, 269},	/* has ckdelay */
 	{O_GHOST, N_("Ghost"), 0, "GHOST", 'g', 160, -160, -160, 50},	/* has ckdelay */
-	{O_GUARD_1, N_("Guard, left"), P_EXPLODES_TO_SPACE | P_CCW, "FIREFLYl", 'Q', i_guard_1, -136, -136, 384},	/* has ckdelay */
-	{O_GUARD_2, N_("Guard, up"), P_EXPLODES_TO_SPACE | P_CCW, "FIREFLYu", 'o', i_guard_2, -136, -136, 384},	/* has ckdelay */
-	{O_GUARD_3, N_("Guard, right"), P_EXPLODES_TO_SPACE | P_CCW, "FIREFLYr", 'O', i_guard_3, -136, -136, 384},	/* has ckdelay */
-	{O_GUARD_4, N_("Guard, down"), P_EXPLODES_TO_SPACE | P_CCW, "FIREFLYd", 'q', i_guard_4, -136, -136, 384},	/* has ckdelay */
-	{O_ALT_GUARD_1, N_("Alternative guard, left"), P_EXPLODES_TO_SPACE, "A_FIREFLYl", 0, i_alt_guard_1, -104, -104, 384},	/* has ckdelay */
-	{O_ALT_GUARD_2, N_("Alternative guard, up"), P_EXPLODES_TO_SPACE, "A_FIREFLYu", 0, i_alt_guard_2, -104, -104, 384},	/* has ckdelay */
-	{O_ALT_GUARD_3, N_("Alternative guard, right"), P_EXPLODES_TO_SPACE, "A_FIREFLYr", 0, i_alt_guard_3, -104, -104, 384},	/* has ckdelay */
-	{O_ALT_GUARD_4, N_("Alternative guard, down"), P_EXPLODES_TO_SPACE, "A_FIREFLYd", 0, i_alt_guard_4, -104, -104, 384},	/* has ckdelay */
-	{O_BUTTER_1, N_("Butterfly, left"), P_EXPLODES_TO_DIAMONDS, "BUTTERFLYl", 'C', i_butter_1, -144, -144, 384},	/* has ckdelay */
-	{O_BUTTER_2, N_("Butterfly, up"), P_EXPLODES_TO_DIAMONDS, "BUTTERFLYu", 'b', i_butter_2, -144, -144, 384},	/* has ckdelay */
-	{O_BUTTER_3, N_("Butterfly, right"), P_EXPLODES_TO_DIAMONDS, "BUTTERFLYr", 'B', i_butter_3, -144, -144, 384},	/* has ckdelay */
-	{O_BUTTER_4, N_("Butterfly, down"), P_EXPLODES_TO_DIAMONDS, "BUTTERFLYd", 'c', i_butter_4, -144, -144, 384},	/* has ckdelay */
-	{O_ALT_BUTTER_1, N_("Alternative butterfly, left"), P_EXPLODES_TO_DIAMONDS | P_CCW, "A_BUTTERFLYl", 0, i_alt_butter_1, -112, -112, 384},	/* has ckdelay */
-	{O_ALT_BUTTER_2, N_("Alternative butterfly, up"), P_EXPLODES_TO_DIAMONDS | P_CCW, "A_BUTTERFLYu", 0, i_alt_butter_2, -112, -112, 384},	/* has ckdelay */
-	{O_ALT_BUTTER_3, N_("Alternative butterfly, right"), P_EXPLODES_TO_DIAMONDS | P_CCW, "A_BUTTERFLYr", 0, i_alt_butter_3, -112, -112, 384},	/* has ckdelay */
-	{O_ALT_BUTTER_4, N_("Alternative butterfly, down"), P_EXPLODES_TO_DIAMONDS | P_CCW, "A_BUTTERFLYd", 0, i_alt_butter_4, -112, -112, 384},	/* has ckdelay */
-	{O_STONEFLY_1, N_("Stonefly, left"), P_EXPLODES_TO_STONES, "STONEFLYl", 0, i_stonefly_1, -152, -152, 384},	/* has ckdelay */
-	{O_STONEFLY_2, N_("Stonefly, up"), P_EXPLODES_TO_STONES, "STONEFLYu", 0, i_stonefly_2, -152, -152, 384},	/* has ckdelay */
-	{O_STONEFLY_3, N_("Stonefly, right"), P_EXPLODES_TO_STONES, "STONEFLYr", 0, i_stonefly_3, -152, -152, 384},	/* has ckdelay */
-	{O_STONEFLY_4, N_("Stonefly, down"), P_EXPLODES_TO_STONES, "STONEFLYd", 0, i_stonefly_4, -152, -152, 384},	/* has ckdelay */
+	{O_FIREFLY_1, N_("Guard, left"), P_EXPLODES_BY_HIT | P_CCW, "FIREFLYl", 'Q', i_guard_1, -136, -136, 384},	/* has ckdelay */
+	{O_FIREFLY_2, N_("Guard, up"), P_EXPLODES_BY_HIT | P_CCW, "FIREFLYu", 'o', i_guard_2, -136, -136, 384},	/* has ckdelay */
+	{O_FIREFLY_3, N_("Guard, right"), P_EXPLODES_BY_HIT | P_CCW, "FIREFLYr", 'O', i_guard_3, -136, -136, 384},	/* has ckdelay */
+	{O_FIREFLY_4, N_("Guard, down"), P_EXPLODES_BY_HIT | P_CCW, "FIREFLYd", 'q', i_guard_4, -136, -136, 384},	/* has ckdelay */
+	{O_ALT_FIREFLY_1, N_("Alternative guard, left"), P_EXPLODES_BY_HIT, "A_FIREFLYl", 0, i_alt_guard_1, -104, -104, 384},	/* has ckdelay */
+	{O_ALT_FIREFLY_2, N_("Alternative guard, up"), P_EXPLODES_BY_HIT, "A_FIREFLYu", 0, i_alt_guard_2, -104, -104, 384},	/* has ckdelay */
+	{O_ALT_FIREFLY_3, N_("Alternative guard, right"), P_EXPLODES_BY_HIT, "A_FIREFLYr", 0, i_alt_guard_3, -104, -104, 384},	/* has ckdelay */
+	{O_ALT_FIREFLY_4, N_("Alternative guard, down"), P_EXPLODES_BY_HIT, "A_FIREFLYd", 0, i_alt_guard_4, -104, -104, 384},	/* has ckdelay */
+	{O_BUTTER_1, N_("Butterfly, left"), P_EXPLODES_BY_HIT, "BUTTERFLYl", 'C', i_butter_1, -144, -144, 384},	/* has ckdelay */
+	{O_BUTTER_2, N_("Butterfly, up"), P_EXPLODES_BY_HIT, "BUTTERFLYu", 'b', i_butter_2, -144, -144, 384},	/* has ckdelay */
+	{O_BUTTER_3, N_("Butterfly, right"), P_EXPLODES_BY_HIT, "BUTTERFLYr", 'B', i_butter_3, -144, -144, 384},	/* has ckdelay */
+	{O_BUTTER_4, N_("Butterfly, down"), P_EXPLODES_BY_HIT, "BUTTERFLYd", 'c', i_butter_4, -144, -144, 384},	/* has ckdelay */
+	{O_ALT_BUTTER_1, N_("Alternative butterfly, left"), P_EXPLODES_BY_HIT | P_CCW, "A_BUTTERFLYl", 0, i_alt_butter_1, -112, -112, 384},	/* has ckdelay */
+	{O_ALT_BUTTER_2, N_("Alternative butterfly, up"), P_EXPLODES_BY_HIT | P_CCW, "A_BUTTERFLYu", 0, i_alt_butter_2, -112, -112, 384},	/* has ckdelay */
+	{O_ALT_BUTTER_3, N_("Alternative butterfly, right"), P_EXPLODES_BY_HIT | P_CCW, "A_BUTTERFLYr", 0, i_alt_butter_3, -112, -112, 384},	/* has ckdelay */
+	{O_ALT_BUTTER_4, N_("Alternative butterfly, down"), P_EXPLODES_BY_HIT | P_CCW, "A_BUTTERFLYd", 0, i_alt_butter_4, -112, -112, 384},	/* has ckdelay */
+	{O_STONEFLY_1, N_("Stonefly, left"), P_EXPLODES_BY_HIT, "STONEFLYl", 0, i_stonefly_1, -152, -152, 384},	/* has ckdelay */
+	{O_STONEFLY_2, N_("Stonefly, up"), P_EXPLODES_BY_HIT, "STONEFLYu", 0, i_stonefly_2, -152, -152, 384},	/* has ckdelay */
+	{O_STONEFLY_3, N_("Stonefly, right"), P_EXPLODES_BY_HIT, "STONEFLYr", 0, i_stonefly_3, -152, -152, 384},	/* has ckdelay */
+	{O_STONEFLY_4, N_("Stonefly, down"), P_EXPLODES_BY_HIT, "STONEFLYd", 0, i_stonefly_4, -152, -152, 384},	/* has ckdelay */
 	{O_BITER_1, N_("Biter, up"), 0, "BITERu", 0, i_biter_1, -168, -168, 518},	/* has ckdelay */
 	{O_BITER_2, N_("Biter, right"), 0, "BITERr", 0, i_biter_2, -168, -168, 518},	/* has ckdelay */
 	{O_BITER_3, N_("Biter, down"), 0, "BITERd", 0, i_biter_3, -168, -168, 518},	/* has ckdelay */
 	{O_BITER_4, N_("Biter, left"), 0, "BITERl", 0, i_biter_4, -168, -168, 518},	/* has ckdelay */
-	{O_DRAGONFLY_1, N_("Dragonfly, left"), P_EXPLODES_AS_DRAGONFLY|P_CCW, "DRAGONFLYl", 0, i_dragonfly_1, -336, -336, 256 },	/* has ckdelay */
-	{O_DRAGONFLY_2, N_("Dragonfly, up"), P_EXPLODES_AS_DRAGONFLY|P_CCW, "DRAGONFLYu", 0, i_dragonfly_2, -336, -336, 256 },	/* has ckdelay */
-	{O_DRAGONFLY_3, N_("Dragonfly, right"), P_EXPLODES_AS_DRAGONFLY|P_CCW, "DRAGONFLYr", 0, i_dragonfly_3, -336, -336, 256 },	/* has ckdelay */
-	{O_DRAGONFLY_4, N_("Dragonfly, down"), P_EXPLODES_AS_DRAGONFLY|P_CCW, "DRAGONFLYd", 0, i_dragonfly_4, -336, -336, 256 },	/* has ckdelay */
+	{O_DRAGONFLY_1, N_("Dragonfly, left"), P_EXPLODES_BY_HIT|P_CCW, "DRAGONFLYl", 0, i_dragonfly_1, -336, -336, 256 },	/* has ckdelay */
+	{O_DRAGONFLY_2, N_("Dragonfly, up"), P_EXPLODES_BY_HIT|P_CCW, "DRAGONFLYu", 0, i_dragonfly_2, -336, -336, 256 },	/* has ckdelay */
+	{O_DRAGONFLY_3, N_("Dragonfly, right"), P_EXPLODES_BY_HIT|P_CCW, "DRAGONFLYr", 0, i_dragonfly_3, -336, -336, 256 },	/* has ckdelay */
+	{O_DRAGONFLY_4, N_("Dragonfly, down"), P_EXPLODES_BY_HIT|P_CCW, "DRAGONFLYd", 0, i_dragonfly_4, -336, -336, 256 },	/* has ckdelay */
 
 	{O_PRE_PL_1, N_("Player birth (1)"), 0, "GUYBIRTH1", 0, 32, 32, 32},
 	{O_PRE_PL_2, N_("Player birth (2)"), 0, "GUYBIRTH2", 0, 33, 33, 33},
 	{O_PRE_PL_3, N_("Player birth (3)"), 0, "GUYBIRTH3", 0, 34, 34, 34},
-	{O_PLAYER, N_("Player"), P_BLOWS_UP_FLIES | P_EXPLODES_TO_SPACE | P_PLAYER, "GUY", 0, i_player, i_player, 35, 32},	/* has ckdelay */
-	{O_PLAYER_BOMB, N_("Player with bomb"), P_BLOWS_UP_FLIES | P_EXPLODES_TO_SPACE | P_PLAYER, "GUYBOMB", 0, 42, 42, 42, 25},	/* has ckdelay */
-	{O_PLAYER_GLUED, N_("Glued player"), P_BLOWS_UP_FLIES | P_EXPLODES_TO_SPACE, "GUYGLUED", 0, i_player_glued, i_player_glued, 35},	/* is not a real player! so active x, y will not find it. */
-	{O_PLAYER_STIRRING, N_("Player stirring"), P_BLOWS_UP_FLIES | P_EXPLODES_TO_SPACE | P_PLAYER, "GUYSTIRRING", 0, 256, -256, -256},
+	{O_PLAYER, N_("Player"), P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT | P_PLAYER, "GUY", 0, i_player, i_player, 35, 32},	/* has ckdelay */
+	{O_PLAYER_BOMB, N_("Player with bomb"), P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT | P_PLAYER, "GUYBOMB", 0, 42, 42, 42, 25},	/* has ckdelay */
+	{O_PLAYER_GLUED, N_("Glued player"), P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT, "GUYGLUED", 0, i_player_glued, i_player_glued, 35},	/* is not a real player! so active x, y will not find it. no P_PLAYER bit! */
+	{O_PLAYER_STIRRING, N_("Player stirring"), P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT | P_PLAYER, "GUYSTIRRING", 0, 256, -256, -256},
 
 	{O_BOMB, N_("Bomb"), 0, "BOMB", 0, 48, 48, 48},
 	{O_BOMB_TICK_1, N_("Ticking bomb (1)"), P_EXPLOSION_FIRST_STAGE, "IGNITEDBOMB1", 0, 49, 49, 49},
@@ -289,10 +294,10 @@ GdElements gd_elements[] = {
 	{O_BOMB_TICK_5, N_("Ticking bomb (5)"), 0, "IGNITEDBOMB5", 0, 53, 53, 53},
 	{O_BOMB_TICK_6, N_("Ticking bomb (6)"), 0, "IGNITEDBOMB6", 0, 54, 54, 54},
 	{O_BOMB_TICK_7, N_("Ticking bomb (7)"), 0, "IGNITEDBOMB7", 0, 55, 55, 55},
-	
-	{O_NITRO_PACK, N_("Nitro pack"), P_SLOPED|P_EXPLODES_AS_NITRO|P_MOVED_BY_CONVEYOR, "NITRO", 0, 288, 288, 288},
-	{O_NITRO_PACK_F, N_("Nitro pack, falling"), P_EXPLODES_AS_NITRO, "NITROf", 0, i_nitro_pack_f, i_nitro_pack_f, 288},
-	{O_NITRO_PACK_EXPLODE, N_("Nitro pack, triggered"), P_EXPLODES_AS_NITRO, "NITROtriggered", 0, i_nitro_explode, i_nitro_explode, 288},
+
+	{O_NITRO_PACK, N_("Nitro pack"), P_SLOPED|P_EXPLODES_BY_HIT|P_MOVED_BY_CONVEYOR_TOP, "NITRO", 0, 288, 288, 288},
+	{O_NITRO_PACK_F, N_("Nitro pack, falling"), P_EXPLODES_BY_HIT, "NITROf", 0, i_nitro_pack_f, i_nitro_pack_f, 288},
+	{O_NITRO_PACK_EXPLODE, N_("Nitro pack, triggered"), P_EXPLODES_BY_HIT, "NITROtriggered", 0, i_nitro_explode, i_nitro_explode, 288},
 
 	{O_PRE_CLOCK_1, N_("Clock birth (1)"), P_EXPLOSION_FIRST_STAGE, "CLOCKBIRTH1", 0, 28, 28, 28, 280},	/* has ckdelay */
 	{O_PRE_CLOCK_2, N_("Clock birth (2)"), 0, "CLOCKBIRTH2", 0, 29, 29, 29, 280},	/* has ckdelay */
@@ -324,22 +329,17 @@ GdElements gd_elements[] = {
 	{O_BOMB_EXPL_2, N_("Bomb explosion (2)"), 0, "BOMBEXPLOSION2", 0, 85, 85, 85, 280},	/* has ckdelay */
 	{O_BOMB_EXPL_3, N_("Bomb explosion (3)"), 0, "BOMBEXPLOSION3", 0, 86, 86, 86, 280},	/* has ckdelay */
 	{O_BOMB_EXPL_4, N_("Bomb explosion (4)"), 0, "BOMBEXPLOSION4", 0, 87, 87, 87, 280},	/* has ckdelay */
-	{O_NITRO_EXPL_1, N_("Nitro pack explosion (1)"), P_EXPLOSION_FIRST_STAGE, "NITROEXPLOSION1", 0, 84, 84, 84, 280},	/* has ckdelay */
-	{O_NITRO_EXPL_2, N_("Nitro pack explosion (2)"), 0, "NITROEXPLOSION2", 0, 85, 85, 85, 280},	/* has ckdelay */
-	{O_NITRO_EXPL_3, N_("Nitro pack explosion (3)"), 0, "NITROEXPLOSION3", 0, 86, 86, 86, 280},	/* has ckdelay */
-	{O_NITRO_EXPL_4, N_("Nitro pack explosion (4)"), 0, "NITROEXPLOSION4", 0, 87, 87, 87, 280},	/* has ckdelay */
+	{O_NITRO_EXPL_1, N_("Nitro pack explosion (1)"), P_EXPLOSION_FIRST_STAGE, "NITROEXPLOSION1", 0, 44, 44, 44, 280},	/* has ckdelay */
+	{O_NITRO_EXPL_2, N_("Nitro pack explosion (2)"), 0, "NITROEXPLOSION2", 0, 45, 45, 45, 280},	/* has ckdelay */
+	{O_NITRO_EXPL_3, N_("Nitro pack explosion (3)"), 0, "NITROEXPLOSION3", 0, 46, 46, 46, 280},	/* has ckdelay */
+	{O_NITRO_EXPL_4, N_("Nitro pack explosion (4)"), 0, "NITROEXPLOSION4", 0, 47, 47, 47, 280},	/* has ckdelay */
 	{O_AMOEBA_2_EXPL_1, N_("Amoeba 2 explosion (1)"), P_EXPLOSION_FIRST_STAGE, "AMOEBA2EXPLOSION1", 0, 292, 292, 292, 280},	/* has ckdelay */
 	{O_AMOEBA_2_EXPL_2, N_("Amoeba 2 explosion (2)"), 0, "AMOEBA2EXPLOSION2", 0, 293, 293, 293, 280},	/* has ckdelay */
 	{O_AMOEBA_2_EXPL_3, N_("Amoeba 2 explosion (3)"), 0, "AMOEBA2EXPLOSION3", 0, 294, 294, 294, 280},	/* has ckdelay */
 	{O_AMOEBA_2_EXPL_4, N_("Amoeba 2 explosion (4)"), 0, "AMOEBA2EXPLOSION4", 0, 295, 295, 295, 280},	/* has ckdelay */
-	{O_DRAGONFLY_EXPLODE_1, N_("Dragonfly explosion (1)"), P_EXPLOSION_FIRST_STAGE, "DRAGONFLYEXPLOSION1", 0, 43, 43, 43, 280},	/* has ckdelay */
-	{O_DRAGONFLY_EXPLODE_2, N_("Dragonfly explosion (2)"), 0, "DRAGONFLYEXPLOSION2", 0, 44, 44, 44, 280},	/* has ckdelay */
-	{O_DRAGONFLY_EXPLODE_3, N_("Dragonfly explosion (3)"), 0, "DRAGONFLYEXPLOSION3", 0, 45, 45, 45, 280},	/* has ckdelay */
-	{O_DRAGONFLY_EXPLODE_4, N_("Dragonfly explosion (4)"), 0, "DRAGONFLYEXPLOSION4", 0, 46, 46, 46, 280},	/* has ckdelay */
-	{O_DRAGONFLY_EXPLODE_5, N_("Dragonfly explosion (5)"), 0, "DRAGONFLYEXPLOSION5", 0, 47, 47, 47, 280},	/* has ckdelay */
 
-	{O_PLAYER_PNEUMATIC_LEFT, NULL /* Player using hammer, left */, P_BLOWS_UP_FLIES|P_EXPLODES_TO_SPACE, "GUYHAMMERl", 0, 265, 265, 265},
-	{O_PLAYER_PNEUMATIC_RIGHT, NULL /* Player using hammer, right */, P_BLOWS_UP_FLIES|P_EXPLODES_TO_SPACE, "GUYHAMMERr", 0, 268, 268, 268},
+	{O_PLAYER_PNEUMATIC_LEFT, NULL /* Player using hammer, left */, P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT | P_PLAYER, "GUYHAMMERl", 0, 265, 265, 265},
+	{O_PLAYER_PNEUMATIC_RIGHT, NULL /* Player using hammer, right */, P_BLOWS_UP_FLIES | P_EXPLODES_BY_HIT | P_PLAYER, "GUYHAMMERr", 0, 268, 268, 268},
 	{O_PNEUMATIC_ACTIVE_LEFT, NULL /* Active hammer, left */, 0, "HAMMERACTIVEl", 0, 264, 264, 264},
 	{O_PNEUMATIC_ACTIVE_RIGHT, NULL /* Active hammer, right */, 0, "HAMMERACTIVEr", 0, 269, 269, 269},
 
@@ -436,15 +436,14 @@ gd_cave_properties[] = {
 	{"CaveMaxTime", GD_TYPE_INT, 0, N_("Maximum time (s)"), CAVE_OFFSET(max_time), 1, N_("If you reach this time by collecting too many clocks, the timer will overflow."), 60, 999},
 	{"TimeValue", GD_TYPE_INT, 0, N_("Score for time"), CAVE_OFFSET(level_timevalue[0]), 5, N_("Points for each seconds remaining, when the player exits the level."), 0, 50},
 	{"CaveScheduling", GD_TYPE_SCHEDULING, GD_ALWAYS_SAVE, N_("Scheduling type"), CAVE_OFFSET(scheduling), 1, N_("This flag sets whether the game uses an emulation of the original timing (c64-style), or a more modern milliseconds-based timing. The original game used a delay (empty loop) based timing of caves; this is selected by setting this to BD1, BD2, Construction Kit or Crazy Dream 7. This is a compatibility setting only; milliseconds-based timing is recommended for every new cave.")},
-	{"PALTiming", GD_TYPE_BOOLEAN, 0, N_("PAL timing"), CAVE_OFFSET(pal_timing), 1, N_("On the PAL version of the C64 computer, the timer was "
-	"actually slower than normal seconds. This flag is used to compensate for this. Most original games are authored for the PAL version.")},
-	{"CaveDelay", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("   Delay (c64-style)"), CAVE_OFFSET(level_ckdelay[0]), 5, N_("The length of the delay loop between game frames. Used when milliseconds-based timing is inactive, ie. C64 scheduling is on."), 0, 32},
-	{"HatchingTime", GD_TYPE_INT, 0, N_("   Hatching time (seconds)"), CAVE_OFFSET(level_hatching_delay_time[0]), 5, N_("This value sets how much the cave will move until the player enters the cave. This is used for the C64-like schedulings."), 1, 40},
+	{"PALTiming", GD_TYPE_BOOLEAN, 0, N_("PAL timing"), CAVE_OFFSET(pal_timing), 1, N_("On the PAL version of the C64 computer, the timer was actually slower than normal seconds. This flag is used to compensate for this. If enabled, one game second will last 1.2 real seconds. Most original games were authored for the PAL version. This is a compatibility setting for imported caves; it is not recommended to enable it for newly authored ones.")},
 	{"FrameTime", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("   Speed (ms)"), CAVE_OFFSET(level_speed[0]), 5, N_("Number of milliseconds between game frames. Used when milliseconds-based timing is active, ie. C64 scheduling is off."), 50, 500},
-	{"HatchingDelay", GD_TYPE_INT, 0, N_("   Hatching delay (frames)"), CAVE_OFFSET(level_hatching_delay_frame[0]), 5, N_("This value sets how much the cave will move until the player enters the cave. This is used for the milliseconds-based scheduling."), 1, 40},
+	{"HatchingDelay", GD_TYPE_INT, 0, N_("   Hatching delay (frames)"), CAVE_OFFSET(level_hatching_delay_frame[0]), 5, N_("This value sets how much the cave will move until the player enters the cave, and is expressed in frames. This is used for the milliseconds-based scheduling."), 1, 40},
+	{"CaveDelay", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("   Delay (C64-style)"), CAVE_OFFSET(level_ckdelay[0]), 5, N_("The length of the delay loop between game frames. Used when milliseconds-based timing is inactive, ie. some kind of C64 or Atari scheduling is selected."), 0, 32},
+	{"HatchingTime", GD_TYPE_INT, 0, N_("   Hatching time (seconds)"), CAVE_OFFSET(level_hatching_delay_time[0]), 5, N_("This value sets how much the cave will move until the player enters the cave. This is used for the C64-like schedulings."), 1, 40},
 
 	/* initial fill */
-	{"RandSeed", GD_TYPE_INT, GD_DONT_SHOW_IN_EDITOR, N_("Random seed value"), CAVE_OFFSET(level_rand[0]), 5, N_("Random seed value controls the predictable random number generator, which fills the cave initially. If set to -1, cave is totally random every time it is played."), -1, 255},
+	{"RandSeed", GD_TYPE_INT, GD_DONT_SHOW_IN_EDITOR, NULL /* random seed value */, CAVE_OFFSET(level_rand[0]), 5, NULL, -1, 255},
 	{"InitialBorder", GD_TYPE_ELEMENT, GD_DONT_SHOW_IN_EDITOR, NULL /* Initial border */, CAVE_OFFSET(initial_border), 1, NULL},
 	{"InitialFill", GD_TYPE_ELEMENT, GD_DONT_SHOW_IN_EDITOR, NULL /* Initial fill */, CAVE_OFFSET(initial_fill), 1, NULL},
 	{"RandomFill", GD_TYPE_ELEMENT, GD_DONT_SHOW_IN_EDITOR, NULL /* Random fill 1 */, CAVE_OFFSET(random_fill[0]), 1, NULL},
@@ -484,76 +483,72 @@ gd_cave_properties[] = {
 
 	/* AMOEBA */
 	{"", GD_TAB, 0, N_("Amoeba")},
-	{"AmoebaProperties.waitforhatching", GD_TYPE_BOOLEAN, 0, N_("Timer waits for hatching"), CAVE_OFFSET(amoeba_timer_wait_for_hatching), 1, N_("This determines if the amoeba timer starts before the player appearing. Amoeba can always be activated before that; but if this is set to true, the timer will not start.")},
-	{"AmoebaProperties.immediately", GD_TYPE_BOOLEAN, 0, N_("Timer started immediately"), CAVE_OFFSET(amoeba_timer_started_immediately), 1, N_("If this flag is enabled, the amoeba slow growth timer will start at the beginning of the cave, regardless of the amoeba being let free or not.")},
+	{"AmoebaProperties.immediately", GD_TYPE_BOOLEAN, 0, N_("Timer started immediately"), CAVE_OFFSET(amoeba_timer_started_immediately), 1, N_("If this flag is enabled, the amoeba slow growth timer will start at the beginning of the cave, regardless of the amoeba being let free or not. This can make a big difference when playing the cave!")},
+	{"AmoebaProperties.waitforhatching", GD_TYPE_BOOLEAN, 0, N_("Timer waits for hatching"), CAVE_OFFSET(amoeba_timer_wait_for_hatching), 1, N_("This determines if the amoeba timer starts before the player appearing. Amoeba can always be activated before that; but if this is set to true, the timer will not start. This setting is for compatiblity for some old imported caves. As the player is usually born within a few seconds, changing this setting makes not much difference. It is not advised to change it, set the slow growth time to fit your needs instead.")},
 	/* amoeba */
 	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("Amoeba")},
-	{"AmoebaThreshold", GD_TYPE_RATIO, 0, N_("Threshold (cells)"), CAVE_OFFSET(level_amoeba_threshold), 5, N_("If the amoeba grows more than this fraction of the cave, it is considered too big."), 0, 16383},
+	{"AmoebaThreshold", GD_TYPE_RATIO, 0, N_("Threshold (cells)"), CAVE_OFFSET(level_amoeba_threshold), 5, N_("If the amoeba grows more than this fraction of the cave, it is considered too big and it converts to the element specified below."), 0, 16383},
 	{"AmoebaTime", GD_TYPE_INT, 0, N_("Slow growth time (s)"), CAVE_OFFSET(level_amoeba_time), 5, N_("After this time, amoeba will grow very quickly."), 0, 999},
 	{"AmoebaGrowthProb", GD_TYPE_PROBABILITY, 0, N_("Growth ratio, slow (%)"), CAVE_OFFSET(amoeba_growth_prob), 1, N_("This sets the speed at which a slow amoeba grows.")},
 	{"AmoebaGrowthProb", GD_TYPE_PROBABILITY, 0, N_("Growth ratio, fast (%)"), CAVE_OFFSET(amoeba_fast_growth_prob), 1, N_("This sets the speed at which a fast amoeba grows.")},
-	{"AMOEBABOULDEReffect", GD_TYPE_EFFECT, 0, N_("If too big, converts to"), CAVE_OFFSET(too_big_amoeba_to), 1, N_("Controls which element an overgrown amoeba converts to.")},
-	{"AMOEBADIAMONDeffect", GD_TYPE_EFFECT, 0, N_("If enclosed, converts to"), CAVE_OFFSET(enclosed_amoeba_to), 1, N_("Controls which element an enclosed amoeba converts to.")},
+	{"AMOEBABOULDEReffect", GD_TYPE_EFFECT, 0, N_("If too big, converts to"), CAVE_OFFSET(amoeba_too_big_effect), 1, N_("Controls which element an overgrown amoeba converts to.")},
+	{"AMOEBADIAMONDeffect", GD_TYPE_EFFECT, 0, N_("If enclosed, converts to"), CAVE_OFFSET(amoeba_enclosed_effect), 1, N_("Controls which element an enclosed amoeba converts to.")},
 	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("Amoeba 2")},
-	{"Amoeba2Threshold", GD_TYPE_RATIO, 0, N_("Threshold (cells)"), CAVE_OFFSET(level_amoeba_2_threshold), 5, N_("If the amoeba grows more than this fraction of the cave, it is considered too big."), 0, 16383},
+	{"Amoeba2Threshold", GD_TYPE_RATIO, 0, N_("Threshold (cells)"), CAVE_OFFSET(level_amoeba_2_threshold), 5, N_("If the amoeba grows more than this fraction of the cave, it is considered too big and it converts to the element specified below."), 0, 16383},
 	{"Amoeba2Time", GD_TYPE_INT, 0, N_("Slow growth time (s)"), CAVE_OFFSET(level_amoeba_2_time), 5, N_("After this time, amoeba will grow very quickly."), 0, 999},
 	{"Amoeba2GrowthProb", GD_TYPE_PROBABILITY, 0, N_("Growth ratio, slow (%)"), CAVE_OFFSET(amoeba_2_growth_prob), 1, N_("This sets the speed at which a slow amoeba grows.")},
 	{"Amoeba2GrowthProb", GD_TYPE_PROBABILITY, 0, N_("Growth ratio, fast (%)"), CAVE_OFFSET(amoeba_2_fast_growth_prob), 1, N_("This sets the speed at which a fast amoeba grows.")},
 	{"Amoeba2Properties.explode", GD_TYPE_BOOLEAN, 0, N_("Explodes by amoeba"), CAVE_OFFSET(amoeba_2_explodes_by_amoeba), 1, N_("If this setting is enabled, an amoeba 2 will explode if it is touched by a normal amoeba.")},
-	{"AMOEBA2EXPLOSIONeffect", GD_TYPE_EFFECT, 0, N_("   Explodes to"), CAVE_OFFSET(amoeba_2_explodes_to), 1, N_("An amoeba 2 explodes to this element, when touched by the original amoeba.")},
-	{"AMOEBA2BOULDEReffect", GD_TYPE_EFFECT, 0, N_("If too big, converts to"), CAVE_OFFSET(too_big_amoeba_2_to), 1, N_("Controls which element an overgrown amoeba converts to.")},
-	{"AMOEBA2DIAMONDeffect", GD_TYPE_EFFECT, 0, N_("If enclosed, converts to"), CAVE_OFFSET(enclosed_amoeba_2_to), 1, N_("Controls which element an enclosed amoeba converts to.")},
+	{"AMOEBA2EXPLOSIONeffect", GD_TYPE_EFFECT, 0, N_("   Explosion ends in"), CAVE_OFFSET(amoeba_2_explosion_effect), 1, N_("An amoeba 2 explodes to this element, when touched by the original amoeba.")},
+	{"AMOEBA2BOULDEReffect", GD_TYPE_EFFECT, 0, N_("If too big, converts to"), CAVE_OFFSET(amoeba_2_too_big_effect), 1, N_("Controls which element an overgrown amoeba converts to.")},
+	{"AMOEBA2DIAMONDeffect", GD_TYPE_EFFECT, 0, N_("If enclosed, converts to"), CAVE_OFFSET(amoeba_2_enclosed_effect), 1, N_("Controls which element an enclosed amoeba converts to.")},
 	{"AMOEBA2LOOKSLIKEeffect", GD_TYPE_EFFECT, 0, N_("Looks like"), CAVE_OFFSET(amoeba_2_looks_like), 1, N_("Amoeba 2 can look like any other element. Hint: it can also look like a normal amoeba. Or it can look like slime, and then you have two different colored amoebas!")},
 
-	/* ACTIVE 1 */
-	{"", GD_TAB, 0, N_("Active elements")},
 	/* magic wall */
-	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("Magic Wall")},
+	{"", GD_TAB, 0, N_("Magic Wall")},
+	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("Timing")},
 	{"MagicWallTime", GD_TYPE_INT, 0, N_("Milling time (s)"), CAVE_OFFSET(level_magic_wall_time), 5, N_("Magic wall will stop after this time, and it cannot be activated again."), 0, 999},
-	{"MagicWallProperties", GD_TYPE_ELEMENT, 0, N_("Converts diamond to"), CAVE_OFFSET(magic_diamond_to), 1, N_("As a special effect, magic walls can convert diamonds to any other element.")},
-	{"MagicWallProperties", GD_TYPE_ELEMENT, 0, N_("Converts stone to"), CAVE_OFFSET(magic_stone_to), 1, N_("As a special effect, magic walls can convert stones to any other element.")},
-	{"MagicWallProperties.megastoneto", GD_TYPE_ELEMENT, 0, N_("Converts mega stone to"), CAVE_OFFSET(magic_mega_stone_to), 1, N_("If a mega stone falls into the magic wall, it will drop this element.")},
-	{"MagicWallProperties.nitropackto", GD_TYPE_ELEMENT, 0, N_("Converts nitro pack to"), CAVE_OFFSET(magic_nitro_pack_to), 1, N_("If a nitro pack falls into the magic wall, it will be turned to this element.")},
-	{"MagicWallProperties.convertamoeba", GD_TYPE_BOOLEAN, 0, N_("Stops amoeba"), CAVE_OFFSET(magic_wall_stops_amoeba), 1, N_("When the magic wall is activated, it can convert amoeba into diamonds.")},
 	{"MagicWallProperties.waitforhatching", GD_TYPE_BOOLEAN, 0, N_("Timer waits for hatching"), CAVE_OFFSET(magic_timer_wait_for_hatching), 1, N_("This determines if the magic wall timer starts before the player appearing. Magic can always be activated before that; but if this is set to true, the timer will not start.")},
+	{"MagicWallProperties.convertamoeba", GD_TYPE_BOOLEAN, 0, N_("Stops amoeba"), CAVE_OFFSET(magic_wall_stops_amoeba), 1, N_("When the magic wall is activated, it can convert amoeba into diamonds.")},
+	{"", GD_LABEL, 0, N_("Conversions")},
+	{"MagicWallProperties", GD_TYPE_ELEMENT, 0, N_("Diamond to"), CAVE_OFFSET(magic_diamond_to), 1, N_("As a special effect, magic walls can convert diamonds to any other element.")},
+	{"MagicWallProperties", GD_TYPE_ELEMENT, 0, N_("Stone to"), CAVE_OFFSET(magic_stone_to), 1, N_("As a special effect, magic walls can convert stones to any other element.")},
+	{"MagicWallProperties.megastoneto", GD_TYPE_ELEMENT, 0, N_("Mega stone to"), CAVE_OFFSET(magic_mega_stone_to), 1, N_("If a mega stone falls into the magic wall, it will drop this element.")},
+	{"MagicWallProperties.nitropackto", GD_TYPE_ELEMENT, 0, N_("Nitro pack to"), CAVE_OFFSET(magic_nitro_pack_to), 1, N_("If a nitro pack falls into the magic wall, it will be turned to this element.")},
+	{"MagicWallProperties.flyingstoneto", GD_TYPE_ELEMENT, 0, N_("Flying stone to"), CAVE_OFFSET(magic_flying_stone_to), 1, N_("If a flying stone climbs up into the magic wall, it will be turned to this element. Remember that flying stones enter the magic wall from its bottom, not from the top!")},
+	{"MagicWallProperties.flyingdiamondto", GD_TYPE_ELEMENT, 0, N_("Flying diamonds to"), CAVE_OFFSET(magic_flying_diamond_to), 1, N_("If a flying diamond enters the magic wall, it will be turned to this element. Remember that flying diamonds enter the magic wall from its bottom, not from the top!")},
 
 	/* slime */
-	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("Slime")},
+	{"", GD_TAB, 0, N_("Slime")},
+	{"", GD_LABEL, GD_SHOW_LEVEL_LABEL, N_("Permeability")},
 	{"", GD_TYPE_BOOLEAN, GD_DONT_SAVE, N_("Predictable"), CAVE_OFFSET(slime_predictable), 1, N_("Controls if the predictable random generator is used for slime. It is required for compatibility with some older caves.")},
 	/* permeabilities are "always" saved; and according to the predictability, one of them is removed. */
 	{"SlimePermeability", GD_TYPE_PROBABILITY, GD_ALWAYS_SAVE, N_("Permeability (unpredictable, %)"), CAVE_OFFSET(level_slime_permeability[0]), 5, N_("This controls the rate at which elements go through the slime. Higher values represent higher probability of passing. This one is for unpredictable slime.")},
 	{"SlimePermeabilityC64", GD_TYPE_INT, GD_ALWAYS_SAVE, N_("Permeability (predictable, bits)"), CAVE_OFFSET(level_slime_permeability_c64[0]), 5, N_("This controls the rate at which elements go through the slime. This one is for predictable slime, and the value is used for a bitwise AND function. The values used by the C64 engines are 0, 128, 192, 224, 240, 248, 252, 254 and 255."), 0, 255},
 	{"SlimePredictableC64.seed", GD_TYPE_INT, 0, N_("Random seed (predictable)"), CAVE_OFFSET(level_slime_seed_c64), 5, N_("The random number seed for predictable slime. Use -1 to leave on its default. Not recommended to change. Does not affect unpredictable slime."), -1, 65535},
-	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("Eats this..."), CAVE_OFFSET(slime_eats_1), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though.")},
-	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("  ... and converts to"), CAVE_OFFSET(slime_converts_1), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though.")},
-	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("Eats this..."), CAVE_OFFSET(slime_eats_2), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though.")},
-	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("  ... and converts to"), CAVE_OFFSET(slime_converts_2), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though.")},
+	{"", GD_LABEL, 0, N_("Passing elements")},
+	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("Eats this..."), CAVE_OFFSET(slime_eats_1), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though. Also, flying diamonds and stones, as well as bladders are always passed.")},
+	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("  ... and converts to"), CAVE_OFFSET(slime_converts_1), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though. Also, flying diamonds and stones, as well as bladders are always passed.")},
+	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("Eats this..."), CAVE_OFFSET(slime_eats_2), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though. Also, flying diamonds and stones, as well as bladders are always passed.")},
+	{"SlimeProperties", GD_TYPE_ELEMENT, 0, N_("  ... and converts to"), CAVE_OFFSET(slime_converts_2), 1, N_("Slime can let other elements than stone and diamond go through. It always lets a waiting or a chasing stone pass, though. Also, flying diamonds and stones, as well as bladders are always passed.")},
 
 	/* ACTIVE 2 */
-	{"", GD_TAB, 0, N_("More elements")},
-	/* water */
-	{"", GD_LABEL, 0, N_("Water")},
-	{"WaterProperties.doesnotflowdown", GD_TYPE_BOOLEAN, 0, N_("Does not flow downwards"), CAVE_OFFSET(water_does_not_flow_down), 1, N_("In CrDr, the water element had the odd property that it did not flow downwards, only in other directions. This flag emulates this behaviour.")},
-
+	{"", GD_TAB, 0, N_("Other elements")},
 	/* acid */
 	{"", GD_LABEL, 0, N_("Acid")},
 	{"AcidProperties", GD_TYPE_ELEMENT, 0, N_("Eats this element"), CAVE_OFFSET(acid_eats_this), 1, N_("The element which acid eats. If it cannot find any, it simply disappears.")},
 	{"AcidProperties", GD_TYPE_PROBABILITY, 0, N_("Spread ratio (%)"), CAVE_OFFSET(acid_spread_ratio), 1, N_("The probability at which an acid will explode and eat neighbouring elements.")},
 	{"ACIDEffect", GD_TYPE_EFFECT, 0, N_("Leaves this behind"), CAVE_OFFSET(acid_turns_to), 1, N_("If acid converts to an explosion puff on spreading or any other element.")},
-
 	/* biter */
 	{"", GD_LABEL, 0, N_("Biter")},
 	{"BiterProperties", GD_TYPE_INT, 0, N_("Delay (frame)"), CAVE_OFFSET(biter_delay_frame), 1, N_("Number of frames biters wait between movements."), 0, 3},
 	{"BiterProperties", GD_TYPE_ELEMENT, 0, N_("Eats this"), CAVE_OFFSET(biter_eat), 1, N_("Biters eat this element. (They always eat dirt.)")},
-
 	/* bladder */
 	{"", GD_LABEL, 0, N_("Bladder")},
 	{"BladderProperties", GD_TYPE_ELEMENT, 0, N_("Converts to clock by touching"), CAVE_OFFSET(bladder_converts_by), 1, NULL},
-
 	/* expanding wall */
 	{"", GD_LABEL, 0, N_("Expanding wall")},
-	{"ExpandingWallDirection.changed", GD_TYPE_BOOLEAN, 0, N_("Direction changed"), CAVE_OFFSET(expanding_wall_changed), 1, N_("If this option is enabled, the direction of growing for the horizontal and vertical expanding wall is switched.")},
-	
+	{"ExpandingWallDirection.changed", GD_TYPE_BOOLEAN, 0, N_("Direction changed"), CAVE_OFFSET(expanding_wall_changed), 1, N_("If this option is enabled, the direction of growing for the horizontal and vertical expanding wall is switched. As you can use both horizontal and vertical expanding walls in a cave, it is not recommended to change this setting, as it might be confusing. You should rather select the type with the correct direction from the element box when drawing the cave.")},
 	/* replicator */
 	{"", GD_LABEL, 0, N_("Replicator")},
 	{"ReplicatorActive", GD_TYPE_BOOLEAN, 0, N_("Active at start"), CAVE_OFFSET(replicators_active), 1, N_("Whether the replicators are turned on or off at the cave start.")},
@@ -561,35 +556,48 @@ gd_cave_properties[] = {
 	/* conveyor belt */
 	{"", GD_LABEL, 0, N_("Conveyor belt")},
 	{"ConveyorBeltActive", GD_TYPE_BOOLEAN, 0, N_("Active at start"), CAVE_OFFSET(conveyor_belts_active), 1, N_("Whether the conveyor belts are moving when the cave starts.")},
-	{"ConveyorBeltDirection.changed", GD_TYPE_BOOLEAN, 0, N_("Direction changed"), CAVE_OFFSET(conveyor_belts_direction_changed), 1, N_("If the conveyor belts' movement is changed, ie. they are running in the opposite direction.")},
+	{"ConveyorBeltDirection.changed", GD_TYPE_BOOLEAN, 0, N_("Direction changed"), CAVE_OFFSET(conveyor_belts_direction_changed), 1, N_("If the conveyor belts' movement is changed, ie. they are running in the opposite direction. As you can freely use left and right going versions of the conveyor belt in a cave, it is not recommended to change this setting, rather you should select the correct one from the element box when drawing.")},
+	/* water */
+	{"", GD_LABEL, 0, N_("Water")},
+	{"WaterProperties.doesnotflowdown", GD_TYPE_BOOLEAN, 0, N_("Does not flow downwards"), CAVE_OFFSET(water_does_not_flow_down), 1, N_("In CrDr, the water element had the odd property that it did not flow downwards, only in other directions. This flag emulates this behaviour.")},
 
 	/* EFFECTS 1 */
 	{"", GD_TAB, 0, N_("Effects")},
 	/* cave effects */
-	{"", GD_LABEL, 0, N_("Cave effects")},
-	{"EXPLOSIONEffect", GD_TYPE_EFFECT, 0, N_("Explosions convert to"), CAVE_OFFSET(explosion_to), 1, N_("This element appears in places where an explosion happens.")},
-	{"DIAMONDBIRTHEffect", GD_TYPE_EFFECT, 0, N_("Diamond births convert to"), CAVE_OFFSET(diamond_birth_to), 1, NULL},
-	{"DRAGONFLYEXPLOSIONeffect", GD_TYPE_EFFECT, 0, N_("Dragonfly explodes to"), CAVE_OFFSET(dragonfly_explosion_to), 1, N_("An exploding dragonfly will create this element.")},
-	{"BOMBEXPLOSIONeffect", GD_TYPE_EFFECT, 0, N_("Bombs explode to"), CAVE_OFFSET(bomb_explode_to), 1, NULL},
-	{"NITROEXPLOSIONeffect", GD_TYPE_EFFECT, 0, N_("Nitro packs explode to"), CAVE_OFFSET(nitro_explode_to), 1, NULL},
-	{"BOULDERfallingeffect", GD_TYPE_EFFECT, 0, N_("Falling stones convert to"), CAVE_OFFSET(falling_stone_to), 1, N_("When a stone begins falling, it converts to this element.")},
-	{"BOULDERbouncingeffect", GD_TYPE_EFFECT, 0, N_("Bouncing stones convert to"), CAVE_OFFSET(bouncing_stone_to), 1, N_("When a stone stops falling and rolling, it converts to this element.")},
-	{"DIAMONDfallingeffect", GD_TYPE_EFFECT, 0, N_("Falling diamonds convert to"), CAVE_OFFSET(falling_diamond_to), 1, N_("When a diamond begins falling, it converts to this element.")},
-	{"DIAMONDbouncingeffect", GD_TYPE_EFFECT, 0, N_("Bouncing diamonds convert to"), CAVE_OFFSET(bouncing_diamond_to), 1, N_("When a diamond stops falling and rolling, it converts to this element.")},
+	{"", GD_LABEL, 0, N_("Stone and diamond effects")},
+	{"BOULDERfallingeffect", GD_TYPE_EFFECT, 0, N_("Falling stones convert to"), CAVE_OFFSET(stone_falling_effect), 1, N_("When a stone begins falling, it converts to this element.")},
+	{"BOULDERbouncingeffect", GD_TYPE_EFFECT, 0, N_("Bouncing stones convert to"), CAVE_OFFSET(stone_bouncing_effect), 1, N_("When a stone stops falling and rolling, it converts to this element.")},
+	{"DIAMONDfallingeffect", GD_TYPE_EFFECT, 0, N_("Falling diamonds convert to"), CAVE_OFFSET(diamond_falling_effect), 1, N_("When a diamond begins falling, it converts to this element.")},
+	{"DIAMONDbouncingeffect", GD_TYPE_EFFECT, 0, N_("Bouncing diamonds convert to"), CAVE_OFFSET(diamond_bouncing_effect), 1, N_("When a diamond stops falling and rolling, it converts to this element.")},
 
-	/* EFFECTS 1 */
-	{"", GD_TAB, 0, N_("Effects")},
-	/* creature effects */
-	{"", GD_LABEL, 0, N_("Creature effects")},
-	{"EnemyDirectionProperties.startbackwards", GD_TYPE_BOOLEAN, 0, N_("Start backwards"), CAVE_OFFSET(creatures_backwards), 1, NULL},
-	{"EnemyDirectionProperties.time", GD_TYPE_INT, 0, N_("Automatically turn (s)"), CAVE_OFFSET(creatures_direction_auto_change_time), 1, N_("If this is greater than zero, creatures will automatically change direction in every x seconds."), 0, 999},
-	{"EnemyDirectionProperties.changeathatching", GD_TYPE_BOOLEAN, 0, N_("Automatically turn on start"), CAVE_OFFSET(creatures_direction_auto_change_on_start), 1, N_("If this is set to true, creatures also turn at the start signal. If false, the first change in direction occurs only later.")},
+	{"", GD_LABEL, 0, N_("Creature explosion effects")},
+	{"FireflyExplodeTo", GD_TYPE_ELEMENT, 0, N_("Fireflies explode to"), CAVE_OFFSET(firefly_explode_to), 1, N_("When a firefly explodes, it will create this element. Change this setting wisely. The firefly is a traditional element which is expected to explode to empty space.")},
+	{"AltFireflyExplodeTo", GD_TYPE_ELEMENT, 0, N_("Alt. fireflies explode to"), CAVE_OFFSET(alt_firefly_explode_to), 1, N_("When an alternative firefly explodes, it will create this element. Use this setting wisely. Do not create a firefly which explodes to stones, for example: use the stonefly instead.")},
+	{"ButterflyExplodeTo", GD_TYPE_ELEMENT, 0, N_("Butterflies explode to"), CAVE_OFFSET(butterfly_explode_to), 1, N_("When a butterfly explodes, it will create this element. Use this setting wisely. Butterflies should explode to diamonds. If you need a creature which explodes to space, use the firefly instead.")},
+	{"AltButterflyExplodeTo", GD_TYPE_ELEMENT, 0, N_("Alt. butterflies explode to"), CAVE_OFFSET(alt_butterfly_explode_to), 1, N_("When an alternative butterfly explodes, it will create this element. Use this setting wisely.")},
+	{"StoneflyExplodeTo", GD_TYPE_ELEMENT, 0, N_("Stoneflies explode to"), CAVE_OFFSET(stonefly_explode_to), 1, N_("When a stonefly explodes, it will create this element.")},
+	{"DragonflyExplodeTo", GD_TYPE_ELEMENT, 0, N_("Dragonflies explode to"), CAVE_OFFSET(dragonfly_explode_to), 1, N_("When a dragonfly explodes, it will create this element.")},
+
+	{"", GD_LABEL, 0, N_("Explosion effects")},
+	{"EXPLOSIONEffect", GD_TYPE_EFFECT, 0, N_("Explosions end in"), CAVE_OFFSET(explosion_effect), 1, N_("This element appears in places where an explosion finishes.")},
+	{"DIAMONDBIRTHEffect", GD_TYPE_EFFECT, 0, N_("Diamond births end in"), CAVE_OFFSET(diamond_birth_effect), 1, N_("When a diamond birth animation reaches its end, it will leave this element there. This can be used to change the element butterflies explode to.")},
+	{"BOMBEXPLOSIONeffect", GD_TYPE_EFFECT, 0, N_("Bombs explosions end in"), CAVE_OFFSET(bomb_explosion_effect), 1, N_("Use this setting to select the element the exploding bomb creates.")},
+	{"NITROEXPLOSIONeffect", GD_TYPE_EFFECT, 0, N_("Nitro explosions end in"), CAVE_OFFSET(nitro_explosion_effect), 1, N_("The nitro explosions can create some element other than space.")},
+
+	/* EFFECTS 2 */
+	{"", GD_TAB, 0, N_("More effects")},
 	/* visual effects */
 	{"", GD_LABEL, 0, N_("Visual effects")},
-	{"EXPANDINGWALLLOOKSLIKEeffect", GD_TYPE_EFFECT, 0, N_("Expanding wall looks like"), CAVE_OFFSET(expanding_wall_looks_like), 1, NULL},
-	{"DIRTLOOKSLIKEeffect", GD_TYPE_EFFECT, 0, N_("Dirt looks like"), CAVE_OFFSET(dirt_looks_like), 1, NULL},
+	{"EXPANDINGWALLLOOKSLIKEeffect", GD_TYPE_EFFECT, 0, N_("Expanding wall looks like"), CAVE_OFFSET(expanding_wall_looks_like), 1, N_("This is a compatibility setting for old caves. If you need an expanding wall which looks like steel, you should rather choose the expanding steel wall from the element box.")},
+	{"DIRTLOOKSLIKEeffect", GD_TYPE_EFFECT, 0, N_("Dirt looks like"), CAVE_OFFSET(dirt_looks_like), 1, N_("Compatibility setting. Use it wisely! Anything other than Dirt 2 (which can be used to emulate the Dirt Mod) is not recommended.")},
+
+	/* creature effects */
+	{"", GD_LABEL, 0, N_("Creature movement")},
+	{"EnemyDirectionProperties.startbackwards", GD_TYPE_BOOLEAN, 0, N_("Start backwards"), CAVE_OFFSET(creatures_backwards), 1, N_("Whether the direction creatures travel will already be switched at the cave start.")},
+	{"EnemyDirectionProperties.time", GD_TYPE_INT, 0, N_("Automatically turn (s)"), CAVE_OFFSET(creatures_direction_auto_change_time), 1, N_("If this is greater than zero, creatures will automatically change direction in every x seconds."), 0, 999},
+	{"EnemyDirectionProperties.changeathatching", GD_TYPE_BOOLEAN, 0, N_("Auto turn on hatching"), CAVE_OFFSET(creatures_direction_auto_change_on_start), 1, N_("If this is set to true, creatures also turn at the start signal. If false, the first change in direction occurs only later.")},
 	/* gravity */
-	{"", GD_LABEL, 0, N_("Gravitation effects")},
+	{"", GD_LABEL, 0, N_("Gravitation change")},
 	{"Gravitation", GD_TYPE_DIRECTION, 0, N_("Direction"), CAVE_OFFSET(gravity), 1, N_("The direction where stones and diamonds fall.")},
 	{"GravitationSwitchActive", GD_TYPE_BOOLEAN, 0, N_("Switch active at start"), CAVE_OFFSET(gravity_switch_active), 1, N_("If set to true, the gravitation switch will be already activated, when the cave is started, as if a pot has already been collected.")},
 	{"SkeletonsForPot", GD_TYPE_INT, 0, N_("Skeletons needed for pot"), CAVE_OFFSET(skeletons_needed_for_pot), 1, N_("The number of skeletons to be collected to be able to use a pot."), 0, 50},
@@ -617,17 +625,19 @@ gd_cave_properties[] = {
 	{"BladderConvert.sound", GD_TYPE_BOOLEAN, 0, N_("Bladder convert"), CAVE_OFFSET(bladder_convert_sound), 1, N_("If true, the bladder converting to a clock will make sound.")},
 	{"", GD_LABEL, 0, N_("Event sounds")},
 	{"GravityChange.sound", GD_TYPE_BOOLEAN, 0, N_("Gravity change"), CAVE_OFFSET(gravity_change_sound), 1, N_("If true, the gravity changing will make sound.")},
-
+	{"EnemyDirectionProperties.sound", GD_TYPE_BOOLEAN, 0, N_("Creature direction change"), CAVE_OFFSET(creature_direction_auto_change_sound), 1, N_("If this is set to true, creatures changing direction will be signaled by a sound.")},
 
 	/* COMPATIBILITY */
 	{"", GD_TAB, 0, N_("Compatibility")},
-	{"", GD_LABEL, 0, N_("Compatibility")},
+	{"", GD_LABEL, 0, N_("Skeleton")},
+	{"SkeletonsWorthDiamonds", GD_TYPE_INT, GD_COMPATIBILITY_SETTING, N_("Skeletons worth diamonds"), CAVE_OFFSET(skeletons_worth_diamonds), 1, N_("The number of diamonds each skeleton is worth. Normally skeletons are used for letting the player use the pot! They are not intended to be used as a second kind of diamond."), 0, 10},
+	{"", GD_LABEL, 0, N_("Borders")},
 	{"BorderProperties.lineshift", GD_TYPE_BOOLEAN, 0, N_("Line shifting border"), CAVE_OFFSET(lineshift), 1, N_("If this is set to true, the player exiting on either side will appear one row lower or upper on the other side.")},
 	{"BorderProperties.objectwraparound", GD_TYPE_BOOLEAN, 0, N_("Objects wrap around"), CAVE_OFFSET(wraparound_objects), 1, N_("If true, objects will wrap around the cave borders as well, ie. if you drag a line to the left, part of it will appear on the right hand side of the cave. The drawing in this case is also affected by the line shifting border property. If that one is enabled, too, crossing the left hand side or right hand side boundary will decrement or increment the row, and crossing the top or the bottom boundary will have no effect at all.")},
-	{"BorderProperties.scan", GD_TYPE_BOOLEAN, 0, N_("Scan first and last row"), CAVE_OFFSET(border_scan_first_and_last), 1, N_("Elements move on first and last row, too.")},
-	{"ShortExplosions", GD_TYPE_BOOLEAN, 0, N_("Short explosions"), CAVE_OFFSET(short_explosions), 1, N_("In 1stB, explosions were longer, took five cave frames to complete, as opposed to four in the original.")},
-	{"SkeletonsWorthDiamonds", GD_TYPE_INT, 0, N_("Skeletons worth diamonds"), CAVE_OFFSET(skeletons_worth_diamonds), 1, N_("The number of diamonds each skeleton is worth."), 0, 10},
-	{"GravityAffectsAll", GD_TYPE_BOOLEAN, 0, N_("Gravity change affects everything"), CAVE_OFFSET(gravity_affects_all), 1, N_("If this is enabled, changing the gravity will also affect bladders (moving and pushing), bladder spenders, falling walls and waiting stones. Otherwise, those elements behave as gravity was always pointing downwards.")},
+	{"BorderProperties.scan", GD_TYPE_BOOLEAN, 0, N_("Scan first and last row"), CAVE_OFFSET(border_scan_first_and_last), 1, N_("Elements move on first and last row, too. Usually those rows are the border. The games created by the original editor were not allowed to put anything but steel wall there, so it was not apparent that the borders were not processed by the engine. Some old caves need this for compatibility; it is not recommended to change this setting for newly designed caves, though.")},
+	{"", GD_LABEL, 0, N_("Other")},
+	{"ShortExplosions", GD_TYPE_BOOLEAN, 0, N_("Short explosions"), CAVE_OFFSET(short_explosions), 1, N_("In 1stB and newer engines, explosions were longer, they took five cave frames to complete, as opposed to four frames in the original.")},
+	{"GravityAffectsAll", GD_TYPE_BOOLEAN, 0, N_("Gravity change affects everything"), CAVE_OFFSET(gravity_affects_all), 1, N_("If this is enabled, changing the gravity will also affect bladders (moving and pushing), bladder spenders, falling walls and waiting stones. Otherwise, those elements behave as gravity was always pointing downwards. This is a compatibility setting which is not recommended to change. It is intended for imported caves.")},
 
 	{NULL}
 };
@@ -637,10 +647,7 @@ gd_cave_properties[] = {
 
 
 /* entries. */
-/* type given for each element;
- * GD_TYPE_ELEMENT represents a combo box of gdash objects.
- * GD_TAB&LABEL represents a notebook tab or a label.
- * others are self-explanatory. */
+/* type given for each element */
 const GdStructDescriptor
 gd_replay_properties[] = {
 	/* default data */
@@ -651,6 +658,7 @@ gd_replay_properties[] = {
 	{"Player", GD_TYPE_STRING, 0, NULL, G_STRUCT_OFFSET(GdReplay, player_name), 1, NULL},
 	{"Date", GD_TYPE_STRING, 0, NULL, G_STRUCT_OFFSET(GdReplay, date), 1, NULL},
 	{"Comment", GD_TYPE_STRING, 0, NULL, G_STRUCT_OFFSET(GdReplay, comment), 1, NULL},
+	{"RecordedWith", GD_TYPE_STRING, 0, NULL, G_STRUCT_OFFSET(GdReplay, recorded_with), 1, NULL},
 	{"Score", GD_TYPE_INT, 0, NULL, G_STRUCT_OFFSET(GdReplay, score), 1, NULL},
 	{"Duration", GD_TYPE_INT, 0, NULL, G_STRUCT_OFFSET(GdReplay, duration), 1, NULL},
 	{"Success", GD_TYPE_BOOLEAN, 0, NULL, G_STRUCT_OFFSET(GdReplay, success), 1, NULL},
@@ -728,6 +736,8 @@ GdPropertyDefault gd_cave_defaults_gdash[] = {
 	{CAVE_OFFSET(magic_stone_to), O_DIAMOND_F},
 	{CAVE_OFFSET(magic_mega_stone_to), O_NITRO_PACK_F},
 	{CAVE_OFFSET(magic_nitro_pack_to), O_MEGA_STONE_F},
+	{CAVE_OFFSET(magic_flying_stone_to), O_FLYING_DIAMOND_F},
+	{CAVE_OFFSET(magic_flying_diamond_to), O_FLYING_STONE_F},
 	{CAVE_OFFSET(magic_wall_stops_amoeba), TRUE},
 	{CAVE_OFFSET(magic_timer_wait_for_hatching), FALSE},
 	/* amoeba */
@@ -740,26 +750,26 @@ GdPropertyDefault gd_cave_defaults_gdash[] = {
 	{CAVE_OFFSET(level_amoeba_time), 999},
 	{CAVE_OFFSET(amoeba_timer_started_immediately), TRUE},
 	{CAVE_OFFSET(amoeba_timer_wait_for_hatching), FALSE},
-	{CAVE_OFFSET(too_big_amoeba_to), O_STONE},
-	{CAVE_OFFSET(enclosed_amoeba_to), O_DIAMOND},
+	{CAVE_OFFSET(amoeba_too_big_effect), O_STONE},
+	{CAVE_OFFSET(amoeba_enclosed_effect), O_DIAMOND},
 	/* amoeba */
 	{CAVE_OFFSET(level_amoeba_2_threshold), 200},
 	{CAVE_OFFSET(amoeba_2_growth_prob), 31250},
 	{CAVE_OFFSET(amoeba_2_fast_growth_prob), 250000},
 	{CAVE_OFFSET(level_amoeba_2_time), 999},
-	{CAVE_OFFSET(too_big_amoeba_2_to), O_STONE},
-	{CAVE_OFFSET(enclosed_amoeba_2_to), O_DIAMOND},
+	{CAVE_OFFSET(amoeba_2_too_big_effect), O_STONE},
+	{CAVE_OFFSET(amoeba_2_enclosed_effect), O_DIAMOND},
 	{CAVE_OFFSET(amoeba_2_explodes_by_amoeba), TRUE},
 	{CAVE_OFFSET(amoeba_2_looks_like), O_AMOEBA_2},
-	{CAVE_OFFSET(amoeba_2_explodes_to), O_SPACE},
+	{CAVE_OFFSET(amoeba_2_explosion_effect), O_SPACE},
 
 	/* water */
 	{CAVE_OFFSET(water_does_not_flow_down), FALSE},
-	
+
 	/* replicator */
 	{CAVE_OFFSET(replicator_delay_frame), 4},
 	{CAVE_OFFSET(replicators_active), TRUE},
-	
+
 	/* conveyor belt */
 	{CAVE_OFFSET(conveyor_belts_active), TRUE},
 	{CAVE_OFFSET(conveyor_belts_direction_changed), FALSE},
@@ -805,20 +815,28 @@ GdPropertyDefault gd_cave_defaults_gdash[] = {
 	{CAVE_OFFSET(bladder_spender_sound), TRUE},
 	{CAVE_OFFSET(bladder_convert_sound), TRUE},
 	{CAVE_OFFSET(gravity_change_sound), TRUE},
+	{CAVE_OFFSET(creature_direction_auto_change_sound), TRUE},
 
 	/* creature effects */
 	{CAVE_OFFSET(creatures_backwards), FALSE},
 	{CAVE_OFFSET(creatures_direction_auto_change_time), 0},
 	{CAVE_OFFSET(creatures_direction_auto_change_on_start), FALSE},
 	/* cave effects */
-	{CAVE_OFFSET(explosion_to), O_SPACE},
-	{CAVE_OFFSET(diamond_birth_to), O_DIAMOND},
-	{CAVE_OFFSET(bomb_explode_to), O_BRICK},
-	{CAVE_OFFSET(nitro_explode_to), O_SPACE},
-	{CAVE_OFFSET(falling_stone_to), O_STONE_F},
-	{CAVE_OFFSET(bouncing_stone_to), O_STONE},
-	{CAVE_OFFSET(falling_diamond_to), O_DIAMOND_F},
-	{CAVE_OFFSET(bouncing_diamond_to), O_DIAMOND},
+	{CAVE_OFFSET(explosion_effect), O_SPACE},
+	{CAVE_OFFSET(diamond_birth_effect), O_DIAMOND},
+	{CAVE_OFFSET(bomb_explosion_effect), O_BRICK},
+	{CAVE_OFFSET(nitro_explosion_effect), O_SPACE},
+	{CAVE_OFFSET(firefly_explode_to), O_EXPLODE_1},
+	{CAVE_OFFSET(alt_firefly_explode_to), O_EXPLODE_1},
+	{CAVE_OFFSET(butterfly_explode_to), O_PRE_DIA_1},
+	{CAVE_OFFSET(alt_butterfly_explode_to), O_PRE_DIA_1},
+	{CAVE_OFFSET(stonefly_explode_to), O_PRE_STONE_1},
+	{CAVE_OFFSET(dragonfly_explode_to), O_EXPLODE_1},
+
+	{CAVE_OFFSET(stone_falling_effect), O_STONE_F},
+	{CAVE_OFFSET(stone_bouncing_effect), O_STONE},
+	{CAVE_OFFSET(diamond_falling_effect), O_DIAMOND_F},
+	{CAVE_OFFSET(diamond_bouncing_effect), O_DIAMOND},
 	/* visual effects */
 	{CAVE_OFFSET(expanding_wall_looks_like), O_BRICK},
 	{CAVE_OFFSET(dirt_looks_like), O_DIRT},
@@ -881,13 +899,13 @@ gd_cave_db_init()
 	gboolean cell_used[NUM_OF_CELLS];
 	GHashTable *pointers;
 	gboolean lowercase_names=TRUE;
-	
+
 	/* maximum index should be inside array bounds. otherwise, increase NUM_OF_CELLS in cave.h! */
 	g_assert(i_max_cell_num<NUM_OF_CELLS);
-	
+
 	for (i=0; i<NUM_OF_CELLS; i++)
 		cell_used[i]=FALSE;
-		
+
 	/* TRANSLATORS: some languages (for example, german) do not have lowercase nouns. */
 	/* When gdash generates the list of lowercase element names, this has to be */
 	/* taken into account. Therefore we have a string, which must be changed */
@@ -901,12 +919,12 @@ gd_cave_db_init()
 	/* if not: for example, german. Do not translate the string, but set the behavior! */
 	if (g_str_equal(_("lowercase-element-names-yes"), "lowercase-element-names-no"))
 		lowercase_names=FALSE;
-	
-		
+
+
 	/* check element database for faults. */
 	for (i=0; gd_elements[i].element!=-1; i++) {
 		int j, m;
-		
+
 		if (gd_elements[i].element!=i)
 			g_critical("element: i:0x%x!=0x%x", i, gd_elements[i].element);
 		/* if it has a name, create a lowercase name (of the translated one). will be used by the editor */
@@ -918,17 +936,17 @@ gd_cave_db_init()
 				/* only translate, no lowercase. */
 				gd_elements[i].lowercase_name=gettext(gd_elements[i].name);
 		}
-		
+
 		/* we do not like generated pixbufs for games. only those that are in the png. */
 		if (ABS(gd_elements[i].image_game)>NUM_OF_CELLS_X*NUM_OF_CELLS_Y)
 			g_critical("game pixbuf for element %x (%s) bigger than png size", i, gd_elements[i].name);
-	
+
 		if (gd_elements[i].image<0)
 			g_critical("editor pixbuf for element %x (%s) should not be animated", i, gd_elements[i].name);
-			
+
 		if (gd_elements[i].properties&P_CAN_BE_HAMMERED && gd_element_get_hammered((GdElement) i)==O_NONE)
 			g_critical("element %x (%s) can be hammered, but get_hammered_element does not define another one", i, gd_elements[i].name);
-			
+
 		m=gd_elements[i].image<0?8:1;
 		for (j=0; j<m; j++)
 			cell_used[ABS(gd_elements[i].image)+j]=TRUE;
@@ -949,7 +967,7 @@ gd_cave_db_init()
 	}
 	g_print("\n");
 	*/
-	
+
 	/* uncomment this, to show free element->character characters. */
 	/*
 	gd_create_char_to_element_table();
@@ -959,12 +977,12 @@ gd_cave_db_init()
 			g_print("%c", i);
 	g_print("\n");
 	*/
-	
+
 	/* check the cave property database for faults. */
 	pointers=g_hash_table_new(g_direct_hash, g_direct_equal);
 	for (i=0; gd_cave_properties[i].identifier!=NULL; i++) {
 		GdType type=gd_cave_properties[i].type;
-	
+
 		switch (type) {
 			case GD_LABEL:
 			case GD_TAB:
@@ -974,7 +992,7 @@ gd_cave_db_init()
 					g_assert_not_reached();
 				}
 				break;
-				
+
 			case GD_TYPE_STRING:
 				/* check if any of the properties are designated as string arrays. they are not supported in
 				 * file read/write and operations, also they do not even make any sense! */
@@ -989,8 +1007,8 @@ gd_cave_db_init()
 					g_critical ("longstring arrays have no sense cave properties: %s", gd_cave_properties[i].identifier);
 					g_assert_not_reached();
 				}
-				break;	
-				
+				break;
+
 			case GD_TYPE_EFFECT:
 				/* the same applies for effects. */
 				if (gd_cave_properties[i].count!=1) {
@@ -1015,10 +1033,10 @@ gd_cave_db_init()
 			g_critical ("show_level_label only for labels: line %d", i);
 			g_assert_not_reached();
 		}
-		
+
 		if (type!=GD_LABEL && type!=GD_TAB) {
 			const char *another_prop;
-			
+
 			/* other types */
 			/* check if its pointer is not the same as another one's */
 			/* +1 is added so it is never zero */

@@ -42,19 +42,24 @@ static const struct helpdata gamehelp[] = {
 			 N_("The game comes with many built-in and pre-installed cave sets, and you can also make "
 				"up your own levels. Just use the options in the File menu. You can load caves stored in the BDCFF format, and import "
 				"from other older file formats, like the No One's Final Boulder, the Construction Kit file format, "
-				"No One's Delight Boulder, an Atari game format, and many more.")},
+				"No One's Delight Boulder, an Atari game format and many more.")},
 		{NULL, NULL, O_NONE, NULL},
 
 		{GTK_STOCK_MEDIA_PLAY, N_("Playing the game"), O_NONE,
-N_("To play the game, press the New Game button. You can select which level you start playing at. During the game, you can control your player with the cursor keys. The Ctrl key has a special meaning: you can snap items, ie. pick up things without moving. If you get stuck, press Escape to restart the level. If there are too many players in the cave and you cannot move, pressing F2 causes the active one to explode. With F11, you can switch to full screen mode. To view the alternative status bar which show keys and skeletons collected, hold down the left shift button.\nThese are the game elements:")},
+			N_("The main idea of this game is very simple. You have to guide your player through the mazes of dirt and stones, to collect "
+			"diamonds within a given time limit. Make sure not to let stones fall on your head or enemies touch you! After you collect "
+			"the correct amount of diamonds, the screen will flash quickly and a secret door is revealed for you to advance to the next level. "
+			"As the game progresses, levels usually become more intricate and difficult.")},
 
 		{NULL, NULL, O_PLAYER, N_("This is the player. He can move through space and dirt. He can pick up diamonds and push stones, but he should avoid flies.")},
 		{NULL, NULL, O_SPACE, N_("Stones and diamonds fall down in space, creatures can freely move here.")},
 		{NULL, NULL, O_DIRT, N_("You can move through dirt leaving empty space behind. Amoeba eats it.")},
 		{NULL, NULL, O_DIRT2, N_("This is also dirt, but has a different color. In any other sense, it is identical to the above one.")},
-		{NULL, NULL, O_DIRT_BALL, N_("A rolling ball of dirt. You cannot push it, but you can dig it away. Sometimes it helps you to solve puzzles.")},
+		{NULL, N_("Dirt ball and loose dirt"), O_DIRT_BALL, N_("A rolling ball and a falling piece of dirt. You cannot push them, but you can dig them away. Sometimes they help you to solve puzzles.")},
 		{NULL, NULL, O_DIAMOND, N_("The main object of the game is to collect required number of diamonds.")},
 		{NULL, NULL, O_STONE, N_("Stones can be pushed by the player, and he can drop them on flies to make an explosion.")},
+		{NULL, NULL, O_FLYING_DIAMOND, N_("Exactly like a diamond, but instead of falling down, it flies upwards, as high as it can.")},
+		{NULL, NULL, O_FLYING_STONE, N_("The flying variant of a stone. Note that this one can also crush enemies as well as the player!")},
 		{NULL, NULL, O_MEGA_STONE, N_("Like ordinary stones, but these are so heavy, that you cannot push them.")},
 		{NULL, NULL, O_BRICK, N_("The wall can't be moved but an explosion destroys it. You can't pass through the wall - instead try to blow it up.")},
 		{NULL, NULL, O_STEEL, N_("This is rock stable wall. It's impossible to move or blow it up.")},
@@ -63,8 +68,8 @@ N_("To play the game, press the New Game button. You can select which level you 
 "Closed out box looks like steel wall, but beware of explosions near the out box: "
 "you could accidentally destroy an exit. This prevents you from successfully finishing the cave.")},
 		{NULL, NULL, O_PRE_INVIS_OUTBOX, N_("This is also an exit, but it remains non-flashing and thus is difficult to find.")},
-		{NULL, N_("Guard"), O_GUARD_1, N_("Guards move through the space. They can fly in the entire cave. Guards blow up when hit by falling stone or diamond. Amoeba is also deadly for them. They explode into space, producing 3x3 square of empty space. Guards are left spinning - they prefer turning left, usually counter clockwise.")},
-		{NULL, N_("Alternative guard"), O_ALT_GUARD_1, N_("Just like a normal guard, but it is right spinning.")},
+		{NULL, N_("Firefly"), O_FIREFLY_1, N_("Fireflies move through the space. They can fly in the entire cave. Fireflies blow up when hit by falling stone or diamond. Amoeba is also deadly for them. They explode into space, producing 3x3 square of empty space. Fireflies are left spinning - they prefer turning left, usually counter clockwise.")},
+		{NULL, N_("Alternative firefly"), O_ALT_FIREFLY_1, N_("Just like a normal firefly, but it is right spinning.")},
 		{NULL, N_("Dragonfly"), O_DRAGONFLY_1, N_("These creatures also guard the diamonds you would like to collect. But they move very differently. They like to run straight ahead, and only change direction if they bump into something. Like normal guards, you must not touch them. But you can easily crush them with stones.")},
 		{NULL, N_("Butterfly"), O_BUTTER_1, N_("Butterflies are similar to guards. In contrast to guards they explode into diamonds, producing 3x3 square of diamonds. Butterflies are right spinning, they usually fly clockwise.")},
 		{NULL, N_("Alternative butterfly"), O_ALT_BUTTER_1, N_("Just like a normal butterfly, but it is left spinning.")},
@@ -78,7 +83,7 @@ N_("To play the game, press the New Game button. You can select which level you 
 		{NULL, NULL, O_SLIME, N_("Slime is permeable. It means that stones and diamonds laying on the slime can randomly pass on.")},
 		{NULL, NULL, O_ACID, N_("Acid eats dirt. Sometimes it spreads in all four directions, leaving a small explosion behind. If there is no dirt to swallow, it just disappears.")},
 		{NULL, NULL, O_WATER, N_("Water, which floods all empty space slowly.")},
-		{NULL, NULL, O_MAGIC_WALL, N_("This very special wall converts stones into diamonds and vice versa. Note that a magic wall can only be activated for some limited time.")},
+		{NULL, NULL, O_MAGIC_WALL, N_("This very special wall converts stones into diamonds and vice versa. Note that a magic wall can only be activated for some limited time. It can also turn mega stones into nitro packs, nitro packs into mega stones. Even flying diamonds and stones pass them to be converted to each other - but these two do that from bottom to up, of course.")},
 		{NULL, NULL, O_EXPANDING_WALL, N_("Expanding wall expands in horizontal or vertical (or both) direction, if there is an empty space to fill up. You should be very careful not to be catched by the expanding wall.")},
 		{NULL, NULL, O_EXPANDING_STEEL_WALL, N_("Expanding wall, but made of steel. You cannot even blow it up!")},
 		{NULL, NULL, O_FALLING_WALL, N_("Whenever there is a falling wall above the player merely separated by empty space, it starts falling. It does so at any distance. If it hits the player, it explodes. If hit on anything else, it just stops.")},
@@ -92,8 +97,8 @@ N_("To play the game, press the New Game button. You can select which level you 
 		{NULL, NULL, O_BOX, N_("Sometimes you have to block a passage, for example to protect a voodoo. This is when a box like this comes handy. You can push it in every direction using the Ctrl key.")},
 		{NULL, NULL, O_PNEUMATIC_HAMMER, N_("Sometimes diamonds or keys are buried in brick walls. You can use a pneumatic hammer to break these walls, or simple brick walls which contain nothing. Stand on something, and press fire and left or right to use the hammer on a wall which is near the player, next to the element you stand on.")},
 		{NULL, NULL, O_REPLICATOR, N_("This machine replicates the element which is on the top of it. At regular intervals, a new element drops out underneath; if there is space to do this. The rate of materializing the new elements can be different in every cave.")},
-		{NULL, N_("Conveyor belt"), O_CONVEYOR_LEFT, N_("The indestructible and immobile conveyor belt carries free-moving elements. Its direction can be changed or its power can be turned completely off with a switch.")},
-		{NULL, NULL, O_LAVA, N_("Heavy elemenets sink into the lava, and disappear without any trace left. Creatures can also step into the lava.")},
+		{NULL, N_("Conveyor belt"), O_CONVEYOR_LEFT, N_("The indestructible and immobile conveyor belt carries free-moving elements. Its direction can be changed or its power can be turned completely off with a switch. It only carries the elements which are resting on it (ie. it will not move a piece of dirt or a firefly.) Flying stones and diamonds under it will also be carried.")},
+		{NULL, NULL, O_LAVA, N_("Heavy elemenets sink into the lava and disappear without any trace left. Creatures can also step into the lava.")},
 		{NULL, NULL, O_CLOCK, N_("Collect this to get extra time.")},
 		{NULL, NULL, O_BLADDER, N_("Bladders can be pushed around easily. They slowly climb up; if they touch a voodoo, they convert into clocks. They can also pass slime.")},
 		{NULL, NULL, O_BLADDER_SPENDER, N_("If there is space above it, the bladder spender turns to a bladder.")},
@@ -110,16 +115,20 @@ N_("To play the game, press the New Game button. You can select which level you 
 		{NULL, NULL, O_CONVEYOR_SWITCH, N_("The conveyor belts also have a switch which can completely stop their action.")},
 		{NULL, N_("Strange elements"), O_DIRT_GLUED, N_("Some caves contain strange elements, for example, diamonds which cannot be collected, a player that cannot move... Don't be surprised!")},
 
-		{GTK_STOCK_DIALOG_INFO, N_("Playing hints"), O_NONE, N_("Obviously, holding fire and pushing a direction causes you to 'touch' an adjacent square without moving into it, collecting diamonds or removing dirt, but a move which is very useful is to push a boulder in this way. It's a good way of making sure you don't 'overpush' the boulder and later on you will have to use this.")},
-		{NULL, NULL, O_NONE, N_("Boulders do not roll off of the side of magic walls. In some caves it is shown where these walls are by placing a boulder to show you that it's magic.")},
+		{GTK_STOCK_DIALOG_INFO, N_("Playing hints"), O_NONE, N_("Obviously, holding fire and pushing a direction causes you to 'touch' an adjacent square without moving into it, collecting diamonds or removing dirt, but a move which is very useful is to push a stone in this way. It's a good way of making sure you don't 'overpush' the stone and later on you will have to use this.")},
+		{NULL, NULL, O_NONE, N_("Stones do not roll off of the side of magic walls. In some caves it is shown where these walls are by placing a stone to show you that it's magic.")},
 		{NULL, NULL, O_NONE, N_("Expanding walls are always horizontally expanding on both sides. In some caves it is shown which parts of the wall are expanding by forcing you to pass it on the other side. You will see the passage close in behind you and this eliminates some guessword in the next puzzle.")},
 		{NULL, NULL, O_NONE, N_("The screen starts scrolling at the edge of the screen. This means it's a bad idea to run in places where enemies are likely to be, since you won't have time to react. Either move very carefully in these situations, keep track of where the enemies roughly are in the cave, or take a different route away from danger - for example in empty space (where enemies are less likely to travel) or through undug mud. Never rush unless you're sure you can or you need to.")},
 		{NULL, NULL, O_NONE, N_("Enemies like to have dirt to move around on. Clearing lots of dirt can create safe patches for you. This technique can be used on levels where you let several fireflies loose and it's hard to kill them. Beware though - certain formations of enemies can hover in 'mid air' and even move slowly through empty space (when two enemies are circling each other in a certain way).")},
-		{NULL, NULL, O_NONE, N_("Magic walls often have a fairly strict time limit, some more than others. Collect up as many boulders as you can just above the magic wall, leaving one strip of mud, and then finally remove this strip and watch the goods get delivered. Just make sure you've cleared an appropriate amount of space under the wall ;)")},
-		{NULL, NULL, O_NONE, N_("Voodoo dolls need to be protected from enemies at all costs, but dropping a boulder on one is usually harmless!")},
+		{NULL, NULL, O_NONE, N_("Magic walls often have a fairly strict time limit, some more than others. Collect up as many stones as you can just above the magic wall, leaving one strip of mud, and then finally remove this strip and watch the goods get delivered. Just make sure you've cleared an appropriate amount of space under the wall ;)")},
+		{NULL, NULL, O_NONE, N_("Voodoo dolls need to be protected from enemies at all costs, but dropping a stone on one is usually harmless!")},
 		{NULL, NULL, O_NONE, N_("You can't collect diamonds which are falling, but you can collect them when they momentarily bounce off of something or down the side of a pile.")},
 		{NULL, NULL, O_NONE, N_("Some levels have hidden exits. These always look like titanium wall, but don't flash. You can always tell where they are by visual clues and deduction.")},
 		{NULL, NULL, O_NONE, N_("Don't blindly take all diamonds. Some of them are red herrings, some may be unobtainable or part of a trap, and believe it or not, sometimes a diamond is more useful to you on the screen than it is collected, due to some sadistic puzzles :)")},
+		{NULL, NULL, O_NONE, NULL},
+
+		{GD_ICON_KEYBOARD, N_("Keys to control the player"), O_NONE,
+N_("To play the game, press the New Game button. You can select which level you start playing at. During the game, you can control your player with the cursor keys. The Ctrl key has a special meaning: you can snap items, ie. pick up things without moving. If you get stuck, press Escape to restart the level. If there are too many players in the cave and you cannot move, pressing F2 causes the active one to explode. With F11, you can switch to full screen mode. To view the alternative status bar which show keys and skeletons collected, hold down the left shift button.\nThese are the game elements:")},
 		{NULL, NULL, O_NONE, NULL},
 
 		{GD_ICON_SNAPSHOT, N_("Snapshots"), O_NONE, N_("You can experiment with levels by saving and reloading snapshots. However, if you are playing a reloaded cave, you will not get score or extra lives.")},

@@ -23,7 +23,7 @@
 void gd_export_cave_to_crli_cavefile(GdCave *cave, int level, const char *filename);
 void gd_export_cave_list_to_crli_cavepack(GList *caveset, int level, const char *filename);
 
-void gd_save_html (char *htmlname, GtkWidget *window);
+void gd_save_html(char *htmlname, GtkWidget *window);
 
 #endif
 

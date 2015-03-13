@@ -1,18 +1,20 @@
 DONE
------ 
-
-
-REFUSED
--------
-
+-----
+Could you list the difficulty level each replay was recorded at in SDash, as well as GDash?
 
 
 TO DO
 -----
-c64 grafika tomb meretet ellenorizni, legalabb a szorzat meglegyen
+lehessen csak nézni is
 
-I really like the new scrolling function, but at cave start a problem can appear. If the game is paused with the screen on the opposite side of the cave as the "start", Rockford will hatch offscreen before the scrolling catches up to him. Allowing a fast scroll at cave start - until hatch would fix it.
+fragile diamonds
 
+How about a gate that shuts after a certain amount of diamonds have been collected? Just put the gate in front of the exit and have a number somewhere that counts down the diamonds until it closes. 
+
+
+replay long comment
+
+portable conveyor belts?	destructible, convey each other.
 
 new elements sound
 
@@ -20,40 +22,21 @@ Amoeba2 sound
 new slime sound
 replicator sound
 
-flying diamonds, flying stones
-
-flying stone=baloon
-
-
 theme image glob pattern
 
 amikor bezárja az editor ablakot, akkor kéne egy replay checksum update?
 vagy a delete event, és akkor rákérdez
 
-TITLE SCREEN
-	Animated intro screen would be nice. It's not necessary to see a complete game or so but animated walls, diamonds, butterflies, etc. would be nice. Same as in the original C64 games.
-	Maybe animate the intro screen? It might be cool to have a little background cave where the elements move around. Or something.
-
 STATUS BAR
 	As for the status bar in GDash: Maybe a little bit larger font would do the thing. There is enough space to use a larger font.
 
-Maybe game notes can be displayed under the title screen as soon as the game is loaded. Optionally at least if someone does not like to show it automatically. 
-
-Maybe a button to apply certain settings to all caves. We'd have to think of which may be appropriate. Timing maybe. Or color palette type. Dunno about this one.
+Maybe game notes can be displayed under the title screen as soon as the game is loaded. Optionally at least if someone does not like to show it automatically.
 
 Already suggested I think: Atari sounds.
 
-copy&paste elengedés után movera vált,
-
-brc slime permeability
-if (random(slime*4)<4) and (tab[x,y+2]=0) then
-      Begin tab[x,y]:=0;col[x,y+2]:=col[x,y];tab[x,y+2]:=27;mat[x,y+2]:=9;Voice4:=2;end;
-- Time bonus of -100 really seems odd.
 
 amoeba threshold - belül %-ban tárolódik,
 de az editor átállítja?
-
-gtk verzióba		{TypeBoolean, N_("Even lines vertical scroll"), N_("Even lines vertical scroll"), &gd_even_line_pal_emu_vertical_scroll, FALSE},
 
 bdcff beolvasás miért hash table?
   size és hasonló szarok miatt
@@ -61,15 +44,12 @@ bdcff beolvasás miért hash table?
 
 design tips?
 
-extensive commenting
-
 cow not perfect
 
 option "More than 1 bomb" in the cave settings
 
 compat:
-	*) magicwall breakscan; De Luxe Caves 1 Cave L, De Luxe Caves 2 Cave A, Deluxe Caves 3 Cave A 
+	*) magicwall breakscan; De Luxe Caves 1 Cave L, De Luxe Caves 2 Cave A, Deluxe Caves 3 Cave A
 	*) frustidash
 
-portable conveyor belts?	destructible, convey each other.
 

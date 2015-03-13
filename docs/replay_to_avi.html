@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>GDash - saving replays as AVI files</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Language" content="en">
+    <meta name="author" content="Czirkos Zoltán">
+    <meta name="language" content="hu">
+    <link rel="stylesheet" href="style.css">
+</head>
+   
+<body>
+<h1>GDash - saving replays as AVI files</h1>
+
+<h2>The sreplay utility</h2>
+<p>
+The sreplay utility is similar to the normal C64-like GDash game.
+
+<p>When you load it, the usual title screen appears. For its own internal workings,
+sreplay disables the zoom and scroll settings you selected. But it obeys your
+C64 and Atari palette settings. Sound is also disabled.
+
+<p>You can load a caveset
+by pressing the <b>L</b> key. After that, the <b>R</b> key will show the available
+replays, as it would normally do in the game.
+You can select the desired replay with the <b>up</b>/<b>down</b> arrow keys, and save it
+with the space key. You are then required to select the filename prefix
+for the files saved. The files saved have names like <i>out_00000000.png</i>, <i>out_00000001.png</i>
+etc. for the video frames, and <i>out.wav</i> for the audio data. The filename
+prefix is <i>out</i> in this case. You can also modify the folder where the
+files are saved. Be sure that there are no files with those names already there.
+They will be overwritten; also they might be incorrectly recognized by Avidemux
+which will do the converting.
+<p>
+You can watch the replay during the saving process, it is shown in real time.
+(Currently the saving cannot be speeded up.) Don't be surprised: there
+will be no sound. But it is of course saved to the disk.
+One minute of audio data takes around 5 megabytes of disk space, and the image
+data rate is usually around 4 megabytes per minute.
+<p>
+When the files are saved, you will be shown the replays menu again. Press <b>ESC</b> to
+quit the application.
+
+
+
+
+
+<h2>Converting the files to AVI with Avidemux</h2>
+<a href="#links">Avidemux</a> is a simple video conversion application which is freeware. It is
+available on both Windows and Unix platforms. It has several built-in codecs, so it does not
+require any external utilities to be installed.
+<p>
+The steps to convert the image files to an AVI movie are pretty straightforward.
+
+<ul>
+<li>Start up Avidemux.
+
+<li>Choose <b>File|Open</b>, and select the first image file (eg. <i>out_00000000.png</i>) of your
+project. Selecting the successive images is not required, as Avidemux will automatically
+recognize them. You can now see the first frame of your animation.
+
+<li>Click <b>Audio|Main&nbsp;Track</b> from the menu. For <b>Audio&nbsp;source</b>, select
+<b>External&nbsp;WAV</b>.
+Click browse, and import the wave file GDash has written (<i>out.wav</i>.)
+
+<li>Select <b>Video|Frame&nbsp;Rate</b> from the menu. It should be set to 25 fps. That is the default
+value in Avidemux and is also required for the GDash replays, but you should check to make sure it is ok.
+<div class="center"><img src="avidemux_fps.png"></div>
+
+<li>At this point you should be able to preview the video with the play button located at the
+lower left part of the Avidemux window. You can also use the scroll bar to seek to any part.
+
+<li>To save the AVI file, you have to select compression settings. Select <b>Video|Encoder</b> from
+the menu. The recommended compressor is MPEG-4 AVC (x264) or MPEG-4 ASP (Xvid4 or lavc).
+YouTube recommends x264.
+<div class="center"><img src="avidemux_codec.png"></div>
+
+<li>The sound codec must also be selected in a similar way. Click <b>Audio|Encoder</b> from the menu,
+and select MP3 (LAME) or maybe Vorbis.
+
+<li>You are now ready to save the video. Click <b>File|Save|Save&nbsp;Video</b>, select a file name
+and Avidemux will convert your replay in a short time.
+</ul>
+
+
+The default quality settings are usually suitable for GDash replays. The resulting AVI file
+is smaller than 1 megabyte/minute. However if you need even smaller files, or you want better
+quality, you can use the two Configure buttons below the video and the audio codec combo
+boxes to fine-tune compression settings.
+<br>
+When you are finished, you can delete the WAV file and the images as they are not needed anymore.
+
+
+
+
+<h2>Converting the files to an AVI with MPlayer</h2>
+On Unix, you can also use the command line to create the video.
+The easiest way to do that is using the mencoder utility, which is
+part of the <a href="#links">MPlayer</a> package.
+The command line is:
+
+<div class="command">
+<span class="param">mencoder mf://out_*.png -fps 25 -ovc x264 -x264encopts bitrate=512 -audiofile
+out.wav -oac mp3lame -lameopts preset=64 -o out.avi</span>
+</div>
+
+The meaning of the parameters are:
+<dl class="param">
+<dt class="param">mf://out_*.png
+	<dd>The name of the image files.
+<dt class="param">-fps 25
+	<dd>This tells mencoder, that 25 image files make up a second of video.
+<dt class="param">-ovc x264
+	<dd>Use x264 compression for the video (most advanced and also recommended by YouTube).
+<dt class="param">-x264encopts bitrate=512
+	<dd>Target bitrate of video, 1024kbits/second. Usually 512 is
+enough, but you can increase, if you see that the video is of bad quality.
+<dt class="param">-audiofile out.wav
+	<dd>Tells mencoder that the audio input data is to be read from that file.
+<dt class="param">-oac mp3lame
+	<dd>Audio compression is mp3.
+<dt class="param">-lameopts preset=64
+	<dd>Audio quality; 64kbit/s is more than enough as the sound is mono.
+<dt class="param">-o out.avi
+	<dd>Output filename.
+</dl>
+As simple as that. Optionally, if your mencoder does not support x264 encoding, you can use
+libavcodec mpeg4. The command line to be used is:
+
+<div class="command">
+<span class="param">mencoder mf://out_*.png -fps 25 -ovc lavc -lavc vcodec=mpeg4:vbitrate=512 -ffourcc DIVX
+-audiofile out.wav -oac mp3lame -lameopts preset=64 -o out.avi</span>
+</div>
+
+I recommend using the <span class="param">-ffourcc DIVX</span> option to increase compatibility with media players
+in this case.
+
+<h2>Upload and share</h2>
+Everybody is encouraged to do that! Upload your replay to <a href="#links">YouTube</a> so other BD fans
+can view it.
+
+<h2>Links</h2>
+<a name="links">
+<ul>
+<li><a href="http://www.youtube.com/watch?v=wO6vNa3cZLo">Sample video</a> on YouTube.
+<li><a href="http://fixounet.free.fr/avidemux/">Avidemux</a> - video converter application. No codecs needed.
+<li><a href="http://www.videolan.org/vlc/">VLC media player</a> - the recommended player for AVI files. With builtin codecs.
+<li><a href="http://mplayerhq.hu">MPlayer</a> and the mencoder utility.
+</ul>
+
+</p></body></html>

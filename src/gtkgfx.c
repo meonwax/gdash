@@ -404,15 +404,15 @@ loadcells_from_pixbuf(GdkPixbuf *cells_pixbuf)
 	create_composite_cell_pixbuf(O_WALLED_KEY_3, O_KEY_3, O_BRICK);
 	create_composite_cell_pixbuf(O_WALLED_DIAMOND, O_DIAMOND, O_BRICK);
 
-	add_arrow_to_cell(O_GUARD_1, O_GUARD_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_CLOCKWISE);
-	add_arrow_to_cell(O_GUARD_2, O_GUARD_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_UPSIDEDOWN);
-	add_arrow_to_cell(O_GUARD_3, O_GUARD_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_COUNTERCLOCKWISE);
-	add_arrow_to_cell(O_GUARD_4, O_GUARD_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_NONE);
+	add_arrow_to_cell(O_FIREFLY_1, O_FIREFLY_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_CLOCKWISE);
+	add_arrow_to_cell(O_FIREFLY_2, O_FIREFLY_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_UPSIDEDOWN);
+	add_arrow_to_cell(O_FIREFLY_3, O_FIREFLY_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_COUNTERCLOCKWISE);
+	add_arrow_to_cell(O_FIREFLY_4, O_FIREFLY_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_NONE);
 
-	add_arrow_to_cell(O_ALT_GUARD_1, O_ALT_GUARD_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_CLOCKWISE);
-	add_arrow_to_cell(O_ALT_GUARD_2, O_ALT_GUARD_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_UPSIDEDOWN);
-	add_arrow_to_cell(O_ALT_GUARD_3, O_ALT_GUARD_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_COUNTERCLOCKWISE);
-	add_arrow_to_cell(O_ALT_GUARD_4, O_ALT_GUARD_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_NONE);
+	add_arrow_to_cell(O_ALT_FIREFLY_1, O_ALT_FIREFLY_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_CLOCKWISE);
+	add_arrow_to_cell(O_ALT_FIREFLY_2, O_ALT_FIREFLY_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_UPSIDEDOWN);
+	add_arrow_to_cell(O_ALT_FIREFLY_3, O_ALT_FIREFLY_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_COUNTERCLOCKWISE);
+	add_arrow_to_cell(O_ALT_FIREFLY_4, O_ALT_FIREFLY_1, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_NONE);
 
 	add_arrow_to_cell(O_H_EXPANDING_WALL, O_H_EXPANDING_WALL, O_LEFTRIGHT_ARROW, GDK_PIXBUF_ROTATE_NONE);
 	add_arrow_to_cell(O_V_EXPANDING_WALL, O_V_EXPANDING_WALL, O_LEFTRIGHT_ARROW, GDK_PIXBUF_ROTATE_CLOCKWISE);
@@ -449,8 +449,10 @@ loadcells_from_pixbuf(GdkPixbuf *cells_pixbuf)
 	add_arrow_to_cell(O_DIAMOND_GLUED, O_DIAMOND, O_GLUED, 0);
 	add_arrow_to_cell(O_DIRT_GLUED, O_DIRT, O_GLUED, 0);
 	add_arrow_to_cell(O_STONE_F, O_STONE, O_DOWN_ARROW, 0);
+	add_arrow_to_cell(O_FLYING_STONE_F, O_FLYING_STONE, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_UPSIDEDOWN);
 	add_arrow_to_cell(O_MEGA_STONE_F, O_MEGA_STONE, O_DOWN_ARROW, 0);
 	add_arrow_to_cell(O_DIAMOND_F, O_DIAMOND, O_DOWN_ARROW, 0);
+	add_arrow_to_cell(O_FLYING_DIAMOND_F, O_FLYING_DIAMOND, O_DOWN_ARROW, GDK_PIXBUF_ROTATE_UPSIDEDOWN);
 	add_arrow_to_cell(O_FALLING_WALL, O_BRICK, O_EXCLAMATION_MARK, 0);
 	add_arrow_to_cell(O_FALLING_WALL_F, O_BRICK, O_DOWN_ARROW, 0);
 	add_arrow_to_cell(O_TIME_PENALTY, O_GRAVESTONE, O_EXCLAMATION_MARK, 0);
@@ -633,6 +635,9 @@ gd_loadcells_default()
 	c64_custom_gfx=NULL;
 	using_png_gfx=FALSE;
 	color0=GD_COLOR_INVALID;	/* so that pixbufs will be recreated */
+	
+	/* size of array (in bytes), -1 which is the cell size */
+	g_assert(sizeof(c64_gfx)-1 == NUM_OF_CELLS_X*NUM_OF_CELLS_Y*c64_gfx[0]*c64_gfx[0]);
 }
 
 /* wrapper */
@@ -813,13 +818,14 @@ gd_get_element_pixbuf_simple_with_border (GdElement element)
 	also up to the caller to call this function only for rendered caves.
 */
 GdkPixbuf *
-gd_drawcave_to_pixbuf(const GdCave * cave, const int width, const int height, const gboolean game_view)
+gd_drawcave_to_pixbuf(const GdCave *cave, const int width, const int height, const gboolean game_view, const gboolean border)
 {
 	int x, y;
 	int cell_size;
 	GdkPixbuf *pixbuf, *scaled;
 	float scale;
 	int x1, y1, x2, y2;
+	int borderadd=border?4:0, borderpos=border?2:0;
 
 	g_assert(cave->map!=NULL);
 	if (game_view) {
@@ -842,8 +848,9 @@ gd_drawcave_to_pixbuf(const GdCave * cave, const int width, const int height, co
 	cell_size=gdk_pixbuf_get_width (cells_pb[0]);
 
 	/* add two pixels black border: +4 +4 for width and height */
-	pixbuf=gdk_pixbuf_new (GDK_COLORSPACE_RGB, gdk_pixbuf_get_has_alpha (cells_pb[0]), 8, (x2-x1+1)*cell_size+4, (y2-y1+1)*cell_size+4);
-	gdk_pixbuf_fill (pixbuf, 0x000000ff);	/* fill with opaque black */
+	pixbuf=gdk_pixbuf_new(GDK_COLORSPACE_RGB, gdk_pixbuf_get_has_alpha (cells_pb[0]), 8, (x2-x1+1)*cell_size+borderadd, (y2-y1+1)*cell_size+borderadd);
+	if (border)
+		gdk_pixbuf_fill(pixbuf, 0x000000ff);	/* fill with opaque black, so border is black */
 
 	/* take visible part into consideration */
 	for (y=y1; y<=y2; y++)
@@ -860,7 +867,11 @@ gd_drawcave_to_pixbuf(const GdCave * cave, const int width, const int height, co
 					case O_EXPANDING_WALL:
 					case O_H_EXPANDING_WALL:
 					case O_V_EXPANDING_WALL:
-						element=cave->expanding_wall_looks_like;
+						/* only change the view, if it is not brick wall (the default value). */
+						/* so arrows remain - as well as they always remaing for the steel expanding wall,
+						   which has no visual effect. */
+						if (cave->expanding_wall_looks_like!=O_BRICK)
+							element=cave->expanding_wall_looks_like;
 						break;
 					case O_AMOEBA_2:
 						element=cave->amoeba_2_looks_like;
@@ -875,7 +886,7 @@ gd_drawcave_to_pixbuf(const GdCave * cave, const int width, const int height, co
 			}
 			else
 				draw=gd_elements[element].image;				/* pixbuf like in the editor */
-			gdk_pixbuf_copy_area (cells_pb[draw], 0, 0, cell_size, cell_size, pixbuf, (x-x1)*cell_size+2, (y-y1)*cell_size+2);
+			gdk_pixbuf_copy_area (cells_pb[draw], 0, 0, cell_size, cell_size, pixbuf, (x-x1)*cell_size+borderpos, (y-y1)*cell_size+borderpos);
 		}
 
 	/* if requested size is 0, return unscaled */

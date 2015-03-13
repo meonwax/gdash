@@ -53,6 +53,8 @@ const char *gd_find_file(const char *filename);
 
 /* wrap a text to specified width */
 char *gd_wrap_text(const char *orig, int width);
+/* count lines in text (number of \n's + 1) */
+int gd_lines_in_text(const char *text);
 
 /* return current date in 2008-12-04 format */
 const char *gd_get_current_date();

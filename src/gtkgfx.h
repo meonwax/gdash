@@ -43,7 +43,7 @@ GdkPixmap *gd_editor_pixmap(int index);
 
 GdkPixbuf *gd_get_element_pixbuf_with_border (GdElement element);
 GdkPixbuf *gd_get_element_pixbuf_simple_with_border (GdElement element);
-GdkPixbuf *gd_drawcave_to_pixbuf(const GdCave * cave, const int width, const int height, const gboolean game_view);
+GdkPixbuf *gd_drawcave_to_pixbuf(const GdCave *cave, const int width, const int height, const gboolean game_view, const gboolean border);
 
 void gd_create_pixbuf_for_builtin_theme();
 GdkPixbuf *gd_pixbuf_load_from_data(guchar *data, int length);

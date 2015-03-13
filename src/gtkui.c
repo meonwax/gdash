@@ -28,6 +28,7 @@
 #include "config.h"
 #include "gtkmain.h"
 #include "gfxutil.h"
+#include "sound.h"
 
 /* pixbufs of icons and the like */
 #include "icons.h"
@@ -640,6 +641,8 @@ gd_preferences (GtkWidget *parent)
 		{TypeBoolean, N_("No invisible outbox"), N_("Show invisible outboxes as visible (blinking) ones."), &gd_no_invisible_outbox, FALSE},
 		{TypeLabel, N_("<b>Sound options</b> (require restart)"), NULL, NULL},
 		{TypeBoolean, N_("Sound"), N_("Play sounds. Enabling this setting requires a restart!"), &gd_sdl_sound, FALSE},
+		{TypePercent, N_("Music volume"), N_("Volume of title screen music."), &gd_sound_music_volume_percent, FALSE},
+		{TypePercent, N_("Cave volume"), N_("Volume of sounds played in a cave."), &gd_sound_chunks_volume_percent, FALSE},
 		{TypeBoolean, N_("Classic sounds only"), N_("Play only classic sounds taken from the original game."), &gd_classic_sound, FALSE},
 		{TypeBoolean, N_("16-bit mixing"), N_("Use 16-bit mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_16bit_mixing, FALSE},
 		{TypeBoolean, N_("44kHz mixing"), N_("Use 44kHz mixing of sounds. Try changing this setting if sound is clicky. Changing this setting requires a restart!"), &gd_sdl_44khz_mixing, FALSE},
@@ -648,10 +651,6 @@ gd_preferences (GtkWidget *parent)
 		{TypeNewColumn, },
 		{TypeLabel, N_("<b>Display options</b>"), NULL, NULL},
 		{TypeBoolean, N_("Random colors"), N_("Use randomly selected colors for caves."), &gd_random_colors, FALSE},
-/*
-   XXX currently dirt mod is not shown to the user.
-		{N_("Allow dirt mod"), N_("Enable caves to use alternative dirt graphics. This applies only to imported caves, not BDCFF (*.bd) files."), &allow_dirt_mod, FALSE},
-*/
 		{TypeBoolean, N_("PAL emulation for game"), N_("Use PAL emulated graphics, ie. lines are striped."), &gd_pal_emulation_game, TRUE},
 		{TypeBoolean, N_("PAL emulation for editor"), N_("Use PAL emulated graphics, ie. lines are striped."), &gd_pal_emulation_editor, TRUE},
 //		{TypeBoolean, N_("Even lines vertical scroll"), N_("Even lines vertical scroll. Scrolls to every second scanline vertically. If you use PAL emulation and PAL scanline shade, scrolling might look better with this turned on."), &gd_even_line_pal_emu_vertical_scroll, FALSE},
@@ -861,6 +860,9 @@ gd_preferences (GtkWidget *parent)
 	
 	/* graphics settings might have changed (ie. pal emu or zoom), so recreate main winow. */
 	gd_main_window_set_title_animation();
+
+	gd_sound_set_music_volume(gd_sound_music_volume_percent);
+	gd_sound_set_chunk_volumes(gd_sound_chunks_volume_percent);
 }
 
 
@@ -1053,6 +1055,7 @@ gd_show_highscore(GtkWidget *parent, GdCave *cave, gboolean show_clear_button, G
 #undef GD_HIGHLIGHT_CAVE
 #undef GD_HIGHLIGHT_RANK
 
+/* try to guess which window is active */
 static GtkWidget *
 guess_active_toplevel()
 {
@@ -1062,7 +1065,6 @@ guess_active_toplevel()
 	/* before doing anything, process updates, as windows may have been opened or closed right at the previous moment */
     gdk_window_process_all_updates();
 
-    /* try to guess which window is active */
     /* if we find a modal window, it is active. */
     toplevels=gtk_window_list_toplevels();
     for (iter=toplevels; iter!=NULL; iter=iter->next)
@@ -1091,14 +1093,14 @@ show_message(GtkMessageType type, const char *primary, const char *secondary)
 {
     GtkWidget *dialog;
 
-    dialog=gtk_message_dialog_new ((GtkWindow *) guess_active_toplevel(),
+    dialog=gtk_message_dialog_new((GtkWindow *) guess_active_toplevel(),
         GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
         type, GTK_BUTTONS_OK,
         "%s", primary);
     gtk_window_set_title(GTK_WINDOW(dialog), "GDash");
    	/* secondary message exists an is not empty string: */
     if (secondary && secondary[0]!=0)
-        gtk_message_dialog_format_secondary_markup (GTK_MESSAGE_DIALOG (dialog), "%s", secondary);
+        gtk_message_dialog_format_secondary_markup(GTK_MESSAGE_DIALOG (dialog), "%s", secondary);
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
 }
@@ -1135,7 +1137,7 @@ gd_discard_changes (GtkWidget *parent)
 	if (!gd_caveset_edited)
 		return TRUE;
 
-	dialog=gtk_message_dialog_new((GtkWindow *) parent, 0, GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, _("Cave set \"%s\" is edited. Discard changes?"), gd_caveset_data->name);
+	dialog=gtk_message_dialog_new((GtkWindow *) parent, 0, GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, _("Caveset \"%s\" is edited or new replays are added. Discard changes?"), gd_caveset_data->name);
 	gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG (dialog), _("If you discard the caveset, all changes and new replays will be lost."));
 	gtk_dialog_add_button(GTK_DIALOG (dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
 	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);

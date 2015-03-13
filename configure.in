@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(GDash, 20090113, cirix@fw.hu)
+AC_INIT(GDash, 20090122, cirix@fw.hu)
 AC_CONFIG_SRCDIR([src/gameplay.c])
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
@@ -59,6 +59,9 @@ if test x"$with_sdl" = "xyes" ; then
   AC_DEFINE(USE_SDL,,[Use SDL.])
   AM_PATH_SDL(1.2.0, :, AC_MSG_ERROR(Test for SDL failed. See the file 'INSTALL' for help.))
 fi
+
+PKG_CHECK_MODULES(LIBPNG, [libpng], AC_DEFINE(HAVE_LIBPNG, 1, Define if you have libpng), [])
+
 
 AM_CONDITIONAL(SOUND, test x"$enable_sound" = "xyes")
 if test x"$enable_sound" = "xyes" ; then

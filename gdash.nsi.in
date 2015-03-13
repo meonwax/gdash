@@ -40,6 +40,7 @@ Section "GDash (required)"
   SetOutPath $INSTDIR
   File "src\gdash.exe"
   File "src\sdash.exe"
+  File "src\sreplay.exe"
   File "include\boulder_rush.png"
   File "include\c64_gfx.png"
   File "include\gdash_screen.png"
@@ -85,7 +86,16 @@ Section "GDash (required)"
   File ${MINGWDIR}\bin\libvorbis-0.dll
   File ${MINGWDIR}\bin\libvorbisfile-3.dll
   File ${MINGWDIR}\bin\libogg-0.dll
-  
+
+
+  ; Documentation
+  SetOutPath $INSTDIR
+  File docs\replay_to_avi.html
+  File docs\style.css  
+  File docs\background.png
+  File docs\gdash.png
+  File docs\avidemux_codec.png
+  File docs\avidemux_fps.png
 
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\GDash "Install_Dir" "$INSTDIR"
@@ -143,7 +153,9 @@ Section "Start Menu Shortcuts"
   CreateDirectory "$SMPROGRAMS\GDash"
   CreateShortCut "$SMPROGRAMS\GDash\GDash.lnk" "$INSTDIR\gdash.exe" "" "$INSTDIR\gdash.ico" 0
   CreateShortCut "$SMPROGRAMS\GDash\GDash (C64-like).lnk" "$INSTDIR\sdash.exe" "" "$INSTDIR\gdash.ico" 0
+  CreateShortCut "$SMPROGRAMS\GDash\Replay converter.lnk" "$INSTDIR\sreplay.exe" "" "" 0
   CreateShortCut "$SMPROGRAMS\GDash\README.lnk" "$INSTDIR\README.txt" "" "" 0
+  CreateShortCut "$SMPROGRAMS\GDash\Replay to AVI.lnk" "$INSTDIR\replay_to_avi.html" "" "" 0
   CreateShortCut "$SMPROGRAMS\GDash\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   
 SectionEnd

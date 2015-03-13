@@ -32,7 +32,7 @@ typedef enum _gd_type {
 	/* not real types, only used by editor to build ui */
 	GD_TAB,
 	GD_LABEL,
-	
+
 	/* gd types */
 	GD_TYPE_STRING,		/* static string, fixed array of characters */
 	GD_TYPE_LONGSTRING,	/* long string which has its own notebook page in the editor */
@@ -52,6 +52,7 @@ enum _gd_property_flags {
 	GD_DONT_SAVE=1<<1,
 	GD_DONT_SHOW_IN_EDITOR=1<<2,
 	GD_SHOW_LEVEL_LABEL=1<<3,
+	GD_COMPATIBILITY_SETTING=1<<4,
 };
 
 typedef struct _gd_struct_descriptor {
@@ -68,7 +69,7 @@ typedef struct _gd_struct_descriptor {
 typedef struct _gd_property_default {
 	int offset;	/* data offset (bytes) in a cave structure */
 	int defval;	/* default value, converted to int. if type is a float, *1000000 */
-	
+
 	int property_index;	/* index in gd_cave_properties; created at runtime */
 } GdPropertyDefault;
 
@@ -79,7 +80,7 @@ typedef struct _gd_property_default {
 #define NUM_OF_CELLS_Y 45
 
 /* +74: placeholder for cells which are rendered by the game; for example diamond+arrow = falling diamond */
-#define NUM_OF_CELLS (NUM_OF_CELLS_X*NUM_OF_CELLS_Y+76)
+#define NUM_OF_CELLS (NUM_OF_CELLS_X*NUM_OF_CELLS_Y+78)
 
 
 
@@ -130,10 +131,14 @@ typedef enum _element {
 	O_BRICK_EATABLE,
 	O_STONE,
 	O_STONE_F,
+	O_FLYING_STONE,
+	O_FLYING_STONE_F,
 	O_MEGA_STONE,
 	O_MEGA_STONE_F,
 	O_DIAMOND,
 	O_DIAMOND_F,
+	O_FLYING_DIAMOND,
+	O_FLYING_DIAMOND_F,
 	O_BLADDER_SPENDER,
 	O_INBOX,
 	O_H_EXPANDING_WALL,
@@ -166,7 +171,7 @@ typedef enum _element {
 	O_DOOR_1,
 	O_DOOR_2,
 	O_DOOR_3,
-	
+
 	O_POT,
 	O_GRAVITY_SWITCH,
 	O_PNEUMATIC_HAMMER,
@@ -227,14 +232,14 @@ typedef enum _element {
 	O_WAITING_STONE,
 	O_CHASING_STONE,
 	O_GHOST,
-	O_GUARD_1,
-	O_GUARD_2,
-	O_GUARD_3,
-	O_GUARD_4,
-	O_ALT_GUARD_1,
-	O_ALT_GUARD_2,
-	O_ALT_GUARD_3,
-	O_ALT_GUARD_4,
+	O_FIREFLY_1,
+	O_FIREFLY_2,
+	O_FIREFLY_3,
+	O_FIREFLY_4,
+	O_ALT_FIREFLY_1,
+	O_ALT_FIREFLY_2,
+	O_ALT_FIREFLY_3,
+	O_ALT_FIREFLY_4,
 	O_BUTTER_1,
 	O_BUTTER_2,
 	O_BUTTER_3,
@@ -263,7 +268,7 @@ typedef enum _element {
 	O_PLAYER_BOMB,
 	O_PLAYER_GLUED,
 	O_PLAYER_STIRRING,
-	
+
 	O_BOMB,
 	O_BOMB_TICK_1,
 	O_BOMB_TICK_2,
@@ -272,11 +277,11 @@ typedef enum _element {
 	O_BOMB_TICK_5,
 	O_BOMB_TICK_6,
 	O_BOMB_TICK_7,
-	
+
 	O_NITRO_PACK,
 	O_NITRO_PACK_F,
 	O_NITRO_PACK_EXPLODE,
-	
+
 	O_PRE_CLOCK_1,
 	O_PRE_CLOCK_2,
 	O_PRE_CLOCK_3,
@@ -315,11 +320,6 @@ typedef enum _element {
 	O_AMOEBA_2_EXPL_2,
 	O_AMOEBA_2_EXPL_3,
 	O_AMOEBA_2_EXPL_4,
-	O_DRAGONFLY_EXPLODE_1,
-	O_DRAGONFLY_EXPLODE_2,
-	O_DRAGONFLY_EXPLODE_3,
-	O_DRAGONFLY_EXPLODE_4,
-	O_DRAGONFLY_EXPLODE_5,
 
 	/* these are used internally for the pneumatic hammer, and should not be used in the editor! */
 	/* (not even as an effect destination or something like that) */
@@ -327,7 +327,7 @@ typedef enum _element {
 	O_PLAYER_PNEUMATIC_RIGHT,
 	O_PNEUMATIC_ACTIVE_LEFT,
 	O_PNEUMATIC_ACTIVE_RIGHT,
-	
+
 	O_UNKNOWN,	/* unknown element imported or read from bdcff */
 	O_NONE,		/* do not draw this element when creating cave; can be used, for example, to skip drawing a maze's path */
 
@@ -378,16 +378,11 @@ enum _element_property {
 	E_P_SLOPED_UP,
 	E_P_SLOPED_DOWN,
 	E_P_BLADDER_SLOPED,	/* element act sloped also for the bladder */
-	
+
 	E_P_AMOEBA_CONSUMES,		/* amoeba can eat this */
 	E_P_DIRT,					/* it is dirt, or something similar (dirt2 or sloped dirt) */
 	E_P_BLOWS_UP_FLIES,		/* flies blow up, if they touch this */
-
-	E_P_EXPLODES_TO_SPACE,			/* explodes if hit by a rock */
-	E_P_EXPLODES_AS_DRAGONFLY,	/* explodes as a dragonfly does */
-	E_P_EXPLODES_TO_DIAMONDS,		/* explodes to diamonds if hit by a rock */
-	E_P_EXPLODES_TO_STONES,		/* explodes to rocks if hit by a rock */
-	E_P_EXPLODES_AS_NITRO,		/* explodes as nitro pack */
+	E_P_EXPLODES_BY_HIT,		/* explodes if hit by a stone */
 
 	E_P_EXPLOSION_FIRST_STAGE,			/* set for first stage of every explosion. helps slower/faster explosions changing */
 
@@ -396,7 +391,8 @@ enum _element_property {
 	E_P_CAN_BE_HAMMERED,		/* can be broken by pneumatic hammer */
 	E_P_VISUAL_EFFECT,		/* if the element can use a visual effect. used to check consistency of the code */
 	E_P_PLAYER,				/* easier to find out if it is a player element */
-	E_P_MOVED_BY_CONVEYOR, 	/* can be moved by conveyor belt */
+	E_P_MOVED_BY_CONVEYOR_TOP, 	/* can be moved by conveyor belt */
+	E_P_MOVED_BY_CONVEYOR_BOTTOM, 	/* can be moved UNDER the conveyor belt */
 };
 
 /* properties */
@@ -407,18 +403,12 @@ enum _element_property {
 /* flag to say "any direction" */
 #define P_SLOPED (P_SLOPED_LEFT|P_SLOPED_RIGHT|P_SLOPED_UP|P_SLOPED_DOWN)
 #define P_BLADDER_SLOPED (1<<E_P_BLADDER_SLOPED)
-	
+
 #define P_AMOEBA_CONSUMES (1<<E_P_AMOEBA_CONSUMES)
 #define P_DIRT (1<<E_P_DIRT)
 #define P_BLOWS_UP_FLIES (1<<E_P_BLOWS_UP_FLIES)
 
-#define P_EXPLODES_TO_SPACE (1<<E_P_EXPLODES_TO_SPACE)
-#define P_EXPLODES_TO_DIAMONDS (1<<E_P_EXPLODES_TO_DIAMONDS)
-#define P_EXPLODES_TO_STONES (1<<E_P_EXPLODES_TO_STONES)
-#define P_EXPLODES_AS_NITRO (1<<E_P_EXPLODES_AS_NITRO)
-#define P_EXPLODES_AS_DRAGONFLY (1<<E_P_EXPLODES_AS_DRAGONFLY)
-/* explodes to something if hit */
-#define P_EXPLODES (P_EXPLODES_TO_SPACE|P_EXPLODES_TO_DIAMONDS|P_EXPLODES_TO_STONES|P_EXPLODES_AS_NITRO|P_EXPLODES_AS_DRAGONFLY)
+#define P_EXPLODES_BY_HIT (1<<E_P_EXPLODES_BY_HIT)
 #define P_EXPLOSION_FIRST_STAGE (1<<E_P_EXPLOSION_FIRST_STAGE)
 
 #define P_NON_EXPLODABLE (1<<E_P_NON_EXPLODABLE)
@@ -426,7 +416,8 @@ enum _element_property {
 #define P_CAN_BE_HAMMERED (1<<E_P_CAN_BE_HAMMERED)
 #define P_VISUAL_EFFECT (1<<E_P_VISUAL_EFFECT)
 #define P_PLAYER (1<<E_P_PLAYER)
-#define P_MOVED_BY_CONVEYOR (1<<E_P_MOVED_BY_CONVEYOR)
+#define P_MOVED_BY_CONVEYOR_TOP (1<<E_P_MOVED_BY_CONVEYOR_TOP)
+#define P_MOVED_BY_CONVEYOR_BOTTOM (1<<E_P_MOVED_BY_CONVEYOR_BOTTOM)
 
 
 
@@ -485,7 +476,7 @@ typedef enum _direction {
 	MV_DOWN_LEFT_2=14,
 	MV_LEFT_2=15,
 	MV_UP_LEFT_2=16,
-	
+
 	MV_MAX,
 } GdDirection;
 
@@ -597,16 +588,17 @@ typedef struct _gd_cave_replay {
 	int level;	/* replay for level n */
 	guint32 seed;	/* seed the cave is to be rendered with */
 	gboolean saved;	/* also store it in the saved bdcff */
+	GdString recorded_with;	/* recorded with - application name and version */
 
 	GdString player_name;	/* who played this */
 	GdString date;			/* when played */
 	GdString comment;		/* some comments from the player */
-	
+
 	int score;				/* score collected */
 	int duration;			/* number of seconds played */
 	gboolean success;		/* successful playing of cave? */
 	guint32 checksum;		/* checksum of the rendered cave. */
-	
+
 	gboolean wrong_checksum;
 	GByteArray *movements;
 	int current_playing_pos;
@@ -642,12 +634,12 @@ typedef struct _gd_cave {
 	GdString date;				/* date of creation */
 	GString *story;				/* story for the cave - will be shown when the cave is played. */
 	GString *remark;			/* some note */
-	
-	
+
+
 
 	GdString charset;			/* these are not used by gdash */
 	GdString fontset;
-	
+
 	/* and this one the highscores */
 	GdHighScore highscore[GD_HIGHSCORE_NUM];
 
@@ -656,7 +648,7 @@ typedef struct _gd_cave {
 	GdElement **map;			/* pointer to data for map, non-null if has a map */
 	GList *objects;
 	GList *replays;
-	
+
 	gboolean intermission;		/* is this cave an intermission? */
 	gboolean intermission_instantlife;	/* one life extra, if the intermission is reached */
 	gboolean intermission_rewardlife;	/* one life extra, if the intermission is successfully finished */
@@ -684,7 +676,7 @@ typedef struct _gd_cave {
 	int level_ckdelay[5];		/* Timing in original game units */
 	int level_time[5];			/* Available time, per level */
 	int level_timevalue[5];		/* points for each second remaining, when exiting level */
-	
+
 	int max_time;			/* the maximum time in seconds. if above, it overflows */
 
 	int w, h;				/* Sizes of cave, width and height. */
@@ -694,7 +686,7 @@ typedef struct _gd_cave {
 
 	int diamond_value;			/* Score for a diamond. */
 	int extra_diamond_value;	/* Score for a diamond, when gate is open. */
-	
+
 	gboolean stone_sound;
 	gboolean diamond_sound;
 	gboolean nitro_sound;
@@ -707,22 +699,22 @@ typedef struct _gd_cave {
 	gboolean magic_wall_stops_amoeba;	/* Turning on magic wall changes amoeba to diamonds. Original BD: yes, constkit: no */
 	gboolean magic_timer_wait_for_hatching;	/* magic wall timer does not start before player's birth */
 	gboolean magic_wall_sound;	/* magic wall has sound */
-	
+
 	int level_amoeba_time[5];		/* amoeba time for each level */
 	double amoeba_growth_prob;		/* Amoeba slow growth probability */
 	double amoeba_fast_growth_prob;	/* Amoeba fast growth probability */
 	int level_amoeba_threshold[5];		/* amoeba turns to stones; if count is bigger than this (number of cells) */
-	GdElement enclosed_amoeba_to;	/* an enclosed amoeba converts to this element */
-	GdElement too_big_amoeba_to;	/* an amoeba grown too big converts to this element */
+	GdElement amoeba_enclosed_effect;	/* an enclosed amoeba converts to this element */
+	GdElement amoeba_too_big_effect;	/* an amoeba grown too big converts to this element */
 
 	int level_amoeba_2_time[5];		/* amoeba time for each level */
 	double amoeba_2_growth_prob;		/* Amoeba slow growth probability */
 	double amoeba_2_fast_growth_prob;	/* Amoeba fast growth probability */
 	int level_amoeba_2_threshold[5];		/* amoeba turns to stones; if count is bigger than this (number of cells) */
-	GdElement enclosed_amoeba_2_to;	/* an enclosed amoeba converts to this element */
-	GdElement too_big_amoeba_2_to;	/* an amoeba grown too big converts to this element */
+	GdElement amoeba_2_enclosed_effect;	/* an enclosed amoeba converts to this element */
+	GdElement amoeba_2_too_big_effect;	/* an amoeba grown too big converts to this element */
 	gboolean amoeba_2_explodes_by_amoeba;	/* amoeba 2 will explode if touched by amoeba1 */
-	GdElement amoeba_2_explodes_to;	/* amoeba 2 explodes to element, when touched by amoeba1 */
+	GdElement amoeba_2_explosion_effect;	/* amoeba 2 explosion ends in ... */
 	GdElement amoeba_2_looks_like;	/* an amoeba 2 looks like this element */
 
 	gboolean amoeba_timer_started_immediately;	/* FALSE: amoeba will start life at the first possibility of growing. */
@@ -746,51 +738,59 @@ typedef struct _gd_cave {
 
 	int level_hatching_delay_frame[5];		/* Scan frames before Player's birth. */
 	int level_hatching_delay_time[5];		/* Scan frames before Player's birth. */
-	
+
 	int level_bonus_time[5];		/* bonus time for clock collected. */
 	int level_penalty_time[5];				/* Time penalty when voodoo destroyed. */
 	gboolean voodoo_collects_diamonds;	/* Voodoo can collect diamonds */
 	gboolean voodoo_dies_by_stone;		/* Voodoo can be killed by a falling stone */
 	gboolean voodoo_can_be_destroyed;	/* Voodoo can be destroyed by and explosion */
-	
+
 	gboolean water_does_not_flow_down;	/* if true, water will not grow downwards, only in other directions. */
 	gboolean water_sound;			/* water has sound */
-	
+
 	gboolean bladder_sound;		/* bladder moving and pushing has sound */
 	GdElement bladder_converts_by;	/* bladder converts to clock by touching this element */
 
 	int biter_delay_frame;		/* frame count biters do move */
 	GdElement biter_eat;		/* biters eat this */
-	gboolean biter_sound;		/* biters have sound */	
+	gboolean biter_sound;		/* biters have sound */
 
 	gboolean expanding_wall_changed;	/* expanding wall direction is changed */
-	
+
 	int	replicator_delay_frame;		/* replicator delay in frames (number of frames to wait between creating a new element) */
 	gboolean replicators_active;		/* replicators are active. */
 	gboolean replicator_sound;		/* when replicating an element, play sound or not. */
-	
+
 	gboolean conveyor_belts_active;
 	gboolean conveyor_belts_direction_changed;
 
 	/* effects */
-	GdElement explosion_to;			/* explosion converts to this element */
-	GdElement diamond_birth_to;		/* a diamond birth converts to this element */
-	GdElement dragonfly_explosion_to;	/* dragonfly explosion will create this */
-	GdElement falling_stone_to;		/* a falling stone converts to this element */
-	GdElement falling_diamond_to;	/* a falling diamond converts to this element */
-	GdElement bouncing_stone_to;	/* a bouncing stone converts to this element */
-	GdElement bouncing_diamond_to;	/* a bouncing diamond converts to this element */
+	GdElement explosion_effect;			/* explosion converts to this element after its last stage. diego effect. */
+	GdElement diamond_birth_effect;		/* a diamond birth converts to this element after its last stage. diego effect. */
+	GdElement bomb_explosion_effect;		/* bombs explode to this element. diego effect (almost). */
+	GdElement nitro_explosion_effect;	/* nitros explode to this */
 
-	GdElement expanding_wall_looks_like;	/* an expanding wall looks like this element */
-	GdElement dirt_looks_like;			/* dirt looks like this element */
+	GdElement firefly_explode_to;		/* fireflies explode to this when hit by a stone */
+	GdElement alt_firefly_explode_to;	/* alternative fireflies explode to this when hit by a stone */
+	GdElement butterfly_explode_to;		/* butterflies explode to this when hit by a stone */
+	GdElement alt_butterfly_explode_to;	/* alternative butterflies explode to this when hit by a stone */
+	GdElement stonefly_explode_to;		/* stoneflies explode to this when hit by a stone */
+	GdElement dragonfly_explode_to;		/* dragonflies explode to this when hit by a stone */
+
+	GdElement stone_falling_effect;		/* a falling stone converts to this element. diego effect. */
+	GdElement diamond_falling_effect;	/* a falling diamond converts to this element. diego effect. */
+	GdElement stone_bouncing_effect;	/* a bouncing stone converts to this element. diego effect. */
+	GdElement diamond_bouncing_effect;	/* a bouncing diamond converts to this element. diego effect. */
+
+	GdElement expanding_wall_looks_like;	/* an expanding wall looks like this element. diego effect. */
+	GdElement dirt_looks_like;			/* dirt looks like this element. diego effect. */
 
 	GdElement magic_stone_to;		/* magic wall converts falling stone to */
 	GdElement magic_diamond_to;		/* magic wall converts falling diamond to */
 	GdElement magic_mega_stone_to;	/* magic wall converts a falling mega stone to */
 	GdElement magic_nitro_pack_to;	/* magic wall converts a falling nitro pack to */
-
-	GdElement bomb_explode_to;		/* bombs explode to this element */
-	GdElement nitro_explode_to;		/* nitro packs explode to this element */
+	GdElement magic_flying_stone_to;	/* flying stones are converted to */
+	GdElement magic_flying_diamond_to;	/* flying diamonds are converted to */
 
 	double pushing_stone_prob;		/* probability of pushing stone */
 	double pushing_stone_prob_sweet;	/* probability of pushing, after eating sweet */
@@ -799,10 +799,11 @@ typedef struct _gd_cave {
 	gboolean creatures_backwards;	/* creatures changed direction */
 	gboolean creatures_direction_auto_change_on_start;	/* the change occurs also at the start signal */
 	int creatures_direction_auto_change_time;	/* creatures automatically change direction every x seconds */
-	
+	gboolean creature_direction_auto_change_sound;	/* automatically changing creature direction may have the sound of the creature dir switch */
+
 	int skeletons_needed_for_pot;	/* how many skeletons to be collected, to use a pot */
 	int skeletons_worth_diamonds;	/* for crazy dream 7 compatibility: collecting skeletons might open the cave door. */
-	
+
 	GdDirection gravity;
 	int gravity_change_time;
 	gboolean gravity_change_sound;
@@ -813,7 +814,9 @@ typedef struct _gd_cave {
 	int pneumatic_hammer_frame;
 	int hammered_wall_reappear_frame;
 	gboolean pneumatic_hammer_sound;
-	
+
+
+
 	/* internal variables, used during the game. private data :) */
 	GdElement* (*getp) (const struct _gd_cave*, int x, int y);	/* returns a pointer to the element at x, y. this points to a perfect border or a line shifting get function. */
 
@@ -836,15 +839,15 @@ typedef struct _gd_cave {
 	int hatching_delay_time;
 	int time_bonus;				/* bonus time for clock collected. */
 	int time_penalty;			/* Time penalty when voodoo destroyed. */
-	int time;					/* seconds remaining to finish cave */
+	int time;					/* milliseconds remaining to finish cave */
 	int timevalue;				/* points for remaining seconds - for current level */
 	int diamonds_needed;		/* diamonds needed to open outbox */
 	int diamonds_collected;		/* diamonds collected */
 	int skeletons_collected;	/* number of skeletons collected */
 	int gate_open_flash;		/* flashing of screen when gate opens */
 	int score;					/* Score got this frame. */
-	int amoeba_time;			/* Amoeba growing slow (low probability, default 3%) for seconds. After that, fast growth default (25%) */
-	int amoeba_2_time;			/* Amoeba growing slow (low probability, default 3%) for seconds. After that, fast growth default (25%) */
+	int amoeba_time;			/* Amoeba growing slow (low probability, default 3%) for milliseconds. After that, fast growth default (25%) */
+	int amoeba_2_time;			/* Amoeba growing slow (low probability, default 3%) for milliseconds. After that, fast growth default (25%) */
 	int amoeba_max_count;			/* selected amoeba 1 threshold for this level */
 	int amoeba_2_max_count;			/* selected amoeba 2 threshold for this level */
 	GdAmoebaState amoeba_state;		/* state of amoeba 1 */
@@ -864,12 +867,12 @@ typedef struct _gd_cave {
 	gboolean inbox_flash_toggle;	/* negated every scan. helps drawing inboxes, and making players be born at different times. */
 	GdDirection last_direction;		/* last direction player moved. used by draw routines */
 	GdDirection last_horizontal_direction;
-	int biters_wait_frame;				/* number of frames to wait until biteres will move again */
+	int biters_wait_frame;				/* number of frames to wait until biters will move again */
 	int replicators_wait_frame;			/* number of frames to wait until replicators are activated again */
 	int creatures_direction_will_change;	/* creatures automatically change direction every x seconds */
 	GdC64RandomGenerator c64_rand;	/* used for predictable random generator during the game. */
 
-	int gravity_will_change;	/* gravity will change in this number of seconds */
+	int gravity_will_change;	/* gravity will change in this number of milliseconds */
 	gboolean gravity_disabled;	/* when the player is stirring the pot, there is no gravity. */
 	GdDirection gravity_next_direction;	/* next direction when the gravity changes. will be set by the player "getting" a gravity switch */
 	gboolean got_pneumatic_hammer;	/* true if the player has a pneumatic hammer */

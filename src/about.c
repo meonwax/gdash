@@ -40,9 +40,10 @@ const char *gd_about_authors[]={ "Czirkos Zoltan <cirix@fw.hu>",
 #ifdef USE_SDL
 								 "SDL: Sam Lantinga <slouken@libsdl.org>",
                                  "SDL_gfx rotozoom: A. Schiffler",
+                                 "SDL png saver: Philip D. Bober <wildfire1138@mchsi.com>",
 #endif
 								NULL };
-const char *gd_about_documenters[]={ "Original engine: LogicDeLuxe", "Playing hints: Sendy", NULL };
+const char *gd_about_documenters[]={ "About original engine: LogicDeLuxe", "Playing hints: Sendy", NULL };
 const char *gd_about_comments=N_("Classic game similar to Emerald Mines.\nCollect diamonds and find exit!");
 const char *gd_about_translator_credits=N_("translator-credits");
 const char *gd_about_website="http://jutas.eet.bme.hu/~cirix/gdash";

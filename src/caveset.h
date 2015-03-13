@@ -80,6 +80,8 @@ void gd_caveset_data_free(GdCavesetData *data);
 /* check replays and optionally remove */
 int gd_cave_check_replays(GdCave *cave, gboolean report, gboolean remove, gboolean repair);
 
+gboolean gd_caveset_has_replays();
+
 
 #endif							/* _CAVESET_H */
 

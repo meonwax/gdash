@@ -16,7 +16,7 @@ endif
 
 # if sdl is enabled, build sdash.
 if SDL
-  SDASH=sdash
+  SDASH=sdash sreplay
 else
   SDASH=
 endif
@@ -90,24 +90,46 @@ gtkheaders = \
 	editorexport.h\
 	help.h
 
+
+
+
 # sdl sources and headers:
 #   the gdash sdl ui with sounds.
-sdlsources = \
+sdlbasesources = \
 	sdlgfx.c \
-	sdlmain.c \
 	sdlui.c
 
-sdlheaders = \
+sdlbaseheaders = \
 	sdlgfx.h \
 	sdlui.h
+
+# sdl sources and headers:
+#   the gdash sdl ui with sounds.
+sdashsources = \
+	sdlmain.c
+
+sdashheaders = 
+
+
+# sdl sources and headers:
+#   the gdash sdl ui with sounds.
+sreplaysources = \
+	sdlreplay.c \
+	IMG_savepng.c
+
+sreplayheaders = \
+	IMG_savepng.h
 
 
 
 noinst_HEADERS = \
 	$(base_headers) \
 	$(gtkheaders) \
-	$(sdlheaders) \
-	$(sound_headers)
+	$(sdlbaseheaders) \
+	$(sound_headers) \
+	$(sdashheaders) \
+	$(sreplayheaders)
+
 
 
 
@@ -140,5 +162,21 @@ endif
 sdash_LDADD = @GLIB_LIBS@ @SDL_LIBS@ $(SDASH_LIBADD)
 sdash_SOURCES = \
 	$(base_sources) \
-	$(sdlsources) \
+	$(sdlbasesources) \
+	$(sdashsources) \
 	$(sound_sources)
+	
+# gtk cflags also for the sdl version - for settings.c
+# sdl is needed for gfx and sound.
+sreplay_CFLAGS = -g -Wall @GTK_CFLAGS@ @GLIB_CFLAGS@ @SDL_CFLAGS@ @LIBPNG_CFLAGS@
+sreplay_LDFLAGS = -g -Wall
+if SDL
+    SREPLAY_LIBADD=-lSDL_mixer -lSDL_image
+endif
+sreplay_LDADD = @GLIB_LIBS@ @SDL_LIBS@ @LIBPNG_LIBS@ $(SREPLAY_LIBADD)
+sreplay_SOURCES = \
+	$(base_sources) \
+	$(sdlbasesources) \
+	$(sreplaysources) \
+	$(sound_sources)
+

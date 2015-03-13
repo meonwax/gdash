@@ -211,7 +211,7 @@ gd_get_element_from_string (const char *string)
 	char *upper=g_ascii_strup(string, -1);
 	gpointer value;
 	gboolean found;
-	
+
 	if (!string) {
 		g_warning("Invalid string representing element: (null)");
 		return O_UNKNOWN;
@@ -261,7 +261,7 @@ gd_struct_set_defaults_from_array(gpointer str, const GdStructDescriptor *proper
 			/* remember so we will be fast later*/
 			defaults[i].property_index=n;
 		}
-		
+
 		/* some properties are arrays. this loop fills all with the same values */
 		for (j=0; j<properties[n].count; j++)
 			switch (properties[n].type) {
@@ -517,7 +517,7 @@ gd_cave_new(void)
 {
 	int i;
 	GdCave *cave;
-	
+
 	cave=g_new0(GdCave, 1);
 
 	/* hash table which stores unknown tags as strings. */
@@ -526,7 +526,7 @@ gd_cave_new(void)
 	for (i=0; gd_cave_properties[i].identifier!=NULL; i++)
 		if (gd_cave_properties[i].type==GD_TYPE_LONGSTRING)
 			G_STRUCT_MEMBER(GString *, cave, gd_cave_properties[i].offset)=g_string_new(NULL);
-	
+
 
 	gd_cave_set_gdash_defaults (cave);
 
@@ -616,7 +616,7 @@ void
 gd_cave_free(GdCave *cave)
 {
 	int i;
-	
+
 	if (!cave)
 		return;
 
@@ -659,7 +659,7 @@ void
 gd_cave_copy(GdCave *dest, const GdCave *src)
 {
 	int i;
-	
+
 	/* copy entire data */
 	g_memmove(dest, src, sizeof(GdCave));
 
@@ -686,11 +686,11 @@ gd_cave_copy(GdCave *dest, const GdCave *src)
 		for (iter=src->objects; iter!=NULL; iter=iter->next)		/* do a deep copy */
 			dest->objects=g_list_append(dest->objects, g_memdup (iter->data, sizeof (GdObject)));
 	}
-	
+
 	/* copy replays */
 	if (src->replays) {
 		GList *iter;
-		
+
 		dest->replays=NULL;
 		for (iter=src->replays; iter!=NULL; iter=iter->next)		/* do a deep copy */
 			dest->replays=g_list_append(dest->replays, gd_replay_new_from_replay(iter->data));
@@ -755,7 +755,7 @@ gd_cave_store_rc(GdCave *cave, int x, int y, const GdElement element, const void
 				y-=cave->h;
 		}
 	}
-	
+
 	/* if the above wraparound code fixed the coordinates, this will always be true. */
 	/* but see the above comment for lineshifting y coordinate */
 	if (x>=0 && x<cave->w && y>=0 && y<cave->h) {
@@ -768,7 +768,7 @@ GdElement
 gd_cave_get_rc(const GdCave *cave, int x, int y)
 {
 	/* always fix coordinates as if cave was wraparound. */
-	
+
 	/* fix x coordinate */
 	if (cave->lineshift) {
 		/* fit x coordinate within range, with correcting y at the same time */
@@ -907,13 +907,13 @@ cave_set_random_indexed_colors(GdCave *cave, GdColor (*color_indexer_func) (int,
 	int bri1=8, bri2=8-bri_spread, bri3=8+bri_spread;
 	/* there are 15 valid choices for hue, so we do a %15 */
 	int col1=hue, col2=(hue+hue_spread+15)%15, col3=(hue-hue_spread+15)%15;
-	
+
 	/* this makes up a random color, and selects a color triad by hue+5 and hue+10. */
 	/* also creates a random saturation. */
 	/* color of brick is 8+sat, so it is always a bright color. */
 	/* another two are 8-sat and 8. */
 	/* order of colors is also changed randomly. */
-	
+
 	if (g_random_boolean())
 		swap(&bri1, &bri2);
 	/* we do not touch bri3 (8+sat), as it should be a bright color */
@@ -923,7 +923,7 @@ cave_set_random_indexed_colors(GdCave *cave, GdColor (*color_indexer_func) (int,
 		swap(&col2, &col3);
 	if (g_random_boolean())
 		swap(&col1, &col3);
-	
+
 	cave->colorb=color_indexer_func(0, 0);
 	cave->color0=color_indexer_func(0, 0);
 	cave->color1=color_indexer_func(col1+1, bri1);
@@ -963,7 +963,7 @@ gd_cave_set_random_rgb_colors(GdCave *cave)
 	double h1=hue, h2=hue+hue_spread, h3=hue+2*hue_spread;
 	double v1, v2, v3;
 	double s1, s2, s3;
-	
+
 	if (g_random_boolean()) {
 		/* when hue spread is low, brightness(saturation) spread is high */
 		/* this formula gives a number (x) between 0.1 and 0.4, which will be 0.5-x and 0.5+x, so the range is 0.1->0.9 */
@@ -974,7 +974,7 @@ gd_cave_set_random_rgb_colors(GdCave *cave)
 		s1=0.5;				/* saturation is different */
 		s2=0.5-spread;
 		s3=0.5+spread;
-	} else {	
+	} else {
 		/* when hue spread is low, brightness(saturation) spread is high */
 		/* this formula gives a number (x) between 0.1 and 0.25, which will be 0.5+x and 0.5+2x, so the range is 0.5->0.9 */
 		double spread=0.1+0.15*(1-hue_spread/hue_max);
@@ -994,11 +994,11 @@ gd_cave_set_random_rgb_colors(GdCave *cave)
 	if (g_random_boolean())	swapd(&s1, &s2);
 	if (g_random_boolean())	swapd(&s2, &s3);
 	if (g_random_boolean())	swapd(&s1, &s3);
-	
+
 	h1=h1*360.0;
 	h2=h2*360.0;
 	h3=h3*360.0;
-	
+
 	cave->colorb=gd_color_get_from_hsv(0,0,0);
 	cave->color0=gd_color_get_from_hsv(0,0,0);		/* black for background */
 	cave->color1=gd_color_get_from_hsv(h1,s1,v1);	/* dirt */
@@ -1024,8 +1024,8 @@ gd_cave_set_random_colors(GdCave *cave, GdColorType type)
 			break;
 		case GD_COLOR_TYPE_ATARI:
 			gd_cave_set_random_atari_colors(cave);
-			break;			
-			
+			break;
+
 		default:
 			g_assert_not_reached();
 	}
@@ -1213,10 +1213,10 @@ cave_set_ckdelay_extra_for_animation(GdCave *cave)
 	for (y=0; y<cave->h; y++)
 		for (x=0; x<cave->w; x++) {
 			switch (cave->map[y][x]&~SCANNED) {
-				case O_GUARD_1:
-				case O_GUARD_2:
-				case O_GUARD_3:
-				case O_GUARD_4:
+				case O_FIREFLY_1:
+				case O_FIREFLY_2:
+				case O_FIREFLY_3:
+				case O_FIREFLY_4:
 					has_firefly=TRUE;
 					break;
 				case O_BUTTER_1:
@@ -1317,7 +1317,7 @@ gd_cave_count_diamonds(GdCave *cave)
    for the paused state (which is used in gdash but not in sdash) - yellowish color.
    also one can select the animation frame (0..7) to draw the cave on. so the caller manages
    increasing that.
-   
+
    if a cell is changed, it is flagged with GD_REDRAW; the flag can be cleared by the caller.
  */
 void
@@ -1361,11 +1361,11 @@ gd_drawcave_game(const GdCave *cave, int **gfx_buffer, gboolean bonus_life_flash
 	if (cave->conveyor_belts_direction_changed) {
 		/* if direction is changed, animation is changed. */
 		int temp;
-		
+
 		temp=elemdrawing[O_CONVEYOR_LEFT];
 		elemdrawing[O_CONVEYOR_LEFT]=elemdrawing[O_CONVEYOR_RIGHT];
 		elemdrawing[O_CONVEYOR_RIGHT]=temp;
-		
+
 		elemdrawing[O_CONVEYOR_DIR_SWITCH]=gd_elements[O_CONVEYOR_DIR_CHANGED].image_game;
 	}
 	else
@@ -1469,7 +1469,7 @@ GdReplay *
 gd_replay_new()
 {
 	GdReplay *rep;
-	
+
 	rep=g_new0(GdReplay, 1);
 	rep->movements=g_byte_array_new();
 	return rep;
@@ -1479,7 +1479,7 @@ GdReplay *
 gd_replay_new_from_replay(GdReplay *orig)
 {
 	GdReplay *rep;
-	
+
 	rep=g_memdup(orig, sizeof(GdReplay));
 	rep->movements=g_byte_array_new();
 	g_byte_array_append(rep->movements, orig->movements->data, orig->movements->len);
@@ -1505,10 +1505,10 @@ void
 gd_replay_store_movement(GdReplay *replay, GdDirection player_move, gboolean player_fire, gboolean suicide)
 {
 	guint8 data[1];
-	
+
 	g_assert(player_move==(player_move & REPLAY_MOVE_MASK));
 	data[0]=(player_move)|(player_fire?REPLAY_FIRE_MASK:0)|(suicide?REPLAY_SUICIDE_MASK:0);
-	
+
 	g_byte_array_append(replay->movements, data, 1);
 }
 
@@ -1518,11 +1518,11 @@ gboolean
 gd_replay_get_next_movement(GdReplay *replay, GdDirection *player_move, gboolean *player_fire, gboolean *suicide)
 {
 	guint8 data;
-	
+
 	/* if no more available movements */
 	if (replay->current_playing_pos>=replay->movements->len)
 		return FALSE;
-	
+
 	data=replay->movements->data[replay->current_playing_pos++];
 	*suicide=(data&REPLAY_SUICIDE_MASK)!=0;
 	*player_fire=(data&REPLAY_FIRE_MASK)!=0;
@@ -1577,15 +1577,15 @@ static char *
 direction_fire_to_bdcff(GdDirection dir, gboolean fire)
 {
 	static char mov[10];
-	
+
 	strcpy(mov, direction_to_bdcff(dir));
 	if (fire) {
 		int i;
-		
+
 		for (i=0; mov[i]!=0; i++)
 			mov[i]=g_ascii_toupper(mov[i]);
 	}
-	
+
 	return mov;
 }
 
@@ -1594,17 +1594,17 @@ gd_replay_movements_to_bdcff(GdReplay *replay)
 {
 	int pos;
 	GString *str;
-	
+
 	str=g_string_new(NULL);
-	
+
 	for (pos=0; pos<replay->movements->len; pos++) {
 		int num=1;
 		guint8 data;
 
-		/* if this is not the first movement, append a space. */		
+		/* if this is not the first movement, append a space. */
 		if (str->len!=0)
 			g_string_append_c(str, ' ');
-		
+
 		/* if same byte appears, count number of occurrences - something like an rle compression. */
 		/* be sure not to cross the array boundaries */
 		while (pos<replay->movements->len-1 && replay->movements->data[pos]==replay->movements->data[pos+1]) {
@@ -1618,7 +1618,7 @@ gd_replay_movements_to_bdcff(GdReplay *replay)
 		if (num!=1)
 			g_string_append_printf(str, "%d", num);
 	}
-	
+
 	return g_string_free(str, FALSE);
 }
 
@@ -1647,7 +1647,7 @@ gd_cave_adler_checksum(GdCave *cave)
 {
 	guint32 a=1;
 	guint32 b=0;
-	
+
 	gd_cave_adler_checksum_more(cave, &a, &b);
 	return (b<<16)+a;
 }

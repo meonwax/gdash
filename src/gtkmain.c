@@ -45,7 +45,7 @@ static gboolean fullscreen=FALSE;
 
 typedef struct _gd_main_window {
 	GtkWidget *window;
-	GtkActionGroup *actions_normal, *actions_title, *actions_game, *actions_snapshot;
+	GtkActionGroup *actions_normal, *actions_title, *actions_title_replay, *actions_game, *actions_snapshot;
 	GtkWidget *scroll_window;
 	GtkWidget *drawing_area, *title_image, *story_label;	   /* three things that could be drawn in the main window */
 	GdkPixmap **title_pixmaps;
@@ -321,9 +321,9 @@ main_window_set_fullscreen_idle_func(gpointer data)
    so we put fullscreening call into a low priority idle function, which will be called
    after all window resizing & the like did take place. */
 static void
-main_window_set_fullscreen()
+main_window_set_fullscreen(gboolean ingame)
 {
-	if (main_window.game && fullscreen) {
+	if (ingame && fullscreen) {
 		gtk_widget_hide(main_window.menubar);
 		gtk_widget_hide(main_window.toolbar);
 		g_idle_add_full(G_PRIORITY_LOW, (GSourceFunc) main_window_set_fullscreen_idle_func, main_window.window, NULL);
@@ -440,11 +440,9 @@ main_window_init_title()
 		gtk_widget_hide(main_window.error_hbox);
 	}
 
-	/* set or unset fullscreen if necessary */
-	main_window_set_fullscreen();
-
 	/* enable menus and buttons of game */
 	gtk_action_group_set_sensitive(main_window.actions_title, !gd_editor_window);
+	gtk_action_group_set_sensitive(main_window.actions_title_replay, !gd_editor_window && gd_caveset_has_replays());
 	gtk_action_group_set_sensitive(main_window.actions_game, FALSE);
 	gtk_action_group_set_sensitive(main_window.actions_snapshot, snapshot!=NULL);
 	/* if editor window exists, no music. */
@@ -455,6 +453,9 @@ main_window_init_title()
 	if (gd_editor_window)
 		gtk_widget_set_sensitive(gd_editor_window, TRUE);
 	gtk_widget_hide(main_window.replay_image_align);
+
+	/* set or unset fullscreen if necessary */
+	main_window_set_fullscreen(FALSE);
 }
 
 
@@ -511,11 +512,9 @@ main_window_init_cave(GdCave *cave)
 	gd_label_set_markup_printf(GTK_LABEL(main_window.label_topleft), _("<b>%s</b>, level %d"), name_escaped, cave->rendered);
 	g_free(name_escaped);
 
-	/* set or unset fullscreen if necessary */
-	main_window_set_fullscreen();
-
 	/* enable menus and buttons of game */
 	gtk_action_group_set_sensitive(main_window.actions_title, FALSE);
+	gtk_action_group_set_sensitive(main_window.actions_title_replay, FALSE);
 	gtk_action_group_set_sensitive(main_window.actions_game, TRUE);
 	gtk_action_group_set_sensitive(main_window.actions_snapshot, snapshot!=NULL);
 
@@ -523,6 +522,9 @@ main_window_init_cave(GdCave *cave)
 	if (gd_editor_window)
 		gtk_widget_set_sensitive(gd_editor_window, FALSE);
 	gtk_widget_hide(main_window.replay_image_align);	/* it will be shown if needed. */
+
+	/* set or unset fullscreen if necessary */
+	main_window_set_fullscreen(TRUE);
 }
 
 static void
@@ -562,11 +564,9 @@ main_window_init_story(GdCave *cave)
 		gtk_widget_hide(main_window.error_hbox);
 	}
 
-	/* set or unset fullscreen if necessary */
-	main_window_set_fullscreen();
-
 	/* enable menus and buttons of game */
 	gtk_action_group_set_sensitive(main_window.actions_title, FALSE);
+	gtk_action_group_set_sensitive(main_window.actions_title_replay, FALSE);
 	gtk_action_group_set_sensitive(main_window.actions_game, TRUE);
 	gtk_action_group_set_sensitive(main_window.actions_snapshot, snapshot!=NULL);
 	/* if editor window exists, no music. */
@@ -574,6 +574,9 @@ main_window_init_story(GdCave *cave)
 	if (gd_editor_window)
 		gtk_widget_set_sensitive(gd_editor_window, FALSE);
 	gtk_widget_hide(main_window.replay_image_align);
+
+	/* set or unset fullscreen if necessary */
+	main_window_set_fullscreen(TRUE);
 }
 
 
@@ -671,7 +674,7 @@ main_int_set_labels()
 		gd_label_set_markup_printf(GTK_LABEL(main_window.label_variables),
 								_("Speed: %dms, Amoeba timer: %ds %d, %ds %d, Magic wall timer: %ds\n"
 								"Expanding wall: %s, Creatures: %ds, %s, Gravity: %s\n"
-								"Kill player: %s, Sweet eaten: %s, Diamond key: %s"),
+								"Kill player: %s, Sweet eaten: %s, Diamond key: %s, Diamonds: %d"),
 								cave->speed,
 								gd_cave_time_show(cave, cave->amoeba_time),
 								cave->amoeba_state,
@@ -682,10 +685,11 @@ main_int_set_labels()
 								cave->expanding_wall_changed?_("vertical"):_("horizontal"),
 								gd_cave_time_show(cave, cave->creatures_direction_will_change),
 								cave->creatures_backwards?_("backwards"):_("forwards"),
-								gd_direction_get_visible_name(cave->gravity_disabled?MV_STILL:cave->gravity),
+								gettext(gd_direction_get_visible_name(cave->gravity_disabled?MV_STILL:cave->gravity)),
 								cave->kill_player?_("yes"):_("no"),
 								cave->sweet_eaten?_("yes"):_("no"),
-								cave->diamond_key_collected?_("yes"):_("no")
+								cave->diamond_key_collected?_("yes"):_("no"),
+								cave->diamonds_collected
 								);
 	}
 }
@@ -716,7 +720,7 @@ main_int_scroll()
 	int i;
 	int player_x, player_y;
 	const GdCave *cave=main_window.game->cave;
-	gboolean exact_scroll;
+	gboolean exact_scroll=FALSE;	/* to avoid compiler warning */
 	/* hystheresis size is this, multiplied by two.
 	 * so player can move half the window without scrolling. */
 	int scroll_start_x=main_window.scroll_window->allocation.width/4;
@@ -728,8 +732,8 @@ main_int_scroll()
 	/* if cave not yet rendered, return. (might be the case for 50hz scrolling */
 	if (main_window.game==NULL || main_window.game->cave==NULL)
 		return;	
-	if (paused)
-		return;	/* no scrolling when pause button is pressed */	
+	if (paused && main_window.game->cave->player_state!=GD_PL_NOT_YET)
+		return;	/* no scrolling when pause button is pressed, BUT ALLOW SCROLLING when the player is not yet born */	
 		
 	/* max scrolling speed depends on the speed of the cave. */
 	/* game moves cell_size_game* 1s/cave time pixels in a second. */
@@ -1048,7 +1052,6 @@ main_stop_game_but_maybe_highscore()
 	gd_sound_off();	/* hack for game over dialog */
 
 	main_window_init_title();
-	main_window_set_fullscreen();
 	/* if editor is active, go back to its window. */
 	if (gd_editor_window)
 		gtk_window_present(GTK_WINDOW(gd_editor_window));
@@ -1328,7 +1331,7 @@ static void
 toggle_fullscreen_cb (GtkWidget * widget, gpointer data)
 {
 	fullscreen=gtk_toggle_action_get_active(GTK_TOGGLE_ACTION (widget));
-	main_window_set_fullscreen();
+	main_window_set_fullscreen(main_window.game!=NULL);	/* we do not exactly know if in game, but try to guess */
 }
 
 static void
@@ -1401,7 +1404,7 @@ new_game_update_preview(GtkWidget *widget, gpointer data)
 
 	/* loading cave, draw cave and scale to specified size. seed=0 */
 	cave=gd_cave_new_from_caveset(gtk_combo_box_get_active(GTK_COMBO_BOX (jump_dialog->combo_cave)), gtk_range_get_value (GTK_RANGE(jump_dialog->spin_level))-1, 0);
-	cave_image=gd_drawcave_to_pixbuf(cave, 320, 240, TRUE);
+	cave_image=gd_drawcave_to_pixbuf(cave, 320, 240, TRUE, TRUE);
 	gtk_image_set_from_pixbuf(GTK_IMAGE (jump_dialog->image), cave_image);
 	g_object_unref(cave_image);
 
@@ -1470,6 +1473,7 @@ new_game_cb (const GtkWidget * widget, const gpointer data)
 
 	gtk_table_attach_defaults(GTK_TABLE(table), gd_label_new_printf(_("Level:")), 0, 1, 2, 3);
 	jump_dialog.spin_level=gtk_hscale_new_with_range(1.0, 5.0, 1.0);
+	gtk_range_set_increments(GTK_RANGE(jump_dialog.spin_level), 1.0, 1.0);
 	gtk_scale_set_value_pos(GTK_SCALE(jump_dialog.spin_level), GTK_POS_LEFT);
 	gtk_table_attach_defaults(GTK_TABLE(table), jump_dialog.spin_level, 1, 2, 2, 3);
 
@@ -1941,7 +1945,10 @@ create_main_window()
 		{"SaveFile", GTK_STOCK_SAVE, NULL, NULL, NULL, G_CALLBACK(save_caveset_cb)},
 		{"SaveAsFile", GTK_STOCK_SAVE_AS, NULL, NULL, NULL, G_CALLBACK(save_caveset_as_cb)},
 		{"HighScore", GD_ICON_AWARD, N_("Hi_ghscores"), NULL, NULL, G_CALLBACK(highscore_cb)},
-		{"ShowReplays", GD_ICON_REPLAY, N_("Show _replays"), NULL, NULL, G_CALLBACK(show_replays_cb)},
+	};
+
+	static GtkActionEntry action_entries_title_replay[]={
+		{"ShowReplays", GD_ICON_REPLAY, N_("Show _replays"), NULL, N_("List replays which are recorded for caves in this caveset"), G_CALLBACK(show_replays_cb)},
 	};
 
 	static GtkActionEntry action_entries_game[]={
@@ -2012,6 +2019,7 @@ create_main_window()
 		"<toolitem action='Restart'/>"
 		"<separator/>"
 		"<toolitem action='CaveInfo'/>"
+		"<toolitem action='ShowReplays'/>"
 		"</toolbar>"
 		"</ui>";
 
@@ -2040,25 +2048,29 @@ create_main_window()
 
 	/* menu */
 	main_window.actions_normal=gtk_action_group_new("main_window.actions_normal");
-	gtk_action_group_set_translation_domain (main_window.actions_normal, PACKAGE);
-	gtk_action_group_add_actions (main_window.actions_normal, action_entries_normal, G_N_ELEMENTS (action_entries_normal), &main_window);
-	gtk_action_group_add_toggle_actions (main_window.actions_normal, action_entries_toggle, G_N_ELEMENTS (action_entries_toggle), NULL);
+	gtk_action_group_set_translation_domain(main_window.actions_normal, PACKAGE);
+	gtk_action_group_add_actions(main_window.actions_normal, action_entries_normal, G_N_ELEMENTS(action_entries_normal), &main_window);
+	gtk_action_group_add_toggle_actions(main_window.actions_normal, action_entries_toggle, G_N_ELEMENTS(action_entries_toggle), NULL);
 	main_window.actions_title=gtk_action_group_new("main_window.actions_title");
-	gtk_action_group_set_translation_domain (main_window.actions_title, PACKAGE);
-	gtk_action_group_add_actions (main_window.actions_title, action_entries_title, G_N_ELEMENTS (action_entries_title), &main_window);
+	gtk_action_group_set_translation_domain(main_window.actions_title, PACKAGE);
+	gtk_action_group_add_actions(main_window.actions_title, action_entries_title, G_N_ELEMENTS(action_entries_title), &main_window);
+	main_window.actions_title_replay=gtk_action_group_new("main_window.actions_title_replay");
+	gtk_action_group_set_translation_domain(main_window.actions_title_replay, PACKAGE);
+	gtk_action_group_add_actions(main_window.actions_title_replay, action_entries_title_replay, G_N_ELEMENTS(action_entries_title_replay), &main_window);
 	/* make this toolbar button always have a title */
 	g_object_set (gtk_action_group_get_action (main_window.actions_title, "NewGame"), "is_important", TRUE, NULL);
 	main_window.actions_game=gtk_action_group_new("main_window.actions_game");
-	gtk_action_group_set_translation_domain (main_window.actions_game, PACKAGE);
-	gtk_action_group_add_actions (main_window.actions_game, action_entries_game, G_N_ELEMENTS (action_entries_game), &main_window);
+	gtk_action_group_set_translation_domain(main_window.actions_game, PACKAGE);
+	gtk_action_group_add_actions(main_window.actions_game, action_entries_game, G_N_ELEMENTS(action_entries_game), &main_window);
 	main_window.actions_snapshot=gtk_action_group_new("main_window.actions_snapshot");
-	gtk_action_group_set_translation_domain (main_window.actions_snapshot, PACKAGE);
-	gtk_action_group_add_actions (main_window.actions_snapshot, action_entries_snapshot, G_N_ELEMENTS (action_entries_snapshot), &main_window);
+	gtk_action_group_set_translation_domain(main_window.actions_snapshot, PACKAGE);
+	gtk_action_group_add_actions(main_window.actions_snapshot, action_entries_snapshot, G_N_ELEMENTS(action_entries_snapshot), &main_window);
 
 	/* build the ui */
 	ui=gtk_ui_manager_new();
 	gtk_ui_manager_insert_action_group (ui, main_window.actions_normal, 0);
 	gtk_ui_manager_insert_action_group (ui, main_window.actions_title, 0);
+	gtk_ui_manager_insert_action_group (ui, main_window.actions_title_replay, 0);
 	gtk_ui_manager_insert_action_group (ui, main_window.actions_game, 0);
 	gtk_ui_manager_insert_action_group (ui, main_window.actions_snapshot, 0);
 	gtk_window_add_accel_group (GTK_WINDOW(main_window.window), gtk_ui_manager_get_accel_group (ui));
@@ -2076,7 +2088,7 @@ create_main_window()
 	gtk_menu_item_set_submenu (GTK_MENU_ITEM (gtk_ui_manager_get_widget (ui, "/MenuBar/FileMenu/LoadInternal")), menu);
 	names=gd_caveset_get_internal_game_names ();
 	while (names[i]) {
-		GtkWidget *menuitem=gtk_menu_item_new_with_label (names[i]);
+		GtkWidget *menuitem=gtk_menu_item_new_with_label(names[i]);
 
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menuitem);
 		gtk_widget_show(menuitem);
@@ -2167,8 +2179,10 @@ main(int argc, char *argv[])
 	GOptionEntry entries[]={
 		{"editor", 'e', 0, G_OPTION_ARG_NONE, &editor, N_("Start editor")},
 		{"gallery", 'g', 0, G_OPTION_ARG_FILENAME, &gallery_filename, N_("Save caveset in a HTML gallery")},
+		{"stylesheet", 's', 0, G_OPTION_ARG_STRING	/* not filename! */, &gd_html_stylesheet_filename, N_("Link stylesheet from file to a HTML gallery, eg. \"../style.css\"")},
+		{"favicon", 's', 0, G_OPTION_ARG_STRING	/* not filename! */, &gd_html_favicon_filename, N_("Link shortcut icon to a HTML gallery, eg. \"../favicon.ico\"")},
 		{"png", 'p', 0, G_OPTION_ARG_FILENAME, &png_filename, N_("Save cave C, level L in a PNG image. If no cave selected, uses a random one")},
-		{"png_size", 's', 0, G_OPTION_ARG_STRING, &png_size, N_("Set PNG image size. Default is 128x96, set to 0x0 for unscaled")},
+		{"png_size", 'P', 0, G_OPTION_ARG_STRING, &png_size, N_("Set PNG image size. Default is 128x96, set to 0x0 for unscaled")},
 		{"save", 'S', 0, G_OPTION_ARG_FILENAME, &save_cave_name, N_("Save caveset in a BDCFF file")},
 		{"quit", 'q', 0, G_OPTION_ARG_NONE, &quit, N_("Batch mode: quit after specified tasks")},
 		{NULL}
@@ -2280,7 +2294,7 @@ main(int argc, char *argv[])
 
 		/* rendering cave for png: seed=0 */
 		renderedcave=gd_cave_new_from_caveset (gd_param_cave-1, gd_param_level-1, 0);
-		pixbuf=gd_drawcave_to_pixbuf(renderedcave, size_x, size_y, TRUE);
+		pixbuf=gd_drawcave_to_pixbuf(renderedcave, size_x, size_y, TRUE, FALSE);
 		if (!gdk_pixbuf_save (pixbuf, png_filename, "png", &error, "compression", "9", NULL))
 			g_critical ("Error saving PNG image %s: %s", png_filename, error->message);
 		g_object_unref(pixbuf);
@@ -2306,7 +2320,10 @@ main(int argc, char *argv[])
 	create_main_window();
 	gd_main_window_set_title();
 
-	gd_sound_init();
+	gd_sound_init(0);
+
+	gd_sound_set_music_volume(gd_sound_music_volume_percent);
+	gd_sound_set_chunk_volumes(gd_sound_chunks_volume_percent);
 
 	main_window_init_title();
 

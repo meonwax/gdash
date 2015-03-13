@@ -175,6 +175,8 @@ LDFLAGS = @LDFLAGS@
 LIBICONV = @LIBICONV@
 LIBINTL = @LIBINTL@
 LIBOBJS = @LIBOBJS@
+LIBPNG_CFLAGS = @LIBPNG_CFLAGS@
+LIBPNG_LIBS = @LIBPNG_LIBS@
 LIBS = @LIBS@
 LTLIBICONV = @LTLIBICONV@
 LTLIBINTL = @LTLIBINTL@
@@ -499,9 +501,9 @@ various_CAVES = various/Joker_Dash_1.gds \
 	various/Boulder_Dash_9_1.gds various/Boulder_Dash_9_7.gds \
 	various/Mjr_Boulder_Dash.gds various/Boulder_Dash_9.gds \
 	various/Angels_Boulder_2.gds various/Polish_Boulderdash.gds \
-	various/Boulder_Dash_8_Hacker.gds various/Cws_Boulder.gds \
-	various/Boulder_Dash_Pro.gds various/Boulder_Dash_9_3.gds \
-	various/Cup_Dash_4.gds various/Hooligan_Dash_01.gds \
+	various/Boulder_Dash_8_Hacker.gds various/Boulder_Dash_Pro.gds \
+	various/Boulder_Dash_9_3.gds various/Cup_Dash_4.gds \
+	various/Hooligan_Dash_01.gds various/CWS_Boulder_2.gds \
 	various/Cheech_Und_Chongs_Boulder_1.gds various/Afl.gds \
 	various/Labyrinth_Dash.gds \
 	various/Falcon_Dash-the_Dark_Cave.gds \
@@ -526,13 +528,13 @@ various_CAVES = various/Joker_Dash_1.gds \
 	various/Achim_Hofmann.gds various/Boulder_Dash_1_Atari.gds \
 	various/Boulder_Dash_Beginner.gds various/Afl_Posocopi.gds \
 	various/Mb_Games_8.gds various/Hooligan_Dash_03.gds \
-	various/Cws_Boulder_2.gds various/Giga_Boulder_1.gds \
-	various/Thomas_Boulder.gds various/Boulderdash-ux.gds \
+	various/Giga_Boulder_1.gds various/Thomas_Boulder.gds \
+	various/Boulderdash-ux.gds various/CWS_Boulder_2.bd \
 	various/Boulder_Dash_7_Madgame.gds \
 	various/Super_Boulder_Dash_1_Chaos.gds \
 	various/Boulder_Dash_9_4.gds various/Boulder_Dash_Iv.gds \
-	various/Lucky_Dash.gds various/Dr_Watson_4.gds \
-	various/Boulder_Dash_2_Atari.gds \
+	various/CWS_Boulder.gds various/Lucky_Dash.gds \
+	various/Dr_Watson_4.gds various/Boulder_Dash_2_Atari.gds \
 	various/3_Boulderdash_Games_C.gds various/Frusti_Dash.gds \
 	various/Bouder_Dash_Geil.gds various/Boulder_Dash_1_Atari.bd \
 	various/Gods_Boulder.gds various/Mb_Games_4.gds \

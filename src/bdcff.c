@@ -402,8 +402,8 @@ cave_process_tags_func(const char *attrib, const char *param, GdCave *cave)
 		identifier_found=TRUE;
 		elem1=gd_get_element_from_string(params[0]);
 		elem2=gd_get_element_from_string(params[1]);
-		cave->too_big_amoeba_to=elem1;
-		cave->enclosed_amoeba_to=elem2;
+		cave->amoeba_too_big_effect=elem1;
+		cave->amoeba_enclosed_effect=elem2;
 		
 	}
 	else
@@ -938,12 +938,12 @@ gd_caveset_load_from_bdcff(const char *contents)
 					if (gd_cave_properties[i].identifier==NULL) {
 						/* for compatibility with tim stridmann's memorydump->bdcff converter... .... ... */
 						if (g_ascii_strcasecmp(params[0], "BOUNCING_BOULDER")==0)
-							cave->bouncing_stone_to=gd_get_element_from_string (params[1]);
+							cave->stone_bouncing_effect=gd_get_element_from_string (params[1]);
 						else if (g_ascii_strcasecmp(params[0], "EXPLOSION3S")==0)
-							cave->explosion_to=gd_get_element_from_string (params[1]);
+							cave->explosion_effect=gd_get_element_from_string(params[1]);
 						/* falling with one l... */
 						else if (g_ascii_strcasecmp(params[0], "STARTING_FALING_DIAMOND")==0)
-							cave->falling_diamond_to=gd_get_element_from_string (params[1]);
+							cave->diamond_falling_effect=gd_get_element_from_string (params[1]);
 						/* dirt lookslike */
 						else if (g_ascii_strcasecmp(params[0], "DIRT")==0)
 							cave->dirt_looks_like=gd_get_element_from_string (params[1]);

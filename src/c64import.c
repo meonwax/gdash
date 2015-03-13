@@ -28,8 +28,8 @@
 static const GdElement bd1_import_table[]={
 	/*  0 */ O_SPACE, O_DIRT, O_BRICK, O_MAGIC_WALL,
 	/*  4 */ O_PRE_OUTBOX, O_OUTBOX, O_STEEL_EXPLODABLE, O_STEEL,
-	/*  8 */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
-	/*  c */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
+	/*  8 */ O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
+	/*  c */ O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
 	/* 10 */ O_STONE, O_STONE, O_STONE_F, O_STONE_F,
 	/* 14 */ O_DIAMOND, O_DIAMOND, O_DIAMOND_F, O_DIAMOND_F,
 	/* 18 */ O_ACID, O_ACID, O_EXPLODE_1, O_EXPLODE_2,	/* ACID: marek roth extension in crazy dream 3 */
@@ -48,7 +48,7 @@ static const GdElement bd1_import_table[]={
 static const GdElement plck_import_nybble[]={
 	/*  0 */ O_STONE, O_DIAMOND, O_MAGIC_WALL, O_BRICK,
 	/*  4 */ O_STEEL, O_H_EXPANDING_WALL, O_VOODOO, O_DIRT,
-	/*  8 */ O_GUARD_1, O_BUTTER_4, O_AMOEBA, O_SLIME,
+	/*  8 */ O_FIREFLY_1, O_BUTTER_4, O_AMOEBA, O_SLIME,
 	/* 12 */ O_PRE_INVIS_OUTBOX, O_PRE_OUTBOX, O_INBOX, O_SPACE
 };
 
@@ -56,8 +56,8 @@ static const GdElement plck_import_nybble[]={
 static const GdElement firstboulder_import_table[]={
 	/*  0 */ O_SPACE, O_DIRT, O_BRICK, O_MAGIC_WALL,
 	/*  4 */ O_PRE_OUTBOX, O_OUTBOX, O_PRE_INVIS_OUTBOX, O_INVIS_OUTBOX,
-	/*  8 */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
-	/*  c */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
+	/*  8 */ O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
+	/*  c */ O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
 	/* 10 */ O_STONE, O_STONE, O_STONE_F, O_STONE_F,
 	/* 14 */ O_DIAMOND, O_DIAMOND, O_DIAMOND_F, O_DIAMOND_F,
 	/* 18 */ O_PRE_CLOCK_1, O_PRE_CLOCK_2, O_PRE_CLOCK_3, O_PRE_CLOCK_4,
@@ -92,8 +92,8 @@ static const GdElement firstboulder_import_table[]={
 static const GdElement crazydream_import_table[]={
 	/*  0 */ O_SPACE, O_DIRT, O_BRICK, O_MAGIC_WALL,
 	/*  4 */ O_PRE_OUTBOX, O_OUTBOX, O_PRE_INVIS_OUTBOX, O_INVIS_OUTBOX,
-	/*  8 */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
-	/*  c */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
+	/*  8 */ O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
+	/*  c */ O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
 	/* 10 */ O_STONE, O_STONE, O_STONE_F, O_STONE_F,
 	/* 14 */ O_DIAMOND, O_DIAMOND, O_DIAMOND_F, O_DIAMOND_F,
 	/* 18 */ O_PRE_CLOCK_1, O_PRE_CLOCK_2, O_PRE_CLOCK_3, O_PRE_CLOCK_4,
@@ -149,8 +149,8 @@ static const GdElement crazydream_import_table[]={
 	/* d4 */ O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN,
 	/* d8 */ O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN,
 	/* dc */ O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN,
-	/* e0 */ O_ALT_GUARD_1, O_ALT_GUARD_2, O_ALT_GUARD_3, O_ALT_GUARD_4,
-	/* e4 */ O_ALT_GUARD_1, O_ALT_GUARD_2, O_ALT_GUARD_3, O_ALT_GUARD_4,
+	/* e0 */ O_ALT_FIREFLY_1, O_ALT_FIREFLY_2, O_ALT_FIREFLY_3, O_ALT_FIREFLY_4,
+	/* e4 */ O_ALT_FIREFLY_1, O_ALT_FIREFLY_2, O_ALT_FIREFLY_3, O_ALT_FIREFLY_4,
 	/* e8 */ O_ALT_BUTTER_3, O_ALT_BUTTER_4, O_ALT_BUTTER_1, O_ALT_BUTTER_2,
 	/* ec */ O_ALT_BUTTER_3, O_ALT_BUTTER_4, O_ALT_BUTTER_1, O_ALT_BUTTER_2,
 	/* f0 */ O_WATER, O_WATER, O_WATER, O_WATER,
@@ -163,8 +163,8 @@ static const GdElement crazydream_import_table[]={
 const GdElement gd_crazylight_import_table[]={
 	/*  0 */ O_SPACE, O_DIRT, O_BRICK, O_MAGIC_WALL,
 	/*  4 */ O_PRE_OUTBOX, O_OUTBOX, O_PRE_INVIS_OUTBOX, O_INVIS_OUTBOX,
-	/*  8 */ O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
-	/*  c */ O_GUARD_1|SCANNED, O_GUARD_2|SCANNED, O_GUARD_3|SCANNED, O_GUARD_4|SCANNED,
+	/*  8 */ O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
+	/*  c */ O_FIREFLY_1|SCANNED, O_FIREFLY_2|SCANNED, O_FIREFLY_3|SCANNED, O_FIREFLY_4|SCANNED,
 	/* 10 */ O_STONE, O_STONE|SCANNED, O_STONE_F, O_STONE_F|SCANNED,
 	/* 14 */ O_DIAMOND, O_DIAMOND|SCANNED, O_DIAMOND_F, O_DIAMOND_F|SCANNED,
 	/* 18 */ O_PRE_CLOCK_1, O_PRE_CLOCK_2, O_PRE_CLOCK_3, O_PRE_CLOCK_4,
@@ -338,7 +338,7 @@ GdPropertyDefault gd_defaults_1stb[] = {
 
 	{CAVE_OFFSET(pal_timing), TRUE},
 	{CAVE_OFFSET(scheduling), GD_SCHEDULING_PLCK},
-	{CAVE_OFFSET(enclosed_amoeba_to), O_PRE_DIA_1},	/* not immediately to diamond, but with animation */
+	{CAVE_OFFSET(amoeba_enclosed_effect), O_PRE_DIA_1},	/* not immediately to diamond, but with animation */
 	{CAVE_OFFSET(dirt_looks_like), O_DIRT2},
 	{-1},
 };
@@ -368,7 +368,7 @@ GdPropertyDefault gd_defaults_crdr_7[] = {
 
 	{CAVE_OFFSET(pal_timing), TRUE},
 	{CAVE_OFFSET(scheduling), GD_SCHEDULING_CRDR},
-	{CAVE_OFFSET(enclosed_amoeba_to), O_PRE_DIA_1},	/* not immediately to diamond, but with animation */
+	{CAVE_OFFSET(amoeba_enclosed_effect), O_PRE_DIA_1},	/* not immediately to diamond, but with animation */
 	{CAVE_OFFSET(water_does_not_flow_down), TRUE},
 	{CAVE_OFFSET(skeletons_worth_diamonds), 1},	/* in crdr, skeletons can also be used to open the gate */
 	{CAVE_OFFSET(gravity_affects_all), FALSE},	/* the intermission "survive" needs this flag */
@@ -399,7 +399,7 @@ GdPropertyDefault gd_defaults_crli[] = {
 
 	{CAVE_OFFSET(pal_timing), TRUE},
 	{CAVE_OFFSET(scheduling), GD_SCHEDULING_PLCK},
-	{CAVE_OFFSET(enclosed_amoeba_to), O_PRE_DIA_1},	/* not immediately to diamond, but with animation */
+	{CAVE_OFFSET(amoeba_enclosed_effect), O_PRE_DIA_1},	/* not immediately to diamond, but with animation */
 	{-1},
 };
 
@@ -1067,7 +1067,7 @@ cave_copy_from_plck(GdCave *cave, const guint8 *data, int remaining_bytes, GdCav
 		/* 3000 */ O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN,
 		/* 3100 */ O_BUTTER_1, O_MAGIC_WALL, O_PRE_DIA_1, O_PRE_DIA_2, O_PRE_DIA_3, O_PRE_DIA_4, O_PRE_DIA_5, O_OUTBOX_CLOSED,
 		/* 3200 */ O_AMOEBA, O_VOODOO, O_STONE, O_DIRT, O_DIAMOND, O_STEEL, O_PLAYER, O_BRICK,
-		/* 3300 */ O_SPACE, O_OUTBOX_OPEN, O_GUARD_1, O_EXPLODE_1, O_EXPLODE_2, O_EXPLODE_3, O_MAGIC_WALL, O_MAGIC_WALL, 
+		/* 3300 */ O_SPACE, O_OUTBOX_OPEN, O_FIREFLY_1, O_EXPLODE_1, O_EXPLODE_2, O_EXPLODE_3, O_MAGIC_WALL, O_MAGIC_WALL, 
 		/* 3400 */ O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, O_PLAYER_TAP_BLINK, 
 		/* 3500 */ O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, O_PLAYER_LEFT, 
 		/* 3600 */ O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, O_PLAYER_RIGHT, 
@@ -1187,12 +1187,12 @@ cave_copy_from_plck(GdCave *cave, const guint8 *data, int remaining_bytes, GdCav
 	/* c64 magic values (byte sequences)  0x20 0x90 0x46, also 0xa9 0x1c 0x85 */
 	if ((data[0x1e5]==0x20 && data[0x1e6]==0x90 && data[0x1e7]==0x46) || (data[0x1e5]==0xa9 && data[0x1e6]==0x1c && data[0x1e7]==0x85)) {
 		/* diego effects enabled. */
-		cave->bouncing_stone_to=bd1_import(data[0x1ea], 0x1ea);
-		cave->falling_diamond_to=bd1_import(data[0x1eb], 0x1eb);
+		cave->stone_bouncing_effect=bd1_import(data[0x1ea], 0x1ea);
+		cave->diamond_falling_effect=bd1_import(data[0x1eb], 0x1eb);
 		/* explosions: 0x1e was explosion 5, if this is set to default, we also do not read it,
 		  as in our engine this would cause an O_EXPLODE_5 to stay there. */
 		if (data[0x1ec]!=0x1e)
-			cave->explosion_to=bd1_import(data[0x1ec], 0x1ec);
+			cave->explosion_effect=bd1_import(data[0x1ec], 0x1ec);
 		/* pointer to element graphic.
 		   two bytes/column (one element), that is data[xxx]%16/2.
 		   also there are 16bytes/row.
@@ -1424,14 +1424,14 @@ cave_copy_from_1stb(GdCave *cave, const guint8 *data, int remaining_bytes)
 
 	cave->biter_delay_frame=data[0x394];
 	cave->magic_wall_stops_amoeba=data[0x395]==0;	/* negated!! */
-	cave->bomb_explode_to=firstboulder_import(data[0x396], 0x396);
-	cave->explosion_to=firstboulder_import(data[0x397], 0x397);
-	cave->bouncing_stone_to=firstboulder_import(data[0x398], 0x398);
-	cave->diamond_birth_to=firstboulder_import(data[0x399], 0x399);
+	cave->bomb_explosion_effect=firstboulder_import(data[0x396], 0x396);
+	cave->explosion_effect=firstboulder_import(data[0x397], 0x397);
+	cave->stone_bouncing_effect=firstboulder_import(data[0x398], 0x398);
+	cave->diamond_birth_effect=firstboulder_import(data[0x399], 0x399);
 	cave->magic_diamond_to=firstboulder_import(data[0x39a], 0x39a);
 
 	cave->bladder_converts_by=firstboulder_import(data[0x39b], 0x39b);
-	cave->falling_diamond_to=firstboulder_import(data[0x39c], 0x39c);
+	cave->diamond_falling_effect=firstboulder_import(data[0x39c], 0x39c);
 	cave->biter_eat=firstboulder_import(data[0x39d], 0x39d);
 	cave->slime_eats_1=firstboulder_import(data[0x39e], 0x39e);
 	cave->slime_converts_1=firstboulder_import(data[0x39e]+3, 0x39e);
@@ -1543,14 +1543,14 @@ cave_copy_from_crdr_7 (GdCave *cave, const guint8 *data, int remaining_bytes)
 	cave->creatures_backwards=data[0x1f]==0x2d;
 	cave->biter_delay_frame=data[0x24];
 	cave->magic_wall_stops_amoeba=data[0x25]==0;	/* negated!! */
-	cave->bomb_explode_to=crazydream_import_table[data[0x26]];
-	cave->explosion_to=crazydream_import_table[data[0x27]];
-	cave->bouncing_stone_to=crazydream_import_table[data[0x28]];
-	cave->diamond_birth_to=crazydream_import_table[data[0x29]];
+	cave->bomb_explosion_effect=crazydream_import_table[data[0x26]];
+	cave->explosion_effect=crazydream_import_table[data[0x27]];
+	cave->stone_bouncing_effect=crazydream_import_table[data[0x28]];
+	cave->diamond_birth_effect=crazydream_import_table[data[0x29]];
 	cave->magic_diamond_to=crazydream_import_table[data[0x2a]];
 
 	cave->bladder_converts_by=crazydream_import_table[data[0x2b]];
-	cave->falling_diamond_to=crazydream_import_table[data[0x2c]];
+	cave->diamond_falling_effect=crazydream_import_table[data[0x2c]];
 	cave->biter_eat=crazydream_import_table[data[0x2d]];
 	cave->slime_eats_1=crazydream_import_table[data[0x2e]];
 	cave->slime_converts_1=crazydream_import_table[data[0x2e]+3];
@@ -2045,14 +2045,14 @@ cave_copy_from_crli (GdCave *cave, const guint8 *data, int remaining_bytes)
 			}
 	cave->biter_delay_frame=uncompressed[0x394];
 	cave->magic_wall_stops_amoeba=uncompressed[0x395]==0;	/* negated!! */
-	cave->bomb_explode_to=import(uncompressed[0x396], 0x396);
-	cave->explosion_to=import(uncompressed[0x397], 0x397);
-	cave->bouncing_stone_to=import(uncompressed[0x398], 0x398);
-	cave->diamond_birth_to=import(uncompressed[0x399], 0x399);
+	cave->bomb_explosion_effect=import(uncompressed[0x396], 0x396);
+	cave->explosion_effect=import(uncompressed[0x397], 0x397);
+	cave->stone_bouncing_effect=import(uncompressed[0x398], 0x398);
+	cave->diamond_birth_effect=import(uncompressed[0x399], 0x399);
 	cave->magic_diamond_to=import(uncompressed[0x39a], 0x39a);
 
 	cave->bladder_converts_by=import(uncompressed[0x39b], 0x39b);
-	cave->falling_diamond_to=import(uncompressed[0x39c], 0x39c);
+	cave->diamond_falling_effect=import(uncompressed[0x39c], 0x39c);
 	cave->biter_eat=import(uncompressed[0x39d], 0x39d);
 	cave->slime_eats_1=import(uncompressed[0x39e], 0x39e);
 	cave->slime_converts_1=import(uncompressed[0x39e]+3, 0x39e);
@@ -2062,8 +2062,8 @@ cave_copy_from_crli (GdCave *cave, const guint8 *data, int remaining_bytes)
 	/* v3.0 has some new properties. */
 	if (version>=V3_0) {
 		cave->diagonal_movements=uncompressed[0x3a4]!=0;
-		cave->too_big_amoeba_to=import(uncompressed[0x3a6], 0x3a6);
-		cave->enclosed_amoeba_to=import(uncompressed[0x3a7], 0x3a7);
+		cave->amoeba_too_big_effect=import(uncompressed[0x3a6], 0x3a6);
+		cave->amoeba_enclosed_effect=import(uncompressed[0x3a7], 0x3a7);
 		/*
 			acid in crazy dream 8:
 			jsr $2500	; true random

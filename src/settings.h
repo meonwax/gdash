@@ -79,6 +79,11 @@ extern guint gd_gtk_key_fire_1;
 extern guint gd_gtk_key_fire_2;
 extern guint gd_gtk_key_suicide;
 
+/* html output option */
+char *gd_html_stylesheet_filename;
+char *gd_html_favicon_filename;
+
+
 #endif	/* only if having gtk */
 
 
@@ -135,6 +140,8 @@ extern gboolean gd_sdl_sound;
 extern gboolean gd_sdl_16bit_mixing;
 extern gboolean gd_sdl_44khz_mixing;
 extern gboolean gd_classic_sound;
+extern int gd_sound_chunks_volume_percent;
+extern int gd_sound_music_volume_percent;
 #endif	/* if gd_sound */
 
 

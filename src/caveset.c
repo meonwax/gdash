@@ -63,13 +63,13 @@ gd_caveset_properties[] = {
 	{"Lives", GD_TYPE_INT, 0, N_("Initial lives"), CAVESET_OFFSET(initial_lives), 1, N_("Number of lives you get at game start."), 3, 9},
 	{"Lives", GD_TYPE_INT, 0, N_("Maximum lives"), CAVESET_OFFSET(maximum_lives), 1, N_("Maximum number of lives you can have by collecting bonus points."), 3, 99},
 	{"BonusLife", GD_TYPE_INT, 0, N_("Bonus life score"), CAVESET_OFFSET(bonus_life_score), 1, N_("Number of points to collect for a bonus life."), 100, 5000},
-	
+
 	{"Story", GD_TYPE_LONGSTRING, 0, N_("Story"), CAVESET_OFFSET(story), 1, N_("Long description of the game.")},
 	{"Remark", GD_TYPE_LONGSTRING, 0, N_("Remark"), CAVESET_OFFSET(remark), 1, N_("Remark (informative).")},
-	
+
 	{"TitleScreen", GD_TYPE_LONGSTRING, GD_DONT_SHOW_IN_EDITOR, N_("Title screen"), CAVESET_OFFSET(title_screen), 1, N_("Title screen image")},
 	{"TitleScreenScroll", GD_TYPE_LONGSTRING, GD_DONT_SHOW_IN_EDITOR, N_("Title screen, scrolling"), CAVESET_OFFSET(title_screen_scroll), 1, N_("Scrolling background for title screen image")},
-	
+
 	{NULL},
 };
 
@@ -106,7 +106,7 @@ void
 gd_caveset_data_free(GdCavesetData *data)
 {
 	int i;
-	
+
 	/* free strings */
 	for (i=0; gd_caveset_properties[i].identifier!=NULL; i++)
 		if (gd_caveset_properties[i].type==GD_TYPE_LONGSTRING)
@@ -123,7 +123,7 @@ gd_caveset_data_free(GdCavesetData *data)
  * highscores saving in config dir
  *
  */
- 
+
 /* calculates an adler checksum, for which it uses all
    elements of all cave-rendereds. */
 static guint32
@@ -134,7 +134,7 @@ caveset_checksum()
 
 	for (iter=gd_caveset; iter!=NULL; iter=iter->next) {
 		GdCave *rendered;
-		
+
 		rendered=gd_cave_new_rendered(iter->data, 0, 0);	/* level=1, seed=0 */
 		gd_cave_adler_checksum_more(rendered, &a, &b);
 		gd_cave_free(rendered);
@@ -417,7 +417,7 @@ static GdElement brc_import_table[]=
 {
 	/* 0 */
 	O_SPACE, O_DIRT, O_BRICK, O_MAGIC_WALL, O_PRE_OUTBOX, O_OUTBOX, O_UNKNOWN, O_STEEL,
-	O_H_EXPANDING_WALL, O_H_EXPANDING_WALL /* scanned */, O_GUARD_1 /* scanned */, O_GUARD_1 /* scanned */, O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
+	O_H_EXPANDING_WALL, O_H_EXPANDING_WALL /* scanned */, O_FIREFLY_1 /* scanned */, O_FIREFLY_1 /* scanned */, O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
 	/* 1 */
 	O_BUTTER_1 /* scanned */, O_BUTTER_1 /* scanned */, O_BUTTER_1, O_BUTTER_2, O_BUTTER_3, O_BUTTER_4, O_PLAYER, O_PLAYER /* scanned */,
 	O_STONE, O_STONE /* scanned */, O_STONE_F, O_STONE_F /* scanned */, O_DIAMOND, O_DIAMOND /* scanned */, O_DIAMOND_F, O_DIAMOND_F /* scanned */,
@@ -434,7 +434,7 @@ static GdElement brc_import_table[]=
 	O_NONE /* bomb explosion utolso */, O_UNKNOWN, O_NONE /* solid bomb glued */, O_UNKNOWN, O_STONE_GLUED, O_UNKNOWN, O_DIAMOND_GLUED, O_UNKNOWN,
 	O_UNKNOWN, O_UNKNOWN, O_NONE, O_NONE, O_NONE, O_NONE, O_NONE, O_NONE,
 	/* 6 */
-	O_ALT_GUARD_1 /* scanned */, O_ALT_GUARD_1 /* scanned */, O_ALT_GUARD_1, O_ALT_GUARD_2, O_ALT_GUARD_3, O_ALT_GUARD_4, O_PLAYER_BOMB, O_PLAYER_BOMB /* scanned */,
+	O_ALT_FIREFLY_1 /* scanned */, O_ALT_FIREFLY_1 /* scanned */, O_ALT_FIREFLY_1, O_ALT_FIREFLY_2, O_ALT_FIREFLY_3, O_ALT_FIREFLY_4, O_PLAYER_BOMB, O_PLAYER_BOMB /* scanned */,
 	O_BOMB, O_BOMB_TICK_1, O_BOMB_TICK_2, O_BOMB_TICK_3, O_BOMB_TICK_4, O_BOMB_TICK_5, O_BOMB_TICK_6, O_BOMB_TICK_7,
 	/* 7 */
 	O_BOMB_TICK_7, O_BOMB_EXPL_1, O_BOMB_EXPL_2, O_BOMB_EXPL_3, O_BOMB_EXPL_4, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN,
@@ -444,10 +444,10 @@ static GdElement brc_import_table[]=
 static GdElement brc_effect_table[]=
 {
 	O_STEEL, O_DIRT, O_SPACE, O_STONE, O_STONE_F, O_STONE_GLUED, O_DIAMOND, O_DIAMOND_F, O_DIAMOND_GLUED, O_PRE_DIA_1,
-	O_PLAYER, O_PRE_PL_1, O_PLAYER_BOMB, O_PRE_OUTBOX, O_OUTBOX, O_GUARD_1, O_GUARD_2, O_GUARD_3, O_GUARD_4,
+	O_PLAYER, O_PRE_PL_1, O_PLAYER_BOMB, O_PRE_OUTBOX, O_OUTBOX, O_FIREFLY_1, O_FIREFLY_2, O_FIREFLY_3, O_FIREFLY_4,
 	O_BUTTER_1, O_BUTTER_2, O_BUTTER_3, O_BUTTER_4, O_BRICK, O_MAGIC_WALL, O_H_EXPANDING_WALL, O_V_EXPANDING_WALL, O_EXPANDING_WALL,
 	O_FALLING_WALL, O_FALLING_WALL_F, O_AMOEBA, O_SLIME, O_ACID, O_VOODOO, O_CLOCK, O_BOMB, O_UNKNOWN, O_UNKNOWN, O_UNKNOWN,
-	O_ALT_GUARD_1, O_ALT_GUARD_2, O_ALT_GUARD_3, O_ALT_GUARD_4, O_ALT_BUTTER_1, O_ALT_BUTTER_2, O_ALT_BUTTER_3, O_ALT_BUTTER_4,
+	O_ALT_FIREFLY_1, O_ALT_FIREFLY_2, O_ALT_FIREFLY_3, O_ALT_FIREFLY_4, O_ALT_BUTTER_1, O_ALT_BUTTER_2, O_ALT_BUTTER_3, O_ALT_BUTTER_4,
 	O_EXPLODE_1, O_BOMB_EXPL_1, O_UNKNOWN,
 };
 
@@ -470,7 +470,7 @@ brc_effect(guint8 byt)
 		g_warning("invalid element identifier for brc effect: %02x", byt);
 		return O_UNKNOWN;
 	}
-	
+
 	return brc_effect_table[byt];
 }
 
@@ -483,7 +483,7 @@ brc_import(guint8 *data)
 	/* we import 100 caves, and the put them in the correct order. */
 	GdCave *imported[100];
 	gboolean import_effect;
-	
+
 	g_assert(G_N_ELEMENTS(brc_color_table)==G_N_ELEMENTS(brc_color_table_comp));
 
 	gd_caveset_clear();
@@ -506,7 +506,7 @@ brc_import(guint8 *data)
 	for (level=0; level<5; level++) {
 		int cavenum;
 		int i;
-		
+
 		for (cavenum=0; cavenum<20; cavenum++) {
 			GdCave *cave;
 
@@ -520,7 +520,7 @@ brc_import(guint8 *data)
 				g_snprintf(cave->name, sizeof(GdString), "Cave %c/%d", 'A'+cavenum, level+1);
 			else
 				g_snprintf(cave->name, sizeof(GdString), "Intermission %d/%d", cavenum-15, level+1);
-			
+
 			/* fixed intermission caves; are smaller. */
 			if (cavenum>=16) {
 				cave->w=20;
@@ -550,14 +550,26 @@ brc_import(guint8 *data)
 				/* bonus time: 100 was added, so it could also be negative */
 				cave->level_bonus_time[i]=(int)data[11*c+datapos+1]-100;
 				cave->level_hatching_delay_frame[i]=data[10*c+datapos];
-				
+
 				/* this was not set in boulder remake. */
 				cave->level_speed[i]=150;
 			}
 			cave->diamond_value=data[2*c+datapos];
 			cave->extra_diamond_value=data[3*c+datapos];
-			/* brc amoeba: random(256)>=size specified in brc. */
-			/* prob: 1-(data/256) */
+			/* BRC PROBABILITIES */
+			/* a typical code example:
+				   46:if (random(slime*4)<4) and (tab[x,y+2]=0) then
+				      Begin tab[x,y]:=0;col[x,y+2]:=col[x,y];tab[x,y+2]:=27;mat[x,y+2]:=9;Voice4:=2;end;
+			   where slime is the byte loaded from the file as it is.
+			   pascal random function generates a random number between 0..limit-1, inclusive, for random(limit).
+			   
+			   so a random number between 0..limit*4-1 is generated.
+			   for limit=1, 0..3, which is always < 4, so P=1.
+			   for limit=2, 0..7, 0..7 is < 4 in P=50%.
+			   for limit=3, 0..11, is < 4 in P=33%.
+			   So the probability is exactly 100%/limit. 
+			   just make sure we do not divide by zero for some broken input.
+			*/
 			if (data[7*c+datapos]==0)
 				g_warning("amoeba growth cannot be zero, error at byte %d", data[7*c+datapos]);
 			else
@@ -567,9 +579,9 @@ brc_import(guint8 *data)
 			else
 				cave->amoeba_fast_growth_prob=1.0/data[8*c+datapos];
 			cave->slime_predictable=FALSE;
-			cave->slime_permeability=1-data[9*c+datapos]/256.0;
-			cave->acid_spread_ratio=1-data[10*c+datapos]/256.0;
-			cave->pushing_stone_prob=1.0/data[11*c+datapos];
+			cave->slime_permeability=1.0/data[9*c+datapos];
+			cave->acid_spread_ratio=1.0/data[10*c+datapos];
+			cave->pushing_stone_prob=1.0/data[11*c+datapos];	/* br only allowed values 1..8 in here, but works the same way. */
 			cave->magic_wall_stops_amoeba=data[12*c+datapos+1]!=0;
 			cave->intermission=cavenum>=16 || data[14*c+datapos+1]!=0;
 
@@ -584,18 +596,18 @@ brc_import(guint8 *data)
 			cave->color5=0x8af713;	/* fixed for slime */
 
 			if (import_effect) {
-				cave->enclosed_amoeba_to=brc_effect(data[14*c+datapos+1]);
-				cave->too_big_amoeba_to=brc_effect(data[15*c+datapos+1]);
-				cave->explosion_to=brc_effect(data[16*c+datapos+1]);
-				cave->bomb_explode_to=brc_effect(data[17*c+datapos+1]);
+				cave->amoeba_enclosed_effect=brc_effect(data[14*c+datapos+1]);
+				cave->amoeba_too_big_effect=brc_effect(data[15*c+datapos+1]);
+				cave->explosion_effect=brc_effect(data[16*c+datapos+1]);
+				cave->bomb_explosion_effect=brc_effect(data[17*c+datapos+1]);
 				/* 18 solid bomb explode to */
-				cave->diamond_birth_to=brc_effect(data[19*c+datapos+1]);
-				cave->bouncing_stone_to=brc_effect(data[20*c+datapos+1]);
-				cave->bouncing_diamond_to=brc_effect(data[21*c+datapos+1]);
+				cave->diamond_birth_effect=brc_effect(data[19*c+datapos+1]);
+				cave->stone_bouncing_effect=brc_effect(data[20*c+datapos+1]);
+				cave->diamond_bouncing_effect=brc_effect(data[21*c+datapos+1]);
 				cave->magic_diamond_to=brc_effect(data[22*c+datapos+1]);
 				cave->acid_eats_this=brc_effect(data[23*c+datapos+1]);
 				/* slime eats: (diamond,boulder,bomb), (diamond,boulder), (diamond,bomb), (boulder,bomb) */
-				cave->enclosed_amoeba_to=brc_effect(data[14*c+datapos+1]);
+				cave->amoeba_enclosed_effect=brc_effect(data[14*c+datapos+1]);
 			}
 		}
 	}
@@ -609,7 +621,7 @@ brc_import(guint8 *data)
 			GdCave *cave=imported[level*20+reorder[cavenum]];
 			gboolean only_dirt;
 			int x, y;
-			
+
 			/* check if cave contains only dirt. that is an empty cave, and do not import. */
 			only_dirt=TRUE;
 			for (y=1; y<cave->h-1 && only_dirt; y++)
@@ -624,9 +636,9 @@ brc_import(guint8 *data)
 				gd_cave_free(cave);
 		}
 	}
-	
+
 #if 0
-	/* debug TINGZ */	
+	/* debug TINGZ */
 	g_print("  [CAVEA] [CAVEB] [CAVEC]\n");
 	for (i=0; i<40; i++) {
 		int datapos=22;
@@ -648,7 +660,7 @@ caveset_name_set_from_filename(const char *filename)
 {
 	char *name;
 	char *c;
-	
+
 	/* make up a caveset name from the filename. */
 	name=g_path_get_basename(filename);
 	gd_strcpy(gd_caveset_data->name, name);
@@ -659,7 +671,7 @@ caveset_name_set_from_filename(const char *filename)
 	/* remove extension */
 	if ((c=strrchr (gd_caveset_data->name, '.'))!=NULL)
 		*c=0;
-}	
+}
 
 
 /* Load caveset from file.
@@ -709,7 +721,7 @@ gd_caveset_load_from_file (const char *filename, const char *configdir)
 	}
 	gd_error_set_context(NULL);
 
-	
+
 	if (g_str_has_suffix(filename, ".brc") || g_str_has_suffix(filename, "*.BRC")) {
 		brc_import((guint8 *) buf);
 		gd_caveset_edited=FALSE;	/* newly loaded cave is not edited */
@@ -840,7 +852,7 @@ gd_cave_check_replays(GdCave *cave, gboolean report, gboolean remove, gboolean r
 {
 	GList *riter;
 	int wrong=0;
-	
+
 	riter=cave->replays;
 	while (riter!=NULL) {
 		GdReplay *replay=(GdReplay *)riter->data;
@@ -848,15 +860,15 @@ gd_cave_check_replays(GdCave *cave, gboolean report, gboolean remove, gboolean r
 		GdCave *rendered;
 		GList *next=riter->next;
 
-		rendered=gd_cave_new_rendered(cave, replay->level, replay->seed);		
+		rendered=gd_cave_new_rendered(cave, replay->level, replay->seed);
 		checksum=gd_cave_adler_checksum(rendered);
 		gd_cave_free(rendered);
-		
+
 		replay->wrong_checksum=FALSE;
 		/* count wrong ones... the checksum might be changed later to "repair" */
 		if (replay->checksum!=0 && checksum!=replay->checksum)
 			wrong++;
-		
+
 		if (replay->checksum==0 || repair) {
 			/* if no checksum found, add one. or if repair requested, overwrite old one. */
 			replay->checksum=checksum;
@@ -864,7 +876,7 @@ gd_cave_check_replays(GdCave *cave, gboolean report, gboolean remove, gboolean r
 			/* if has a checksum, compare with this one. */
 			if (replay->checksum!=checksum) {
 				replay->wrong_checksum=TRUE;
-				
+
 				if (report)
 					g_warning("%s: replay played by %s at %s is invalid", cave->name, replay->player_name, replay->date);
 
@@ -875,14 +887,29 @@ gd_cave_check_replays(GdCave *cave, gboolean report, gboolean remove, gboolean r
 				}
 			}
 		}
-		
+
 		/* advance to next list item which we remembered. the current one might have been deleted */
 		riter=next;
 	}
-	
+
 	return wrong;
 }
 
 
 
+gboolean gd_caveset_has_replays()
+{
+	GList *citer;
+
+	/* for all caves */
+	for (citer=gd_caveset; citer!=NULL; citer=citer->next) {
+		GdCave *cave=(GdCave *)citer->data;
+
+		if (cave->replays)
+			return TRUE;
+	}
+
+	/* if neither of the caves had a replay, */
+	return FALSE;
+}
 

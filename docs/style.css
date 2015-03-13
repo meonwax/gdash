@@ -1,0 +1,54 @@
+* {
+    border: 0;
+    text-decoration: none;
+    font: sans-serif;
+}
+
+body {
+    background: url(background.png);
+    font: 13px/18px sans-serif;
+    color: #222;
+    margin: 1em;
+    width: 800px;
+}
+
+a { color: #5555aa; }
+a:hover { color: #e33939; }
+
+h1 {
+    background: url(gdash.png) no-repeat left center;
+    padding: 0 0 0 56px; 
+    color: #222;
+    font: 36px/48px sans-serif;
+    font-weight: bold;
+}
+
+h2 {
+    margin-top: 2em;
+    margin-bottom: 0.5em;
+}
+
+div.command {
+    margin: 0.25em 4em 0.5em 4em;
+    padding: 0.5em;
+    font: 13px monospace;
+    border: 1px #222 solid;
+}
+
+dl.param {
+    margin-left: 4em;
+}
+
+dt.param {
+    font: 13px monospace;
+}
+
+span.param {
+    font: 13px monospace;
+}
+
+div.center {
+    text-align: center;
+    padding: 1em;
+}
+

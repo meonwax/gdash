@@ -61,6 +61,9 @@ static Mix_Chunk *sounds[GD_S_MAX];
 static gboolean mixer_started=FALSE;
 static GdSound snd_playing[5];
 static Mix_Music *music=NULL;
+
+static int chunk_volumes=MIX_MAX_VOLUME;
+static int music_volume=MIX_MAX_VOLUME;
 #endif
 
 #ifdef GD_SOUND
@@ -70,6 +73,30 @@ sound_playing(int channel)
 	return snd_playing[channel];
 }
 #endif
+
+void
+gd_sound_set_music_volume(int percent)
+{
+#ifdef GD_SOUND
+	music_volume=MIX_MAX_VOLUME*percent/100;
+	Mix_VolumeMusic(music_volume);
+#endif
+}
+
+void
+gd_sound_set_chunk_volumes(int percent)
+{
+#ifdef GD_SOUND
+	int i;
+	
+	chunk_volumes=MIX_MAX_VOLUME*percent/100;
+	
+	for (i=0; i<G_N_ELEMENTS(sounds); i++) {
+		if (sounds[i]!=NULL)
+			Mix_VolumeChunk(sounds[i], chunk_volumes);
+	}
+#endif
+}
 
 #ifdef GD_SOUND
 static void
@@ -91,6 +118,8 @@ loadsound(GdSound which, const char *filename)
 	sounds[which]=Mix_LoadWAV(full_filename);
 	if (sounds[which]==NULL)
 		g_warning("%s: %s", filename, Mix_GetError());
+	else
+		Mix_VolumeChunk(sounds[which], chunk_volumes);
 }
 #endif
 
@@ -158,7 +187,7 @@ play_sound(int channel, GdSound sound)
 
 
 gboolean
-gd_sound_init()
+gd_sound_init(unsigned int bufsize)
 {
 #ifdef GD_SOUND
 	int i;
@@ -166,7 +195,10 @@ gd_sound_init()
 	for (i=0; i<G_N_ELEMENTS(snd_playing); i++)
 		snd_playing[i]=GD_S_NONE;
 	
-	if(Mix_OpenAudio(gd_sdl_44khz_mixing?44100:22050, gd_sdl_16bit_mixing?AUDIO_S16:AUDIO_U8, 1, 1024)==-1) {
+	/* default buffer size. */
+	if (bufsize==0)
+		bufsize=1024;
+	if(Mix_OpenAudio(gd_sdl_44khz_mixing?44100:22050, gd_sdl_16bit_mixing?AUDIO_S16:AUDIO_U8, 2, bufsize)==-1) {
 		g_warning("%s", Mix_GetError());
 		return FALSE;
 	}
@@ -328,8 +360,10 @@ gd_music_play_random()
 	music=Mix_LoadMUS(g_ptr_array_index(music_filenames, g_random_int_range(0, music_filenames->len)));
 	if (!music)
 		g_warning("%s", SDL_GetError());
-	if (music)
+	if (music) {
+		Mix_VolumeMusic(music_volume);
 		Mix_PlayMusic(music, -1);
+	}
 #endif
 }
 

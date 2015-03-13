@@ -174,6 +174,7 @@ gd_wrap_text(const char *orig, int width)
 	char **lines;
 	int l;
 	
+	g_assert(orig!=NULL);
 	wrapped=g_string_new(NULL);
 	lines=g_strsplit_set(orig, "\n", -1);
 	for (l=0; lines[l]!=NULL; l++) {
@@ -209,6 +210,19 @@ gd_wrap_text(const char *orig, int width)
 	return g_string_free(wrapped, FALSE);
 }
 
+int
+gd_lines_in_text(const char *text)
+{
+	int lines, i;
+	
+	g_assert(text!=NULL);
+	lines=0;
+	for (i=0; text[i]!=0; i++)
+		if (text[i]=='\n')
+			lines++;
+	
+	return lines+1;
+}
 
 /* return current date in 2008-12-04 format */
 const char *

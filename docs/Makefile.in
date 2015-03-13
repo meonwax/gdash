@@ -88,6 +88,8 @@ LDFLAGS = @LDFLAGS@
 LIBICONV = @LIBICONV@
 LIBINTL = @LIBINTL@
 LIBOBJS = @LIBOBJS@
+LIBPNG_CFLAGS = @LIBPNG_CFLAGS@
+LIBPNG_LIBS = @LIBPNG_LIBS@
 LIBS = @LIBS@
 LTLIBICONV = @LTLIBICONV@
 LTLIBINTL = @LTLIBINTL@
@@ -167,7 +169,11 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-EXTRA_DIST = c64_internals.txt ckdelay.xls cd7_speeds.xls ckdelay.txt brc_format.txt
+EXTRA_DIST = \
+	c64_internals.txt ckdelay.xls cd7_speeds.xls ckdelay.txt brc_format.txt \
+	cave_style.css background.png \
+	replay_to_avi.html style.css gdash.png avidemux_codec.png avidemux_fps.png
+
 all: all-am
 
 .SUFFIXES:
