@@ -27,6 +27,7 @@
 #include "config.h"
 
 #include <stdexcept>
+#include <algorithm>
 
 
 class CaveMapFuncs {
