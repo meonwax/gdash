@@ -27,6 +27,8 @@
 #include <SDL_opengl.h>
 
 #include <glib.h>
+#include <string>
+#include <vector>
 #include "sdl/sdlabstractscreen.hpp"
 
 class SDLNewOGLScreen: public SDLAbstractScreen {
