@@ -2,6 +2,8 @@
 
 localedir = $(datadir)/locale
 
+AUTOMAKE_OPTIONS = subdir-objects
+
 DEFS = -DLOCALEDIR=\"$(localedir)\" -DPKGDATADIR=\"$(pkgdatadir)\" @DEFS@
 
 INCLUDES = -I$(top_srcdir)/include

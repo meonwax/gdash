@@ -29,7 +29,7 @@ AC_FUNC_MEMCMP
 AC_FUNC_MALLOC
 AC_TYPE_UINT32_T
 
-AM_PATH_GLIB_2_0(2.12.0, :, AC_MSG_ERROR(Test for GLIB failed. See the file 'INSTALL' for help.), gthread)
+PKG_CHECK_MODULES([GLIB], [glib-2.0])
 
 
 dnl
@@ -52,7 +52,7 @@ dnl this conditional must ALWAYS be run, not inside the if below.
 AM_CONDITIONAL(GTK, test x"$with_gtk" = "xyes")
 if test x"$with_gtk" = "xyes" ; then
   AC_DEFINE(HAVE_GTK,,[Use GTK.])
-  AM_PATH_GTK_2_0(2.12.0, :, AC_MSG_ERROR(Test for GTK+ failed. See the file 'INSTALL' for help.))
+  PKG_CHECK_MODULES([GTK], [gtk+-2.0])
 else
   GTK_CFLAGS=""
   GTK_LIBS=""

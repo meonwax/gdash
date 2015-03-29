@@ -4,7 +4,6 @@ SUBDIRS = po include src caves docs sound music shaders
 
 ACLOCAL_AMFLAGS = -Im4
 
-
 desktopdir = $(datadir)/applications
 desktop_DATA = gdash.desktop
 
