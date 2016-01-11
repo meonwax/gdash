@@ -11,3 +11,7 @@ GDash has a cave editor, supports sound, joystick and keyboard controls. It can 
 ## License ##
 
 The game is licensed under MIT license terms. See the COPYING file in the source tree.
+
+## Ports ##
+
+GDash has an unofficial [Pandora port](http://repo.openpandora.org/?page=detail&app=gdash).
