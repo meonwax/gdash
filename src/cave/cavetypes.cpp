@@ -402,10 +402,11 @@ bool read_from_string(const std::string &s, GdInt &i) {
     std::istringstream is(s);
     /* was saved as a normal int */
     int read;
-    bool success = (is >> read);
-    if (success)
+    if (is >> read) {
         i = read;
-    return success;
+        return true;
+    }
+    return false;
 }
 
 
